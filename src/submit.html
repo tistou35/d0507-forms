@@ -1,0 +1,294 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ส่งฟอร์ม — D-0507 Flight Training</title>
+<meta name="robots" content="noindex">
+<style>@@CSS@@
+.wrap{max-width:760px;margin:0 auto;padding:32px 20px 60px;display:flex;flex-direction:column;gap:22px}
+.fh{border:1px solid var(--border-light);border-radius:8px;overflow:hidden;background:var(--surface)}
+.fh .top{background:var(--navy-900);color:#fff;padding:16px 18px;text-align:center}
+.fh .top .o{font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.72}
+.fh .top h1{font-size:19px;font-weight:700;margin-top:4px;color:#fff;line-height:1.3}
+.fh .meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));background:var(--g-50);
+  font-family:var(--font-mono);font-size:11.5px}
+.fh .meta div{padding:9px 15px;border-right:1px solid var(--g-100)}
+.fh .meta div:last-child{border-right:0}
+.fh .meta span{display:block;color:var(--g-400);font-size:10px;letter-spacing:.09em;text-transform:uppercase}
+.fh .meta b{font-weight:700;color:var(--navy-900)}
+.fld{background:var(--surface);border:1px solid var(--border-light);border-radius:8px;padding:20px}
+.fld > label{font-size:14.5px;font-weight:600;font-family:var(--font-sans);display:block}
+.fld .hint{font-size:12.5px;color:var(--g-500);margin:3px 0 13px;line-height:1.55}
+.fld input,.fld textarea{width:100%;min-height:48px;border:1px solid var(--border-med);border-radius:8px;
+  padding:11px 13px;font-size:15px;font-family:var(--font-sans)}
+.fld textarea{min-height:110px;resize:vertical;line-height:1.6}
+.req{color:var(--red-500)}
+.opt2{display:flex;align-items:center;gap:13px;min-height:60px;padding:10px 14px;border-radius:8px;
+  border:1px solid var(--border-light);margin-bottom:9px;cursor:pointer;background:var(--surface);width:100%;
+  text-align:left;font-family:var(--font-sans)}
+.opt2:hover{border-color:var(--sky-500)}
+.opt2[aria-pressed="true"]{border-color:var(--sky-500);border-width:2px;background:var(--sky-100)}
+.opt2 .av2{width:38px;height:38px;border-radius:50%;background:var(--navy-900);color:#fff;
+  font-family:var(--font-display);font-weight:700;font-size:12.5px;display:grid;place-items:center;flex:none}
+.opt2[aria-pressed="true"] .av2{background:var(--sky-600)}
+.opt2 .nm2{font-size:14.5px;font-weight:600;line-height:1.3;display:block}
+.opt2 .rl2{font-size:12px;color:var(--g-500)}
+.opt2 .tk{margin-left:auto;color:var(--sky-600);font-size:18px}
+.sub{min-height:52px;border-radius:8px;border:0;background:var(--navy-900);color:#fff;font-weight:700;
+  font-size:15.5px;cursor:pointer;font-family:var(--font-sans);width:100%}
+.sub:disabled{background:var(--g-200);color:var(--g-500);cursor:not-allowed}
+/* หน้ารับเรื่อง */
+.rcpt{background:var(--surface);border:1px solid var(--border-light);border-radius:12px;padding:34px 28px 26px;
+  box-shadow:var(--sh-lg);text-align:center}
+.rcpt .chk{width:76px;height:76px;border-radius:50%;background:var(--green-100);display:grid;place-items:center;margin:0 auto 20px}
+.rcpt .chk svg{width:36px;height:36px;color:var(--green-600)}
+.rcpt h2{font-size:24px;font-weight:700;line-height:1.25}
+.trk{border:1px dashed var(--border-med);border-radius:8px;background:var(--g-50);padding:14px 18px;
+  display:flex;align-items:center;gap:14px;text-align:left;flex-wrap:wrap;margin-top:20px}
+.trk .l{font-size:12.5px;color:var(--g-500)}
+.trk .v{font-family:var(--font-mono);font-size:18px;color:var(--navy-900)}
+.sentbox{background:var(--sky-100);border-radius:8px;padding:15px 18px;display:flex;align-items:center;gap:14px;
+  text-align:left;margin-top:13px}
+.sentbox .av2{width:44px;height:44px;border-radius:50%;background:var(--navy-900);color:#fff;
+  font-family:var(--font-display);font-weight:700;font-size:13px;display:grid;place-items:center;flex:none}
+.racts{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.racts button,.racts a{min-height:48px;border-radius:8px;font-size:14.5px;font-weight:600;cursor:pointer;
+  font-family:var(--font-sans);padding:0 20px;flex:1;display:flex;align-items:center;justify-content:center;
+  gap:9px;text-decoration:none}
+.racts .sec{border:1px solid var(--border-med);background:var(--surface);color:var(--navy-900)}
+.racts .pri{border:0;background:var(--navy-900);color:#fff}
+@media print{.racts,.topbar,footer{display:none}}
+</style>
+</head><body>
+
+<div class="topbar">
+  <div class="brand">
+    <svg viewBox="0 0 320 72" fill="none" role="img" aria-label="D0507 Flight Training">
+      <g transform="translate(8,12)"><path d="M4 28 L44 20 L52 22 L44 26 L48 36 L40 34 L36 28 Z" fill="#fff"/>
+      <path d="M18 24 L44 20 L40 34 L22 30 Z" fill="#4A90D9"/><path d="M4 28 L14 22 L16 26 L8 30 Z" fill="#4A90D9"/></g>
+      <text x="70" y="36" font-family="'Arial Narrow',Arial,sans-serif" font-size="28" font-weight="800" letter-spacing="-0.5" fill="#fff">D0507</text>
+      <text x="71" y="54" font-family="'Arial Narrow',Arial,sans-serif" font-size="14" font-weight="600" letter-spacing="4" fill="#4A90D9">FLIGHT TRAINING</text>
+    </svg>
+    <span class="div"></span><span><span class="nm">ส่งฟอร์ม</span><span class="en">Submit</span></span>
+  </div>
+  <div class="tright">
+    <a class="acct" href="@@BASE@@student/" style="padding:0 16px">
+      <span class="who"><b>← ฟอร์มนักเรียน</b><span>Back</span></span></a>
+  </div>
+</div>
+
+<main class="wrap">
+  <div id="app"><p class="note">กำลังเตรียมฟอร์ม…</p></div>
+</main>
+
+<footer>D-0507 Flight Training Co., Ltd. · ระบบฟอร์มออนไลน์</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+"use strict";
+const CFG = @@FBCFG@@;
+const PUB = @@REGPUB@@;
+firebase.initializeApp(CFG);
+const db = firebase.firestore();
+const auth = firebase.auth();
+
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g,
+  c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const $ = id => document.getElementById(id);
+const app = $('app');
+
+const code = new URLSearchParams(location.search).get('f') || '';
+const FORM = PUB.forms.find(f => f.abbr === code || f.doc === code);
+const initials = n => (n || '?').trim().split(/\s+/).map(x => x[0]).join('').slice(0, 2).toUpperCase();
+
+let PICKED = null, INSTRUCTORS = [], READY = false;
+
+function fail(title, detail) {
+  app.innerHTML = `<div class="warn"><b>${esc(title)}</b><br>${detail}</div>
+    <p style="margin-top:14px"><a href="@@BASE@@student/">← กลับไปหน้าฟอร์มนักเรียน</a></p>`;
+}
+
+if (!FORM) {
+  fail('ไม่พบฟอร์มนี้', 'ลิงก์อาจไม่ถูกต้อง กรุณาเลือกฟอร์มจากหน้าฟอร์มนักเรียนอีกครั้ง');
+} else if (!FORM.assignTo) {
+  fail('ฟอร์มนี้ไม่ได้ส่งผ่านระบบนี้',
+       `${esc(FORM.th || FORM.t)} กรอกได้ที่ระบบเดิมโดยตรง — กลับไปกดจากหน้าฟอร์มนักเรียน`);
+} else {
+  start();
+}
+
+async function start() {
+  // ตัวเลือกผู้รับ — อ่านจาก publicDirectory/instructors (อ่านได้ทั้งโลก มีแค่ชื่อกับตำแหน่ง)
+  try {
+    const d = await db.collection('publicDirectory').doc('instructors').get();
+    const all = (d.exists && Array.isArray(d.data().list)) ? d.data().list : [];
+    // แสดงเฉพาะคนที่รับฟอร์มประเภทนี้ได้ — SEF ส่งถึง CMM, APF ส่งถึง ACM ไม่ใช่ครูทุกคน
+    INSTRUCTORS = all.filter(i => Array.isArray(i.recv) && i.recv.includes(FORM.assignTo));
+  } catch (e) { INSTRUCTORS = []; }
+
+  // ต้องเปิด Anonymous Auth ใน Firebase Console ก่อน ระบบจึงจะส่งฟอร์มได้
+  try {
+    if (!auth.currentUser) await auth.signInAnonymously();
+    READY = true;
+  } catch (e) { READY = false; }
+
+  renderForm();
+}
+
+function renderForm() {
+  const blocked = !READY || !INSTRUCTORS.length;
+  app.innerHTML = `
+    <div class="fh">
+      <div class="top"><p class="o">D-0507 Flight Training Co., Ltd.</p>
+        <h1>${esc(FORM.th || FORM.t)}</h1></div>
+      <div class="meta">
+        <div><span>Doc code</span><b>${esc(FORM.doc || FORM.abbr)}</b></div>
+        <div><span>ส่งถึง</span><b>${esc(FORM.assignTo)}</b></div>
+        <div><span>วันที่</span><b id="dnow">—</b></div>
+      </div>
+    </div>
+
+    ${blocked ? `<div class="warn"><b>ยังส่งฟอร์มผ่านระบบนี้ไม่ได้</b><br>
+      ${!READY ? 'ยังไม่ได้เปิด Anonymous Authentication ใน Firebase Console' : ''}
+      ${!READY && !INSTRUCTORS.length ? ' · ' : ''}
+      ${!INSTRUCTORS.length ? 'ยังไม่มีผู้รับที่รับฟอร์มประเภท ' + esc(FORM.assignTo) + ' ใน publicDirectory/instructors' : ''}
+      <br>ระหว่างนี้กรอกที่ระบบเดิมได้ตามปกติ — ดู <span class="mono">firebase/README.md</span> ในโปรเจกต์
+      </div>` : ''}
+
+    <div class="fld">
+      <label for="nm">ชื่อ–นามสกุลของคุณ <span class="req">*</span></label>
+      <p class="hint">ใช้ชื่อตามที่ลงทะเบียนไว้กับโรงเรียน เพื่อให้ครูจับคู่ได้ถูกคน</p>
+      <input id="nm" type="text" autocomplete="name" placeholder="เช่น ธนกฤต ว.">
+    </div>
+
+    <div class="fld">
+      <label for="em">อีเมลของคุณ <span class="req">*</span></label>
+      <p class="hint">ระบบจะส่งสำเนาฟอร์มฉบับนี้ไปให้ เพื่อบันทึกเป็น PDF หรือพิมพ์เก็บไว้</p>
+      <input id="em" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com">
+    </div>
+
+    <div class="fld">
+      <label>ผู้รับฟอร์ม <span class="req">*</span></label>
+      <p class="hint">ระบบจะส่งฟอร์มนี้เข้าคิวงานของคนที่คุณเลือก · แสดงเฉพาะผู้ที่รับฟอร์มประเภทนี้ได้</p>
+      <div id="picks">${
+        INSTRUCTORS.length
+          ? INSTRUCTORS.map(i => `<button class="opt2" type="button" data-id="${esc(i.id)}"
+              aria-pressed="false"><span class="av2">${esc(initials(i.name))}</span>
+              <span><span class="nm2">${esc(i.name)}</span><span class="rl2">${esc(i.role || '')}</span></span>
+              <span class="tk" aria-hidden="true"></span></button>`).join('')
+          : `<p class="hint">— ยังไม่มีรายชื่อ —</p>` }</div>
+    </div>
+
+    <div class="fld">
+      <label for="nt">รายละเอียดเพิ่มเติม</label>
+      <p class="hint">ระบุเที่ยวบิน บทเรียน หรือสิ่งที่อยากให้ครูทราบ · ช่องกรอกครบตามแบบฟอร์มจริงจะเพิ่มในขั้นถัดไป</p>
+      <textarea id="nt" placeholder="เช่น บิน Lesson L-14 เวลา 13:00 · นอนพักผ่อน 6.5 ชม."></textarea>
+    </div>
+
+    <div class="warn"><b>สำเนาที่คุณได้รับเป็นหลักฐานส่วนตัว ไม่ใช่ฉบับควบคุม</b> —
+    ฉบับที่นับเป็นบันทึกตามคู่มือคือฉบับที่เจ้าหน้าที่ลงนามแล้ว</div>
+
+    <button class="sub" id="go" ${blocked ? 'disabled' : ''}>ส่งฟอร์ม</button>`;
+
+  const n = new Date();
+  $('dnow').textContent = String(n.getDate()).padStart(2, '0') + ' ' +
+    ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][n.getMonth()] + ' ' + n.getFullYear();
+
+  document.querySelectorAll('.opt2').forEach(b => b.addEventListener('click', () => {
+    PICKED = INSTRUCTORS.find(i => i.id === b.dataset.id) || null;
+    document.querySelectorAll('.opt2').forEach(x => {
+      const on = x === b;
+      x.setAttribute('aria-pressed', on);
+      x.querySelector('.tk').textContent = on ? '✓' : '';
+    });
+  }));
+  if ($('go')) $('go').addEventListener('click', submit);
+}
+
+function trackingNo() {
+  const n = new Date(), p = x => String(x).padStart(2, '0');
+  const rnd = Math.floor(Math.random() * 900 + 100);
+  return `${FORM.abbr}-${n.getFullYear()}-${p(n.getMonth() + 1)}${p(n.getDate())}-${rnd}`;
+}
+
+async function submit() {
+  const name = $('nm').value.trim(), email = $('em').value.trim(), note = $('nt').value.trim();
+  if (!name)  return alert('กรุณากรอกชื่อ–นามสกุล');
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return alert('กรุณากรอกอีเมลให้ถูกต้อง');
+  if (!PICKED) return alert('กรุณาเลือกผู้รับฟอร์ม');
+
+  const btn = $('go'); btn.disabled = true; btn.textContent = 'กำลังส่ง…';
+  const trk = trackingNo();
+
+  try {
+    const ref = db.collection('submissions').doc();
+    await ref.set({
+      formCode: FORM.abbr,
+      status: 'awaiting-assignee',
+      byPublic: true,
+      assigneeUid: PICKED.id,
+      tracking: trk,
+      submitterName: name,
+      submitterEmail: email,
+      note: note,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+
+    // งานเข้าคิวของผู้รับ · ปุ่ม "ไม่ใช่นักเรียนของฉัน" อยู่ฝั่งเจ้าหน้าที่
+    await db.collection('tasks').add({
+      assigneeUid: PICKED.id, subId: ref.id, formCode: FORM.abbr,
+      tracking: trk, state: 'open', app: 'forms',
+      title: `${FORM.th || FORM.t} — จาก ${name}`,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+
+    // คิวอีเมล — Trigger Email extension จะหยิบไปส่ง (ถ้ายังไม่ติดตั้งจะค้างไว้เฉย ๆ)
+    await db.collection('mail').add({
+      to: [email],
+      message: {
+        subject: `[D-0507] ${FORM.th || FORM.t} — ${trk}`,
+        text: [
+          `เรียน ${name}`, '',
+          `ได้รับ${FORM.th || FORM.t}ของท่านเรียบร้อยแล้ว`,
+          `เลขที่: ${trk}`,
+          `ส่งถึง: ${PICKED.name} (${PICKED.role || ''})`,
+          note ? `รายละเอียด: ${note}` : '',
+          '',
+          'สำเนาฉบับนี้เป็นหลักฐานส่วนตัวของท่าน ไม่ใช่เอกสารควบคุม',
+          'ฉบับที่นับเป็นบันทึกตามคู่มือคือฉบับที่เจ้าหน้าที่ลงนามแล้ว',
+          '', 'D-0507 Flight Training Co., Ltd.',
+        ].filter(Boolean).join('\n'),
+      },
+    });
+
+    receipt(trk, name, email);
+  } catch (e) {
+    btn.disabled = false; btn.textContent = 'ส่งฟอร์ม';
+    alert('ส่งไม่สำเร็จ: ' + e.message + '\n\nกรุณาลองใหม่ หรือกรอกที่ระบบเดิม');
+  }
+}
+
+function receipt(trk, name, email) {
+  app.innerHTML = `<div class="rcpt">
+    <span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"
+      stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l5 5L19.5 7"/></svg></span>
+    <h2>ส่งฟอร์มเรียบร้อยแล้ว</h2><span class="en">Submitted successfully</span>
+    <div class="trk"><span><span class="l">เลขที่ · Tracking no.</span><br><span class="v">${esc(trk)}</span></span>
+      <button class="sec" style="min-height:40px;border:1px solid var(--border-med);border-radius:8px;
+        background:#fff;padding:0 16px;margin-left:auto;cursor:pointer"
+        onclick="navigator.clipboard&&navigator.clipboard.writeText('${esc(trk)}');this.textContent='คัดลอกแล้ว'">คัดลอก</button></div>
+    <div class="sentbox"><span class="av2">${esc(initials(PICKED.name))}</span>
+      <span><span style="font-size:14.5px">ส่งถึง <b>${esc(PICKED.name)}</b></span><br>
+      <span style="font-size:12.5px;color:var(--g-600)">${esc(PICKED.role || '')} — รอเจ้าหน้าที่ตรวจและลงนาม</span></span></div>
+    <div class="sentbox" style="background:#f3fbf6">
+      <span><span style="font-size:14px">ส่งสำเนาไปที่</span><br>
+      <span class="mono" style="font-size:12.5px;color:var(--green-600)">${esc(email)}</span><br>
+      <span style="font-size:12.5px;color:var(--g-600)">เปิดอีเมลแล้วบันทึกเป็น PDF หรือสั่งพิมพ์เก็บไว้ได้</span></span></div>
+    <div class="racts">
+      <button class="sec" onclick="window.print()">พิมพ์หน้านี้</button>
+      <a class="pri" href="@@BASE@@student/">เสร็จสิ้น</a>
+    </div>
+  </div>`;
+}
+</script>
+</body></html>

@@ -1,0 +1,112 @@
+rules_version = '2';
+
+// ============================================================
+// D-0507 — Firestore Security Rules
+// โปรเจกต์ d0507-audit (ใช้ร่วมกัน 2 แอป: d0507-audit + d0507-forms)
+//
+// ⚠️ Rules ผูกกับ "โปรเจกต์" ไม่ใช่กับแอปที่เรียก
+//    แยกสิทธิ์ตาม "บทบาทของผู้ใช้" ไม่ใช่ตาม "แอปไหนเรียกมา"
+//
+// ก่อนวางจริง: ทดสอบด้วย emulator ก่อนเสมอ
+//   firebase emulators:start --only firestore
+// ============================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── รายชื่อทีม ─────────────────────────────────────────
+    // เพิ่ม/ลบคนที่นี่ (ต้องตรงกับ Storage rules ของ d0507-audit ด้วย)
+    function staffEmails() {
+      return [
+        'tistou35@gmail.com'
+      ];
+    }
+    function signedIn()  { return request.auth != null; }
+    function staff()     { return signedIn() && request.auth.token.email in staffEmails(); }
+    function isSelf(uid) { return signedIn() && request.auth.uid == uid; }
+    // ผู้ใช้ที่ยังไม่ได้ยืนยันตัวตน — ฝั่งนักเรียนที่ล็อกอินแบบ anonymous
+    function anon()      { return signedIn() && request.auth.token.firebase.sign_in_provider == 'anonymous'; }
+
+    // ════════════════════════════════════════════════════════
+    //  ของเดิม — d0507-audit  (อย่าแก้โดยไม่คุยกับ session นั้น)
+    // ════════════════════════════════════════════════════════
+    match /audits/{aid} {
+      allow read, write: if staff();
+      match /items/{itemId} { allow read, write: if staff(); }
+    }
+    match /plans/{year}    { allow read, write: if staff(); }
+    match /library/{proj}  { allow read, write: if staff(); }
+
+    // ════════════════════════════════════════════════════════
+    //  ใช้ร่วมสองแอป
+    // ════════════════════════════════════════════════════════
+
+    // โปรไฟล์ + บทบาท · ผู้ใช้แก้ role ตัวเองไม่ได้
+    match /users/{uid} {
+      allow read:  if isSelf(uid) || staff();
+      allow write: if staff();
+    }
+
+    // รายชื่อครูสำหรับตัวเลือกฝั่งนักเรียน
+    // เอกสารนี้อ่านได้ทั้งโลก → ใส่ได้แค่ ชื่อ + ตำแหน่ง ห้ามมีอีเมลหรือเบอร์โทร
+    match /publicDirectory/{doc} {
+      allow read:  if true;
+      allow write: if staff();
+    }
+
+    // ════════════════════════════════════════════════════════
+    //  d0507-forms
+    // ════════════════════════════════════════════════════════
+
+    // นิยามฟอร์ม — อ่านได้ทั้งโลก (หน้าสาธารณะต้องใช้) แก้ได้เฉพาะเจ้าหน้าที่
+    match /formDefs/{formCode} {
+      allow read:  if true;
+      allow write: if staff();
+    }
+
+    function newSubmissionOk() {
+      let d = request.resource.data;
+      return d.keys().hasAll(['formCode', 'status', 'byPublic', 'assigneeUid', 'createdAt'])
+          && d.byPublic == true
+          && d.status == 'awaiting-assignee'
+          && d.assigneeUid is string && d.assigneeUid.size() > 0
+          && d.formCode is string && d.formCode.size() <= 40
+          && d.createdAt == request.time
+          // กันยัดข้อมูลก้อนใหญ่จากหน้าสาธารณะ
+          && d.keys().size() <= 12;
+    }
+
+    match /submissions/{subId} {
+      // ฝั่งนักเรียนเขียนได้อย่างเดียว อ่านของใครไม่ได้เลย รวมทั้งของตัวเอง
+      allow create: if staff() || (anon() && newSubmissionOk());
+      allow read:   if staff();
+      allow update: if staff();
+      allow delete: if false;
+
+      // log แบบ append-only — แก้ไม่ได้ ลบไม่ได้
+      match /events/{eventId} {
+        allow create: if signedIn();
+        allow read:   if staff();
+        allow update, delete: if false;
+      }
+    }
+
+    // คิวงานรวมทุกแอป — ผู้รับผิดชอบเห็นของตัวเอง
+    match /tasks/{taskId} {
+      allow read:   if staff();
+      allow create: if staff() || anon();   // ฟอร์มสาธารณะสร้าง task ให้ครูได้
+      allow update: if staff();
+      allow delete: if false;
+    }
+
+    // คิวอีเมล — Trigger Email extension อ่านไปส่ง
+    // เขียนได้อย่างเดียว อ่านไม่ได้ ไม่งั้นดึงอีเมลคนอื่นได้
+    match /mail/{mailId} {
+      allow create: if signedIn();
+      allow read, update, delete: if false;
+    }
+
+    // ปิดทุกอย่างที่ไม่ได้ระบุไว้
+    match /{document=**} { allow read, write: if false; }
+  }
+}

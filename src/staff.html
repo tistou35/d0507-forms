@@ -112,10 +112,12 @@
         <div class="sh"><h2>ระบบเชื่อมโยง</h2><span class="en">Connected systems</span>
           <span class="rt">ฟอร์มบางใบอยู่ในระบบอื่นที่ใช้งานอยู่แล้ว — เปิดจากที่นี่ได้</span></div>
         <div class="sys" id="sysgrid"></div>
-        <p class="warn" style="margin-top:14px"><b>ยังต้องยืนยันรายใบ</b> —
-        ฟอร์มที่ติดป้าย <span class="tag warn">ต้องยืนยัน</span> ทะเบียนระบุว่าชี้ไป Jotform
-        แต่น่าจะใช้งานจริงอยู่ในระบบภายนอก ถ้ายืนยันแล้วว่าอยู่ระบบอื่นจริง แปลว่า LEF ในคู่มือชี้ผิดที่
-        และถ้าใช้ทั้งสองที่พร้อมกัน = ฟอร์มควบคุมใบเดียวมีสองฉบับ ต้องเลือกให้เหลือฉบับเดียว</p>
+        <p class="warn" style="margin-top:14px"><b>ยืนยันแล้ว 01 AUG 2026 — และเจอปัญหาซ้อน</b>
+        ฟอร์ม 6 ใบยืนยันแล้วว่าใช้งานจริงในระบบภายนอก (FPL อยู่ Dispatch · EFM และ GSP อยู่ระบบบันทึกการฝึก ·
+        AFM, MTC, APP อยู่ AeroFBO) แต่ทั้ง 6 ใบ<b>ยังมีฉบับ Jotform อยู่ด้วย</b> และ LEF ในคู่มือชี้ไปฉบับ Jotform นั้น
+        → ฟอร์มควบคุมใบเดียวมีสองฉบับ ต้องเลือกให้เหลือฉบับเดียว ปิดอีกฉบับ แล้วแก้ LEF ให้ชี้ถูกที่
+        (ติดป้าย <span class="tag bad">มีสองฉบับ — ระบบภายนอกและ Jotform</span> ในทะเบียนด้านล่าง) ·
+        ปุ่มเปิดฟอร์มในหน้านี้พาไป<b>ระบบภายนอก</b>ซึ่งเป็นฉบับที่ใช้จริงแล้ว</p>
       </section>
 
       <section id="register">
@@ -229,7 +231,7 @@ function renderStats() {
     ['red', c('shadow'),            'ใช้บน Jotform แต่ไม่มีในคู่มือ'],
     ['amb', c('notinlef'),          'มีเอกสารแต่ยังไม่อยู่ใน LEF'],
     ['amb', c('noform') + c('pdfonly'), 'LEF ระบุ Online แต่ยังไม่มีฟอร์ม'],
-    ['sky', F.filter(f => f.sysConfirm).length, 'ต้องยืนยันว่าอยู่ระบบใด']
+    ['red', c('dupsys'),            'มีสองฉบับ — ระบบภายนอกและ Jotform']
   ];
   document.getElementById('stats').innerHTML = box.map(b =>
     `<div class="stat ${b[0]}"><div class="top"><span class="ti">${esc(b[2])}</span>
@@ -307,7 +309,7 @@ function renderCards() {
     const s = stOf(f), sy = sysOf(f), t = target(f);
     const tags = [];
     if (f.st !== 'ok') tags.push(`<span class="tag ${s.lv}">${esc(s.n)}</span>`);
-    if (f.sysConfirm) tags.push(`<span class="tag warn">ต้องยืนยัน</span>`);
+    if (f.sysOK) tags.push(`<span class="tag ok">ระบบยืนยันแล้ว</span>`);
     if (f.with && f.with.length) tags.push(`<span class="tag sh2">ร่วมกับ ${esc(f.with.join(' · '))}</span>`);
     const badge = f.sys === 'here' ? `<span class="ext here">ระบบนี้</span>` : `<span class="ext">${esc(sy.n)}</span>`;
     const body = `
@@ -335,7 +337,7 @@ function renderSys() {
         .map(t => `<li><span class="dot"></span> ${esc(t)}</li>`).join('')
       : fs.slice(0, 6).map(f => `<li><span class="dot"></span> ${esc(f.th || f.t)}` +
           (f.doc ? ` <span class="code">${esc(f.doc)}</span>` : '') +
-          (f.sysConfirm ? ` <span class="tag warn">ต้องยืนยัน</span>` : '') + `</li>`).join('');
+          (f.sysOK ? ` <span class="tag ok">ยืนยันแล้ว</span>` : '') + `</li>`).join('');
     const btn = self
       ? `<span class="go self">คุณอยู่ที่นี่ · ${fs.length} ฟอร์ม</span>`
       : `<a class="go" href="${esc(s.url)}"${k === 'audit' ? '' : ' target="_blank" rel="noopener"'}>เปิด ${esc(s.n)} <span>↗</span></a>`;
@@ -367,7 +369,7 @@ function renderReg() {
       <td class="c">${f.iss ? esc(f.iss) + ' / ' + esc(f.rev) : '—'}</td>
       <td class="c">${esc(f.eff || '—')}</td>
       <td class="c">${f.lef && f.lef.length ? esc(f.lef.join(' · ')) : '—'}</td>
-      <td class="c">${esc(sy.n)}${f.sysConfirm ? ' <span class="tag warn">ยืนยัน</span>' : ''}</td>
+      <td class="c">${esc(sy.n)}${f.sysOK ? ' <span class="tag ok">ยืนยันแล้ว</span>' : ''}</td>
       <td><span class="tag ${s.lv}">${esc(s.n)}</span>${f.note ? `<div style="color:var(--g-400);font-size:11px;margin-top:3px">${esc(f.note)}</div>` : ''}</td>
       <td>${open}</td></tr>`;
   }).join('') || '<tr><td colspan="9" style="color:var(--g-400);padding:16px">ไม่พบฟอร์มที่ตรงเงื่อนไข</td></tr>';

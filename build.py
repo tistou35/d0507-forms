@@ -92,6 +92,8 @@ def main():
         ('student.html', os.path.join(HERE, 'student', 'index.html'),     '../',  {'@@REGPUB@@': jsonjs(pub)}),
         ('staff.html',   os.path.join(HERE, 'staff',   'index.html'),     '../',  {'@@REG@@': jsonjs(reg),
                                                                                    '@@FBCFG@@': FIREBASE_CONFIG}),
+        ('submit.html',  os.path.join(HERE, 'submit',  'index.html'),     '../',  {'@@REGPUB@@': jsonjs(pub),
+                                                                                   '@@FBCFG@@': FIREBASE_CONFIG}),
     ]
     for src, out, base, extra in pages:
         subs = {'@@CSS@@': css.replace('@@BASE@@', base),
@@ -108,6 +110,7 @@ def main():
     idx = open(os.path.join(HERE, 'index.html'), encoding='utf-8').read()
     stu = open(os.path.join(HERE, 'student', 'index.html'), encoding='utf-8').read()
     stf = open(os.path.join(HERE, 'staff', 'index.html'), encoding='utf-8').read()
+    sbm = open(os.path.join(HERE, 'submit', 'index.html'), encoding='utf-8').read()
 
     if 'firebase' in idx.lower():
         errs.append('index.html (ประตูเข้า) ไม่ควรมี Firebase')
@@ -119,6 +122,10 @@ def main():
         errs.append('สถานะ LEF หลุดในหน้านักเรียน')
     if 'firebase' not in stf.lower():
         errs.append('staff/index.html ต้องมี Firebase')
+    for code in [f['code'] for f in forms if f.get('code')]:
+        if code and code in sbm:
+            errs.append('control code ภายในหลุดในหน้าส่งฟอร์ม: ' + code)
+            break
     if errs:
         sys.exit('ตรวจไม่ผ่าน:\n  - ' + '\n  - '.join(errs))
     print('ตรวจผ่าน: ประตูเข้าไม่มี Firebase · หน้านักเรียนไม่มีข้อมูลควบคุมภายใน · หน้าเจ้าหน้าที่มี auth')

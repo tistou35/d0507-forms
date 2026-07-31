@@ -122,6 +122,8 @@ const sysOf = f => PUB.systems[f.sys] || PUB.systems.here;
 
 function target(f) {
   const s = sysOf(f);
+  // ฟอร์มที่ต้องมีเจ้าหน้าที่ลงนาม → ผ่านหน้าส่งฟอร์มของระบบนี้ เพื่อเลือกผู้รับและได้สำเนาทางอีเมล
+  if (f.sys === 'here' && f.assignTo) return { url: '@@BASE@@submit/?f=' + encodeURIComponent(f.abbr), ext: false };
   if (f.sys !== 'here' && s.url) return { url: s.url, label: 'เปิดใน ' + s.n, ext: true };
   if (f.jot) return { url: 'https://form.jotform.com/' + encodeURIComponent(f.jot), label: 'เปิดฟอร์ม', ext: true };
   return null;

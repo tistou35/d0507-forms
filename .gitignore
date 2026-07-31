@@ -1,3 +1,6 @@
 .DS_Store
 __pycache__/
 *.pyc
+serviceAccountKey.json
+*serviceAccount*.json
+node_modules/
