@@ -1,0 +1,382 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>D-0507 Forms Portal — เจ้าหน้าที่</title>
+<meta name="robots" content="noindex">
+<style>@@CSS@@</style>
+</head><body>
+
+<div class="topbar">
+  <div class="brand">
+    <svg viewBox="0 0 320 72" fill="none" role="img" aria-label="D0507 Flight Training">
+      <g transform="translate(8,12)">
+        <path d="M4 28 L44 20 L52 22 L44 26 L48 36 L40 34 L36 28 Z" fill="#fff"/>
+        <path d="M18 24 L44 20 L40 34 L22 30 Z" fill="#4A90D9"/>
+        <path d="M4 28 L14 22 L16 26 L8 30 Z" fill="#4A90D9"/>
+      </g>
+      <text x="70" y="36" font-family="'Arial Narrow',Arial,sans-serif" font-size="28" font-weight="800" letter-spacing="-0.5" fill="#fff">D0507</text>
+      <text x="71" y="54" font-family="'Arial Narrow',Arial,sans-serif" font-size="14" font-weight="600" letter-spacing="4" fill="#4A90D9">FLIGHT TRAINING</text>
+    </svg>
+    <span class="div"></span>
+    <span><span class="nm">ระบบฟอร์มออนไลน์</span><span class="en">Forms &amp; Approvals</span></span>
+  </div>
+  <div class="tsearch" onclick="document.getElementById('q').focus()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
+    <span>ค้นหาฟอร์ม · Search forms</span><span class="k">⌘K</span>
+  </div>
+  <div class="tright" id="authbox"></div>
+</div>
+
+<div class="body">
+  <nav class="rail">
+    <span class="lab">เมนู · Menu</span>
+    <a class="nav on" href="#home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>
+      <span><span class="t">หน้าหลัก</span><span class="en">Home</span></span></a>
+    <a class="nav" href="#catalogue">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg>
+      <span><span class="t">คลังฟอร์ม</span><span class="en">All forms</span></span><span class="pill gry" id="nForms">—</span></a>
+    <a class="nav" href="#systems">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.5 13.5a4.5 4.5 0 0 0 6.4 0l2.6-2.6a4.5 4.5 0 0 0-6.4-6.4L11.5 6"/><path d="M13.5 10.5a4.5 4.5 0 0 0-6.4 0l-2.6 2.6a4.5 4.5 0 0 0 6.4 6.4L12.5 18"/></svg>
+      <span><span class="t">ระบบเชื่อมโยง</span><span class="en">Connected systems</span></span><span class="pill sky" id="nSys">—</span></a>
+    <a class="nav" href="#register">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h8.5L19 7v14.5H6z"/><path d="M14 2.5V7h5"/><path d="M9 12h7M9 15.5h7"/></svg>
+      <span><span class="t">ทะเบียนเอกสาร</span><span class="en">Form register (LEF)</span></span></a>
+    <a class="nav" href="@@BASE@@../d0507-audit/">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.4 15.4L21 21"/></svg>
+      <span><span class="t">งานตรวจสอบ</span><span class="en">Audit portal ↗</span></span></a>
+
+    <div class="railfoot">
+      <svg class="q" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9.2"/><path d="M9.4 9.2a2.7 2.7 0 1 1 3.4 2.6c-.6.2-.8.7-.8 1.3v.6"/><circle cx="12" cy="17" r=".9" fill="currentColor" stroke="none"/></svg>
+      <b>ไม่รู้ว่าต้องใช้ฟอร์มไหน?</b>
+      <p>พิมพ์สิ่งที่อยากทำในช่องค้นหา ระบบจะหาให้ข้ามทุกระบบ</p>
+    </div>
+  </nav>
+
+  <main class="main">
+
+    <div id="loginui" class="hide">
+      <h2>เข้าสู่ระบบ</h2><span class="en">Staff sign in</span>
+      <button onclick="loginGoogle()">เข้าสู่ระบบด้วย Google</button>
+      <input id="lp_em" type="email" placeholder="อีเมล" autocomplete="username">
+      <input id="lp_pw" type="password" placeholder="รหัสผ่าน" autocomplete="current-password">
+      <button class="alt" onclick="loginEmail()">เข้าสู่ระบบด้วยอีเมล</button>
+      <button class="alt" onclick="signupEmail()">สมัครใหม่ (ครั้งแรกของอีเมลนี้)</button>
+      <p class="hint">ใช้บัญชีเดียวกับ D-0507 Audit — ถ้าเข้าระบบนั้นอยู่แล้วจะเข้าที่นี่ได้ทันที<br>
+      อีเมลต้องอยู่ในรายชื่อขององค์กร (Security Rules)</p>
+      <p class="hint"><a href="@@BASE@@?pick=1">← กลับไปหน้าเลือกประตู</a></p>
+    </div>
+
+    <div id="content" class="hide">
+
+      <div class="greet" id="home">
+        <div>
+          <p class="eyebrow" id="today">—</p>
+          <h1 id="hello">สวัสดี</h1>
+          <p class="sub" id="sub">ทะเบียนฟอร์มควบคุมและกระบวนการอนุมัติของ D-0507</p>
+        </div>
+        <a class="obtn" href="#register">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+          <span id="allBtn">ดูทะเบียนทั้งหมด</span>
+        </a>
+      </div>
+
+      <section class="intent">
+        <div class="hd"><h2>บอกเราว่าคุณต้องการทำอะไร</h2>
+          <span class="en">ค้นข้ามทุกระบบ — searches every connected system</span></div>
+        <div class="srow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
+          <input id="q" type="search" placeholder="เช่น ‘ต้องยื่นแผนการบิน’ หรือ ‘นักเรียนจะบินเดี่ยว’ · ชื่อฟอร์ม หรือรหัสเอกสาร">
+          <button onclick="document.getElementById('q').focus()">ค้นหา</button>
+        </div>
+        <div id="res"></div>
+        <div class="chips" id="chips"></div>
+      </section>
+
+      <section>
+        <div class="sh"><h2>สถานะทะเบียนฟอร์ม</h2><span class="en">Register status</span>
+          <span class="rt">จับคู่ LEF ใน OMA · OMM · TM กับไฟล์ .docx และบัญชี Jotform</span></div>
+        <div class="stats" id="stats"></div>
+        <p class="note" style="margin-top:14px"><b>คิวงานและการอนุมัติยังไม่เปิดใช้</b> —
+        ระยะนี้เป็นทะเบียนสำหรับอ่านและเปิดฟอร์ม ปุ่ม “เปิดฟอร์ม” ยังพาไประบบเดิม
+        ประโยชน์ทันทีคือเปิดฟอร์ม <b>ถูกใบ</b> จากที่เดียว ไม่ต้องพึ่งลิงก์ในคู่มือที่ยังชี้ผิด</p>
+      </section>
+
+      <section id="catalogue">
+        <div class="sh"><h2>คลังฟอร์ม</h2><span class="en">All forms</span>
+          <span class="rt" id="roleNote"></span></div>
+        <div class="filters" id="roles"></div>
+        <div class="forms" id="fgrid"></div>
+      </section>
+
+      <section id="systems">
+        <div class="sh"><h2>ระบบเชื่อมโยง</h2><span class="en">Connected systems</span>
+          <span class="rt">ฟอร์มบางใบอยู่ในระบบอื่นที่ใช้งานอยู่แล้ว — เปิดจากที่นี่ได้</span></div>
+        <div class="sys" id="sysgrid"></div>
+        <p class="warn" style="margin-top:14px"><b>ยังต้องยืนยันรายใบ</b> —
+        ฟอร์มที่ติดป้าย <span class="tag warn">ต้องยืนยัน</span> ทะเบียนระบุว่าชี้ไป Jotform
+        แต่น่าจะใช้งานจริงอยู่ในระบบภายนอก ถ้ายืนยันแล้วว่าอยู่ระบบอื่นจริง แปลว่า LEF ในคู่มือชี้ผิดที่
+        และถ้าใช้ทั้งสองที่พร้อมกัน = ฟอร์มควบคุมใบเดียวมีสองฉบับ ต้องเลือกให้เหลือฉบับเดียว</p>
+      </section>
+
+      <section id="register">
+        <div class="sh"><h2>ทะเบียนฟอร์มทั้งหมด</h2><span class="en">List of Effective Forms</span>
+          <span class="rt">ทะเบียนกลางสำหรับควบคุมเอกสาร — ไม่แยกตามกลุ่มผู้ใช้</span></div>
+        <div class="filters">
+          <button class="fb" data-f="all" aria-pressed="true">ทั้งหมด</button>
+          <button class="fb" data-f="issue" aria-pressed="false">เฉพาะที่มีปัญหา</button>
+          <button class="fb" data-f="inlef" aria-pressed="false">อยู่ใน LEF</button>
+          <button class="fb" data-f="notlef" aria-pressed="false">ยังไม่อยู่ใน LEF</button>
+          <input id="rq" type="search" placeholder="ค้นหาในทะเบียน">
+        </div>
+        <div class="twrap">
+          <table class="reg"><thead><tr>
+            <th>Doc Code</th><th>Control Code</th><th>ชื่อฟอร์ม</th><th>Issue/Rev</th>
+            <th>Effective</th><th>อยู่ใน</th><th>ระบบ</th><th>สถานะควบคุม</th><th>เปิด</th>
+          </tr></thead><tbody id="regbody"></tbody></table>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+
+<footer>D-0507 Flight Training Co., Ltd. · Controlled Document System · Forms Portal</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+"use strict";
+const CFG = @@FBCFG@@;
+const REG = @@REG@@;
+const STATS = @@STATS@@;
+firebase.initializeApp(CFG);
+const db = firebase.firestore();
+
+let USER = null, MYROLES = [], ROLE = REG.roles[0].k, FILTER = 'all';
+
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g,
+  c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const stOf = f => REG.status[f.st] || { n: f.st, lv: 'warn' };
+const sysOf = f => REG.systems[f.sys] || REG.systems.here;
+
+/* ปลายทางของฟอร์ม — ระบบภายนอกมาก่อน แล้วค่อย Jotform */
+function target(f) {
+  const s = sysOf(f);
+  if (f.sys === 'audit') return { url: '@@BASE@@../d0507-audit/', label: 'งานตรวจสอบ', ext: false };
+  if (f.sys !== 'here' && s.url) return { url: s.url, label: 'เปิดใน ' + s.n, ext: true };
+  if (f.jot) return { url: 'https://form.jotform.com/' + encodeURIComponent(f.jot), label: 'เปิดฟอร์ม', ext: true };
+  return null;
+}
+
+function loginGoogle(){ firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e=>alert(e.message)); }
+function loginEmail(){ firebase.auth().signInWithEmailAndPassword(
+  document.getElementById('lp_em').value.trim(), document.getElementById('lp_pw').value).catch(e=>alert(e.message)); }
+function signupEmail(){ firebase.auth().createUserWithEmailAndPassword(
+  document.getElementById('lp_em').value.trim(), document.getElementById('lp_pw').value).catch(e=>alert(e.message)); }
+
+firebase.auth().onAuthStateChanged(async u => {
+  USER = u;
+  document.getElementById('loginui').classList.toggle('hide', !!u);
+  document.getElementById('content').classList.toggle('hide', !u);
+  document.getElementById('authbox').innerHTML = u
+    ? `<span class="acct"><span class="av">${esc((u.displayName||u.email||'?').slice(0,2).toUpperCase())}</span>
+       <span class="who"><b>${esc(u.displayName||u.email)}</b><span id="roleline">—</span></span></span>
+       <a class="acct" href="@@BASE@@?pick=1" style="padding:0 16px"><span class="who"><b>เปลี่ยนประตู</b><span>Switch</span></span></a>
+       <a class="acct" href="#" onclick="firebase.auth().signOut();return false" style="padding:0 16px"><span class="who"><b>ออก</b><span>Sign out</span></span></a>`
+    : `<a class="acct" href="@@BASE@@?pick=1" style="padding:0 16px"><span class="who"><b>เปลี่ยนประตู</b><span>Switch</span></span></a>`;
+  if (!u) return;
+
+  MYROLES = [];
+  try {
+    const d = await db.collection('users').doc(u.uid).get();
+    if (d.exists && Array.isArray(d.data().roles)) MYROLES = d.data().roles;
+  } catch (e) { /* ยังไม่มี users/{uid} หรือ rule ไม่อนุญาต — แสดงทุกกลุ่ม */ }
+
+  const mine = REG.roles.filter(r => MYROLES.includes(r.k));
+  ROLE = mine.length ? mine[0].k : REG.roles[0].k;
+  const rl = document.getElementById('roleline');
+  if (rl) rl.textContent = mine.length ? mine.map(r => r.n).join(' · ') : 'ยังไม่ได้กำหนดบทบาท';
+  document.getElementById('roleNote').textContent = mine.length
+    ? 'บทบาทของคุณ: ' + mine.map(r => r.n).join(' · ')
+    : 'ยังไม่ได้กำหนดบทบาทให้บัญชีนี้ — แสดงทุกกลุ่มไว้ก่อน';
+  document.getElementById('hello').textContent =
+    'สวัสดี ' + (u.displayName ? u.displayName.split(' ')[0] : (u.email||'').split('@')[0]) + ' — วันนี้ต้องทำอะไร?';
+
+  render();
+});
+
+/* ── วันที่ พ.ศ. ── */
+(function () {
+  const D = ['วันอาทิตย์','วันจันทร์','วันอังคาร','วันพุธ','วันพฤหัสบดี','วันศุกร์','วันเสาร์'];
+  const M = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
+             'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  const n = new Date();
+  document.getElementById('today').textContent =
+    `${D[n.getDay()]}ที่ ${n.getDate()} ${M[n.getMonth()]} ${n.getFullYear() + 543}`;
+  document.getElementById('nForms').textContent = STATS.forms;
+  document.getElementById('nSys').textContent = STATS.systems;
+  document.getElementById('allBtn').textContent = 'ดูทะเบียนทั้งหมด ' + STATS.forms + ' ฟอร์ม';
+})();
+
+function render(){ renderStats(); renderChips(); renderRoles(); renderCards(); renderSys(); renderReg(); }
+
+function renderStats() {
+  const F = REG.forms, c = k => F.filter(f => f.st === k).length;
+  const box = [
+    ['grn', c('ok'),                'พร้อมใช้ ครบทั้งสามช่องทาง'],
+    ['red', c('linkwrong'),         'ลิงก์ใน LEF ชี้ฟอร์มผิดใบ'],
+    ['red', c('shadow'),            'ใช้บน Jotform แต่ไม่มีในคู่มือ'],
+    ['amb', c('notinlef'),          'มีเอกสารแต่ยังไม่อยู่ใน LEF'],
+    ['amb', c('noform') + c('pdfonly'), 'LEF ระบุ Online แต่ยังไม่มีฟอร์ม'],
+    ['sky', F.filter(f => f.sysConfirm).length, 'ต้องยืนยันว่าอยู่ระบบใด']
+  ];
+  document.getElementById('stats').innerHTML = box.map(b =>
+    `<div class="stat ${b[0]}"><div class="top"><span class="ti">${esc(b[2])}</span>
+     <span class="n">${b[1]}</span></div></div>`).join('');
+}
+
+function renderChips() {
+  const q = ['ต้องยื่นแผนการบิน','นักเรียนจะบินเดี่ยว','เจอเหตุไม่ปลอดภัย อยากรายงาน',
+             'ขอแก้ข้อความในคู่มือ','เบิกค่าใช้จ่ายรายเดือน'];
+  document.getElementById('chips').innerHTML = q.map(t =>
+    `<button class="chip" data-q="${esc(t)}"><span class="ar">→</span> ${esc(t)}</button>`).join('');
+  document.querySelectorAll('#chips .chip').forEach(b => b.addEventListener('click', () => {
+    document.getElementById('q').value = b.dataset.q; search();
+  }));
+}
+
+/* ── ค้นหาข้ามระบบ ── */
+/* ── จับคู่คำค้น ──
+   ภาษาไทยไม่มีช่องว่างระหว่างคำ ตัดคำด้วย whitespace จึงใช้ไม่ได้
+   จึงเช็คสองทาง: คำสำคัญของฟอร์มอยู่ในประโยคที่พิมพ์ไหม + คำที่พิมพ์อยู่ในข้อมูลฟอร์มไหม */
+function scoreOf(f, q) {
+  const keys = [f.abbr, f.doc, f.code, f.t, f.th].concat(f.kw || [])
+    .filter(Boolean).map(x => String(x).toLowerCase());
+  let s = 0;
+  for (const k of keys) if (k.length >= 2 && q.includes(k)) s += (k.length >= 4 ? 3 : 1);
+  const hay = keys.join(' ');
+  for (const w of q.split(/\s+/)) if (w.length >= 2 && hay.includes(w)) s += 1;
+  return s;
+}
+function search() {
+  const q = document.getElementById('q').value.trim().toLowerCase();
+  const box = document.getElementById('res');
+  if (!q) { box.innerHTML = ''; return; }
+  const words = q.split(/\s+/).filter(Boolean);
+  const hits = REG.forms.map(f => ({ f, score: scoreOf(f, q) }))
+    .filter(x => x.score > 0).sort((a, b) => b.score - a.score).slice(0, 6);
+
+  if (!hits.length) {
+    box.innerHTML = `<div class="res"><p class="rh">ไม่พบฟอร์มที่ตรงกับคำค้น</p></div>`;
+    return;
+  }
+  const nsys = new Set(hits.map(h => h.f.sys)).size;
+  box.innerHTML = `<div class="res"><p class="rh">ฟอร์มที่ตรงกับคำค้น · ${hits.length} รายการ ข้าม ${nsys} ระบบ</p>` +
+    hits.map(({ f }) => {
+      const t = target(f), s = sysOf(f);
+      const wh = f.sys === 'here'
+        ? `<span class="wh here">ฟอร์มในระบบนี้</span>`
+        : `<span class="wh">${esc(f.sys === 'audit' ? 'ไปงานตรวจสอบ' : 'เปิดใน ' + s.n)}</span>`;
+      const inner = `<span><span class="nm">${esc(f.th || f.t)}</span> <span class="cd">${esc(f.doc || f.abbr)}</span></span>${wh}`;
+      return t ? `<a class="rr" href="${esc(t.url)}"${t.ext ? ' target="_blank" rel="noopener"' : ''}>${inner}</a>`
+               : `<div class="rr" style="cursor:default;opacity:.65">${inner}</div>`;
+    }).join('') + `</div>`;
+}
+document.getElementById('q').addEventListener('input', search);
+document.addEventListener('keydown', e => {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); document.getElementById('q').focus(); }
+});
+
+/* ── คลังฟอร์มตามกลุ่มผู้ใช้ ── */
+function renderRoles() {
+  document.getElementById('roles').innerHTML = REG.roles.map(r => {
+    const n = REG.forms.filter(f => f.r && f.r[r.k]).length;
+    return `<button class="fb" data-r="${r.k}" aria-pressed="${r.k === ROLE}">${esc(r.n)} · ${n}</button>`;
+  }).join('');
+  document.querySelectorAll('#roles .fb').forEach(b => b.addEventListener('click', () => {
+    ROLE = b.dataset.r;
+    document.querySelectorAll('#roles .fb').forEach(x => x.setAttribute('aria-pressed', x.dataset.r === ROLE));
+    renderCards();
+  }));
+}
+
+function renderCards() {
+  const list = REG.forms.filter(f => f.r && f.r[ROLE]);
+  document.getElementById('fgrid').innerHTML = list.map(f => {
+    const s = stOf(f), sy = sysOf(f), t = target(f);
+    const tags = [];
+    if (f.st !== 'ok') tags.push(`<span class="tag ${s.lv}">${esc(s.n)}</span>`);
+    if (f.sysConfirm) tags.push(`<span class="tag warn">ต้องยืนยัน</span>`);
+    if (f.with && f.with.length) tags.push(`<span class="tag sh2">ร่วมกับ ${esc(f.with.join(' · '))}</span>`);
+    const badge = f.sys === 'here' ? `<span class="ext here">ระบบนี้</span>` : `<span class="ext">${esc(sy.n)}</span>`;
+    const body = `
+      <div class="row">
+        <span class="tile ${f.sys === 'here' ? 'sky' : 'gry'}">${esc(f.abbr.slice(0, 4))}</span>
+        <span><span class="ti">${esc(f.th || f.t)}</span><span class="en">${esc(f.t)}</span></span>
+      </div>
+      <div class="duty">${esc(f.r[ROLE])}</div>
+      <div class="meta">${f.doc ? `<span class="code">${esc(f.doc)}</span>` : ''}${badge}${tags.join('')}</div>`;
+    return t ? `<a class="fcard" href="${esc(t.url)}"${t.ext ? ' target="_blank" rel="noopener"' : ''}>${body}</a>`
+             : `<div class="fcard" style="opacity:.7">${body}</div>`;
+  }).join('') || '<p class="note">ยังไม่มีฟอร์มที่ผูกกับกลุ่มนี้</p>';
+}
+
+/* ── ระบบเชื่อมโยง ── */
+function renderSys() {
+  const order = ['dispatch', 'training', 'fbo', 'audit', 'here'];
+  document.getElementById('sysgrid').innerHTML = order.map(k => {
+    const s = REG.systems[k]; if (!s) return '';
+    const fs = REG.forms.filter(f => f.sys === k);
+    const self = k === 'here';
+    const items = self
+      ? ['ฟอร์มควบคุมที่เหลือทั้งหมดในทะเบียน', 'กระบวนการอนุมัติเป็นลำดับขั้นและลายเซ็น',
+         'ทะเบียนเอกสารและ log การแก้ไข', 'ค้นหาข้ามทุกระบบจากที่เดียว']
+        .map(t => `<li><span class="dot"></span> ${esc(t)}</li>`).join('')
+      : fs.slice(0, 6).map(f => `<li><span class="dot"></span> ${esc(f.th || f.t)}` +
+          (f.doc ? ` <span class="code">${esc(f.doc)}</span>` : '') +
+          (f.sysConfirm ? ` <span class="tag warn">ต้องยืนยัน</span>` : '') + `</li>`).join('');
+    const btn = self
+      ? `<span class="go self">คุณอยู่ที่นี่ · ${fs.length} ฟอร์ม</span>`
+      : `<a class="go" href="${esc(s.url)}"${k === 'audit' ? '' : ' target="_blank" rel="noopener"'}>เปิด ${esc(s.n)} <span>↗</span></a>`;
+    return `<div class="scard${self ? ' self' : ''}">
+      <div class="top"><span class="lg ${esc(s.cl)}">${esc(s.lg)}</span>
+        <span><span class="ti">${esc(s.n)}</span><span class="host">${esc(s.url || 'ระบบนี้')}</span></span></div>
+      <ul>${items}</ul>${btn}</div>`;
+  }).join('');
+}
+
+/* ── ทะเบียน ── */
+function renderReg() {
+  const q = (document.getElementById('rq').value || '').trim().toLowerCase();
+  let list = REG.forms.slice();
+  if (FILTER === 'issue')  list = list.filter(f => f.st !== 'ok');
+  if (FILTER === 'inlef')  list = list.filter(f => f.lef && f.lef.length);
+  if (FILTER === 'notlef') list = list.filter(f => !f.lef || !f.lef.length);
+  if (q) list = list.filter(f => [f.doc, f.code, f.t, f.th, f.abbr].join(' ').toLowerCase().includes(q));
+
+  document.getElementById('regbody').innerHTML = list.map(f => {
+    const s = stOf(f), sy = sysOf(f), t = target(f);
+    const open = t
+      ? `<a class="fb" style="min-height:32px;padding:0 12px;display:inline-block;line-height:30px" href="${esc(t.url)}"${t.ext ? ' target="_blank" rel="noopener"' : ''}>เปิด</a>`
+      : '<span style="color:var(--g-300)">—</span>';
+    return `<tr>
+      <td class="c">${esc(f.doc || '—')}</td>
+      <td class="c">${esc(f.code || '—')}</td>
+      <td class="nm">${esc(f.t)}<span class="th">${esc(f.th || '')}</span></td>
+      <td class="c">${f.iss ? esc(f.iss) + ' / ' + esc(f.rev) : '—'}</td>
+      <td class="c">${esc(f.eff || '—')}</td>
+      <td class="c">${f.lef && f.lef.length ? esc(f.lef.join(' · ')) : '—'}</td>
+      <td class="c">${esc(sy.n)}${f.sysConfirm ? ' <span class="tag warn">ยืนยัน</span>' : ''}</td>
+      <td><span class="tag ${s.lv}">${esc(s.n)}</span>${f.note ? `<div style="color:var(--g-400);font-size:11px;margin-top:3px">${esc(f.note)}</div>` : ''}</td>
+      <td>${open}</td></tr>`;
+  }).join('') || '<tr><td colspan="9" style="color:var(--g-400);padding:16px">ไม่พบฟอร์มที่ตรงเงื่อนไข</td></tr>';
+}
+document.querySelectorAll('#register .fb[data-f]').forEach(b => b.addEventListener('click', () => {
+  FILTER = b.dataset.f;
+  document.querySelectorAll('#register .fb[data-f]').forEach(x => x.setAttribute('aria-pressed', x.dataset.f === FILTER));
+  renderReg();
+}));
+document.getElementById('rq').addEventListener('input', renderReg);
+</script>
+</body></html>

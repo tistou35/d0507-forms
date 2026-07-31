@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 72" fill="none">
+  
+  <g transform="translate(8,12)">
+    
+    <path d="M4 28 L44 20 L52 22 L44 26 L48 36 L40 34 L36 28 Z" fill="#0D1B2A"></path>
+    
+    <path d="M18 24 L44 20 L40 34 L22 30 Z" fill="#4A90D9"></path>
+    
+    <path d="M4 28 L14 22 L16 26 L8 30 Z" fill="#4A90D9"></path>
+    
+    <ellipse cx="42" cy="22" rx="3" ry="2.5" fill="#93c3f0" opacity="0.8"></ellipse>
+  </g>
+  
+  <text x="70" y="36" font-family="&#39;Barlow Condensed&#39;, &#39;Arial Narrow&#39;, sans-serif" font-size="28" font-weight="800" letter-spacing="-0.5" fill="#0D1B2A">D0507</text>
+  <text x="71" y="54" font-family="&#39;Barlow Condensed&#39;, &#39;Arial Narrow&#39;, sans-serif" font-size="14" font-weight="600" letter-spacing="4" fill="#4A90D9">FLIGHT TRAINING</text>
+</svg>
