@@ -1,0 +1,42 @@
+{
+  "code": "XXX",
+  "doc": "D-0507-XXX-001",
+  "control": "",
+  "issue": "01",
+  "rev": "00",
+  "eff": "",
+  "title": { "th": "", "en": "" },
+  "retain": "OMA A.10",
+
+  "parties": [
+    { "k": "a", "n": "ผู้กรอก", "auth": "public" },
+    { "k": "b", "n": "ผู้ตรวจ/ผู้อนุมัติ", "auth": "role:FI" }
+  ],
+
+  "sections": [
+    {
+      "k": "A",
+      "title": { "th": "ส่วนที่ 1", "en": "Section 1" },
+      "party": "a",
+      "fields": [
+        { "k": "name", "type": "text", "req": true,
+          "label": { "th": "ชื่อ–นามสกุล", "en": "Full name" } }
+      ]
+    }
+  ],
+
+  "compute": [],
+  "gates": [],
+
+  "route": [
+    { "step": 1, "party": "a", "sign": true },
+    { "step": 2, "party": "b", "sign": true, "assignedBy": "submitter" }
+  ],
+
+  "export": {
+    "docx": "",
+    "lockUntilComplete": true,
+    "draftWatermark": "DRAFT",
+    "map": {}
+  }
+}

@@ -1,0 +1,56 @@
+<!-- ===== RAIL ===== -->
+<nav class="rail">
+  <span class="lab">เมนู · Menu</span>
+  <a class="nav" data-nav="home" href="@@BASE@@">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>
+    <span><span class="t">หน้าหลัก</span><span class="en">Home</span></span></a>
+  <a class="nav" data-nav="all" href="@@BASE@@all/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg>
+    <span><span class="t">คลังฟอร์ม</span><span class="en">All forms</span></span><span class="pill gry" data-cnt="forms">—</span></a>
+  <a class="nav staffonly" data-nav="queue" href="@@BASE@@queue/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l4 4L14 8"/><path d="M10 13l4 4L22 8"/></svg>
+    <span><span class="t">งานของฉัน</span><span class="en">My queue</span></span><span class="pill amb" data-cnt="queue">0</span></a>
+  <a class="nav staffonly" data-nav="register" href="@@BASE@@admin/register/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h8.5L19 7v14.5H6z"/><path d="M14 2.5V7h5"/><path d="M9 12h7M9 15.5h7"/></svg>
+    <span><span class="t">ทะเบียนเอกสาร</span><span class="en">Register · LEF</span></span></a>
+  <a class="nav staffonly" data-nav="audit" href="@@BASE@@../d0507-audit/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.4 15.4L21 21"/></svg>
+    <span><span class="t">งานตรวจสอบ</span><span class="en">Audit portal ↗</span></span></a>
+
+  <div class="railfoot">
+    <svg class="q" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9.2"/><path d="M9.4 9.2a2.7 2.7 0 1 1 3.4 2.6c-.6.2-.8.7-.8 1.3v.6"/><circle cx="12" cy="17" r=".9" fill="currentColor" stroke="none"/></svg>
+    <b>ไม่รู้ว่าต้องใช้ฟอร์มไหน?</b>
+    <p>พิมพ์สิ่งที่อยากทำในช่องค้นหา ระบบจะหาให้ข้ามทุกระบบ</p>
+  </div>
+</nav>
+
+<!-- ===== BOTNAV ===== -->
+<nav class="botnav">
+  <a data-nav="home" href="@@BASE@@">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>หน้าหลัก</a>
+  <a data-nav="all" href="@@BASE@@all/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg>คลังฟอร์ม</a>
+  <a data-nav="queue" class="staffonly" href="@@BASE@@queue/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l4 4L14 8"/><path d="M10 13l4 4L22 8"/></svg>งานของฉัน</a>
+  <a data-nav="register" class="staffonly" href="@@BASE@@admin/register/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h8.5L19 7v14.5H6z"/><path d="M14 2.5V7h5"/><path d="M9 12h7M9 15.5h7"/></svg>ทะเบียน</a>
+</nav>
+
+<!-- ===== TOPBAR ===== -->
+<div class="topbar">
+  <a class="brand" href="@@BASE@@" style="text-decoration:none">
+    <svg viewBox="0 0 320 72" fill="none" role="img" aria-label="D0507 Flight Training">
+      <g transform="translate(8,12)"><path d="M4 28 L44 20 L52 22 L44 26 L48 36 L40 34 L36 28 Z" fill="#fff"/>
+      <path d="M18 24 L44 20 L40 34 L22 30 Z" fill="#4A90D9"/><path d="M4 28 L14 22 L16 26 L8 30 Z" fill="#4A90D9"/></g>
+      <text x="70" y="36" font-family="'Arial Narrow',Arial,sans-serif" font-size="28" font-weight="800" letter-spacing="-0.5" fill="#fff">D0507</text>
+      <text x="71" y="54" font-family="'Arial Narrow',Arial,sans-serif" font-size="14" font-weight="600" letter-spacing="4" fill="#4A90D9">FLIGHT TRAINING</text>
+    </svg>
+    <span class="div"></span>
+    <span><span class="nm">ระบบฟอร์มออนไลน์</span><span class="en">Forms &amp; Approvals</span></span>
+  </a>
+  <div class="tsearch" onclick="location.href='@@BASE@@all/'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
+    <span>ค้นหาฟอร์ม · Search forms</span><span class="k">⌘K</span>
+  </div>
+  <div class="tright" id="authbox"></div>
+</div>

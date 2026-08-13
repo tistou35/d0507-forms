@@ -1,0 +1,53 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>เข้าสู่ระบบเจ้าหน้าที่ — D-0507</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="../assets/app.css">
+</head><body>
+<div class="topbar">
+  <a class="brand" href="../" style="text-decoration:none">
+    <svg viewBox="0 0 320 72" fill="none" role="img" aria-label="D0507 Flight Training">
+      <g transform="translate(8,12)"><path d="M4 28 L44 20 L52 22 L44 26 L48 36 L40 34 L36 28 Z" fill="#fff"/>
+      <path d="M18 24 L44 20 L40 34 L22 30 Z" fill="#4A90D9"/><path d="M4 28 L14 22 L16 26 L8 30 Z" fill="#4A90D9"/></g>
+      <text x="70" y="36" font-family="'Arial Narrow',Arial,sans-serif" font-size="28" font-weight="800" letter-spacing="-0.5" fill="#fff">D0507</text>
+      <text x="71" y="54" font-family="'Arial Narrow',Arial,sans-serif" font-size="14" font-weight="600" letter-spacing="4" fill="#4A90D9">FLIGHT TRAINING</text>
+    </svg>
+    <span class="div"></span>
+    <span><span class="nm">ระบบฟอร์มออนไลน์</span><span class="en">Forms &amp; Approvals</span></span>
+  </a>
+  <div class="tsearch" onclick="location.href='../all/'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
+    <span>ค้นหาฟอร์ม · Search forms</span><span class="k">⌘K</span>
+  </div>
+  <div class="tright" id="authbox"></div>
+</div>
+<main class="main" style="max-width:640px;margin:0 auto">
+  <div id="loginui">
+    <h2>เข้าสู่ระบบเจ้าหน้าที่</h2><span class="en">Staff sign in</span>
+    <button onclick="D0507.login()">เข้าสู่ระบบด้วย Google</button>
+    <input id="em" type="email" placeholder="อีเมล" autocomplete="username">
+    <input id="pw" type="password" placeholder="รหัสผ่าน" autocomplete="current-password">
+    <button class="alt" onclick="D0507.loginEmail(em.value.trim(),pw.value)">เข้าสู่ระบบด้วยอีเมล</button>
+    <button class="alt" onclick="D0507.signup(em.value.trim(),pw.value)">สมัครใหม่ (ครั้งแรกของอีเมลนี้)</button>
+    <p class="hint">ใช้บัญชีเดียวกับ D-0507 Audit — ถ้าเข้าระบบนั้นอยู่แล้วจะเข้าที่นี่ได้ทันที<br>
+      อีเมลต้องอยู่ในรายชื่อขององค์กร (Security Rules)</p>
+    <p class="hint"><a href="../">← กลับหน้าหลัก</a> · นักเรียนไม่ต้องเข้าสู่ระบบ</p>
+  </div>
+</main>
+<footer>D-0507 Flight Training Co., Ltd.</footer>
+<script>window.BASE='../';</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="../assets/app.js"></script>
+<script>
+D0507.initAuth({
+  apiKey: "AIzaSyB_O4vBBOa7-YtGJyPnZ5NLPtQZjWMSJnQ",
+  authDomain: "d0507-audit.firebaseapp.com",
+  projectId: "d0507-audit",
+  storageBucket: "d0507-audit.firebasestorage.app",
+  messagingSenderId: "880880454045",
+  appId: "1:880880454045:web:a8fe249ca18f1a7a20c774"
+}, u => { if (u) location.href = '../'; });
+</script>
+</body></html>

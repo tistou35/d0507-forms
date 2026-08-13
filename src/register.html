@@ -1,0 +1,94 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ทะเบียนเอกสาร — D-0507 Flight Training</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="@@BASE@@assets/app.css">
+</head><body>
+@@TOPBAR@@
+<div class="body">
+@@RAIL@@
+  <main class="main">
+    <div class="greet"><div>
+      <p class="eyebrow">ควบคุมเอกสาร · DOCUMENT CONTROL</p>
+      <h1>ทะเบียนฟอร์ม (LEF)</h1>
+      <p class="sub">จับคู่ LEF ใน OMA · OMM · TM กับไฟล์ .docx และระบบที่ฟอร์มอยู่จริง</p></div></div>
+    <div id="gate"></div>
+    <div id="body" class="hide">
+      <section><div class="sh"><h2>สถานะทะเบียน</h2><span class="en">Register status</span></div>
+        <div class="stats" id="stats"></div></section>
+      <section><div class="sh"><h2>ทะเบียนทั้งหมด</h2><span class="en">All entries</span></div>
+        <div class="filters">
+          <button class="fb" data-f="all" aria-pressed="true">ทั้งหมด</button>
+          <button class="fb" data-f="issue" aria-pressed="false">เฉพาะที่มีปัญหา</button>
+          <button class="fb" data-f="inlef" aria-pressed="false">อยู่ใน LEF</button>
+          <button class="fb" data-f="notlef" aria-pressed="false">ยังไม่อยู่ใน LEF</button>
+          <input id="q" type="search" placeholder="ค้นหาในทะเบียน">
+        </div>
+        <div class="twrap"><table class="reg"><thead><tr>
+          <th>Doc code</th><th>Control code</th><th>ชื่อฟอร์ม</th><th>Issue/Rev</th>
+          <th>Effective</th><th>อยู่ใน</th><th>ระบบ</th><th>สถานะ</th>
+        </tr></thead><tbody id="tb"></tbody></table></div>
+      </section>
+    </div>
+  </main>
+</div>
+@@BOTNAV@@
+<footer>D-0507 Flight Training Co., Ltd. · Controlled Document System</footer>
+<script>window.BASE='@@BASE@@';</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="@@BASE@@assets/app.js"></script>
+<script>
+"use strict";
+const REG=@@REG@@, A=D0507; let FILTER='all';
+document.querySelectorAll('[data-cnt="forms"]').forEach(e=>e.textContent=REG.forms.length);
+A.reg = REG;
+A.initAuth(@@FBCFG@@, paint); paint();
+function paint(){
+  const ok=A.isStaff();
+  document.getElementById('body').classList.toggle('hide',!ok);
+  document.getElementById('gate').innerHTML = ok ? '' :
+    `<div class="note"><b>ต้องเข้าสู่ระบบก่อน</b> — ทะเบียนเอกสารเป็นข้อมูลภายใน
+     <br><a class="big pri" style="margin-top:12px" href="@@BASE@@staff-login/">เข้าสู่ระบบ</a></div>`;
+  if(!ok) return;
+  const F=REG.forms, c=k=>F.filter(f=>f.st===k).length;
+  document.getElementById('stats').innerHTML=[
+    ['grn',c('ok'),'พร้อมใช้ ครบทั้งสามช่องทาง'],
+    ['red',c('linkwrong'),'ลิงก์ใน LEF ชี้ฟอร์มผิดใบ'],
+    ['red',c('dupsys'),'มีสองฉบับ — ระบบภายนอกและ Jotform'],
+    ['red',c('shadow'),'ใช้บน Jotform แต่ไม่มีในคู่มือ'],
+    ['amb',c('notinlef'),'มีเอกสารแต่ยังไม่อยู่ใน LEF'],
+    ['amb',c('noform')+c('pdfonly')+c('nolink'),'LEF กับฟอร์มยังไม่ตรงกัน']
+  ].map(b=>`<div class="stat ${b[0]}"><div class="top"><span class="ti">${A.esc(b[2])}</span>
+     <span class="n">${b[1]}</span></div></div>`).join('');
+  rows();
+}
+function rows(){
+  const q=(document.getElementById('q').value||'').trim().toLowerCase();
+  let L=REG.forms.slice();
+  if(FILTER==='issue')  L=L.filter(f=>f.st!=='ok');
+  if(FILTER==='inlef')  L=L.filter(f=>f.lef&&f.lef.length);
+  if(FILTER==='notlef') L=L.filter(f=>!f.lef||!f.lef.length);
+  if(q) L=L.filter(f=>[f.doc,f.code,f.t,f.th,f.abbr].join(' ').toLowerCase().includes(q));
+  document.getElementById('tb').innerHTML = L.map(f=>{
+    const st=REG.status[f.st]||{}, s=A.sysOf(REG,f);
+    return `<tr onclick="location.href='${A.formUrl(f)}'" style="cursor:pointer">
+      <td class="c">${A.esc(f.doc||'—')}</td><td class="c">${A.esc(f.code||'—')}</td>
+      <td class="nm">${A.esc(f.t)}<span class="th">${A.esc(f.th||'')}</span></td>
+      <td class="c">${f.iss?A.esc(f.iss)+' / '+A.esc(f.rev):'—'}</td>
+      <td class="c">${A.esc(f.eff||'—')}</td>
+      <td class="c">${f.lef&&f.lef.length?A.esc(f.lef.join(' · ')):'—'}</td>
+      <td class="c">${A.esc(s.n)}${f.sysOK?' <span class="tag ok">ยืนยันแล้ว</span>':''}</td>
+      <td><span class="tag ${st.lv||''}">${A.esc(st.n||'')}</span>
+        ${f.note?`<div style="color:var(--g-400);font-size:11px;margin-top:3px">${A.esc(f.note)}</div>`:''}</td>
+    </tr>`;}).join('') || '<tr><td colspan="8" style="padding:16px;color:var(--g-400)">ไม่พบรายการ</td></tr>';
+}
+document.querySelectorAll('.fb[data-f]').forEach(b=>b.addEventListener('click',()=>{
+  FILTER=b.dataset.f;
+  document.querySelectorAll('.fb[data-f]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.f===FILTER));
+  rows();
+}));
+document.getElementById('q').addEventListener('input',rows);
+</script>
+</body></html>

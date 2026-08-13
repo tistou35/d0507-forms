@@ -1,0 +1,185 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ระบบฟอร์มออนไลน์ — D-0507 Flight Training</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="@@BASE@@assets/app.css">
+</head><body>
+@@TOPBAR@@
+<div class="body">
+@@RAIL@@
+  <main class="main">
+
+    <div class="greet">
+      <div>
+        <p class="eyebrow" id="today">—</p>
+        <h1 id="hello">จะทำอะไรวันนี้?</h1>
+        <p class="sub" id="sub">เลือกฟอร์มที่ต้องการได้เลย — ไม่ต้องเข้าสู่ระบบ</p>
+      </div>
+      <a class="obtn" href="@@BASE@@all/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        <span id="allBtn">ดูฟอร์มทั้งหมด</span>
+      </a>
+    </div>
+
+    <section class="intent">
+      <div class="hd"><h2>บอกเราว่าคุณต้องการทำอะไร</h2>
+        <span class="en">ค้นข้ามทุกระบบ — searches every connected system</span></div>
+      <div class="srow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
+        <input id="q" type="search" placeholder="เช่น ‘พรุ่งนี้จะบินกับครู’ หรือ ‘ต้องยื่นแผนการบิน’">
+        <button onclick="document.getElementById('q').focus()">ค้นหา</button>
+      </div>
+      <div id="res"></div>
+      <div class="chips" id="chips"></div>
+    </section>
+
+    <section class="staffonly hide" id="queuesec">
+      <div class="sh"><h2>งานที่รอคุณ</h2><span class="en">Waiting on you</span>
+        <span class="rt"><a href="@@BASE@@queue/">ดูทั้งหมด →</a></span></div>
+      <div class="stats" id="queue"></div>
+    </section>
+
+    <section>
+      <div class="sh"><h2 id="fhead">ฟอร์มที่ใช้บ่อย</h2><span class="en">Frequently used</span>
+        <span class="rt" id="fnote"></span></div>
+      <div class="forms" id="fgrid"></div>
+    </section>
+
+    <section id="how">
+      <div class="sh"><h2>ขั้นตอนก่อนออกบิน</h2><span class="en">Before every flight</span></div>
+      <div class="steps">
+        <div class="stp"><span class="k">ขั้นที่ 1</span><span class="v">นักเรียนกรอกประเมินความเสี่ยง</span>
+          <span class="m">ต่างคนต่างกรอก ไม่เห็นคำตอบของอีกฝ่าย</span></div>
+        <div class="stp"><span class="k">ขั้นที่ 2</span><span class="v">ครูกรอกฝั่งครู</span>
+          <span class="m">ระบบรวมคะแนนความเสี่ยงให้อัตโนมัติ</span></div>
+        <div class="stp"><span class="k">ขั้นที่ 3</span><span class="v">ครูลงนามยืนยัน</span>
+          <span class="m">จุดที่เอกสารกลายเป็นบันทึกควบคุม</span></div>
+        <div class="stp"><span class="k">ขั้นที่ 4</span><span class="v">ฝ่ายปฏิบัติการออกใบอนุญาต</span>
+          <span class="m">ต้องมีผลประเมินที่ผ่านแล้วแนบเสมอ</span></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+@@BOTNAV@@
+<footer>D-0507 Flight Training Co., Ltd. · Controlled Document System</footer>
+
+<script>window.BASE='@@BASE@@';</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="@@BASE@@assets/app.js"></script>
+<script>
+"use strict";
+const REG = @@REG@@;
+const A = D0507;
+document.getElementById('today').textContent = A.today();
+document.querySelectorAll('[data-cnt="forms"]').forEach(e => e.textContent = REG.forms.length);
+
+const CHIPS_PUB = ['พรุ่งนี้จะบินกับครู','จะบินเดี่ยวครั้งแรก','อยากดูผลการฝึกของตัวเอง',
+                   'เจอเหตุไม่ปลอดภัย อยากแจ้ง','สมัครเรียน'];
+const CHIPS_STF = ['ต้องยื่นแผนการบิน','นักเรียนจะบินเดี่ยว','เจอเหตุไม่ปลอดภัย อยากรายงาน',
+                   'ขอแก้ข้อความในคู่มือ','เบิกค่าใช้จ่ายรายเดือน'];
+
+/* หน้าเดียว ปรับตามสถานะ login — ไม่ต้องมีประตูให้เลือกเอง */
+A.reg = REG;
+A.initAuth(@@FBCFG@@, () => paint());
+paint();
+
+function visible() {
+  return A.isStaff() ? REG.forms : REG.forms.filter(f => f.public);
+}
+
+function paint() {
+  const staff = A.isStaff();
+  const list = visible();
+
+  document.getElementById('hello').textContent = staff && A.user
+    ? 'สวัสดี ' + (A.user.displayName ? A.user.displayName.split(' ')[0] : (A.user.email || '').split('@')[0]) + ' — วันนี้ต้องทำอะไร?'
+    : 'จะทำอะไรวันนี้?';
+  document.getElementById('sub').textContent = staff
+    ? 'ค้นหาฟอร์ม เปิดงานที่รออยู่ หรือดูทะเบียนเอกสาร'
+    : 'เลือกฟอร์มที่ต้องการได้เลย — ไม่ต้องเข้าสู่ระบบ';
+  document.getElementById('allBtn').textContent = 'ดูฟอร์มทั้งหมด ' + list.length + ' ฟอร์ม';
+  document.getElementById('q').placeholder = staff
+    ? 'เช่น ‘ต้องยื่นแผนการบิน’ · ชื่อฟอร์ม หรือรหัสเอกสาร'
+    : 'เช่น ‘พรุ่งนี้จะบินกับครู’ หรือ ‘อยากดูผลการฝึกของตัวเอง’';
+
+  const chips = staff ? CHIPS_STF : CHIPS_PUB;
+  document.getElementById('chips').innerHTML = chips.map(t =>
+    `<button class="chip" data-q="${A.esc(t)}"><span class="ar">→</span> ${A.esc(t)}</button>`).join('');
+  document.querySelectorAll('#chips .chip').forEach(b => b.addEventListener('click', () => {
+    document.getElementById('q').value = b.dataset.q; search();
+  }));
+
+  /* ฟอร์มที่ใช้บ่อย — ของเจ้าหน้าที่คัดตามบทบาท ของนักเรียนคือฟอร์มสาธารณะ */
+  let show, head, note;
+  if (staff && A.roles.length) {
+    const r = A.roles.find(x => REG.roles.some(y => y.k === x)) || 'ins';
+    show = REG.forms.filter(f => f.r && f.r[r]).slice(0, 6);
+    head = 'ฟอร์มของคุณ'; note = 'ตามบทบาท ' + A.roleNames().join(' · ');
+  } else if (staff) {
+    show = REG.forms.filter(f => f.sys === 'here').slice(0, 6);
+    head = 'ฟอร์มที่ใช้บ่อย'; note = 'ยังไม่ได้กำหนดบทบาทให้บัญชีนี้';
+  } else {
+    show = list; head = 'ฟอร์มของนักเรียน'; note = list.length + ' ฟอร์ม · ไม่ต้องเข้าสู่ระบบ';
+  }
+  document.getElementById('fhead').textContent = head;
+  document.getElementById('fnote').textContent = note;
+  const role = staff && A.roles.length ? A.roles[0] : 'stu';
+  document.getElementById('fgrid').innerHTML =
+    show.map(f => A.card(REG, f, f.r && f.r[role])).join('');
+
+  if (staff) loadQueue();
+  search();
+}
+
+function search() {
+  const box = document.getElementById('res');
+  const q = document.getElementById('q').value;
+  if (!q.trim()) { box.innerHTML = ''; return; }
+  const hits = A.search(visible(), q, 6);
+  if (!hits.length) {
+    box.innerHTML = `<div class="res"><p class="rh">ไม่พบฟอร์มที่ตรงกับคำค้น —
+      <a href="@@BASE@@all/" style="color:var(--sky-300)">ดูฟอร์มทั้งหมด</a></p></div>`;
+    return;
+  }
+  const nsys = new Set(hits.map(h => h.sys)).size;
+  box.innerHTML = `<div class="res"><p class="rh">ตรงกับคำค้น · ${hits.length} รายการ ข้าม ${nsys} ระบบ</p>` +
+    hits.map(f => {
+      const s = A.sysOf(REG, f);
+      const wh = f.sys === 'here' ? `<span class="wh here">ฟอร์มในระบบนี้</span>`
+        : `<span class="wh">${A.esc(f.sys === 'audit' ? 'ไปงานตรวจสอบ' : 'เปิดใน ' + s.n)}</span>`;
+      return `<a class="rr" href="${A.formUrl(f)}"><span><span class="nm">${A.esc(f.th || f.t)}</span>
+        <span class="cd">${A.esc(f.doc || f.abbr)}</span></span>${wh}</a>`;
+    }).join('') + `</div>`;
+}
+document.getElementById('q').addEventListener('input', search);
+
+async function loadQueue() {
+  const sec = document.getElementById('queuesec');
+  try {
+    const snap = await A.db.collection('tasks')
+      .where('assigneeUid', '==', A.user.uid).where('state', '==', 'open').limit(3).get();
+    const n = snap.size;
+    document.querySelectorAll('[data-cnt="queue"]').forEach(e => e.textContent = n);
+    sec.classList.remove('hide');
+    document.getElementById('queue').innerHTML = n
+      ? snap.docs.map(d => { const t = d.data();
+          return `<a class="stat amb lk" href="@@BASE@@queue/"><div class="top">
+            <span><span class="ti">${A.esc(t.title || t.formCode)}</span>
+            <span class="en">${A.esc(t.tracking || '')}</span></span></div>
+            <p class="cta">เปิดงาน <span>→</span></p></a>`; }).join('')
+      : `<div class="stat grn"><div class="top"><span class="ti">ไม่มีงานค้าง</span><span class="n">0</span></div>
+         <p class="note">งานที่ถูกส่งถึงคุณจะมาโผล่ที่นี่</p></div>`;
+  } catch (e) {
+    sec.classList.remove('hide');
+    document.getElementById('queue').innerHTML =
+      `<div class="stat"><div class="top"><span class="ti">คิวงานยังไม่พร้อมใช้</span></div>
+       <p class="note">${A.esc(e.code === 'permission-denied'
+         ? 'ยังไม่ได้วาง Security Rules ชุดใหม่ — ดู firebase/README.md'
+         : e.message)}</p></div>`;
+  }
+}
+</script>
+</body></html>

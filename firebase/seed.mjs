@@ -15,6 +15,7 @@
  */
 import { initializeApp, applicationDefault } from 'firebase-admin/app';
 import { getFirestore, FieldValue } from 'firebase-admin/firestore';
+import { readFileSync, existsSync } from 'node:fs';
 
 const DRY = process.argv.includes('--dry');
 
@@ -111,6 +112,18 @@ async function main() {
   for (const u of users) batch.set(db.doc(u.path), u.data, { merge: true });
   batch.set(db.doc('publicDirectory/instructors'),
             { list: instructors, updatedAt: FieldValue.serverTimestamp() });
+
+  // ทะเบียนฉบับเต็ม — เว็บสาธารณะฝังไม่ได้ จึงอ่านจาก Firestore หลัง login
+  const regPath = new URL('./registry.json', import.meta.url);
+  if (existsSync(regPath)) {
+    const reg = JSON.parse(readFileSync(regPath, 'utf8'));
+    batch.set(db.doc('registry/current'),
+              Object.assign({}, reg, { updatedAt: FieldValue.serverTimestamp() }));
+    console.log(`registry/current:      ${reg.forms.length} ฟอร์ม`);
+  } else {
+    console.warn('  ⚠ ไม่พบ firebase/registry.json — รัน python3 build.py ก่อน');
+  }
+
   await batch.commit();
   console.log('\nเขียนเรียบร้อย');
 }

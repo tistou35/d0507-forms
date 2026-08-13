@@ -1,0 +1,30 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>เข้าสู่ระบบเจ้าหน้าที่ — D-0507</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="@@BASE@@assets/app.css">
+</head><body>
+@@TOPBAR@@
+<main class="main" style="max-width:640px;margin:0 auto">
+  <div id="loginui">
+    <h2>เข้าสู่ระบบเจ้าหน้าที่</h2><span class="en">Staff sign in</span>
+    <button onclick="D0507.login()">เข้าสู่ระบบด้วย Google</button>
+    <input id="em" type="email" placeholder="อีเมล" autocomplete="username">
+    <input id="pw" type="password" placeholder="รหัสผ่าน" autocomplete="current-password">
+    <button class="alt" onclick="D0507.loginEmail(em.value.trim(),pw.value)">เข้าสู่ระบบด้วยอีเมล</button>
+    <button class="alt" onclick="D0507.signup(em.value.trim(),pw.value)">สมัครใหม่ (ครั้งแรกของอีเมลนี้)</button>
+    <p class="hint">ใช้บัญชีเดียวกับ D-0507 Audit — ถ้าเข้าระบบนั้นอยู่แล้วจะเข้าที่นี่ได้ทันที<br>
+      อีเมลต้องอยู่ในรายชื่อขององค์กร (Security Rules)</p>
+    <p class="hint"><a href="@@BASE@@">← กลับหน้าหลัก</a> · นักเรียนไม่ต้องเข้าสู่ระบบ</p>
+  </div>
+</main>
+<footer>D-0507 Flight Training Co., Ltd.</footer>
+<script>window.BASE='@@BASE@@';</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="@@BASE@@assets/app.js"></script>
+<script>
+D0507.initAuth(@@FBCFG@@, u => { if (u) location.href = '@@BASE@@'; });
+</script>
+</body></html>

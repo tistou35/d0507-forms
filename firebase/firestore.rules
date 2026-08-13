@@ -64,6 +64,13 @@ service cloud.firestore {
       allow write: if staff();
     }
 
+    // ทะเบียนฟอร์มฉบับเต็ม — มี control code, สถานะ LEF, หมายเหตุ
+    // เว็บ host แบบสาธารณะจึงฝังในไฟล์ไม่ได้ ต้องอ่านจากที่นี่หลัง login
+    match /registry/{doc} {
+      allow read:  if staff();
+      allow write: if staff();
+    }
+
     function newSubmissionOk() {
       let d = request.resource.data;
       return d.keys().hasAll(['formCode', 'status', 'byPublic', 'assigneeUid', 'createdAt'])

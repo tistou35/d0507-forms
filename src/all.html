@@ -1,0 +1,110 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>คลังฟอร์ม — D-0507 Flight Training</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="@@BASE@@assets/app.css">
+</head><body>
+@@TOPBAR@@
+<div class="body">
+@@RAIL@@
+  <main class="main">
+    <div class="greet">
+      <div><p class="eyebrow">คลังฟอร์ม · ALL FORMS</p>
+        <h1 id="hd">ฟอร์มทั้งหมด</h1>
+        <p class="sub">รายการเดียว กรองได้ตามกลุ่มผู้ใช้ ระบบที่ฟอร์มอยู่ และสถานะเอกสาร</p></div>
+    </div>
+
+    <section>
+      <div class="filters">
+        <input id="q" type="search" placeholder="ค้นหา — ชื่อฟอร์ม รหัสเอกสาร หรือสิ่งที่อยากทำ">
+        <button class="fb" id="view" data-v="card">มุมมอง: การ์ด</button>
+      </div>
+      <div class="filters" id="fgroup"></div>
+      <div class="filters" id="fsys"></div>
+      <div class="filters staffonly hide" id="fst"></div>
+      <p class="sub" id="cnt" style="margin:4px 0 14px"></p>
+      <div id="out"></div>
+    </section>
+  </main>
+</div>
+@@BOTNAV@@
+<footer>D-0507 Flight Training Co., Ltd. · Controlled Document System</footer>
+<script>window.BASE='@@BASE@@';</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="@@BASE@@assets/app.js"></script>
+<script>
+"use strict";
+const REG = @@REG@@;
+const A = D0507;
+let GROUP='all', SYS='all', ST='all', VIEW='card';
+document.querySelectorAll('[data-cnt="forms"]').forEach(e=>e.textContent=REG.forms.length);
+A.reg = REG;
+A.initAuth(@@FBCFG@@, () => { chips(); paint(); });
+chips(); paint();
+
+function pill(id, items, cur, set){
+  document.getElementById(id).innerHTML = items.map(i =>
+    `<button class="fb" data-v="${A.esc(i.v)}" aria-pressed="${i.v===cur}">${A.esc(i.n)}</button>`).join('');
+  document.querySelectorAll('#'+id+' .fb').forEach(b => b.addEventListener('click', ()=>{
+    set(b.dataset.v);
+    document.querySelectorAll('#'+id+' .fb').forEach(x=>x.setAttribute('aria-pressed', x.dataset.v===b.dataset.v));
+    paint();
+  }));
+}
+function chips(){
+  pill('fgroup', [{v:'all',n:'ทุกกลุ่ม'}].concat(REG.roles.map(r=>({v:r.k,n:r.n}))), GROUP, v=>GROUP=v);
+  pill('fsys', [{v:'all',n:'ทุกระบบ'}].concat(Object.keys(REG.systems).map(k=>({v:k,n:REG.systems[k].n}))), SYS, v=>SYS=v);
+  if (A.isStaff()) {
+    document.getElementById('fst').classList.remove('hide');
+    pill('fst', [{v:'all',n:'ทุกสถานะ'},{v:'issue',n:'เฉพาะที่มีปัญหา'},
+                 {v:'inlef',n:'อยู่ใน LEF'},{v:'notlef',n:'ยังไม่อยู่ใน LEF'}], ST, v=>ST=v);
+  }
+}
+function list(){
+  let L = A.isStaff() ? REG.forms.slice() : REG.forms.filter(f=>f.public);
+  if (GROUP!=='all') L = L.filter(f=>f.r && f.r[GROUP]);
+  if (SYS!=='all')   L = L.filter(f=>f.sys===SYS);
+  if (A.isStaff()){
+    if (ST==='issue')  L = L.filter(f=>f.st!=='ok');
+    if (ST==='inlef')  L = L.filter(f=>f.lef && f.lef.length);
+    if (ST==='notlef') L = L.filter(f=>!f.lef || !f.lef.length);
+  }
+  const q = document.getElementById('q').value.trim().toLowerCase();
+  if (q) L = L.map(f=>({f,s:A.score(f,q)})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s).map(x=>x.f);
+  return L;
+}
+function paint(){
+  const L = list();
+  document.getElementById('hd').textContent = 'ฟอร์มทั้งหมด ' + L.length + ' ฟอร์ม';
+  document.getElementById('cnt').textContent =
+    (A.isStaff()?'มุมมองเจ้าหน้าที่ — เห็นทั้งทะเบียน':'มุมมองสาธารณะ — เฉพาะฟอร์มของนักเรียน');
+  const role = GROUP!=='all' ? GROUP : (A.roles[0] || 'stu');
+  document.getElementById('out').innerHTML = !L.length
+    ? '<p class="note">ไม่พบฟอร์มที่ตรงเงื่อนไข</p>'
+    : VIEW==='card'
+      ? '<div class="forms">' + L.map(f=>A.card(REG,f,f.r&&f.r[role])).join('') + '</div>'
+      : table(L);
+}
+function table(L){
+  return `<div class="twrap"><table class="reg"><thead><tr>
+    <th>Doc code</th><th>ชื่อฟอร์ม</th><th>กลุ่มผู้ใช้</th><th>ระบบ</th>${A.isStaff()?'<th>สถานะ</th>':''}
+    </tr></thead><tbody>` + L.map(f=>{
+      const s=A.sysOf(REG,f), st=REG.status[f.st];
+      return `<tr onclick="location.href='${A.formUrl(f)}'" style="cursor:pointer">
+        <td class="c">${A.esc(f.doc||f.abbr)}</td>
+        <td class="nm">${A.esc(f.th||f.t)}<span class="th">${A.esc(f.t)}</span></td>
+        <td class="c">${Object.keys(f.r||{}).map(k=>A.ROLE_N[k]||k).join(' · ')||'—'}</td>
+        <td class="c">${A.esc(s.n)}</td>
+        ${A.isStaff()?`<td><span class="tag ${st?st.lv:''}">${A.esc(st?st.n:'')}</span></td>`:''}
+      </tr>`;}).join('') + `</tbody></table></div>`;
+}
+document.getElementById('q').addEventListener('input', paint);
+document.getElementById('view').addEventListener('click', e=>{
+  VIEW = VIEW==='card' ? 'table' : 'card';
+  e.target.textContent = 'มุมมอง: ' + (VIEW==='card'?'การ์ด':'ตาราง');
+  paint();
+});
+</script>
+</body></html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>คลังฟอร์ม — D-0507 Flight Training</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="../assets/app.css">
+</head><body>
+<div class="topbar">
+  <a class="brand" href="../" style="text-decoration:none">
+    <svg viewBox="0 0 320 72" fill="none" role="img" aria-label="D0507 Flight Training">
+      <g transform="translate(8,12)"><path d="M4 28 L44 20 L52 22 L44 26 L48 36 L40 34 L36 28 Z" fill="#fff"/>
+      <path d="M18 24 L44 20 L40 34 L22 30 Z" fill="#4A90D9"/><path d="M4 28 L14 22 L16 26 L8 30 Z" fill="#4A90D9"/></g>
+      <text x="70" y="36" font-family="'Arial Narrow',Arial,sans-serif" font-size="28" font-weight="800" letter-spacing="-0.5" fill="#fff">D0507</text>
+      <text x="71" y="54" font-family="'Arial Narrow',Arial,sans-serif" font-size="14" font-weight="600" letter-spacing="4" fill="#4A90D9">FLIGHT TRAINING</text>
+    </svg>
+    <span class="div"></span>
+    <span><span class="nm">ระบบฟอร์มออนไลน์</span><span class="en">Forms &amp; Approvals</span></span>
+  </a>
+  <div class="tsearch" onclick="location.href='../all/'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
+    <span>ค้นหาฟอร์ม · Search forms</span><span class="k">⌘K</span>
+  </div>
+  <div class="tright" id="authbox"></div>
+</div>
+<div class="body">
+<nav class="rail">
+  <span class="lab">เมนู · Menu</span>
+  <a class="nav" data-nav="home" href="../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>
+    <span><span class="t">หน้าหลัก</span><span class="en">Home</span></span></a>
+  <a class="nav" data-nav="all" href="../all/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg>
+    <span><span class="t">คลังฟอร์ม</span><span class="en">All forms</span></span><span class="pill gry" data-cnt="forms">—</span></a>
+  <a class="nav staffonly" data-nav="queue" href="../queue/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l4 4L14 8"/><path d="M10 13l4 4L22 8"/></svg>
+    <span><span class="t">งานของฉัน</span><span class="en">My queue</span></span><span class="pill amb" data-cnt="queue">0</span></a>
+  <a class="nav staffonly" data-nav="register" href="../admin/register/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h8.5L19 7v14.5H6z"/><path d="M14 2.5V7h5"/><path d="M9 12h7M9 15.5h7"/></svg>
+    <span><span class="t">ทะเบียนเอกสาร</span><span class="en">Register · LEF</span></span></a>
+  <a class="nav staffonly" data-nav="audit" href="../../d0507-audit/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.4 15.4L21 21"/></svg>
+    <span><span class="t">งานตรวจสอบ</span><span class="en">Audit portal ↗</span></span></a>
+
+  <div class="railfoot">
+    <svg class="q" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9.2"/><path d="M9.4 9.2a2.7 2.7 0 1 1 3.4 2.6c-.6.2-.8.7-.8 1.3v.6"/><circle cx="12" cy="17" r=".9" fill="currentColor" stroke="none"/></svg>
+    <b>ไม่รู้ว่าต้องใช้ฟอร์มไหน?</b>
+    <p>พิมพ์สิ่งที่อยากทำในช่องค้นหา ระบบจะหาให้ข้ามทุกระบบ</p>
+  </div>
+</nav>
+  <main class="main">
+    <div class="greet">
+      <div><p class="eyebrow">คลังฟอร์ม · ALL FORMS</p>
+        <h1 id="hd">ฟอร์มทั้งหมด</h1>
+        <p class="sub">รายการเดียว กรองได้ตามกลุ่มผู้ใช้ ระบบที่ฟอร์มอยู่ และสถานะเอกสาร</p></div>
+    </div>
+
+    <section>
+      <div class="filters">
+        <input id="q" type="search" placeholder="ค้นหา — ชื่อฟอร์ม รหัสเอกสาร หรือสิ่งที่อยากทำ">
+        <button class="fb" id="view" data-v="card">มุมมอง: การ์ด</button>
+      </div>
+      <div class="filters" id="fgroup"></div>
+      <div class="filters" id="fsys"></div>
+      <div class="filters staffonly hide" id="fst"></div>
+      <p class="sub" id="cnt" style="margin:4px 0 14px"></p>
+      <div id="out"></div>
+    </section>
+  </main>
+</div>
+<nav class="botnav">
+  <a data-nav="home" href="../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>หน้าหลัก</a>
+  <a class="on" data-nav="all" href="../all/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg>คลังฟอร์ม</a>
+  <a data-nav="queue" class="staffonly" href="../queue/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l4 4L14 8"/><path d="M10 13l4 4L22 8"/></svg>งานของฉัน</a>
+  <a data-nav="register" class="staffonly" href="../admin/register/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h8.5L19 7v14.5H6z"/><path d="M14 2.5V7h5"/><path d="M9 12h7M9 15.5h7"/></svg>ทะเบียน</a>
+</nav>
+<footer>D-0507 Flight Training Co., Ltd. · Controlled Document System</footer>
+<script>window.BASE='../';</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="../assets/app.js"></script>
+<script>
+"use strict";
+const REG = {"systems":{"here":{"n":"ระบบฟอร์มออนไลน์","en":"This portal","url":"","lg":"52","cl":"d"},"dispatch":{"n":"ระบบ Dispatch","en":"Flight dispatch","url":"https://d0507.361vision.org/d0507-app/dispatch/?v=final","lg":"DSP","cl":"a"},"training":{"n":"ระบบบันทึกการฝึก","en":"Training records","url":"https://d0507.361vision.org/","lg":"TRN","cl":"b"},"fbo":{"n":"AeroFBO","en":"Operations & maintenance","url":"https://indyzz.com/aerofbo/index.php","lg":"FBO","cl":"c"},"audit":{"n":"Audit Portal","en":"Internal audit","url":"../d0507-audit/","lg":"AUD","cl":"a"}},"forms":[{"doc":"D-0507-FRAE-001","abbr":"FRAE","t":"Flight Risk Assessment and Evaluation","th":"การประเมินความเสี่ยงก่อนทำการบิน","sys":"here","jot":"210071253532038","assignTo":"FI","r":{"stu":"กรอกฝั่งนักเรียนก่อนบินทุกเที่ยว"},"chain":"preflight","kw":["บิน","จะบิน","ก่อนบิน","พรุ่งนี้","ความเสี่ยง","เสี่ยง","ประเมิน","ครู","fit to fly","frae","risk","preflight"],"public":true,"iss":"01","rev":"00","eff":"07 JUL 2022","hasDef":false},{"doc":"D-0507-SDF-001","abbr":"SDF","t":"Self Declaration Form","th":"แบบแจ้งข้อมูลด้วยตนเอง","sys":"here","jot":"210394186308456","r":{"stu":"แจ้งเมื่อหยุดบินเกิน 2 สัปดาห์ หรือมีการบินอื่นนอกหลักสูตร"},"chain":"preflight","kw":["แจ้ง","หยุด","หยุดบิน","ไม่ได้บิน","บินที่อื่น","ประกาศตน","declaration","sdf"],"public":true,"iss":"01","rev":"00","eff":"10 FEB 2021","hasDef":false},{"doc":"D-0507-GSP-001","abbr":"GSP","t":"PPL Ground and Flight Training Record","th":"บันทึกการฝึกภาคพื้นและภาคอากาศ PPL","sys":"training","r":{"stu":"ดูบันทึกการฝึกและความคืบหน้าของตัวเอง (อ่านเท่านั้น)"},"chain":"training","kw":["ผลการฝึก","ความคืบหน้า","บันทึกการฝึก","gradeslip","training record","ppl","gsp"],"public":true,"iss":"01","rev":"00","eff":"07 JUL 2022","hasDef":false},{"doc":"D-0507-EFM-001","abbr":"EFM","t":"Progress and Evaluation Form","th":"แบบประเมินความคืบหน้า","sys":"training","r":{"stu":"ดูผลการฝึกของตัวเอง · Gradeslip PPL"},"chain":"training","kw":["ผลการฝึก","ดูผล","เกรด","gradeslip","ความคืบหน้า","ประเมินความคืบหน้า","efm"],"public":true,"iss":"01","rev":"00","eff":"20 NOV 2024","hasDef":false},{"doc":"D-0507-SEF-001","abbr":"SEF","t":"Student Evaluation Form","th":"แบบประเมินครูผู้สอนโดยนักเรียน","sys":"here","jot":"210063447392452","assignTo":"CMM","r":{"stu":"ประเมินครูผู้สอนเมื่อจบแต่ละ Stage (ไม่เปิดเผยชื่อ)"},"chain":"training","kw":["ประเมินครู","ครูผู้สอน","ให้คะแนนครู","ความเห็น","feedback","sef"],"public":true,"iss":"01","rev":"00","eff":"20 AUG 2020","hasDef":false},{"doc":"D-0507-PWR-001","abbr":"PWR","t":"Passenger Waiver and Release Form","th":"หนังสือสละสิทธิ์เรียกร้องของผู้โดยสาร","sys":"here","jot":"243218657614460","assignTo":"FI","r":{"stu":"ผู้โดยสาร trial flight ลงนามก่อนขึ้นบิน"},"chain":"admin","kw":["ผู้โดยสาร","พาคนขึ้น","trial flight","waiver","สละสิทธิ์","pwr"],"public":true,"iss":"01","rev":"02","eff":"18 JUL 2024","hasDef":false},{"doc":"D-0507-APP-001","abbr":"APP","t":"Application Form","th":"ใบสมัคร","sys":"fbo","r":{"stu":"สมัครเข้าเรียน เปลี่ยนหลักสูตร หรือขอ licence / rating"},"chain":"admin","kw":["สมัคร","สมัครเรียน","เข้าเรียน","ใบสมัคร","โปรไฟล์","application","app"],"public":true,"iss":"01","rev":"00","eff":"13 JAN 2022","hasDef":false},{"doc":"D-0507-APF-001","abbr":"APF","t":"Appeal Form","th":"แบบอุทธรณ์","sys":"here","jot":"243218287458465","assignTo":"ACM","r":{"stu":"ยื่นอุทธรณ์คำวินิจฉัยของ ATO ภายใน 14 วัน"},"chain":"admin","kw":["อุทธรณ์","ไม่เป็นธรรม","ร้องเรียน","appeal","apf"],"public":true,"iss":"01","rev":"00","eff":"18 JUL 2022","hasDef":false},{"doc":"D-0507-VSR-001","abbr":"VSR","t":"Voluntary Safety Report","th":"รายงานนิรภัยโดยสมัครใจ","sys":"here","jot":"221482584465058","r":{"stu":"แจ้งเหตุหรือความเสี่ยงด้านนิรภัย (ไม่ระบุชื่อได้)"},"chain":"safety","kw":["ไม่ปลอดภัย","อันตราย","เหตุ","แจ้งเหตุ","นิรภัย","รายงาน","safety","vsr","เกือบเกิดเหตุ"],"public":true,"iss":"01","rev":"00","eff":"01 MAR 2020","hasDef":false}],"roles":[{"k":"stu","n":"นักเรียน","d":"นักศึกษาการบิน · ผู้เข้ารับการฝึก"},{"k":"ins","n":"ครูการบิน / ครูภาคทฤษฎี","d":"FI · TKI · FIE"},{"k":"mnt","n":"ช่างอากาศยาน","d":"ฝ่ายซ่อมบำรุง (ME)"},{"k":"ops","n":"ฝ่ายปฏิบัติการ","d":"Operations · Dispatch · ธุรการเอกสาร"},{"k":"mgt","n":"ฝ่ายบริหาร","d":"ACM · HT · CMM · Safety Manager"}],"status":{"ok":{"n":"พร้อมใช้","lv":"ok"},"linkwrong":{"n":"ลิงก์ใน LEF ผิดใบ","lv":"bad"},"nolink":{"n":"LEF ยังไม่ใส่ลิงก์","lv":"warn"},"noform":{"n":"ยังไม่มีฟอร์มออนไลน์","lv":"warn"},"pdfonly":{"n":"เป็น PDF บน Drive","lv":"warn"},"notinlef":{"n":"ยังไม่อยู่ใน LEF","lv":"warn"},"shadow":{"n":"ใช้บน Jotform · ไม่มีในคู่มือ","lv":"bad"},"dupsys":{"n":"มีสองฉบับ — ระบบภายนอกและ Jotform","lv":"bad"}},"lefcount":{"total":52}};
+const A = D0507;
+let GROUP='all', SYS='all', ST='all', VIEW='card';
+document.querySelectorAll('[data-cnt="forms"]').forEach(e=>e.textContent=REG.forms.length);
+A.reg = REG;
+A.initAuth({
+  apiKey: "AIzaSyB_O4vBBOa7-YtGJyPnZ5NLPtQZjWMSJnQ",
+  authDomain: "d0507-audit.firebaseapp.com",
+  projectId: "d0507-audit",
+  storageBucket: "d0507-audit.firebasestorage.app",
+  messagingSenderId: "880880454045",
+  appId: "1:880880454045:web:a8fe249ca18f1a7a20c774"
+}, () => { chips(); paint(); });
+chips(); paint();
+
+function pill(id, items, cur, set){
+  document.getElementById(id).innerHTML = items.map(i =>
+    `<button class="fb" data-v="${A.esc(i.v)}" aria-pressed="${i.v===cur}">${A.esc(i.n)}</button>`).join('');
+  document.querySelectorAll('#'+id+' .fb').forEach(b => b.addEventListener('click', ()=>{
+    set(b.dataset.v);
+    document.querySelectorAll('#'+id+' .fb').forEach(x=>x.setAttribute('aria-pressed', x.dataset.v===b.dataset.v));
+    paint();
+  }));
+}
+function chips(){
+  pill('fgroup', [{v:'all',n:'ทุกกลุ่ม'}].concat(REG.roles.map(r=>({v:r.k,n:r.n}))), GROUP, v=>GROUP=v);
+  pill('fsys', [{v:'all',n:'ทุกระบบ'}].concat(Object.keys(REG.systems).map(k=>({v:k,n:REG.systems[k].n}))), SYS, v=>SYS=v);
+  if (A.isStaff()) {
+    document.getElementById('fst').classList.remove('hide');
+    pill('fst', [{v:'all',n:'ทุกสถานะ'},{v:'issue',n:'เฉพาะที่มีปัญหา'},
+                 {v:'inlef',n:'อยู่ใน LEF'},{v:'notlef',n:'ยังไม่อยู่ใน LEF'}], ST, v=>ST=v);
+  }
+}
+function list(){
+  let L = A.isStaff() ? REG.forms.slice() : REG.forms.filter(f=>f.public);
+  if (GROUP!=='all') L = L.filter(f=>f.r && f.r[GROUP]);
+  if (SYS!=='all')   L = L.filter(f=>f.sys===SYS);
+  if (A.isStaff()){
+    if (ST==='issue')  L = L.filter(f=>f.st!=='ok');
+    if (ST==='inlef')  L = L.filter(f=>f.lef && f.lef.length);
+    if (ST==='notlef') L = L.filter(f=>!f.lef || !f.lef.length);
+  }
+  const q = document.getElementById('q').value.trim().toLowerCase();
+  if (q) L = L.map(f=>({f,s:A.score(f,q)})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s).map(x=>x.f);
+  return L;
+}
+function paint(){
+  const L = list();
+  document.getElementById('hd').textContent = 'ฟอร์มทั้งหมด ' + L.length + ' ฟอร์ม';
+  document.getElementById('cnt').textContent =
+    (A.isStaff()?'มุมมองเจ้าหน้าที่ — เห็นทั้งทะเบียน':'มุมมองสาธารณะ — เฉพาะฟอร์มของนักเรียน');
+  const role = GROUP!=='all' ? GROUP : (A.roles[0] || 'stu');
+  document.getElementById('out').innerHTML = !L.length
+    ? '<p class="note">ไม่พบฟอร์มที่ตรงเงื่อนไข</p>'
+    : VIEW==='card'
+      ? '<div class="forms">' + L.map(f=>A.card(REG,f,f.r&&f.r[role])).join('') + '</div>'
+      : table(L);
+}
+function table(L){
+  return `<div class="twrap"><table class="reg"><thead><tr>
+    <th>Doc code</th><th>ชื่อฟอร์ม</th><th>กลุ่มผู้ใช้</th><th>ระบบ</th>${A.isStaff()?'<th>สถานะ</th>':''}
+    </tr></thead><tbody>` + L.map(f=>{
+      const s=A.sysOf(REG,f), st=REG.status[f.st];
+      return `<tr onclick="location.href='${A.formUrl(f)}'" style="cursor:pointer">
+        <td class="c">${A.esc(f.doc||f.abbr)}</td>
+        <td class="nm">${A.esc(f.th||f.t)}<span class="th">${A.esc(f.t)}</span></td>
+        <td class="c">${Object.keys(f.r||{}).map(k=>A.ROLE_N[k]||k).join(' · ')||'—'}</td>
+        <td class="c">${A.esc(s.n)}</td>
+        ${A.isStaff()?`<td><span class="tag ${st?st.lv:''}">${A.esc(st?st.n:'')}</span></td>`:''}
+      </tr>`;}).join('') + `</tbody></table></div>`;
+}
+document.getElementById('q').addEventListener('input', paint);
+document.getElementById('view').addEventListener('click', e=>{
+  VIEW = VIEW==='card' ? 'table' : 'card';
+  e.target.textContent = 'มุมมอง: ' + (VIEW==='card'?'การ์ด':'ตาราง');
+  paint();
+});
+</script>
+</body></html>

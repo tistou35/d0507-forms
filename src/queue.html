@@ -1,0 +1,56 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>งานของฉัน — D-0507 Flight Training</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="@@BASE@@assets/app.css">
+</head><body>
+@@TOPBAR@@
+<div class="body">
+@@RAIL@@
+  <main class="main">
+    <div class="greet"><div>
+      <p class="eyebrow">งานของฉัน · MY QUEUE</p>
+      <h1>งานที่รอคุณ</h1>
+      <p class="sub">รวมงานจากทุกระบบ — ฟอร์มที่ถูกส่งถึงคุณ และ CAR จากงานตรวจสอบ</p></div></div>
+    <div id="out"><p class="note">กำลังโหลด…</p></div>
+  </main>
+</div>
+@@BOTNAV@@
+<footer>D-0507 Flight Training Co., Ltd. · Controlled Document System</footer>
+<script>window.BASE='@@BASE@@';</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="@@BASE@@assets/app.js"></script>
+<script>
+"use strict";
+const REG=@@REG@@, A=D0507;
+document.querySelectorAll('[data-cnt="forms"]').forEach(e=>e.textContent=REG.forms.length);
+A.reg = REG;
+A.initAuth(@@FBCFG@@, load);
+function load(){
+  const out=document.getElementById('out');
+  if(!A.isStaff()){
+    out.innerHTML=`<div class="note"><b>ต้องเข้าสู่ระบบก่อน</b> — คิวงานเป็นของเจ้าหน้าที่
+      <br><a class="big pri" style="margin-top:12px" href="@@BASE@@staff-login/">เข้าสู่ระบบ</a></div>`;
+    return;
+  }
+  A.db.collection('tasks').where('assigneeUid','==',A.user.uid).where('state','==','open').get()
+   .then(s=>{
+      document.querySelectorAll('[data-cnt="queue"]').forEach(e=>e.textContent=s.size);
+      out.innerHTML = s.size ? '<div class="stats">' + s.docs.map(d=>{
+        const t=d.data(), f=REG.forms.find(x=>x.abbr===t.formCode);
+        const url = t.app==='audit' ? '@@BASE@@../d0507-audit/' : (f?A.formUrl(f):'@@BASE@@all/');
+        return `<a class="stat amb lk" href="${url}"><div class="top">
+          <span><span class="ti">${A.esc(t.title||t.formCode)}</span>
+          <span class="en">${A.esc(t.tracking||'')}</span></span></div>
+          <p class="note">${A.esc(t.app==='audit'?'จากงานตรวจสอบ':'ฟอร์มที่ถูกส่งถึงคุณ')}</p>
+          <p class="cta">เปิดงาน <span>→</span></p></a>`;}).join('') + '</div>'
+        : `<div class="stat grn"><div class="top"><span class="ti">ไม่มีงานค้าง</span><span class="n">0</span></div>
+           <p class="note">งานที่ถูกส่งถึงคุณจะมาโผล่ที่นี่</p></div>`;
+   })
+   .catch(e=>{ out.innerHTML=`<div class="warn"><b>อ่านคิวงานไม่ได้</b><br>${A.esc(
+      e.code==='permission-denied'?'ยังไม่ได้วาง Security Rules ชุดใหม่ — ดู firebase/README.md':e.message)}</div>`; });
+}
+</script>
+</body></html>
