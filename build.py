@@ -32,12 +32,15 @@ DEFS = os.path.join(HERE, 'formdefs')
 CFG_PATH = os.path.join(HERE, 'firebase', 'config.json')
 
 
+FB_KEYS = ('apiKey', 'authDomain', 'projectId', 'storageBucket', 'messagingSenderId', 'appId')
+
+
 def firebase_config():
     raw = json.load(open(CFG_PATH, encoding='utf-8'))
-    cfg = {k: v for k, v in raw.items() if not k.startswith('_')}
+    cfg = {k: raw[k] for k in FB_KEYS if k in raw}
     todo = [k for k, v in cfg.items() if 'REPLACE_ME' in str(v)]
     body = ',\n'.join('  %s: "%s"' % (k, v) for k, v in cfg.items())
-    return '{\n' + body + '\n}', todo
+    return '{\n' + body + '\n}', todo, raw.get('gasUrl', '')
 
 PUBLIC_FORBIDDEN = ('code', 'lef', 'st', 'note', 'docx', 'own', 'jotDup')
 PUBLIC_KEEP = ('doc', 'abbr', 't', 'th', 'sys', 'jot', 'assignTo', 'r', 'chain', 'kw',
@@ -151,7 +154,7 @@ def main():
 
     pub = public_view(reg)
     # ⚠️ ทุกหน้าที่ host แบบสาธารณะฝังได้เฉพาะ pub — ทะเบียนเต็มอยู่ Firestore เท่านั้น
-    FB, todo = firebase_config()
+    FB, todo, GAS = firebase_config()
     R, P = jsonjs(pub), jsonjs(pub)
     stats = {'forms': len(reg['forms']), 'lef': reg['lefcount']['unique'],
              'public': len(pub['forms']), 'systems': len([k for k in reg['systems'] if k != 'here']),
@@ -159,6 +162,8 @@ def main():
 
     print('register: %d ฟอร์ม · สาธารณะ %d · มีนิยามฟอร์มแล้ว %d' %
           (stats['forms'], stats['public'], stats['defs']))
+    if not GAS:
+        print('  หมายเหตุ: ยังไม่ได้ใส่ gasUrl — การส่งออกไป Drive/Sheet จะยังไม่ทำงาน')
     if todo:
         print('\n  ⚠️  firebase/config.json ยังไม่ได้ใส่ค่าจริง: %s' % ', '.join(todo))
         print('     เว็บจะทำงานเฉพาะส่วนสาธารณะ — login / คิวงาน / ส่งฟอร์ม จะยังใช้ไม่ได้')
@@ -183,7 +188,7 @@ def main():
         ('submit.html',      'submit/index.html',              '../',   'all'),
     ]
     for src, out, base, active in pages:
-        sub = {'@@REG@@': R, '@@REGPUB@@': P, '@@FBCFG@@': FB,
+        sub = {'@@REG@@': R, '@@REGPUB@@': P, '@@FBCFG@@': FB, '@@GASURL@@': GAS,
                '@@STATS@@': jsonjs(stats), '@@DEFS@@': jsonjs(defs)}
         n = emit(src, os.path.join(HERE, out), base, active, sub)
         total += n
@@ -200,7 +205,7 @@ def main():
         # ฝังเฉพาะฟิลด์ที่เปิดสาธารณะได้ — code / lef / st / note / docx มาจาก Firestore ตอน login
         fpub = {k: f[k] for k in ('abbr','doc','t','th','sys','chain','public','r','with',
                                   'assignTo','iss','rev','eff','jot','hasDef') if k in f}
-        sub = {'@@REG@@': jsonjs(mini), '@@FBCFG@@': FB, '@@FORM@@': jsonjs(fpub),
+        sub = {'@@REG@@': jsonjs(mini), '@@FBCFG@@': FB, '@@GASURL@@': GAS, '@@FORM@@': jsonjs(fpub),
                '@@FTITLE@@': (f.get('th') or f.get('t') or f['abbr']).replace('"', "'")}
         total += emit('form.html', os.path.join(HERE, 'f', f['abbr'], 'index.html'),
                       '../../', 'all', sub)

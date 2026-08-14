@@ -121,6 +121,38 @@
     return `${DAY[n.getDay()]}ที่ ${n.getDate()} ${MON[n.getMonth()]} ${n.getFullYear() + 543}`;
   };
 
+  /* ── ส่งออกไป Google Drive + Sheet ────────────────────
+     เรียกเมื่อใบ "จบ" เท่านั้น — จบที่ submit หรือจบทั้ง flow
+     ปลายทางคือ Apps Script Web App (ดู gas/README.md)
+
+     หมายเหตุเรื่อง CORS: Apps Script เปลี่ยนเส้นทางไป googleusercontent.com
+     ทำให้บางเบราว์เซอร์อ่าน response ไม่ได้ ถึงแม้ POST จะถึงปลายทางแล้ว
+     จึงถือว่า "ส่งแล้ว" เมื่อ fetch ไม่ throw และให้ผู้ใช้เปิดโฟลเดอร์ตรวจเองได้ */
+  A.GAS_URL = '';        // ตั้งค่าโดย build.py จาก firebase/config.json
+
+  A.exportSubmission = async function (submission) {
+    if (!A.GAS_URL) return { ok: false, error: 'ยังไม่ได้ตั้ง URL ของตัวส่งออก' };
+    if (submission.status !== 'complete')
+      return { ok: false, error: 'ใบนี้ยังไม่จบ — ส่งออกเมื่อจบเท่านั้น' };
+    const u = firebase.auth().currentUser;
+    if (!u) return { ok: false, error: 'ต้องเข้าสู่ระบบก่อน' };
+    const idToken = await u.getIdToken();
+    try {
+      // text/plain เพื่อเลี่ยง preflight ที่ Apps Script ไม่ตอบ
+      const res = await fetch(A.GAS_URL, {
+        method: 'POST', redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ idToken, submission }),
+      });
+      const out = await res.json();
+      return out.ok ? Object.assign({ ok: true, sent: true }, out.result)
+                    : { ok: false, error: out.error };
+    } catch (e) {
+      // อ่าน response ไม่ได้ แต่ POST ออกไปแล้ว
+      return { ok: true, sent: true, unconfirmed: true, note: e.message };
+    }
+  };
+
   /* การ์ดฟอร์มมาตรฐาน — ใช้ร่วมทุกหน้า */
   A.card = function (reg, f, duty) {
     const s = A.sysOf(reg, f);

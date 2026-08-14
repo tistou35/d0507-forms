@@ -1,0 +1,260 @@
+/**
+ * D-0507 Forms — ตัวส่งออกไป Google Drive และ Google Sheet
+ * Apps Script Web App · deploy แบบ "Execute as: Me" + "Who has access: Anyone"
+ *
+ * โครงที่สร้างให้อัตโนมัติ
+ *   <PARENT_FOLDER>/
+ *     <ABBR>/                              ← subfolder ชื่อเดียวกับตัวย่อฟอร์ม
+ *       <ABBR> — Records          (Sheet)  ← 1 แถวต่อ 1 ใบที่จบแล้ว
+ *       <ABBR>_TEMPLATE           (Doc)    ← แม่แบบ PDF (อัปโหลดเอง ดู README)
+ *       <tracking>.pdf                     ← ฉบับสมบูรณ์ของแต่ละใบ
+ *
+ * เขียนเมื่อ "จบ" เท่านั้น — จบที่ submit หรือจบทั้ง flow
+ * ระหว่างรออนุมัติไม่เขียน กันเอกสารครึ่ง ๆ กลาง ๆ ปนในแฟ้ม
+ */
+
+// ── ตั้งค่า ─────────────────────────────────────────────────
+// ใส่ค่าที่ Project Settings → Script Properties (อย่า hardcode ลงไฟล์นี้)
+//   PARENT_FOLDER_ID   1osUg2ReIT_mqll6BbDSUR-FBAg4zSEp6
+//   FIREBASE_API_KEY   apiKey ของโปรเจกต์ d0507-forms
+//   FIREBASE_PROJECT   d0507-forms
+function cfg_(k) {
+  var v = PropertiesService.getScriptProperties().getProperty(k);
+  if (!v) throw new Error('ยังไม่ได้ตั้ง Script Property: ' + k);
+  return v;
+}
+
+// ── จุดรับ POST ─────────────────────────────────────────────
+function doPost(e) {
+  try {
+    var body = JSON.parse(e.postData.contents);
+    var who = verifyToken_(body.idToken);          // ตรวจว่า token มาจากโปรเจกต์เราจริง
+    var out = exportSubmission_(body.submission, who);
+    return json_({ ok: true, result: out });
+  } catch (err) {
+    return json_({ ok: false, error: String(err && err.message || err) });
+  }
+}
+
+function doGet() {
+  return json_({ ok: true, service: 'D-0507 Forms exporter', at: new Date().toISOString() });
+}
+
+function json_(o) {
+  return ContentService.createTextOutput(JSON.stringify(o))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * ตรวจ Firebase ID token ผ่าน Identity Toolkit
+ * ได้ทั้งการยืนยันว่า token ยังไม่หมดอายุ และว่าเป็นของโปรเจกต์นี้จริง
+ * (นักเรียนที่ล็อกอินแบบ anonymous ก็มี token จึงใช้กติกาเดียวกัน)
+ */
+function verifyToken_(idToken) {
+  if (!idToken) throw new Error('ไม่มี idToken');
+  var res = UrlFetchApp.fetch(
+    'https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=' + cfg_('FIREBASE_API_KEY'),
+    { method: 'post', contentType: 'application/json',
+      payload: JSON.stringify({ idToken: idToken }), muteHttpExceptions: true });
+  if (res.getResponseCode() !== 200) throw new Error('idToken ไม่ผ่านการตรวจสอบ');
+  var u = (JSON.parse(res.getContentText()).users || [])[0];
+  if (!u) throw new Error('ไม่พบผู้ใช้ของ idToken นี้');
+  return {
+    uid: u.localId,
+    email: u.email || '',
+    anonymous: !u.email,
+  };
+}
+
+// ── ตัวช่วยเรื่องโฟลเดอร์ / ชีต ─────────────────────────────
+function subFolder_(abbr) {
+  var parent = DriveApp.getFolderById(cfg_('PARENT_FOLDER_ID'));
+  var it = parent.getFoldersByName(abbr);
+  return it.hasNext() ? it.next() : parent.createFolder(abbr);
+}
+
+function recordSheet_(folder, abbr, headers) {
+  var name = abbr + ' — Records';
+  var it = folder.getFilesByName(name), ss;
+  if (it.hasNext()) {
+    ss = SpreadsheetApp.open(it.next());
+  } else {
+    ss = SpreadsheetApp.create(name);
+    // SpreadsheetApp.create วางไฟล์ไว้ที่ My Drive — ย้ายเข้า subfolder
+    var f = DriveApp.getFileById(ss.getId());
+    folder.addFile(f);
+    DriveApp.getRootFolder().removeFile(f);
+  }
+  var sh = ss.getSheets()[0];
+  if (sh.getLastRow() === 0) {
+    sh.appendRow(headers);
+    sh.getRange(1, 1, 1, headers.length).setFontWeight('bold')
+      .setBackground('#0D1B2A').setFontColor('#ffffff');
+    sh.setFrozenRows(1);
+  }
+  return { ss: ss, sh: sh };
+}
+
+/** ถ้ามีหัวคอลัมน์ใหม่ที่ชีตยังไม่มี ให้ต่อท้าย ไม่เขียนทับของเดิม */
+function alignHeaders_(sh, headers) {
+  var cur = sh.getRange(1, 1, 1, Math.max(1, sh.getLastColumn())).getValues()[0]
+    .filter(function (x) { return x !== ''; });
+  var add = headers.filter(function (h) { return cur.indexOf(h) < 0; });
+  if (add.length) {
+    sh.getRange(1, cur.length + 1, 1, add.length).setValues([add])
+      .setFontWeight('bold').setBackground('#0D1B2A').setFontColor('#ffffff');
+    cur = cur.concat(add);
+  }
+  return cur;
+}
+
+// ── ส่งออกหนึ่งใบ ───────────────────────────────────────────
+function exportSubmission_(s, who) {
+  if (!s || !s.formCode) throw new Error('payload ไม่มี formCode');
+  if (!s.tracking) throw new Error('payload ไม่มี tracking');
+  if (s.status !== 'complete') throw new Error('ใบนี้ยังไม่จบ — ส่งออกเมื่อจบเท่านั้น');
+
+  var abbr = String(s.formCode).replace(/[^A-Za-z0-9\-]/g, '');
+  var folder = subFolder_(abbr);
+
+  // ── 1. แถวในชีต ──
+  var flat = flatten_(s.data || {});
+  var base = ['เลขที่', 'วันที่บันทึก', 'Doc code', 'Issue/Rev', 'defRev',
+              'ผู้ส่ง', 'อีเมลผู้ส่ง', 'สถานะ', 'ผู้ลงนาม', 'PDF'];
+  var extra = Object.keys(flat);
+  var r = recordSheet_(folder, abbr, base.concat(extra));
+  var headers = alignHeaders_(r.sh, base.concat(extra));
+
+  // ── 2. PDF ──
+  var pdf = makePdf_(folder, abbr, s);
+
+  var byKey = {
+    'เลขที่': s.tracking,
+    'วันที่บันทึก': new Date(),
+    'Doc code': s.doc || '',
+    'Issue/Rev': (s.issue || '') + '/' + (s.rev || ''),
+    'defRev': s.defRev || '',
+    'ผู้ส่ง': s.submitterName || '',
+    'อีเมลผู้ส่ง': s.submitterEmail || '',
+    'สถานะ': s.status,
+    'ผู้ลงนาม': (s.signedBy || []).join(', '),
+    'PDF': pdf ? pdf.getUrl() : '',
+  };
+  Object.keys(flat).forEach(function (k) { byKey[k] = flat[k]; });
+
+  // กันบันทึกซ้ำถ้ายิงมาสองครั้ง
+  var trkCol = headers.indexOf('เลขที่') + 1;
+  if (trkCol > 0 && r.sh.getLastRow() > 1) {
+    var col = r.sh.getRange(2, trkCol, r.sh.getLastRow() - 1, 1).getValues();
+    for (var i = 0; i < col.length; i++) {
+      if (String(col[i][0]) === String(s.tracking)) {
+        return { duplicate: true, tracking: s.tracking,
+                 sheet: r.ss.getUrl(), pdf: pdf ? pdf.getUrl() : '', folder: folder.getUrl() };
+      }
+    }
+  }
+
+  r.sh.appendRow(headers.map(function (h) { return byKey[h] === undefined ? '' : byKey[h]; }));
+
+  return { tracking: s.tracking, sheet: r.ss.getUrl(),
+           pdf: pdf ? pdf.getUrl() : '', folder: folder.getUrl(),
+           verifiedUid: who.uid, verifiedEmail: who.email };
+}
+
+/** แผ่คำตอบให้เป็นคอลัมน์เดียว — checklist และ array กลายเป็นข้อความอ่านได้ */
+function flatten_(data) {
+  var out = {};
+  Object.keys(data).forEach(function (k) {
+    var v = data[k];
+    if (v === null || v === undefined) { out[k] = ''; return; }
+    if (Array.isArray(v)) { out[k] = v.join(', '); return; }
+    if (typeof v === 'object') {
+      out[k] = Object.keys(v).map(function (i) { return i + '=' + v[i]; }).join(' · ');
+      return;
+    }
+    if (typeof v === 'string' && v.indexOf('data:image') === 0) { out[k] = '(ลายเซ็น)'; return; }
+    out[k] = v;
+  });
+  return out;
+}
+
+// ── PDF ─────────────────────────────────────────────────────
+/**
+ * ถ้ามีแม่แบบ <ABBR>_TEMPLATE (Google Doc) ใน subfolder จะใช้แม่แบบนั้น
+ * แทนค่า {{key}} ด้วยคำตอบ แล้ว export เป็น PDF — ได้หน้าตาตรงฟอร์มต้นฉบับ
+ * ถ้ายังไม่มีแม่แบบ จะสร้าง PDF สำรองจาก HTML เพื่อให้ระบบเดินต่อได้
+ */
+function makePdf_(folder, abbr, s) {
+  var name = s.tracking + '.pdf';
+  var old = folder.getFilesByName(name);
+  if (old.hasNext()) return old.next();          // มีแล้ว ไม่สร้างซ้ำ
+
+  var tpl = folder.getFilesByName(abbr + '_TEMPLATE');
+  var blob;
+  if (tpl.hasNext()) {
+    var copy = tpl.next().makeCopy(s.tracking + ' (working)', folder);
+    var doc = DocumentApp.openById(copy.getId());
+    var b = doc.getBody();
+    var flat = flatten_(s.data || {});
+    var all = Object.assign({}, flat, {
+      tracking: s.tracking, doc: s.doc || '', issue: s.issue || '', rev: s.rev || '',
+      defRev: s.defRev || '', submitter: s.submitterName || '',
+      submittedAt: s.submittedAt || '', score: (s.computed && s.computed.score) || '',
+    });
+    Object.keys(all).forEach(function (k) {
+      b.replaceText('\\{\\{' + k + '\\}\\}', String(all[k]));
+    });
+    b.replaceText('\\{\\{[a-zA-Z0-9_]+\\}\\}', '');   // ตัวที่เหลือให้ว่างไว้
+    doc.saveAndClose();
+    blob = copy.getAs('application/pdf').setName(name);
+    copy.setTrashed(true);
+  } else {
+    blob = Utilities.newBlob(fallbackHtml_(abbr, s), 'text/html', 'x.html')
+      .getAs('application/pdf').setName(name);
+  }
+  return folder.createFile(blob);
+}
+
+function fallbackHtml_(abbr, s) {
+  var esc = function (x) {
+    return String(x === undefined || x === null ? '' : x)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  };
+  var flat = flatten_(s.data || {});
+  var rows = Object.keys(flat).map(function (k) {
+    return '<tr><td class="k">' + esc(k) + '</td><td>' + esc(flat[k]) + '</td></tr>';
+  }).join('');
+  return '<html><head><meta charset="utf-8"><style>' +
+    'body{font-family:Sarabun,Arial,sans-serif;font-size:11pt;margin:28px}' +
+    'h1{font-size:15pt;margin:0}.sub{color:#555;font-size:9pt}' +
+    '.band{background:#0D1B2A;color:#fff;padding:10px 14px;margin:14px 0 0}' +
+    'table{width:100%;border-collapse:collapse;margin-top:10px}' +
+    'td{border-bottom:1px solid #ddd;padding:6px 8px;vertical-align:top}' +
+    'td.k{width:38%;color:#555}' +
+    '.warn{background:#fef3d8;border-left:4px solid #E8A020;padding:10px 14px;margin-top:16px;font-size:9pt}' +
+    '</style></head><body>' +
+    '<div class="band"><h1>' + esc(s.title || abbr) + '</h1>' +
+    '<div class="sub" style="color:#cfe0f5">D-0507 Flight Training Co., Ltd.</div></div>' +
+    '<p class="sub">' + esc(s.doc || abbr) + ' · Issue ' + esc(s.issue) + '/Rev ' + esc(s.rev) +
+    ' · defRev ' + esc(s.defRev) + ' · เลขที่ ' + esc(s.tracking) + '</p>' +
+    '<table>' + rows + '</table>' +
+    '<div class="warn"><b>ยังไม่ได้ติดตั้งแม่แบบของฟอร์มนี้</b><br>' +
+    'อัปโหลด ' + esc(abbr) + '_TEMPLATE (Google Doc) เข้าโฟลเดอร์ ' + esc(abbr) +
+    ' เพื่อให้ PDF มีหน้าตาตรงกับฟอร์มต้นฉบับ</div>' +
+    '</body></html>';
+}
+
+// ── ทดสอบจากใน editor โดยไม่ต้องยิงจากเว็บ ──────────────────
+function testExport() {
+  var out = exportSubmission_({
+    formCode: 'FRAE', tracking: 'FRAE-TEST-0001', status: 'complete',
+    doc: 'D-0507-FRAE-001', issue: '01', rev: '00', defRev: 1,
+    title: 'การประเมินความเสี่ยงก่อนทำการบิน',
+    submitterName: 'ทดสอบระบบ', submitterEmail: 'test@example.com',
+    signedBy: ['ทดสอบระบบ'],
+    computed: { score: 7 },
+    data: { picFirst: 'ทดสอบ', picLast: 'ระบบ', flightDate: '2026-08-14',
+            aircraftReg: 'HS-VVD', flightType: 'VFR', totalScore: 7, decision: 'GO' },
+  }, { uid: 'test', email: 'editor@local' });
+  Logger.log(JSON.stringify(out, null, 2));
+}

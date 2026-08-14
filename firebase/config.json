@@ -5,5 +5,9 @@
   "projectId": "d0507-forms",
   "storageBucket": "d0507-forms.firebasestorage.app",
   "messagingSenderId": "38336897307",
-  "appId": "1:38336897307:web:0e423f959e635a07faf3be"
+  "appId": "1:38336897307:web:0e423f959e635a07faf3be",
+
+  "_export": "ค่าสำหรับส่งออกไป Google Drive/Sheet — gasUrl ได้จากตอน deploy Apps Script (ดู gas/README.md)",
+  "gasUrl": "",
+  "driveFolderId": "1osUg2ReIT_mqll6BbDSUR-FBAg4zSEp6"
 }
