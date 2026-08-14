@@ -160,8 +160,7 @@ function info_(b) {
 
 function section_(b, s) {
   var p = b.appendParagraph('SECTION ' + s.n + '  —  ' + s.t);
-  p.setAttributes(attr_({ SZ: 10, C: '#FFFFFF', BOLD: true, SPACE_BEFORE: 6, SPACE_AFTER: 0 }));
-  p.setBackgroundColor(NAVY);
+  p.setAttributes(attr_({ SZ: 10, C: '#FFFFFF', BOLD: true, SPACE_BEFORE: 6, SPACE_AFTER: 0, BG: NAVY }));
 
   var rows = s.rows.map(function (r) {
     if (r.sel) {
@@ -242,6 +241,7 @@ function footer_(doc) {
 function attr_(o) {
   var D = DocumentApp.Attribute, a = {};
   a[D.FONT_FAMILY] = 'Sarabun';
+  a[D.BACKGROUND_COLOR] = o.BG || null;
   if (o.SZ !== undefined)   a[D.FONT_SIZE] = o.SZ;
   if (o.C)                  a[D.FOREGROUND_COLOR] = o.C;
   if (o.BOLD !== undefined) a[D.BOLD] = o.BOLD;
@@ -261,7 +261,13 @@ function styleTable_(t) {
 }
 
 function cell_(c, spec) {
-  c.getChild(0).asParagraph().setAttributes(attr_(spec));
+  // ต้องจัดทุกย่อหน้าในช่อง ไม่ใช่แค่ย่อหน้าแรก
+  // ช่องที่มีสองบรรทัด (หัวข้อ + แถวตัวเลือก) บรรทัดที่สองจะสืบทอดสีพื้นมาถ้าไม่ตั้งทับ
+  for (var i = 0; i < c.getNumChildren(); i++) {
+    var ch = c.getChild(i);
+    if (ch.getType() === DocumentApp.ElementType.PARAGRAPH)
+      ch.asParagraph().setAttributes(attr_(spec));
+  }
 }
 
 function label_(c) { cell_(c, { SZ: 8.5, C: SKY, BOLD: true }); }
