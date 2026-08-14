@@ -191,6 +191,27 @@
     doFill:     { th: 'กรอกฟอร์ม', en: 'Fill in the form' },
     doSend:     { th: 'ส่งฟอร์ม', en: 'Submit the form' },
     doOpen:     { th: 'เปิดฟอร์ม', en: 'Open the form' },
+
+    /* หน้าตรวจทานก่อนส่ง และผลการส่ง */
+    reviewTitle: { th: 'ตรวจทานก่อนส่ง', en: 'Review before submitting' },
+    reviewSub:   { th: 'ใบนี้เป็นเอกสารควบคุม — ส่งแล้วแก้ไม่ได้',
+                   en: 'This is a controlled record — it cannot be edited after submission.' },
+    goBack:      { th: 'กลับไปแก้', en: 'Go back and edit' },
+    confirmSend: { th: 'ยืนยันและส่ง', en: 'Confirm and submit' },
+    signed:      { th: 'ลงนามแล้ว', en: 'signed' },
+    goesToApproval: { th: 'ส่งแล้วจะเข้าคิวรออนุมัติ', en: 'Goes to the approval queue' },
+    endsHere:    { th: 'ส่งแล้วจบทันที บันทึกลงแฟ้มเลย', en: 'Complete on submit — filed immediately' },
+    sending:     { th: 'กำลังส่ง…', en: 'Submitting…' },
+    sentComplete:{ th: 'ส่งเรียบร้อยและบันทึกลงแฟ้มแล้ว', en: 'Submitted and filed' },
+    sentPending: { th: 'ส่งเรียบร้อย — รอผู้มีอำนาจลงนามอนุมัติ',
+                   en: 'Submitted — waiting for authorisation' },
+    trackingNo:  { th: 'เลขที่ใบ', en: 'Record no.' },
+    sendFailed:  { th: 'ส่งไม่สำเร็จ — ข้อมูลที่กรอกยังอยู่ในหน้านี้ ยังไม่หาย',
+                   en: 'Submission failed — your answers are still on this page' },
+    exportFailed:{ th: 'บันทึกลง Drive/Sheet ไม่สำเร็จ (ใบถูกบันทึกในระบบแล้ว):',
+                   en: 'Could not write to Drive/Sheet (the record itself was saved):' },
+    tryAgain:    { th: 'ลองส่งอีกครั้ง', en: 'Try again' },
+    ticked:      { th: 'ติ๊กไว้', en: 'Ticked' },
   };
 
   A.onLang = [];               // หน้าเว็บลงทะเบียนไว้ให้เรียกเมื่อเปลี่ยนภาษา

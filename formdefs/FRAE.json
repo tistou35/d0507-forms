@@ -146,7 +146,8 @@
             "en": "Optional — format letters-YYYYMM-sequence"
           },
           "ph": "AS-{YYYYMM}-4",
-          "pattern": "[A-Za-z]{2,4}-\\d{6}-\\d{1,3}"
+          "pattern": "[A-Za-z]{2,4}-\\d{6}-\\d{1,3}",
+      "mask": "AAAA-999999-999"
         },
         {
           "k": "aircraftReg",

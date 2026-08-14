@@ -40,6 +40,8 @@
     stDone:     { th: 'ตอบครบแล้ว', en: 'Complete' },
     stIdle:     { th: 'ยังไม่ได้กรอก', en: 'Not started' },
     badFormat:  { th: 'รูปแบบไม่ตรงตัวอย่าง', en: 'Format does not match the example' },
+    fillFirst:  { th: n => 'กรอกช่องบังคับในหน้านี้ให้ครบก่อน — เหลืออีก ' + n + ' ช่อง (ที่ทำเครื่องหมายไว้)',
+                  en: n => 'Complete the required fields on this page first — ' + n + ' left (marked below)' },
   };
   const T = (k, lang, arg) => {
     const v = L(UI[k], lang);
@@ -143,6 +145,32 @@
   function ph(s) {
     const d = new Date();
     return String(s || '').replace(/\{YYYYMM\}/g, d.getFullYear() + p2(d.getMonth() + 1));
+  }
+
+  /* ── mask: ใส่ตัวคั่นให้อัตโนมัติระหว่างพิมพ์ ──────────────
+     "AAAA-999999-999"   A = ตัวอักษร (แปลงเป็นตัวใหญ่) · 9 = ตัวเลข · อื่น ๆ = ตัวคั่น
+
+     กลุ่มที่ยาวไม่คงที่รองรับได้ — พิมพ์ตัวที่ไม่เข้าคลาสปัจจุบันเมื่อไร
+     ให้ข้ามไปตัวคั่นถัดไป  เช่น AS แล้วพิมพ์ 2 ต่อ ได้ AS-2 ทันที
+     ตัวคั่นโผล่พร้อมตัวถัดไป ไม่ค้างเป็น "AS-" ให้ลบทิ้งเอง */
+  function maskVal(mask, raw) {
+    if (!mask) return raw;
+    const src = String(raw == null ? '' : raw).replace(/[^A-Za-z0-9]/g, '');
+    const cls = m => m === 'A' ? /[A-Za-z]/ : m === '9' ? /[0-9]/ : null;
+    let out = '', mi = 0, si = 0;
+    while (si < src.length && mi < mask.length) {
+      const c = cls(mask[mi]);
+      if (!c) { out += mask[mi]; mi++; continue; }
+      if (c.test(src[si])) {
+        out += mask[mi] === 'A' ? src[si].toUpperCase() : src[si];
+        si++; mi++; continue;
+      }
+      let nx = -1;
+      for (let j = mi + 1; j < mask.length; j++) if (!cls(mask[j])) { nx = j; break; }
+      if (nx < 0) break;                 // ไม่มีตัวคั่นเหลือแล้ว — ตัวที่พิมพ์เกินมาทิ้งไป
+      mi = nx;
+    }
+    return out;
   }
 
   FormKit.prototype.ctx = function () {
@@ -249,10 +277,11 @@
     const v = this.data[f.k];
     const ro = this.readonly || (this.party && f.__sec.party !== this.party);
     const dis = ro ? ' aria-disabled="true"' : '';
+    const flag = (this.flagged || []).indexOf(f.k) >= 0 ? ' bad' : '';
     const lab = esc(L(f.label, this.lang));
 
     if (f.type === 'check' && typeof f.score === 'number') {
-      return `<div class="fk-row chk" data-fk="${esc(f.k)}" data-toggle="${esc(f.k)}"
+      return `<div class="fk-row chk${flag}" data-fk="${esc(f.k)}" data-toggle="${esc(f.k)}"
         role="checkbox" aria-checked="${!!v}" tabindex="${ro ? -1 : 0}"${dis}>
         <span class="box"></span><span class="t">${lab}</span>
         <span class="pt">${f.score}</span></div>`;
@@ -262,7 +291,7 @@
         `<button type="button" class="fk-opt" data-k="${esc(f.k)}" data-v="${esc(o.v)}"
            aria-pressed="${v == o.v}"${ro ? ' disabled' : ''}>${esc(L(o.n, this.lang) || o.v)}
            <em>${f.score[o.v] || 0}</em></button>`).join('');
-      return `<div class="fk-row col" data-fk="${esc(f.k)}">
+      return `<div class="fk-row col${flag}" data-fk="${esc(f.k)}">
         <span class="t">${lab}${f.req ? ' <span style="color:var(--red-500)">*</span>' : ''}</span>
         <div class="fk-opts sm">${opts}</div></div>`;
     }
@@ -351,7 +380,8 @@
       }
     }
 
-    return `<div class="fk-f" data-fk="${esc(f.k)}">
+    const bad = (this.flagged || []).indexOf(f.k) >= 0 ? ' bad' : '';
+    return `<div class="fk-f${bad}" data-fk="${esc(f.k)}">
       <label for="${id}">${esc(lab)}${f.req ? ' <span style="color:var(--red-500)">*</span>' : ''}${star}</label>
       ${f.hint ? `<p class="hint">${esc(L(f.hint, this.lang))}</p>` : ''}
       ${body}</div>`;
@@ -440,6 +470,12 @@
       html += cur.secs.map(s => this.sectionHtml(s, ctx)).join('');
       if (last) html += this.routeHtml(ctx);
 
+      if (this.flagged && this.flagged.length)
+        html += `<div class="fk-gate warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l9.5 17H2.5z"/>
+          <path d="M12 9.5v4.5"/><circle cx="12" cy="16.8" r=".9" fill="currentColor" stroke="none"/></svg>
+          <span>${esc(T('fillFirst', this.lang, this.flagged.length))}</span></div>`;
+
       html += `<div class="fk-nav">
         ${i > 0 ? `<button type="button" class="fb" data-go="${esc(tabs[i - 1].k)}">← ${esc(tabs[i - 1].n)}</button>` : '<span></span>'}
         ${!last ? `<button type="button" class="big pri" data-go="${esc(tabs[i + 1].k)}">${esc(tabs[i + 1].n)} →</button>` : '<span></span>'}
@@ -468,8 +504,19 @@
     const self = this;
     const rerender = () => self.render(el);
 
-    el.querySelectorAll('input[data-k],textarea[data-k]').forEach(i =>
-      i.addEventListener('change', () => { self.set(i.dataset.k, i.type === 'number' ? Number(i.value) : i.value); rerender(); }));
+    el.querySelectorAll('input[data-k],textarea[data-k]').forEach(i => {
+      const f = self.fields[i.dataset.k] || {};
+      if (f.mask) i.addEventListener('input', () => {
+        const v = maskVal(f.mask, i.value);
+        if (v !== i.value) i.value = v;      // เขียนทับในช่องเลย ไม่ rerender — กัน focus หลุด
+        self.data[i.dataset.k] = v;
+      });
+      i.addEventListener('change', () => {
+        const raw = f.mask ? maskVal(f.mask, i.value) : i.value;
+        self.set(i.dataset.k, i.type === 'number' ? Number(raw) : raw);
+        rerender();
+      });
+    });
 
     el.querySelectorAll('.fk-opt[data-k],.fk-grade button[data-k]').forEach(b =>
       b.addEventListener('click', () => {
@@ -502,6 +549,21 @@
     // viaKey เท่านั้นที่ย้าย focus — ถ้า focus ทุกครั้งที่คลิก
     // ป้ายจะขึ้นวงแหวน focus ค้างไว้ทั้งที่ผู้ใช้ใช้เมาส์
     const go = (k, viaKey) => {
+      const list = self.tabs();
+      const from = list.findIndex(t => t.k === self.tab);
+      const to   = list.findIndex(t => t.k === k);
+      // ถอยหลังหรือกลับที่เดิมได้เสมอ — บล็อกเฉพาะการเดินหน้าข้ามช่องบังคับ
+      if (to > from && from >= 0) {
+        const miss = self.validate(list[from].secs);
+        if (miss.length) {
+          self.flagged = miss.map(m => m.k);
+          rerender();
+          const bad = el.querySelector('.fk-f.bad, .fk-row.bad');
+          if (bad) bad.scrollIntoView({ block: 'center', behavior: 'smooth' });
+          return;
+        }
+      }
+      self.flagged = null;
       self.tab = k;
       rerender();
       const sel = el.querySelector('.fk-tab[aria-selected="true"]');
@@ -568,7 +630,13 @@
     };
     const down = e => { e.preventDefault(); drawing = true; const [x, y] = pt(e); g.beginPath(); g.moveTo(x, y); };
     const move = e => { if (!drawing) return; e.preventDefault(); const [x, y] = pt(e); g.lineTo(x, y); g.stroke(); };
-    const up = () => { if (!drawing) return; drawing = false; fk.data[cv.dataset.sign] = cv.toDataURL('image/png'); };
+    // ต้องผ่าน set() ไม่ใช่เขียน data ตรง ๆ — ไม่งั้นหน้าไม่รู้ว่าลงนามแล้ว
+    // ปุ่มส่งจะยังปิดอยู่ทั้งที่เซ็นเสร็จแล้ว
+    const up = () => {
+      if (!drawing) return;
+      drawing = false;
+      fk.set(cv.dataset.sign, cv.toDataURL('image/png'));
+    };
     cv.addEventListener('pointerdown', down); cv.addEventListener('pointermove', move);
     window.addEventListener('pointerup', up);
   }

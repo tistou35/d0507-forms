@@ -3,6 +3,24 @@
 <title>กรอกฟอร์ม — D-0507 Flight Training</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="@@BASE@@assets/app.css">
+<style>
+dialog{border:0;border-radius:12px;padding:0;max-width:680px;width:calc(100% - 32px);
+  box-shadow:var(--sh-lg);background:var(--surface);color:var(--fg-1)}
+dialog::backdrop{background:rgba(13,27,42,.5)}
+dialog .dh{background:var(--navy-900);color:#fff;padding:18px 22px}
+dialog .dh h3{font-size:18px;font-weight:700;color:#fff}
+dialog .dh p{font-size:12.5px;color:rgba(255,255,255,.7);margin-top:3px}
+dialog .db{padding:18px 22px;max-height:60vh;overflow:auto}
+dialog .df{padding:14px 22px;border-top:1px solid var(--g-100);display:flex;gap:10px;
+  justify-content:flex-end;flex-wrap:wrap}
+.rvh{font-family:var(--font-display);font-size:14px;color:var(--sky-600);
+  margin:18px 0 6px;letter-spacing:.02em}
+.rvh:first-child{margin-top:0}
+.rvr{display:flex;gap:14px;justify-content:space-between;align-items:baseline;
+  padding:6px 0;border-bottom:1px solid var(--g-100);font-size:13.5px}
+.rvr span{color:var(--g-600);flex:1}
+.rvr b{font-weight:600;text-align:right;max-width:55%}
+</style>
 </head><body>
 @@TOPBAR@@
 <main class="main" style="max-width:860px;margin:0 auto">
@@ -10,6 +28,12 @@
   <div id="form"></div>
   <div id="foot"></div>
 </main>
+
+<dialog id="rv"><form method="dialog">
+  <div class="dh"><h3 id="rvt">—</h3><p id="rvs"></p></div>
+  <div class="db" id="rvb"></div>
+  <div class="df" id="rvf"></div>
+</form></dialog>
 @@BOTNAV@@
 <footer>D-0507 Flight Training Co., Ltd. · Controlled Document System</footer>
 <script>window.BASE='@@BASE@@';</script>
@@ -74,6 +98,121 @@ function renderFoot(){
     <div class="acts"><button class="big ${miss.length||stop?'off':'pri'}"
       ${miss.length||stop?'disabled':''} id="send">${A.esc(A.t('send'))}</button>
       <a class="big sec" href="${A.formUrl(F)}">${A.esc(A.t('cancel'))}</a></div>`;
+  const b=document.getElementById('send');
+  if(b && !b.disabled) b.addEventListener('click', e=>{ e.preventDefault(); review(); });
+}
+
+/* ── ตรวจทานก่อนส่ง ────────────────────────────────────────
+   ใบนี้เป็นเอกสารควบคุม แก้ทีหลังไม่ได้ จึงต้องเห็นทุกคำตอบก่อนกดยืนยัน */
+const dlg=document.getElementById('rv');
+function modal(title,sub,body,foot){
+  document.getElementById('rvt').textContent=title;
+  document.getElementById('rvs').textContent=sub||'';
+  document.getElementById('rvb').innerHTML=body;
+  document.getElementById('rvf').innerHTML=foot;
+  dlg.showModal();
+}
+const LL=(o)=>FormKit.L(o,A.lang);
+
+function shown(v,f){
+  if(v===undefined||v===null||v==='') return '—';
+  if(typeof v==='boolean') return v?'✓':'—';
+  if(Array.isArray(v)) return v.join(' · ');
+  if(typeof v==='string'&&v.indexOf('data:image')===0) return '✓ '+A.t('signed');
+  if(f&&f.opt){ const o=f.opt.find(x=>String(x.v)===String(v)); if(o) return LL(o.n)||o.v; }
+  if(f&&f.type==='date') return A.esc(v).split('-').reverse().join('/');
+  return String(v);
+}
+
+function review(){
+  const ctx=FK.ctx(), c=FK.computed(), gates=FK.gates();
+  const rows=(DEF.sections||[]).filter(s=>FormKit.evalCond(s.showIf,ctx)).map(sec=>{
+    const fs=(sec.fields||[]).filter(f=>f.type!=='static'&&FormKit.evalCond(f.showIf,ctx));
+    if(!fs.length) return '';
+    // ช่องติ๊กแสดงเฉพาะข้อที่ติ๊ก แล้วสรุปจำนวนไว้ท้าย — ถ้าโชว์ '—' ครบทุกข้อ
+    // ข้อที่ติ๊กจริงจะจมหายไปในแถวว่าง 36 แถว
+    const box=fs.filter(f=>f.type==='check');
+    const on=box.filter(f=>FK.data[f.k]);
+    const rest=fs.filter(f=>f.type!=='check');
+    const line=f=>`<div class="rvr"><span>${A.esc(LL(f.label))}</span>
+        <b>${A.esc(shown(FK.data[f.k],f))}</b></div>`;
+    return `<h4 class="rvh">${A.esc(LL(sec.title))}</h4>`
+      + rest.map(line).join('') + on.map(line).join('')
+      + (box.length?`<div class="rvr"><span>${A.esc(A.t('ticked'))}</span>
+          <b>${on.length} / ${box.length}</b></div>`:'');
+  }).join('');
+
+  const steps=(DEF.route||[]).filter(r=>FormKit.evalCond(r.onlyIf,ctx));
+  const nx=(DEF.parties||[]).find(p=>p.k===(steps[1]||{}).party);
+  const next=steps.length>1
+    ? A.t('goesToApproval')+' — '+(LL(nx&&nx.n)||steps[1].party)
+    : A.t('endsHere');
+
+  modal(A.t('reviewTitle'), A.t('reviewSub'),
+    (gates.length?gates.map(g=>`<div class="fk-gate ${A.esc(g.level)}" style="margin-bottom:10px">
+       <span>${A.esc(LL(g.msg))}</span></div>`).join(''):'')+
+    `<div class="fk-score ${FK.band().lv}"><span class="n">${c.score}</span>
+       <span><b style="font-size:14.5px">${A.esc(FormKit.L({th:'คะแนนความเสี่ยงรวม',en:'Total risk score'},A.lang))}</b><br>
+       <span style="font-size:12.5px;color:var(--g-500)">${A.esc(next)}</span></span></div>`+rows,
+    `<button class="fb" value="cancel">${A.esc(A.t('goBack'))}</button>
+     <button class="big pri" id="ok" value="ok">${A.esc(A.t('confirmSend'))}</button>`);
+  document.getElementById('ok').addEventListener('click', e=>{ e.preventDefault(); dlg.close(); send(); });
+}
+
+/* ── ส่งจริง ───────────────────────────────────────────────
+   เขียนลง Firestore ก่อนเสมอ นั่นคือหลักฐานว่าส่งแล้ว
+   ส่วนการทำ PDF/ชีต เป็นขั้นตามหลัง ล้มได้โดยไม่ทำให้ใบหาย */
+async function send(){
+  const foot=document.getElementById('foot');
+  foot.innerHTML=`<div class="note">${A.esc(A.t('sending'))}</div>`;
+  try{
+    if(!firebase.auth().currentUser) await firebase.auth().signInAnonymously();
+    const u=firebase.auth().currentUser;
+    const ref=A.db.collection('submissions').doc();
+    const d=new Date(), p2=n=>String(n).padStart(2,'0');
+    const trk=`${F.abbr}-${d.getFullYear()}${p2(d.getMonth()+1)}${p2(d.getDate())}-${ref.id.slice(0,4).toUpperCase()}`;
+    const ctx=FK.ctx();
+    const steps=(DEF.route||[]).filter(r=>FormKit.evalCond(r.onlyIf,ctx));
+    const done=steps.length<=1;
+
+    const sub={
+      formCode:F.abbr, tracking:trk,
+      doc:F.doc||'', issue:F.iss||'', rev:F.rev||'', defRev:DEF.defRev||0,
+      title:F.th||F.t||F.abbr,
+      status: done?'complete':'pending',
+      step: done?steps.length:2,
+      submitterUid:u.uid, submitterName:FK.data.picFirst?`${FK.data.picFirst} ${FK.data.picLast||''}`.trim():(u.displayName||''),
+      submitterEmail:u.email||'',
+      submittedAt:firebase.firestore.FieldValue.serverTimestamp(),
+      computed:FK.computed(),
+      data:FK.data,
+    };
+    await ref.set(sub);
+
+    let ex=null;
+    if(done) ex=await A.exportSubmission(Object.assign({},sub,{submittedAt:d.toISOString()}));
+
+    foot.innerHTML=`<div class="fk-gate info" style="margin-bottom:14px"><span>
+        <b>${A.esc(A.t(done?'sentComplete':'sentPending'))}</b><br>
+        ${A.esc(A.t('trackingNo'))}: <span class="mono">${A.esc(trk)}</span>
+        ${ex&&ex.ok===false?'<br>'+A.esc(A.t('exportFailed'))+' '+A.esc(ex.error||''):''}
+        ${ex&&ex.pdf?`<br><a href="${A.esc(ex.pdf)}" target="_blank" rel="noopener">PDF ↗</a>`:''}
+      </span></div>
+      <div class="acts"><a class="big pri" href="${A.formUrl(F)}">${A.esc(A.t('backToForm'))}</a>
+        <a class="big sec" href="@@BASE@@all/">${A.esc(A.t('backToAll'))}</a></div>`;
+    window.scrollTo({top:foot.getBoundingClientRect().top+window.scrollY-90,behavior:'smooth'});
+  }catch(e){
+    foot.innerHTML=`<div class="fk-gate stop" style="margin-bottom:14px"><span>
+        <b>${A.esc(A.t('sendFailed'))}</b><br>${A.esc(e.code||e.message||String(e))}
+      </span></div>`;
+    renderFootRetry();
+  }
+}
+function renderFootRetry(){
+  const d=document.createElement('div'); d.className='acts';
+  d.innerHTML=`<button class="big pri" id="again">${A.esc(A.t('tryAgain'))}</button>`;
+  document.getElementById('foot').appendChild(d);
+  document.getElementById('again').addEventListener('click',()=>send());
 }
 </script>
 </body></html>
