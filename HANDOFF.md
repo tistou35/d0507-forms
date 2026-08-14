@@ -201,3 +201,50 @@ safety-critical, `sign`, `static`, `table`) · build ตรวจนิยาม
 
 **ข้อมูลในทะเบียนที่ยังไม่มีอังกฤษ** — `r` (หน้าที่ของแต่ละบทบาท) · `with` · `note` ·
 `kw` (คำค้น) — แสดงเป็นไทยแม้อยู่โหมดอังกฤษ
+
+## สถานะระบบจริง (14 AUG 2026)
+
+ทุกอย่างต่อกันครบและทดสอบจากปลายถึงปลายแล้ว
+
+| ส่วน | สถานะ |
+|---|---|
+| Firestore rules | publish แล้ว — ตรงกับ `firebase/firestore.rules` |
+| `users/{uid}` | ken dhepp · บทบาท ins, mgt |
+| `publicDirectory/instructors` | 1 คน · รับฟอร์ม FI |
+| `registry/current` | 52 ฟอร์ม |
+| Apps Script | **D-0507 Forms Exporter** · deploy แล้ว · URL อยู่ใน `firebase/config.json` |
+| Drive | `Forms/FRAE/` มี `FRAE_TEMPLATE` · `FRAE — Records` · PDF ตัวอย่าง |
+
+**ผลทดสอบส่งจริง** — นักเรียน (ไม่ล็อกอิน) กรอก FRAE ครบ เลือกครูผู้รับ ส่งสำเร็จ
+ได้เลขที่ `FRAE-20260814-VJA4` · คะแนน 10 · status `pending` · assigneeUid ตรงกับครูที่เลือก
+
+**ยังไม่ได้ทดสอบ** — ขั้นครูลงนามอนุมัติ แล้ว export ลง Drive/Sheet
+เพราะยังไม่ได้ทำ flow อนุมัติ (รอรายละเอียดจากผู้ใช้)
+
+### เรื่องที่รู้ไว้
+
+**ผู้ที่มีบทบาท `ins` กรอก FRAE ในฐานะ PIC ไม่ได้** — `partyOf()` จับคู่บทบาทก่อน
+คนที่เป็นครูจึงถูกจัดเป็นฝ่าย `fi` เสมอ ส่วนของ PIC เลยเป็นอ่านอย่างเดียว
+ถ้าครูต้องบินเองแล้วกรอก FRAE ของตัวเอง ต้องแก้ตรงนี้
+
+**ใน `submissions` มีใบทดสอบ 2 ใบ** — ลบไม่ได้ตามกติกาเอกสารควบคุม (`allow delete: if false`)
+
+### แก้ rules ต้องทำยังไง
+
+editor ของคอนโซลเติมวงเล็บปิดเองเมื่อบรรทัดจบด้วย `{` — วางโค้ดหลายบรรทัดจะเพี้ยนทุกครั้ง
+
+```bash
+python3 firebase/flatten_rules.py > firebase/firestore.rules.console
+```
+
+แล้ววาง `firestore.rules.console` ลงคอนโซล (ตัดสองบรรทัด `}` ท้ายสุดออก — editor ใส่ให้เอง)
+
+### แก้ Apps Script ต้องทำยังไง
+
+`pbcopy` ทำภาษาไทยเพี้ยนถ้า shell ไม่ได้ตั้ง UTF-8
+
+```bash
+export LC_ALL=en_US.UTF-8; pbcopy < gas/Code.gs
+```
+
+แล้ว Cmd+A / Cmd+V ในไฟล์ที่ตรงกัน — **อย่าพิมพ์** เพราะ editor เติมวงเล็บเอง
