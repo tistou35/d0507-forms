@@ -46,10 +46,26 @@ service cloud.firestore {
       allow write: if staff();
     }
 
-    // ── นิยามฟอร์ม — หน้าสาธารณะต้องใช้ ─────────────────────
+    // ── นิยามฟอร์ม — หน้าสาธารณะต้องใช้จึงอ่านได้ทั้งโลก ────
+    // ห้ามใส่ข้อมูลควบคุมภายใน (control code / สถานะ LEF) ลงในนิยามฟอร์ม
     match /formDefs/{formCode} {
       allow read:  if true;
       allow write: if staff();
+
+      // สำเนาแช่แข็งของแต่ละรุ่นที่ publish — เขียนได้ครั้งเดียว แก้ไม่ได้ ลบไม่ได้
+      // record ที่กรอกไว้ผูกกับรุ่นนี้ ถ้าแก้ย้อนหลังได้จะไม่ใช่เอกสารควบคุมอีกต่อไป
+      match /versions/{defRev} {
+        allow read:   if true;
+        allow create: if staff();
+        allow update, delete: if false;
+      }
+
+      // log การแก้ไข — append-only ใช้ generate editor note และ revision log
+      match /events/{eventId} {
+        allow read:   if staff();
+        allow create: if staff();
+        allow update, delete: if false;
+      }
     }
 
     // ── ฟอร์มที่ถูกส่ง ──────────────────────────────────────

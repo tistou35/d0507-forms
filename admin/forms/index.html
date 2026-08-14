@@ -1,0 +1,371 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>จัดการฟอร์ม — D-0507 Flight Training</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="../../assets/app.css">
+<style>
+.fmrow{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;
+  background:var(--surface);border:1px solid var(--border-light);border-radius:8px;
+  padding:14px 18px;margin-bottom:10px}
+.fmrow .cd{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--sky-600)}
+.fmrow .nm{font-size:15px;font-weight:600;font-family:var(--font-sans);line-height:1.3}
+.fmrow .mt{font-size:12.5px;color:var(--g-500);margin-top:3px}
+.fmrow .act{display:flex;gap:8px;flex-wrap:wrap}
+.fb.sm{min-height:36px;font-size:12.5px;padding:0 12px}
+dialog{border:0;border-radius:12px;padding:0;max-width:640px;width:calc(100% - 32px);
+  box-shadow:var(--sh-lg);background:var(--surface);color:var(--fg-1)}
+dialog::backdrop{background:rgba(13,27,42,.5)}
+dialog .dh{background:var(--navy-900);color:#fff;padding:18px 22px}
+dialog .dh h3{font-size:18px;font-weight:700;color:#fff}
+dialog .dh p{font-size:12.5px;color:rgba(255,255,255,.7);margin-top:3px}
+dialog .db{padding:20px 22px;max-height:60vh;overflow:auto}
+dialog .df{padding:14px 22px;border-top:1px solid var(--g-100);display:flex;gap:10px;
+  justify-content:flex-end;flex-wrap:wrap}
+.ver{border-left:2px solid var(--g-150);padding:0 0 14px 16px;margin-left:6px;position:relative}
+.ver::before{content:"";position:absolute;left:-5px;top:5px;width:8px;height:8px;border-radius:50%;
+  background:var(--sky-500)}
+.ver .h{font-size:13.5px;font-weight:600;font-family:var(--font-sans)}
+.ver .m{font-size:12.5px;color:var(--g-500);line-height:1.6}
+.ver pre{font-family:var(--font-mono);font-size:11.5px;background:var(--g-50);border-radius:6px;
+  padding:10px 12px;margin-top:8px;white-space:pre-wrap;line-height:1.6}
+</style>
+</head><body>
+<div class="topbar">
+  <a class="brand" href="../../" style="text-decoration:none">
+    <svg viewBox="0 0 320 72" fill="none" role="img" aria-label="D0507 Flight Training">
+      <g transform="translate(8,12)"><path d="M4 28 L44 20 L52 22 L44 26 L48 36 L40 34 L36 28 Z" fill="#fff"/>
+      <path d="M18 24 L44 20 L40 34 L22 30 Z" fill="#4A90D9"/><path d="M4 28 L14 22 L16 26 L8 30 Z" fill="#4A90D9"/></g>
+      <text x="70" y="36" font-family="'Arial Narrow',Arial,sans-serif" font-size="28" font-weight="800" letter-spacing="-0.5" fill="#fff">D0507</text>
+      <text x="71" y="54" font-family="'Arial Narrow',Arial,sans-serif" font-size="14" font-weight="600" letter-spacing="4" fill="#4A90D9">FLIGHT TRAINING</text>
+    </svg>
+    <span class="div"></span>
+    <span><span class="nm">ระบบฟอร์มออนไลน์</span><span class="en">Forms &amp; Approvals</span></span>
+  </a>
+  <div class="tsearch" onclick="location.href='../../all/'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
+    <span>ค้นหาฟอร์ม · Search forms</span><span class="k">⌘K</span>
+  </div>
+  <div class="tright" id="authbox"></div>
+</div>
+<div class="body">
+<nav class="rail">
+  <span class="lab">เมนู · Menu</span>
+  <a class="nav" data-nav="home" href="../../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>
+    <span><span class="t">หน้าหลัก</span><span class="en">Home</span></span></a>
+  <a class="nav" data-nav="all" href="../../all/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg>
+    <span><span class="t">คลังฟอร์ม</span><span class="en">All forms</span></span><span class="pill gry" data-cnt="forms">—</span></a>
+  <a class="nav staffonly" data-nav="queue" href="../../queue/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l4 4L14 8"/><path d="M10 13l4 4L22 8"/></svg>
+    <span><span class="t">งานของฉัน</span><span class="en">My queue</span></span><span class="pill amb" data-cnt="queue">0</span></a>
+  <a class="nav staffonly" data-nav="register" href="../../admin/register/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h8.5L19 7v14.5H6z"/><path d="M14 2.5V7h5"/><path d="M9 12h7M9 15.5h7"/></svg>
+    <span><span class="t">ทะเบียนเอกสาร</span><span class="en">Register · LEF</span></span></a>
+  <a class="nav staffonly" data-nav="fadmin" href="../../admin/forms/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 12h16M4 19h9"/><circle cx="18.5" cy="19" r="2.5"/></svg>
+    <span><span class="t">จัดการฟอร์ม</span><span class="en">Form management</span></span></a>
+  <a class="nav staffonly" data-nav="setup" href="../../admin/setup/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>
+    <span><span class="t">ตั้งค่าระบบ</span><span class="en">Admin setup</span></span></a>
+  <a class="nav staffonly" data-nav="audit" href="../../../d0507-audit/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.4 15.4L21 21"/></svg>
+    <span><span class="t">งานตรวจสอบ</span><span class="en">Audit ↗ login แยก</span></span></a>
+
+  <div class="railfoot">
+    <svg class="q" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9.2"/><path d="M9.4 9.2a2.7 2.7 0 1 1 3.4 2.6c-.6.2-.8.7-.8 1.3v.6"/><circle cx="12" cy="17" r=".9" fill="currentColor" stroke="none"/></svg>
+    <b>ไม่รู้ว่าต้องใช้ฟอร์มไหน?</b>
+    <p>พิมพ์สิ่งที่อยากทำในช่องค้นหา ระบบจะหาให้ข้ามทุกระบบ</p>
+  </div>
+</nav>
+  <main class="main">
+    <div class="greet"><div>
+      <p class="eyebrow">ผู้ดูแลระบบ · FORM MANAGEMENT</p>
+      <h1>จัดการฟอร์ม</h1>
+      <p class="sub">เพิ่มฟอร์ม · ออกเวอร์ชันใหม่ · เปิด-ปิดใช้งาน · ดูประวัติการแก้ไข</p></div>
+      <button class="obtn" id="add">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+        เพิ่มนิยามฟอร์ม</button>
+    </div>
+
+    <div id="gate"></div>
+
+    <div id="body" class="hide">
+      <section>
+        <div class="sh"><h2>สรุป</h2><span class="en">Overview</span></div>
+        <div class="stats" id="sum"></div>
+      </section>
+
+      <section>
+        <div class="sh"><h2>นิยามฟอร์ม</h2><span class="en">Form definitions</span>
+          <span class="rt"><button class="fb sm" id="dl">ดาวน์โหลดทั้งหมดเป็น JSON</button></span></div>
+        <div class="filters">
+          <button class="fb" data-f="all" aria-pressed="true">ทั้งหมด</button>
+          <button class="fb" data-f="published" aria-pressed="false">ใช้งานอยู่</button>
+          <button class="fb" data-f="draft" aria-pressed="false">ร่าง</button>
+          <button class="fb" data-f="disabled" aria-pressed="false">ปิดใช้งาน</button>
+          <button class="fb" data-f="none" aria-pressed="false">ยังไม่มีนิยาม</button>
+        </div>
+        <div id="list"></div>
+      </section>
+    </div>
+  </main>
+</div>
+<nav class="botnav">
+  <a data-nav="home" href="../../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>หน้าหลัก</a>
+  <a data-nav="all" href="../../all/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg>คลังฟอร์ม</a>
+  <a data-nav="queue" class="staffonly" href="../../queue/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l4 4L14 8"/><path d="M10 13l4 4L22 8"/></svg>งานของฉัน</a>
+  <a data-nav="register" class="staffonly" href="../../admin/register/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h8.5L19 7v14.5H6z"/><path d="M14 2.5V7h5"/><path d="M9 12h7M9 15.5h7"/></svg>ทะเบียน</a>
+</nav>
+<footer>D-0507 Flight Training Co., Ltd. · Controlled Document System</footer>
+
+<dialog id="dlg"><form method="dialog">
+  <div class="dh"><h3 id="dt">—</h3><p id="ds"></p></div>
+  <div class="db" id="dbody"></div>
+  <div class="df" id="dfoot"></div>
+</form></dialog>
+
+<script>window.BASE='../../';</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="../../assets/app.js"></script>
+<script src="../../assets/formmgr.js"></script>
+<script>
+"use strict";
+const REG = {"systems":{"here":{"n":"ระบบฟอร์มออนไลน์","en":"This portal","url":"","lg":"52","cl":"d"},"dispatch":{"n":"ระบบ Dispatch","en":"Flight dispatch","url":"https://d0507.361vision.org/d0507-app/dispatch/?v=final","lg":"DSP","cl":"a"},"training":{"n":"ระบบบันทึกการฝึก","en":"Training records","url":"https://d0507.361vision.org/","lg":"TRN","cl":"b"},"fbo":{"n":"AeroFBO","en":"Operations & maintenance","url":"https://indyzz.com/aerofbo/index.php","lg":"FBO","cl":"c"},"audit":{"n":"Audit Portal","en":"Internal audit","url":"../d0507-audit/","lg":"AUD","cl":"a"}},"forms":[{"doc":"D-0507-FRAE-001","abbr":"FRAE","t":"Flight Risk Assessment and Evaluation","th":"การประเมินความเสี่ยงก่อนทำการบิน","sys":"here","jot":"210071253532038","assignTo":"FI","r":{"stu":"กรอกฝั่งนักเรียนก่อนบินทุกเที่ยว"},"chain":"preflight","kw":["บิน","จะบิน","ก่อนบิน","พรุ่งนี้","ความเสี่ยง","เสี่ยง","ประเมิน","ครู","fit to fly","frae","risk","preflight"],"public":true,"iss":"01","rev":"00","eff":"07 JUL 2022","hasDef":false},{"doc":"D-0507-SDF-001","abbr":"SDF","t":"Self Declaration Form","th":"แบบแจ้งข้อมูลด้วยตนเอง","sys":"here","jot":"210394186308456","r":{"stu":"แจ้งเมื่อหยุดบินเกิน 2 สัปดาห์ หรือมีการบินอื่นนอกหลักสูตร"},"chain":"preflight","kw":["แจ้ง","หยุด","หยุดบิน","ไม่ได้บิน","บินที่อื่น","ประกาศตน","declaration","sdf"],"public":true,"iss":"01","rev":"00","eff":"10 FEB 2021","hasDef":false},{"doc":"D-0507-GSP-001","abbr":"GSP","t":"PPL Ground and Flight Training Record","th":"บันทึกการฝึกภาคพื้นและภาคอากาศ PPL","sys":"training","r":{"stu":"ดูบันทึกการฝึกและความคืบหน้าของตัวเอง (อ่านเท่านั้น)"},"chain":"training","kw":["ผลการฝึก","ความคืบหน้า","บันทึกการฝึก","gradeslip","training record","ppl","gsp"],"public":true,"iss":"01","rev":"00","eff":"07 JUL 2022","hasDef":false},{"doc":"D-0507-EFM-001","abbr":"EFM","t":"Progress and Evaluation Form","th":"แบบประเมินความคืบหน้า","sys":"training","r":{"stu":"ดูผลการฝึกของตัวเอง · Gradeslip PPL"},"chain":"training","kw":["ผลการฝึก","ดูผล","เกรด","gradeslip","ความคืบหน้า","ประเมินความคืบหน้า","efm"],"public":true,"iss":"01","rev":"00","eff":"20 NOV 2024","hasDef":false},{"doc":"D-0507-SEF-001","abbr":"SEF","t":"Student Evaluation Form","th":"แบบประเมินครูผู้สอนโดยนักเรียน","sys":"here","jot":"210063447392452","assignTo":"CMM","r":{"stu":"ประเมินครูผู้สอนเมื่อจบแต่ละ Stage (ไม่เปิดเผยชื่อ)"},"chain":"training","kw":["ประเมินครู","ครูผู้สอน","ให้คะแนนครู","ความเห็น","feedback","sef"],"public":true,"iss":"01","rev":"00","eff":"20 AUG 2020","hasDef":false},{"doc":"D-0507-PWR-001","abbr":"PWR","t":"Passenger Waiver and Release Form","th":"หนังสือสละสิทธิ์เรียกร้องของผู้โดยสาร","sys":"here","jot":"243218657614460","assignTo":"FI","r":{"stu":"ผู้โดยสาร trial flight ลงนามก่อนขึ้นบิน"},"chain":"admin","kw":["ผู้โดยสาร","พาคนขึ้น","trial flight","waiver","สละสิทธิ์","pwr"],"public":true,"iss":"01","rev":"02","eff":"18 JUL 2024","hasDef":false},{"doc":"D-0507-APP-001","abbr":"APP","t":"Application Form","th":"ใบสมัคร","sys":"fbo","r":{"stu":"สมัครเข้าเรียน เปลี่ยนหลักสูตร หรือขอ licence / rating"},"chain":"admin","kw":["สมัคร","สมัครเรียน","เข้าเรียน","ใบสมัคร","โปรไฟล์","application","app"],"public":true,"iss":"01","rev":"00","eff":"13 JAN 2022","hasDef":false},{"doc":"D-0507-APF-001","abbr":"APF","t":"Appeal Form","th":"แบบอุทธรณ์","sys":"here","jot":"243218287458465","assignTo":"ACM","r":{"stu":"ยื่นอุทธรณ์คำวินิจฉัยของ ATO ภายใน 14 วัน"},"chain":"admin","kw":["อุทธรณ์","ไม่เป็นธรรม","ร้องเรียน","appeal","apf"],"public":true,"iss":"01","rev":"00","eff":"18 JUL 2022","hasDef":false},{"doc":"D-0507-VSR-001","abbr":"VSR","t":"Voluntary Safety Report","th":"รายงานนิรภัยโดยสมัครใจ","sys":"here","jot":"221482584465058","r":{"stu":"แจ้งเหตุหรือความเสี่ยงด้านนิรภัย (ไม่ระบุชื่อได้)"},"chain":"safety","kw":["ไม่ปลอดภัย","อันตราย","เหตุ","แจ้งเหตุ","นิรภัย","รายงาน","safety","vsr","เกือบเกิดเหตุ"],"public":true,"iss":"01","rev":"00","eff":"01 MAR 2020","hasDef":false}],"roles":[{"k":"stu","n":"นักเรียน","d":"นักศึกษาการบิน · ผู้เข้ารับการฝึก"},{"k":"ins","n":"ครูการบิน / ครูภาคทฤษฎี","d":"FI · TKI · FIE"},{"k":"mnt","n":"ช่างอากาศยาน","d":"ฝ่ายซ่อมบำรุง (ME)"},{"k":"ops","n":"ฝ่ายปฏิบัติการ","d":"Operations · Dispatch · ธุรการเอกสาร"},{"k":"mgt","n":"ฝ่ายบริหาร","d":"ACM · HT · CMM · Safety Manager"}],"status":{"ok":{"n":"พร้อมใช้","lv":"ok"},"linkwrong":{"n":"ลิงก์ใน LEF ผิดใบ","lv":"bad"},"nolink":{"n":"LEF ยังไม่ใส่ลิงก์","lv":"warn"},"noform":{"n":"ยังไม่มีฟอร์มออนไลน์","lv":"warn"},"pdfonly":{"n":"เป็น PDF บน Drive","lv":"warn"},"notinlef":{"n":"ยังไม่อยู่ใน LEF","lv":"warn"},"shadow":{"n":"ใช้บน Jotform · ไม่มีในคู่มือ","lv":"bad"},"dupsys":{"n":"มีสองฉบับ — ระบบภายนอกและ Jotform","lv":"bad"}},"lefcount":{"total":52}};
+const A = D0507, M = FormMgr;
+let DEFS = {}, FILTER = 'all';
+
+A.reg = REG;
+A.initAuth({
+  apiKey: "AIzaSyCVR8EiBJDT4Qr3KZ2DRPhmFzUksHTwAjg",
+  authDomain: "d0507-forms.firebaseapp.com",
+  projectId: "d0507-forms",
+  storageBucket: "d0507-forms.firebasestorage.app",
+  messagingSenderId: "38336897307",
+  appId: "1:38336897307:web:0e423f959e635a07faf3be"
+}, boot);
+
+const dlg = document.getElementById('dlg');
+function modal(title, sub, body, foot){
+  document.getElementById('dt').textContent = title;
+  document.getElementById('ds').textContent = sub || '';
+  document.getElementById('dbody').innerHTML = body;
+  document.getElementById('dfoot').innerHTML = foot;
+  dlg.showModal();
+}
+const codes = () => REG.forms.map(f => f.abbr);
+const meta  = c => REG.forms.find(f => f.abbr === c) || {};
+
+async function boot(){
+  const ok = A.isStaff();
+  document.getElementById('body').classList.toggle('hide', !ok);
+  document.getElementById('add').style.display = ok ? '' : 'none';
+  document.getElementById('gate').innerHTML = ok ? '' :
+    `<div class="note"><b>ต้องเข้าสู่ระบบก่อน</b> — หน้านี้แก้ไขนิยามฟอร์มของระบบ
+     <br><a class="big pri" style="margin-top:12px;display:inline-flex" href="../../staff-login/">เข้าสู่ระบบ</a></div>`;
+  if (ok) await refresh();
+}
+
+async function refresh(){
+  try {
+    DEFS = {};
+    (await M.list(A.db)).forEach(d => DEFS[d.code] = d);
+  } catch(e){
+    document.getElementById('list').innerHTML =
+      `<div class="warn">อ่านนิยามฟอร์มไม่ได้: ${A.esc(e.code || e.message)}</div>`;
+    return;
+  }
+  const all = REG.forms.length;
+  const n = s => Object.values(DEFS).filter(d => d.status === s).length;
+  document.getElementById('sum').innerHTML = [
+    ['grn', n('published'), 'ใช้งานอยู่'],
+    ['sky', n('draft'),     'ร่าง — ยังไม่ publish'],
+    ['', n('disabled'),     'ปิดใช้งาน'],
+    ['amb', all - Object.keys(DEFS).length, 'ยังไม่มีนิยามฟอร์ม'],
+  ].map(b => `<div class="stat ${b[0]}"><div class="top"><span class="ti">${A.esc(b[2])}</span>
+      <span class="n">${b[1]}</span></div></div>`).join('');
+  render();
+}
+
+function render(){
+  const rows = REG.forms.map(f => {
+    const d = DEFS[f.abbr];
+    const st = d ? d.status : 'none';
+    if (FILTER !== 'all' && FILTER !== st) return '';
+    const lv = { published:'ok', draft:'sh2', disabled:'', none:'warn' }[st];
+    const label = d ? M.STATUS[st] : 'ยังไม่มีนิยาม';
+    const ver = d && d.defRev ? `Issue ${d.issue}/Rev ${d.rev} · defRev ${d.defRev}` :
+                d ? 'ยังไม่เคย publish' : '—';
+    const act = [];
+    if (d) {
+      act.push(`<button class="fb sm" data-hist="${A.esc(f.abbr)}">ประวัติ</button>`);
+      act.push(`<button class="fb sm" data-pub="${A.esc(f.abbr)}">ออกเวอร์ชันใหม่</button>`);
+      if (st === 'disabled') act.push(`<button class="fb sm" data-on="${A.esc(f.abbr)}">เปิดใช้งาน</button>`);
+      else if (d.defRev) act.push(`<button class="fb sm" data-off="${A.esc(f.abbr)}">ปิดใช้งาน</button>`);
+    } else {
+      act.push(`<button class="fb sm" data-new="${A.esc(f.abbr)}">เพิ่มนิยาม</button>`);
+    }
+    return `<div class="fmrow">
+      <div><span class="cd">${A.esc(f.doc || f.abbr)}</span>
+        <div class="nm">${A.esc(f.th || f.t)}</div>
+        <div class="mt"><span class="tag ${lv}">${A.esc(label)}</span> ${A.esc(ver)}</div></div>
+      <div class="act">${act.join('')}</div></div>`;
+  }).join('');
+  document.getElementById('list').innerHTML = rows ||
+    '<p class="note">ไม่มีฟอร์มที่ตรงเงื่อนไข</p>';
+
+  document.querySelectorAll('[data-hist]').forEach(b => b.onclick = () => history(b.dataset.hist));
+  document.querySelectorAll('[data-pub]').forEach(b => b.onclick = () => publishDlg(b.dataset.pub));
+  document.querySelectorAll('[data-off]').forEach(b => b.onclick = () => toggle(b.dataset.off, 'disabled'));
+  document.querySelectorAll('[data-on]').forEach(b => b.onclick = () => toggle(b.dataset.on, 'published'));
+  document.querySelectorAll('[data-new]').forEach(b => b.onclick = () => importDlg(b.dataset.new));
+}
+
+document.querySelectorAll('.fb[data-f]').forEach(b => b.onclick = () => {
+  FILTER = b.dataset.f;
+  document.querySelectorAll('.fb[data-f]').forEach(x => x.setAttribute('aria-pressed', x.dataset.f === FILTER));
+  render();
+});
+
+/* ── เพิ่ม / นำเข้านิยาม ── */
+document.getElementById('add').onclick = () => importDlg(null);
+
+function importDlg(code){
+  modal('เพิ่มนิยามฟอร์ม', code ? 'สำหรับ ' + code : 'เลือกไฟล์ JSON ตามแบบใน _SCHEMA.md',
+    `<div class="fk-f"><label for="fj">ไฟล์นิยามฟอร์ม (.json)</label>
+       <p class="hint">ระบบจะตรวจตามสเปกก่อนบันทึก และบันทึกเป็น <b>ร่าง</b> — ยังไม่มีผลกับผู้ใช้
+         จนกว่าจะกด “ออกเวอร์ชันใหม่”</p>
+       <input id="fj" type="file" accept=".json,application/json"></div>
+     <div id="vres"></div>`,
+    `<button class="fb" value="cancel">ยกเลิก</button>
+     <button class="fb" id="doImport" disabled style="background:var(--navy-900);color:#fff;border-color:var(--navy-900)">บันทึกเป็นร่าง</button>`);
+
+  let DEF = null;
+  document.getElementById('fj').onchange = async ev => {
+    const f = ev.target.files[0];
+    const box = document.getElementById('vres');
+    document.getElementById('doImport').disabled = true; DEF = null;
+    if (!f) { box.innerHTML = ''; return; }
+    try {
+      const raw = JSON.parse(await f.text());
+      if (code && raw.code !== code)
+        throw new Error(`ไฟล์นี้เป็นของ "${raw.code}" ไม่ใช่ "${code}"`);
+      const errs = M.validate(raw, codes());
+      if (errs.length) {
+        box.innerHTML = `<div class="warn"><b>ยังไม่ผ่านการตรวจ ${errs.length} ข้อ</b><br>· ${errs.map(A.esc).join('<br>· ')}</div>`;
+        return;
+      }
+      DEF = raw;
+      const nf = (raw.sections || []).reduce((a, s) => a + (s.fields || []).length, 0);
+      box.innerHTML = `<div class="note"><b>${A.esc(raw.code)}</b> —
+        ${(raw.parties || []).length} ฝ่าย · ${(raw.sections || []).length} ส่วน · ${nf} ฟิลด์ ·
+        ${(raw.gates || []).length} gate · ${(raw.route || []).length} ขั้นอนุมัติ<br>ตรวจผ่านทั้งหมด</div>`;
+      document.getElementById('doImport').disabled = false;
+    } catch(e){ box.innerHTML = `<div class="warn">อ่านไฟล์ไม่ได้: ${A.esc(e.message)}</div>`; }
+  };
+  document.getElementById('doImport').onclick = async e => {
+    e.preventDefault();
+    if (!DEF) return;
+    try { await M.saveDraft(A.db, A.user, DEF); dlg.close(); await refresh(); }
+    catch(err){ alert('บันทึกไม่สำเร็จ: ' + err.message); }
+  };
+}
+
+/* ── ออกเวอร์ชันใหม่ ── */
+function publishDlg(code){
+  const d = DEFS[code];
+  const nextRev   = String(Number(d.rev) + 1).padStart(2, '0');
+  const nextIssue = String(Number(d.issue) + 1).padStart(2, '0');
+  modal('ออกเวอร์ชันใหม่ — ' + code, `ปัจจุบัน Issue ${d.issue}/Rev ${d.rev} · defRev ${d.defRev || 0}`,
+    `<div class="fk-f"><label>ระดับการเปลี่ยนแปลงของเอกสารควบคุม</label>
+       <div class="fk-opts" id="bump">
+         <button type="button" class="fk-opt" data-v="none" aria-pressed="true">คงเลขเดิม ${A.esc(d.issue)}/${A.esc(d.rev)}</button>
+         <button type="button" class="fk-opt" data-v="rev" aria-pressed="false">แก้ไข → ${A.esc(d.issue)}/${nextRev}</button>
+         <button type="button" class="fk-opt" data-v="issue" aria-pressed="false">ออกฉบับใหม่ → ${nextIssue}/00</button>
+       </div>
+       <p class="hint" id="bhint">ใช้เมื่อแก้เรื่องที่ไม่กระทบเนื้อหาควบคุม เช่น คำอธิบายหรือคำค้น</p></div>
+     <div class="fk-f"><label for="cn">แก้อะไร <span style="color:var(--red-500)">*</span></label>
+       <textarea id="cn" placeholder="เช่น เพิ่มช่องชั่วโมงพักผ่อน 24 ชม. และปรับเกณฑ์คะแนนเป็น 3 ระดับ"></textarea></div>
+     <div class="fk-f"><label>เหตุผล <span style="color:var(--red-500)">*</span></label>
+       <div class="fk-opts" id="reason">${M.REASONS.map((r, i) =>
+         `<button type="button" class="fk-opt" data-v="${r}" aria-pressed="${i === 0}">${r}</button>`).join('')}</div></div>
+     <div class="warn">รุ่นที่ publish แล้วจะถูกแช่แข็งไว้ แก้ไม่ได้ลบไม่ได้ ·
+       ใบที่กรอกด้วยรุ่นเก่ายังผูกกับรุ่นเดิมเสมอ</div>`,
+    `<button class="fb" value="cancel">ยกเลิก</button>
+     <button class="fb" id="doPub" style="background:var(--navy-900);color:#fff;border-color:var(--navy-900)">publish</button>`);
+
+  let bump = 'none', reason = M.REASONS[0];
+  const HINT = { none:'ใช้เมื่อแก้เรื่องที่ไม่กระทบเนื้อหาควบคุม เช่น คำอธิบายหรือคำค้น',
+                 rev:'ต้องอัปเดต LEF ในคู่มือให้ตรงกับเลข Revision ใหม่',
+                 issue:'ต้องอัปเดต LEF และแจ้ง Distribution List ตามขั้นตอนเอกสารควบคุม' };
+  const pick = (sel, set) => document.querySelectorAll(sel).forEach(b => b.onclick = () => {
+    document.querySelectorAll(sel).forEach(x => x.setAttribute('aria-pressed', x === b));
+    set(b.dataset.v);
+  });
+  pick('#bump .fk-opt', v => { bump = v; document.getElementById('bhint').textContent = HINT[v]; });
+  pick('#reason .fk-opt', v => reason = v);
+
+  document.getElementById('doPub').onclick = async e => {
+    e.preventDefault();
+    try {
+      const v = await M.publish(A.db, A.user, code, {
+        bump, reason, changeNote: document.getElementById('cn').value, knownCodes: codes() });
+      dlg.close(); await refresh();
+      alert('publish แล้ว — Issue ' + v.issue + '/Rev ' + v.rev + ' · defRev ' + v.defRev);
+    } catch(err){ alert(err.message); }
+  };
+}
+
+/* ── เปิด / ปิด ── */
+async function toggle(code, status){
+  const msg = status === 'disabled'
+    ? 'ปิดใช้งานฟอร์มนี้?\n\nผู้ใช้จะเริ่มกรอกใบใหม่ไม่ได้ แต่ใบที่ค้างอยู่ยังเดินต่อจนจบได้'
+    : 'เปิดใช้งานฟอร์มนี้?';
+  if (!confirm(msg)) return;
+  try { await M.setStatus(A.db, A.user, code, status); await refresh(); }
+  catch(e){ alert(e.message); }
+}
+
+/* ── ประวัติ ── */
+async function history(code){
+  modal('ประวัติการแก้ไข — ' + code, 'log แก้ไขไม่ได้ ลบไม่ได้', '<p class="hint">กำลังโหลด…</p>',
+    `<button class="fb" value="cancel">ปิด</button>`);
+  try {
+    const [vers, evs] = await Promise.all([M.versions(A.db, code), M.events(A.db, code)]);
+    const fmt = t => t && t.toDate ? t.toDate().toLocaleString('th-TH') : '—';
+    document.getElementById('dbody').innerHTML =
+      `<h4 style="font-family:var(--font-display);font-size:15px;margin-bottom:10px">รุ่นที่ publish (${vers.length})</h4>` +
+      (vers.length ? vers.map(v => `<div class="ver">
+          <div class="h">Issue ${A.esc(v.issue)}/Rev ${A.esc(v.rev)} · defRev ${v.defRev}</div>
+          <div class="m">${A.esc(v.changeNote || '—')}<br>
+            ${A.esc(v.reason || '')} · ${A.esc(v.publishedBy || '')} · ${A.esc(fmt(v.publishedAt))}</div>
+        </div>`).join('') : '<p class="hint">ยังไม่เคย publish</p>') +
+      `<h4 style="font-family:var(--font-display);font-size:15px;margin:18px 0 10px">log ทั้งหมด (${evs.length})</h4>` +
+      evs.map(e => `<div class="ver">
+          <div class="h">${A.esc(e.action)}${e.toDefRev != null ? ' → defRev ' + e.toDefRev : ''}</div>
+          <div class="m">${A.esc(e.changeNote || '—')}
+            ${e.diff ? '<br>' + A.esc(M.diffText(e.diff)) : ''}<br>
+            ${A.esc(e.by || '')} · ${A.esc(fmt(e.at))}</div>
+          ${e.action === 'published' ? `<pre>${A.esc(M.editorNote(code, e))}</pre>` : ''}
+        </div>`).join('');
+  } catch(e){
+    document.getElementById('dbody').innerHTML = `<div class="warn">อ่านประวัติไม่ได้: ${A.esc(e.code || e.message)}</div>`;
+  }
+}
+
+/* ── สำรองลงเครื่อง ── */
+document.getElementById('dl').onclick = () => {
+  const blob = new Blob([JSON.stringify(Object.values(DEFS), null, 1)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'formdefs-backup.json';
+  a.click();
+};
+</script>
+</body></html>

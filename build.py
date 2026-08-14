@@ -11,6 +11,7 @@
 #     -> queue/                     คิวงานของฉัน
 #     -> admin/register/            ทะเบียน LEF (เจ้าหน้าที่)
 #     -> admin/setup/               ตั้งค่าระบบ — บทบาท · ผู้รับฟอร์ม · อัปโหลดทะเบียน
+#     -> admin/forms/               จัดการฟอร์ม — เวอร์ชัน · log · เปิด-ปิด
 #     -> staff-login/               หน้าเข้าสู่ระบบ
 #
 # กติกา
@@ -177,6 +178,7 @@ def main():
         ('register.html',    'admin/register/index.html',      '../../', 'register'),
         ('staff-login.html', 'staff-login/index.html',         '../',   ''),
         ('setup.html',       'admin/setup/index.html',          '../../', 'setup'),
+        ('forms-admin.html', 'admin/forms/index.html',          '../../', 'fadmin'),
         ('fill.html',        'fill/index.html',                '../',   'all'),
         ('submit.html',      'submit/index.html',              '../',   'all'),
     ]
