@@ -171,6 +171,13 @@ function docDate_(v) {
   return m ? m[3] + ' ' + MON_[Number(m[2]) - 1] + ' ' + m[1] : v;
 }
 
+/** รับ ISO datetime ด้วย (เวลาที่ส่ง) — คืนรูปแบบวันที่ของเอกสารควบคุม */
+function docStamp_(v) {
+  var d = v ? new Date(v) : new Date();
+  if (isNaN(d.getTime())) return String(v || '');
+  return ('0' + d.getDate()).slice(-2) + ' ' + MON_[d.getMonth()] + ' ' + d.getFullYear();
+}
+
 /** แผ่คำตอบให้เป็นคอลัมน์เดียว — checklist และ array กลายเป็นข้อความอ่านได้ */
 function flatten_(data) {
   var out = {};
@@ -210,16 +217,25 @@ function makePdf_(folder, abbr, s) {
     var all = Object.assign({}, flat, ticks_(data), {
       tracking: s.tracking, doc: s.doc || '', issue: s.issue || '', rev: s.rev || '',
       defRev: s.defRev || '', submitter: s.submitterName || '',
-      submittedAt: s.submittedAt || '', score: (s.computed && s.computed.score) || 0,
+      submittedAt: docStamp_(s.submittedAt), score: (s.computed && s.computed.score) || 0,
     });
     // ลายเซ็นต้องทำก่อนล้าง token ที่เหลือ มิฉะนั้น {{sig_…}} จะถูกลบไปก่อน
     signatures_(b, data);
-    Object.keys(all).forEach(function (k) {
-      b.replaceText('\\{\\{' + k + '\\}\\}', String(all[k]));
+
+    // หัวและท้ายกระดาษเป็นคนละส่วนกับเนื้อ — replaceText บน body ไม่แตะให้
+    // ถ้าลืม จะเห็น {{submittedAt}} ค้างอยู่ท้ายทุกหน้าของเอกสารจริง
+    var parts = [b];
+    try { var hd = doc.getHeader(); if (hd) parts.push(hd); } catch (e) {}
+    try { var ft = doc.getFooter(); if (ft) parts.push(ft); } catch (e) {}
+
+    parts.forEach(function (part) {
+      Object.keys(all).forEach(function (k) {
+        part.replaceText('\\{\\{' + k + '\\}\\}', String(all[k]));
+      });
+      // ช่องติ๊กที่ผู้กรอกไม่ได้แตะเลยจะไม่มีใน data — ต้องเป็น ☐ ไม่ใช่ช่องว่าง
+      part.replaceText('\\{\\{k_[a-zA-Z0-9_\\-]+\\}\\}', '☐');
+      part.replaceText('\\{\\{[a-zA-Z0-9_]+\\}\\}', '');   // token อื่นที่เหลือให้ว่างไว้
     });
-    // ช่องติ๊กที่ผู้กรอกไม่ได้แตะเลยจะไม่มีใน data — ต้องเป็น ☐ ไม่ใช่ช่องว่าง
-    b.replaceText('\\{\\{k_[a-zA-Z0-9_\\-]+\\}\\}', '☐');
-    b.replaceText('\\{\\{[a-zA-Z0-9_]+\\}\\}', '');   // token อื่นที่เหลือให้ว่างไว้
     doc.saveAndClose();
     blob = copy.getAs('application/pdf').setName(name);
     copy.setTrashed(true);
