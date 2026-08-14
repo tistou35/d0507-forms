@@ -23,16 +23,19 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SRC  = os.path.join(HERE, 'src')
 DEFS = os.path.join(HERE, 'formdefs')
 
-# Firebase — โปรเจกต์เดียวกับ d0507-audit
-# origin เดียวกัน (tistou35.github.io) + apiKey เดียวกัน => login ครั้งเดียวใช้ได้ทั้งสอง repo
-FIREBASE_CONFIG = '''{
-  apiKey: "AIzaSyB_O4vBBOa7-YtGJyPnZ5NLPtQZjWMSJnQ",
-  authDomain: "d0507-audit.firebaseapp.com",
-  projectId: "d0507-audit",
-  storageBucket: "d0507-audit.firebasestorage.app",
-  messagingSenderId: "880880454045",
-  appId: "1:880880454045:web:a8fe249ca18f1a7a20c774"
-}'''
+# ── Firebase ────────────────────────────────────────────────
+# d0507-forms เป็น "คนละโปรเจกต์" กับ d0507-audit (ตัดสินใจ 01 AUG 2026)
+# แปลว่า Auth และ Firestore แยกขาดจากกัน — ผู้ใช้ต้อง login แยกสองระบบ
+# ใส่ค่าจริงที่ firebase/config.json แล้ว build ใหม่
+CFG_PATH = os.path.join(HERE, 'firebase', 'config.json')
+
+
+def firebase_config():
+    raw = json.load(open(CFG_PATH, encoding='utf-8'))
+    cfg = {k: v for k, v in raw.items() if not k.startswith('_')}
+    todo = [k for k, v in cfg.items() if 'REPLACE_ME' in str(v)]
+    body = ',\n'.join('  %s: "%s"' % (k, v) for k, v in cfg.items())
+    return '{\n' + body + '\n}', todo
 
 PUBLIC_FORBIDDEN = ('code', 'lef', 'st', 'note', 'docx', 'own', 'jotDup')
 PUBLIC_KEEP = ('doc', 'abbr', 't', 'th', 'sys', 'jot', 'assignTo', 'r', 'chain', 'kw',
@@ -146,13 +149,18 @@ def main():
 
     pub = public_view(reg)
     # ⚠️ ทุกหน้าที่ host แบบสาธารณะฝังได้เฉพาะ pub — ทะเบียนเต็มอยู่ Firestore เท่านั้น
-    R, P, FB = jsonjs(pub), jsonjs(pub), FIREBASE_CONFIG
+    FB, todo = firebase_config()
+    R, P = jsonjs(pub), jsonjs(pub)
     stats = {'forms': len(reg['forms']), 'lef': reg['lefcount']['unique'],
              'public': len(pub['forms']), 'systems': len([k for k in reg['systems'] if k != 'here']),
              'defs': len(defs)}
 
     print('register: %d ฟอร์ม · สาธารณะ %d · มีนิยามฟอร์มแล้ว %d' %
           (stats['forms'], stats['public'], stats['defs']))
+    if todo:
+        print('\n  ⚠️  firebase/config.json ยังไม่ได้ใส่ค่าจริง: %s' % ', '.join(todo))
+        print('     เว็บจะทำงานเฉพาะส่วนสาธารณะ — login / คิวงาน / ส่งฟอร์ม จะยังใช้ไม่ได้')
+        print('     สร้างโปรเจกต์ใหม่แล้วคัดลอก config มาวาง จากนั้น build ใหม่\n')
 
     # ลบผลลัพธ์เดิมที่ build ไม่ได้ผลิตแล้ว กันไฟล์ตกค้างซึ่งอาจมีข้อมูลรุ่นเก่า
     for stale in ('f', 'staff', 'student'):

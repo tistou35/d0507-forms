@@ -7,11 +7,12 @@
 
 ## กติกาของ repo นี้
 
-1. **แก้หน้าเว็บที่ `src/` เท่านั้น** — `index.html`, `student/`, `staff/` เป็นไฟล์ที่ build แล้ว ห้ามแก้มือ
+1. **แก้หน้าเว็บที่ `src/` เท่านั้น** · สไตล์ที่ `assets/app.css` · ตัวเรนเดอร์ที่ `assets/formkit.js`
+   ไฟล์ที่ build แล้ว (`index.html`, `all/`, `f/`, …) ห้ามแก้มือ
 2. **`build.py` เป็นตัวประกอบอย่างเดียว ไม่เก็บ HTML ไว้ข้างใน**
    *(บทเรียนจาก d0507-audit: เคยเก็บ HTML ไว้ใน build.py แล้ว session อื่นเข้าใจผิดว่าไฟล์โดนย่อ จึง restore ทับ)*
 3. **ตรวจหลัง build ให้ดูขนาดไฟล์ผลลัพธ์ ไม่ใช่ขนาด `build.py`**
-   ค่าอ้างอิงปัจจุบัน — `index.html` ~29 KB · `student/index.html` ~43 KB · `staff/index.html` ~88 KB
+   ค่าอ้างอิงปัจจุบัน — `index.html` ~24 KB · `all/` ~18 KB · `f/<ABBR>/` ~12 KB · รวม ~943 KB
    ถ้าเล็กกว่านี้มากแปลว่า `src/` หรือ `forms_register.json` ผิดปกติ
 4. **แก้ข้อมูลฟอร์มที่ `forms_register.json` แล้ว build** ไม่ต้องแตะโค้ดหน้าเว็บ
 
@@ -24,26 +25,25 @@ python3 build.py
 ## โครงไฟล์
 
 ```
-index.html              build ← src/door.html        ประตูเข้า      ไม่ต้อง login
-student/index.html      build ← src/student.html     ฝั่งนักเรียน    ไม่ต้อง login
-staff/index.html        build ← src/staff.html       ฝั่งเจ้าหน้าที่  ต้อง login
-src/shell.css           design tokens + component ทั้งหมด (inline เข้าไปตอน build)
-assets/fonts/           Interstate-Bold.otf · Ocean_Sans_Std_Book.ttf
-assets/logo.svg
-forms_register.json     ทะเบียน 52 ฟอร์ม — แหล่งข้อมูลกลาง
+src/            ← แก้ที่นี่   home · all · form · fill · submit · queue · register
+                             staff-login · _partials (topbar/rail/botnav)
+assets/         app.css · app.js · formkit.js · fonts/ · logo.svg
+formdefs/       _SCHEMA.md (แบบมาตรฐาน) · _TEMPLATE.json · <ABBR>.json ต่อฟอร์ม
+firebase/       config.json (ใส่ค่าเอง) · firestore.rules · seed.mjs · README.md
+forms_register.json    ทะเบียน 52 ฟอร์ม — แหล่งข้อมูลกลาง
 build.py
 ```
 
 ### placeholder ที่ build.py แทนค่า
 
-| | ใช้ที่ | ค่า |
-|---|---|---|
-| `@@CSS@@` | ทุกหน้า | เนื้อ `src/shell.css` |
-| `@@BASE@@` | ทุกหน้า | `''` ที่ราก · `'../'` ในโฟลเดอร์ย่อย |
-| `@@STATS@@` | ทุกหน้า | ตัวเลขสรุปจากทะเบียน |
-| `@@REG@@` | staff | ทะเบียนเต็ม 52 ฟอร์ม |
-| `@@REGPUB@@` | student | **เฉพาะฟอร์ม `public:true` และเฉพาะฟิลด์ที่ปลอดภัย** |
-| `@@FBCFG@@` | staff | `FIREBASE_CONFIG` |
+| | ค่า |
+|---|---|
+| `@@BASE@@` | path กลับ root — `''` ที่ราก · `'../'` · `'../../'` |
+| `@@TOPBAR@@` `@@RAIL@@` `@@BOTNAV@@` | ดึงจาก `src/_partials.html` แล้วตั้ง active ให้ |
+| `@@REG@@` `@@REGPUB@@` | **ชุดสาธารณะเท่านั้น** — ทะเบียนเต็มมาจาก Firestore |
+| `@@FBCFG@@` | อ่านจาก `firebase/config.json` |
+| `@@DEFS@@` | นิยามฟอร์มทั้งหมดใน `formdefs/` |
+| `@@FORM@@` `@@FTITLE@@` | เฉพาะหน้า `f/<ABBR>/` — ฟิลด์สาธารณะของฟอร์มนั้น |
 
 build จะ **หยุดทันที** ถ้ามี placeholder เหลือ หรือมีฟิลด์ต้องห้ามหลุดไปหน้าสาธารณะ
 
@@ -55,16 +55,21 @@ build จะ **หยุดทันที** ถ้ามี placeholder เห�
 
 ---
 
-## Authentication
+## Authentication — โปรเจกต์แยก
 
-ใช้ Firebase โปรเจกต์ **`d0507-audit`** ตัวเดิม (config ฝังใน `build.py`)
+**d0507-forms ใช้ Firebase โปรเจกต์ของตัวเอง แยกขาดจาก `d0507-audit`** (ตัดสินใจ 01 AUG 2026)
 
-ทั้งสอง repo อยู่บนโดเมน `tistou35.github.io` เหมือนกัน → **origin เดียวกัน** →
-Firebase Auth เก็บ session ต่อ origin → **login ครั้งเดียวใช้ได้ทั้งสอง repo**
+config อยู่ที่ **`firebase/config.json`** (ไม่ได้ฝังใน `build.py` แล้ว)
+ถ้ายังเป็น `REPLACE_ME` build จะเตือน และเว็บจะทำงานเฉพาะส่วนสาธารณะ
 
-⚠️ ถ้าย้ายไปโดเมนของตัวเอง (เช่น `d0507.361vision.org`) **ต้องย้ายทั้งสอง repo พร้อมกัน**
-ไม่งั้นคนละ origin → single sign-on พัง ต้อง login สองรอบ
+| | ผลของการแยกโปรเจกต์ |
+|---|---|
+| **Login** | คนละระบบ — เข้าที่นี่แล้วยังต้องเข้า `d0507-audit` อีกรอบ |
+| **คิวงาน** | รวมงาน CAR จากระบบตรวจมาแสดง**ไม่ได้** คนละฐานข้อมูล · ปุ่มในเมนูเป็นลิงก์ออกเฉย ๆ |
+| **ทะเบียนผู้ใช้** | ต้องทำ `users/{uid}` สองที่ · uid คนละตัวด้วย |
+| **ข้อดี** | rules ที่นี่แก้ยังไงก็ไม่กระทบระบบตรวจ · เผลอพังก็พังแค่ระบบเดียว |
 
+ขั้นตอนตั้งค่าทั้งหมดอยู่ที่ `firebase/README.md`
 ---
 
 ## สถานะปัจจุบัน (31 JUL 2026)

@@ -29,7 +29,7 @@
     <input id="pw" type="password" placeholder="รหัสผ่าน" autocomplete="current-password">
     <button class="alt" onclick="D0507.loginEmail(em.value.trim(),pw.value)">เข้าสู่ระบบด้วยอีเมล</button>
     <button class="alt" onclick="D0507.signup(em.value.trim(),pw.value)">สมัครใหม่ (ครั้งแรกของอีเมลนี้)</button>
-    <p class="hint">ใช้บัญชีเดียวกับ D-0507 Audit — ถ้าเข้าระบบนั้นอยู่แล้วจะเข้าที่นี่ได้ทันที<br>
+    <p class="hint">ระบบนี้ใช้บัญชีแยกจาก D-0507 Audit — เข้าที่นี่แล้วยังต้องเข้าระบบตรวจสอบอีกรอบ<br>
       อีเมลต้องอยู่ในรายชื่อขององค์กร (Security Rules)</p>
     <p class="hint"><a href="../">← กลับหน้าหลัก</a> · นักเรียนไม่ต้องเข้าสู่ระบบ</p>
   </div>
@@ -42,12 +42,12 @@
 <script src="../assets/app.js"></script>
 <script>
 D0507.initAuth({
-  apiKey: "AIzaSyB_O4vBBOa7-YtGJyPnZ5NLPtQZjWMSJnQ",
-  authDomain: "d0507-audit.firebaseapp.com",
-  projectId: "d0507-audit",
-  storageBucket: "d0507-audit.firebasestorage.app",
-  messagingSenderId: "880880454045",
-  appId: "1:880880454045:web:a8fe249ca18f1a7a20c774"
+  apiKey: "REPLACE_ME",
+  authDomain: "REPLACE_ME.firebaseapp.com",
+  projectId: "REPLACE_ME",
+  storageBucket: "REPLACE_ME.firebasestorage.app",
+  messagingSenderId: "REPLACE_ME",
+  appId: "REPLACE_ME"
 }, u => { if (u) location.href = '../'; });
 </script>
 </body></html>

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * seed.mjs — สร้าง users/{uid} และ publicDirectory/instructors ใน Firestore
+ * seed.mjs — สร้าง users/{uid}, publicDirectory/instructors และ registry/current
+ *          ในโปรเจกต์ Firebase ของ d0507-forms (คนละโปรเจกต์กับ d0507-audit)
  *
  * ใช้ครั้งเดียวตอนตั้งระบบ และรันซ้ำได้ทุกครั้งที่มีคนเข้า/ออก
  *

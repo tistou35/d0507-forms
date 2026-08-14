@@ -1,21 +1,18 @@
 rules_version = '2';
 
 // ============================================================
-// D-0507 — Firestore Security Rules
-// โปรเจกต์ d0507-audit (ใช้ร่วมกัน 2 แอป: d0507-audit + d0507-forms)
+// d0507-forms — Firestore Security Rules
+// โปรเจกต์นี้ "แยกขาด" จาก d0507-audit (ตัดสินใจ 01 AUG 2026)
+// จึงไม่มี audits / plans / library อยู่ที่นี่ และแก้ rules ที่นี่
+// ไม่กระทบระบบตรวจสอบเลย
 //
-// ⚠️ Rules ผูกกับ "โปรเจกต์" ไม่ใช่กับแอปที่เรียก
-//    แยกสิทธิ์ตาม "บทบาทของผู้ใช้" ไม่ใช่ตาม "แอปไหนเรียกมา"
-//
-// ก่อนวางจริง: ทดสอบด้วย emulator ก่อนเสมอ
-//   firebase emulators:start --only firestore
+// ทดสอบก่อนวางจริง:  firebase emulators:start --only firestore
 // ============================================================
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ── รายชื่อทีม ─────────────────────────────────────────
-    // เพิ่ม/ลบคนที่นี่ (ต้องตรงกับ Storage rules ของ d0507-audit ด้วย)
+    // ── รายชื่อเจ้าหน้าที่ — เพิ่ม/ลบคนที่นี่ ────────────────
     function staffEmails() {
       return [
         'tistou35@gmail.com'
@@ -24,53 +21,38 @@ service cloud.firestore {
     function signedIn()  { return request.auth != null; }
     function staff()     { return signedIn() && request.auth.token.email in staffEmails(); }
     function isSelf(uid) { return signedIn() && request.auth.uid == uid; }
-    // ผู้ใช้ที่ยังไม่ได้ยืนยันตัวตน — ฝั่งนักเรียนที่ล็อกอินแบบ anonymous
+    // ฝั่งนักเรียนล็อกอินแบบ anonymous เพื่อให้ส่งฟอร์มได้โดยไม่ต้องสมัคร
     function anon()      { return signedIn() && request.auth.token.firebase.sign_in_provider == 'anonymous'; }
 
-    // ════════════════════════════════════════════════════════
-    //  ของเดิม — d0507-audit  (อย่าแก้โดยไม่คุยกับ session นั้น)
-    // ════════════════════════════════════════════════════════
-    match /audits/{aid} {
-      allow read, write: if staff();
-      match /items/{itemId} { allow read, write: if staff(); }
-    }
-    match /plans/{year}    { allow read, write: if staff(); }
-    match /library/{proj}  { allow read, write: if staff(); }
-
-    // ════════════════════════════════════════════════════════
-    //  ใช้ร่วมสองแอป
-    // ════════════════════════════════════════════════════════
-
-    // โปรไฟล์ + บทบาท · ผู้ใช้แก้ role ตัวเองไม่ได้
+    // ── โปรไฟล์ + บทบาท · ผู้ใช้แก้ role ตัวเองไม่ได้ ────────
     match /users/{uid} {
       allow read:  if isSelf(uid) || staff();
       allow write: if staff();
     }
 
-    // รายชื่อครูสำหรับตัวเลือกฝั่งนักเรียน
-    // เอกสารนี้อ่านได้ทั้งโลก → ใส่ได้แค่ ชื่อ + ตำแหน่ง ห้ามมีอีเมลหรือเบอร์โทร
+    // ── รายชื่อผู้รับฟอร์ม สำหรับตัวเลือกฝั่งนักเรียน ────────
+    // อ่านได้ทั้งโลก → ใส่ได้แค่ ชื่อ + ตำแหน่ง + recv
+    // ห้ามมีอีเมลหรือเบอร์โทรเด็ดขาด (seed.mjs ตรวจให้แล้ว)
     match /publicDirectory/{doc} {
       allow read:  if true;
       allow write: if staff();
     }
 
-    // ════════════════════════════════════════════════════════
-    //  d0507-forms
-    // ════════════════════════════════════════════════════════
-
-    // นิยามฟอร์ม — อ่านได้ทั้งโลก (หน้าสาธารณะต้องใช้) แก้ได้เฉพาะเจ้าหน้าที่
-    match /formDefs/{formCode} {
-      allow read:  if true;
-      allow write: if staff();
-    }
-
-    // ทะเบียนฟอร์มฉบับเต็ม — มี control code, สถานะ LEF, หมายเหตุ
+    // ── ทะเบียนฟอร์มฉบับเต็ม ────────────────────────────────
+    // มี control code · สถานะ LEF · หมายเหตุ
     // เว็บ host แบบสาธารณะจึงฝังในไฟล์ไม่ได้ ต้องอ่านจากที่นี่หลัง login
     match /registry/{doc} {
       allow read:  if staff();
       allow write: if staff();
     }
 
+    // ── นิยามฟอร์ม — หน้าสาธารณะต้องใช้ ─────────────────────
+    match /formDefs/{formCode} {
+      allow read:  if true;
+      allow write: if staff();
+    }
+
+    // ── ฟอร์มที่ถูกส่ง ──────────────────────────────────────
     function newSubmissionOk() {
       let d = request.resource.data;
       return d.keys().hasAll(['formCode', 'status', 'byPublic', 'assigneeUid', 'createdAt'])
@@ -79,8 +61,7 @@ service cloud.firestore {
           && d.assigneeUid is string && d.assigneeUid.size() > 0
           && d.formCode is string && d.formCode.size() <= 40
           && d.createdAt == request.time
-          // กันยัดข้อมูลก้อนใหญ่จากหน้าสาธารณะ
-          && d.keys().size() <= 12;
+          && d.keys().size() <= 12;          // กันยัดข้อมูลก้อนใหญ่จากหน้าสาธารณะ
     }
 
     match /submissions/{subId} {
@@ -90,7 +71,7 @@ service cloud.firestore {
       allow update: if staff();
       allow delete: if false;
 
-      // log แบบ append-only — แก้ไม่ได้ ลบไม่ได้
+      // log แบบ append-only — แก้ไม่ได้ ลบไม่ได้ (ข้อกำหนดเอกสารควบคุม)
       match /events/{eventId} {
         allow create: if signedIn();
         allow read:   if staff();
@@ -98,15 +79,16 @@ service cloud.firestore {
       }
     }
 
-    // คิวงานรวมทุกแอป — ผู้รับผิดชอบเห็นของตัวเอง
+    // ── คิวงาน — เฉพาะงานของระบบฟอร์มนี้ ────────────────────
+    // งาน CAR อยู่คนละโปรเจกต์ จึงรวมมาที่นี่ไม่ได้
     match /tasks/{taskId} {
       allow read:   if staff();
-      allow create: if staff() || anon();   // ฟอร์มสาธารณะสร้าง task ให้ครูได้
+      allow create: if staff() || anon();
       allow update: if staff();
       allow delete: if false;
     }
 
-    // คิวอีเมล — Trigger Email extension อ่านไปส่ง
+    // ── คิวอีเมล — Trigger Email extension อ่านไปส่ง ────────
     // เขียนได้อย่างเดียว อ่านไม่ได้ ไม่งั้นดึงอีเมลคนอื่นได้
     match /mail/{mailId} {
       allow create: if signedIn();
