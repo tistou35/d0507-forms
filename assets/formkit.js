@@ -132,6 +132,14 @@
   /* ── แท็บ ──────────────────────────────────────────────
      ฟอร์มยาว ๆ อย่าง FRAE มี 40 ช่อง ถ้าเรียงหน้าเดียวต้องเลื่อนจนหลง
      แบ่งเป็นแท็บแล้วให้คะแนนรวมค้างอยู่บนหัวตลอด จะได้เห็นผลของทุกการติ๊ก */
+  FormKit.prototype.filled = function (f) {
+    const v = this.data[f.k];
+    if (v === undefined || v === null || v === '') return false;
+    if (Array.isArray(v)) return v.length > 0;
+    if (f.type === 'checklist') return Object.keys(v || {}).length > 0;
+    return true;
+  };
+
   FormKit.prototype.tabs = function (ctx) {
     const defs = (this.def.ui && this.def.ui.tabs) || [];
     if (!defs.length) return null;
@@ -139,10 +147,20 @@
     const live = (this.def.sections || []).filter(s => evalCond(s.showIf, ctx));
     return defs.map(t => {
       const secs = live.filter(s => (s.tab || defs[0].k) === t.k);
-      let sc = 0;
-      secs.forEach(s => (s.fields || []).forEach(f => { sc += fieldScore(f, this.data[f.k]); }));
-      return { k: t.k, n: L(t, this.lang), secs: secs, score: sc,
-               miss: this.validate(secs).length };
+      let sc = 0, ans = 0, tot = 0;
+      secs.forEach(s => (s.fields || []).forEach(f => {
+        if (f.type === 'static' || !evalCond(f.showIf, ctx)) return;
+        sc += fieldScore(f, this.data[f.k]);
+        tot++;
+        if (this.filled(f)) ans++;
+      }));
+      const miss = this.validate(secs).length;
+      // สถานะที่หัวแท็บต้องบอกให้ตรง ไม่ใช่เขียวไว้ก่อน
+      //   miss    ยังมีช่องบังคับว่าง        · warn  ตอบแล้วและมีคะแนน
+      //   done    ตอบแล้วแต่ไม่มีคะแนน       · idle  ยังไม่ได้แตะเลย
+      const st = miss ? 'miss' : !ans ? 'idle' : sc ? 'warn' : 'done';
+      return { k: t.k, n: L(t, this.lang), secs: secs,
+               score: sc, miss: miss, ans: ans, tot: tot, st: st };
     }).filter(t => t.secs.length);
   };
 
@@ -315,20 +333,32 @@
       const i = tabs.findIndex(t => t.k === this.tab), cur = tabs[i], last = i === tabs.length - 1;
       const b = this.band();
 
-      // แถบคะแนน + หัวแท็บ ค้างอยู่บนหัวตลอด ไม่ว่าจะเลื่อนไปไหน
+      const ans = tabs.reduce((a, t) => a + t.ans, 0);
+      const tot = tabs.reduce((a, t) => a + t.tot, 0);
+      const pct = tot ? Math.round(ans / tot * 100) : 0;
+
+      // แถบคะแนน + ป้ายแท็บ ค้างอยู่บนหัวตลอด ไม่ว่าจะเลื่อนไปไหน
       html += `<div class="fk-tabwrap">
         ${scored ? `<div class="fk-bar ${b.lv}">
           <span class="n">${c.score}</span>
           <span class="lbl"><b>คะแนนความเสี่ยงรวม</b><br>Total risk score</span>
           ${b.n ? `<span class="band">${esc(b.n)}</span>` : ''}
-          <span class="prog">${esc(cur.n)} · ${i + 1}/${tabs.length}</span>
+          <span class="prog"><span class="pct">ตอบแล้ว ${ans}/${tot}</span>
+            <span class="tr"><i style="width:${pct}%"></i></span></span>
         </div>` : ''}
-        <nav class="fk-tabbar" role="tablist">` + tabs.map((t, n) =>
-          `<button type="button" role="tab" data-tab="${esc(t.k)}"
-             aria-selected="${t.k === this.tab}">${n + 1}. ${esc(t.n)}
-             ${t.miss ? `<span class="b miss">${t.miss}</span>`
-               : t.score ? `<span class="b has">+${t.score}</span>` : ''}</button>`).join('')
-        + `</nav></div>`;
+        <nav class="fk-tabbar" role="tablist" aria-label="ส่วนของฟอร์ม">` + tabs.map((t, n) => {
+          const on = t.k === this.tab;
+          const tag = t.miss ? `<span class="b">${t.miss}</span>`
+                    : t.score ? `<span class="b">+${t.score}</span>`
+                    : t.st === 'done' ? `<span class="b tick" aria-hidden="true">✓</span>` : '';
+          const say = t.miss ? `ยังไม่ครบ ${t.miss} ช่อง`
+                    : t.score ? `ได้ ${t.score} คะแนน`
+                    : t.st === 'done' ? 'ตอบครบแล้ว' : 'ยังไม่ได้กรอก';
+          return `<button type="button" role="tab" class="fk-tab ${t.st}" data-tab="${esc(t.k)}"
+             aria-selected="${on}" tabindex="${on ? 0 : -1}"
+             aria-label="${n + 1}. ${esc(t.n)} — ${say}">
+             <span class="i">${n + 1}</span><span class="nm">${esc(t.n)}</span>${tag}</button>`;
+        }).join('') + `</nav></div>`;
 
       // gate ระดับ stop ต้องเห็นทุกแท็บ ที่เหลือรวมไว้หน้าสรุป
       for (const g of this.gates()) {
@@ -397,13 +427,31 @@
     });
 
     // เปลี่ยนแท็บ — ขึ้นหัวฟอร์มทุกครั้ง จะได้ไม่ค้างกลางหน้าเดิม
+    // viaKey เท่านั้นที่ย้าย focus — ถ้า focus ทุกครั้งที่คลิก
+    // ป้ายจะขึ้นวงแหวน focus ค้างไว้ทั้งที่ผู้ใช้ใช้เมาส์
+    const go = (k, viaKey) => {
+      self.tab = k;
+      rerender();
+      const sel = el.querySelector('.fk-tab[aria-selected="true"]');
+      if (sel) {
+        // บนมือถือแถบป้ายเลื่อนแนวนอน ป้ายที่เลือกอาจอยู่นอกจอ — ดึงเข้ามาเสมอ
+        if (sel.scrollIntoView) sel.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+        if (viaKey) sel.focus({ preventScroll: true });
+      }
+      const top = el.getBoundingClientRect().top + window.scrollY - 76;
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    };
     el.querySelectorAll('[data-tab],[data-go]').forEach(b =>
-      b.addEventListener('click', () => {
-        self.tab = b.dataset.tab || b.dataset.go;
-        rerender();
-        const top = el.getBoundingClientRect().top + window.scrollY - 76;
-        window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
-      }));
+      b.addEventListener('click', () => go(b.dataset.tab || b.dataset.go)));
+
+    // ลูกศรซ้าย/ขวา · Home · End ตามแบบ tablist มาตรฐาน
+    const strip = Array.from(el.querySelectorAll('.fk-tab'));
+    strip.forEach((b, i) => b.addEventListener('keydown', e => {
+      const j = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: strip.length - 1 }[e.key];
+      if (j === undefined) return;
+      e.preventDefault();
+      go(strip[(j + strip.length) % strip.length].dataset.tab, true);
+    }));
 
     el.querySelectorAll('[data-cl]').forEach(b =>
       b.addEventListener('click', () => {
