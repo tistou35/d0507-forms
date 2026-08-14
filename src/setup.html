@@ -1,0 +1,264 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ตั้งค่าระบบ — D-0507 Flight Training</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="@@BASE@@assets/app.css">
+</head><body>
+@@TOPBAR@@
+<div class="body">
+@@RAIL@@
+  <main class="main">
+    <div class="greet"><div>
+      <p class="eyebrow">ผู้ดูแลระบบ · ADMIN</p>
+      <h1>ตั้งค่าระบบ</h1>
+      <p class="sub">บทบาทผู้ใช้ · รายชื่อผู้รับฟอร์ม · ทะเบียนเอกสาร — เขียนด้วยสิทธิ์ของบัญชีที่เข้าสู่ระบบ</p></div></div>
+
+    <div id="gate"></div>
+
+    <div id="body" class="hide">
+
+      <section>
+        <div class="sh"><h2>สถานะข้อมูลตั้งต้น</h2><span class="en">Setup status</span>
+          <span class="rt"><button class="fb" id="recheck">ตรวจใหม่</button></span></div>
+        <div class="stats" id="status"></div>
+      </section>
+
+      <section>
+        <div class="sh"><h2>โปรไฟล์และบทบาทของฉัน</h2><span class="en">My profile &amp; roles</span></div>
+        <div class="card">
+          <dl class="kv" id="me"></dl>
+          <div class="fk-f" style="margin-top:16px">
+            <label for="nm">ชื่อที่จะแสดง <span style="color:var(--red-500)">*</span></label>
+            <input id="nm" type="text" placeholder="เช่น ธนวัฒน์ ว.">
+          </div>
+          <div class="fk-f">
+            <label for="cert">ตำแหน่ง</label>
+            <p class="hint">ข้อความนี้จะแสดงในตัวเลือกผู้รับฝั่งนักเรียน — <b>ห้ามใส่อีเมลหรือเบอร์โทร</b></p>
+            <input id="cert" type="text" placeholder="เช่น FI · หัวหน้าฝ่ายปฏิบัติการการบิน">
+          </div>
+          <div class="fk-f">
+            <label>บทบาท — กำหนดว่าเห็นฟอร์มกลุ่มไหน</label>
+            <div class="fk-opts" id="roles"></div>
+          </div>
+          <div class="fk-f">
+            <label>รับฟอร์มประเภทไหนได้</label>
+            <p class="hint">นักเรียนจะเลือกคุณเป็นผู้รับได้เมื่อฟอร์มนั้นส่งถึงบทบาทนี้ ·
+              FRAE และ PWR → FI · SEF → CMM · APF → ACM · ไม่เลือกเลย = ไม่ปรากฏในตัวเลือก</p>
+            <div class="fk-opts" id="recv"></div>
+          </div>
+          <div class="acts"><button class="big pri" id="saveMe">บันทึกโปรไฟล์</button></div>
+        </div>
+      </section>
+
+      <section>
+        <div class="sh"><h2>รายชื่อผู้รับฟอร์ม</h2><span class="en">Recipient directory</span>
+          <span class="rt">อ่านได้ทั้งโลก — มีแค่ชื่อ ตำแหน่ง และประเภทฟอร์มที่รับ</span></div>
+        <div class="card"><div id="dir">—</div></div>
+      </section>
+
+      <section>
+        <div class="sh"><h2>ทะเบียนเอกสาร</h2><span class="en">Form register</span></div>
+        <div class="card">
+          <p class="hint" style="margin-bottom:12px">ทะเบียนฉบับเต็มมี control code · สถานะ LEF · หมายเหตุ
+            จึง<b>ไม่ฝังไว้ในเว็บ</b> — เลือกไฟล์ <span class="mono">forms_register.json</span> จากเครื่องของคุณ
+            แล้วอัปโหลดขึ้น <span class="mono">registry/current</span></p>
+          <div class="fk-f">
+            <label for="file">เลือกไฟล์ forms_register.json</label>
+            <input id="file" type="file" accept=".json,application/json">
+          </div>
+          <div id="preview"></div>
+          <div class="acts"><button class="big pri" id="upReg" disabled>อัปโหลดทะเบียน</button></div>
+        </div>
+      </section>
+
+      <section>
+        <div class="sh"><h2>ผลการทำงาน</h2><span class="en">Log</span></div>
+        <div class="card"><pre id="out" style="font-family:var(--font-mono);font-size:12.5px;
+          white-space:pre-wrap;margin:0;line-height:1.7">—</pre></div>
+      </section>
+
+    </div>
+  </main>
+</div>
+@@BOTNAV@@
+<footer>D-0507 Flight Training Co., Ltd. · Controlled Document System</footer>
+
+<script>window.BASE='@@BASE@@';</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="@@BASE@@assets/app.js"></script>
+<script>
+"use strict";
+const REG = @@REG@@;
+const A = D0507;
+const ROLE_KEYS = ['stu','ins','mnt','ops','mgt'];
+const RECV_KEYS = ['FI','CMM','ACM'];
+let ROLES = new Set(), RECV = new Set(), NEWREG = null;
+
+A.reg = REG;
+A.initAuth(@@FBCFG@@, boot);
+
+function log(s, cls){
+  const el = document.getElementById('out');
+  if (el.textContent === '—') el.textContent = '';
+  el.innerHTML += (cls ? `<span style="color:var(--${cls})">${A.esc(s)}</span>` : A.esc(s)) + '\n';
+}
+
+function chips(el, keys, set, label){
+  el.innerHTML = keys.map(k =>
+    `<button type="button" class="fk-opt" data-v="${k}" aria-pressed="${set.has(k)}">${A.esc(label(k))}</button>`).join('');
+  el.querySelectorAll('.fk-opt').forEach(b => b.addEventListener('click', () => {
+    const v = b.dataset.v;
+    set.has(v) ? set.delete(v) : set.add(v);
+    b.setAttribute('aria-pressed', set.has(v));
+  }));
+}
+
+async function boot(){
+  const ok = A.isStaff();
+  document.getElementById('body').classList.toggle('hide', !ok);
+  document.getElementById('gate').innerHTML = ok ? '' :
+    `<div class="note"><b>ต้องเข้าสู่ระบบก่อน</b> — หน้านี้เขียนข้อมูลด้วยสิทธิ์ของบัญชีที่เข้าสู่ระบบ
+     <br><a class="big pri" style="margin-top:12px;display:inline-flex" href="@@BASE@@staff-login/">เข้าสู่ระบบ</a></div>`;
+  if (!ok) return;
+
+  document.getElementById('me').innerHTML =
+    `<dt>อีเมล</dt><dd>${A.esc(A.user.email)}</dd>
+     <dt>uid</dt><dd class="mono" style="font-size:12.5px">${A.esc(A.user.uid)}</dd>`;
+
+  // ดึงโปรไฟล์เดิมถ้ามี
+  try {
+    const d = await A.db.collection('users').doc(A.user.uid).get();
+    if (d.exists) {
+      const v = d.data();
+      document.getElementById('nm').value = v.name || '';
+      document.getElementById('cert').value = v.cert || '';
+      (v.roles || []).forEach(r => ROLES.add(r));
+    }
+  } catch(e){ /* ยังไม่มี */ }
+  if (!document.getElementById('nm').value)
+    document.getElementById('nm').value = A.user.displayName || A.user.email.split('@')[0];
+  if (!ROLES.size) ['ins','mgt'].forEach(r => ROLES.add(r));
+
+  try {
+    const d = await A.db.collection('publicDirectory').doc('instructors').get();
+    const mine = ((d.exists && d.data().list) || []).find(x => x.id === A.user.uid);
+    (mine && mine.recv || ['FI']).forEach(r => RECV.add(r));
+  } catch(e){ RECV.add('FI'); }
+
+  chips(document.getElementById('roles'), ROLE_KEYS, ROLES, k => A.ROLE_N[k] || k);
+  chips(document.getElementById('recv'), RECV_KEYS, RECV, k => k);
+  check(); dir();
+}
+
+async function check(){
+  const rows = [];
+  for (const [label, path, get] of [
+      ['โปรไฟล์และบทบาทของฉัน', 'users/{uid}', () => A.db.collection('users').doc(A.user.uid).get()],
+      ['รายชื่อผู้รับฟอร์ม', 'publicDirectory/instructors', () => A.db.collection('publicDirectory').doc('instructors').get()],
+      ['ทะเบียนเอกสาร', 'registry/current', () => A.db.collection('registry').doc('current').get()]]) {
+    let st = 'red', txt = 'ยังไม่มี';
+    try {
+      const d = await get();
+      if (d.exists) {
+        st = 'grn'; txt = 'พร้อมใช้';
+        const v = d.data();
+        if (v.forms) txt = v.forms.length + ' ฟอร์ม';
+        if (v.list)  txt = v.list.length + ' คน';
+        if (v.roles) txt = (v.roles || []).map(r => A.ROLE_N[r] || r).join(' · ');
+      }
+    } catch(e){ st = 'red'; txt = e.code === 'permission-denied' ? 'ไม่มีสิทธิ์อ่าน' : e.code; }
+    rows.push(`<div class="stat ${st}"><div class="top"><span><span class="ti">${A.esc(label)}</span>
+      <span class="en">${A.esc(path)}</span></span></div><p class="note">${A.esc(txt)}</p></div>`);
+  }
+  document.getElementById('status').innerHTML = rows.join('');
+}
+
+async function dir(){
+  try {
+    const d = await A.db.collection('publicDirectory').doc('instructors').get();
+    const list = (d.exists && d.data().list) || [];
+    document.getElementById('dir').innerHTML = list.length
+      ? `<div class="twrap"><table class="reg"><thead><tr><th>ชื่อ</th><th>ตำแหน่ง</th><th>รับฟอร์ม</th><th></th></tr></thead><tbody>` +
+        list.map(x => `<tr><td class="nm">${A.esc(x.name)}</td><td>${A.esc(x.role || '—')}</td>
+          <td class="c">${A.esc((x.recv || []).join(' · ') || '—')}</td>
+          <td><button class="fb" data-rm="${A.esc(x.id)}">เอาออก</button></td></tr>`).join('') +
+        `</tbody></table></div>`
+      : '<p class="hint">ยังไม่มีใครในรายชื่อ — บันทึกโปรไฟล์ของคุณเพื่อเพิ่มตัวเองเป็นคนแรก</p>';
+    document.querySelectorAll('[data-rm]').forEach(b => b.addEventListener('click', () => removeFromDir(b.dataset.rm)));
+  } catch(e){ document.getElementById('dir').innerHTML = `<p class="hint">อ่านไม่ได้: ${A.esc(e.code)}</p>`; }
+}
+
+async function removeFromDir(id){
+  if (!confirm('เอาคนนี้ออกจากรายชื่อผู้รับฟอร์ม?')) return;
+  const ref = A.db.collection('publicDirectory').doc('instructors');
+  const d = await ref.get();
+  const list = ((d.exists && d.data().list) || []).filter(x => x.id !== id);
+  await ref.set({ list, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+  log('เอาออกจากรายชื่อแล้ว', 'green-600'); dir(); check();
+}
+
+document.getElementById('saveMe').addEventListener('click', async () => {
+  const name = document.getElementById('nm').value.trim();
+  const cert = document.getElementById('cert').value.trim();
+  if (!name) return alert('กรอกชื่อที่จะแสดงก่อน');
+  const btn = document.getElementById('saveMe'); btn.disabled = true;
+  try {
+    await A.db.collection('users').doc(A.user.uid).set({
+      email: A.user.email, name, cert, roles: [...ROLES], active: true,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+    log('users/' + A.user.uid + ' — บันทึกแล้ว · บทบาท: ' + [...ROLES].join(', '), 'green-600');
+
+    const ref = A.db.collection('publicDirectory').doc('instructors');
+    const d = await ref.get();
+    const list = ((d.exists && d.data().list) || []).filter(x => x.id !== A.user.uid);
+    if (RECV.size) {
+      const entry = { id: A.user.uid, name, role: cert, recv: [...RECV] };
+      // ด่านกันข้อมูลติดต่อหลุดเข้าเอกสารที่อ่านได้ทั้งโลก
+      if (/@|\d{9,}/.test(JSON.stringify(entry)))
+        throw new Error('ชื่อหรือตำแหน่งมีอีเมลหรือเบอร์โทรอยู่ — เอาออกก่อน');
+      list.push(entry);
+    }
+    await ref.set({ list, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    log('publicDirectory/instructors — ' + list.length + ' คน' +
+        (RECV.size ? ' · คุณรับ: ' + [...RECV].join(', ') : ' · คุณไม่อยู่ในรายชื่อ (ไม่ได้เลือกประเภทฟอร์ม)'), 'green-600');
+    check(); dir();
+  } catch(e){ log('ล้มเหลว: ' + e.message, 'red-600'); }
+  btn.disabled = false;
+});
+
+document.getElementById('file').addEventListener('change', async ev => {
+  const f = ev.target.files[0]; NEWREG = null;
+  const box = document.getElementById('preview');
+  document.getElementById('upReg').disabled = true;
+  if (!f) { box.innerHTML = ''; return; }
+  try {
+    const raw = JSON.parse(await f.text());
+    if (!Array.isArray(raw.forms) || !raw.status) throw new Error('ไม่ใช่ไฟล์ทะเบียน (ต้องมี forms และ status)');
+    NEWREG = { forms: raw.forms, status: raw.status,
+               lefcount: Object.assign({}, raw.lefcount, { total: raw.forms.length }) };
+    const c = k => raw.forms.filter(x => x.st === k).length;
+    box.innerHTML = `<div class="note"><b>${A.esc(f.name)}</b> — ${raw.forms.length} ฟอร์ม<br>
+      พร้อมใช้ ${c('ok')} · ลิงก์ผิดใบ ${c('linkwrong')} · มีสองฉบับ ${c('dupsys')} ·
+      ไม่มีในคู่มือ ${c('shadow')} · ยังไม่อยู่ใน LEF ${c('notinlef')}</div>`;
+    document.getElementById('upReg').disabled = false;
+  } catch(e){ box.innerHTML = `<div class="warn">อ่านไฟล์ไม่ได้: ${A.esc(e.message)}</div>`; }
+});
+
+document.getElementById('upReg').addEventListener('click', async () => {
+  if (!NEWREG) return;
+  const btn = document.getElementById('upReg'); btn.disabled = true;
+  try {
+    await A.db.collection('registry').doc('current').set(Object.assign({}, NEWREG, {
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      updatedBy: A.user.email }));
+    log('registry/current — อัปโหลดแล้ว ' + NEWREG.forms.length + ' ฟอร์ม', 'green-600');
+    check();
+  } catch(e){ log('อัปโหลดล้มเหลว: ' + e.message, 'red-600'); }
+  btn.disabled = false;
+});
+
+document.getElementById('recheck').addEventListener('click', () => { check(); dir(); });
+</script>
+</body></html>

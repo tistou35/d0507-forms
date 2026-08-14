@@ -10,6 +10,7 @@
 #     -> submit/                    หน้าส่งฟอร์มฝั่งนักเรียน (เลือกผู้รับ + อีเมลสำเนา)
 #     -> queue/                     คิวงานของฉัน
 #     -> admin/register/            ทะเบียน LEF (เจ้าหน้าที่)
+#     -> admin/setup/               ตั้งค่าระบบ — บทบาท · ผู้รับฟอร์ม · อัปโหลดทะเบียน
 #     -> staff-login/               หน้าเข้าสู่ระบบ
 #
 # กติกา
@@ -175,6 +176,7 @@ def main():
         ('queue.html',       'queue/index.html',               '../',   'queue'),
         ('register.html',    'admin/register/index.html',      '../../', 'register'),
         ('staff-login.html', 'staff-login/index.html',         '../',   ''),
+        ('setup.html',       'admin/setup/index.html',          '../../', 'setup'),
         ('fill.html',        'fill/index.html',                '../',   'all'),
         ('submit.html',      'submit/index.html',              '../',   'all'),
     ]
