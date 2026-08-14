@@ -78,7 +78,9 @@ def load_defs():
                 errs.append(f"{name}: route ขั้น {r.get('step')} อ้าง party '{r.get('party')}' ที่ไม่มี")
         for expr in [s.get('showIf') for s in d.get('sections', [])] + \
                     [g.get('when') for g in d.get('gates', [])]:
-            for tok in re.findall(r'\b([a-zA-Z_]\w*)\b', expr or ''):
+            # ตัดค่าคงที่ในเครื่องหมายคำพูดทิ้งก่อน มิฉะนั้น 'GO' จะถูกนับเป็นชื่อฟิลด์
+            bare = re.sub(r"'[^']*'|\"[^\"]*\"", ' ', expr or '')
+            for tok in re.findall(r'\b([a-zA-Z_]\w*)\b', bare):
                 if tok in ('true', 'false', 'anyStarBelow', 'filled', 'score'):
                     continue
                 if tok not in keys and tok not in {c2.get('k') for c2 in d.get('compute', [])}:

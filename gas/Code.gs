@@ -195,16 +195,21 @@ function makePdf_(folder, abbr, s) {
     var copy = tpl.next().makeCopy(s.tracking + ' (working)', folder);
     var doc = DocumentApp.openById(copy.getId());
     var b = doc.getBody();
-    var flat = flatten_(s.data || {});
-    var all = Object.assign({}, flat, {
+    var data = s.data || {};
+    var flat = flatten_(data);
+    var all = Object.assign({}, flat, ticks_(data), {
       tracking: s.tracking, doc: s.doc || '', issue: s.issue || '', rev: s.rev || '',
       defRev: s.defRev || '', submitter: s.submitterName || '',
-      submittedAt: s.submittedAt || '', score: (s.computed && s.computed.score) || '',
+      submittedAt: s.submittedAt || '', score: (s.computed && s.computed.score) || 0,
     });
+    // ลายเซ็นต้องทำก่อนล้าง token ที่เหลือ มิฉะนั้น {{sig_…}} จะถูกลบไปก่อน
+    signatures_(b, data);
     Object.keys(all).forEach(function (k) {
       b.replaceText('\\{\\{' + k + '\\}\\}', String(all[k]));
     });
-    b.replaceText('\\{\\{[a-zA-Z0-9_]+\\}\\}', '');   // ตัวที่เหลือให้ว่างไว้
+    // ช่องติ๊กที่ผู้กรอกไม่ได้แตะเลยจะไม่มีใน data — ต้องเป็น ☐ ไม่ใช่ช่องว่าง
+    b.replaceText('\\{\\{k_[a-zA-Z0-9_\\-]+\\}\\}', '☐');
+    b.replaceText('\\{\\{[a-zA-Z0-9_]+\\}\\}', '');   // token อื่นที่เหลือให้ว่างไว้
     doc.saveAndClose();
     blob = copy.getAs('application/pdf').setName(name);
     copy.setTrashed(true);
@@ -213,6 +218,53 @@ function makePdf_(folder, abbr, s) {
       .getAs('application/pdf').setName(name);
   }
   return folder.createFile(blob);
+}
+
+/**
+ * token ช่องติ๊ก — แทนที่อักขระเดียวในตำแหน่งเดิม เลย์เอาต์จึงไม่ขยับ
+ *   {{k_s1Thunder}}        ช่องติ๊กเดี่ยว        → ☑ เมื่อ data.s1Thunder เป็นจริง
+ *   {{k_s1Icing_moderate}} ตัวเลือกในกลุ่ม      → ☑ เมื่อ data.s1Icing === 'moderate'
+ */
+function ticks_(data) {
+  var TICK = '☑', BOX = '☐', out = {};
+  Object.keys(data).forEach(function (k) {
+    var v = data[k];
+    if (typeof v === 'boolean') { out['k_' + k] = v ? TICK : BOX; return; }
+    if (typeof v === 'string' && v && v.indexOf('data:image') !== 0) {
+      out['k_' + k + '_' + v] = TICK;               // ตัวที่เลือก
+    }
+    if (Array.isArray(v)) v.forEach(function (x) { out['k_' + k + '_' + x] = TICK; });
+  });
+  return out;
+}
+
+/**
+ * ฝังรูปลายเซ็นแทน {{sig_<key>}}
+ * ค่าที่เว็บส่งมาเป็น data URL จาก canvas ใน formkit.js
+ * ตัวที่ไม่มีลายเซ็นปล่อยให้ตัวล้าง token จัดการต่อ
+ */
+function signatures_(b, data) {
+  Object.keys(data).forEach(function (k) {
+    var v = data[k];
+    if (typeof v !== 'string' || v.indexOf('data:image') !== 0) return;
+    var blob;
+    try {
+      var m = v.match(/^data:([^;]+);base64,(.*)$/);
+      if (!m) return;
+      blob = Utilities.newBlob(Utilities.base64Decode(m[2]), m[1], k + '.png');
+    } catch (err) { return; }
+
+    var tok = '\\{\\{sig_' + k + '\\}\\}';
+    var r = b.findText(tok);
+    while (r) {
+      var el = r.getElement().asText();
+      el.deleteText(r.getStartOffset(), r.getEndOffsetInclusive());
+      var img = el.getParent().asParagraph().insertInlineImage(0, blob);
+      var w = 150, h = img.getHeight() * w / img.getWidth();
+      img.setWidth(w).setHeight(Math.round(h));
+      r = b.findText(tok);
+    }
+  });
 }
 
 function fallbackHtml_(abbr, s) {
@@ -245,16 +297,43 @@ function fallbackHtml_(abbr, s) {
 }
 
 // ── ทดสอบจากใน editor โดยไม่ต้องยิงจากเว็บ ──────────────────
-function testExport() {
-  var out = exportSubmission_({
+/** ใบตัวอย่างที่คะแนนรวม 7 = MODERATE — ใช้ทั้งทดสอบและดูหน้าตา PDF */
+function sampleFrae_() {
+  return {
     formCode: 'FRAE', tracking: 'FRAE-TEST-0001', status: 'complete',
     doc: 'D-0507-FRAE-001', issue: '01', rev: '00', defRev: 1,
     title: 'การประเมินความเสี่ยงก่อนทำการบิน',
-    submitterName: 'ทดสอบระบบ', submitterEmail: 'test@example.com',
-    signedBy: ['ทดสอบระบบ'],
+    submitterName: 'ทดสอบ ระบบ', submitterEmail: 'test@example.com',
+    submittedAt: '14 AUG 2026',
+    signedBy: ['ทดสอบ ระบบ'],
     computed: { score: 7 },
-    data: { picFirst: 'ทดสอบ', picLast: 'ระบบ', flightDate: '2026-08-14',
-            aircraftReg: 'HS-VVD', flightType: 'VFR', totalScore: 7, decision: 'GO' },
-  }, { uid: 'test', email: 'editor@local' });
+    data: {
+      picFirst: 'ทดสอบ', picLast: 'ระบบ', evalDate: '2026-08-14',
+      aircraftReg: 'HS-VVD', flightType: 'VFR',
+      s1AfterMx: true,                       // 1
+      s1Icing: 'none', s1PrevFlight: '3rd',  // 0 + 2
+      s2Fatigue: true,                       // 3
+      s3Runway: 'wet',                       // 1
+      s5Runway: 'dry',                       // 0
+      s3Night: false, s3Wind: false,
+      decision: 'GO',
+      mitigation: 'เลื่อนเวลาออกเดินทางเป็นช่วงบ่าย และพักก่อนบิน 2 ชั่วโมง',
+      fiName: 'ครูการบิน ตัวอย่าง', fiDate: '2026-08-14',
+      fiComment: 'อนุญาต — ให้ทบทวนแผนสำรองก่อนขึ้นบิน',
+    },
+  };
+}
+
+function testExport() {
+  var out = exportSubmission_(sampleFrae_(), { uid: 'test', email: 'editor@local' });
   Logger.log(JSON.stringify(out, null, 2));
+}
+
+/** สร้างแม่แบบแล้วออกใบตัวอย่างทันที — ใช้ดูหน้าตา PDF จริงในครั้งเดียว */
+function testFraeTemplate() {
+  Logger.log('แม่แบบ: ' + buildFraeTemplate());
+  var folder = subFolder_('FRAE');
+  var old = folder.getFilesByName('FRAE-TEST-0001.pdf');
+  while (old.hasNext()) old.next().setTrashed(true);   // ให้สร้างใหม่ทุกครั้ง
+  testExport();
 }
