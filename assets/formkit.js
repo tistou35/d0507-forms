@@ -108,10 +108,11 @@
   };
   FormKit.prototype.blocked = function () { return this.gates().some(g => g.level === 'stop'); };
 
-  /* ตรวจฟิลด์บังคับเฉพาะส่วนที่ party นี้รับผิดชอบ */
-  FormKit.prototype.validate = function () {
+  /* ตรวจฟิลด์บังคับเฉพาะส่วนที่ party นี้รับผิดชอบ
+     ส่ง secs มาได้เพื่อตรวจเฉพาะบางส่วน (ใช้นับตัวเลขค้างบนหัว tab) */
+  FormKit.prototype.validate = function (secs) {
     const ctx = this.ctx(), miss = [];
-    for (const s of this.def.sections || []) {
+    for (const s of secs || this.def.sections || []) {
       if (this.party && s.party !== this.party) continue;
       if (!evalCond(s.showIf, ctx)) continue;
       for (const f of s.fields || []) {
@@ -128,7 +129,60 @@
     return miss;
   };
 
+  /* ── แท็บ ──────────────────────────────────────────────
+     ฟอร์มยาว ๆ อย่าง FRAE มี 40 ช่อง ถ้าเรียงหน้าเดียวต้องเลื่อนจนหลง
+     แบ่งเป็นแท็บแล้วให้คะแนนรวมค้างอยู่บนหัวตลอด จะได้เห็นผลของทุกการติ๊ก */
+  FormKit.prototype.tabs = function (ctx) {
+    const defs = (this.def.ui && this.def.ui.tabs) || [];
+    if (!defs.length) return null;
+    ctx = ctx || this.ctx();
+    const live = (this.def.sections || []).filter(s => evalCond(s.showIf, ctx));
+    return defs.map(t => {
+      const secs = live.filter(s => (s.tab || defs[0].k) === t.k);
+      let sc = 0;
+      secs.forEach(s => (s.fields || []).forEach(f => { sc += fieldScore(f, this.data[f.k]); }));
+      return { k: t.k, n: L(t, this.lang), secs: secs, score: sc,
+               miss: this.validate(secs).length };
+    }).filter(t => t.secs.length);
+  };
+
+  /* ระดับความเสี่ยงที่ใช้ระบายสี — เอาจาก gate ที่แรงที่สุดที่ทำงานอยู่ */
+  FormKit.prototype.band = function () {
+    const g = this.gates();
+    const top = g.find(x => x.level === 'stop') || g.find(x => x.level === 'warn') || g[0];
+    return { lv: top ? (top.level === 'info' ? 'ok' : top.level) : 'ok',
+             n: top && top.short ? L(top.short, this.lang) : '' };
+  };
+
   /* ── เรนเดอร์ ─────────────────────────────────────────── */
+
+  /* แถวแบบกระชับ — ใช้กับช่องที่มีคะแนน จะได้ไม่กินความสูงช่องละ 3 บรรทัด
+     คืน null เมื่อไม่เข้าเงื่อนไข ให้กลับไปใช้ตัวเรนเดอร์ปกติ */
+  FormKit.prototype.row = function (f) {
+    if (!(this.def.ui && this.def.ui.compact) || !f.score) return null;
+    const v = this.data[f.k];
+    const ro = this.readonly || (this.party && f.__sec.party !== this.party);
+    const dis = ro ? ' aria-disabled="true"' : '';
+    const lab = esc(L(f.label, this.lang));
+
+    if (f.type === 'check' && typeof f.score === 'number') {
+      return `<div class="fk-row chk" data-fk="${esc(f.k)}" data-toggle="${esc(f.k)}"
+        role="checkbox" aria-checked="${!!v}" tabindex="${ro ? -1 : 0}"${dis}>
+        <span class="box"></span><span class="t">${lab}</span>
+        <span class="pt">${f.score}</span></div>`;
+    }
+    if ((f.type === 'select' || f.type === 'scale') && typeof f.score === 'object') {
+      const opts = (f.opt || []).map(o =>
+        `<button type="button" class="fk-opt" data-k="${esc(f.k)}" data-v="${esc(o.v)}"
+           aria-pressed="${v == o.v}"${ro ? ' disabled' : ''}>${esc(L(o.n, this.lang) || o.v)}
+           <em>${f.score[o.v] || 0}</em></button>`).join('');
+      return `<div class="fk-row col" data-fk="${esc(f.k)}">
+        <span class="t">${lab}${f.req ? ' <span style="color:var(--red-500)">*</span>' : ''}</span>
+        <div class="fk-opts sm">${opts}</div></div>`;
+    }
+    return null;
+  };
+
   FormKit.prototype.field = function (f) {
     const v = this.data[f.k];
     const ro = this.readonly || (this.party && f.__sec.party !== this.party);
@@ -192,7 +246,8 @@
       }
 
       case 'sign':
-        body = `<canvas class="fk-sign" data-sign="${esc(f.k)}"></canvas>`;
+        body = `<div class="fk-signwrap"><canvas class="fk-sign" data-sign="${esc(f.k)}"></canvas>
+          ${ro ? '' : '<button type="button" class="fb sm" data-clearsign>ล้างลายเซ็น</button>'}</div>`;
         break;
 
       case 'table':
@@ -213,55 +268,92 @@
       ${body}</div>`;
   };
 
+  FormKit.prototype.gateHtml = function (g) {
+    return `<div class="fk-gate ${esc(g.level)}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"
+        stroke-linejoin="round"><path d="M12 3l9.5 17H2.5z"/><path d="M12 9.5v4.5"/>
+        <circle cx="12" cy="16.8" r=".9" fill="currentColor" stroke="none"/></svg>
+      <span>${esc(L(g.msg, this.lang))}</span></div>`;
+  };
+
+  FormKit.prototype.sectionHtml = function (s, ctx) {
+    const mine = !this.party || s.party === this.party;
+    const pn = (this.def.parties || []).find(p => p.k === s.party);
+    const hidden = s.blind && !mine;
+    return `<section class="fk-sec">
+      <header><h3>${esc(L(s.title, this.lang))}</h3>
+        <span class="party${mine ? '' : ' locked'}">${esc(pn ? pn.n : s.party || '')}${mine ? '' : ' · อ่านอย่างเดียว'}</span>
+      </header>
+      ${s.desc ? `<p class="desc">${esc(L(s.desc, this.lang))}</p>` : ''}
+      ${hidden
+        ? `<p class="fk-static">ส่วนนี้ถูกซ่อนไว้จนกว่าคุณจะส่งส่วนของตัวเอง —
+           ตามข้อกำหนดที่ให้แต่ละฝ่ายประเมินอย่างอิสระ</p>`
+        : (s.fields || []).filter(f => evalCond(f.showIf, ctx))
+            .map(f => this.row(f) || this.field(f)).join('')}
+    </section>`;
+  };
+
+  FormKit.prototype.routeHtml = function (ctx) {
+    if (!(this.def.route || []).length) return '';
+    return `<h3 style="font-family:var(--font-display);font-size:17px;margin:22px 0 10px">ลำดับอนุมัติ</h3>
+      <div class="fk-route">` + this.def.route.filter(r => evalCond(r.onlyIf, ctx)).map(r => {
+        const p = (this.def.parties || []).find(x => x.k === r.party);
+        return `<div class="fk-step"><span class="k">ขั้นที่ ${r.step}</span>
+          <span class="v">${esc(p ? p.n : r.party)}</span>
+          <span class="m">${r.sign ? 'ต้องลงนาม' : 'ไม่ต้องลงนาม'}${r.slaDays ? ' · ภายใน ' + r.slaDays + ' วัน' : ''}</span></div>`;
+      }).join('') + `</div>`;
+  };
+
   FormKit.prototype.render = function (el) {
     const ctx = this.ctx(), c = this.computed();
+    const scored = (this.def.compute || []).some(x => x.k === 'score' || x.op === 'sumScore');
+    const tabs = this.tabs(ctx);
     let html = '';
 
-    // gate
-    for (const g of this.gates()) {
-      html += `<div class="fk-gate ${esc(g.level)}">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"
-          stroke-linejoin="round"><path d="M12 3l9.5 17H2.5z"/><path d="M12 9.5v4.5"/>
-          <circle cx="12" cy="16.8" r=".9" fill="currentColor" stroke="none"/></svg>
-        <span>${esc(L(g.msg, this.lang))}</span></div>`;
-    }
+    if (tabs) {
+      if (!tabs.some(t => t.k === this.tab)) this.tab = tabs[0].k;
+      const i = tabs.findIndex(t => t.k === this.tab), cur = tabs[i], last = i === tabs.length - 1;
+      const b = this.band();
 
-    // คะแนน
-    if ((this.def.compute || []).some(x => x.k === 'score' || x.op === 'sumScore')) {
-      const lv = this.gates().some(g => g.level === 'stop') ? 'stop'
-               : this.gates().some(g => g.level === 'warn') ? 'warn' : 'ok';
-      html += `<div class="fk-score ${lv}"><span class="n">${c.score}</span>
-        <span><b style="font-size:14.5px">คะแนนรวม</b><br>
-        <span style="font-size:12.5px;color:var(--g-500)">คำนวณอัตโนมัติจากคำตอบ</span></span></div>`;
-    }
+      // แถบคะแนน + หัวแท็บ ค้างอยู่บนหัวตลอด ไม่ว่าจะเลื่อนไปไหน
+      html += `<div class="fk-tabwrap">
+        ${scored ? `<div class="fk-bar ${b.lv}">
+          <span class="n">${c.score}</span>
+          <span class="lbl"><b>คะแนนความเสี่ยงรวม</b><br>Total risk score</span>
+          ${b.n ? `<span class="band">${esc(b.n)}</span>` : ''}
+          <span class="prog">${esc(cur.n)} · ${i + 1}/${tabs.length}</span>
+        </div>` : ''}
+        <nav class="fk-tabbar" role="tablist">` + tabs.map((t, n) =>
+          `<button type="button" role="tab" data-tab="${esc(t.k)}"
+             aria-selected="${t.k === this.tab}">${n + 1}. ${esc(t.n)}
+             ${t.miss ? `<span class="b miss">${t.miss}</span>`
+               : t.score ? `<span class="b has">+${t.score}</span>` : ''}</button>`).join('')
+        + `</nav></div>`;
 
-    // ส่วนของฟอร์ม
-    for (const s of this.def.sections || []) {
-      if (!evalCond(s.showIf, ctx)) continue;
-      const mine = !this.party || s.party === this.party;
-      const pn = (this.def.parties || []).find(p => p.k === s.party);
-      const hidden = s.blind && !mine;
-      html += `<section class="fk-sec">
-        <header><h3>${esc(L(s.title, this.lang))}</h3>
-          <span class="party${mine ? '' : ' locked'}">${esc(pn ? pn.n : s.party || '')}${mine ? '' : ' · อ่านอย่างเดียว'}</span>
-        </header>
-        ${s.desc ? `<p class="desc">${esc(L(s.desc, this.lang))}</p>` : ''}
-        ${hidden
-          ? `<p class="fk-static">ส่วนนี้ถูกซ่อนไว้จนกว่าคุณจะส่งส่วนของตัวเอง —
-             ตามข้อกำหนดที่ให้แต่ละฝ่ายประเมินอย่างอิสระ</p>`
-          : (s.fields || []).filter(f => evalCond(f.showIf, ctx)).map(f => this.field(f)).join('')}
-      </section>`;
-    }
+      // gate ระดับ stop ต้องเห็นทุกแท็บ ที่เหลือรวมไว้หน้าสรุป
+      for (const g of this.gates()) {
+        if (g.level === 'stop' || last) html += this.gateHtml(g);
+      }
 
-    // ลำดับอนุมัติ
-    if ((this.def.route || []).length) {
-      html += `<h3 style="font-family:var(--font-display);font-size:17px;margin:22px 0 10px">ลำดับอนุมัติ</h3>
-        <div class="fk-route">` + this.def.route.filter(r => evalCond(r.onlyIf, ctx)).map(r => {
-          const p = (this.def.parties || []).find(x => x.k === r.party);
-          return `<div class="fk-step"><span class="k">ขั้นที่ ${r.step}</span>
-            <span class="v">${esc(p ? p.n : r.party)}</span>
-            <span class="m">${r.sign ? 'ต้องลงนาม' : 'ไม่ต้องลงนาม'}${r.slaDays ? ' · ภายใน ' + r.slaDays + ' วัน' : ''}</span></div>`;
-        }).join('') + `</div>`;
+      html += cur.secs.map(s => this.sectionHtml(s, ctx)).join('');
+      if (last) html += this.routeHtml(ctx);
+
+      html += `<div class="fk-nav">
+        ${i > 0 ? `<button type="button" class="fb" data-go="${esc(tabs[i - 1].k)}">← ${esc(tabs[i - 1].n)}</button>` : '<span></span>'}
+        ${!last ? `<button type="button" class="big pri" data-go="${esc(tabs[i + 1].k)}">${esc(tabs[i + 1].n)} →</button>` : '<span></span>'}
+      </div>`;
+
+    } else {
+      for (const g of this.gates()) html += this.gateHtml(g);
+      if (scored) {
+        const b = this.band();
+        html += `<div class="fk-score ${b.lv}"><span class="n">${c.score}</span>
+          <span><b style="font-size:14.5px">คะแนนรวม</b><br>
+          <span style="font-size:12.5px;color:var(--g-500)">คำนวณอัตโนมัติจากคำตอบ</span></span></div>`;
+      }
+      html += (this.def.sections || []).filter(s => evalCond(s.showIf, ctx))
+        .map(s => this.sectionHtml(s, ctx)).join('');
+      html += this.routeHtml(ctx);
     }
 
     el.innerHTML = html;
@@ -293,8 +385,25 @@
         self.set(k, arr); rerender();
       }));
 
-    el.querySelectorAll('[data-toggle]').forEach(b =>
-      b.addEventListener('click', () => { self.set(b.dataset.toggle, !self.data[b.dataset.toggle]); rerender(); }));
+    el.querySelectorAll('[data-toggle]').forEach(b => {
+      if (b.getAttribute('aria-disabled') === 'true') return;
+      const flip = () => { self.set(b.dataset.toggle, !self.data[b.dataset.toggle]); rerender(); };
+      b.addEventListener('click', flip);
+      // แถวกระชับเป็น div ไม่ใช่ปุ่ม จึงต้องผูกคีย์บอร์ดเอง
+      if (b.getAttribute('role') === 'checkbox')
+        b.addEventListener('keydown', e => {
+          if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flip(); }
+        });
+    });
+
+    // เปลี่ยนแท็บ — ขึ้นหัวฟอร์มทุกครั้ง จะได้ไม่ค้างกลางหน้าเดิม
+    el.querySelectorAll('[data-tab],[data-go]').forEach(b =>
+      b.addEventListener('click', () => {
+        self.tab = b.dataset.tab || b.dataset.go;
+        rerender();
+        const top = el.getBoundingClientRect().top + window.scrollY - 76;
+        window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+      }));
 
     el.querySelectorAll('[data-cl]').forEach(b =>
       b.addEventListener('click', () => {
@@ -314,6 +423,23 @@
     cv.width = r.width * dpr; cv.height = r.height * dpr;
     const g = cv.getContext('2d');
     g.scale(dpr, dpr); g.lineWidth = 2; g.lineCap = 'round'; g.strokeStyle = '#0D1B2A';
+
+    // ทุกครั้งที่เรนเดอร์ใหม่ canvas จะว่าง — วาดลายเซ็นเดิมกลับมา
+    // ไม่งั้นพอเปลี่ยนแท็บกลับมาจะดูเหมือนลายเซ็นหาย ทั้งที่ข้อมูลยังอยู่
+    const prev = fk.data[cv.dataset.sign];
+    if (prev && String(prev).indexOf('data:image') === 0) {
+      const im = new Image();
+      im.onload = () => g.drawImage(im, 0, 0, r.width, r.height);
+      im.src = prev;
+    }
+
+    const clear = cv.parentElement && cv.parentElement.querySelector('[data-clearsign]');
+    if (clear) clear.addEventListener('click', () => {
+      g.clearRect(0, 0, r.width, r.height);
+      delete fk.data[cv.dataset.sign];
+      fk.onChange(cv.dataset.sign, undefined, fk);
+    });
+
     let drawing = false;
     const pt = e => {
       const b = cv.getBoundingClientRect();

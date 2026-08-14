@@ -429,6 +429,72 @@ footer{text-align:center;color:var(--g-400);font-size:12px;padding:22px}
 .fk-step.done{background:var(--green-100)} .fk-step.done .v{color:var(--green-600)}
 .fk-step.now{background:var(--sky-100)}    .fk-step.now .v{color:var(--sky-600)}
 
+/* แท็บ + แถบคะแนนที่ค้างอยู่บนหัว */
+.fk-tabwrap{position:sticky;top:64px;z-index:30;background:var(--bg-page);
+  margin:0 -6px 16px;padding:8px 6px 0}
+.fk-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;border-radius:8px;
+  padding:10px 16px;background:var(--surface);border:1px solid var(--border-light);
+  box-shadow:0 1px 3px rgba(13,27,42,.07)}
+.fk-bar .n{font-family:var(--font-display);font-weight:700;font-size:30px;line-height:1;
+  min-width:44px}
+.fk-bar .lbl{font-size:12.5px;color:var(--g-500);line-height:1.4}
+.fk-bar .lbl b{font-size:13.5px;color:var(--fg-1);font-family:var(--font-sans)}
+.fk-bar .band{font-size:11px;font-weight:700;letter-spacing:.08em;padding:5px 11px;
+  border-radius:999px;font-family:var(--font-mono)}
+.fk-bar .prog{margin-left:auto;font-size:12px;color:var(--g-500);font-family:var(--font-mono)}
+.fk-bar.ok   .n{color:var(--green-600)} .fk-bar.ok   .band{background:var(--green-100);color:var(--green-600)}
+.fk-bar.warn .n{color:var(--amber-500)} .fk-bar.warn .band{background:var(--amber-100);color:#5c3d08}
+.fk-bar.stop .n{color:var(--red-600)}   .fk-bar.stop .band{background:var(--red-100);color:var(--red-600)}
+.fk-bar.stop{border-color:var(--red-500)}
+
+.fk-tabbar{display:flex;gap:2px;overflow-x:auto;margin-top:8px;
+  border-bottom:1px solid var(--border-light);scrollbar-width:none}
+.fk-tabbar::-webkit-scrollbar{display:none}
+.fk-tabbar button{flex:none;min-height:44px;padding:0 13px;background:none;border:0;
+  border-bottom:2px solid transparent;font-family:var(--font-sans);font-size:13.5px;
+  font-weight:600;color:var(--g-500);cursor:pointer;white-space:nowrap;
+  display:flex;align-items:center;gap:7px}
+.fk-tabbar button[aria-selected="true"]{color:var(--sky-600);border-bottom-color:var(--sky-500)}
+.fk-tabbar .b{font-family:var(--font-mono);font-size:10.5px;font-weight:700;padding:2px 6px;
+  border-radius:999px;background:var(--g-100);color:var(--g-500)}
+.fk-tabbar .b.has{background:var(--amber-100);color:#5c3d08}
+.fk-tabbar .b.miss{background:var(--red-100);color:var(--red-600)}
+.fk-nav{display:flex;gap:10px;justify-content:space-between;align-items:center;margin-top:20px}
+
+/* แถวแบบกระชับ — ช่องติ๊กที่มีคะแนน */
+.fk-row{display:flex;align-items:center;gap:12px;min-height:44px;padding:4px 2px;
+  border-bottom:1px solid var(--g-100)}
+.fk-row:last-child{border-bottom:0}
+.fk-row .t{flex:1;font-size:13.5px;line-height:1.45}
+.fk-row .pt{flex:none;font-family:var(--font-mono);font-size:11.5px;font-weight:700;
+  color:var(--g-400);min-width:22px;text-align:right}
+.fk-row.chk{cursor:pointer;-webkit-tap-highlight-color:transparent}
+.fk-row.chk[aria-disabled="true"]{cursor:default;opacity:.6}
+.fk-row.chk:focus-visible{outline:2px solid var(--sky-500);outline-offset:2px;border-radius:6px}
+.fk-row .box{flex:none;width:24px;height:24px;border-radius:6px;background:var(--surface);
+  border:1.5px solid var(--border-med);position:relative}
+.fk-row .box::after{content:"";position:absolute;left:7.5px;top:3px;width:5px;height:11px;
+  border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg);opacity:0}
+.fk-row.chk[aria-checked="true"] .box{background:var(--sky-500);border-color:var(--sky-500)}
+.fk-row.chk[aria-checked="true"] .box::after{opacity:1}
+.fk-row.chk[aria-checked="true"] .pt{color:var(--sky-600)}
+.fk-row.col{display:block;padding:12px 2px}
+.fk-row.col .t{display:block;font-weight:600;margin-bottom:8px}
+.fk-opts.sm .fk-opt{min-height:40px;font-size:12.5px;padding:0 12px;gap:6px}
+.fk-opts.sm .fk-opt em{font-style:normal;font-family:var(--font-mono);font-size:10.5px;
+  color:var(--g-400);font-weight:700}
+.fk-opts.sm .fk-opt[aria-pressed="true"] em{color:var(--sky-600)}
+.fk-signwrap{position:relative}
+.fk-signwrap [data-clearsign]{position:absolute;right:10px;bottom:10px}
+
+/* top เท่ากับความสูง .topbar พอดี — topbar สูง 64px ทุกขนาดจอ
+   เคยตั้ง 56px บนมือถือ ทำให้แถบคะแนนมุดใต้ topbar ไป 8px */
+@media(max-width:900px){
+  .fk-bar .prog{display:none}
+  .fk-bar .n{font-size:26px;min-width:38px}
+  .fk-bar{padding:9px 13px;gap:11px}
+}
+
 /* สถานะ draft ของนิยามฟอร์ม */
 .draftbar{background:repeating-linear-gradient(45deg,var(--amber-100),var(--amber-100) 10px,
   #fdf0d4 10px,#fdf0d4 20px);border:1px solid var(--amber-500);border-radius:8px;

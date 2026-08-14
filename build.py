@@ -19,7 +19,7 @@
 #   · ไฟล์นี้เป็นตัวประกอบอย่างเดียว ไม่เก็บ HTML ไว้ข้างใน
 #   · ตรวจหลัง build ให้ดูขนาด "ไฟล์ผลลัพธ์" ไม่ใช่ขนาดไฟล์นี้
 # ============================================================
-import os, json, re, sys, glob, shutil
+import os, json, re, sys, glob, shutil, hashlib
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC  = os.path.join(HERE, 'src')
@@ -123,13 +123,29 @@ def partials(active, base):
             top.replace('@@BASE@@', base))
 
 
-def emit(src_name, outpath, base, active, subs):
+def asset_versions():
+    """?v=<hash ของเนื้อไฟล์> ต่อท้าย asset ทุกตัว
+
+    GitHub Pages แคช .js/.css ไว้ ถ้าไม่ติดเลขกำกับ ผู้ใช้จะได้ตัวเรนเดอร์เก่า
+    มาคู่กับนิยามฟอร์มใหม่ — ฟอร์มจะแสดงผิดโดยไม่มีอะไรฟ้อง
+    """
+    out = {}
+    for name in os.listdir(os.path.join(HERE, 'assets')):
+        p = os.path.join(HERE, 'assets', name)
+        if os.path.isfile(p):
+            out[name] = hashlib.sha1(open(p, 'rb').read()).hexdigest()[:8]
+    return out
+
+
+def emit(src_name, outpath, base, active, subs, ver=None):
     t = open(os.path.join(SRC, src_name), encoding='utf-8').read()
     rail, bot, top = partials(active, base)
     t = t.replace('@@RAIL@@', rail).replace('@@BOTNAV@@', bot).replace('@@TOPBAR@@', top)
     for k, v in subs.items():
         t = t.replace(k, v)
     t = t.replace('@@BASE@@', base)
+    for name, h in (ver or {}).items():
+        t = t.replace('assets/%s"' % name, 'assets/%s?v=%s"' % (name, h))
     left = sorted(set(re.findall(r'@@[A-Z_]+@@', t)))
     if left:
         sys.exit('placeholder ยังเหลือใน %s: %s' % (src_name, left))
@@ -189,10 +205,11 @@ def main():
         ('fill.html',        'fill/index.html',                '../',   'all'),
         ('submit.html',      'submit/index.html',              '../',   'all'),
     ]
+    VER = asset_versions()
     for src, out, base, active in pages:
         sub = {'@@REG@@': R, '@@REGPUB@@': P, '@@FBCFG@@': FB, '@@GASURL@@': GAS,
                '@@STATS@@': jsonjs(stats), '@@DEFS@@': jsonjs(defs)}
-        n = emit(src, os.path.join(HERE, out), base, active, sub)
+        n = emit(src, os.path.join(HERE, out), base, active, sub, VER)
         total += n
         print('  built: %-30s %7d bytes' % (out, n))
 
@@ -210,7 +227,7 @@ def main():
         sub = {'@@REG@@': jsonjs(mini), '@@FBCFG@@': FB, '@@GASURL@@': GAS, '@@FORM@@': jsonjs(fpub),
                '@@FTITLE@@': (f.get('th') or f.get('t') or f['abbr']).replace('"', "'")}
         total += emit('form.html', os.path.join(HERE, 'f', f['abbr'], 'index.html'),
-                      '../../', 'all', sub)
+                      '../../', 'all', sub, VER)
     print('  built: %-30s %d หน้า' % ('f/<ABBR>/', len(reg['forms'])))
 
     # ทะเบียนเต็มสำหรับอัปโหลดขึ้น Firestore (registry/current) — ไม่ได้ถูก host

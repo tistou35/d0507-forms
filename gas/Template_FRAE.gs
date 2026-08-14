@@ -138,23 +138,22 @@ function head_(b) {
   p = b.appendParagraph(FRAE.titleEn);
   p.setAttributes(attr_({ SZ: 10, C: GREY, BOLD: true, SPACE_AFTER: 8 }));
 
-  p = b.appendParagraph(
-    FRAE.doc + '  ·  ISSUE NO. ' + FRAE.issue + '/REVISION NO. ' + FRAE.rev +
-    '  ·  เลขที่ {{tracking}}');
+  p = b.appendParagraph(FRAE.doc + '  ·  ISSUE NO. ' + FRAE.issue + '/REVISION NO. ' + FRAE.rev);
   p.setAttributes(attr_({ SZ: 8.5, C: GREY, SPACE_AFTER: 10 }));
 }
 
 function info_(b) {
   var t = b.appendTable([
-    ['PIC NAME', '{{picFirst}} {{picLast}}', 'DATE', '{{evalDate}}'],
+    ['PIC / STUDENT NAME', '{{picFirst}} {{picLast}}', 'DATE', '{{evalDate}}'],
     ['AIRCRAFT REG.', '{{aircraftReg}}', 'TYPE OF FLIGHT', '{{flightType}}'],
+    ['ASSESSED BY', '{{k_role_PIC}} PIC    {{k_role_Student}} STUDENT', 'RECORD NO.', '{{tracking}}'],
   ]);
   styleTable_(t);
-  for (var r = 0; r < 2; r++) {
+  for (var r = 0; r < 3; r++) {
     label_(t.getCell(r, 0)); label_(t.getCell(r, 2));
     value_(t.getCell(r, 1)); value_(t.getCell(r, 3));
   }
-  t.setColumnWidth(0, 92).setColumnWidth(1, 190).setColumnWidth(2, 104).setColumnWidth(3, 130);
+  t.setColumnWidth(0, 116).setColumnWidth(1, 190).setColumnWidth(2, 92).setColumnWidth(3, 118);
   gap_(b, 8);
 }
 
@@ -209,8 +208,9 @@ function bands_(b) {
 }
 
 function sigBlock_(b) {
+  // ครูการบินลงนามเฉพาะกรณีผู้ประเมินเป็นนักเรียน — ถ้าเป็น PIC ช่องขวาจะว่าง
   var t = b.appendTable([
-    ['PIC / STUDENT', 'AUTHORISING FI / HT'],
+    ['PIC / STUDENT', 'AUTHORISING FI / HT  (นักเรียนเท่านั้น)'],
     ['{{sig_picSign}}', '{{sig_fiSign}}'],
     ['{{picFirst}} {{picLast}}', '{{fiName}}'],
     ['DATE  {{evalDate}}', 'DATE  {{fiDate}}'],
