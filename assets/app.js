@@ -212,6 +212,15 @@
                    en: 'Could not write to Drive/Sheet (the record itself was saved):' },
     tryAgain:    { th: 'ลองส่งอีกครั้ง', en: 'Try again' },
     ticked:      { th: 'ติ๊กไว้', en: 'Ticked' },
+    sendToWho:   { th: 'ส่งให้ครูการบินท่านใดลงนาม', en: 'Which instructor should authorise this?' },
+    sendToWhoHint:{ th: 'ใบจะเข้าคิวงานของท่านนั้นทันทีที่ส่ง', en: 'It goes straight into their queue when you submit.' },
+    noRecipient: { th: 'ยังไม่มีรายชื่อผู้รับฟอร์มในระบบ — ผู้ดูแลต้องตั้งค่าที่หน้าตั้งค่าระบบก่อน',
+                   en: 'No recipients configured yet — an admin must set this up in Admin setup.' },
+    needLoginTitle:{ th: 'ใบนี้ต้องเข้าสู่ระบบก่อนจึงจะส่งได้', en: 'Sign in required to submit this record' },
+    needLoginSub: { th: 'เอกสารควบคุมต้องมีผู้รับผิดชอบที่ระบุตัวได้',
+                    en: 'A controlled record must have an identifiable owner.' },
+    needLoginBody:{ th: 'ใบนี้จบทันทีที่ส่ง ไม่มีขั้นอนุมัติต่อ จึงต้องเป็นเจ้าหน้าที่ที่เข้าสู่ระบบแล้วเป็นผู้ส่ง — หรือเลือกผู้ทำการประเมินเป็น Student เพื่อให้ครูการบินลงนามอนุญาต',
+                    en: 'This record is complete on submission with no approval step, so it must be filed by a signed-in staff member — or set the assessor to Student so an instructor authorises it.' },
   };
 
   A.onLang = [];               // หน้าเว็บลงทะเบียนไว้ให้เรียกเมื่อเปลี่ยนภาษา

@@ -49,7 +49,23 @@ const REG=@@REG@@, DEFS=@@DEFS@@, A=D0507;
 const code=new URLSearchParams(location.search).get('c')||'';
 const F=REG.forms.find(f=>f.abbr===code);
 const DEF=DEFS[code];
-let FK=null;
+let FK=null, DIR=[], PICK='';   // DIR = รายชื่อผู้รับฟอร์ม · PICK = คนที่เลือกไว้
+
+/* ใบนี้ต้องมีคนอื่นอนุมัติต่อไหม — ดูจาก route ที่ยังใช้ได้จริงตามคำตอบปัจจุบัน */
+function needsApproval(){
+  if(!FK) return false;
+  const ctx=FK.ctx();
+  return (DEF.route||[]).filter(r=>FormKit.evalCond(r.onlyIf,ctx)).length>1;
+}
+
+/* รายชื่อครูที่รับฟอร์มประเภทนี้ — อ่านได้ทั้งโลก มีแค่ชื่อกับตำแหน่ง ไม่มีอีเมล */
+async function loadDir(){
+  try{
+    const d=await A.db.collection('publicDirectory').doc('instructors').get();
+    const want=F.assignTo;
+    DIR=((d.exists&&d.data().list)||[]).filter(x=>!want||(x.recv||[]).includes(want));
+  }catch(e){ DIR=[]; }
+}
 A.reg = REG;
 A.initAuth(@@FBCFG@@, boot); boot();
 // เปลี่ยนภาษาแล้ว render ใหม่ทั้งใบ — ข้อมูลที่กรอกไว้อยู่ใน FK.data ไม่หาย
@@ -80,6 +96,7 @@ function boot(){
   FK=new FormKit(DEF,{party:partyOf(),lang:A.lang,data:keep,onChange:()=>renderFoot()});
   FK.render(document.getElementById('form'));
   renderFoot();
+  loadDir();
 }
 function partyOf(){
   if(!DEF) return null;
@@ -148,15 +165,41 @@ function review(){
     ? A.t('goesToApproval')+' — '+(LL(nx&&nx.n)||steps[1].party)
     : A.t('endsHere');
 
+  // ผู้ที่ไม่ได้ล็อกอินปิดใบเองไม่ได้ — ใบต้องมีคนรับผิดชอบเสมอ
+  const anon=!A.isStaff();
+  if(anon && !needsApproval()){
+    modal(A.t('needLoginTitle'), A.t('needLoginSub'),
+      `<p class="fk-static">${A.esc(A.t('needLoginBody'))}</p>`,
+      `<button class="fb" value="cancel">${A.esc(A.t('goBack'))}</button>
+       <a class="big pri" href="@@BASE@@staff-login/">${A.esc(A.t('signIn'))}</a>`);
+    return;
+  }
+  const picker = anon ? (DIR.length
+    ? `<h4 class="rvh">${A.esc(A.t('sendToWho'))}</h4>
+       <p class="hint" style="margin-bottom:8px">${A.esc(A.t('sendToWhoHint'))}</p>
+       <div class="fk-opts" id="pick">`+DIR.map(x=>
+         `<button type="button" class="fk-opt" data-uid="${A.esc(x.id)}"
+            aria-pressed="${PICK===x.id}">${A.esc(x.name)}${x.cert?`<em style="font-style:normal;
+            color:var(--g-500);font-size:11.5px;margin-left:7px">${A.esc(x.cert)}</em>`:''}</button>`).join('')+`</div>`
+    : `<div class="fk-gate warn"><span>${A.esc(A.t('noRecipient'))}</span></div>`) : '';
+
   modal(A.t('reviewTitle'), A.t('reviewSub'),
     (gates.length?gates.map(g=>`<div class="fk-gate ${A.esc(g.level)}" style="margin-bottom:10px">
        <span>${A.esc(LL(g.msg))}</span></div>`).join(''):'')+
     `<div class="fk-score ${FK.band().lv}"><span class="n">${c.score}</span>
        <span><b style="font-size:14.5px">${A.esc(FormKit.L({th:'คะแนนความเสี่ยงรวม',en:'Total risk score'},A.lang))}</b><br>
-       <span style="font-size:12.5px;color:var(--g-500)">${A.esc(next)}</span></span></div>`+rows,
+       <span style="font-size:12.5px;color:var(--g-500)">${A.esc(next)}</span></span></div>`+picker+rows,
     `<button class="fb" value="cancel">${A.esc(A.t('goBack'))}</button>
      <button class="big pri" id="ok" value="ok">${A.esc(A.t('confirmSend'))}</button>`);
-  document.getElementById('ok').addEventListener('click', e=>{ e.preventDefault(); dlg.close(); send(); });
+  const okb=document.getElementById('ok');
+  const sync=()=>{ okb.disabled = anon && !PICK; okb.classList.toggle('off', okb.disabled); };
+  document.querySelectorAll('#pick .fk-opt').forEach(b=>b.addEventListener('click',e=>{
+    e.preventDefault(); PICK=b.dataset.uid;
+    document.querySelectorAll('#pick .fk-opt').forEach(x=>x.setAttribute('aria-pressed', x===b));
+    sync();
+  }));
+  sync();
+  okb.addEventListener('click', e=>{ e.preventDefault(); if(okb.disabled) return; dlg.close(); send(); });
 }
 
 /* ── ส่งจริง ───────────────────────────────────────────────
@@ -175,12 +218,15 @@ async function send(){
     const steps=(DEF.route||[]).filter(r=>FormKit.evalCond(r.onlyIf,ctx));
     const done=steps.length<=1;
 
+    // ลำดับคีย์และ status ต้องผ่าน newSubmissionOk() ใน firestore.rules
+    // ผู้ไม่ล็อกอินสร้างได้เฉพาะ status 'pending' ที่มี assigneeUid จริงเท่านั้น
     const sub={
       formCode:F.abbr, tracking:trk,
       doc:F.doc||'', issue:F.iss||'', rev:F.rev||'', defRev:DEF.defRev||0,
       title:F.th||F.t||F.abbr,
       status: done?'complete':'pending',
       step: done?steps.length:2,
+      assigneeUid: PICK||'',
       submitterUid:u.uid, submitterName:FK.data.picFirst?`${FK.data.picFirst} ${FK.data.picLast||''}`.trim():(u.displayName||''),
       submitterEmail:u.email||'',
       submittedAt:firebase.firestore.FieldValue.serverTimestamp(),

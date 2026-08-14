@@ -1,0 +1,48 @@
+  rules_version = '2';
+// ============================================================
+// d0507-forms — Firestore Security Rules
+// โปรเจกต์นี้ "แยกขาด" จาก d0507-audit (ตัดสินใจ 01 AUG 2026)
+// จึงไม่มี audits / plans / library อยู่ที่นี่ และแก้ rules ที่นี่
+// ไม่กระทบระบบตรวจสอบเลย
+//
+// ทดสอบก่อนวางจริง:  firebase emulators:start --only firestore
+// ============================================================
+service cloud.firestore {
+  match /databases/{database}/documents {
+// ── รายชื่อเจ้าหน้าที่ — เพิ่ม/ลบคนที่นี่ ────────────────
+  function staffEmails() { return [ 'tistou35@gmail.com' ]; }
+  function signedIn() { return request.auth != null; }
+  function staff() { return signedIn() && request.auth.token.email in staffEmails(); }
+  function isSelf(uid) { return signedIn() && request.auth.uid == uid; }
+// ฝั่งนักเรียนล็อกอินแบบ anonymous เพื่อให้ส่งฟอร์มได้โดยไม่ต้องสมัคร
+  function anon() { return signedIn() && request.auth.token.firebase.sign_in_provider == 'anonymous'; }
+// ── โปรไฟล์ + บทบาท · ผู้ใช้แก้ role ตัวเองไม่ได้ ────────
+  match /users/{uid} { allow read: if isSelf(uid) || staff(); allow write: if staff(); }
+// ── รายชื่อผู้รับฟอร์ม สำหรับตัวเลือกฝั่งนักเรียน ────────
+// อ่านได้ทั้งโลก → ใส่ได้แค่ ชื่อ + ตำแหน่ง + recv
+// ห้ามมีอีเมลหรือเบอร์โทรเด็ดขาด (seed.mjs ตรวจให้แล้ว)
+  match /publicDirectory/{doc} { allow read: if true; allow write: if staff(); }
+// ── ทะเบียนฟอร์มฉบับเต็ม ────────────────────────────────
+// มี control code · สถานะ LEF · หมายเหตุ
+// เว็บ host แบบสาธารณะจึงฝังในไฟล์ไม่ได้ ต้องอ่านจากที่นี่หลัง login
+  match /registry/{doc} { allow read: if staff(); allow write: if staff(); }
+// ── นิยามฟอร์ม — หน้าสาธารณะต้องใช้จึงอ่านได้ทั้งโลก ────
+// ห้ามใส่ข้อมูลควบคุมภายใน (control code / สถานะ LEF) ลงในนิยามฟอร์ม
+  match /formDefs/{formCode} { allow read: if true; allow write: if staff(); match /versions/{defRev} { allow read: if true; allow create: if staff(); allow update, delete: if false; } match /events/{eventId} { allow read: if staff(); allow create: if staff(); allow update, delete: if false; } }
+// ── ฟอร์มที่ถูกส่ง ──────────────────────────────────────
+// หลักการ: ผู้ที่ไม่ได้ล็อกอิน (นักเรียน) สร้างได้เฉพาะใบที่ "ต้องมีคนอื่นอนุมัติ"
+//   · status ต้องเป็น pending เท่านั้น — ปิดใบเองไม่ได้
+//   · ต้องระบุผู้รับที่มีตัวตนจริง ใบจึงมีคนรับผิดชอบเสมอ
+// ใบที่จบทันทีที่ส่ง (ไม่มีขั้นอนุมัติ) ต้องล็อกอินเป็นเจ้าหน้าที่ก่อน
+  function newSubmissionOk() { let d = request.resource.data; return d.keys().hasAll(['formCode', 'tracking', 'status', 'assigneeUid', 'submittedAt']) && d.status == 'pending' && d.assigneeUid is string && d.assigneeUid.size() > 0 && d.formCode is string && d.formCode.size() <= 40 && d.tracking is string && d.tracking.size() <= 60 && d.submittedAt == request.time && d.keys().size() <= 20; }
+  match /submissions/{subId} { allow create: if staff() || (anon() && newSubmissionOk()); allow read: if staff(); allow update: if staff(); allow delete: if false; match /events/{eventId} { allow create: if signedIn(); allow read: if staff(); allow update, delete: if false; } }
+// ── คิวงาน — เฉพาะงานของระบบฟอร์มนี้ ────────────────────
+// งาน CAR อยู่คนละโปรเจกต์ จึงรวมมาที่นี่ไม่ได้
+  match /tasks/{taskId} { allow read: if staff(); allow create: if staff() || anon(); allow update: if staff(); allow delete: if false; }
+// ── คิวอีเมล — Trigger Email extension อ่านไปส่ง ────────
+// เขียนได้อย่างเดียว อ่านไม่ได้ ไม่งั้นดึงอีเมลคนอื่นได้
+  match /mail/{mailId} { allow create: if signedIn(); allow read, update, delete: if false; }
+// ปิดทุกอย่างที่ไม่ได้ระบุไว้
+  match /{document=**} { allow read, write: if false; }
+}
+}

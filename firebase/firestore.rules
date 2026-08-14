@@ -69,15 +69,19 @@ service cloud.firestore {
     }
 
     // ── ฟอร์มที่ถูกส่ง ──────────────────────────────────────
+    // หลักการ: ผู้ที่ไม่ได้ล็อกอิน (นักเรียน) สร้างได้เฉพาะใบที่ "ต้องมีคนอื่นอนุมัติ"
+    //   · status ต้องเป็น pending เท่านั้น — ปิดใบเองไม่ได้
+    //   · ต้องระบุผู้รับที่มีตัวตนจริง ใบจึงมีคนรับผิดชอบเสมอ
+    // ใบที่จบทันทีที่ส่ง (ไม่มีขั้นอนุมัติ) ต้องล็อกอินเป็นเจ้าหน้าที่ก่อน
     function newSubmissionOk() {
       let d = request.resource.data;
-      return d.keys().hasAll(['formCode', 'status', 'byPublic', 'assigneeUid', 'createdAt'])
-          && d.byPublic == true
-          && d.status == 'awaiting-assignee'
+      return d.keys().hasAll(['formCode', 'tracking', 'status', 'assigneeUid', 'submittedAt'])
+          && d.status == 'pending'
           && d.assigneeUid is string && d.assigneeUid.size() > 0
-          && d.formCode is string && d.formCode.size() <= 40
-          && d.createdAt == request.time
-          && d.keys().size() <= 12;          // กันยัดข้อมูลก้อนใหญ่จากหน้าสาธารณะ
+          && d.formCode  is string && d.formCode.size()  <= 40
+          && d.tracking  is string && d.tracking.size()  <= 60
+          && d.submittedAt == request.time   // ใช้เวลาเซิร์ฟเวอร์ ปลอมย้อนหลังไม่ได้
+          && d.keys().size() <= 20;
     }
 
     match /submissions/{subId} {
