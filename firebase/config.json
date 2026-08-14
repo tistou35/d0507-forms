@@ -1,9 +1,9 @@
 {
-  "_comment": "Firebase Web App config ของโปรเจกต์ d0507-forms (คนละโปรเจกต์กับ d0507-audit) — คัดลอกจาก Firebase Console → Project settings → Your apps → Web app → Config แล้ววางทับค่าด้านล่าง จากนั้นรัน python3 build.py",
-  "apiKey": "REPLACE_ME",
-  "authDomain": "REPLACE_ME.firebaseapp.com",
-  "projectId": "REPLACE_ME",
-  "storageBucket": "REPLACE_ME.firebasestorage.app",
-  "messagingSenderId": "REPLACE_ME",
-  "appId": "REPLACE_ME"
+  "_comment": "Firebase Web App config ของโปรเจกต์ d0507-forms (คนละโปรเจกต์กับ d0507-audit) — จาก Firebase Console → Project settings → Your apps → d0507-forms-web · สร้าง 01 AUG 2026",
+  "apiKey": "AIzaSyCVR8EiBJDT4Qr3KZ2DRPhmFzUksHTwAjg",
+  "authDomain": "d0507-forms.firebaseapp.com",
+  "projectId": "d0507-forms",
+  "storageBucket": "d0507-forms.firebasestorage.app",
+  "messagingSenderId": "38336897307",
+  "appId": "1:38336897307:web:0e423f959e635a07faf3be"
 }

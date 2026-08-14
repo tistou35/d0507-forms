@@ -112,12 +112,12 @@ document.getElementById('en').textContent = F.t;
 A.reg = REG;
 /* เมื่อ login แล้ว A.hydrate() จะดึงทะเบียนเต็มมาใส่ A.reg — เอารายละเอียดควบคุมของฟอร์มนี้มาเติม */
 A.initAuth({
-  apiKey: "REPLACE_ME",
-  authDomain: "REPLACE_ME.firebaseapp.com",
-  projectId: "REPLACE_ME",
-  storageBucket: "REPLACE_ME.firebasestorage.app",
-  messagingSenderId: "REPLACE_ME",
-  appId: "REPLACE_ME"
+  apiKey: "AIzaSyCVR8EiBJDT4Qr3KZ2DRPhmFzUksHTwAjg",
+  authDomain: "d0507-forms.firebaseapp.com",
+  projectId: "d0507-forms",
+  storageBucket: "d0507-forms.firebasestorage.app",
+  messagingSenderId: "38336897307",
+  appId: "1:38336897307:web:0e423f959e635a07faf3be"
 }, () => {
   const full = (A.reg.forms || []).find(x => x.abbr === F.abbr);
   if (full) Object.assign(F, full);
