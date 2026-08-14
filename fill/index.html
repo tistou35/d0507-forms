@@ -136,13 +136,18 @@ function boot(){
   renderFoot();
   loadDir();
 }
+/* หน้านี้เป็นการ "เริ่มใบใหม่" เสมอ — คนที่กดกรอกคือผู้เริ่ม
+   จึงได้ฝ่ายของขั้นแรกใน route ไม่ว่าจะล็อกอินหรือไม่ ไม่ว่ามีบทบาทอะไร
+
+   เดิมจับคู่ตามบทบาทตรงนี้ ทำให้คนที่มีบทบาทครูถูกจัดเป็นฝ่ายครูทันที
+   ส่วนของ PIC เลยกลายเป็นอ่านอย่างเดียว — ครูกรอกใบของตัวเองไม่ได้เลย
+
+   การจับคู่ตามบทบาทเป็นเรื่องของการ "เปิดใบที่ส่งมาแล้วเพื่อลงนาม"
+   ซึ่งเป็นคนละหน้ากัน (คิวงาน) ไม่ใช่ตอนเริ่มใบใหม่ */
 function partyOf(){
   if(!DEF) return null;
-  for(const p of DEF.parties||[]){
-    if(p.auth==='public' && !A.isStaff()) return p.k;
-    if(p.auth&&p.auth.startsWith('role:')&&A.roles.includes(p.auth.slice(5).toLowerCase())) return p.k;
-  }
-  return (DEF.parties&&DEF.parties[0]||{}).k;
+  const first=(DEF.route||[])[0];
+  return (first&&first.party) || (DEF.parties&&DEF.parties[0]||{}).k;
 }
 function renderFoot(){
   if(!FK) return;
@@ -204,15 +209,15 @@ function review(){
     : A.t('endsHere');
 
   // ผู้ที่ไม่ได้ล็อกอินปิดใบเองไม่ได้ — ใบต้องมีคนรับผิดชอบเสมอ
-  const anon=!A.isStaff();
-  if(anon && !needsApproval()){
+  const anon=!A.isStaff(), needs=needsApproval();
+  if(anon && !needs){
     modal(A.t('needLoginTitle'), A.t('needLoginSub'),
       `<p class="fk-static">${A.esc(A.t('needLoginBody'))}</p>`,
       `<button class="fb" value="cancel">${A.esc(A.t('goBack'))}</button>
        <a class="big pri" href="../staff-login/">${A.esc(A.t('signIn'))}</a>`);
     return;
   }
-  const picker = anon ? (DIR.length
+  const picker = needs ? (DIR.length
     ? `<h4 class="rvh">${A.esc(A.t('sendToWho'))}</h4>
        <p class="hint" style="margin-bottom:8px">${A.esc(A.t('sendToWhoHint'))}</p>
        <div class="fk-opts" id="pick">`+DIR.map(x=>
@@ -230,7 +235,7 @@ function review(){
     `<button class="fb" value="cancel">${A.esc(A.t('goBack'))}</button>
      <button class="big pri" id="ok" value="ok">${A.esc(A.t('confirmSend'))}</button>`);
   const okb=document.getElementById('ok');
-  const sync=()=>{ okb.disabled = anon && !PICK; okb.classList.toggle('off', okb.disabled); };
+  const sync=()=>{ okb.disabled = needs && !PICK; okb.classList.toggle('off', okb.disabled); };
   document.querySelectorAll('#pick .fk-opt').forEach(b=>b.addEventListener('click',e=>{
     e.preventDefault(); PICK=b.dataset.uid;
     document.querySelectorAll('#pick .fk-opt').forEach(x=>x.setAttribute('aria-pressed', x===b));
