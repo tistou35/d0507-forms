@@ -1,0 +1,538 @@
+{
+  "code": "SDF",
+  "doc": "D-0507-SDF-001",
+  "control": "AD-SDF-301-A",
+  "issue": "01",
+  "rev": "01",
+  "eff": "22 JUN 2026",
+  "title": {
+    "th": "แบบแจ้งข้อมูลด้วยตนเอง",
+    "en": "Self Declaration Form"
+  },
+  "retain": "OMA A.10",
+  "ui": {
+    "compact": true,
+    "tabs": [
+      {
+        "k": "T1",
+        "th": "ผู้แจ้ง",
+        "en": "Personal details"
+      },
+      {
+        "k": "T2",
+        "th": "การบินล่าสุด",
+        "en": "Recent flight"
+      },
+      {
+        "k": "T3",
+        "th": "ชั่วโมงสะสม FTL",
+        "en": "FTL hours"
+      },
+      {
+        "k": "T4",
+        "th": "คำรับรองและลงนาม",
+        "en": "Declaration & sign"
+      }
+    ],
+    "headline": {
+      "value": "t7",
+      "of": 28,
+      "th": "ชั่วโมงสะสม 7 วัน (รวมแผนวันนี้)",
+      "en": "7-day cumulative hours (incl. today)"
+    }
+  },
+  "parties": [
+    {
+      "k": "dec",
+      "n": {
+        "th": "ผู้แจ้ง",
+        "en": "Declarer"
+      },
+      "auth": "public"
+    },
+    {
+      "k": "app",
+      "n": {
+        "th": "ผู้อนุมัติ",
+        "en": "Approver"
+      },
+      "auth": "role:mgt"
+    }
+  ],
+  "sections": [
+    {
+      "k": "APPLY",
+      "tab": "T1",
+      "title": {
+        "th": "ใช้แบบฟอร์มนี้เมื่อ",
+        "en": "This form applies for"
+      },
+      "party": "dec",
+      "desc": {
+        "th": "เลือกได้มากกว่าหนึ่งข้อ",
+        "en": "Select all that apply."
+      },
+      "fields": [
+        {
+          "k": "applyFor",
+          "type": "multi",
+          "req": true,
+          "label": {
+            "th": "กรณีที่ตรงกับคุณ",
+            "en": "Applicable case"
+          },
+          "opt": [
+            {
+              "v": "away2w",
+              "n": {
+                "th": "ครูการบินที่ไม่ได้ปฏิบัติหน้าที่กับบริษัทเกิน 2 สัปดาห์",
+                "en": "Flight Instructor who left the company for more than 2 weeks"
+              }
+            },
+            {
+              "v": "dualDuty",
+              "n": {
+                "th": "ครูการบินหรือนักเรียนที่มีหน้าที่เป็นผู้ประจำหน้าที่ในอากาศยานอื่นด้วย",
+                "en": "Flight Instructor or Student with dual duty as air personnel"
+              }
+            },
+            {
+              "v": "otherFly",
+              "n": {
+                "th": "ครูการบินหรือนักเรียนที่มีการบินอื่น (เพื่อสันทนาการหรือเกี่ยวกับการบิน)",
+                "en": "Flight Instructor or Student with other flying (recreational or aviation-related)"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "k": "A",
+      "tab": "T1",
+      "title": {
+        "th": "A · ข้อมูลส่วนบุคคล",
+        "en": "A · Personal details"
+      },
+      "party": "dec",
+      "fields": [
+        {
+          "k": "youAre",
+          "type": "select",
+          "req": true,
+          "label": {
+            "th": "สถานะของคุณ",
+            "en": "You are"
+          },
+          "opt": [
+            {
+              "v": "instructor",
+              "n": {
+                "th": "ครูการบิน",
+                "en": "Instructor"
+              }
+            },
+            {
+              "v": "student",
+              "n": {
+                "th": "นักเรียนปัจจุบัน",
+                "en": "Current Student"
+              }
+            },
+            {
+              "v": "alumni",
+              "n": {
+                "th": "ศิษย์เก่า / มาบินทบทวน",
+                "en": "Alumni / Recurrent"
+              }
+            }
+          ]
+        },
+        {
+          "k": "name",
+          "type": "text",
+          "req": true,
+          "label": {
+            "th": "ชื่อ–นามสกุล",
+            "en": "Name"
+          }
+        },
+        {
+          "k": "licence",
+          "type": "text",
+          "req": true,
+          "label": {
+            "th": "เลขที่ใบอนุญาต",
+            "en": "Licence No."
+          }
+        },
+        {
+          "k": "email",
+          "type": "email",
+          "req": true,
+          "label": {
+            "th": "อีเมล",
+            "en": "Email"
+          },
+          "hint": {
+            "th": "ใช้ส่งสำเนาใบที่อนุมัติแล้วกลับถึงคุณ",
+            "en": "Used to send you a copy of the approved record."
+          }
+        }
+      ]
+    },
+    {
+      "k": "B",
+      "tab": "T2",
+      "title": {
+        "th": "B · ข้อมูลการบินล่าสุด",
+        "en": "B · Recent flight data"
+      },
+      "party": "dec",
+      "fields": [
+        {
+          "k": "lastFlightDate",
+          "type": "date",
+          "req": true,
+          "label": {
+            "th": "วันที่ทำการบินครั้งล่าสุด",
+            "en": "Date of latest flight"
+          }
+        },
+        {
+          "k": "last24",
+          "type": "number",
+          "req": true,
+          "min": 0,
+          "step": "0.1",
+          "label": {
+            "th": "ชั่วโมงบินใน 24 ชั่วโมงล่าสุด",
+            "en": "Latest 24 hr flight hours"
+          }
+        },
+        {
+          "k": "depTime",
+          "type": "time",
+          "req": true,
+          "label": {
+            "th": "เวลาออก (DEP)",
+            "en": "Last flight time — DEP"
+          }
+        },
+        {
+          "k": "arrTime",
+          "type": "time",
+          "req": true,
+          "label": {
+            "th": "เวลาถึง (ARR)",
+            "en": "Last flight time — ARR"
+          }
+        }
+      ]
+    },
+    {
+      "k": "C",
+      "tab": "T3",
+      "title": {
+        "th": "C · ชั่วโมงสะสมตาม FTL — ทุกผู้ดำเนินการ",
+        "en": "C · FTL cumulative hours — all operators"
+      },
+      "party": "dec",
+      "desc": {
+        "th": "แจ้งชั่วโมงบินรวมจากทุกผู้ดำเนินการ (D-0507 สายการบิน ATO อื่น และการบินส่วนบุคคล) ไม่นับเวลาฝึกบินจำลองและภาคพื้น · ข้อมูลจะถูกตรวจสอบเทียบกับสมุดบันทึกการบิน LOG ME",
+        "en": "Declare total flight hours from ALL operators combined (D-0507, airlines, other ATOs, and private operations). Do not include simulated flight or ground training time. Data will be cross-checked against LOG ME logbook records."
+      },
+      "fields": [
+        {
+          "k": "h7",
+          "type": "number",
+          "req": true,
+          "min": 0,
+          "step": "0.1",
+          "label": {
+            "th": "ย้อนหลัง 7 วันติดต่อกัน (เพดาน 28 ชม.)",
+            "en": "Past 7 consecutive days (28 hr max)"
+          }
+        },
+        {
+          "k": "h28",
+          "type": "number",
+          "req": true,
+          "min": 0,
+          "step": "0.1",
+          "label": {
+            "th": "ย้อนหลัง 28 วันติดต่อกัน (เพดาน 100 ชม.)",
+            "en": "Past 28 consecutive days (100 hr max)"
+          }
+        },
+        {
+          "k": "h365",
+          "type": "number",
+          "req": true,
+          "min": 0,
+          "step": "0.1",
+          "label": {
+            "th": "ย้อนหลัง 365 วันติดต่อกัน (เพดาน 1,000 ชม.)",
+            "en": "Past 365 consecutive days (1,000 hr max)"
+          }
+        },
+        {
+          "k": "planned",
+          "type": "number",
+          "req": true,
+          "min": 0,
+          "step": "0.1",
+          "label": {
+            "th": "ชั่วโมงบินที่วางแผนกับ D-0507 วันนี้",
+            "en": "Planned flight hours with D-0507 today"
+          },
+          "hint": {
+            "th": "ระบบจะบวกเข้ากับชั่วโมงสะสมแล้วเทียบกับเพดาน FTL ให้",
+            "en": "Added to the cumulative hours and checked against the FTL limits."
+          }
+        },
+        {
+          "k": "ftlConfirm",
+          "type": "check",
+          "req": true,
+          "label": {
+            "th": "ยืนยันการปฏิบัติตาม FTL — ข้าพเจ้ายืนยันว่าตัวเลขข้างต้นรวมชั่วโมงจากทุกผู้ดำเนินการแล้ว และหลังปฏิบัติหน้าที่กับ D-0507 ตามแผนวันนี้ ชั่วโมงบินของข้าพเจ้าจะไม่เกินเพดาน FTL (7 วัน ≤ 28 ชม. / 28 วัน ≤ 100 ชม. / 365 วัน ≤ 1,000 ชม.) ข้าพเจ้าเข้าใจว่าการแจ้งข้อมูลอันเป็นเท็จเป็นความผิดตามกฎหมายการเดินอากาศของไทย",
+            "en": "FTL Compliance Confirmation: I confirm the totals above include hours from ALL operators. After today's planned duty with D-0507, my flight hours will not exceed the FTL limits: 7 days ≤ 28 hr / 28 days ≤ 100 hr / 365 days ≤ 1,000 hr. I understand that inaccurate declaration is a regulatory offence under Thai civil aviation law."
+          },
+          "on": {
+            "th": "ยืนยัน",
+            "en": "Confirm"
+          }
+        }
+      ]
+    },
+    {
+      "k": "D",
+      "tab": "T4",
+      "title": {
+        "th": "D · คำรับรอง",
+        "en": "D · Declaration"
+      },
+      "party": "dec",
+      "fields": [
+        {
+          "k": "declText",
+          "type": "static",
+          "text": {
+            "th": "ข้าพเจ้าขอรับรองว่าได้ปฏิบัติหน้าที่ในวันที่ระบุข้างต้นจริง และเวลาบินครั้งล่าสุดกับชั่วโมงสะสมในแต่ละช่วงเป็นไปตามที่บันทึกไว้ ข้าพเจ้ายืนยันการปฏิบัติตามข้อกำหนดเรื่องเวลาบินและระยะเวลาปฏิบัติหน้าที่ตาม TCAR ORO.FTL ชั่วโมงบินสะสมจากทุกผู้ดำเนินการไม่เกินเพดาน FTL ในทุกช่วง 7 วัน 28 วัน และ 365 วัน ข้าพเจ้ามีหน้าที่จัดให้ตนเองได้พักผ่อนเพียงพอก่อนเข้ารับการฝึกหรือปฏิบัติงานกับ D-0507 ข้าพเจ้าขอรับรองว่ารายละเอียดข้างต้นถูกต้องและเป็นความจริงทุกประการ การลงนามในเอกสารนี้ถือว่าข้าพเจ้ารับผิดชอบตามกฎหมายเป็นการส่วนตัวต่อความถูกต้องของคำรับรองนี้",
+            "en": "I hereby declare that my duty has occurred on the date stated above and that my latest flight time and cumulative rolling period hours are as recorded. I confirm compliance with the requirements regarding Flight Time and Flight Duty Period under TCAR ORO.FTL. My cumulative flight hours from all operators do not exceed the FTL limits for any rolling 7-day, 28-day, or 365-day period. I am responsible for ensuring adequate rest before training or working with D-0507. I certify that the above details are correct and true in all respects. By signing this document, I acknowledge that I hold personal legal responsibility for the accuracy of this declaration."
+          },
+          "label": {
+            "th": "คำรับรอง",
+            "en": "Declaration"
+          }
+        },
+        {
+          "k": "decSign",
+          "type": "sign",
+          "req": true,
+          "label": {
+            "th": "ลายเซ็นผู้แจ้ง",
+            "en": "Signature"
+          }
+        },
+        {
+          "k": "decDate",
+          "type": "date",
+          "req": true,
+          "prefill": "today",
+          "label": {
+            "th": "วันที่ลงนาม",
+            "en": "Date signed"
+          }
+        }
+      ]
+    },
+    {
+      "k": "APV",
+      "tab": "T4",
+      "title": {
+        "th": "การอนุมัติ",
+        "en": "Approval"
+      },
+      "party": "app",
+      "desc": {
+        "th": "ผู้อนุมัติกรอกส่วนนี้จากหน้าคิวงาน ผู้แจ้งกรอกแทนไม่ได้",
+        "en": "Completed by the approver from their queue — not editable by the declarer."
+      },
+      "fields": [
+        {
+          "k": "apName",
+          "type": "text",
+          "req": true,
+          "label": {
+            "th": "ชื่อผู้อนุมัติ",
+            "en": "Approver name"
+          }
+        },
+        {
+          "k": "apDate",
+          "type": "date",
+          "req": true,
+          "label": {
+            "th": "วันที่อนุมัติ",
+            "en": "Date approved"
+          }
+        },
+        {
+          "k": "apComment",
+          "type": "textarea",
+          "label": {
+            "th": "ความเห็น",
+            "en": "Comment"
+          }
+        },
+        {
+          "k": "apSign",
+          "type": "sign",
+          "req": true,
+          "label": {
+            "th": "ลายเซ็นผู้อนุมัติ",
+            "en": "Approver signature"
+          }
+        }
+      ]
+    }
+  ],
+  "compute": [
+    {
+      "k": "t7",
+      "op": "sum",
+      "of": [
+        "h7",
+        "planned"
+      ]
+    },
+    {
+      "k": "t28",
+      "op": "sum",
+      "of": [
+        "h28",
+        "planned"
+      ]
+    },
+    {
+      "k": "t365",
+      "op": "sum",
+      "of": [
+        "h365",
+        "planned"
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "when": "t7 > 28",
+      "level": "stop",
+      "short": {
+        "th": "เกิน 7 วัน",
+        "en": "7-day exceeded"
+      },
+      "msg": {
+        "th": "เกินเพดาน FTL 7 วัน — รวมชั่วโมงที่วางแผนวันนี้แล้วเกิน 28 ชั่วโมง ทำการบินไม่ได้",
+        "en": "Exceeds the 7-day FTL limit — including today's planned hours, the total is over 28 hr."
+      }
+    },
+    {
+      "when": "t28 > 100",
+      "level": "stop",
+      "short": {
+        "th": "เกิน 28 วัน",
+        "en": "28-day exceeded"
+      },
+      "msg": {
+        "th": "เกินเพดาน FTL 28 วัน — รวมชั่วโมงที่วางแผนวันนี้แล้วเกิน 100 ชั่วโมง ทำการบินไม่ได้",
+        "en": "Exceeds the 28-day FTL limit — including today's planned hours, the total is over 100 hr."
+      }
+    },
+    {
+      "when": "t365 > 1000",
+      "level": "stop",
+      "short": {
+        "th": "เกิน 365 วัน",
+        "en": "365-day exceeded"
+      },
+      "msg": {
+        "th": "เกินเพดาน FTL 365 วัน — รวมชั่วโมงที่วางแผนวันนี้แล้วเกิน 1,000 ชั่วโมง ทำการบินไม่ได้",
+        "en": "Exceeds the 365-day FTL limit — including today's planned hours, the total is over 1,000 hr."
+      }
+    },
+    {
+      "when": "t7 > 25 && t7 <= 28",
+      "level": "warn",
+      "short": {
+        "th": "ใกล้เพดาน 7 วัน",
+        "en": "Near 7-day limit"
+      },
+      "msg": {
+        "th": "ใกล้เพดาน FTL 7 วัน (เหลือไม่ถึง 3 ชั่วโมง) — วางแผนเที่ยวบินถัดไปด้วยความระมัดระวัง",
+        "en": "Close to the 7-day FTL limit (under 3 hr left) — plan the next flights carefully."
+      }
+    },
+    {
+      "when": "t28 > 90 && t28 <= 100",
+      "level": "warn",
+      "short": {
+        "th": "ใกล้เพดาน 28 วัน",
+        "en": "Near 28-day limit"
+      },
+      "msg": {
+        "th": "ใกล้เพดาน FTL 28 วัน (เหลือไม่ถึง 10 ชั่วโมง)",
+        "en": "Close to the 28-day FTL limit (under 10 hr left)."
+      }
+    },
+    {
+      "when": "t365 > 900 && t365 <= 1000",
+      "level": "warn",
+      "short": {
+        "th": "ใกล้เพดาน 365 วัน",
+        "en": "Near 365-day limit"
+      },
+      "msg": {
+        "th": "ใกล้เพดาน FTL 365 วัน (เหลือไม่ถึง 100 ชั่วโมง)",
+        "en": "Close to the 365-day FTL limit (under 100 hr left)."
+      }
+    },
+    {
+      "when": "t7 <= 25 && t28 <= 90 && t365 <= 900",
+      "level": "info",
+      "short": {
+        "th": "อยู่ในเกณฑ์",
+        "en": "Within limits"
+      },
+      "msg": {
+        "th": "ชั่วโมงสะสมรวมแผนวันนี้อยู่ในเกณฑ์ FTL ทุกช่วง",
+        "en": "Cumulative hours including today's plan are within all FTL limits."
+      }
+    }
+  ],
+  "route": [
+    {
+      "step": 1,
+      "party": "dec",
+      "sign": true
+    },
+    {
+      "step": 2,
+      "party": "app",
+      "sign": true,
+      "assignedBy": "submitter",
+      "canDelegate": true,
+      "notify": [
+        "line",
+        "email"
+      ],
+      "slaDays": 1
+    }
+  ],
+  "export": {
+    "docx": "D-0507-SDF-001.docx",
+    "lockUntilComplete": true,
+    "map": {}
+  }
+}

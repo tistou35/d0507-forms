@@ -44,7 +44,10 @@ function load(){
       document.querySelectorAll('[data-cnt="queue"]').forEach(e=>e.textContent=s.size);
       out.innerHTML = s.size ? '<div class="stats">' + s.docs.map(d=>{
         const t=d.data(), f=REG.forms.find(x=>x.abbr===t.formCode);
-        const url = t.app==='audit' ? '@@BASE@@../d0507-audit/' : (f?A.formUrl(f):'@@BASE@@all/');
+        // งานอนุมัติต้องเปิดหน้าอนุมัติ ไม่ใช่หน้าฟอร์มเปล่า
+        const url = t.app==='audit' ? '@@BASE@@../d0507-audit/'
+                  : t.subId ? '@@BASE@@approve/?t='+encodeURIComponent(d.id)
+                  : (f?A.formUrl(f):'@@BASE@@all/');
         return `<a class="stat amb lk" href="${url}"><div class="top">
           <span><span class="ti">${A.esc(t.title||t.formCode)}</span>
           <span class="en">${A.esc(t.tracking||'')}</span></span></div>

@@ -1,0 +1,292 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>อนุมัติเอกสาร — D-0507 Flight Training</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="@@BASE@@assets/app.css">
+<style>
+dialog{border:0;border-radius:12px;padding:0;max-width:640px;width:calc(100% - 32px);
+  box-shadow:var(--sh-lg);background:var(--surface);color:var(--fg-1)}
+dialog::backdrop{background:rgba(13,27,42,.5)}
+dialog .dh{background:var(--navy-900);color:#fff;padding:18px 22px}
+dialog .dh h3{font-size:18px;font-weight:700;color:#fff}
+dialog .dh p{font-size:12.5px;color:rgba(255,255,255,.7);margin-top:3px}
+dialog .db{padding:18px 22px;max-height:60vh;overflow:auto}
+dialog .df{padding:14px 22px;border-top:1px solid var(--g-100);display:flex;gap:10px;
+  justify-content:flex-end;flex-wrap:wrap}
+.trail{border-left:2px solid var(--g-150);padding:0 0 12px 16px;margin-left:6px;position:relative}
+.trail::before{content:"";position:absolute;left:-5px;top:5px;width:8px;height:8px;border-radius:50%;
+  background:var(--sky-500)}
+.trail b{font-size:13.5px;font-family:var(--font-sans)}
+.trail span{display:block;font-size:12.5px;color:var(--g-500)}
+</style>
+</head><body>
+@@TOPBAR@@
+<main class="main" style="max-width:860px;margin:0 auto">
+  <div id="head"></div>
+  <div id="form"></div>
+  <div id="foot"></div>
+</main>
+@@BOTNAV@@
+<footer>D-0507 Flight Training Co., Ltd. · Controlled Document System</footer>
+
+<dialog id="dlg"><form method="dialog">
+  <div class="dh"><h3 id="dt">—</h3><p id="ds"></p></div>
+  <div class="db" id="dbody"></div>
+  <div class="df" id="dfoot"></div>
+</form></dialog>
+
+<script>window.BASE='@@BASE@@';</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="@@BASE@@assets/app.js"></script>
+<script>D0507.GAS_URL='@@GASURL@@';</script>
+<script src="@@BASE@@assets/formkit.js"></script>
+<script>
+"use strict";
+const REG=@@REG@@, DEFS=@@DEFS@@, A=D0507;
+const qs=new URLSearchParams(location.search);
+const TASKID=qs.get('t')||'';
+let TASK=null, SUB=null, SUBREF=null, DEF=null, F=null, FK=null, DIR=[], PICK='';
+
+A.reg = REG;
+A.initAuth(@@FBCFG@@, boot);
+A.onLang.push(()=>{ if(FK) FK.lang=A.lang; paint(); });
+
+const dlg=document.getElementById('dlg');
+function modal(title,sub,body,foot){
+  document.getElementById('dt').textContent=title;
+  document.getElementById('ds').textContent=sub||'';
+  document.getElementById('dbody').innerHTML=body;
+  document.getElementById('dfoot').innerHTML=foot;
+  dlg.showModal();
+}
+const LL=o=>FormKit.L(o,A.lang);
+const box=(cls,html)=>`<div class="fk-gate ${cls}"><span>${html}</span></div>`;
+
+async function boot(){
+  const head=document.getElementById('head');
+  if(!A.isStaff()){
+    head.innerHTML=`<div class="note"><b>${A.esc(A.t('mustSignIn'))}</b>
+      <br><a class="big pri" style="margin-top:12px" href="@@BASE@@staff-login/">${A.esc(A.t('signIn'))}</a></div>`;
+    return;
+  }
+  if(!TASKID){ head.innerHTML=box('stop',A.esc(A.t('noTask'))); return; }
+  head.innerHTML=`<div class="note">${A.esc(A.t('loading'))}</div>`;
+  try{
+    const td=await A.db.collection('tasks').doc(TASKID).get();
+    if(!td.exists) return fail(A.t('taskGone'));
+    TASK=Object.assign({id:td.id},td.data());
+    if(TASK.assigneeUid!==A.user.uid) return fail(A.t('notYours'));
+
+    SUBREF=A.db.collection('submissions').doc(TASK.subId);
+    const sd=await SUBREF.get();
+    if(!sd.exists) return fail(A.t('subGone'));
+    SUB=sd.data();
+    F=REG.forms.find(x=>x.abbr===SUB.formCode);
+    DEF=DEFS[SUB.formCode];
+    if(!DEF) return fail(A.t('noDef'));
+
+    // ผู้รับช่วงต่อ — คนอื่นที่รับฟอร์มประเภทเดียวกันได้ ยกเว้นตัวเอง
+    try{
+      const d=await A.db.collection('publicDirectory').doc('instructors').get();
+      const want=F&&F.assignTo;
+      DIR=((d.exists&&d.data().list)||[])
+        .filter(x=>x.id!==A.user.uid && (!want||(x.recv||[]).includes(want)));
+    }catch(e){ DIR=[]; }
+
+    const party=(DEF.route||[])[1] ? DEF.route[1].party : (DEF.parties||[])[1]?.k;
+    FK=new FormKit(DEF,{party:party,lang:A.lang,data:SUB.data||{},onChange:()=>paint()});
+    // เติมชื่อและวันที่ให้ผู้อนุมัติล่วงหน้า — ไม่ต้องพิมพ์ซ้ำทุกใบ
+    (DEF.sections||[]).forEach(s=>{ if(s.party!==party) return;
+      (s.fields||[]).forEach(f=>{
+        if(FK.data[f.k]!==undefined&&FK.data[f.k]!=='') return;
+        if(/name$/i.test(f.k)) FK.data[f.k]=A.user.displayName||A.user.email;
+        if(f.type==='date') FK.data[f.k]=new Date().toISOString().slice(0,10);
+      });
+    });
+    paint();
+  }catch(e){ fail(e.code||e.message||String(e)); }
+}
+function fail(msg){ document.getElementById('head').innerHTML=box('stop',A.esc(msg)); }
+
+function paint(){
+  if(!FK) return;
+  document.getElementById('head').innerHTML=`<div class="fhero"><div class="band">
+      <p class="o">D-0507 Flight Training Co., Ltd.</p><h1>${A.esc(A.nm(F||{abbr:SUB.formCode}))}</h1>
+      <p class="en">${A.esc(A.t('approvalRequest'))}</p></div>
+      <div class="grid">
+        <div><span>${A.esc(A.t('trackingNo'))}</span><b>${A.esc(SUB.tracking||'—')}</b></div>
+        <div><span>${A.esc(A.t('submittedBy'))}</span><b>${A.esc(SUB.submitterName||'—')}</b></div>
+        <div><span>${A.esc(A.t('issueRev'))}</span><b>${A.esc((SUB.issue||'')+' / '+(SUB.rev||''))}</b></div>
+      </div></div>`;
+
+  FK.render(document.getElementById('form'));
+
+  const miss=FK.validate(), stop=FK.blocked();
+  const trail=(SUB.chain||[]).map(c=>`<div class="trail"><b>${A.esc(c.action)}</b>
+      <span>${A.esc(c.byName||'')} · ${A.esc(c.at||'')}${c.note?' · '+A.esc(c.note):''}</span></div>`).join('');
+
+  document.getElementById('foot').innerHTML=
+    (trail?`<h3 style="font-family:var(--font-display);font-size:17px;margin:22px 0 10px">${A.esc(A.t('history'))}</h3>${trail}`:'')+
+    (stop?box('stop',A.esc(A.t('blockedByGate'))):'')+
+    (miss.length?`<div class="warn" style="margin:14px 0">${A.esc(A.t('incomplete'))}:
+       ${A.esc(miss.map(m=>m.label).join(' · '))}</div>`:'')+
+    `<div class="acts">
+      <button class="big ${miss.length||stop?'off':'pri'}" ${miss.length||stop?'disabled':''} id="ap">${A.esc(A.t('doApprove'))}</button>
+      <button class="big sec" id="dg">${A.esc(A.t('doDelegate'))}</button>
+      <button class="big sec" id="rj">${A.esc(A.t('doReject'))}</button>
+      <a class="big sec" href="@@BASE@@queue/">${A.esc(A.t('backToQueue'))}</a></div>`;
+
+  const ap=document.getElementById('ap');
+  if(ap&&!ap.disabled) ap.addEventListener('click',e=>{e.preventDefault();confirmApprove();});
+  document.getElementById('dg').addEventListener('click',e=>{e.preventDefault();delegateDlg();});
+  document.getElementById('rj').addEventListener('click',e=>{e.preventDefault();rejectDlg();});
+}
+
+/* ── อนุมัติ ─────────────────────────────────────────────── */
+function confirmApprove(){
+  const ctx=FK.ctx();
+  const rows=(DEF.sections||[]).filter(s=>FormKit.evalCond(s.showIf,ctx)).map(sec=>{
+    const fs=(sec.fields||[]).filter(f=>f.type!=='static'&&FormKit.evalCond(f.showIf,ctx));
+    if(!fs.length) return '';
+    const on=fs.filter(f=>f.type!=='check'||FK.data[f.k]);
+    return `<h4 class="rvh" style="font-family:var(--font-display);font-size:14px;color:var(--sky-600);margin:16px 0 6px">${A.esc(LL(sec.title))}</h4>`+
+      on.map(f=>`<div style="display:flex;gap:14px;justify-content:space-between;padding:6px 0;
+        border-bottom:1px solid var(--g-100);font-size:13.5px">
+        <span style="color:var(--g-600);flex:1">${A.esc(LL(f.label))}</span>
+        <b style="text-align:right;max-width:55%">${A.esc(shown(FK.data[f.k],f))}</b></div>`).join('');
+  }).join('');
+  modal(A.t('confirmApprove'), A.t('approveSub'), rows,
+    `<button class="fb" value="cancel">${A.esc(A.t('goBack'))}</button>
+     <button class="big pri" id="okap" value="ok">${A.esc(A.t('doApprove'))}</button>`);
+  document.getElementById('okap').addEventListener('click',e=>{e.preventDefault();dlg.close();doApprove();});
+}
+function shown(v,f){
+  if(v===undefined||v===null||v==='') return '—';
+  if(typeof v==='boolean') return v?'✓':'—';
+  if(Array.isArray(v)) return v.map(x=>{
+    const o=(f.opt||[]).find(y=>y.v===x); return o?LL(o.n)||o.v:x; }).join(' · ');
+  if(typeof v==='string'&&v.indexOf('data:image')===0) return '✓ '+A.t('signed');
+  if(f&&f.opt){ const o=f.opt.find(x=>String(x.v)===String(v)); if(o) return LL(o.n)||o.v; }
+  if(f&&f.type==='date') return String(v).split('-').reverse().join('/');
+  return String(v);
+}
+
+async function doApprove(){
+  await finish('complete','approve','');
+}
+
+/* ── ส่งต่อให้คนอื่นอนุมัติแทน ───────────────────────────── */
+function delegateDlg(){
+  const list=DIR.length
+    ? `<div class="fk-opts" id="pick">`+DIR.map(x=>
+        `<button type="button" class="fk-opt" data-uid="${A.esc(x.id)}" aria-pressed="false">
+          ${A.esc(x.name)}${x.cert?`<em style="font-style:normal;color:var(--g-500);font-size:12px"> · ${A.esc(x.cert)}</em>`:''}
+         </button>`).join('')+`</div>`
+    : box('warn',A.esc(A.t('noDelegate')));
+  modal(A.t('doDelegate'), A.t('delegateSub'),
+    list+`<div class="fk-f" style="margin-top:16px"><label for="dnote">${A.esc(A.t('reason'))}</label>
+      <textarea id="dnote"></textarea></div>`,
+    `<button class="fb" value="cancel">${A.esc(A.t('goBack'))}</button>
+     <button class="big pri off" id="okdg" value="ok" disabled>${A.esc(A.t('doDelegate'))}</button>`);
+  const okb=document.getElementById('okdg');
+  document.querySelectorAll('#pick .fk-opt').forEach(b=>b.addEventListener('click',e=>{
+    e.preventDefault(); PICK=b.dataset.uid;
+    document.querySelectorAll('#pick .fk-opt').forEach(x=>x.setAttribute('aria-pressed',x===b));
+    okb.disabled=false; okb.classList.remove('off');
+  }));
+  okb.addEventListener('click',e=>{
+    e.preventDefault();
+    const note=document.getElementById('dnote').value;
+    dlg.close(); doDelegate(note);
+  });
+}
+
+async function doDelegate(note){
+  const foot=document.getElementById('foot');
+  foot.innerHTML=`<div class="note">${A.esc(A.t('working'))}</div>`;
+  try{
+    const who=DIR.find(x=>x.id===PICK)||{};
+    const me=A.user.displayName||A.user.email;
+    const stamp=new Date().toISOString().slice(0,10);
+    await A.db.collection('tasks').doc(TASK.id).update({ state:'delegated', closedAt:now(), note:note||'' });
+    await A.db.collection('tasks').add({
+      subId:TASK.subId, formCode:TASK.formCode, tracking:TASK.tracking, title:TASK.title,
+      assigneeUid:PICK, assigneeName:who.name||'', state:'open', step:TASK.step,
+      fromUid:A.user.uid, fromName:me, delegated:true, note:note||'', createdAt:now(),
+    });
+    await SUBREF.update({
+      assigneeUid:PICK, delegatedFrom:me,
+      chain:firebase.firestore.FieldValue.arrayUnion({
+        action:'delegate', byUid:A.user.uid, byName:me, toUid:PICK, toName:who.name||'',
+        at:stamp, note:note||'' }),
+    });
+    await log('delegate', note);
+    foot.innerHTML=box('info',`<b>${A.esc(A.t('delegated'))}</b><br>${A.esc(who.name||'')}`)+
+      `<div class="acts"><a class="big pri" href="@@BASE@@queue/">${A.esc(A.t('backToQueue'))}</a></div>`;
+  }catch(e){ foot.innerHTML=box('stop',`<b>${A.esc(A.t('actionFailed'))}</b><br>${A.esc(e.code||e.message)}`); }
+}
+
+/* ── ตีกลับ ──────────────────────────────────────────────── */
+function rejectDlg(){
+  modal(A.t('doReject'), A.t('rejectSub'),
+    `<div class="fk-f"><label for="rnote">${A.esc(A.t('reasonRequired'))}</label>
+      <textarea id="rnote"></textarea></div>`,
+    `<button class="fb" value="cancel">${A.esc(A.t('goBack'))}</button>
+     <button class="big pri off" id="okrj" value="ok" disabled>${A.esc(A.t('doReject'))}</button>`);
+  const ta=document.getElementById('rnote'), okb=document.getElementById('okrj');
+  ta.addEventListener('input',()=>{ okb.disabled=!ta.value.trim(); okb.classList.toggle('off',okb.disabled); });
+  okb.addEventListener('click',e=>{ e.preventDefault(); const n=ta.value.trim(); dlg.close(); finish('rejected','reject',n); });
+}
+
+/* ── เขียนผลลัพธ์ ────────────────────────────────────────── */
+const now=()=>firebase.firestore.FieldValue.serverTimestamp();
+async function log(action,note){
+  try{
+    await SUBREF.collection('events').add({
+      action:action, byUid:A.user.uid, byName:A.user.displayName||A.user.email,
+      note:note||'', at:now(),
+    });
+  }catch(e){ /* log ล้มเหลวไม่ควรทำให้การอนุมัติล้มตาม */ }
+}
+
+async function finish(status,action,note){
+  const foot=document.getElementById('foot');
+  foot.innerHTML=`<div class="note">${A.esc(A.t('working'))}</div>`;
+  try{
+    const me=A.user.displayName||A.user.email;
+    const stamp=new Date().toISOString().slice(0,10);
+    const patch={
+      status:status, data:FK.data, computed:FK.computed(),
+      closedAt:now(), closedBy:me,
+      chain:firebase.firestore.FieldValue.arrayUnion({
+        action:action, byUid:A.user.uid, byName:me, at:stamp, note:note||'' }),
+    };
+    if(status==='complete') patch.signedBy=firebase.firestore.FieldValue.arrayUnion(me);
+    await SUBREF.update(patch);
+    await A.db.collection('tasks').doc(TASK.id).update({ state:'done', closedAt:now(), note:note||'' });
+    await log(action,note);
+
+    let ex=null;
+    if(status==='complete'){
+      ex=await A.exportSubmission(Object.assign({},SUB,patch,{
+        status:'complete', data:FK.data, computed:FK.computed(),
+        submittedAt:new Date().toISOString(),
+        signedBy:(SUB.signedBy||[]).concat([me]),
+        chain:undefined, closedAt:undefined,
+      }));
+    }
+    foot.innerHTML=box(status==='complete'?'info':'warn',
+      `<b>${A.esc(A.t(status==='complete'?'approved':'rejectedDone'))}</b><br>
+       ${A.esc(A.t('trackingNo'))}: <span class="mono">${A.esc(SUB.tracking||'')}</span>
+       ${ex&&ex.ok===false?'<br>'+A.esc(A.t('exportFailed'))+' '+A.esc(ex.error||''):''}
+       ${ex&&ex.pdf?`<br><a href="${A.esc(ex.pdf)}" target="_blank" rel="noopener">PDF ↗</a>`:''}`)+
+      `<div class="acts"><a class="big pri" href="@@BASE@@queue/">${A.esc(A.t('backToQueue'))}</a></div>`;
+    window.scrollTo({top:foot.getBoundingClientRect().top+window.scrollY-90,behavior:'smooth'});
+  }catch(e){
+    foot.innerHTML=box('stop',`<b>${A.esc(A.t('actionFailed'))}</b><br>${A.esc(e.code||e.message||String(e))}`);
+  }
+}
+</script>
+</body></html>

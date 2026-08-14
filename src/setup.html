@@ -43,7 +43,7 @@
           <div class="fk-f">
             <label>รับฟอร์มประเภทไหนได้</label>
             <p class="hint">นักเรียนจะเลือกคุณเป็นผู้รับได้เมื่อฟอร์มนั้นส่งถึงบทบาทนี้ ·
-              FRAE และ PWR → FI · SEF → CMM · APF → ACM · ไม่เลือกเลย = ไม่ปรากฏในตัวเลือก</p>
+              FRAE และ PWR → FI · SDF → HT · SEF → CMM · APF → ACM · ไม่เลือกเลย = ไม่ปรากฏในตัวเลือก</p>
             <div class="fk-opts" id="recv"></div>
           </div>
           <div class="acts"><button class="big pri" id="saveMe">บันทึกโปรไฟล์</button></div>
@@ -94,7 +94,7 @@
 const REG = @@REG@@;
 const A = D0507;
 const ROLE_KEYS = ['stu','ins','mnt','ops','mgt'];
-const RECV_KEYS = ['FI','CMM','ACM'];
+const RECV_KEYS = ['FI','HT','CMM','ACM'];
 let ROLES = new Set(), RECV = new Set(), NEWREG = null;
 
 A.reg = REG;

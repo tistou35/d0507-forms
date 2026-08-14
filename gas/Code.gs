@@ -214,10 +214,14 @@ function makePdf_(folder, abbr, s) {
     var b = doc.getBody();
     var data = s.data || {};
     var flat = flatten_(data);
-    var all = Object.assign({}, flat, ticks_(data), {
+    // ค่าคำนวณทุกตัว ไม่ใช่แค่ score — SDF ใช้ t7 / t28 / t365 ในแม่แบบ
+    // ถ้าดึงเฉพาะ score ช่องสรุปชั่วโมงในเอกสารจะว่างโดยไม่มีอะไรฟ้อง
+    var all = Object.assign({}, flat, ticks_(data), s.computed || {}, {
       tracking: s.tracking, doc: s.doc || '', issue: s.issue || '', rev: s.rev || '',
       defRev: s.defRev || '', submitter: s.submitterName || '',
-      submittedAt: docStamp_(s.submittedAt), score: (s.computed && s.computed.score) || 0,
+      submittedAt: docStamp_(s.submittedAt),
+      score: (s.computed && s.computed.score) || 0,
+      delegatedFrom: s.delegatedFrom || '',
     });
     // ลายเซ็นต้องทำก่อนล้าง token ที่เหลือ มิฉะนั้น {{sig_…}} จะถูกลบไปก่อน
     signatures_(b, data);

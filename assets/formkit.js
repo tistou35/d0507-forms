@@ -40,6 +40,7 @@
     stDone:     { th: 'ตอบครบแล้ว', en: 'Complete' },
     stIdle:     { th: 'ยังไม่ได้กรอก', en: 'Not started' },
     badFormat:  { th: 'รูปแบบไม่ตรงตัวอย่าง', en: 'Format does not match the example' },
+    limit:      { th: 'เพดาน', en: 'limit' },
     fillFirst:  { th: n => 'กรอกช่องบังคับในหน้านี้ให้ครบก่อน — เหลืออีก ' + n + ' ช่อง (ที่ทำเครื่องหมายไว้)',
                   en: n => 'Complete the required fields on this page first — ' + n + ' left (marked below)' },
   };
@@ -371,7 +372,9 @@
 
       default: {
         const t = ['number', 'date', 'time', 'email', 'tel'].includes(f.type) ? f.type : 'text';
-        const rng = (f.min !== undefined ? ` min="${f.min}"` : '') + (f.max !== undefined ? ` max="${f.max}"` : '');
+        const rng = (f.min !== undefined ? ` min="${f.min}"` : '') + (f.max !== undefined ? ` max="${f.max}"` : '')
+          // ชั่วโมงบินเป็นทศนิยม ถ้าไม่ใส่ step เบราว์เซอร์จะตีว่า 1.5 ไม่ถูกต้อง
+          + (f.step !== undefined ? ` step="${f.step}"` : '');
         const hint = f.ph ? ` placeholder="${esc(ph(f.ph))}"` : '';
         body = `<input id="${id}" type="${t}" data-k="${esc(f.k)}" value="${esc(v == null ? '' : v)}"${rng}${hint}${dis}>`;
         if (f.type === 'date' && v) body += `<p class="fk-dmy">${esc(dmy(v))}</p>`;
@@ -425,7 +428,10 @@
 
   FormKit.prototype.render = function (el) {
     const ctx = this.ctx(), c = this.computed();
-    const scored = (this.def.compute || []).some(x => x.k === 'score' || x.op === 'sumScore');
+    /* แถบบนหัวแสดงตัวเลขที่ต้องเห็นตลอดขณะกรอก
+       ฟอร์มที่มีคะแนนรวม (FRAE) ใช้ score · ฟอร์มอื่นระบุเองที่ ui.headline (SDF ใช้ชั่วโมง FTL) */
+    const hl = this.def.ui && this.def.ui.headline;
+    const scored = !!hl || (this.def.compute || []).some(x => x.k === 'score' || x.op === 'sumScore');
     const tabs = this.tabs(ctx);
     const other = this.lang === 'th' ? 'en' : 'th';
     let html = '';
@@ -442,8 +448,10 @@
       // แถบคะแนน + ป้ายแท็บ ค้างอยู่บนหัวตลอด ไม่ว่าจะเลื่อนไปไหน
       html += `<div class="fk-tabwrap">
         ${scored ? `<div class="fk-bar ${b.lv}">
-          <span class="n">${c.score}</span>
-          <span class="lbl"><b>${esc(T('riskTotal', this.lang))}</b><br>${esc(T('riskTotal', other))}</span>
+          <span class="n">${hl ? esc(String(c[hl.value] === undefined ? 0 : c[hl.value])) : c.score}</span>
+          <span class="lbl">${hl
+            ? `<b>${esc(L(hl, this.lang))}</b><br>${esc(T('limit', this.lang))} ${esc(String(hl.of))}`
+            : `<b>${esc(T('riskTotal', this.lang))}</b><br>${esc(T('riskTotal', other))}`}</span>
           ${b.n ? `<span class="band">${esc(b.n)}</span>` : ''}
           <span class="prog"><span class="pct">${esc(T('answered', this.lang))} ${ans}/${tot}</span>
             <span class="tr"><i style="width:${pct}%"></i></span></span>
@@ -595,11 +603,11 @@
         self.set(k, cur); rerender();
       }));
 
-    el.querySelectorAll('canvas[data-sign]').forEach(cv => bindSign(cv, self));
+    el.querySelectorAll('canvas[data-sign]').forEach(cv => bindSign(cv, self, rerender));
   };
 
   /* ลายเซ็นด้วยนิ้ว / Apple Pencil */
-  function bindSign(cv, fk) {
+  function bindSign(cv, fk, rerender) {
     const dpr = window.devicePixelRatio || 1;
     const r = cv.getBoundingClientRect();
     cv.width = r.width * dpr; cv.height = r.height * dpr;
@@ -620,6 +628,7 @@
       g.clearRect(0, 0, r.width, r.height);
       delete fk.data[cv.dataset.sign];
       fk.onChange(cv.dataset.sign, undefined, fk);
+      if (rerender) rerender();
     });
 
     let drawing = false;
@@ -636,6 +645,9 @@
       if (!drawing) return;
       drawing = false;
       fk.set(cv.dataset.sign, cv.toDataURL('image/png'));
+      // ต้องวาดใหม่ด้วย ไม่งั้นป้ายบนหัวแท็บยังนับว่าช่องลงนามว่างอยู่
+      // (ลายเซ็นถูกวาดกลับจากข้อมูลตอนเรนเดอร์ จึงไม่หาย)
+      if (rerender) rerender();
     };
     cv.addEventListener('pointerdown', down); cv.addEventListener('pointermove', move);
     window.addEventListener('pointerup', up);

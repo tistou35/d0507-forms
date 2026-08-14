@@ -141,8 +141,8 @@
    "t": "Self Declaration Form",
    "th": "แบบแจ้งข้อมูลด้วยตนเอง",
    "iss": "01",
-   "rev": "00",
-   "eff": "10 FEB 2021",
+   "rev": "01",
+   "eff": "22 JUN 2026",
    "own": "AD",
    "lef": [
     "OMA",
@@ -168,7 +168,8 @@
     "ประกาศตน",
     "declaration",
     "sdf"
-   ]
+   ],
+   "assignTo": "HT"
   },
   {
    "doc": "D-0507-BCK-001",

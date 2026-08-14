@@ -240,6 +240,18 @@ async function send(){
     };
     await ref.set(sub);
 
+    // งานในคิวของผู้อนุมัติ — ถ้าไม่สร้าง ใบจะค้างเป็น pending โดยไม่มีใครเห็น
+    if(!done && PICK){
+      const who=DIR.find(x=>x.id===PICK)||{};
+      await A.db.collection('tasks').add({
+        subId:ref.id, formCode:F.abbr, tracking:trk, title:sub.title,
+        assigneeUid:PICK, assigneeName:who.name||'',
+        state:'open', step:2,
+        fromUid:u.uid, fromName:sub.submitterName,
+        createdAt:firebase.firestore.FieldValue.serverTimestamp(),
+      });
+    }
+
     let ex=null;
     if(done) ex=await A.exportSubmission(Object.assign({},sub,{submittedAt:d.toISOString()}));
 
