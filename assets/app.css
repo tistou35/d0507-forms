@@ -70,6 +70,13 @@ a{color:var(--sky-600)}
 .bell .b{position:absolute;top:-3px;right:-3px;min-width:21px;height:21px;border-radius:99px;
   background:var(--amber-500);color:var(--navy-900);font-family:var(--font-display);font-weight:700;
   font-size:12px;display:grid;place-items:center;padding:0 5px;border:2px solid var(--navy-900)}
+.langsw{display:flex;flex:none;border-radius:99px;padding:3px;gap:2px;
+  background:rgba(255,255,255,.07);border:1px solid var(--border-inv)}
+.langsw button{min-height:38px;min-width:44px;padding:0 13px;border:0;border-radius:99px;
+  background:none;cursor:pointer;font-family:var(--font-sans);font-size:13px;font-weight:600;
+  color:rgba(255,255,255,.6);transition:background .15s ease,color .15s ease}
+.langsw button:hover{color:#fff;background:rgba(255,255,255,.10)}
+.langsw button[aria-pressed="true"]{background:var(--sky-500);color:#fff}
 .acct{display:flex;align-items:center;gap:10px;min-height:48px;padding:0 12px 0 6px;border-radius:99px;
   background:rgba(255,255,255,.07);border:1px solid var(--border-inv);cursor:pointer;
   color:inherit;text-decoration:none;font-family:var(--font-sans)}

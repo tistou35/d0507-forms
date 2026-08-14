@@ -65,18 +65,161 @@
       box.innerHTML = A.isStaff()
         ? `<span class="acct"><span class="av">${A.esc((A.user.displayName || A.user.email || '?').slice(0, 2).toUpperCase())}</span>
              <span class="who"><b>${A.esc(A.user.displayName || A.user.email)}</b>
-             <span>${A.roles.length ? A.esc(A.roleNames().join(' · ')) : 'ยังไม่ได้กำหนดบทบาท'}</span></span></span>
+             <span>${A.roles.length ? A.esc(A.roleNames().join(' · ')) : A.esc(A.t('noRole'))}</span></span></span>
            <a class="acct" href="#" onclick="D0507.logout();return false" style="padding:0 16px">
-             <span class="who"><b>ออก</b><span>Sign out</span></span></a>`
+             <span class="who"><b>${A.esc(A.t('signOut'))}</b><span>${A.esc(A.t('signOutSub'))}</span></span></a>`
         : `<a class="acct" href="${base}staff-login/" style="padding:0 16px">
-             <span class="who"><b>เข้าสู่ระบบเจ้าหน้าที่</b><span>Staff sign in</span></span></a>`;
+             <span class="who"><b>${A.esc(A.t('signIn'))}</b><span>${A.esc(A.t('signInSub'))}</span></span></a>`;
     }
     document.querySelectorAll('.staffonly').forEach(el => el.classList.toggle('hide', !A.isStaff()));
   };
 
-  A.ROLE_N = { stu: 'นักเรียน', ins: 'ครูการบิน / ครูภาคทฤษฎี', mnt: 'ช่างอากาศยาน',
-               ops: 'ฝ่ายปฏิบัติการ', mgt: 'ฝ่ายบริหาร' };
-  A.roleNames = () => A.roles.map(r => A.ROLE_N[r] || r);
+  A.ROLE_N = {
+    stu: { th: 'นักเรียน', en: 'Student' },
+    ins: { th: 'ครูการบิน / ครูภาคทฤษฎี', en: 'Flight / theoretical knowledge instructor' },
+    mnt: { th: 'ช่างอากาศยาน', en: 'Aircraft maintenance' },
+    ops: { th: 'ฝ่ายปฏิบัติการ', en: 'Flight operations' },
+    mgt: { th: 'ฝ่ายบริหาร', en: 'Management' },
+  };
+  A.roleNames = () => A.roles.map(r => A.L(A.ROLE_N[r]) || r);
+
+  /* ── ภาษา ──────────────────────────────────────────────
+     เอกสารควบคุมของ CAAT เป็นภาษาอังกฤษ แต่คนกรอกอ่านไทย
+     จึงต้องสลับได้ โดยที่ทะเบียนและนิยามฟอร์มเก็บทั้งสองภาษาไว้ในไฟล์เดียว
+
+     L() รับได้ทั้ง {th,en} และสตริงเปล่า ๆ (ของเก่าที่ยังไม่ได้แปลง)
+     และ fallback ไปภาษาที่มีเสมอ — ไม่มีทางได้ช่องว่างเพราะขาดคำแปล */
+  A.LANGS = ['th', 'en'];
+  A.lang = 'th';
+  try {
+    const s = localStorage.getItem('d0507_lang');
+    if (A.LANGS.indexOf(s) >= 0) A.lang = s;
+  } catch (e) { /* โหมดส่วนตัวปิด localStorage ไว้ — ใช้ค่าตั้งต้น */ }
+
+  A.L = (o, lang) => typeof o === 'string' ? o
+    : (o && (o[lang || A.lang] || o.th || o.en)) || '';
+  A.t = (k, lang) => A.L(A.T[k], lang) || k;
+  A.other = () => A.lang === 'th' ? 'en' : 'th';
+  A.nm = f => A.lang === 'en' ? (f.t || f.th || f.abbr) : (f.th || f.t || f.abbr);
+  /* ทะเบียนเก็บอังกฤษไว้ใน key แยก (n/en, d/den) ไม่ใช่ {th,en} — ของเดิมก่อนมีระบบสองภาษา */
+  A.n2 = (o, k) => !o ? '' : (A.lang === 'en' ? (o[(k || 'n') === 'n' ? 'en' : 'den'] || o[k || 'n']) : o[k || 'n']) || '';
+
+  A.T = {
+    langTh:     { th: 'ไทย', en: 'ไทย' },
+    langEn:     { th: 'EN', en: 'EN' },
+    signIn:     { th: 'เข้าสู่ระบบเจ้าหน้าที่', en: 'Staff sign in' },
+    signInSub:  { th: 'Staff sign in', en: 'เจ้าหน้าที่' },
+    signOut:    { th: 'ออก', en: 'Sign out' },
+    signOutSub: { th: 'Sign out', en: 'ออกจากระบบ' },
+    noRole:     { th: 'ยังไม่ได้กำหนดบทบาท', en: 'No role assigned yet' },
+    helpTitle:  { th: 'ไม่รู้ว่าต้องใช้ฟอร์มไหน?', en: 'Not sure which form you need?' },
+    helpBody:   { th: 'พิมพ์สิ่งที่อยากทำในช่องค้นหา ระบบจะหาให้ข้ามทุกระบบ',
+                  en: 'Type what you want to do in the search box — it looks across every system.' },
+    notFound:   { th: 'ไม่พบฟอร์มนี้', en: 'Form not found' },
+    noDefTitle: { th: 'ฟอร์มนี้ยังไม่ได้ใส่ช่องกรอก', en: 'This form has no fields yet' },
+    noDefBody:  { th: 'โครงระบบและตัวเรนเดอร์พร้อมแล้ว รอใส่นิยามฟอร์มที่',
+                  en: 'The system and renderer are ready — waiting on a form definition at' },
+    noDefBody2: { th: 'ตามแบบมาตรฐานใน', en: 'following the standard in' },
+    noDefBody3: { th: '— เพิ่มไฟล์แล้ว build ก็ใช้ได้ทันที ไม่ต้องแก้โค้ด',
+                  en: '— add the file, rebuild, and it works. No code change needed.' },
+    backToForm: { th: 'กลับหน้าฟอร์ม', en: 'Back to form' },
+    incomplete: { th: 'ยังกรอกไม่ครบ', en: 'Still incomplete' },
+    send:       { th: 'ส่งฟอร์ม', en: 'Submit form' },
+    cancel:     { th: 'ยกเลิก', en: 'Cancel' },
+    docCode:    { th: 'รหัสเอกสาร', en: 'Doc code' },
+    issueRev:   { th: 'ฉบับ / แก้ไข', en: 'Issue / Rev' },
+    effective:  { th: 'วันที่มีผล', en: 'Effective' },
+
+    /* เมนูและแบรนด์ — คู่ไทย/อังกฤษที่แสดงพร้อมกันสองบรรทัด
+       data-t  = ภาษาที่เลือก (บรรทัดหลัก) · data-t2 = อีกภาษา (บรรทัดรอง) */
+    brand:      { th: 'ระบบฟอร์มออนไลน์', en: 'Forms & Approvals' },
+    menu:       { th: 'เมนู', en: 'Menu' },
+    navHome:    { th: 'หน้าหลัก', en: 'Home' },
+    navAll:     { th: 'คลังฟอร์ม', en: 'All forms' },
+    navQueue:   { th: 'งานของฉัน', en: 'My queue' },
+    navReg:     { th: 'ทะเบียนเอกสาร', en: 'Register · LEF' },
+    navRegSh:   { th: 'ทะเบียน', en: 'Register' },
+    navForms:   { th: 'จัดการฟอร์ม', en: 'Form management' },
+    navSetup:   { th: 'ตั้งค่าระบบ', en: 'Admin setup' },
+    navAudit:   { th: 'งานตรวจสอบ', en: 'Audit' },
+    auditNote:  { th: 'Audit ↗ login แยก', en: 'งานตรวจสอบ ↗ แยก login' },
+    searchPh:   { th: 'ค้นหาฟอร์ม', en: 'Search forms' },
+    thisSystem: { th: 'ระบบนี้', en: 'This system' },
+    allForms:   { th: 'คลังฟอร์ม', en: 'All forms' },
+    allFormsN:  { th: n => 'ฟอร์มทั้งหมด ' + n + ' ฟอร์ม', en: n => n + ' form' + (n === 1 ? '' : 's') },
+    allSub:     { th: 'รายการเดียว กรองได้ตามกลุ่มผู้ใช้ ระบบที่ฟอร์มอยู่ และสถานะเอกสาร',
+                  en: 'One list — filter by user group, host system, and document status.' },
+    searchAll:  { th: 'ค้นหา — ชื่อฟอร์ม รหัสเอกสาร หรือสิ่งที่อยากทำ',
+                  en: 'Search — form name, doc code, or what you want to do' },
+    viewAs:     { th: 'มุมมอง', en: 'View' },
+    viewCard:   { th: 'การ์ด', en: 'Cards' },
+    viewTable:  { th: 'ตาราง', en: 'Table' },
+    allGroups:  { th: 'ทุกกลุ่ม', en: 'All groups' },
+    allSystems: { th: 'ทุกระบบ', en: 'All systems' },
+    allStatus:  { th: 'ทุกสถานะ', en: 'All statuses' },
+    stIssue:    { th: 'เฉพาะที่มีปัญหา', en: 'Issues only' },
+    stInLef:    { th: 'อยู่ใน LEF', en: 'In LEF' },
+    stNotLef:   { th: 'ยังไม่อยู่ใน LEF', en: 'Not in LEF' },
+    viewStaff:  { th: 'มุมมองเจ้าหน้าที่ — เห็นทั้งทะเบียน', en: 'Staff view — the whole register' },
+    viewPublic: { th: 'มุมมองสาธารณะ — เฉพาะฟอร์มของนักเรียน', en: 'Public view — student forms only' },
+    noMatch:    { th: 'ไม่พบฟอร์มที่ตรงเงื่อนไข', en: 'No form matches these filters' },
+    colName:    { th: 'ชื่อฟอร์ม', en: 'Form name' },
+    colGroup:   { th: 'กลุ่มผู้ใช้', en: 'User group' },
+    colSystem:  { th: 'ระบบ', en: 'System' },
+    colStatus:  { th: 'สถานะ', en: 'Status' },
+    openIn:     { th: 'เปิดใน', en: 'Open in' },
+    goAudit:    { th: 'ไปงานตรวจสอบ', en: 'Go to Audit' },
+    inSystem:   { th: 'อยู่ในระบบ', en: 'Hosted in' },
+    confirmed:  { th: 'ยืนยันแล้ว', en: 'Confirmed' },
+    whenWho:    { th: 'ฟอร์มนี้ใช้เมื่อไร · ใครเกี่ยวข้อง', en: 'When to use it · who is involved' },
+    ctrlStatus: { th: 'สถานะเอกสารควบคุม', en: 'Controlled document status' },
+    related:    { th: 'ฟอร์มที่เกี่ยวข้องในสายงานเดียวกัน', en: 'Related forms in the same chain' },
+    noOnline:   { th: 'ยังไม่มีฟอร์มออนไลน์', en: 'No online form yet' },
+    backToAll:  { th: 'กลับคลังฟอร์ม', en: 'Back to all forms' },
+    noFields:   { th: 'ฟอร์มนี้ยังไม่มีช่องกรอกในระบบ — รอใส่ข้อมูลตามแบบมาตรฐาน',
+                  en: 'This form has no fields in the system yet — waiting on a definition.' },
+    withWhom:   { th: 'ทำร่วมกับ', en: 'Filled with' },
+    sendTo:     { th: 'ส่งถึง', en: 'Sent to' },
+    chain:      { th: 'สายงาน', en: 'Chain' },
+    inLef:      { th: 'อยู่ใน LEF', en: 'In LEF' },
+    notInLef:   { th: 'ยังไม่อยู่ใน LEF', en: 'Not in LEF yet' },
+    srcFile:    { th: 'ไฟล์ต้นฉบับ', en: 'Source file' },
+    docOwner:   { th: 'เจ้าของเอกสาร', en: 'Document owner' },
+    jotDup:     { th: 'Jotform ฉบับซ้ำ', en: 'Duplicate Jotform' },
+    sysOK:      { th: 'ยืนยันระบบ', en: 'System confirmed' },
+    ctrlCode:   { th: 'Control code', en: 'Control code' },
+    doFill:     { th: 'กรอกฟอร์ม', en: 'Fill in the form' },
+    doSend:     { th: 'ส่งฟอร์ม', en: 'Submit the form' },
+    doOpen:     { th: 'เปิดฟอร์ม', en: 'Open the form' },
+  };
+
+  A.onLang = [];               // หน้าเว็บลงทะเบียนไว้ให้เรียกเมื่อเปลี่ยนภาษา
+
+  A.setLang = function (l) {
+    if (A.LANGS.indexOf(l) < 0 || l === A.lang) return;
+    A.lang = l;
+    try { localStorage.setItem('d0507_lang', l); } catch (e) { /* ไม่เก็บก็ยังใช้ได้ */ }
+    A.paintLang();
+    A.paintAuth();
+    A.onLang.forEach(fn => { try { fn(l); } catch (e) { console.error(e); } });
+  };
+
+  A.paintLang = function () {
+    document.documentElement.lang = A.lang;
+    document.querySelectorAll('[data-lang]').forEach(b =>
+      b.setAttribute('aria-pressed', b.dataset.lang === A.lang));
+    document.querySelectorAll('[data-t]').forEach(el => { el.textContent = A.t(el.dataset.t); });
+    // บรรทัดรองแสดงอีกภาษาเสมอ — ป้ายเมนูจึงอ่านได้ทั้งสองภาษาโดยไม่ต้องเพิ่มคำแปลซ้ำ
+    document.querySelectorAll('[data-t2]').forEach(el => { el.textContent = A.t(el.dataset.t2, A.other()); });
+  };
+
+  function bindLang() {
+    document.querySelectorAll('[data-lang]').forEach(b =>
+      b.addEventListener('click', () => A.setLang(b.dataset.lang)));
+    A.paintLang();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindLang);
+  else bindLang();
 
   /* ── ค้นหา ─────────────────────────────────────────────
      ภาษาไทยไม่มีช่องว่างระหว่างคำ จึงเช็คสองทาง:
@@ -103,11 +246,11 @@
   A.target = function (reg, f) {
     const base = (g.BASE || '');
     const s = A.sysOf(reg, f);
-    if (f.sys === 'audit') return { url: base + '../d0507-audit/', label: 'ไปงานตรวจสอบ', ext: false };
-    if (f.sys !== 'here' && s.url) return { url: s.url, label: 'เปิดใน ' + s.n, ext: true };
-    if (f.hasDef) return { url: base + 'fill/?c=' + encodeURIComponent(f.abbr), label: 'กรอกฟอร์ม', ext: false };
-    if (f.assignTo) return { url: base + 'submit/?f=' + encodeURIComponent(f.abbr), label: 'ส่งฟอร์ม', ext: false };
-    if (f.jot) return { url: 'https://form.jotform.com/' + encodeURIComponent(f.jot), label: 'เปิดฟอร์ม', ext: true };
+    if (f.sys === 'audit') return { url: base + '../d0507-audit/', label: A.t('goAudit'), ext: false };
+    if (f.sys !== 'here' && s.url) return { url: s.url, label: A.t('openIn') + ' ' + A.n2(s), ext: true };
+    if (f.hasDef) return { url: base + 'fill/?c=' + encodeURIComponent(f.abbr), label: A.t('doFill'), ext: false };
+    if (f.assignTo) return { url: base + 'submit/?f=' + encodeURIComponent(f.abbr), label: A.t('doSend'), ext: false };
+    if (f.jot) return { url: 'https://form.jotform.com/' + encodeURIComponent(f.jot), label: A.t('doOpen'), ext: true };
     return null;
   };
   A.formUrl = f => (g.BASE || '') + 'f/' + encodeURIComponent(f.abbr) + '/';
@@ -156,13 +299,13 @@
   /* การ์ดฟอร์มมาตรฐาน — ใช้ร่วมทุกหน้า */
   A.card = function (reg, f, duty) {
     const s = A.sysOf(reg, f);
-    const badge = f.sys === 'here' ? '<span class="ext here">ระบบนี้</span>'
-                                   : `<span class="ext">${A.esc(s.n)}</span>`;
+    const badge = f.sys === 'here' ? `<span class="ext here">${A.esc(A.t('thisSystem'))}</span>`
+                                   : `<span class="ext">${A.esc(A.n2(s))}</span>`;
     const st = reg.status[f.st];
-    const warn = (A.isStaff() && st && st.lv !== 'ok') ? `<span class="tag ${st.lv}">${A.esc(st.n)}</span>` : '';
+    const warn = (A.isStaff() && st && st.lv !== 'ok') ? `<span class="tag ${st.lv}">${A.esc(A.n2(st))}</span>` : '';
     return `<a class="fcard" href="${A.formUrl(f)}">
       <div class="row"><span class="tile ${f.sys === 'here' ? 'sky' : 'gry'}">${A.esc(f.abbr.slice(0, 4))}</span>
-        <span><span class="ti">${A.esc(f.th || f.t)}</span><span class="en">${A.esc(f.t)}</span></span></div>
+        <span><span class="ti">${A.esc(A.nm(f))}</span><span class="en">${A.esc(A.lang === 'en' ? (f.th || '') : (f.t || ''))}</span></span></div>
       ${duty ? `<div class="duty">${A.esc(duty)}</div>` : ''}
       <div class="meta">${f.doc ? `<span class="code">${A.esc(f.doc)}</span>` : ''}${badge}${warn}</div></a>`;
   };

@@ -85,6 +85,9 @@ const CHIPS_STF = ['ต้องยื่นแผนการบิน','นั
 /* หน้าเดียว ปรับตามสถานะ login — ไม่ต้องมีประตูให้เลือกเอง */
 A.reg = REG;
 A.initAuth(@@FBCFG@@, () => paint());
+// เปลี่ยนภาษาแล้ววาดใหม่ทั้งหน้า
+A.onLang.push(() => paint());
+
 paint();
 
 function visible() {
@@ -150,8 +153,8 @@ function search() {
     hits.map(f => {
       const s = A.sysOf(REG, f);
       const wh = f.sys === 'here' ? `<span class="wh here">ฟอร์มในระบบนี้</span>`
-        : `<span class="wh">${A.esc(f.sys === 'audit' ? 'ไปงานตรวจสอบ' : 'เปิดใน ' + s.n)}</span>`;
-      return `<a class="rr" href="${A.formUrl(f)}"><span><span class="nm">${A.esc(f.th || f.t)}</span>
+        : `<span class="wh">${A.esc(f.sys === 'audit' ? A.t('goAudit') : A.t('openIn') + ' ' + A.n2(s))}</span>`;
+      return `<a class="rr" href="${A.formUrl(f)}"><span><span class="nm">${A.esc(A.nm(f))}</span>
         <span class="cd">${A.esc(f.doc || f.abbr)}</span></span>${wh}</a>`;
     }).join('') + `</div>`;
 }

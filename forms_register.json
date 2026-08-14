@@ -12,61 +12,79 @@
   {
    "k": "stu",
    "n": "นักเรียน",
-   "d": "นักศึกษาการบิน · ผู้เข้ารับการฝึก"
+   "d": "นักศึกษาการบิน · ผู้เข้ารับการฝึก",
+   "en": "Students",
+   "den": "Student pilots · trainees"
   },
   {
    "k": "ins",
    "n": "ครูการบิน / ครูภาคทฤษฎี",
-   "d": "FI · TKI · FIE"
+   "d": "FI · TKI · FIE",
+   "en": "Instructors",
+   "den": "FI · TKI · FIE"
   },
   {
    "k": "mnt",
    "n": "ช่างอากาศยาน",
-   "d": "ฝ่ายซ่อมบำรุง (ME)"
+   "d": "ฝ่ายซ่อมบำรุง (ME)",
+   "en": "Maintenance",
+   "den": "Maintenance (ME)"
   },
   {
    "k": "ops",
    "n": "ฝ่ายปฏิบัติการ",
-   "d": "Operations · Dispatch · ธุรการเอกสาร"
+   "d": "Operations · Dispatch · ธุรการเอกสาร",
+   "en": "Operations",
+   "den": "Operations · Dispatch · document control"
   },
   {
    "k": "mgt",
    "n": "ฝ่ายบริหาร",
-   "d": "ACM · HT · CMM · Safety Manager"
+   "d": "ACM · HT · CMM · Safety Manager",
+   "en": "Management",
+   "den": "ACM · HT · CMM · Safety Manager"
   }
  ],
  "status": {
   "ok": {
    "n": "พร้อมใช้",
-   "lv": "ok"
+   "lv": "ok",
+   "en": "Ready"
   },
   "linkwrong": {
    "n": "ลิงก์ใน LEF ผิดใบ",
-   "lv": "bad"
+   "lv": "bad",
+   "en": "LEF links to the wrong form"
   },
   "nolink": {
    "n": "LEF ยังไม่ใส่ลิงก์",
-   "lv": "warn"
+   "lv": "warn",
+   "en": "No link in LEF"
   },
   "noform": {
    "n": "ยังไม่มีฟอร์มออนไลน์",
-   "lv": "warn"
+   "lv": "warn",
+   "en": "No online form yet"
   },
   "pdfonly": {
    "n": "เป็น PDF บน Drive",
-   "lv": "warn"
+   "lv": "warn",
+   "en": "PDF on Drive"
   },
   "notinlef": {
    "n": "ยังไม่อยู่ใน LEF",
-   "lv": "warn"
+   "lv": "warn",
+   "en": "Not in LEF yet"
   },
   "shadow": {
    "n": "ใช้บน Jotform · ไม่มีในคู่มือ",
-   "lv": "bad"
+   "lv": "bad",
+   "en": "In use but not registered"
   },
   "dupsys": {
    "n": "มีสองฉบับ — ระบบภายนอกและ Jotform",
-   "lv": "bad"
+   "lv": "bad",
+   "en": "Duplicate across systems"
   }
  },
  "forms": [

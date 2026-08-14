@@ -46,6 +46,9 @@ const REG=@@REG@@, A=D0507; let FILTER='all';
 document.querySelectorAll('[data-cnt="forms"]').forEach(e=>e.textContent=REG.forms.length);
 A.reg = REG;
 A.initAuth(@@FBCFG@@, paint); paint();
+// เปลี่ยนภาษาแล้ววาดใหม่ทั้งหน้า
+A.onLang.push(() => paint());
+
 function paint(){
   const ok=A.isStaff();
   document.getElementById('body').classList.toggle('hide',!ok);
@@ -80,8 +83,8 @@ function rows(){
       <td class="c">${f.iss?A.esc(f.iss)+' / '+A.esc(f.rev):'—'}</td>
       <td class="c">${A.esc(f.eff||'—')}</td>
       <td class="c">${f.lef&&f.lef.length?A.esc(f.lef.join(' · ')):'—'}</td>
-      <td class="c">${A.esc(s.n)}${f.sysOK?' <span class="tag ok">ยืนยันแล้ว</span>':''}</td>
-      <td><span class="tag ${st.lv||''}">${A.esc(st.n||'')}</span>
+      <td class="c">${A.esc(A.n2(s))}${f.sysOK?` <span class="tag ok">${A.esc(A.t('confirmed'))}</span>`:''}</td>
+      <td><span class="tag ${st.lv||''}">${A.esc(A.n2(st)||'')}</span>
         ${f.note?`<div style="color:var(--g-400);font-size:11px;margin-top:3px">${A.esc(f.note)}</div>`:''}</td>
     </tr>`;}).join('') || '<tr><td colspan="8" style="padding:16px;color:var(--g-400)">ไม่พบรายการ</td></tr>';
 }

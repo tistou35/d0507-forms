@@ -9,7 +9,7 @@
 @@RAIL@@
   <main class="main">
     <p class="eyebrow" style="font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--sky-500)">
-      <a href="@@BASE@@all/" style="color:inherit;text-decoration:none">คลังฟอร์ม</a> ·
+      <a href="@@BASE@@all/" style="color:inherit;text-decoration:none" data-t="allForms">คลังฟอร์ม</a> ·
       <span id="chain"></span></p>
 
     <div class="fhero">
@@ -25,17 +25,17 @@
     <div id="alerts"></div>
 
     <div class="card">
-      <h3>ฟอร์มนี้ใช้เมื่อไร · ใครเกี่ยวข้อง</h3>
+      <h3 data-t="whenWho">ฟอร์มนี้ใช้เมื่อไร · ใครเกี่ยวข้อง</h3>
       <dl class="kv" id="who"></dl>
     </div>
 
     <div class="card staffonly hide">
-      <h3>สถานะเอกสารควบคุม</h3>
+      <h3 data-t="ctrlStatus">สถานะเอกสารควบคุม</h3>
       <dl class="kv" id="ctrl"></dl>
     </div>
 
     <div class="card" id="relwrap" style="display:none">
-      <h3>ฟอร์มที่เกี่ยวข้องในสายงานเดียวกัน</h3>
+      <h3 data-t="related">ฟอร์มที่เกี่ยวข้องในสายงานเดียวกัน</h3>
       <div class="forms" id="rel" style="margin-top:4px"></div>
     </div>
   </main>
@@ -53,13 +53,15 @@
 const REG = @@REG@@;
 const F   = @@FORM@@;
 const A   = D0507;
-const CHAIN_N = {preflight:'ก่อนทำการบิน',training:'บันทึกการฝึก',safety:'นิรภัย / SMS',
-  maint:'ช่างอากาศยาน',standardisation:'มาตรฐานครูการบิน',doccontrol:'ควบคุมเอกสาร',
-  admin:'ธุรการ / บุคคล',audit:'งานตรวจสอบ',ops:'ปฏิบัติการบิน'};
+const CHAIN_N = {
+  preflight:{th:'ก่อนทำการบิน',en:'Pre-flight'}, training:{th:'บันทึกการฝึก',en:'Training records'},
+  safety:{th:'นิรภัย / SMS',en:'Safety / SMS'}, maint:{th:'ช่างอากาศยาน',en:'Maintenance'},
+  standardisation:{th:'มาตรฐานครูการบิน',en:'Instructor standardisation'},
+  doccontrol:{th:'ควบคุมเอกสาร',en:'Document control'}, admin:{th:'ธุรการ / บุคคล',en:'Admin / HR'},
+  audit:{th:'งานตรวจสอบ',en:'Audit'}, ops:{th:'ปฏิบัติการบิน',en:'Flight operations'}};
 
 document.querySelectorAll('[data-cnt="forms"]').forEach(e=>e.textContent=REG.lefcount.total||'');
-document.getElementById('chain').textContent = CHAIN_N[F.chain] || '—';
-document.getElementById('th').textContent = F.th || F.t;
+document.getElementById('th').textContent = A.nm(F);
 document.getElementById('en').textContent = F.t;
 
 A.reg = REG;
@@ -70,29 +72,32 @@ A.initAuth(@@FBCFG@@, () => {
   paint();
 });
 paint();
+// เปลี่ยนภาษาแล้ววาดใหม่ทั้งหน้า
+A.onLang.push(() => paint());
 
 function paint(){
   const staff = A.isStaff();
+  document.getElementById('chain').textContent = A.L(CHAIN_N[F.chain]) || '—';
   const s = A.sysOf(REG, F);
 
   document.getElementById('meta').innerHTML = [
-    ['Doc code', F.doc || '—'],
-    ['Control code', staff ? (F.code || '—') : null],
-    ['Issue / Rev', F.iss ? F.iss + ' / ' + F.rev : '—'],
-    ['Effective', F.eff || '—'],
-    ['อยู่ในระบบ', s.n],
+    [A.t('docCode'), F.doc || '—'],
+    [A.t('ctrlCode'), staff ? (F.code || '—') : null],
+    [A.t('issueRev'), F.iss ? F.iss + ' / ' + F.rev : '—'],
+    [A.t('effective'), F.eff || '—'],
+    [A.t('inSystem'), A.n2(s)],
   ].filter(x => x[1] !== null).map(x =>
     `<div><span>${A.esc(x[0])}</span><b>${A.esc(x[1])}</b></div>`).join('');
 
   const t = A.target(REG, F);
   document.getElementById('acts').innerHTML =
     (t ? `<a class="big pri" href="${A.esc(t.url)}"${t.ext?' target="_blank" rel="noopener"':''}>${A.esc(t.label)}${t.ext?' ↗':''}</a>` :
-         `<span class="big off">ยังไม่มีฟอร์มออนไลน์</span>`) +
-    `<a class="big sec" href="@@BASE@@all/">กลับคลังฟอร์ม</a>`;
+         `<span class="big off">${A.esc(A.t('noOnline'))}</span>`) +
+    `<a class="big sec" href="@@BASE@@all/">${A.esc(A.t('backToAll'))}</a>`;
 
   const al = [];
   if (F.hasDef === false && F.sys === 'here' && !F.jot && !F.assignTo)
-    al.push(['warn','ฟอร์มนี้ยังไม่มีช่องกรอกในระบบ — รอใส่ข้อมูลตามแบบมาตรฐาน']);
+    al.push(['warn', A.t('noFields')]);
   if (staff && F.note) al.push([(REG.status[F.st]||{}).lv==='bad'?'stop':'warn', F.note]);
   document.getElementById('alerts').innerHTML = al.map(x =>
     `<div class="fk-gate ${x[0]==='stop'?'stop':'warn'}" style="margin-top:14px">
@@ -102,22 +107,22 @@ function paint(){
       <span>${A.esc(x[1])}</span></div>`).join('');
 
   const rows = [];
-  for (const r of REG.roles) if (F.r && F.r[r.k]) rows.push([r.n, F.r[r.k]]);
-  if (F.with && F.with.length) rows.push(['ทำร่วมกับ', F.with.join(' · ')]);
-  if (F.assignTo) rows.push(['ส่งถึง', F.assignTo]);
-  rows.push(['สายงาน', CHAIN_N[F.chain] || '—']);
+  for (const r of REG.roles) if (F.r && F.r[r.k]) rows.push([A.n2(r), F.r[r.k]]);
+  if (F.with && F.with.length) rows.push([A.t('withWhom'), F.with.join(' · ')]);
+  if (F.assignTo) rows.push([A.t('sendTo'), F.assignTo]);
+  rows.push([A.t('chain'), A.L(CHAIN_N[F.chain]) || '—']);
   document.getElementById('who').innerHTML = rows.map(r =>
     `<dt>${A.esc(r[0])}</dt><dd>${A.esc(r[1])}</dd>`).join('');
 
   if (staff) {
     const st = REG.status[F.st] || {};
     document.getElementById('ctrl').innerHTML = [
-      ['สถานะ', st.n || F.st],
-      ['อยู่ใน LEF', F.lef && F.lef.length ? F.lef.join(' · ') : 'ยังไม่อยู่ใน LEF'],
-      ['ไฟล์ต้นฉบับ', F.docx || '—'],
-      ['เจ้าของเอกสาร', F.own || '—'],
-      F.jotDup ? ['Jotform ฉบับซ้ำ', F.jotDup] : null,
-      F.sysOK ? ['ยืนยันระบบ', F.sysOK] : null,
+      [A.t('colStatus'), A.n2(st) || F.st],
+      [A.t('inLef'), F.lef && F.lef.length ? F.lef.join(' · ') : A.t('notInLef')],
+      [A.t('srcFile'), F.docx || '—'],
+      [A.t('docOwner'), F.own || '—'],
+      F.jotDup ? [A.t('jotDup'), F.jotDup] : null,
+      F.sysOK ? [A.t('sysOK'), F.sysOK] : null,
     ].filter(Boolean).map(r => `<dt>${A.esc(r[0])}</dt><dd>${A.esc(r[1])}</dd>`).join('');
   }
 

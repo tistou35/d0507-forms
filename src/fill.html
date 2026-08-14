@@ -28,28 +28,32 @@ const DEF=DEFS[code];
 let FK=null;
 A.reg = REG;
 A.initAuth(@@FBCFG@@, boot); boot();
+// เปลี่ยนภาษาแล้ว render ใหม่ทั้งใบ — ข้อมูลที่กรอกไว้อยู่ใน FK.data ไม่หาย
+A.onLang.push(()=>{ if(FK) FK.lang=A.lang; boot(); });
 
 function boot(){
   const head=document.getElementById('head');
-  if(!F){ head.innerHTML='<div class="warn"><b>ไม่พบฟอร์มนี้</b></div>'; return; }
+  if(!F){ head.innerHTML=`<div class="warn"><b>${A.esc(A.t('notFound'))}</b></div>`; return; }
   head.innerHTML=`<div class="fhero"><div class="band">
-      <p class="o">D-0507 Flight Training Co., Ltd.</p><h1>${A.esc(F.th||F.t)}</h1>
-      <p class="en">${A.esc(F.t)}</p></div>
+      <p class="o">D-0507 Flight Training Co., Ltd.</p><h1>${A.esc(A.nm(F))}</h1>
+      <p class="en">${A.esc(A.lang==='en'?(F.th||''):(F.t||''))}</p></div>
       <div class="grid">
-        <div><span>Doc code</span><b>${A.esc(F.doc||F.abbr)}</b></div>
-        <div><span>Issue / Rev</span><b>${F.iss?A.esc(F.iss)+' / '+A.esc(F.rev):'—'}</b></div>
-        <div><span>Effective</span><b>${A.esc(F.eff||'—')}</b></div>
+        <div><span>${A.esc(A.t('docCode'))}</span><b>${A.esc(F.doc||F.abbr)}</b></div>
+        <div><span>${A.esc(A.t('issueRev'))}</span><b>${F.iss?A.esc(F.iss)+' / '+A.esc(F.rev):'—'}</b></div>
+        <div><span>${A.esc(A.t('effective'))}</span><b>${A.esc(F.eff||'—')}</b></div>
       </div></div>`;
   if(!DEF){
     document.getElementById('form').innerHTML=`<div class="draftbar" style="margin-top:18px">
-      <b>ฟอร์มนี้ยังไม่ได้ใส่ช่องกรอก</b><br>
-      โครงระบบและตัวเรนเดอร์พร้อมแล้ว รอใส่นิยามฟอร์มที่
-      <span class="mono">formdefs/${A.esc(code)}.json</span> ตามแบบมาตรฐานใน
-      <span class="mono">formdefs/_SCHEMA.md</span> — เพิ่มไฟล์แล้ว build ก็ใช้ได้ทันที ไม่ต้องแก้โค้ด</div>
-      <div class="acts" style="margin-top:16px"><a class="big sec" href="${A.formUrl(F)}">← กลับหน้าฟอร์ม</a></div>`;
+      <b>${A.esc(A.t('noDefTitle'))}</b><br>
+      ${A.esc(A.t('noDefBody'))}
+      <span class="mono">formdefs/${A.esc(code)}.json</span> ${A.esc(A.t('noDefBody2'))}
+      <span class="mono">formdefs/_SCHEMA.md</span> ${A.esc(A.t('noDefBody3'))}</div>
+      <div class="acts" style="margin-top:16px"><a class="big sec" href="${A.formUrl(F)}">← ${A.esc(A.t('backToForm'))}</a></div>`;
     return;
   }
-  FK=new FormKit(DEF,{party:partyOf(),onChange:()=>renderFoot()});
+  // เก็บคำตอบเดิมไว้เมื่อ boot ซ้ำ (เช่นตอนสลับภาษา หรือ auth เปลี่ยนสถานะ)
+  const keep = FK ? FK.data : {};
+  FK=new FormKit(DEF,{party:partyOf(),lang:A.lang,data:keep,onChange:()=>renderFoot()});
   FK.render(document.getElementById('form'));
   renderFoot();
 }
@@ -65,11 +69,11 @@ function renderFoot(){
   if(!FK) return;
   const miss=FK.validate(), stop=FK.blocked();
   document.getElementById('foot').innerHTML=`
-    ${miss.length?`<div class="warn" style="margin-bottom:14px">ยังกรอกไม่ครบ:
+    ${miss.length?`<div class="warn" style="margin-bottom:14px">${A.esc(A.t('incomplete'))}:
       ${A.esc(miss.map(m=>m.label).join(' · '))}</div>`:''}
     <div class="acts"><button class="big ${miss.length||stop?'off':'pri'}"
-      ${miss.length||stop?'disabled':''} id="send">ส่งฟอร์ม</button>
-      <a class="big sec" href="${A.formUrl(F)}">ยกเลิก</a></div>`;
+      ${miss.length||stop?'disabled':''} id="send">${A.esc(A.t('send'))}</button>
+      <a class="big sec" href="${A.formUrl(F)}">${A.esc(A.t('cancel'))}</a></div>`;
 }
 </script>
 </body></html>

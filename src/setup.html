@@ -148,7 +148,7 @@ async function boot(){
     (mine && mine.recv || ['FI']).forEach(r => RECV.add(r));
   } catch(e){ RECV.add('FI'); }
 
-  chips(document.getElementById('roles'), ROLE_KEYS, ROLES, k => A.ROLE_N[k] || k);
+  chips(document.getElementById('roles'), ROLE_KEYS, ROLES, k => A.L(A.ROLE_N[k]) || k);
   chips(document.getElementById('recv'), RECV_KEYS, RECV, k => k);
   check(); dir();
 }
@@ -167,7 +167,7 @@ async function check(){
         const v = d.data();
         if (v.forms) txt = v.forms.length + ' ฟอร์ม';
         if (v.list)  txt = v.list.length + ' คน';
-        if (v.roles) txt = (v.roles || []).map(r => A.ROLE_N[r] || r).join(' · ');
+        if (v.roles) txt = (v.roles || []).map(r => A.L(A.ROLE_N[r]) || r).join(' · ');
       }
     } catch(e){ st = 'red'; txt = e.code === 'permission-denied' ? 'ไม่มีสิทธิ์อ่าน' : e.code; }
     rows.push(`<div class="stat ${st}"><div class="top"><span><span class="ti">${A.esc(label)}</span>

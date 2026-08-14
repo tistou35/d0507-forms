@@ -29,6 +29,9 @@ const REG=@@REG@@, A=D0507;
 document.querySelectorAll('[data-cnt="forms"]').forEach(e=>e.textContent=REG.forms.length);
 A.reg = REG;
 A.initAuth(@@FBCFG@@, load);
+// เปลี่ยนภาษาแล้ววาดใหม่ทั้งหน้า
+A.onLang.push(() => load());
+
 function load(){
   const out=document.getElementById('out');
   if(!A.isStaff()){

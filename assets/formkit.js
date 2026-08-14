@@ -10,7 +10,40 @@
 
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g,
     c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const L = (o, lang) => (o && (o[lang || 'th'] || o.th || o.en)) || '';
+
+  /* รับได้ทั้ง {th,en} และสตริงเปล่า ๆ · ขาดคำแปลก็ยังได้ข้อความ ไม่ใช่ช่องว่าง */
+  const L = (o, lang) => typeof o === 'string' ? o
+    : (o && (o[lang || 'th'] || o.th || o.en)) || '';
+
+  /* ข้อความของตัวเรนเดอร์เอง — ที่ไม่ได้มาจากนิยามฟอร์ม */
+  const UI = {
+    yes:        { th: 'ใช่', en: 'Yes' },
+    readonly:   { th: 'อ่านอย่างเดียว', en: 'read only' },
+    blind:      { th: 'ส่วนนี้ถูกซ่อนไว้จนกว่าคุณจะส่งส่วนของตัวเอง — ตามข้อกำหนดที่ให้แต่ละฝ่ายประเมินอย่างอิสระ',
+                  en: 'Hidden until you submit your own part — each party assesses independently.' },
+    tableTodo:  { th: 'ตารางแถวซ้ำ — จะเปิดใช้เมื่อใส่ข้อมูลฟอร์มที่ต้องใช้ (ALR รายวัน · MRF timesheet)',
+                  en: 'Repeating table — enabled when a form that needs it is defined (daily ALR · MRF timesheet).' },
+    clearSign:  { th: 'ล้างลายเซ็น', en: 'Clear signature' },
+    route:      { th: 'ลำดับอนุมัติ', en: 'Approval route' },
+    step:       { th: 'ขั้นที่', en: 'Step' },
+    mustSign:   { th: 'ต้องลงนาม', en: 'Signature required' },
+    noSign:     { th: 'ไม่ต้องลงนาม', en: 'No signature' },
+    within:     { th: 'ภายใน', en: 'within' },
+    days:       { th: 'วัน', en: 'days' },
+    riskTotal:  { th: 'คะแนนความเสี่ยงรวม', en: 'Total risk score' },
+    scoreTotal: { th: 'คะแนนรวม', en: 'Total score' },
+    scoreAuto:  { th: 'คำนวณอัตโนมัติจากคำตอบ', en: 'Calculated automatically from your answers' },
+    answered:   { th: 'ตอบแล้ว', en: 'Answered' },
+    sections:   { th: 'ส่วนของฟอร์ม', en: 'Form sections' },
+    stMiss:     { th: n => 'ยังไม่ครบ ' + n + ' ช่อง', en: n => n + ' field' + (n > 1 ? 's' : '') + ' still empty' },
+    stScore:    { th: n => 'ได้ ' + n + ' คะแนน', en: n => n + ' risk point' + (n > 1 ? 's' : '') },
+    stDone:     { th: 'ตอบครบแล้ว', en: 'Complete' },
+    stIdle:     { th: 'ยังไม่ได้กรอก', en: 'Not started' },
+  };
+  const T = (k, lang, arg) => {
+    const v = L(UI[k], lang);
+    return typeof v === 'function' ? v(arg) : v;
+  };
 
   /* ── ตัวประเมินเงื่อนไข ──────────────────────────────────
      รองรับเท่าที่สเปกต้องใช้: เปรียบเทียบ ค่าคงที่ && || และ
@@ -68,7 +101,8 @@
   function FormKit(def, opts) {
     opts = opts || {};
     this.def = def;
-    this.lang = opts.lang || 'th';
+    // ไม่ได้ส่งมาก็ตามภาษาที่ผู้ใช้เลือกไว้ทั้งเว็บ
+    this.lang = opts.lang || (global.D0507 && global.D0507.lang) || 'th';
     this.data = opts.data || {};
     this.party = opts.party || null;          // party ที่ผู้ใช้ปัจจุบันกรอกได้
     this.readonly = !!opts.readonly;
@@ -233,7 +267,7 @@
 
       case 'check':
         body = `<div class="fk-opts"><button type="button" class="fk-opt" data-toggle="${esc(f.k)}"
-          aria-pressed="${!!v}"${dis}>${esc(L(f.on, this.lang) || 'ใช่')}</button></div>`;
+          aria-pressed="${!!v}"${dis}>${esc(L(f.on, this.lang) || T('yes', this.lang))}</button></div>`;
         break;
 
       case 'scale':
@@ -265,12 +299,11 @@
 
       case 'sign':
         body = `<div class="fk-signwrap"><canvas class="fk-sign" data-sign="${esc(f.k)}"></canvas>
-          ${ro ? '' : '<button type="button" class="fb sm" data-clearsign>ล้างลายเซ็น</button>'}</div>`;
+          ${ro ? '' : `<button type="button" class="fb sm" data-clearsign>${esc(T('clearSign', this.lang))}</button>`}</div>`;
         break;
 
       case 'table':
-        body = `<div class="fk-static">ตารางแถวซ้ำ — จะเปิดใช้เมื่อใส่ข้อมูลฟอร์มที่ต้องใช้
-          (ALR รายวัน · MRF timesheet)</div>`;
+        body = `<div class="fk-static">${esc(T('tableTodo', this.lang))}</div>`;
         break;
 
       default: {
@@ -300,12 +333,11 @@
     const hidden = s.blind && !mine;
     return `<section class="fk-sec">
       <header><h3>${esc(L(s.title, this.lang))}</h3>
-        <span class="party${mine ? '' : ' locked'}">${esc(pn ? pn.n : s.party || '')}${mine ? '' : ' · อ่านอย่างเดียว'}</span>
+        <span class="party${mine ? '' : ' locked'}">${esc(pn ? L(pn.n, this.lang) : s.party || '')}${mine ? '' : ' · ' + esc(T('readonly', this.lang))}</span>
       </header>
       ${s.desc ? `<p class="desc">${esc(L(s.desc, this.lang))}</p>` : ''}
       ${hidden
-        ? `<p class="fk-static">ส่วนนี้ถูกซ่อนไว้จนกว่าคุณจะส่งส่วนของตัวเอง —
-           ตามข้อกำหนดที่ให้แต่ละฝ่ายประเมินอย่างอิสระ</p>`
+        ? `<p class="fk-static">${esc(T('blind', this.lang))}</p>`
         : (s.fields || []).filter(f => evalCond(f.showIf, ctx))
             .map(f => this.row(f) || this.field(f)).join('')}
     </section>`;
@@ -313,12 +345,13 @@
 
   FormKit.prototype.routeHtml = function (ctx) {
     if (!(this.def.route || []).length) return '';
-    return `<h3 style="font-family:var(--font-display);font-size:17px;margin:22px 0 10px">ลำดับอนุมัติ</h3>
+    return `<h3 style="font-family:var(--font-display);font-size:17px;margin:22px 0 10px">${esc(T('route', this.lang))}</h3>
       <div class="fk-route">` + this.def.route.filter(r => evalCond(r.onlyIf, ctx)).map(r => {
         const p = (this.def.parties || []).find(x => x.k === r.party);
-        return `<div class="fk-step"><span class="k">ขั้นที่ ${r.step}</span>
-          <span class="v">${esc(p ? p.n : r.party)}</span>
-          <span class="m">${r.sign ? 'ต้องลงนาม' : 'ไม่ต้องลงนาม'}${r.slaDays ? ' · ภายใน ' + r.slaDays + ' วัน' : ''}</span></div>`;
+        return `<div class="fk-step"><span class="k">${esc(T('step', this.lang))} ${r.step}</span>
+          <span class="v">${esc(p ? L(p.n, this.lang) : r.party)}</span>
+          <span class="m">${esc(T(r.sign ? 'mustSign' : 'noSign', this.lang))}${r.slaDays
+            ? ' · ' + esc(T('within', this.lang)) + ' ' + r.slaDays + ' ' + esc(T('days', this.lang)) : ''}</span></div>`;
       }).join('') + `</div>`;
   };
 
@@ -326,6 +359,7 @@
     const ctx = this.ctx(), c = this.computed();
     const scored = (this.def.compute || []).some(x => x.k === 'score' || x.op === 'sumScore');
     const tabs = this.tabs(ctx);
+    const other = this.lang === 'th' ? 'en' : 'th';
     let html = '';
 
     if (tabs) {
@@ -341,19 +375,19 @@
       html += `<div class="fk-tabwrap">
         ${scored ? `<div class="fk-bar ${b.lv}">
           <span class="n">${c.score}</span>
-          <span class="lbl"><b>คะแนนความเสี่ยงรวม</b><br>Total risk score</span>
+          <span class="lbl"><b>${esc(T('riskTotal', this.lang))}</b><br>${esc(T('riskTotal', other))}</span>
           ${b.n ? `<span class="band">${esc(b.n)}</span>` : ''}
-          <span class="prog"><span class="pct">ตอบแล้ว ${ans}/${tot}</span>
+          <span class="prog"><span class="pct">${esc(T('answered', this.lang))} ${ans}/${tot}</span>
             <span class="tr"><i style="width:${pct}%"></i></span></span>
         </div>` : ''}
-        <nav class="fk-tabbar" role="tablist" aria-label="ส่วนของฟอร์ม">` + tabs.map((t, n) => {
+        <nav class="fk-tabbar" role="tablist" aria-label="${esc(T('sections', this.lang))}">` + tabs.map((t, n) => {
           const on = t.k === this.tab;
           const tag = t.miss ? `<span class="b">${t.miss}</span>`
                     : t.score ? `<span class="b">+${t.score}</span>`
                     : t.st === 'done' ? `<span class="b tick" aria-hidden="true">✓</span>` : '';
-          const say = t.miss ? `ยังไม่ครบ ${t.miss} ช่อง`
-                    : t.score ? `ได้ ${t.score} คะแนน`
-                    : t.st === 'done' ? 'ตอบครบแล้ว' : 'ยังไม่ได้กรอก';
+          const say = t.miss ? T('stMiss', this.lang, t.miss)
+                    : t.score ? T('stScore', this.lang, t.score)
+                    : T(t.st === 'done' ? 'stDone' : 'stIdle', this.lang);
           return `<button type="button" role="tab" class="fk-tab ${t.st}" data-tab="${esc(t.k)}"
              aria-selected="${on}" tabindex="${on ? 0 : -1}"
              aria-label="${n + 1}. ${esc(t.n)} — ${say}">
@@ -378,8 +412,8 @@
       if (scored) {
         const b = this.band();
         html += `<div class="fk-score ${b.lv}"><span class="n">${c.score}</span>
-          <span><b style="font-size:14.5px">คะแนนรวม</b><br>
-          <span style="font-size:12.5px;color:var(--g-500)">คำนวณอัตโนมัติจากคำตอบ</span></span></div>`;
+          <span><b style="font-size:14.5px">${esc(T('scoreTotal', this.lang))}</b><br>
+          <span style="font-size:12.5px;color:var(--g-500)">${esc(T('scoreAuto', this.lang))}</span></span></div>`;
       }
       html += (this.def.sections || []).filter(s => evalCond(s.showIf, ctx))
         .map(s => this.sectionHtml(s, ctx)).join('');

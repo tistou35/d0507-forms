@@ -9,15 +9,15 @@
 @@RAIL@@
   <main class="main">
     <div class="greet">
-      <div><p class="eyebrow">คลังฟอร์ม · ALL FORMS</p>
-        <h1 id="hd">ฟอร์มทั้งหมด</h1>
-        <p class="sub">รายการเดียว กรองได้ตามกลุ่มผู้ใช้ ระบบที่ฟอร์มอยู่ และสถานะเอกสาร</p></div>
+      <div><p class="eyebrow"><span data-t="allForms">คลังฟอร์ม</span> · <span data-t2="allForms">ALL FORMS</span></p>
+        <h1 id="hd">—</h1>
+        <p class="sub" data-t="allSub">รายการเดียว กรองได้ตามกลุ่มผู้ใช้ ระบบที่ฟอร์มอยู่ และสถานะเอกสาร</p></div>
     </div>
 
     <section>
       <div class="filters">
-        <input id="q" type="search" placeholder="ค้นหา — ชื่อฟอร์ม รหัสเอกสาร หรือสิ่งที่อยากทำ">
-        <button class="fb" id="view" data-v="card">มุมมอง: การ์ด</button>
+        <input id="q" type="search">
+        <button class="fb" id="view" data-v="card">—</button>
       </div>
       <div class="filters" id="fgroup"></div>
       <div class="filters" id="fsys"></div>
@@ -43,6 +43,9 @@ let GROUP='all', SYS='all', ST='all', VIEW='card';
 document.querySelectorAll('[data-cnt="forms"]').forEach(e=>e.textContent=REG.forms.length);
 A.reg = REG;
 A.initAuth(@@FBCFG@@, () => { chips(); paint(); });
+// เปลี่ยนภาษาแล้ววาดใหม่ทั้งหน้า
+A.onLang.push(() => { chips(); paint(); });
+
 chips(); paint();
 
 function pill(id, items, cur, set){
@@ -55,12 +58,12 @@ function pill(id, items, cur, set){
   }));
 }
 function chips(){
-  pill('fgroup', [{v:'all',n:'ทุกกลุ่ม'}].concat(REG.roles.map(r=>({v:r.k,n:r.n}))), GROUP, v=>GROUP=v);
-  pill('fsys', [{v:'all',n:'ทุกระบบ'}].concat(Object.keys(REG.systems).map(k=>({v:k,n:REG.systems[k].n}))), SYS, v=>SYS=v);
+  pill('fgroup', [{v:'all',n:A.t('allGroups')}].concat(REG.roles.map(r=>({v:r.k,n:A.n2(r)}))), GROUP, v=>GROUP=v);
+  pill('fsys', [{v:'all',n:A.t('allSystems')}].concat(Object.keys(REG.systems).map(k=>({v:k,n:A.n2(REG.systems[k])}))), SYS, v=>SYS=v);
   if (A.isStaff()) {
     document.getElementById('fst').classList.remove('hide');
-    pill('fst', [{v:'all',n:'ทุกสถานะ'},{v:'issue',n:'เฉพาะที่มีปัญหา'},
-                 {v:'inlef',n:'อยู่ใน LEF'},{v:'notlef',n:'ยังไม่อยู่ใน LEF'}], ST, v=>ST=v);
+    pill('fst', [{v:'all',n:A.t('allStatus')},{v:'issue',n:A.t('stIssue')},
+                 {v:'inlef',n:A.t('stInLef')},{v:'notlef',n:A.t('stNotLef')}], ST, v=>ST=v);
   }
 }
 function list(){
@@ -78,33 +81,36 @@ function list(){
 }
 function paint(){
   const L = list();
-  document.getElementById('hd').textContent = 'ฟอร์มทั้งหมด ' + L.length + ' ฟอร์ม';
+  document.getElementById('hd').textContent = A.L(A.T.allFormsN)(L.length);
+  document.getElementById('q').placeholder = A.t('searchAll');
+  document.getElementById('view').textContent =
+    A.t('viewAs') + ': ' + A.t(VIEW==='card'?'viewCard':'viewTable');
   document.getElementById('cnt').textContent =
-    (A.isStaff()?'มุมมองเจ้าหน้าที่ — เห็นทั้งทะเบียน':'มุมมองสาธารณะ — เฉพาะฟอร์มของนักเรียน');
+    A.t(A.isStaff()?'viewStaff':'viewPublic');
   const role = GROUP!=='all' ? GROUP : (A.roles[0] || 'stu');
   document.getElementById('out').innerHTML = !L.length
-    ? '<p class="note">ไม่พบฟอร์มที่ตรงเงื่อนไข</p>'
+    ? `<p class="note">${A.esc(A.t('noMatch'))}</p>`
     : VIEW==='card'
       ? '<div class="forms">' + L.map(f=>A.card(REG,f,f.r&&f.r[role])).join('') + '</div>'
       : table(L);
 }
 function table(L){
   return `<div class="twrap"><table class="reg"><thead><tr>
-    <th>Doc code</th><th>ชื่อฟอร์ม</th><th>กลุ่มผู้ใช้</th><th>ระบบ</th>${A.isStaff()?'<th>สถานะ</th>':''}
+    <th>${A.esc(A.t('docCode'))}</th><th>${A.esc(A.t('colName'))}</th><th>${A.esc(A.t('colGroup'))}</th><th>${A.esc(A.t('colSystem'))}</th>${A.isStaff()?`<th>${A.esc(A.t('colStatus'))}</th>`:''}
     </tr></thead><tbody>` + L.map(f=>{
       const s=A.sysOf(REG,f), st=REG.status[f.st];
       return `<tr onclick="location.href='${A.formUrl(f)}'" style="cursor:pointer">
         <td class="c">${A.esc(f.doc||f.abbr)}</td>
-        <td class="nm">${A.esc(f.th||f.t)}<span class="th">${A.esc(f.t)}</span></td>
-        <td class="c">${Object.keys(f.r||{}).map(k=>A.ROLE_N[k]||k).join(' · ')||'—'}</td>
-        <td class="c">${A.esc(s.n)}</td>
-        ${A.isStaff()?`<td><span class="tag ${st?st.lv:''}">${A.esc(st?st.n:'')}</span></td>`:''}
+        <td class="nm">${A.esc(A.nm(f))}<span class="th">${A.esc(A.lang==='en'?(f.th||''):(f.t||''))}</span></td>
+        <td class="c">${A.esc(Object.keys(f.r||{}).map(k=>A.L(A.ROLE_N[k])||k).join(' · ')||'—')}</td>
+        <td class="c">${A.esc(A.n2(s))}</td>
+        ${A.isStaff()?`<td><span class="tag ${st?st.lv:''}">${A.esc(st?A.n2(st):'')}</span></td>`:''}
       </tr>`;}).join('') + `</tbody></table></div>`;
 }
 document.getElementById('q').addEventListener('input', paint);
 document.getElementById('view').addEventListener('click', e=>{
   VIEW = VIEW==='card' ? 'table' : 'card';
-  e.target.textContent = 'มุมมอง: ' + (VIEW==='card'?'การ์ด':'ตาราง');
+  e.target.textContent = A.t('viewAs') + ': ' + A.t(VIEW==='card'?'viewCard':'viewTable');
   paint();
 });
 </script>

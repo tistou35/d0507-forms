@@ -2,7 +2,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>เข้าสู่ระบบเจ้าหน้าที่ — D-0507</title>
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="../assets/app.css?v=d95552e5">
+<link rel="stylesheet" href="../assets/app.css?v=1a101b07">
 </head><body>
 <div class="topbar">
   <a class="brand" href="../" style="text-decoration:none">
@@ -13,13 +13,19 @@
       <text x="71" y="54" font-family="'Arial Narrow',Arial,sans-serif" font-size="14" font-weight="600" letter-spacing="4" fill="#4A90D9">FLIGHT TRAINING</text>
     </svg>
     <span class="div"></span>
-    <span><span class="nm">ระบบฟอร์มออนไลน์</span><span class="en">Forms &amp; Approvals</span></span>
+    <span><span class="nm" data-t="brand">ระบบฟอร์มออนไลน์</span><span class="en" data-t2="brand">Forms &amp; Approvals</span></span>
   </a>
   <div class="tsearch" onclick="location.href='../all/'">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
-    <span>ค้นหาฟอร์ม · Search forms</span><span class="k">⌘K</span>
+    <span><span data-t="searchPh">ค้นหาฟอร์ม</span> · <span data-t2="searchPh">Search forms</span></span><span class="k">⌘K</span>
   </div>
-  <div class="tright" id="authbox"></div>
+  <div class="tright">
+    <div class="langsw" role="group" aria-label="ภาษา · Language">
+      <button type="button" data-lang="th" aria-pressed="true">ไทย</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+    <div id="authbox" style="display:flex;align-items:center;gap:14px"></div>
+  </div>
 </div>
 <main class="main" style="max-width:640px;margin:0 auto">
   <div id="loginui">
@@ -39,7 +45,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="../assets/app.js?v=12690cad"></script>
+<script src="../assets/app.js?v=fd4626d2"></script>
 <script>D0507.GAS_URL='';</script>
 <script>
 D0507.initAuth({
