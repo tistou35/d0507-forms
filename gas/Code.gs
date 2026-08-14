@@ -161,6 +161,16 @@ function exportSubmission_(s, who) {
            verifiedUid: who.uid, verifiedEmail: who.email };
 }
 
+/**
+ * YYYY-MM-DD -> DD MMM YYYY ตามรูปแบบวันที่ของเอกสารควบคุม (OMA style guide)
+ * ค่าที่เว็บเก็บเป็น ISO เพราะ <input type="date"> ให้มาแบบนั้น
+ */
+var MON_ = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+function docDate_(v) {
+  var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(v || ''));
+  return m ? m[3] + ' ' + MON_[Number(m[2]) - 1] + ' ' + m[1] : v;
+}
+
 /** แผ่คำตอบให้เป็นคอลัมน์เดียว — checklist และ array กลายเป็นข้อความอ่านได้ */
 function flatten_(data) {
   var out = {};
@@ -173,7 +183,7 @@ function flatten_(data) {
       return;
     }
     if (typeof v === 'string' && v.indexOf('data:image') === 0) { out[k] = '(ลายเซ็น)'; return; }
-    out[k] = v;
+    out[k] = typeof v === 'string' ? docDate_(v) : v;
   });
   return out;
 }
@@ -309,6 +319,7 @@ function sampleFrae_() {
     computed: { score: 7 },
     data: {
       picFirst: 'ทดสอบ', picLast: 'ระบบ', evalDate: '2026-08-14',
+      flightNo: 'AS-202608-4',
       aircraftReg: 'HS-VVD', flightType: 'VFR',
       s1AfterMx: true,                       // 1
       s1Icing: 'none', s1PrevFlight: '3rd',  // 0 + 2

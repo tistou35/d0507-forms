@@ -145,11 +145,12 @@ function head_(b) {
 function info_(b) {
   var t = b.appendTable([
     ['PIC / STUDENT NAME', '{{picFirst}} {{picLast}}', 'DATE', '{{evalDate}}'],
-    ['AIRCRAFT REG.', '{{aircraftReg}}', 'TYPE OF FLIGHT', '{{flightType}}'],
-    ['ASSESSED BY', '{{k_role_PIC}} PIC    {{k_role_Student}} STUDENT', 'RECORD NO.', '{{tracking}}'],
+    ['AIRCRAFT REG.', '{{aircraftReg}}', 'FLIGHT NO.', '{{flightNo}}'],
+    ['TYPE OF FLIGHT', '{{flightType}}', 'RECORD NO.', '{{tracking}}'],
+    ['ASSESSED BY', '{{k_role_PIC}} PIC    {{k_role_Student}} STUDENT', '', ''],
   ]);
   styleTable_(t);
-  for (var r = 0; r < 3; r++) {
+  for (var r = 0; r < 4; r++) {
     label_(t.getCell(r, 0)); label_(t.getCell(r, 2));
     value_(t.getCell(r, 1)); value_(t.getCell(r, 3));
   }

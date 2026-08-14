@@ -127,7 +127,26 @@
           "label": {
             "th": "วันที่ประเมิน",
             "en": "Date (evaluation risk)"
+          },
+          "prefill": "today",
+          "hint": {
+            "th": "ตั้งเป็นวันนี้ให้แล้ว แก้ได้ · บรรทัดใต้ช่องคือวันที่แบบ DD/MM/YYYY",
+            "en": "Prefilled with today — editable. The line below shows it as DD/MM/YYYY."
           }
+        },
+        {
+          "k": "flightNo",
+          "type": "text",
+          "label": {
+            "th": "เลขที่เที่ยวบิน",
+            "en": "Flight No."
+          },
+          "hint": {
+            "th": "ไม่บังคับ — รูปแบบ ตัวอักษร-ปีเดือน-ลำดับ",
+            "en": "Optional — format letters-YYYYMM-sequence"
+          },
+          "ph": "AS-{YYYYMM}-4",
+          "pattern": "[A-Za-z]{2,4}-\\d{6}-\\d{1,3}"
         },
         {
           "k": "aircraftReg",

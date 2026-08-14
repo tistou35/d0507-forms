@@ -39,6 +39,7 @@
     stScore:    { th: n => 'ได้ ' + n + ' คะแนน', en: n => n + ' risk point' + (n > 1 ? 's' : '') },
     stDone:     { th: 'ตอบครบแล้ว', en: 'Complete' },
     stIdle:     { th: 'ยังไม่ได้กรอก', en: 'Not started' },
+    badFormat:  { th: 'รูปแบบไม่ตรงตัวอย่าง', en: 'Format does not match the example' },
   };
   const T = (k, lang, arg) => {
     const v = L(UI[k], lang);
@@ -109,6 +110,39 @@
     this.onChange = opts.onChange || function () {};
     this.fields = {};
     (def.sections || []).forEach(s => (s.fields || []).forEach(f => { this.fields[f.k] = f; f.__sec = s; }));
+
+    // ค่าตั้งต้น — ใส่ตอนสร้าง ไม่ใช่ตอนเรนเดอร์
+    // จะได้นับเป็น "ตอบแล้ว" และติดไปกับใบที่ส่งออกแม้ผู้กรอกไม่ได้แตะช่องนั้น
+    Object.keys(this.fields).forEach(k => {
+      if (this.data[k] !== undefined) return;
+      const f = this.fields[k];
+      if (f.prefill === 'today') this.data[k] = todayISO();
+      else if (f.prefill === 'now') this.data[k] = clockHM();
+      else if (f.def !== undefined) this.data[k] = f.def;
+    });
+  }
+
+  /* วันที่ของเครื่องผู้ใช้ ไม่ใช่ UTC — toISOString() จะเพี้ยนไปหนึ่งวัน
+     ที่ไทย (UTC+7) ทุกครั้งที่กรอกก่อนเจ็ดโมงเช้า */
+  const p2 = n => String(n).padStart(2, '0');
+  function todayISO(d) {
+    d = d || new Date();
+    return d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate());
+  }
+  function clockHM(d) {
+    d = d || new Date();
+    return p2(d.getHours()) + ':' + p2(d.getMinutes());
+  }
+  /* ISO -> DD/MM/YYYY · ช่อง <input type="date"> แสดงตาม locale ของเบราว์เซอร์
+     ซึ่งบังคับไม่ได้ จึงต้องมีบรรทัดกำกับว่าวันที่ที่เลือกคือวันไหนกันแน่ */
+  function dmy(iso) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(iso || ''));
+    return m ? m[3] + '/' + m[2] + '/' + m[1] : '';
+  }
+  /* {YYYYMM} ในตัวอย่างที่แสดงในช่อง — ให้เป็นเดือนปัจจุบันเสมอ ไม่ค้างเป็นเดือนเก่า */
+  function ph(s) {
+    const d = new Date();
+    return String(s || '').replace(/\{YYYYMM\}/g, d.getFullYear() + p2(d.getMonth() + 1));
   }
 
   FormKit.prototype.ctx = function () {
@@ -309,7 +343,11 @@
       default: {
         const t = ['number', 'date', 'time', 'email', 'tel'].includes(f.type) ? f.type : 'text';
         const rng = (f.min !== undefined ? ` min="${f.min}"` : '') + (f.max !== undefined ? ` max="${f.max}"` : '');
-        body = `<input id="${id}" type="${t}" data-k="${esc(f.k)}" value="${esc(v == null ? '' : v)}"${rng}${dis}>`;
+        const hint = f.ph ? ` placeholder="${esc(ph(f.ph))}"` : '';
+        body = `<input id="${id}" type="${t}" data-k="${esc(f.k)}" value="${esc(v == null ? '' : v)}"${rng}${hint}${dis}>`;
+        if (f.type === 'date' && v) body += `<p class="fk-dmy">${esc(dmy(v))}</p>`;
+        if (f.pattern && v && !new RegExp('^(?:' + f.pattern + ')$').test(v))
+          body += `<p class="fk-soft">${esc(T('badFormat', this.lang))}${f.ph ? ' — ' + esc(ph(f.ph)) : ''}</p>`;
       }
     }
 
