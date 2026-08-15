@@ -139,7 +139,7 @@ def build(abbr, verbose=False):
     avail = {}
     for c in short: avail[c] = avail.get(c, 0) + 1
 
-    by_label, by_line, boxes, unmatched, approval = [], [], [], [], []
+    by_label, by_line, boxes, unmatched, approval, tables = [], [], [], [], [], []
     used_lines = set()
 
     def take(c):
@@ -180,15 +180,16 @@ def build(abbr, verbose=False):
                                                         (o.get('n') or {}).get('en') or o['v'])})
             continue
 
-        # แถวซ้ำ — token ต่อช่อง ต่อแถว ตามที่ flatten_ แตกไว้ฝั่ง Apps Script
+        # แถวซ้ำ — ส่งโครงตารางไปให้ฝั่ง Apps Script หาตารางที่หัวคอลัมน์ตรงกัน
+        # แล้ววาง token ลงทีละช่อง ดีกว่าโยนเข้ารายการวางมือ 32 บรรทัด
         if f.get('type') == 'table':
-            for r in range(1, (f.get('rows') or 1) + 1):
-                for c in f.get('cols') or []:
-                    unmatched.append({
-                        'tok': '{{%s_%d_%s}}' % (f['k'], r, c['k']),
-                        'label': '%s แถว %d · %s' % ((f.get('label') or {}).get('en') or f['k'],
-                                                     r, (c.get('label') or {}).get('en') or c['k']),
-                        'labelTh': '', 'sign': False})
+            tables.append({
+                'k': f['k'],
+                'rows': f.get('rows') or 1,
+                'label': (f.get('label') or {}).get('en') or f['k'],
+                'cols': [{'k': c['k'],
+                          'head': (c.get('label') or {}).get('en') or c['k']}
+                         for c in f.get('cols') or []]})
             continue
 
         lab_en, lab_th = (f.get('label') or {}).get('en'), (f.get('label') or {}).get('th')
@@ -254,6 +255,7 @@ def build(abbr, verbose=False):
         'byLabel': by_label,
         'byLine': by_line,
         'boxes': boxes,
+        'tables': tables,
         'boxesInDocx': n_box_docx,
         'approval': approval,
         'manual': unmatched,
@@ -278,8 +280,8 @@ def main():
         warn = ''
         if len(m['boxes']) != m['boxesInDocx']:
             warn = '  ⚠️ ช่องติ๊กในนิยามฟอร์ม %d ≠ ☐ ในเอกสาร %d' % (len(m['boxes']), m['boxesInDocx'])
-        report.append('%-6s วางอัตโนมัติ %2d (เซลล์ %d · เส้นประ %d) · ต่อท้ายส่วนอนุมัติ %d · วางมือ %d · ช่องติ๊ก %d%s'
-                      % (a, auto, len(m['byLabel']), len(m['byLine']),
+        report.append('%-6s วางอัตโนมัติ %2d (เซลล์ %d · เส้นประ %d) · ตาราง %d · ต่อท้ายส่วนอนุมัติ %d · วางมือ %d · ช่องติ๊ก %d%s'
+                      % (a, auto, len(m['byLabel']), len(m['byLine']), len(m['tables']),
                          len(m['approval']), len(note), len(m['boxes']), warn))
         if note:
             report.append('       ต้องวางมือ: ' + ', '.join(x['label'] for x in note[:6])

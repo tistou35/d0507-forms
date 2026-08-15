@@ -212,6 +212,14 @@ function headBox(c,next){
 function shown(v,f){
   if(v===undefined||v===null||v==='') return '—';
   if(typeof v==='boolean') return v?'✓':'—';
+  // ตารางแถวซ้ำ — แถวว่างไม่ต้องแสดง คนตรวจทานจะได้เห็นเฉพาะที่กรอกจริง
+  if(Array.isArray(v)&&v.length&&typeof v[0]==='object'){
+    const cols=(f&&f.cols)||[];
+    const rows=v.filter(r=>r&&Object.keys(r).some(k=>String(r[k]||'').trim()!==''));
+    if(!rows.length) return '—';
+    return rows.map((r,i)=>(i+1)+'. '+cols.map(c=>r[c.k]).filter(x=>String(x||'').trim()!=='')
+      .join(' · ')).join('\n');
+  }
   if(Array.isArray(v)) return v.join(' · ');
   if(typeof v==='string'&&v.indexOf('data:image')===0) return '✓ '+A.t('signed');
   if(f&&f.opt){ const o=f.opt.find(x=>String(x.v)===String(v)); if(o) return LL(o.n)||o.v; }

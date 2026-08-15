@@ -108,6 +108,7 @@ var TOKEN_MAP = {
         "label": "Appeal dismissed"
       }
     ],
+    "tables": [],
     "boxesInDocx": 8,
     "approval": [
       {
@@ -246,6 +247,7 @@ var TOKEN_MAP = {
         "label": "Night navigation"
       }
     ],
+    "tables": [],
     "boxesInDocx": 16,
     "approval": [],
     "manual": [
@@ -419,6 +421,7 @@ var TOKEN_MAP = {
         "label": "Other"
       }
     ],
+    "tables": [],
     "boxesInDocx": 15,
     "approval": [
       {
@@ -511,6 +514,31 @@ var TOKEN_MAP = {
         "label": "Digital"
       }
     ],
+    "tables": [
+      {
+        "k": "docs",
+        "rows": 8,
+        "label": "Document list",
+        "cols": [
+          {
+            "k": "title",
+            "head": "Document title"
+          },
+          {
+            "k": "code",
+            "head": "Document code"
+          },
+          {
+            "k": "rev",
+            "head": "Issue / Rev."
+          },
+          {
+            "k": "eff",
+            "head": "Eff. date"
+          }
+        ]
+      }
+    ],
     "boxesInDocx": 2,
     "approval": [
       {
@@ -520,200 +548,7 @@ var TOKEN_MAP = {
         "sign": true
       }
     ],
-    "manual": [
-      {
-        "tok": "{{docs_1_title}}",
-        "label": "Document list แถว 1 · Document title",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_1_code}}",
-        "label": "Document list แถว 1 · Document code",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_1_rev}}",
-        "label": "Document list แถว 1 · Issue / Rev.",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_1_eff}}",
-        "label": "Document list แถว 1 · Eff. date",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_2_title}}",
-        "label": "Document list แถว 2 · Document title",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_2_code}}",
-        "label": "Document list แถว 2 · Document code",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_2_rev}}",
-        "label": "Document list แถว 2 · Issue / Rev.",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_2_eff}}",
-        "label": "Document list แถว 2 · Eff. date",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_3_title}}",
-        "label": "Document list แถว 3 · Document title",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_3_code}}",
-        "label": "Document list แถว 3 · Document code",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_3_rev}}",
-        "label": "Document list แถว 3 · Issue / Rev.",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_3_eff}}",
-        "label": "Document list แถว 3 · Eff. date",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_4_title}}",
-        "label": "Document list แถว 4 · Document title",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_4_code}}",
-        "label": "Document list แถว 4 · Document code",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_4_rev}}",
-        "label": "Document list แถว 4 · Issue / Rev.",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_4_eff}}",
-        "label": "Document list แถว 4 · Eff. date",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_5_title}}",
-        "label": "Document list แถว 5 · Document title",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_5_code}}",
-        "label": "Document list แถว 5 · Document code",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_5_rev}}",
-        "label": "Document list แถว 5 · Issue / Rev.",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_5_eff}}",
-        "label": "Document list แถว 5 · Eff. date",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_6_title}}",
-        "label": "Document list แถว 6 · Document title",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_6_code}}",
-        "label": "Document list แถว 6 · Document code",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_6_rev}}",
-        "label": "Document list แถว 6 · Issue / Rev.",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_6_eff}}",
-        "label": "Document list แถว 6 · Eff. date",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_7_title}}",
-        "label": "Document list แถว 7 · Document title",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_7_code}}",
-        "label": "Document list แถว 7 · Document code",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_7_rev}}",
-        "label": "Document list แถว 7 · Issue / Rev.",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_7_eff}}",
-        "label": "Document list แถว 7 · Eff. date",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_8_title}}",
-        "label": "Document list แถว 8 · Document title",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_8_code}}",
-        "label": "Document list แถว 8 · Document code",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_8_rev}}",
-        "label": "Document list แถว 8 · Issue / Rev.",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docs_8_eff}}",
-        "label": "Document list แถว 8 · Eff. date",
-        "labelTh": "",
-        "sign": false
-      }
-    ]
+    "manual": []
   },
   "DRF": {
     "abbr": "DRF",
@@ -819,6 +654,7 @@ var TOKEN_MAP = {
         "label": "CAAT directive"
       }
     ],
+    "tables": [],
     "boxesInDocx": 10,
     "approval": [
       {
@@ -1257,6 +1093,7 @@ var TOKEN_MAP = {
         "label": "Recurrent Night · Unsatisfied"
       }
     ],
+    "tables": [],
     "boxesInDocx": 94,
     "approval": [],
     "manual": [
@@ -2674,6 +2511,7 @@ var TOKEN_MAP = {
         "label": "Poor"
       }
     ],
+    "tables": [],
     "boxesInDocx": 340,
     "approval": [
       {
@@ -3006,6 +2844,7 @@ var TOKEN_MAP = {
         "label": "NO-GO"
       }
     ],
+    "tables": [],
     "boxesInDocx": 64,
     "approval": [
       {
@@ -3234,6 +3073,7 @@ var TOKEN_MAP = {
         "label": "Unserviceable — defects require rectification first"
       }
     ],
+    "tables": [],
     "boxesInDocx": 31,
     "approval": [
       {
@@ -3364,6 +3204,7 @@ var TOKEN_MAP = {
         "label": "No — requires further action"
       }
     ],
+    "tables": [],
     "boxesInDocx": 5,
     "approval": [
       {
@@ -3522,6 +3363,96 @@ var TOKEN_MAP = {
         "label": "No"
       }
     ],
+    "tables": [
+      {
+        "k": "hazards",
+        "rows": 3,
+        "label": "Identified hazards / risks",
+        "cols": [
+          {
+            "k": "hazard",
+            "head": "Hazard / risk"
+          },
+          {
+            "k": "likelihood",
+            "head": "Likelihood"
+          },
+          {
+            "k": "severity",
+            "head": "Severity"
+          },
+          {
+            "k": "level",
+            "head": "Risk level"
+          },
+          {
+            "k": "mitigation",
+            "head": "Mitigation measure"
+          }
+        ]
+      },
+      {
+        "k": "regs",
+        "rows": 3,
+        "label": "Applicable regulations / standards",
+        "cols": [
+          {
+            "k": "reg",
+            "head": "Regulation / standard"
+          },
+          {
+            "k": "ref",
+            "head": "Reference"
+          },
+          {
+            "k": "action",
+            "head": "Compliance action required"
+          }
+        ]
+      },
+      {
+        "k": "docsAffected",
+        "rows": 4,
+        "label": "Document list",
+        "cols": [
+          {
+            "k": "code",
+            "head": "Document code"
+          },
+          {
+            "k": "title",
+            "head": "Document title"
+          },
+          {
+            "k": "action",
+            "head": "Action required"
+          }
+        ]
+      },
+      {
+        "k": "plan",
+        "rows": 5,
+        "label": "Action steps",
+        "cols": [
+          {
+            "k": "action",
+            "head": "Action / step"
+          },
+          {
+            "k": "owner",
+            "head": "Responsible person"
+          },
+          {
+            "k": "target",
+            "head": "Target date"
+          },
+          {
+            "k": "status",
+            "head": "Status"
+          }
+        ]
+      }
+    ],
     "boxesInDocx": 16,
     "approval": [
       {
@@ -3550,342 +3481,6 @@ var TOKEN_MAP = {
       }
     ],
     "manual": [
-      {
-        "tok": "{{hazards_1_hazard}}",
-        "label": "Identified hazards / risks แถว 1 · Hazard / risk",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{hazards_1_likelihood}}",
-        "label": "Identified hazards / risks แถว 1 · Likelihood",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{hazards_1_severity}}",
-        "label": "Identified hazards / risks แถว 1 · Severity",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{hazards_1_level}}",
-        "label": "Identified hazards / risks แถว 1 · Risk level",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{hazards_1_mitigation}}",
-        "label": "Identified hazards / risks แถว 1 · Mitigation measure",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{hazards_2_hazard}}",
-        "label": "Identified hazards / risks แถว 2 · Hazard / risk",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{hazards_2_likelihood}}",
-        "label": "Identified hazards / risks แถว 2 · Likelihood",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{hazards_2_severity}}",
-        "label": "Identified hazards / risks แถว 2 · Severity",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{hazards_2_level}}",
-        "label": "Identified hazards / risks แถว 2 · Risk level",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{hazards_2_mitigation}}",
-        "label": "Identified hazards / risks แถว 2 · Mitigation measure",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{hazards_3_hazard}}",
-        "label": "Identified hazards / risks แถว 3 · Hazard / risk",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{hazards_3_likelihood}}",
-        "label": "Identified hazards / risks แถว 3 · Likelihood",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{hazards_3_severity}}",
-        "label": "Identified hazards / risks แถว 3 · Severity",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{hazards_3_level}}",
-        "label": "Identified hazards / risks แถว 3 · Risk level",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{hazards_3_mitigation}}",
-        "label": "Identified hazards / risks แถว 3 · Mitigation measure",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{regs_1_reg}}",
-        "label": "Applicable regulations / standards แถว 1 · Regulation / standard",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{regs_1_ref}}",
-        "label": "Applicable regulations / standards แถว 1 · Reference",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{regs_1_action}}",
-        "label": "Applicable regulations / standards แถว 1 · Compliance action required",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{regs_2_reg}}",
-        "label": "Applicable regulations / standards แถว 2 · Regulation / standard",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{regs_2_ref}}",
-        "label": "Applicable regulations / standards แถว 2 · Reference",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{regs_2_action}}",
-        "label": "Applicable regulations / standards แถว 2 · Compliance action required",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{regs_3_reg}}",
-        "label": "Applicable regulations / standards แถว 3 · Regulation / standard",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{regs_3_ref}}",
-        "label": "Applicable regulations / standards แถว 3 · Reference",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{regs_3_action}}",
-        "label": "Applicable regulations / standards แถว 3 · Compliance action required",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docsAffected_1_code}}",
-        "label": "Document list แถว 1 · Document code",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docsAffected_1_title}}",
-        "label": "Document list แถว 1 · Document title",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docsAffected_1_action}}",
-        "label": "Document list แถว 1 · Action required",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docsAffected_2_code}}",
-        "label": "Document list แถว 2 · Document code",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docsAffected_2_title}}",
-        "label": "Document list แถว 2 · Document title",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docsAffected_2_action}}",
-        "label": "Document list แถว 2 · Action required",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docsAffected_3_code}}",
-        "label": "Document list แถว 3 · Document code",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docsAffected_3_title}}",
-        "label": "Document list แถว 3 · Document title",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docsAffected_3_action}}",
-        "label": "Document list แถว 3 · Action required",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docsAffected_4_code}}",
-        "label": "Document list แถว 4 · Document code",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docsAffected_4_title}}",
-        "label": "Document list แถว 4 · Document title",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{docsAffected_4_action}}",
-        "label": "Document list แถว 4 · Action required",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{plan_1_action}}",
-        "label": "Action steps แถว 1 · Action / step",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{plan_1_owner}}",
-        "label": "Action steps แถว 1 · Responsible person",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{plan_1_target}}",
-        "label": "Action steps แถว 1 · Target date",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{plan_1_status}}",
-        "label": "Action steps แถว 1 · Status",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{plan_2_action}}",
-        "label": "Action steps แถว 2 · Action / step",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{plan_2_owner}}",
-        "label": "Action steps แถว 2 · Responsible person",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{plan_2_target}}",
-        "label": "Action steps แถว 2 · Target date",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{plan_2_status}}",
-        "label": "Action steps แถว 2 · Status",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{plan_3_action}}",
-        "label": "Action steps แถว 3 · Action / step",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{plan_3_owner}}",
-        "label": "Action steps แถว 3 · Responsible person",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{plan_3_target}}",
-        "label": "Action steps แถว 3 · Target date",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{plan_3_status}}",
-        "label": "Action steps แถว 3 · Status",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{plan_4_action}}",
-        "label": "Action steps แถว 4 · Action / step",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{plan_4_owner}}",
-        "label": "Action steps แถว 4 · Responsible person",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{plan_4_target}}",
-        "label": "Action steps แถว 4 · Target date",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{plan_4_status}}",
-        "label": "Action steps แถว 4 · Status",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{plan_5_action}}",
-        "label": "Action steps แถว 5 · Action / step",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{plan_5_owner}}",
-        "label": "Action steps แถว 5 · Responsible person",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{plan_5_target}}",
-        "label": "Action steps แถว 5 · Target date",
-        "labelTh": "",
-        "sign": false
-      },
-      {
-        "tok": "{{plan_5_status}}",
-        "label": "Action steps แถว 5 · Status",
-        "labelTh": "",
-        "sign": false
-      },
       {
         "tok": "{{sig_subSign}}",
         "label": "Submitter signature",
@@ -4182,6 +3777,7 @@ var TOKEN_MAP = {
         "label": "No"
       }
     ],
+    "tables": [],
     "boxesInDocx": 50,
     "approval": [
       {
@@ -4444,6 +4040,7 @@ var TOKEN_MAP = {
         "label": "No"
       }
     ],
+    "tables": [],
     "boxesInDocx": 41,
     "approval": [
       {
@@ -4536,6 +4133,7 @@ var TOKEN_MAP = {
         "label": "Passenger is a minor (under 18). A parent or legal guardian must sign."
       }
     ],
+    "tables": [],
     "boxesInDocx": 1,
     "approval": [
       {
@@ -4685,6 +4283,7 @@ var TOKEN_MAP = {
         "label": "Unsatisfactory"
       }
     ],
+    "tables": [],
     "boxesInDocx": 13,
     "approval": [
       {
@@ -4801,6 +4400,7 @@ var TOKEN_MAP = {
         "label": "FTL Compliance Confirmation: I confirm the totals above include hours from ALL operators. After today's planned duty with D-0507, my flight hours will not exceed the FTL limits: 7 days ≤ 28 hr / 28 days ≤ 100 hr / 365 days ≤ 1,000 hr. I understand that inaccurate declaration is a regulatory offence under Thai civil aviation law."
       }
     ],
+    "tables": [],
     "boxesInDocx": 7,
     "approval": [
       {
@@ -6071,6 +5671,7 @@ var TOKEN_MAP = {
         "label": "Very poor"
       }
     ],
+    "tables": [],
     "boxesInDocx": 299,
     "approval": [
       {
@@ -6294,6 +5895,7 @@ var TOKEN_MAP = {
         "label": "Requires follow-up"
       }
     ],
+    "tables": [],
     "boxesInDocx": 27,
     "approval": [
       {
@@ -6388,6 +5990,7 @@ var TOKEN_MAP = {
         "label": "Other"
       }
     ],
+    "tables": [],
     "boxesInDocx": 5,
     "approval": [
       {

@@ -12,8 +12,9 @@
  *        byLabel  "Name" | ____              ใส่ในเซลล์ถัดไป
  *        byLine   "Signature: ______"        แทนเส้นประในบรรทัดนั้น
  *        boxes    ☐                          แทนตามลำดับ ถ้าจำนวนตรงกัน
- *   4. ต่อท้ายด้วยตารางส่วนอนุมัติ — ระบบมีขั้นอนุมัติที่กระดาษเดิมไม่มี
- *   5. ต่อท้ายด้วยรายการ token ที่เหลือ ให้คนวางมือแล้วลบบล็อกนั้นทิ้ง
+ *   4. วาง token ลงตารางแถวซ้ำ โดยจับคู่จากหัวคอลัมน์
+ *   5. ต่อท้ายด้วยตารางส่วนอนุมัติ — ระบบมีขั้นอนุมัติที่กระดาษเดิมไม่มี
+ *   6. ต่อท้ายด้วยรายการ token ที่เหลือ ให้คนวางมือแล้วลบบล็อกนั้นทิ้ง
  *
  * ⚠️ ช่องติ๊กจะไม่ถูกแทนอัตโนมัติเมื่อจำนวน ☐ ในเอกสารไม่เท่ากับในนิยามฟอร์ม
  *    ปล่อยให้วางมือดีกว่าวางเลื่อนช่องทั้งใบโดยไม่มีใครรู้
@@ -21,8 +22,7 @@
 
 /* ใบที่จะทำเมื่อกด Run โดยไม่เลือกฟังก์ชัน — เมนูเลือกฟังก์ชันในเว็บกดยาก
    แก้บรรทัดนี้แล้ว push ใหม่ ง่ายและแน่นอนกว่า */
-var RUN_LIST = ['APF', 'ASF', 'DAF', 'DRC', 'DRF', 'EFC', 'EFM', 'FTR',
-                'MOC', 'PCR-FI', 'PCR-TKI', 'RTR', 'SEF', 'STR'];
+var RUN_LIST = ['DRC', 'MOC'];
 
 function importTemplate(abbr) {
   if (!abbr) return RUN_LIST.map(function (a) { return importTemplate(a); });
@@ -138,10 +138,39 @@ function fillTokens_(doc, map) {
     boxes.forEach(function (b) { left.push(b.tok + '  ← ☐ ' + b.label); });
   }
 
-  // 4) ส่วนอนุมัติ — ระบบมีขั้นนี้ กระดาษเดิมไม่มี จึงต่อท้ายให้
+  // 4) ตารางแถวซ้ำ — หาตารางที่หัวคอลัมน์ตรงกัน แล้ววาง token ทีละช่อง
+  (map.tables || []).forEach(function (t) {
+    var hit = findTableByHead_(body, t.cols);
+    if (!hit) {
+      for (var r = 1; r <= t.rows; r++)
+        t.cols.forEach(function (c) {
+          left.push('{{' + t.k + '_' + r + '_' + c.k + '}}  ← ' + t.label + ' แถว ' + r + ' · ' + c.head);
+        });
+      return;
+    }
+    // แถวข้อมูลเริ่มถัดจากหัวตาราง และมีเท่าที่กระดาษพิมพ์ไว้จริง
+    var n = Math.min(t.rows, hit.tbl.getNumRows() - hit.headRow - 1);
+    for (var i = 0; i < n; i++) {
+      var row = hit.tbl.getRow(hit.headRow + 1 + i);
+      t.cols.forEach(function (c, j) {
+        var ci = hit.colIdx[j];
+        if (ci == null || ci >= row.getNumCells()) return;
+        var cell = row.getCell(ci), cur = cell.getText().trim();
+        if (cur && !/^[_\.\s\/\-:]*$/.test(cur)) return;   // ช่องเลขลำดับ ฯลฯ อย่าไปทับ
+        cell.setText('{{' + t.k + '_' + (i + 1) + '_' + c.k + '}}');
+        placed++;
+      });
+    }
+    for (var r2 = n + 1; r2 <= t.rows; r2++)
+      t.cols.forEach(function (c) {
+        left.push('{{' + t.k + '_' + r2 + '_' + c.k + '}}  ← ' + t.label + ' แถว ' + r2 + ' (กระดาษมีไม่พอ)');
+      });
+  });
+
+  // 6) ส่วนอนุมัติ — ระบบมีขั้นนี้ กระดาษเดิมไม่มี จึงต่อท้ายให้
   var appended = appendApproval_(body, map.approval || []);
 
-  // 5) ที่เหลือ บอกให้ชัด ไม่ปล่อยไปเจอเอาตอน PDF ออกมาแล้วช่องว่าง
+  // 7) ที่เหลือ บอกให้ชัด ไม่ปล่อยไปเจอเอาตอน PDF ออกมาแล้วช่องว่าง
   if (left.length) {
     body.appendParagraph('').setAttributes(mono_(8));
     body.appendParagraph('⚠️ TOKEN ที่ยังไม่ได้วาง — ' + left.length + ' รายการ')
@@ -152,6 +181,38 @@ function fillTokens_(doc, map) {
   }
 
   return { placed: placed, appended: appended, left: left, boxNote: boxNote };
+}
+
+/**
+ * หาตารางในเอกสารที่หัวคอลัมน์ตรงกับ cols ที่นิยามฟอร์มบอกไว้
+ * คืนดัชนีคอลัมน์จริงด้วย เพราะกระดาษมักมีคอลัมน์ "#" นำหน้าที่ฟอร์มไม่มี
+ * ต้องเจอครบทุกคอลัมน์จึงจะถือว่าใช่ — เจอครึ่งเดียวแล้ววางจะเลื่อนทั้งตาราง
+ */
+function findTableByHead_(body, cols) {
+  var norm = function (s) {
+    return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  };
+  for (var i = 0; i < body.getNumChildren(); i++) {
+    var ch = body.getChild(i);
+    if (ch.getType() !== DocumentApp.ElementType.TABLE) continue;
+    var tbl = ch.asTable();
+    for (var r = 0; r < Math.min(tbl.getNumRows(), 3); r++) {
+      var row = tbl.getRow(r), heads = [];
+      for (var c = 0; c < row.getNumCells(); c++) heads.push(norm(row.getCell(c).getText()));
+      var idx = cols.map(function (col) {
+        var want = norm(col.head);
+        for (var k = 0; k < heads.length; k++)
+          if (heads[k] && (heads[k] === want || heads[k].indexOf(want) === 0 || want.indexOf(heads[k]) === 0))
+            return k;
+        return null;
+      });
+      if (idx.every(function (x) { return x != null; })
+          && new Set(idx).size === idx.length
+          && tbl.getNumRows() > r + 1)
+        return { tbl: tbl, headRow: r, colIdx: idx };
+    }
+  }
+  return null;
 }
 
 /** ตารางบันทึกการอนุมัติ ต่อท้ายเอกสาร — หน้าตาเดียวกันทุกใบ */
