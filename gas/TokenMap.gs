@@ -11,6 +11,7 @@ var TOKEN_MAP = {
   "APF": {
     "abbr": "APF",
     "docx": "D-0507-APF-001.docx",
+    "orderWarn": [],
     "byLabel": [
       {
         "label": "Full Name:",
@@ -77,35 +78,43 @@ var TOKEN_MAP = {
     "boxes": [
       {
         "tok": "{{k_decCat_assessment}}",
-        "label": "Assessment result"
+        "label": "Assessment result",
+        "ord": "Assessment result"
       },
       {
         "tok": "{{k_decCat_exam}}",
-        "label": "Examination failure"
+        "label": "Examination failure",
+        "ord": "Examination failure"
       },
       {
         "tok": "{{k_decCat_enrolment}}",
-        "label": "Enrolment decision"
+        "label": "Enrolment decision",
+        "ord": "Enrolment decision"
       },
       {
         "tok": "{{k_decCat_disciplinary}}",
-        "label": "Disciplinary action"
+        "label": "Disciplinary action",
+        "ord": "Disciplinary action"
       },
       {
         "tok": "{{k_decCat_other}}",
-        "label": "Other"
+        "label": "Other",
+        "ord": "Other"
       },
       {
         "tok": "{{k_outcome_upheld}}",
-        "label": "Appeal upheld"
+        "label": "Appeal upheld",
+        "ord": "Appeal upheld"
       },
       {
         "tok": "{{k_outcome_partly}}",
-        "label": "Appeal partly upheld"
+        "label": "Appeal partly upheld",
+        "ord": "Appeal partly upheld"
       },
       {
         "tok": "{{k_outcome_dismissed}}",
-        "label": "Appeal dismissed"
+        "label": "Appeal dismissed",
+        "ord": "Appeal dismissed"
       }
     ],
     "tables": [],
@@ -142,6 +151,7 @@ var TOKEN_MAP = {
   "ASF": {
     "abbr": "ASF",
     "docx": "D-0507-ASF-001.docx",
+    "orderWarn": [],
     "byLabel": [
       {
         "label": "Student Name",
@@ -184,67 +194,96 @@ var TOKEN_MAP = {
     "boxes": [
       {
         "tok": "{{k_soloType_initial}}",
-        "label": "Initial solo"
+        "label": "Initial solo",
+        "ord": "Initial solo"
       },
       {
         "tok": "{{k_soloType_localxc}}",
-        "label": "Solo local / cross-country"
+        "label": "Solo local / cross-country",
+        "ord": "Solo local / cross-country"
       },
       {
         "tok": "{{k_soloType_night}}",
-        "label": "Night solo local / cross-country"
+        "label": "Night solo local / cross-country",
+        "ord": "Night solo local / cross-country"
       },
       {
         "tok": "{{k_preHours_hours_Y}}",
-        "label": "Flight hours & landings · ✓"
-      },
-      {
-        "tok": "{{k_knowledge_systems_Y}}",
-        "label": "Aircraft systems & flight controls · ✓"
-      },
-      {
-        "tok": "{{k_knowledge_aero_Y}}",
-        "label": "Aerodynamics · ✓"
-      },
-      {
-        "tok": "{{k_knowledge_emerg_Y}}",
-        "label": "Emergency procedures · ✓"
-      },
-      {
-        "tok": "{{k_knowledge_law_Y}}",
-        "label": "Airspace, air laws & regulations · ✓"
-      },
-      {
-        "tok": "{{k_knowledge_wx_Y}}",
-        "label": "Weather — interpretation & decision-making · ✓"
-      },
-      {
-        "tok": "{{k_knowledge_preflight_Y}}",
-        "label": "Pre-flight procedures & documentation · ✓"
-      },
-      {
-        "tok": "{{k_knowledge_radio_Y}}",
-        "label": "Radio communication procedures · ✓"
+        "label": "Flight hours & landings · ✓",
+        "ord": "✓",
+        "item": "Flight hours & landings"
       },
       {
         "tok": "{{k_nightKnow_nightHours_Y}}",
-        "label": "Night hours & landings · ✓"
+        "label": "Night hours & landings · ✓",
+        "ord": "✓",
+        "item": "Night hours & landings"
+      },
+      {
+        "tok": "{{k_knowledge_systems_Y}}",
+        "label": "Aircraft systems & flight controls · ✓",
+        "ord": "✓",
+        "item": "Aircraft systems & flight controls"
+      },
+      {
+        "tok": "{{k_knowledge_aero_Y}}",
+        "label": "Aerodynamics · ✓",
+        "ord": "✓",
+        "item": "Aerodynamics"
+      },
+      {
+        "tok": "{{k_knowledge_emerg_Y}}",
+        "label": "Emergency procedures · ✓",
+        "ord": "✓",
+        "item": "Emergency procedures"
+      },
+      {
+        "tok": "{{k_knowledge_law_Y}}",
+        "label": "Airspace, air laws & regulations · ✓",
+        "ord": "✓",
+        "item": "Airspace, air laws & regulations"
+      },
+      {
+        "tok": "{{k_knowledge_wx_Y}}",
+        "label": "Weather — interpretation & decision-making · ✓",
+        "ord": "✓",
+        "item": "Weather — interpretation & decision-making"
+      },
+      {
+        "tok": "{{k_knowledge_preflight_Y}}",
+        "label": "Pre-flight procedures & documentation · ✓",
+        "ord": "✓",
+        "item": "Pre-flight procedures & documentation"
+      },
+      {
+        "tok": "{{k_knowledge_radio_Y}}",
+        "label": "Radio communication procedures · ✓",
+        "ord": "✓",
+        "item": "Radio communication procedures"
       },
       {
         "tok": "{{k_nightKnow_vision_Y}}",
-        "label": "Night vision & physiology · ✓"
+        "label": "Night vision & physiology · ✓",
+        "ord": "✓",
+        "item": "Night vision & physiology"
       },
       {
         "tok": "{{k_nightKnow_lighting_Y}}",
-        "label": "Aircraft lighting systems · ✓"
+        "label": "Aircraft lighting systems · ✓",
+        "ord": "✓",
+        "item": "Aircraft lighting systems"
       },
       {
         "tok": "{{k_nightKnow_disorient_Y}}",
-        "label": "Spatial disorientation — recognition & recovery · ✓"
+        "label": "Spatial disorientation — recognition & recovery · ✓",
+        "ord": "✓",
+        "item": "Spatial disorientation — recognition & recovery"
       },
       {
         "tok": "{{k_nightKnow_nav_Y}}",
-        "label": "Night navigation · ✓"
+        "label": "Night navigation · ✓",
+        "ord": "✓",
+        "item": "Night navigation"
       }
     ],
     "tables": [],
@@ -287,6 +326,7 @@ var TOKEN_MAP = {
   "DAF": {
     "abbr": "DAF",
     "docx": "D-0507-DAF-001.docx",
+    "orderWarn": [],
     "byLabel": [
       {
         "label": "Full Name:",
@@ -363,63 +403,78 @@ var TOKEN_MAP = {
     "boxes": [
       {
         "tok": "{{k_infCat_sop}}",
-        "label": "Breach of SOP / procedure"
+        "label": "Breach of SOP / procedure",
+        "ord": "Breach of SOP / procedure"
       },
       {
         "tok": "{{k_infCat_caat}}",
-        "label": "Violation of CAAT regulation"
+        "label": "Violation of CAAT regulation",
+        "ord": "Violation of CAAT regulation"
       },
       {
         "tok": "{{k_infCat_unsafe}}",
-        "label": "Unsafe act"
+        "label": "Unsafe act",
+        "ord": "Unsafe act"
       },
       {
         "tok": "{{k_infCat_misconduct}}",
-        "label": "Misconduct"
+        "label": "Misconduct",
+        "ord": "Misconduct"
       },
       {
         "tok": "{{k_infCat_negligence}}",
-        "label": "Negligence"
+        "label": "Negligence",
+        "ord": "Negligence"
       },
       {
         "tok": "{{k_infCat_insub}}",
-        "label": "Insubordination"
+        "label": "Insubordination",
+        "ord": "Insubordination"
       },
       {
         "tok": "{{k_infCat_dishonesty}}",
-        "label": "Dishonesty / falsification"
+        "label": "Dishonesty / falsification",
+        "ord": "Dishonesty / falsification"
       },
       {
         "tok": "{{k_infCat_other}}",
-        "label": "Other"
+        "label": "Other",
+        "ord": "Other"
       },
       {
         "tok": "{{k_actLevel_verbal}}",
-        "label": "Verbal warning"
+        "label": "Verbal warning",
+        "ord": "Verbal warning"
       },
       {
         "tok": "{{k_actLevel_written}}",
-        "label": "Written warning"
+        "label": "Written warning",
+        "ord": "Written warning"
       },
       {
         "tok": "{{k_actLevel_suspend}}",
-        "label": "Suspension"
+        "label": "Suspension",
+        "ord": "Suspension"
       },
       {
         "tok": "{{k_actLevel_terminate}}",
-        "label": "Termination / expulsion"
+        "label": "Termination / expulsion",
+        "ord": "Termination / expulsion"
       },
       {
         "tok": "{{k_actLevel_training}}",
-        "label": "Additional training required"
+        "label": "Additional training required",
+        "ord": "Additional training required"
       },
       {
         "tok": "{{k_actLevel_licence}}",
-        "label": "Licence suspension request to CAAT"
+        "label": "Licence suspension request to CAAT",
+        "ord": "Licence suspension request to CAAT"
       },
       {
         "tok": "{{k_actLevel_other}}",
-        "label": "Other"
+        "label": "Other",
+        "ord": "Other"
       }
     ],
     "tables": [],
@@ -474,6 +529,7 @@ var TOKEN_MAP = {
   "DRC": {
     "abbr": "DRC",
     "docx": "D-0507-DRC-001.docx",
+    "orderWarn": [],
     "byLabel": [
       {
         "label": "Distributed to (Name):",
@@ -508,11 +564,13 @@ var TOKEN_MAP = {
     "boxes": [
       {
         "tok": "{{k_copyType_hard}}",
-        "label": "Hard copy"
+        "label": "Hard copy",
+        "ord": "Hard copy"
       },
       {
         "tok": "{{k_copyType_digital}}",
-        "label": "Digital"
+        "label": "Digital",
+        "ord": "Digital"
       }
     ],
     "tables": [
@@ -554,6 +612,7 @@ var TOKEN_MAP = {
   "DRF": {
     "abbr": "DRF",
     "docx": "D-0507-DRF-001.docx",
+    "orderWarn": [],
     "byLabel": [
       {
         "label": "Request No.:",
@@ -616,43 +675,53 @@ var TOKEN_MAP = {
     "boxes": [
       {
         "tok": "{{k_changeType_minor}}",
-        "label": "Minor correction"
+        "label": "Minor correction",
+        "ord": "Minor correction"
       },
       {
         "tok": "{{k_changeType_major}}",
-        "label": "Major revision"
+        "label": "Major revision",
+        "ord": "Major revision"
       },
       {
         "tok": "{{k_changeType_new}}",
-        "label": "New section"
+        "label": "New section",
+        "ord": "New section"
       },
       {
         "tok": "{{k_changeType_delete}}",
-        "label": "Delete section"
+        "label": "Delete section",
+        "ord": "Delete section"
       },
       {
         "tok": "{{k_changeType_regulatory}}",
-        "label": "Regulatory update"
+        "label": "Regulatory update",
+        "ord": "Regulatory update"
       },
       {
         "tok": "{{k_reason_regulatory}}",
-        "label": "Regulatory requirement"
+        "label": "Regulatory requirement",
+        "ord": "Regulatory requirement"
       },
       {
         "tok": "{{k_reason_operational}}",
-        "label": "Operational need"
+        "label": "Operational need",
+        "ord": "Operational need"
       },
       {
         "tok": "{{k_reason_error}}",
-        "label": "Error correction"
+        "label": "Error correction",
+        "ord": "Error correction"
       },
       {
         "tok": "{{k_reason_practice}}",
-        "label": "Best practice update"
+        "label": "Best practice update",
+        "ord": "Best practice update"
       },
       {
         "tok": "{{k_reason_directive}}",
-        "label": "CAAT directive"
+        "label": "CAAT directive",
+        "ord": "CAAT directive"
       }
     ],
     "tables": [],
@@ -689,6 +758,7 @@ var TOKEN_MAP = {
   "EFC": {
     "abbr": "EFC",
     "docx": "D-0507-EFC-001.docx",
+    "orderWarn": [],
     "byLabel": [
       {
         "label": "Student Name",
@@ -719,379 +789,557 @@ var TOKEN_MAP = {
     "boxes": [
       {
         "tok": "{{k_courseType_ground}}",
-        "label": "Ground course"
+        "label": "Ground course",
+        "ord": "Ground course"
       },
       {
         "tok": "{{k_courseType_flight}}",
-        "label": "Flight training"
+        "label": "Flight training",
+        "ord": "Flight training"
       },
       {
         "tok": "{{k_examType_afterclass}}",
-        "label": "After class"
+        "label": "After class",
+        "ord": "After class"
       },
       {
         "tok": "{{k_examType_stage}}",
-        "label": "Stage exam"
+        "label": "Stage exam",
+        "ord": "Stage exam"
       },
       {
         "tok": "{{k_examType_endcourse}}",
-        "label": "End-of-course"
+        "label": "End-of-course",
+        "ord": "End-of-course"
       },
       {
         "tok": "{{k_examType_progressive}}",
-        "label": "Flight progressive"
+        "label": "Flight progressive",
+        "ord": "Flight progressive"
       },
       {
         "tok": "{{k_examType_endflight}}",
-        "label": "End-of-course flight"
+        "label": "End-of-course flight",
+        "ord": "End-of-course flight"
       },
       {
         "tok": "{{k_result_passed}}",
-        "label": "Passed"
+        "label": "Passed",
+        "ord": "Passed"
       },
       {
         "tok": "{{k_result_notpassed}}",
-        "label": "Not passed"
+        "label": "Not passed",
+        "ord": "Not passed"
       },
       {
         "tok": "{{k_result_repeat}}",
-        "label": "Repeat"
+        "label": "Repeat",
+        "ord": "Repeat"
       },
       {
         "tok": "{{k_s1_sIntroDiscoveringAviation_S}}",
-        "label": "[Intro] Discovering Aviation · Satisfied"
+        "label": "[Intro] Discovering Aviation · Satisfied",
+        "ord": "Satisfied",
+        "item": "[Intro] Discovering Aviation"
       },
       {
         "tok": "{{k_s1_sIntroDiscoveringAviation_U}}",
-        "label": "[Intro] Discovering Aviation · Unsatisfied"
+        "label": "[Intro] Discovering Aviation · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[Intro] Discovering Aviation"
       },
       {
         "tok": "{{k_s1_sPpl01AirplaneSystems_S}}",
-        "label": "[PPL 01] Airplane Systems · Satisfied"
+        "label": "[PPL 01] Airplane Systems · Satisfied",
+        "ord": "Satisfied",
+        "item": "[PPL 01] Airplane Systems"
       },
       {
         "tok": "{{k_s1_sPpl01AirplaneSystems_U}}",
-        "label": "[PPL 01] Airplane Systems · Unsatisfied"
+        "label": "[PPL 01] Airplane Systems · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[PPL 01] Airplane Systems"
       },
       {
         "tok": "{{k_s1_sPpl02AerodynamicPrinciples_S}}",
-        "label": "[PPL 02] Aerodynamic Principles · Satisfied"
+        "label": "[PPL 02] Aerodynamic Principles · Satisfied",
+        "ord": "Satisfied",
+        "item": "[PPL 02] Aerodynamic Principles"
       },
       {
         "tok": "{{k_s1_sPpl02AerodynamicPrinciples_U}}",
-        "label": "[PPL 02] Aerodynamic Principles · Unsatisfied"
+        "label": "[PPL 02] Aerodynamic Principles · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[PPL 02] Aerodynamic Principles"
       },
       {
         "tok": "{{k_s1_sPpl03TheFlight_S}}",
-        "label": "[PPL 03] The Flight Environment · Satisfied"
+        "label": "[PPL 03] The Flight Environment · Satisfied",
+        "ord": "Satisfied",
+        "item": "[PPL 03] The Flight Environment"
       },
       {
         "tok": "{{k_s1_sPpl03TheFlight_U}}",
-        "label": "[PPL 03] The Flight Environment · Unsatisfied"
+        "label": "[PPL 03] The Flight Environment · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[PPL 03] The Flight Environment"
       },
       {
         "tok": "{{k_s1_sPpl04CommunicationAnd_S}}",
-        "label": "[PPL 04] Communication and Flight Information · Satisfied"
+        "label": "[PPL 04] Communication and Flight Information · Satisfied",
+        "ord": "Satisfied",
+        "item": "[PPL 04] Communication and Flight Information"
       },
       {
         "tok": "{{k_s1_sPpl04CommunicationAnd_U}}",
-        "label": "[PPL 04] Communication and Flight Information · Unsatisfied"
+        "label": "[PPL 04] Communication and Flight Information · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[PPL 04] Communication and Flight Information"
       },
       {
         "tok": "{{k_s1_sPpl05MeteorologyFor_S}}",
-        "label": "[PPL 05] Meteorology for Pilots and Interpreting Weather Data · Satisfied"
+        "label": "[PPL 05] Meteorology for Pilots and Interpreting Weather Data · Satisfied",
+        "ord": "Satisfied",
+        "item": "[PPL 05] Meteorology for Pilots and Interpreting Weather Data"
       },
       {
         "tok": "{{k_s1_sPpl05MeteorologyFor_U}}",
-        "label": "[PPL 05] Meteorology for Pilots and Interpreting Weather Data · Unsatisfied"
+        "label": "[PPL 05] Meteorology for Pilots and Interpreting Weather Data · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[PPL 05] Meteorology for Pilots and Interpreting Weather Data"
       },
       {
         "tok": "{{k_s1_sPpl06AirplanePerformance_S}}",
-        "label": "[PPL 06] Airplane Performance & Technical Type · Satisfied"
+        "label": "[PPL 06] Airplane Performance & Technical Type · Satisfied",
+        "ord": "Satisfied",
+        "item": "[PPL 06] Airplane Performance & Technical Type"
       },
       {
         "tok": "{{k_s1_sPpl06AirplanePerformance_U}}",
-        "label": "[PPL 06] Airplane Performance & Technical Type · Unsatisfied"
+        "label": "[PPL 06] Airplane Performance & Technical Type · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[PPL 06] Airplane Performance & Technical Type"
       },
       {
         "tok": "{{k_s1_sPpl07Navigation_S}}",
-        "label": "[PPL 07] Navigation · Satisfied"
+        "label": "[PPL 07] Navigation · Satisfied",
+        "ord": "Satisfied",
+        "item": "[PPL 07] Navigation"
       },
       {
         "tok": "{{k_s1_sPpl07Navigation_U}}",
-        "label": "[PPL 07] Navigation · Unsatisfied"
+        "label": "[PPL 07] Navigation · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[PPL 07] Navigation"
       },
       {
         "tok": "{{k_s1_sPpl08ApplyingHuman_S}}",
-        "label": "[PPL 08] Applying Human Factor Principles · Satisfied"
+        "label": "[PPL 08] Applying Human Factor Principles · Satisfied",
+        "ord": "Satisfied",
+        "item": "[PPL 08] Applying Human Factor Principles"
       },
       {
         "tok": "{{k_s1_sPpl08ApplyingHuman_U}}",
-        "label": "[PPL 08] Applying Human Factor Principles · Unsatisfied"
+        "label": "[PPL 08] Applying Human Factor Principles · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[PPL 08] Applying Human Factor Principles"
       },
       {
         "tok": "{{k_s1_sCpl061FlyingCrosscountry_S}}",
-        "label": "[CPL 06.1] Flying Cross-Country · Satisfied"
+        "label": "[CPL 06.1] Flying Cross-Country · Satisfied",
+        "ord": "Satisfied",
+        "item": "[CPL 06.1] Flying Cross-Country"
       },
       {
         "tok": "{{k_s1_sCpl061FlyingCrosscountry_U}}",
-        "label": "[CPL 06.1] Flying Cross-Country · Unsatisfied"
+        "label": "[CPL 06.1] Flying Cross-Country · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[CPL 06.1] Flying Cross-Country"
       },
       {
         "tok": "{{k_s1_sPpl09AirLaws_S}}",
-        "label": "[PPL 09] Air Laws & Rule of the Air · Satisfied"
+        "label": "[PPL 09] Air Laws & Rule of the Air · Satisfied",
+        "ord": "Satisfied",
+        "item": "[PPL 09] Air Laws & Rule of the Air"
       },
       {
         "tok": "{{k_s1_sPpl09AirLaws_U}}",
-        "label": "[PPL 09] Air Laws & Rule of the Air · Unsatisfied"
+        "label": "[PPL 09] Air Laws & Rule of the Air · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[PPL 09] Air Laws & Rule of the Air"
       },
       {
         "tok": "{{k_s2_sDft01MathPhysics_S}}",
-        "label": "[DFT 01] Math & Physics for Aviation · Satisfied"
+        "label": "[DFT 01] Math & Physics for Aviation · Satisfied",
+        "ord": "Satisfied",
+        "item": "[DFT 01] Math & Physics for Aviation"
       },
       {
         "tok": "{{k_s2_sDft01MathPhysics_U}}",
-        "label": "[DFT 01] Math & Physics for Aviation · Unsatisfied"
+        "label": "[DFT 01] Math & Physics for Aviation · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[DFT 01] Math & Physics for Aviation"
       },
       {
         "tok": "{{k_s2_sDft02C172System_S}}",
-        "label": "[DFT 02] C-172 System · Satisfied"
+        "label": "[DFT 02] C-172 System · Satisfied",
+        "ord": "Satisfied",
+        "item": "[DFT 02] C-172 System"
       },
       {
         "tok": "{{k_s2_sDft02C172System_U}}",
-        "label": "[DFT 02] C-172 System · Unsatisfied"
+        "label": "[DFT 02] C-172 System · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[DFT 02] C-172 System"
       },
       {
         "tok": "{{k_s2_sDft03NormalEmergency_S}}",
-        "label": "[DFT 03] Normal & Emergency Procedure · Satisfied"
+        "label": "[DFT 03] Normal & Emergency Procedure · Satisfied",
+        "ord": "Satisfied",
+        "item": "[DFT 03] Normal & Emergency Procedure"
       },
       {
         "tok": "{{k_s2_sDft03NormalEmergency_U}}",
-        "label": "[DFT 03] Normal & Emergency Procedure · Unsatisfied"
+        "label": "[DFT 03] Normal & Emergency Procedure · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[DFT 03] Normal & Emergency Procedure"
       },
       {
         "tok": "{{k_s2_sDft04FundamentalOf_S}}",
-        "label": "[DFT 04] Fundamental of Psychology · Satisfied"
+        "label": "[DFT 04] Fundamental of Psychology · Satisfied",
+        "ord": "Satisfied",
+        "item": "[DFT 04] Fundamental of Psychology"
       },
       {
         "tok": "{{k_s2_sDft04FundamentalOf_U}}",
-        "label": "[DFT 04] Fundamental of Psychology · Unsatisfied"
+        "label": "[DFT 04] Fundamental of Psychology · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[DFT 04] Fundamental of Psychology"
       },
       {
         "tok": "{{k_s3_sCpl01AdvanceSystems_S}}",
-        "label": "[CPL 01] Advance Systems 2 · Satisfied"
+        "label": "[CPL 01] Advance Systems 2 · Satisfied",
+        "ord": "Satisfied",
+        "item": "[CPL 01] Advance Systems 2"
       },
       {
         "tok": "{{k_s3_sCpl01AdvanceSystems_U}}",
-        "label": "[CPL 01] Advance Systems 2 · Unsatisfied"
+        "label": "[CPL 01] Advance Systems 2 · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[CPL 01] Advance Systems 2"
       },
       {
         "tok": "{{k_s3_sCpl02Aerodynamic2_S}}",
-        "label": "[CPL 02] Aerodynamic 2 · Satisfied"
+        "label": "[CPL 02] Aerodynamic 2 · Satisfied",
+        "ord": "Satisfied",
+        "item": "[CPL 02] Aerodynamic 2"
       },
       {
         "tok": "{{k_s3_sCpl02Aerodynamic2_U}}",
-        "label": "[CPL 02] Aerodynamic 2 · Unsatisfied"
+        "label": "[CPL 02] Aerodynamic 2 · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[CPL 02] Aerodynamic 2"
       },
       {
         "tok": "{{k_s3_sCpl031CommercialFlight_S}}",
-        "label": "[CPL 03.1] Commercial Flight Consideration · Satisfied"
+        "label": "[CPL 03.1] Commercial Flight Consideration · Satisfied",
+        "ord": "Satisfied",
+        "item": "[CPL 03.1] Commercial Flight Consideration"
       },
       {
         "tok": "{{k_s3_sCpl031CommercialFlight_U}}",
-        "label": "[CPL 03.1] Commercial Flight Consideration · Unsatisfied"
+        "label": "[CPL 03.1] Commercial Flight Consideration · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[CPL 03.1] Commercial Flight Consideration"
       },
       {
         "tok": "{{k_s3_sCpl032CommercialManeuver_S}}",
-        "label": "[CPL 03.2] Commercial Maneuver · Satisfied"
+        "label": "[CPL 03.2] Commercial Maneuver · Satisfied",
+        "ord": "Satisfied",
+        "item": "[CPL 03.2] Commercial Maneuver"
       },
       {
         "tok": "{{k_s3_sCpl032CommercialManeuver_U}}",
-        "label": "[CPL 03.2] Commercial Maneuver · Unsatisfied"
+        "label": "[CPL 03.2] Commercial Maneuver · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[CPL 03.2] Commercial Maneuver"
       },
       {
         "tok": "{{k_s3_sCpl04AirplanePerformance_S}}",
-        "label": "[CPL 04] Airplane Performance 2 · Satisfied"
+        "label": "[CPL 04] Airplane Performance 2 · Satisfied",
+        "ord": "Satisfied",
+        "item": "[CPL 04] Airplane Performance 2"
       },
       {
         "tok": "{{k_s3_sCpl04AirplanePerformance_U}}",
-        "label": "[CPL 04] Airplane Performance 2 · Unsatisfied"
+        "label": "[CPL 04] Airplane Performance 2 · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[CPL 04] Airplane Performance 2"
       },
       {
         "tok": "{{k_s3_sCpl05Navigation2_S}}",
-        "label": "[CPL 05] Navigation 2 · Satisfied"
+        "label": "[CPL 05] Navigation 2 · Satisfied",
+        "ord": "Satisfied",
+        "item": "[CPL 05] Navigation 2"
       },
       {
         "tok": "{{k_s3_sCpl05Navigation2_U}}",
-        "label": "[CPL 05] Navigation 2 · Unsatisfied"
+        "label": "[CPL 05] Navigation 2 · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[CPL 05] Navigation 2"
       },
       {
         "tok": "{{k_s3_sCpl062FlyingCross_S}}",
-        "label": "[CPL 06.2] Flying Cross Country · Satisfied"
+        "label": "[CPL 06.2] Flying Cross Country · Satisfied",
+        "ord": "Satisfied",
+        "item": "[CPL 06.2] Flying Cross Country"
       },
       {
         "tok": "{{k_s3_sCpl062FlyingCross_U}}",
-        "label": "[CPL 06.2] Flying Cross Country · Unsatisfied"
+        "label": "[CPL 06.2] Flying Cross Country · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[CPL 06.2] Flying Cross Country"
       },
       {
         "tok": "{{k_s4_sIr01PrinciplesOf_S}}",
-        "label": "[IR 01] Principles of Instrument Flight · Satisfied"
+        "label": "[IR 01] Principles of Instrument Flight · Satisfied",
+        "ord": "Satisfied",
+        "item": "[IR 01] Principles of Instrument Flight"
       },
       {
         "tok": "{{k_s4_sIr01PrinciplesOf_U}}",
-        "label": "[IR 01] Principles of Instrument Flight · Unsatisfied"
+        "label": "[IR 01] Principles of Instrument Flight · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[IR 01] Principles of Instrument Flight"
       },
       {
         "tok": "{{k_s4_sIr02IfrFlight_S}}",
-        "label": "[IR 02] IFR Flight Environment · Satisfied"
+        "label": "[IR 02] IFR Flight Environment · Satisfied",
+        "ord": "Satisfied",
+        "item": "[IR 02] IFR Flight Environment"
       },
       {
         "tok": "{{k_s4_sIr02IfrFlight_U}}",
-        "label": "[IR 02] IFR Flight Environment · Unsatisfied"
+        "label": "[IR 02] IFR Flight Environment · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[IR 02] IFR Flight Environment"
       },
       {
         "tok": "{{k_s4_sIr03Departure_S}}",
-        "label": "[IR 03] Departure · Satisfied"
+        "label": "[IR 03] Departure · Satisfied",
+        "ord": "Satisfied",
+        "item": "[IR 03] Departure"
       },
       {
         "tok": "{{k_s4_sIr03Departure_U}}",
-        "label": "[IR 03] Departure · Unsatisfied"
+        "label": "[IR 03] Departure · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[IR 03] Departure"
       },
       {
         "tok": "{{k_s4_sIr04Enroute_S}}",
-        "label": "[IR 04] Enroute · Satisfied"
+        "label": "[IR 04] Enroute · Satisfied",
+        "ord": "Satisfied",
+        "item": "[IR 04] Enroute"
       },
       {
         "tok": "{{k_s4_sIr04Enroute_U}}",
-        "label": "[IR 04] Enroute · Unsatisfied"
+        "label": "[IR 04] Enroute · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[IR 04] Enroute"
       },
       {
         "tok": "{{k_s4_sIr05Arrival_S}}",
-        "label": "[IR 05] Arrival · Satisfied"
+        "label": "[IR 05] Arrival · Satisfied",
+        "ord": "Satisfied",
+        "item": "[IR 05] Arrival"
       },
       {
         "tok": "{{k_s4_sIr05Arrival_U}}",
-        "label": "[IR 05] Arrival · Unsatisfied"
+        "label": "[IR 05] Arrival · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[IR 05] Arrival"
       },
       {
         "tok": "{{k_s4_sIr061Approach_S}}",
-        "label": "[IR 06.1] Approach · Satisfied"
+        "label": "[IR 06.1] Approach · Satisfied",
+        "ord": "Satisfied",
+        "item": "[IR 06.1] Approach"
       },
       {
         "tok": "{{k_s4_sIr061Approach_U}}",
-        "label": "[IR 06.1] Approach · Unsatisfied"
+        "label": "[IR 06.1] Approach · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[IR 06.1] Approach"
       },
       {
         "tok": "{{k_s4_sIr062InstrumentApproaches_S}}",
-        "label": "[IR 06.2] Instrument Approaches · Satisfied"
+        "label": "[IR 06.2] Instrument Approaches · Satisfied",
+        "ord": "Satisfied",
+        "item": "[IR 06.2] Instrument Approaches"
       },
       {
         "tok": "{{k_s4_sIr062InstrumentApproaches_U}}",
-        "label": "[IR 06.2] Instrument Approaches · Unsatisfied"
+        "label": "[IR 06.2] Instrument Approaches · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[IR 06.2] Instrument Approaches"
       },
       {
         "tok": "{{k_s4_sIr07Meteorology_S}}",
-        "label": "[IR 07] Meteorology · Satisfied"
+        "label": "[IR 07] Meteorology · Satisfied",
+        "ord": "Satisfied",
+        "item": "[IR 07] Meteorology"
       },
       {
         "tok": "{{k_s4_sIr07Meteorology_U}}",
-        "label": "[IR 07] Meteorology · Unsatisfied"
+        "label": "[IR 07] Meteorology · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[IR 07] Meteorology"
       },
       {
         "tok": "{{k_s4_sIr08IfrFlight_S}}",
-        "label": "[IR 08] IFR Flight Considerations · Satisfied"
+        "label": "[IR 08] IFR Flight Considerations · Satisfied",
+        "ord": "Satisfied",
+        "item": "[IR 08] IFR Flight Considerations"
       },
       {
         "tok": "{{k_s4_sIr08IfrFlight_U}}",
-        "label": "[IR 08] IFR Flight Considerations · Unsatisfied"
+        "label": "[IR 08] IFR Flight Considerations · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[IR 08] IFR Flight Considerations"
       },
       {
         "tok": "{{k_s4_sIr09FlightRule_S}}",
-        "label": "[IR 09] Flight Rule · Satisfied"
+        "label": "[IR 09] Flight Rule · Satisfied",
+        "ord": "Satisfied",
+        "item": "[IR 09] Flight Rule"
       },
       {
         "tok": "{{k_s4_sIr09FlightRule_U}}",
-        "label": "[IR 09] Flight Rule · Unsatisfied"
+        "label": "[IR 09] Flight Rule · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[IR 09] Flight Rule"
       },
       {
         "tok": "{{k_s5_sIp01FoundationOf_S}}",
-        "label": "[IP 01] Foundation of Learning · Satisfied"
+        "label": "[IP 01] Foundation of Learning · Satisfied",
+        "ord": "Satisfied",
+        "item": "[IP 01] Foundation of Learning"
       },
       {
         "tok": "{{k_s5_sIp01FoundationOf_U}}",
-        "label": "[IP 01] Foundation of Learning · Unsatisfied"
+        "label": "[IP 01] Foundation of Learning · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[IP 01] Foundation of Learning"
       },
       {
         "tok": "{{k_s5_sIp02TheArt_S}}",
-        "label": "[IP 02] The Art and Science of Teaching · Satisfied"
+        "label": "[IP 02] The Art and Science of Teaching · Satisfied",
+        "ord": "Satisfied",
+        "item": "[IP 02] The Art and Science of Teaching"
       },
       {
         "tok": "{{k_s5_sIp02TheArt_U}}",
-        "label": "[IP 02] The Art and Science of Teaching · Unsatisfied"
+        "label": "[IP 02] The Art and Science of Teaching · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[IP 02] The Art and Science of Teaching"
       },
       {
         "tok": "{{k_s5_sIp03ExploringHuman_S}}",
-        "label": "[IP 03] Exploring Human Factor · Satisfied"
+        "label": "[IP 03] Exploring Human Factor · Satisfied",
+        "ord": "Satisfied",
+        "item": "[IP 03] Exploring Human Factor"
       },
       {
         "tok": "{{k_s5_sIp03ExploringHuman_U}}",
-        "label": "[IP 03] Exploring Human Factor · Unsatisfied"
+        "label": "[IP 03] Exploring Human Factor · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[IP 03] Exploring Human Factor"
       },
       {
         "tok": "{{k_s5_sIp04BecomingAn_S}}",
-        "label": "[IP 04] Becoming an Instructor · Satisfied"
+        "label": "[IP 04] Becoming an Instructor · Satisfied",
+        "ord": "Satisfied",
+        "item": "[IP 04] Becoming an Instructor"
       },
       {
         "tok": "{{k_s5_sIp04BecomingAn_U}}",
-        "label": "[IP 04] Becoming an Instructor · Unsatisfied"
+        "label": "[IP 04] Becoming an Instructor · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[IP 04] Becoming an Instructor"
       },
       {
         "tok": "{{k_s5_sIp05TheBasic_S}}",
-        "label": "[IP 05] The Basic Instructor · Satisfied"
+        "label": "[IP 05] The Basic Instructor · Satisfied",
+        "ord": "Satisfied",
+        "item": "[IP 05] The Basic Instructor"
       },
       {
         "tok": "{{k_s5_sIp05TheBasic_U}}",
-        "label": "[IP 05] The Basic Instructor · Unsatisfied"
+        "label": "[IP 05] The Basic Instructor · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[IP 05] The Basic Instructor"
       },
       {
         "tok": "{{k_s5_sIp06TheAdvanced_S}}",
-        "label": "[IP 06] The Advanced Instructor · Satisfied"
+        "label": "[IP 06] The Advanced Instructor · Satisfied",
+        "ord": "Satisfied",
+        "item": "[IP 06] The Advanced Instructor"
       },
       {
         "tok": "{{k_s5_sIp06TheAdvanced_U}}",
-        "label": "[IP 06] The Advanced Instructor · Unsatisfied"
+        "label": "[IP 06] The Advanced Instructor · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "[IP 06] The Advanced Instructor"
       },
       {
         "tok": "{{k_s6_sRecurrentA_S}}",
-        "label": "Recurrent A · Satisfied"
+        "label": "Recurrent A · Satisfied",
+        "ord": "Satisfied",
+        "item": "Recurrent A"
       },
       {
         "tok": "{{k_s6_sRecurrentA_U}}",
-        "label": "Recurrent A · Unsatisfied"
+        "label": "Recurrent A · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "Recurrent A"
       },
       {
         "tok": "{{k_s6_sRecurrentE_S}}",
-        "label": "Recurrent E · Satisfied"
+        "label": "Recurrent E · Satisfied",
+        "ord": "Satisfied",
+        "item": "Recurrent E"
       },
       {
         "tok": "{{k_s6_sRecurrentE_U}}",
-        "label": "Recurrent E · Unsatisfied"
+        "label": "Recurrent E · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "Recurrent E"
       },
       {
         "tok": "{{k_s6_sRecurrentIr_S}}",
-        "label": "Recurrent IR · Satisfied"
+        "label": "Recurrent IR · Satisfied",
+        "ord": "Satisfied",
+        "item": "Recurrent IR"
       },
       {
         "tok": "{{k_s6_sRecurrentIr_U}}",
-        "label": "Recurrent IR · Unsatisfied"
+        "label": "Recurrent IR · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "Recurrent IR"
       },
       {
         "tok": "{{k_s6_sRecurrentNight_S}}",
-        "label": "Recurrent Night · Satisfied"
+        "label": "Recurrent Night · Satisfied",
+        "ord": "Satisfied",
+        "item": "Recurrent Night"
       },
       {
         "tok": "{{k_s6_sRecurrentNight_U}}",
-        "label": "Recurrent Night · Unsatisfied"
+        "label": "Recurrent Night · Unsatisfied",
+        "ord": "Unsatisfied",
+        "item": "Recurrent Night"
       }
     ],
     "tables": [],
@@ -1127,6 +1375,7 @@ var TOKEN_MAP = {
   "EFM": {
     "abbr": "EFM",
     "docx": "D-0507-EFM-001.docx",
+    "orderWarn": [],
     "byLabel": [
       {
         "label": "Date",
@@ -1153,1363 +1402,2033 @@ var TOKEN_MAP = {
     "boxes": [
       {
         "tok": "{{k_trainType_ground}}",
-        "label": "Ground"
+        "label": "Ground",
+        "ord": "Ground"
       },
       {
         "tok": "{{k_trainType_flight}}",
-        "label": "Flight"
+        "label": "Flight",
+        "ord": "Flight"
       },
       {
         "tok": "{{k_trainType_simulator}}",
-        "label": "Simulator"
+        "label": "Simulator",
+        "ord": "Simulator"
       },
       {
         "tok": "{{k_trainType_recurrent}}",
-        "label": "Recurrent"
+        "label": "Recurrent",
+        "ord": "Recurrent"
       },
       {
         "tok": "{{k_trainType_progressive}}",
-        "label": "Progressive / standard check"
+        "label": "Progressive / standard check",
+        "ord": "Progressive / standard check"
       },
       {
         "tok": "{{k_teach_tTheContentInThe_excellent}}",
-        "label": "The content in the lesson was · Excellent"
+        "label": "The content in the lesson was · Excellent",
+        "ord": "Excellent",
+        "item": "The content in the lesson was"
       },
       {
         "tok": "{{k_teach_tTheContentInThe_verygood}}",
-        "label": "The content in the lesson was · Very good"
+        "label": "The content in the lesson was · Very good",
+        "ord": "Very good",
+        "item": "The content in the lesson was"
       },
       {
         "tok": "{{k_teach_tTheContentInThe_good}}",
-        "label": "The content in the lesson was · Good"
+        "label": "The content in the lesson was · Good",
+        "ord": "Good",
+        "item": "The content in the lesson was"
       },
       {
         "tok": "{{k_teach_tTheContentInThe_fair}}",
-        "label": "The content in the lesson was · Fair"
+        "label": "The content in the lesson was · Fair",
+        "ord": "Fair",
+        "item": "The content in the lesson was"
       },
       {
         "tok": "{{k_teach_tTheContentInThe_poor}}",
-        "label": "The content in the lesson was · Poor"
+        "label": "The content in the lesson was · Poor",
+        "ord": "Poor",
+        "item": "The content in the lesson was"
       },
       {
         "tok": "{{k_teach_tTheContentInThe_na}}",
-        "label": "The content in the lesson was · N/A"
+        "label": "The content in the lesson was · N/A",
+        "ord": "N/A",
+        "item": "The content in the lesson was"
       },
       {
         "tok": "{{k_teach_tTheInstructorsContributionTo_excellent}}",
-        "label": "The instructor's contribution to the training/course was · Excellent"
+        "label": "The instructor's contribution to the training/course was · Excellent",
+        "ord": "Excellent",
+        "item": "The instructor's contribution to the training/course was"
       },
       {
         "tok": "{{k_teach_tTheInstructorsContributionTo_verygood}}",
-        "label": "The instructor's contribution to the training/course was · Very good"
+        "label": "The instructor's contribution to the training/course was · Very good",
+        "ord": "Very good",
+        "item": "The instructor's contribution to the training/course was"
       },
       {
         "tok": "{{k_teach_tTheInstructorsContributionTo_good}}",
-        "label": "The instructor's contribution to the training/course was · Good"
+        "label": "The instructor's contribution to the training/course was · Good",
+        "ord": "Good",
+        "item": "The instructor's contribution to the training/course was"
       },
       {
         "tok": "{{k_teach_tTheInstructorsContributionTo_fair}}",
-        "label": "The instructor's contribution to the training/course was · Fair"
+        "label": "The instructor's contribution to the training/course was · Fair",
+        "ord": "Fair",
+        "item": "The instructor's contribution to the training/course was"
       },
       {
         "tok": "{{k_teach_tTheInstructorsContributionTo_poor}}",
-        "label": "The instructor's contribution to the training/course was · Poor"
+        "label": "The instructor's contribution to the training/course was · Poor",
+        "ord": "Poor",
+        "item": "The instructor's contribution to the training/course was"
       },
       {
         "tok": "{{k_teach_tTheInstructorsContributionTo_na}}",
-        "label": "The instructor's contribution to the training/course was · N/A"
+        "label": "The instructor's contribution to the training/course was · N/A",
+        "ord": "N/A",
+        "item": "The instructor's contribution to the training/course was"
       },
       {
         "tok": "{{k_teach_tTheInstructorsEffectivenessIn_excellent}}",
-        "label": "The instructor's effectiveness in teaching the subject matter was · Excellent"
+        "label": "The instructor's effectiveness in teaching the subject matter was · Excellent",
+        "ord": "Excellent",
+        "item": "The instructor's effectiveness in teaching the subject matter was"
       },
       {
         "tok": "{{k_teach_tTheInstructorsEffectivenessIn_verygood}}",
-        "label": "The instructor's effectiveness in teaching the subject matter was · Very good"
+        "label": "The instructor's effectiveness in teaching the subject matter was · Very good",
+        "ord": "Very good",
+        "item": "The instructor's effectiveness in teaching the subject matter was"
       },
       {
         "tok": "{{k_teach_tTheInstructorsEffectivenessIn_good}}",
-        "label": "The instructor's effectiveness in teaching the subject matter was · Good"
+        "label": "The instructor's effectiveness in teaching the subject matter was · Good",
+        "ord": "Good",
+        "item": "The instructor's effectiveness in teaching the subject matter was"
       },
       {
         "tok": "{{k_teach_tTheInstructorsEffectivenessIn_fair}}",
-        "label": "The instructor's effectiveness in teaching the subject matter was · Fair"
+        "label": "The instructor's effectiveness in teaching the subject matter was · Fair",
+        "ord": "Fair",
+        "item": "The instructor's effectiveness in teaching the subject matter was"
       },
       {
         "tok": "{{k_teach_tTheInstructorsEffectivenessIn_poor}}",
-        "label": "The instructor's effectiveness in teaching the subject matter was · Poor"
+        "label": "The instructor's effectiveness in teaching the subject matter was · Poor",
+        "ord": "Poor",
+        "item": "The instructor's effectiveness in teaching the subject matter was"
       },
       {
         "tok": "{{k_teach_tTheInstructorsEffectivenessIn_na}}",
-        "label": "The instructor's effectiveness in teaching the subject matter was · N/A"
+        "label": "The instructor's effectiveness in teaching the subject matter was · N/A",
+        "ord": "N/A",
+        "item": "The instructor's effectiveness in teaching the subject matter was"
       },
       {
         "tok": "{{k_teach_tClarityOfInstructorsVoice_excellent}}",
-        "label": "Clarity of instructor's voice was · Excellent"
+        "label": "Clarity of instructor's voice was · Excellent",
+        "ord": "Excellent",
+        "item": "Clarity of instructor's voice was"
       },
       {
         "tok": "{{k_teach_tClarityOfInstructorsVoice_verygood}}",
-        "label": "Clarity of instructor's voice was · Very good"
+        "label": "Clarity of instructor's voice was · Very good",
+        "ord": "Very good",
+        "item": "Clarity of instructor's voice was"
       },
       {
         "tok": "{{k_teach_tClarityOfInstructorsVoice_good}}",
-        "label": "Clarity of instructor's voice was · Good"
+        "label": "Clarity of instructor's voice was · Good",
+        "ord": "Good",
+        "item": "Clarity of instructor's voice was"
       },
       {
         "tok": "{{k_teach_tClarityOfInstructorsVoice_fair}}",
-        "label": "Clarity of instructor's voice was · Fair"
+        "label": "Clarity of instructor's voice was · Fair",
+        "ord": "Fair",
+        "item": "Clarity of instructor's voice was"
       },
       {
         "tok": "{{k_teach_tClarityOfInstructorsVoice_poor}}",
-        "label": "Clarity of instructor's voice was · Poor"
+        "label": "Clarity of instructor's voice was · Poor",
+        "ord": "Poor",
+        "item": "Clarity of instructor's voice was"
       },
       {
         "tok": "{{k_teach_tClarityOfInstructorsVoice_na}}",
-        "label": "Clarity of instructor's voice was · N/A"
+        "label": "Clarity of instructor's voice was · N/A",
+        "ord": "N/A",
+        "item": "Clarity of instructor's voice was"
       },
       {
         "tok": "{{k_teach_tExplanationsByInstructorWere_excellent}}",
-        "label": "Explanations by instructor were · Excellent"
+        "label": "Explanations by instructor were · Excellent",
+        "ord": "Excellent",
+        "item": "Explanations by instructor were"
       },
       {
         "tok": "{{k_teach_tExplanationsByInstructorWere_verygood}}",
-        "label": "Explanations by instructor were · Very good"
+        "label": "Explanations by instructor were · Very good",
+        "ord": "Very good",
+        "item": "Explanations by instructor were"
       },
       {
         "tok": "{{k_teach_tExplanationsByInstructorWere_good}}",
-        "label": "Explanations by instructor were · Good"
+        "label": "Explanations by instructor were · Good",
+        "ord": "Good",
+        "item": "Explanations by instructor were"
       },
       {
         "tok": "{{k_teach_tExplanationsByInstructorWere_fair}}",
-        "label": "Explanations by instructor were · Fair"
+        "label": "Explanations by instructor were · Fair",
+        "ord": "Fair",
+        "item": "Explanations by instructor were"
       },
       {
         "tok": "{{k_teach_tExplanationsByInstructorWere_poor}}",
-        "label": "Explanations by instructor were · Poor"
+        "label": "Explanations by instructor were · Poor",
+        "ord": "Poor",
+        "item": "Explanations by instructor were"
       },
       {
         "tok": "{{k_teach_tExplanationsByInstructorWere_na}}",
-        "label": "Explanations by instructor were · N/A"
+        "label": "Explanations by instructor were · N/A",
+        "ord": "N/A",
+        "item": "Explanations by instructor were"
       },
       {
         "tok": "{{k_teach_tInstructorsUseOfExamples_excellent}}",
-        "label": "Instructor's use of examples and illustrations was · Excellent"
+        "label": "Instructor's use of examples and illustrations was · Excellent",
+        "ord": "Excellent",
+        "item": "Instructor's use of examples and illustrations was"
       },
       {
         "tok": "{{k_teach_tInstructorsUseOfExamples_verygood}}",
-        "label": "Instructor's use of examples and illustrations was · Very good"
+        "label": "Instructor's use of examples and illustrations was · Very good",
+        "ord": "Very good",
+        "item": "Instructor's use of examples and illustrations was"
       },
       {
         "tok": "{{k_teach_tInstructorsUseOfExamples_good}}",
-        "label": "Instructor's use of examples and illustrations was · Good"
+        "label": "Instructor's use of examples and illustrations was · Good",
+        "ord": "Good",
+        "item": "Instructor's use of examples and illustrations was"
       },
       {
         "tok": "{{k_teach_tInstructorsUseOfExamples_fair}}",
-        "label": "Instructor's use of examples and illustrations was · Fair"
+        "label": "Instructor's use of examples and illustrations was · Fair",
+        "ord": "Fair",
+        "item": "Instructor's use of examples and illustrations was"
       },
       {
         "tok": "{{k_teach_tInstructorsUseOfExamples_poor}}",
-        "label": "Instructor's use of examples and illustrations was · Poor"
+        "label": "Instructor's use of examples and illustrations was · Poor",
+        "ord": "Poor",
+        "item": "Instructor's use of examples and illustrations was"
       },
       {
         "tok": "{{k_teach_tInstructorsUseOfExamples_na}}",
-        "label": "Instructor's use of examples and illustrations was · N/A"
+        "label": "Instructor's use of examples and illustrations was · N/A",
+        "ord": "N/A",
+        "item": "Instructor's use of examples and illustrations was"
       },
       {
         "tok": "{{k_teach_tQualityOfQuestionsOr_excellent}}",
-        "label": "Quality of questions or problems raised by the instructor was · Excellent"
+        "label": "Quality of questions or problems raised by the instructor was · Excellent",
+        "ord": "Excellent",
+        "item": "Quality of questions or problems raised by the instructor was"
       },
       {
         "tok": "{{k_teach_tQualityOfQuestionsOr_verygood}}",
-        "label": "Quality of questions or problems raised by the instructor was · Very good"
+        "label": "Quality of questions or problems raised by the instructor was · Very good",
+        "ord": "Very good",
+        "item": "Quality of questions or problems raised by the instructor was"
       },
       {
         "tok": "{{k_teach_tQualityOfQuestionsOr_good}}",
-        "label": "Quality of questions or problems raised by the instructor was · Good"
+        "label": "Quality of questions or problems raised by the instructor was · Good",
+        "ord": "Good",
+        "item": "Quality of questions or problems raised by the instructor was"
       },
       {
         "tok": "{{k_teach_tQualityOfQuestionsOr_fair}}",
-        "label": "Quality of questions or problems raised by the instructor was · Fair"
+        "label": "Quality of questions or problems raised by the instructor was · Fair",
+        "ord": "Fair",
+        "item": "Quality of questions or problems raised by the instructor was"
       },
       {
         "tok": "{{k_teach_tQualityOfQuestionsOr_poor}}",
-        "label": "Quality of questions or problems raised by the instructor was · Poor"
+        "label": "Quality of questions or problems raised by the instructor was · Poor",
+        "ord": "Poor",
+        "item": "Quality of questions or problems raised by the instructor was"
       },
       {
         "tok": "{{k_teach_tQualityOfQuestionsOr_na}}",
-        "label": "Quality of questions or problems raised by the instructor was · N/A"
+        "label": "Quality of questions or problems raised by the instructor was · N/A",
+        "ord": "N/A",
+        "item": "Quality of questions or problems raised by the instructor was"
       },
       {
         "tok": "{{k_teach_tStudentsConfidenceInInstructors_excellent}}",
-        "label": "Student's confidence in instructor's knowledge was · Excellent"
+        "label": "Student's confidence in instructor's knowledge was · Excellent",
+        "ord": "Excellent",
+        "item": "Student's confidence in instructor's knowledge was"
       },
       {
         "tok": "{{k_teach_tStudentsConfidenceInInstructors_verygood}}",
-        "label": "Student's confidence in instructor's knowledge was · Very good"
+        "label": "Student's confidence in instructor's knowledge was · Very good",
+        "ord": "Very good",
+        "item": "Student's confidence in instructor's knowledge was"
       },
       {
         "tok": "{{k_teach_tStudentsConfidenceInInstructors_good}}",
-        "label": "Student's confidence in instructor's knowledge was · Good"
+        "label": "Student's confidence in instructor's knowledge was · Good",
+        "ord": "Good",
+        "item": "Student's confidence in instructor's knowledge was"
       },
       {
         "tok": "{{k_teach_tStudentsConfidenceInInstructors_fair}}",
-        "label": "Student's confidence in instructor's knowledge was · Fair"
+        "label": "Student's confidence in instructor's knowledge was · Fair",
+        "ord": "Fair",
+        "item": "Student's confidence in instructor's knowledge was"
       },
       {
         "tok": "{{k_teach_tStudentsConfidenceInInstructors_poor}}",
-        "label": "Student's confidence in instructor's knowledge was · Poor"
+        "label": "Student's confidence in instructor's knowledge was · Poor",
+        "ord": "Poor",
+        "item": "Student's confidence in instructor's knowledge was"
       },
       {
         "tok": "{{k_teach_tStudentsConfidenceInInstructors_na}}",
-        "label": "Student's confidence in instructor's knowledge was · N/A"
+        "label": "Student's confidence in instructor's knowledge was · N/A",
+        "ord": "N/A",
+        "item": "Student's confidence in instructor's knowledge was"
       },
       {
         "tok": "{{k_teach_tInstructorsEnthusiasmWas_excellent}}",
-        "label": "Instructor's enthusiasm was · Excellent"
+        "label": "Instructor's enthusiasm was · Excellent",
+        "ord": "Excellent",
+        "item": "Instructor's enthusiasm was"
       },
       {
         "tok": "{{k_teach_tInstructorsEnthusiasmWas_verygood}}",
-        "label": "Instructor's enthusiasm was · Very good"
+        "label": "Instructor's enthusiasm was · Very good",
+        "ord": "Very good",
+        "item": "Instructor's enthusiasm was"
       },
       {
         "tok": "{{k_teach_tInstructorsEnthusiasmWas_good}}",
-        "label": "Instructor's enthusiasm was · Good"
+        "label": "Instructor's enthusiasm was · Good",
+        "ord": "Good",
+        "item": "Instructor's enthusiasm was"
       },
       {
         "tok": "{{k_teach_tInstructorsEnthusiasmWas_fair}}",
-        "label": "Instructor's enthusiasm was · Fair"
+        "label": "Instructor's enthusiasm was · Fair",
+        "ord": "Fair",
+        "item": "Instructor's enthusiasm was"
       },
       {
         "tok": "{{k_teach_tInstructorsEnthusiasmWas_poor}}",
-        "label": "Instructor's enthusiasm was · Poor"
+        "label": "Instructor's enthusiasm was · Poor",
+        "ord": "Poor",
+        "item": "Instructor's enthusiasm was"
       },
       {
         "tok": "{{k_teach_tInstructorsEnthusiasmWas_na}}",
-        "label": "Instructor's enthusiasm was · N/A"
+        "label": "Instructor's enthusiasm was · N/A",
+        "ord": "N/A",
+        "item": "Instructor's enthusiasm was"
       },
       {
         "tok": "{{k_teach_tEncouragementGivenToStudents_excellent}}",
-        "label": "Encouragement given to students to express themselves was · Excellent"
+        "label": "Encouragement given to students to express themselves was · Excellent",
+        "ord": "Excellent",
+        "item": "Encouragement given to students to express themselves was"
       },
       {
         "tok": "{{k_teach_tEncouragementGivenToStudents_verygood}}",
-        "label": "Encouragement given to students to express themselves was · Very good"
+        "label": "Encouragement given to students to express themselves was · Very good",
+        "ord": "Very good",
+        "item": "Encouragement given to students to express themselves was"
       },
       {
         "tok": "{{k_teach_tEncouragementGivenToStudents_good}}",
-        "label": "Encouragement given to students to express themselves was · Good"
+        "label": "Encouragement given to students to express themselves was · Good",
+        "ord": "Good",
+        "item": "Encouragement given to students to express themselves was"
       },
       {
         "tok": "{{k_teach_tEncouragementGivenToStudents_fair}}",
-        "label": "Encouragement given to students to express themselves was · Fair"
+        "label": "Encouragement given to students to express themselves was · Fair",
+        "ord": "Fair",
+        "item": "Encouragement given to students to express themselves was"
       },
       {
         "tok": "{{k_teach_tEncouragementGivenToStudents_poor}}",
-        "label": "Encouragement given to students to express themselves was · Poor"
+        "label": "Encouragement given to students to express themselves was · Poor",
+        "ord": "Poor",
+        "item": "Encouragement given to students to express themselves was"
       },
       {
         "tok": "{{k_teach_tEncouragementGivenToStudents_na}}",
-        "label": "Encouragement given to students to express themselves was · N/A"
+        "label": "Encouragement given to students to express themselves was · N/A",
+        "ord": "N/A",
+        "item": "Encouragement given to students to express themselves was"
       },
       {
         "tok": "{{k_teach_tAnswersToStudentQuestions_excellent}}",
-        "label": "Answers to student questions were · Excellent"
+        "label": "Answers to student questions were · Excellent",
+        "ord": "Excellent",
+        "item": "Answers to student questions were"
       },
       {
         "tok": "{{k_teach_tAnswersToStudentQuestions_verygood}}",
-        "label": "Answers to student questions were · Very good"
+        "label": "Answers to student questions were · Very good",
+        "ord": "Very good",
+        "item": "Answers to student questions were"
       },
       {
         "tok": "{{k_teach_tAnswersToStudentQuestions_good}}",
-        "label": "Answers to student questions were · Good"
+        "label": "Answers to student questions were · Good",
+        "ord": "Good",
+        "item": "Answers to student questions were"
       },
       {
         "tok": "{{k_teach_tAnswersToStudentQuestions_fair}}",
-        "label": "Answers to student questions were · Fair"
+        "label": "Answers to student questions were · Fair",
+        "ord": "Fair",
+        "item": "Answers to student questions were"
       },
       {
         "tok": "{{k_teach_tAnswersToStudentQuestions_poor}}",
-        "label": "Answers to student questions were · Poor"
+        "label": "Answers to student questions were · Poor",
+        "ord": "Poor",
+        "item": "Answers to student questions were"
       },
       {
         "tok": "{{k_teach_tAnswersToStudentQuestions_na}}",
-        "label": "Answers to student questions were · N/A"
+        "label": "Answers to student questions were · N/A",
+        "ord": "N/A",
+        "item": "Answers to student questions were"
       },
       {
         "tok": "{{k_teach_tAvailabilityOfExtraHelp_excellent}}",
-        "label": "Availability of extra help when needed was · Excellent"
+        "label": "Availability of extra help when needed was · Excellent",
+        "ord": "Excellent",
+        "item": "Availability of extra help when needed was"
       },
       {
         "tok": "{{k_teach_tAvailabilityOfExtraHelp_verygood}}",
-        "label": "Availability of extra help when needed was · Very good"
+        "label": "Availability of extra help when needed was · Very good",
+        "ord": "Very good",
+        "item": "Availability of extra help when needed was"
       },
       {
         "tok": "{{k_teach_tAvailabilityOfExtraHelp_good}}",
-        "label": "Availability of extra help when needed was · Good"
+        "label": "Availability of extra help when needed was · Good",
+        "ord": "Good",
+        "item": "Availability of extra help when needed was"
       },
       {
         "tok": "{{k_teach_tAvailabilityOfExtraHelp_fair}}",
-        "label": "Availability of extra help when needed was · Fair"
+        "label": "Availability of extra help when needed was · Fair",
+        "ord": "Fair",
+        "item": "Availability of extra help when needed was"
       },
       {
         "tok": "{{k_teach_tAvailabilityOfExtraHelp_poor}}",
-        "label": "Availability of extra help when needed was · Poor"
+        "label": "Availability of extra help when needed was · Poor",
+        "ord": "Poor",
+        "item": "Availability of extra help when needed was"
       },
       {
         "tok": "{{k_teach_tAvailabilityOfExtraHelp_na}}",
-        "label": "Availability of extra help when needed was · N/A"
+        "label": "Availability of extra help when needed was · N/A",
+        "ord": "N/A",
+        "item": "Availability of extra help when needed was"
       },
       {
         "tok": "{{k_teach_tUseOfClassTime_excellent}}",
-        "label": "Use of class time was · Excellent"
+        "label": "Use of class time was · Excellent",
+        "ord": "Excellent",
+        "item": "Use of class time was"
       },
       {
         "tok": "{{k_teach_tUseOfClassTime_verygood}}",
-        "label": "Use of class time was · Very good"
+        "label": "Use of class time was · Very good",
+        "ord": "Very good",
+        "item": "Use of class time was"
       },
       {
         "tok": "{{k_teach_tUseOfClassTime_good}}",
-        "label": "Use of class time was · Good"
+        "label": "Use of class time was · Good",
+        "ord": "Good",
+        "item": "Use of class time was"
       },
       {
         "tok": "{{k_teach_tUseOfClassTime_fair}}",
-        "label": "Use of class time was · Fair"
+        "label": "Use of class time was · Fair",
+        "ord": "Fair",
+        "item": "Use of class time was"
       },
       {
         "tok": "{{k_teach_tUseOfClassTime_poor}}",
-        "label": "Use of class time was · Poor"
+        "label": "Use of class time was · Poor",
+        "ord": "Poor",
+        "item": "Use of class time was"
       },
       {
         "tok": "{{k_teach_tUseOfClassTime_na}}",
-        "label": "Use of class time was · N/A"
+        "label": "Use of class time was · N/A",
+        "ord": "N/A",
+        "item": "Use of class time was"
       },
       {
         "tok": "{{k_teach_tInstructorsInterestInStudents_excellent}}",
-        "label": "Instructor's interest in student's progress was · Excellent"
+        "label": "Instructor's interest in student's progress was · Excellent",
+        "ord": "Excellent",
+        "item": "Instructor's interest in student's progress was"
       },
       {
         "tok": "{{k_teach_tInstructorsInterestInStudents_verygood}}",
-        "label": "Instructor's interest in student's progress was · Very good"
+        "label": "Instructor's interest in student's progress was · Very good",
+        "ord": "Very good",
+        "item": "Instructor's interest in student's progress was"
       },
       {
         "tok": "{{k_teach_tInstructorsInterestInStudents_good}}",
-        "label": "Instructor's interest in student's progress was · Good"
+        "label": "Instructor's interest in student's progress was · Good",
+        "ord": "Good",
+        "item": "Instructor's interest in student's progress was"
       },
       {
         "tok": "{{k_teach_tInstructorsInterestInStudents_fair}}",
-        "label": "Instructor's interest in student's progress was · Fair"
+        "label": "Instructor's interest in student's progress was · Fair",
+        "ord": "Fair",
+        "item": "Instructor's interest in student's progress was"
       },
       {
         "tok": "{{k_teach_tInstructorsInterestInStudents_poor}}",
-        "label": "Instructor's interest in student's progress was · Poor"
+        "label": "Instructor's interest in student's progress was · Poor",
+        "ord": "Poor",
+        "item": "Instructor's interest in student's progress was"
       },
       {
         "tok": "{{k_teach_tInstructorsInterestInStudents_na}}",
-        "label": "Instructor's interest in student's progress was · N/A"
+        "label": "Instructor's interest in student's progress was · N/A",
+        "ord": "N/A",
+        "item": "Instructor's interest in student's progress was"
       },
       {
         "tok": "{{k_teach_tAmountYouLearnedWas_excellent}}",
-        "label": "Amount you learned was · Excellent"
+        "label": "Amount you learned was · Excellent",
+        "ord": "Excellent",
+        "item": "Amount you learned was"
       },
       {
         "tok": "{{k_teach_tAmountYouLearnedWas_verygood}}",
-        "label": "Amount you learned was · Very good"
+        "label": "Amount you learned was · Very good",
+        "ord": "Very good",
+        "item": "Amount you learned was"
       },
       {
         "tok": "{{k_teach_tAmountYouLearnedWas_good}}",
-        "label": "Amount you learned was · Good"
+        "label": "Amount you learned was · Good",
+        "ord": "Good",
+        "item": "Amount you learned was"
       },
       {
         "tok": "{{k_teach_tAmountYouLearnedWas_fair}}",
-        "label": "Amount you learned was · Fair"
+        "label": "Amount you learned was · Fair",
+        "ord": "Fair",
+        "item": "Amount you learned was"
       },
       {
         "tok": "{{k_teach_tAmountYouLearnedWas_poor}}",
-        "label": "Amount you learned was · Poor"
+        "label": "Amount you learned was · Poor",
+        "ord": "Poor",
+        "item": "Amount you learned was"
       },
       {
         "tok": "{{k_teach_tAmountYouLearnedWas_na}}",
-        "label": "Amount you learned was · N/A"
+        "label": "Amount you learned was · N/A",
+        "ord": "N/A",
+        "item": "Amount you learned was"
       },
       {
         "tok": "{{k_teach_tRelevanceOfCoursetrainingContent_excellent}}",
-        "label": "Relevance of course/training content was · Excellent"
+        "label": "Relevance of course/training content was · Excellent",
+        "ord": "Excellent",
+        "item": "Relevance of course/training content was"
       },
       {
         "tok": "{{k_teach_tRelevanceOfCoursetrainingContent_verygood}}",
-        "label": "Relevance of course/training content was · Very good"
+        "label": "Relevance of course/training content was · Very good",
+        "ord": "Very good",
+        "item": "Relevance of course/training content was"
       },
       {
         "tok": "{{k_teach_tRelevanceOfCoursetrainingContent_good}}",
-        "label": "Relevance of course/training content was · Good"
+        "label": "Relevance of course/training content was · Good",
+        "ord": "Good",
+        "item": "Relevance of course/training content was"
       },
       {
         "tok": "{{k_teach_tRelevanceOfCoursetrainingContent_fair}}",
-        "label": "Relevance of course/training content was · Fair"
+        "label": "Relevance of course/training content was · Fair",
+        "ord": "Fair",
+        "item": "Relevance of course/training content was"
       },
       {
         "tok": "{{k_teach_tRelevanceOfCoursetrainingContent_poor}}",
-        "label": "Relevance of course/training content was · Poor"
+        "label": "Relevance of course/training content was · Poor",
+        "ord": "Poor",
+        "item": "Relevance of course/training content was"
       },
       {
         "tok": "{{k_teach_tRelevanceOfCoursetrainingContent_na}}",
-        "label": "Relevance of course/training content was · N/A"
+        "label": "Relevance of course/training content was · N/A",
+        "ord": "N/A",
+        "item": "Relevance of course/training content was"
       },
       {
         "tok": "{{k_teach_tGradingTechniquesWere_excellent}}",
-        "label": "Grading techniques were · Excellent"
+        "label": "Grading techniques were · Excellent",
+        "ord": "Excellent",
+        "item": "Grading techniques were"
       },
       {
         "tok": "{{k_teach_tGradingTechniquesWere_verygood}}",
-        "label": "Grading techniques were · Very good"
+        "label": "Grading techniques were · Very good",
+        "ord": "Very good",
+        "item": "Grading techniques were"
       },
       {
         "tok": "{{k_teach_tGradingTechniquesWere_good}}",
-        "label": "Grading techniques were · Good"
+        "label": "Grading techniques were · Good",
+        "ord": "Good",
+        "item": "Grading techniques were"
       },
       {
         "tok": "{{k_teach_tGradingTechniquesWere_fair}}",
-        "label": "Grading techniques were · Fair"
+        "label": "Grading techniques were · Fair",
+        "ord": "Fair",
+        "item": "Grading techniques were"
       },
       {
         "tok": "{{k_teach_tGradingTechniquesWere_poor}}",
-        "label": "Grading techniques were · Poor"
+        "label": "Grading techniques were · Poor",
+        "ord": "Poor",
+        "item": "Grading techniques were"
       },
       {
         "tok": "{{k_teach_tGradingTechniquesWere_na}}",
-        "label": "Grading techniques were · N/A"
+        "label": "Grading techniques were · N/A",
+        "ord": "N/A",
+        "item": "Grading techniques were"
       },
       {
         "tok": "{{k_teach_tReasonablenessOfAssignedWork_excellent}}",
-        "label": "Reasonableness of assigned work was · Excellent"
+        "label": "Reasonableness of assigned work was · Excellent",
+        "ord": "Excellent",
+        "item": "Reasonableness of assigned work was"
       },
       {
         "tok": "{{k_teach_tReasonablenessOfAssignedWork_verygood}}",
-        "label": "Reasonableness of assigned work was · Very good"
+        "label": "Reasonableness of assigned work was · Very good",
+        "ord": "Very good",
+        "item": "Reasonableness of assigned work was"
       },
       {
         "tok": "{{k_teach_tReasonablenessOfAssignedWork_good}}",
-        "label": "Reasonableness of assigned work was · Good"
+        "label": "Reasonableness of assigned work was · Good",
+        "ord": "Good",
+        "item": "Reasonableness of assigned work was"
       },
       {
         "tok": "{{k_teach_tReasonablenessOfAssignedWork_fair}}",
-        "label": "Reasonableness of assigned work was · Fair"
+        "label": "Reasonableness of assigned work was · Fair",
+        "ord": "Fair",
+        "item": "Reasonableness of assigned work was"
       },
       {
         "tok": "{{k_teach_tReasonablenessOfAssignedWork_poor}}",
-        "label": "Reasonableness of assigned work was · Poor"
+        "label": "Reasonableness of assigned work was · Poor",
+        "ord": "Poor",
+        "item": "Reasonableness of assigned work was"
       },
       {
         "tok": "{{k_teach_tReasonablenessOfAssignedWork_na}}",
-        "label": "Reasonableness of assigned work was · N/A"
+        "label": "Reasonableness of assigned work was · N/A",
+        "ord": "N/A",
+        "item": "Reasonableness of assigned work was"
       },
       {
         "tok": "{{k_teach_tClarityOfStudentRequirements_excellent}}",
-        "label": "Clarity of student requirements was · Excellent"
+        "label": "Clarity of student requirements was · Excellent",
+        "ord": "Excellent",
+        "item": "Clarity of student requirements was"
       },
       {
         "tok": "{{k_teach_tClarityOfStudentRequirements_verygood}}",
-        "label": "Clarity of student requirements was · Very good"
+        "label": "Clarity of student requirements was · Very good",
+        "ord": "Very good",
+        "item": "Clarity of student requirements was"
       },
       {
         "tok": "{{k_teach_tClarityOfStudentRequirements_good}}",
-        "label": "Clarity of student requirements was · Good"
+        "label": "Clarity of student requirements was · Good",
+        "ord": "Good",
+        "item": "Clarity of student requirements was"
       },
       {
         "tok": "{{k_teach_tClarityOfStudentRequirements_fair}}",
-        "label": "Clarity of student requirements was · Fair"
+        "label": "Clarity of student requirements was · Fair",
+        "ord": "Fair",
+        "item": "Clarity of student requirements was"
       },
       {
         "tok": "{{k_teach_tClarityOfStudentRequirements_poor}}",
-        "label": "Clarity of student requirements was · Poor"
+        "label": "Clarity of student requirements was · Poor",
+        "ord": "Poor",
+        "item": "Clarity of student requirements was"
       },
       {
         "tok": "{{k_teach_tClarityOfStudentRequirements_na}}",
-        "label": "Clarity of student requirements was · N/A"
+        "label": "Clarity of student requirements was · N/A",
+        "ord": "N/A",
+        "item": "Clarity of student requirements was"
       },
       {
         "tok": "{{k_f1_fRouteSelection_S}}",
-        "label": "Route Selection · Satisfied"
+        "label": "Route Selection · Satisfied",
+        "ord": "Satisfied",
+        "item": "Route Selection"
       },
       {
         "tok": "{{k_f1_fRouteSelection_U}}",
-        "label": "Route Selection · Not satisfied"
+        "label": "Route Selection · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Route Selection"
       },
       {
         "tok": "{{k_f1_fRouteSelection_NA}}",
-        "label": "Route Selection · Exempt"
+        "label": "Route Selection · Exempt",
+        "ord": "Exempt",
+        "item": "Route Selection"
       },
       {
         "tok": "{{k_f1_fFuelPlanning_S}}",
-        "label": "Fuel Planning · Satisfied"
+        "label": "Fuel Planning · Satisfied",
+        "ord": "Satisfied",
+        "item": "Fuel Planning"
       },
       {
         "tok": "{{k_f1_fFuelPlanning_U}}",
-        "label": "Fuel Planning · Not satisfied"
+        "label": "Fuel Planning · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Fuel Planning"
       },
       {
         "tok": "{{k_f1_fFuelPlanning_NA}}",
-        "label": "Fuel Planning · Exempt"
+        "label": "Fuel Planning · Exempt",
+        "ord": "Exempt",
+        "item": "Fuel Planning"
       },
       {
         "tok": "{{k_f1_fComplianceWithRegulations_S}}",
-        "label": "Compliance with Regulations · Satisfied"
+        "label": "Compliance with Regulations · Satisfied",
+        "ord": "Satisfied",
+        "item": "Compliance with Regulations"
       },
       {
         "tok": "{{k_f1_fComplianceWithRegulations_U}}",
-        "label": "Compliance with Regulations · Not satisfied"
+        "label": "Compliance with Regulations · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Compliance with Regulations"
       },
       {
         "tok": "{{k_f1_fComplianceWithRegulations_NA}}",
-        "label": "Compliance with Regulations · Exempt"
+        "label": "Compliance with Regulations · Exempt",
+        "ord": "Exempt",
+        "item": "Compliance with Regulations"
       },
       {
         "tok": "{{k_f1_fMassAndBalance_S}}",
-        "label": "Mass and Balance · Satisfied"
+        "label": "Mass and Balance · Satisfied",
+        "ord": "Satisfied",
+        "item": "Mass and Balance"
       },
       {
         "tok": "{{k_f1_fMassAndBalance_U}}",
-        "label": "Mass and Balance · Not satisfied"
+        "label": "Mass and Balance · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Mass and Balance"
       },
       {
         "tok": "{{k_f1_fMassAndBalance_NA}}",
-        "label": "Mass and Balance · Exempt"
+        "label": "Mass and Balance · Exempt",
+        "ord": "Exempt",
+        "item": "Mass and Balance"
       },
       {
         "tok": "{{k_f1_fMapVfrNavigationLog_S}}",
-        "label": "Map, VFR Navigation Log, Dead Reckoning · Satisfied"
+        "label": "Map, VFR Navigation Log, Dead Reckoning · Satisfied",
+        "ord": "Satisfied",
+        "item": "Map, VFR Navigation Log, Dead Reckoning"
       },
       {
         "tok": "{{k_f1_fMapVfrNavigationLog_U}}",
-        "label": "Map, VFR Navigation Log, Dead Reckoning · Not satisfied"
+        "label": "Map, VFR Navigation Log, Dead Reckoning · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Map, VFR Navigation Log, Dead Reckoning"
       },
       {
         "tok": "{{k_f1_fMapVfrNavigationLog_NA}}",
-        "label": "Map, VFR Navigation Log, Dead Reckoning · Exempt"
+        "label": "Map, VFR Navigation Log, Dead Reckoning · Exempt",
+        "ord": "Exempt",
+        "item": "Map, VFR Navigation Log, Dead Reckoning"
       },
       {
         "tok": "{{k_f1_fPreflightInspectionAndServicing_S}}",
-        "label": "Preflight Inspection and Servicing · Satisfied"
+        "label": "Preflight Inspection and Servicing · Satisfied",
+        "ord": "Satisfied",
+        "item": "Preflight Inspection and Servicing"
       },
       {
         "tok": "{{k_f1_fPreflightInspectionAndServicing_U}}",
-        "label": "Preflight Inspection and Servicing · Not satisfied"
+        "label": "Preflight Inspection and Servicing · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Preflight Inspection and Servicing"
       },
       {
         "tok": "{{k_f1_fPreflightInspectionAndServicing_NA}}",
-        "label": "Preflight Inspection and Servicing · Exempt"
+        "label": "Preflight Inspection and Servicing · Exempt",
+        "ord": "Exempt",
+        "item": "Preflight Inspection and Servicing"
       },
       {
         "tok": "{{k_f1_fCockpitManagement_S}}",
-        "label": "Cockpit Management · Satisfied"
+        "label": "Cockpit Management · Satisfied",
+        "ord": "Satisfied",
+        "item": "Cockpit Management"
       },
       {
         "tok": "{{k_f1_fCockpitManagement_U}}",
-        "label": "Cockpit Management · Not satisfied"
+        "label": "Cockpit Management · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Cockpit Management"
       },
       {
         "tok": "{{k_f1_fCockpitManagement_NA}}",
-        "label": "Cockpit Management · Exempt"
+        "label": "Cockpit Management · Exempt",
+        "ord": "Exempt",
+        "item": "Cockpit Management"
       },
       {
         "tok": "{{k_f2_fKnowledgeOfAtcProcedures_S}}",
-        "label": "Knowledge of ATC Procedures · Satisfied"
+        "label": "Knowledge of ATC Procedures · Satisfied",
+        "ord": "Satisfied",
+        "item": "Knowledge of ATC Procedures"
       },
       {
         "tok": "{{k_f2_fKnowledgeOfAtcProcedures_U}}",
-        "label": "Knowledge of ATC Procedures · Not satisfied"
+        "label": "Knowledge of ATC Procedures · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Knowledge of ATC Procedures"
       },
       {
         "tok": "{{k_f2_fKnowledgeOfAtcProcedures_NA}}",
-        "label": "Knowledge of ATC Procedures · Exempt"
+        "label": "Knowledge of ATC Procedures · Exempt",
+        "ord": "Exempt",
+        "item": "Knowledge of ATC Procedures"
       },
       {
         "tok": "{{k_f2_fAbilityToCommunicateAtc_S}}",
-        "label": "Ability to Communicate ATC Procedures · Satisfied"
+        "label": "Ability to Communicate ATC Procedures · Satisfied",
+        "ord": "Satisfied",
+        "item": "Ability to Communicate ATC Procedures"
       },
       {
         "tok": "{{k_f2_fAbilityToCommunicateAtc_U}}",
-        "label": "Ability to Communicate ATC Procedures · Not satisfied"
+        "label": "Ability to Communicate ATC Procedures · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Ability to Communicate ATC Procedures"
       },
       {
         "tok": "{{k_f2_fAbilityToCommunicateAtc_NA}}",
-        "label": "Ability to Communicate ATC Procedures · Exempt"
+        "label": "Ability to Communicate ATC Procedures · Exempt",
+        "ord": "Exempt",
+        "item": "Ability to Communicate ATC Procedures"
       },
       {
         "tok": "{{k_f3_fExplanationOfRouteProcedures_S}}",
-        "label": "Explanation of Route Procedures · Satisfied"
+        "label": "Explanation of Route Procedures · Satisfied",
+        "ord": "Satisfied",
+        "item": "Explanation of Route Procedures"
       },
       {
         "tok": "{{k_f3_fExplanationOfRouteProcedures_U}}",
-        "label": "Explanation of Route Procedures · Not satisfied"
+        "label": "Explanation of Route Procedures · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Explanation of Route Procedures"
       },
       {
         "tok": "{{k_f3_fExplanationOfRouteProcedures_NA}}",
-        "label": "Explanation of Route Procedures · Exempt"
+        "label": "Explanation of Route Procedures · Exempt",
+        "ord": "Exempt",
+        "item": "Explanation of Route Procedures"
       },
       {
         "tok": "{{k_f3_fProperUseOfRoute_S}}",
-        "label": "Proper Use of Route Procedures · Satisfied"
+        "label": "Proper Use of Route Procedures · Satisfied",
+        "ord": "Satisfied",
+        "item": "Proper Use of Route Procedures"
       },
       {
         "tok": "{{k_f3_fProperUseOfRoute_U}}",
-        "label": "Proper Use of Route Procedures · Not satisfied"
+        "label": "Proper Use of Route Procedures · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Proper Use of Route Procedures"
       },
       {
         "tok": "{{k_f3_fProperUseOfRoute_NA}}",
-        "label": "Proper Use of Route Procedures · Exempt"
+        "label": "Proper Use of Route Procedures · Exempt",
+        "ord": "Exempt",
+        "item": "Proper Use of Route Procedures"
       },
       {
         "tok": "{{k_f4_fCommunicationWithAtc_S}}",
-        "label": "Communication with ATC · Satisfied"
+        "label": "Communication with ATC · Satisfied",
+        "ord": "Satisfied",
+        "item": "Communication with ATC"
       },
       {
         "tok": "{{k_f4_fCommunicationWithAtc_U}}",
-        "label": "Communication with ATC · Not satisfied"
+        "label": "Communication with ATC · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Communication with ATC"
       },
       {
         "tok": "{{k_f4_fCommunicationWithAtc_NA}}",
-        "label": "Communication with ATC · Exempt"
+        "label": "Communication with ATC · Exempt",
+        "ord": "Exempt",
+        "item": "Communication with ATC"
       },
       {
         "tok": "{{k_f4_fCommunicationWithOtherAircraft_S}}",
-        "label": "Communication with Other Aircraft · Satisfied"
+        "label": "Communication with Other Aircraft · Satisfied",
+        "ord": "Satisfied",
+        "item": "Communication with Other Aircraft"
       },
       {
         "tok": "{{k_f4_fCommunicationWithOtherAircraft_U}}",
-        "label": "Communication with Other Aircraft · Not satisfied"
+        "label": "Communication with Other Aircraft · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Communication with Other Aircraft"
       },
       {
         "tok": "{{k_f4_fCommunicationWithOtherAircraft_NA}}",
-        "label": "Communication with Other Aircraft · Exempt"
+        "label": "Communication with Other Aircraft · Exempt",
+        "ord": "Exempt",
+        "item": "Communication with Other Aircraft"
       },
       {
         "tok": "{{k_f5_fInterpretationOfWeatherReports_S}}",
-        "label": "Interpretation of Weather Reports · Satisfied"
+        "label": "Interpretation of Weather Reports · Satisfied",
+        "ord": "Satisfied",
+        "item": "Interpretation of Weather Reports"
       },
       {
         "tok": "{{k_f5_fInterpretationOfWeatherReports_U}}",
-        "label": "Interpretation of Weather Reports · Not satisfied"
+        "label": "Interpretation of Weather Reports · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Interpretation of Weather Reports"
       },
       {
         "tok": "{{k_f5_fInterpretationOfWeatherReports_NA}}",
-        "label": "Interpretation of Weather Reports · Exempt"
+        "label": "Interpretation of Weather Reports · Exempt",
+        "ord": "Exempt",
+        "item": "Interpretation of Weather Reports"
       },
       {
         "tok": "{{k_f5_fInterpretationOfWeatherForecasts_S}}",
-        "label": "Interpretation of Weather Forecasts · Satisfied"
+        "label": "Interpretation of Weather Forecasts · Satisfied",
+        "ord": "Satisfied",
+        "item": "Interpretation of Weather Forecasts"
       },
       {
         "tok": "{{k_f5_fInterpretationOfWeatherForecasts_U}}",
-        "label": "Interpretation of Weather Forecasts · Not satisfied"
+        "label": "Interpretation of Weather Forecasts · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Interpretation of Weather Forecasts"
       },
       {
         "tok": "{{k_f5_fInterpretationOfWeatherForecasts_NA}}",
-        "label": "Interpretation of Weather Forecasts · Exempt"
+        "label": "Interpretation of Weather Forecasts · Exempt",
+        "ord": "Exempt",
+        "item": "Interpretation of Weather Forecasts"
       },
       {
         "tok": "{{k_f6_fAbilityToAnswerTechnical_S}}",
-        "label": "Ability to Answer Technical Questions · Satisfied"
+        "label": "Ability to Answer Technical Questions · Satisfied",
+        "ord": "Satisfied",
+        "item": "Ability to Answer Technical Questions"
       },
       {
         "tok": "{{k_f6_fAbilityToAnswerTechnical_U}}",
-        "label": "Ability to Answer Technical Questions · Not satisfied"
+        "label": "Ability to Answer Technical Questions · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Ability to Answer Technical Questions"
       },
       {
         "tok": "{{k_f6_fAbilityToAnswerTechnical_NA}}",
-        "label": "Ability to Answer Technical Questions · Exempt"
+        "label": "Ability to Answer Technical Questions · Exempt",
+        "ord": "Exempt",
+        "item": "Ability to Answer Technical Questions"
       },
       {
         "tok": "{{k_f6_fRelevanceOfTechnicalKnowledge_S}}",
-        "label": "Relevance of Technical Knowledge · Satisfied"
+        "label": "Relevance of Technical Knowledge · Satisfied",
+        "ord": "Satisfied",
+        "item": "Relevance of Technical Knowledge"
       },
       {
         "tok": "{{k_f6_fRelevanceOfTechnicalKnowledge_U}}",
-        "label": "Relevance of Technical Knowledge · Not satisfied"
+        "label": "Relevance of Technical Knowledge · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Relevance of Technical Knowledge"
       },
       {
         "tok": "{{k_f6_fRelevanceOfTechnicalKnowledge_NA}}",
-        "label": "Relevance of Technical Knowledge · Exempt"
+        "label": "Relevance of Technical Knowledge · Exempt",
+        "ord": "Exempt",
+        "item": "Relevance of Technical Knowledge"
       },
       {
         "tok": "{{k_f7_fAdherenceToCompanyPolicies_S}}",
-        "label": "Adherence to Company Policies · Satisfied"
+        "label": "Adherence to Company Policies · Satisfied",
+        "ord": "Satisfied",
+        "item": "Adherence to Company Policies"
       },
       {
         "tok": "{{k_f7_fAdherenceToCompanyPolicies_U}}",
-        "label": "Adherence to Company Policies · Not satisfied"
+        "label": "Adherence to Company Policies · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Adherence to Company Policies"
       },
       {
         "tok": "{{k_f7_fAdherenceToCompanyPolicies_NA}}",
-        "label": "Adherence to Company Policies · Exempt"
+        "label": "Adherence to Company Policies · Exempt",
+        "ord": "Exempt",
+        "item": "Adherence to Company Policies"
       },
       {
         "tok": "{{k_f7_fKnowledgeOfCompanyRegulations_S}}",
-        "label": "Knowledge of Company Regulations · Satisfied"
+        "label": "Knowledge of Company Regulations · Satisfied",
+        "ord": "Satisfied",
+        "item": "Knowledge of Company Regulations"
       },
       {
         "tok": "{{k_f7_fKnowledgeOfCompanyRegulations_U}}",
-        "label": "Knowledge of Company Regulations · Not satisfied"
+        "label": "Knowledge of Company Regulations · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Knowledge of Company Regulations"
       },
       {
         "tok": "{{k_f7_fKnowledgeOfCompanyRegulations_NA}}",
-        "label": "Knowledge of Company Regulations · Exempt"
+        "label": "Knowledge of Company Regulations · Exempt",
+        "ord": "Exempt",
+        "item": "Knowledge of Company Regulations"
       },
       {
         "tok": "{{k_f8_fKnowledgeOfEmergencyEquipment_S}}",
-        "label": "Knowledge of Emergency Equipment · Satisfied"
+        "label": "Knowledge of Emergency Equipment · Satisfied",
+        "ord": "Satisfied",
+        "item": "Knowledge of Emergency Equipment"
       },
       {
         "tok": "{{k_f8_fKnowledgeOfEmergencyEquipment_U}}",
-        "label": "Knowledge of Emergency Equipment · Not satisfied"
+        "label": "Knowledge of Emergency Equipment · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Knowledge of Emergency Equipment"
       },
       {
         "tok": "{{k_f8_fKnowledgeOfEmergencyEquipment_NA}}",
-        "label": "Knowledge of Emergency Equipment · Exempt"
+        "label": "Knowledge of Emergency Equipment · Exempt",
+        "ord": "Exempt",
+        "item": "Knowledge of Emergency Equipment"
       },
       {
         "tok": "{{k_f8_fDemonstrationOfEmergencyProcedures_S}}",
-        "label": "Demonstration of Emergency Procedures · Satisfied"
+        "label": "Demonstration of Emergency Procedures · Satisfied",
+        "ord": "Satisfied",
+        "item": "Demonstration of Emergency Procedures"
       },
       {
         "tok": "{{k_f8_fDemonstrationOfEmergencyProcedures_U}}",
-        "label": "Demonstration of Emergency Procedures · Not satisfied"
+        "label": "Demonstration of Emergency Procedures · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Demonstration of Emergency Procedures"
       },
       {
         "tok": "{{k_f8_fDemonstrationOfEmergencyProcedures_NA}}",
-        "label": "Demonstration of Emergency Procedures · Exempt"
+        "label": "Demonstration of Emergency Procedures · Exempt",
+        "ord": "Exempt",
+        "item": "Demonstration of Emergency Procedures"
       },
       {
         "tok": "{{k_f9_fFosteringCrewCooperation_S}}",
-        "label": "Fostering Crew Cooperation · Satisfied"
+        "label": "Fostering Crew Cooperation · Satisfied",
+        "ord": "Satisfied",
+        "item": "Fostering Crew Cooperation"
       },
       {
         "tok": "{{k_f9_fFosteringCrewCooperation_U}}",
-        "label": "Fostering Crew Cooperation · Not satisfied"
+        "label": "Fostering Crew Cooperation · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Fostering Crew Cooperation"
       },
       {
         "tok": "{{k_f9_fFosteringCrewCooperation_NA}}",
-        "label": "Fostering Crew Cooperation · Exempt"
+        "label": "Fostering Crew Cooperation · Exempt",
+        "ord": "Exempt",
+        "item": "Fostering Crew Cooperation"
       },
       {
         "tok": "{{k_f9_fCoordinationDuringFlight_S}}",
-        "label": "Coordination During Flight · Satisfied"
+        "label": "Coordination During Flight · Satisfied",
+        "ord": "Satisfied",
+        "item": "Coordination During Flight"
       },
       {
         "tok": "{{k_f9_fCoordinationDuringFlight_U}}",
-        "label": "Coordination During Flight · Not satisfied"
+        "label": "Coordination During Flight · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Coordination During Flight"
       },
       {
         "tok": "{{k_f9_fCoordinationDuringFlight_NA}}",
-        "label": "Coordination During Flight · Exempt"
+        "label": "Coordination During Flight · Exempt",
+        "ord": "Exempt",
+        "item": "Coordination During Flight"
       },
       {
         "tok": "{{k_f10_fDecisionmakingDuringFlight_S}}",
-        "label": "Decision-Making During Flight · Satisfied"
+        "label": "Decision-Making During Flight · Satisfied",
+        "ord": "Satisfied",
+        "item": "Decision-Making During Flight"
       },
       {
         "tok": "{{k_f10_fDecisionmakingDuringFlight_U}}",
-        "label": "Decision-Making During Flight · Not satisfied"
+        "label": "Decision-Making During Flight · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Decision-Making During Flight"
       },
       {
         "tok": "{{k_f10_fDecisionmakingDuringFlight_NA}}",
-        "label": "Decision-Making During Flight · Exempt"
+        "label": "Decision-Making During Flight · Exempt",
+        "ord": "Exempt",
+        "item": "Decision-Making During Flight"
       },
       {
         "tok": "{{k_f10_fEfficiencyInFlightOperations_S}}",
-        "label": "Efficiency in Flight Operations · Satisfied"
+        "label": "Efficiency in Flight Operations · Satisfied",
+        "ord": "Satisfied",
+        "item": "Efficiency in Flight Operations"
       },
       {
         "tok": "{{k_f10_fEfficiencyInFlightOperations_U}}",
-        "label": "Efficiency in Flight Operations · Not satisfied"
+        "label": "Efficiency in Flight Operations · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Efficiency in Flight Operations"
       },
       {
         "tok": "{{k_f10_fEfficiencyInFlightOperations_NA}}",
-        "label": "Efficiency in Flight Operations · Exempt"
+        "label": "Efficiency in Flight Operations · Exempt",
+        "ord": "Exempt",
+        "item": "Efficiency in Flight Operations"
       },
       {
         "tok": "{{k_f11_fKnowledgeOfAircraftSystems_S}}",
-        "label": "Knowledge of Aircraft Systems · Satisfied"
+        "label": "Knowledge of Aircraft Systems · Satisfied",
+        "ord": "Satisfied",
+        "item": "Knowledge of Aircraft Systems"
       },
       {
         "tok": "{{k_f11_fKnowledgeOfAircraftSystems_U}}",
-        "label": "Knowledge of Aircraft Systems · Not satisfied"
+        "label": "Knowledge of Aircraft Systems · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Knowledge of Aircraft Systems"
       },
       {
         "tok": "{{k_f11_fKnowledgeOfAircraftSystems_NA}}",
-        "label": "Knowledge of Aircraft Systems · Exempt"
+        "label": "Knowledge of Aircraft Systems · Exempt",
+        "ord": "Exempt",
+        "item": "Knowledge of Aircraft Systems"
       },
       {
         "tok": "{{k_f11_fApplicationOfSystemsKnowledge_S}}",
-        "label": "Application of Systems Knowledge During Flight · Satisfied"
+        "label": "Application of Systems Knowledge During Flight · Satisfied",
+        "ord": "Satisfied",
+        "item": "Application of Systems Knowledge During Flight"
       },
       {
         "tok": "{{k_f11_fApplicationOfSystemsKnowledge_U}}",
-        "label": "Application of Systems Knowledge During Flight · Not satisfied"
+        "label": "Application of Systems Knowledge During Flight · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Application of Systems Knowledge During Flight"
       },
       {
         "tok": "{{k_f11_fApplicationOfSystemsKnowledge_NA}}",
-        "label": "Application of Systems Knowledge During Flight · Exempt"
+        "label": "Application of Systems Knowledge During Flight · Exempt",
+        "ord": "Exempt",
+        "item": "Application of Systems Knowledge During Flight"
       },
       {
         "tok": "{{k_f12_fEngineStarting_S}}",
-        "label": "Engine Starting · Satisfied"
+        "label": "Engine Starting · Satisfied",
+        "ord": "Satisfied",
+        "item": "Engine Starting"
       },
       {
         "tok": "{{k_f12_fEngineStarting_U}}",
-        "label": "Engine Starting · Not satisfied"
+        "label": "Engine Starting · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Engine Starting"
       },
       {
         "tok": "{{k_f12_fEngineStarting_NA}}",
-        "label": "Engine Starting · Exempt"
+        "label": "Engine Starting · Exempt",
+        "ord": "Exempt",
+        "item": "Engine Starting"
       },
       {
         "tok": "{{k_f12_fTaxiing_S}}",
-        "label": "Taxiing · Satisfied"
+        "label": "Taxiing · Satisfied",
+        "ord": "Satisfied",
+        "item": "Taxiing"
       },
       {
         "tok": "{{k_f12_fTaxiing_U}}",
-        "label": "Taxiing · Not satisfied"
+        "label": "Taxiing · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Taxiing"
       },
       {
         "tok": "{{k_f12_fTaxiing_NA}}",
-        "label": "Taxiing · Exempt"
+        "label": "Taxiing · Exempt",
+        "ord": "Exempt",
+        "item": "Taxiing"
       },
       {
         "tok": "{{k_f12_fPretakeoffCheck_S}}",
-        "label": "Pre-Takeoff Check · Satisfied"
+        "label": "Pre-Takeoff Check · Satisfied",
+        "ord": "Satisfied",
+        "item": "Pre-Takeoff Check"
       },
       {
         "tok": "{{k_f12_fPretakeoffCheck_U}}",
-        "label": "Pre-Takeoff Check · Not satisfied"
+        "label": "Pre-Takeoff Check · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Pre-Takeoff Check"
       },
       {
         "tok": "{{k_f12_fPretakeoffCheck_NA}}",
-        "label": "Pre-Takeoff Check · Exempt"
+        "label": "Pre-Takeoff Check · Exempt",
+        "ord": "Exempt",
+        "item": "Pre-Takeoff Check"
       },
       {
         "tok": "{{k_f12_fNormalAndCrossWind_S}}",
-        "label": "Normal and Cross Wind Takeoff and Climb · Satisfied"
+        "label": "Normal and Cross Wind Takeoff and Climb · Satisfied",
+        "ord": "Satisfied",
+        "item": "Normal and Cross Wind Takeoff and Climb"
       },
       {
         "tok": "{{k_f12_fNormalAndCrossWind_U}}",
-        "label": "Normal and Cross Wind Takeoff and Climb · Not satisfied"
+        "label": "Normal and Cross Wind Takeoff and Climb · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Normal and Cross Wind Takeoff and Climb"
       },
       {
         "tok": "{{k_f12_fNormalAndCrossWind_NA}}",
-        "label": "Normal and Cross Wind Takeoff and Climb · Exempt"
+        "label": "Normal and Cross Wind Takeoff and Climb · Exempt",
+        "ord": "Exempt",
+        "item": "Normal and Cross Wind Takeoff and Climb"
       },
       {
         "tok": "{{k_f12_fShortfieldTakeoffAndClimb_S}}",
-        "label": "Short-Field Takeoff and Climb · Satisfied"
+        "label": "Short-Field Takeoff and Climb · Satisfied",
+        "ord": "Satisfied",
+        "item": "Short-Field Takeoff and Climb"
       },
       {
         "tok": "{{k_f12_fShortfieldTakeoffAndClimb_U}}",
-        "label": "Short-Field Takeoff and Climb · Not satisfied"
+        "label": "Short-Field Takeoff and Climb · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Short-Field Takeoff and Climb"
       },
       {
         "tok": "{{k_f12_fShortfieldTakeoffAndClimb_NA}}",
-        "label": "Short-Field Takeoff and Climb · Exempt"
+        "label": "Short-Field Takeoff and Climb · Exempt",
+        "ord": "Exempt",
+        "item": "Short-Field Takeoff and Climb"
       },
       {
         "tok": "{{k_f12_fSoftfieldTakeoffAndClimb_S}}",
-        "label": "Soft-Field Takeoff and Climb · Satisfied"
+        "label": "Soft-Field Takeoff and Climb · Satisfied",
+        "ord": "Satisfied",
+        "item": "Soft-Field Takeoff and Climb"
       },
       {
         "tok": "{{k_f12_fSoftfieldTakeoffAndClimb_U}}",
-        "label": "Soft-Field Takeoff and Climb · Not satisfied"
+        "label": "Soft-Field Takeoff and Climb · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Soft-Field Takeoff and Climb"
       },
       {
         "tok": "{{k_f12_fSoftfieldTakeoffAndClimb_NA}}",
-        "label": "Soft-Field Takeoff and Climb · Exempt"
+        "label": "Soft-Field Takeoff and Climb · Exempt",
+        "ord": "Exempt",
+        "item": "Soft-Field Takeoff and Climb"
       },
       {
         "tok": "{{k_f12_fStraightAndLevelFlight_S}}",
-        "label": "Straight and Level Flight · Satisfied"
+        "label": "Straight and Level Flight · Satisfied",
+        "ord": "Satisfied",
+        "item": "Straight and Level Flight"
       },
       {
         "tok": "{{k_f12_fStraightAndLevelFlight_U}}",
-        "label": "Straight and Level Flight · Not satisfied"
+        "label": "Straight and Level Flight · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Straight and Level Flight"
       },
       {
         "tok": "{{k_f12_fStraightAndLevelFlight_NA}}",
-        "label": "Straight and Level Flight · Exempt"
+        "label": "Straight and Level Flight · Exempt",
+        "ord": "Exempt",
+        "item": "Straight and Level Flight"
       },
       {
         "tok": "{{k_f12_fLevelTurns_S}}",
-        "label": "Level Turns · Satisfied"
+        "label": "Level Turns · Satisfied",
+        "ord": "Satisfied",
+        "item": "Level Turns"
       },
       {
         "tok": "{{k_f12_fLevelTurns_U}}",
-        "label": "Level Turns · Not satisfied"
+        "label": "Level Turns · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Level Turns"
       },
       {
         "tok": "{{k_f12_fLevelTurns_NA}}",
-        "label": "Level Turns · Exempt"
+        "label": "Level Turns · Exempt",
+        "ord": "Exempt",
+        "item": "Level Turns"
       },
       {
         "tok": "{{k_f12_fStraightClimbsAndClimbing_S}}",
-        "label": "Straight Climbs and Climbing Turns · Satisfied"
+        "label": "Straight Climbs and Climbing Turns · Satisfied",
+        "ord": "Satisfied",
+        "item": "Straight Climbs and Climbing Turns"
       },
       {
         "tok": "{{k_f12_fStraightClimbsAndClimbing_U}}",
-        "label": "Straight Climbs and Climbing Turns · Not satisfied"
+        "label": "Straight Climbs and Climbing Turns · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Straight Climbs and Climbing Turns"
       },
       {
         "tok": "{{k_f12_fStraightClimbsAndClimbing_NA}}",
-        "label": "Straight Climbs and Climbing Turns · Exempt"
+        "label": "Straight Climbs and Climbing Turns · Exempt",
+        "ord": "Exempt",
+        "item": "Straight Climbs and Climbing Turns"
       },
       {
         "tok": "{{k_f12_fStraightDescentAndDescending_S}}",
-        "label": "Straight Descent and Descending Turns · Satisfied"
+        "label": "Straight Descent and Descending Turns · Satisfied",
+        "ord": "Satisfied",
+        "item": "Straight Descent and Descending Turns"
       },
       {
         "tok": "{{k_f12_fStraightDescentAndDescending_U}}",
-        "label": "Straight Descent and Descending Turns · Not satisfied"
+        "label": "Straight Descent and Descending Turns · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Straight Descent and Descending Turns"
       },
       {
         "tok": "{{k_f12_fStraightDescentAndDescending_NA}}",
-        "label": "Straight Descent and Descending Turns · Exempt"
+        "label": "Straight Descent and Descending Turns · Exempt",
+        "ord": "Exempt",
+        "item": "Straight Descent and Descending Turns"
       },
       {
         "tok": "{{k_f12_fPoweronStalls_S}}",
-        "label": "Power-On Stalls · Satisfied"
+        "label": "Power-On Stalls · Satisfied",
+        "ord": "Satisfied",
+        "item": "Power-On Stalls"
       },
       {
         "tok": "{{k_f12_fPoweronStalls_U}}",
-        "label": "Power-On Stalls · Not satisfied"
+        "label": "Power-On Stalls · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Power-On Stalls"
       },
       {
         "tok": "{{k_f12_fPoweronStalls_NA}}",
-        "label": "Power-On Stalls · Exempt"
+        "label": "Power-On Stalls · Exempt",
+        "ord": "Exempt",
+        "item": "Power-On Stalls"
       },
       {
         "tok": "{{k_f12_fPoweroffStalls_S}}",
-        "label": "Power-Off Stalls · Satisfied"
+        "label": "Power-Off Stalls · Satisfied",
+        "ord": "Satisfied",
+        "item": "Power-Off Stalls"
       },
       {
         "tok": "{{k_f12_fPoweroffStalls_U}}",
-        "label": "Power-Off Stalls · Not satisfied"
+        "label": "Power-Off Stalls · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Power-Off Stalls"
       },
       {
         "tok": "{{k_f12_fPoweroffStalls_NA}}",
-        "label": "Power-Off Stalls · Exempt"
+        "label": "Power-Off Stalls · Exempt",
+        "ord": "Exempt",
+        "item": "Power-Off Stalls"
       },
       {
         "tok": "{{k_f12_fManeuveringDuringSlowFlight_S}}",
-        "label": "Maneuvering during Slow Flight · Satisfied"
+        "label": "Maneuvering during Slow Flight · Satisfied",
+        "ord": "Satisfied",
+        "item": "Maneuvering during Slow Flight"
       },
       {
         "tok": "{{k_f12_fManeuveringDuringSlowFlight_U}}",
-        "label": "Maneuvering during Slow Flight · Not satisfied"
+        "label": "Maneuvering during Slow Flight · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Maneuvering during Slow Flight"
       },
       {
         "tok": "{{k_f12_fManeuveringDuringSlowFlight_NA}}",
-        "label": "Maneuvering during Slow Flight · Exempt"
+        "label": "Maneuvering during Slow Flight · Exempt",
+        "ord": "Exempt",
+        "item": "Maneuvering during Slow Flight"
       },
       {
         "tok": "{{k_f12_fSteepTurns_S}}",
-        "label": "Steep Turns · Satisfied"
+        "label": "Steep Turns · Satisfied",
+        "ord": "Satisfied",
+        "item": "Steep Turns"
       },
       {
         "tok": "{{k_f12_fSteepTurns_U}}",
-        "label": "Steep Turns · Not satisfied"
+        "label": "Steep Turns · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Steep Turns"
       },
       {
         "tok": "{{k_f12_fSteepTurns_NA}}",
-        "label": "Steep Turns · Exempt"
+        "label": "Steep Turns · Exempt",
+        "ord": "Exempt",
+        "item": "Steep Turns"
       },
       {
         "tok": "{{k_f12_fEmergencyDescent_S}}",
-        "label": "Emergency Descent · Satisfied"
+        "label": "Emergency Descent · Satisfied",
+        "ord": "Satisfied",
+        "item": "Emergency Descent"
       },
       {
         "tok": "{{k_f12_fEmergencyDescent_U}}",
-        "label": "Emergency Descent · Not satisfied"
+        "label": "Emergency Descent · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Emergency Descent"
       },
       {
         "tok": "{{k_f12_fEmergencyDescent_NA}}",
-        "label": "Emergency Descent · Exempt"
+        "label": "Emergency Descent · Exempt",
+        "ord": "Exempt",
+        "item": "Emergency Descent"
       },
       {
         "tok": "{{k_f12_fEmergencyApproachAndLanding_S}}",
-        "label": "Emergency Approach and Landing · Satisfied"
+        "label": "Emergency Approach and Landing · Satisfied",
+        "ord": "Satisfied",
+        "item": "Emergency Approach and Landing"
       },
       {
         "tok": "{{k_f12_fEmergencyApproachAndLanding_U}}",
-        "label": "Emergency Approach and Landing · Not satisfied"
+        "label": "Emergency Approach and Landing · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Emergency Approach and Landing"
       },
       {
         "tok": "{{k_f12_fEmergencyApproachAndLanding_NA}}",
-        "label": "Emergency Approach and Landing · Exempt"
+        "label": "Emergency Approach and Landing · Exempt",
+        "ord": "Exempt",
+        "item": "Emergency Approach and Landing"
       },
       {
         "tok": "{{k_f12_fSystemsAndEquipmentMalfunction_S}}",
-        "label": "Systems and Equipment Malfunction · Satisfied"
+        "label": "Systems and Equipment Malfunction · Satisfied",
+        "ord": "Satisfied",
+        "item": "Systems and Equipment Malfunction"
       },
       {
         "tok": "{{k_f12_fSystemsAndEquipmentMalfunction_U}}",
-        "label": "Systems and Equipment Malfunction · Not satisfied"
+        "label": "Systems and Equipment Malfunction · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Systems and Equipment Malfunction"
       },
       {
         "tok": "{{k_f12_fSystemsAndEquipmentMalfunction_NA}}",
-        "label": "Systems and Equipment Malfunction · Exempt"
+        "label": "Systems and Equipment Malfunction · Exempt",
+        "ord": "Exempt",
+        "item": "Systems and Equipment Malfunction"
       },
       {
         "tok": "{{k_f12_fNormalAndCrosswindApproach_S}}",
-        "label": "Normal and Crosswind Approach and Landing · Satisfied"
+        "label": "Normal and Crosswind Approach and Landing · Satisfied",
+        "ord": "Satisfied",
+        "item": "Normal and Crosswind Approach and Landing"
       },
       {
         "tok": "{{k_f12_fNormalAndCrosswindApproach_U}}",
-        "label": "Normal and Crosswind Approach and Landing · Not satisfied"
+        "label": "Normal and Crosswind Approach and Landing · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Normal and Crosswind Approach and Landing"
       },
       {
         "tok": "{{k_f12_fNormalAndCrosswindApproach_NA}}",
-        "label": "Normal and Crosswind Approach and Landing · Exempt"
+        "label": "Normal and Crosswind Approach and Landing · Exempt",
+        "ord": "Exempt",
+        "item": "Normal and Crosswind Approach and Landing"
       },
       {
         "tok": "{{k_f12_fSoftFieldApproachAnd_S}}",
-        "label": "Soft Field Approach and Landing · Satisfied"
+        "label": "Soft Field Approach and Landing · Satisfied",
+        "ord": "Satisfied",
+        "item": "Soft Field Approach and Landing"
       },
       {
         "tok": "{{k_f12_fSoftFieldApproachAnd_U}}",
-        "label": "Soft Field Approach and Landing · Not satisfied"
+        "label": "Soft Field Approach and Landing · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Soft Field Approach and Landing"
       },
       {
         "tok": "{{k_f12_fSoftFieldApproachAnd_NA}}",
-        "label": "Soft Field Approach and Landing · Exempt"
+        "label": "Soft Field Approach and Landing · Exempt",
+        "ord": "Exempt",
+        "item": "Soft Field Approach and Landing"
       },
       {
         "tok": "{{k_f12_fShortFieldApproachAnd_S}}",
-        "label": "Short Field Approach and Landing · Satisfied"
+        "label": "Short Field Approach and Landing · Satisfied",
+        "ord": "Satisfied",
+        "item": "Short Field Approach and Landing"
       },
       {
         "tok": "{{k_f12_fShortFieldApproachAnd_U}}",
-        "label": "Short Field Approach and Landing · Not satisfied"
+        "label": "Short Field Approach and Landing · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Short Field Approach and Landing"
       },
       {
         "tok": "{{k_f12_fShortFieldApproachAnd_NA}}",
-        "label": "Short Field Approach and Landing · Exempt"
+        "label": "Short Field Approach and Landing · Exempt",
+        "ord": "Exempt",
+        "item": "Short Field Approach and Landing"
       },
       {
         "tok": "{{k_f12_fLostCommunicationProcedure_S}}",
-        "label": "Lost Communication & Procedure · Satisfied"
+        "label": "Lost Communication & Procedure · Satisfied",
+        "ord": "Satisfied",
+        "item": "Lost Communication & Procedure"
       },
       {
         "tok": "{{k_f12_fLostCommunicationProcedure_U}}",
-        "label": "Lost Communication & Procedure · Not satisfied"
+        "label": "Lost Communication & Procedure · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Lost Communication & Procedure"
       },
       {
         "tok": "{{k_f12_fLostCommunicationProcedure_NA}}",
-        "label": "Lost Communication & Procedure · Exempt"
+        "label": "Lost Communication & Procedure · Exempt",
+        "ord": "Exempt",
+        "item": "Lost Communication & Procedure"
       },
       {
         "tok": "{{k_f12_fGoaround_S}}",
-        "label": "Go-Around · Satisfied"
+        "label": "Go-Around · Satisfied",
+        "ord": "Satisfied",
+        "item": "Go-Around"
       },
       {
         "tok": "{{k_f12_fGoaround_U}}",
-        "label": "Go-Around · Not satisfied"
+        "label": "Go-Around · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Go-Around"
       },
       {
         "tok": "{{k_f12_fGoaround_NA}}",
-        "label": "Go-Around · Exempt"
+        "label": "Go-Around · Exempt",
+        "ord": "Exempt",
+        "item": "Go-Around"
       },
       {
         "tok": "{{k_f13_fDeclarationOfResult_S}}",
-        "label": "Declaration of Result · Satisfied"
+        "label": "Declaration of Result · Satisfied",
+        "ord": "Satisfied",
+        "item": "Declaration of Result"
       },
       {
         "tok": "{{k_f13_fDeclarationOfResult_U}}",
-        "label": "Declaration of Result · Not satisfied"
+        "label": "Declaration of Result · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Declaration of Result"
       },
       {
         "tok": "{{k_f13_fDeclarationOfResult_NA}}",
-        "label": "Declaration of Result · Exempt"
+        "label": "Declaration of Result · Exempt",
+        "ord": "Exempt",
+        "item": "Declaration of Result"
       },
       {
         "tok": "{{k_f13_fReasonOfTheResult_S}}",
-        "label": "Reason of the Result · Satisfied"
+        "label": "Reason of the Result · Satisfied",
+        "ord": "Satisfied",
+        "item": "Reason of the Result"
       },
       {
         "tok": "{{k_f13_fReasonOfTheResult_U}}",
-        "label": "Reason of the Result · Not satisfied"
+        "label": "Reason of the Result · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Reason of the Result"
       },
       {
         "tok": "{{k_f13_fReasonOfTheResult_NA}}",
-        "label": "Reason of the Result · Exempt"
+        "label": "Reason of the Result · Exempt",
+        "ord": "Exempt",
+        "item": "Reason of the Result"
       },
       {
         "tok": "{{k_f13_fRatingAndPerformanceObtained_S}}",
-        "label": "Rating and Performance Obtained · Satisfied"
+        "label": "Rating and Performance Obtained · Satisfied",
+        "ord": "Satisfied",
+        "item": "Rating and Performance Obtained"
       },
       {
         "tok": "{{k_f13_fRatingAndPerformanceObtained_U}}",
-        "label": "Rating and Performance Obtained · Not satisfied"
+        "label": "Rating and Performance Obtained · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Rating and Performance Obtained"
       },
       {
         "tok": "{{k_f13_fRatingAndPerformanceObtained_NA}}",
-        "label": "Rating and Performance Obtained · Exempt"
+        "label": "Rating and Performance Obtained · Exempt",
+        "ord": "Exempt",
+        "item": "Rating and Performance Obtained"
       },
       {
         "tok": "{{k_f13_fGuidanceForTheNext_S}}",
-        "label": "Guidance for the Next Step · Satisfied"
+        "label": "Guidance for the Next Step · Satisfied",
+        "ord": "Satisfied",
+        "item": "Guidance for the Next Step"
       },
       {
         "tok": "{{k_f13_fGuidanceForTheNext_U}}",
-        "label": "Guidance for the Next Step · Not satisfied"
+        "label": "Guidance for the Next Step · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Guidance for the Next Step"
       },
       {
         "tok": "{{k_f13_fGuidanceForTheNext_NA}}",
-        "label": "Guidance for the Next Step · Exempt"
+        "label": "Guidance for the Next Step · Exempt",
+        "ord": "Exempt",
+        "item": "Guidance for the Next Step"
       },
       {
         "tok": "{{k_f13_fBalancingOfDebriefGood_S}}",
-        "label": "Balancing of Debrief: Good and Bad Side · Satisfied"
+        "label": "Balancing of Debrief: Good and Bad Side · Satisfied",
+        "ord": "Satisfied",
+        "item": "Balancing of Debrief: Good and Bad Side"
       },
       {
         "tok": "{{k_f13_fBalancingOfDebriefGood_U}}",
-        "label": "Balancing of Debrief: Good and Bad Side · Not satisfied"
+        "label": "Balancing of Debrief: Good and Bad Side · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Balancing of Debrief: Good and Bad Side"
       },
       {
         "tok": "{{k_f13_fBalancingOfDebriefGood_NA}}",
-        "label": "Balancing of Debrief: Good and Bad Side · Exempt"
+        "label": "Balancing of Debrief: Good and Bad Side · Exempt",
+        "ord": "Exempt",
+        "item": "Balancing of Debrief: Good and Bad Side"
       },
       {
         "tok": "{{k_f13_fPleasantDebriefAtmosphere_S}}",
-        "label": "Pleasant Debrief Atmosphere · Satisfied"
+        "label": "Pleasant Debrief Atmosphere · Satisfied",
+        "ord": "Satisfied",
+        "item": "Pleasant Debrief Atmosphere"
       },
       {
         "tok": "{{k_f13_fPleasantDebriefAtmosphere_U}}",
-        "label": "Pleasant Debrief Atmosphere · Not satisfied"
+        "label": "Pleasant Debrief Atmosphere · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Pleasant Debrief Atmosphere"
       },
       {
         "tok": "{{k_f13_fPleasantDebriefAtmosphere_NA}}",
-        "label": "Pleasant Debrief Atmosphere · Exempt"
+        "label": "Pleasant Debrief Atmosphere · Exempt",
+        "ord": "Exempt",
+        "item": "Pleasant Debrief Atmosphere"
       },
       {
         "tok": "{{k_f14_fDiscipline_S}}",
-        "label": "Discipline · Satisfied"
+        "label": "Discipline · Satisfied",
+        "ord": "Satisfied",
+        "item": "Discipline"
       },
       {
         "tok": "{{k_f14_fDiscipline_U}}",
-        "label": "Discipline · Not satisfied"
+        "label": "Discipline · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Discipline"
       },
       {
         "tok": "{{k_f14_fDiscipline_NA}}",
-        "label": "Discipline · Exempt"
+        "label": "Discipline · Exempt",
+        "ord": "Exempt",
+        "item": "Discipline"
       },
       {
         "tok": "{{k_f14_fSkillAndProficiency_S}}",
-        "label": "Skill and Proficiency · Satisfied"
+        "label": "Skill and Proficiency · Satisfied",
+        "ord": "Satisfied",
+        "item": "Skill and Proficiency"
       },
       {
         "tok": "{{k_f14_fSkillAndProficiency_U}}",
-        "label": "Skill and Proficiency · Not satisfied"
+        "label": "Skill and Proficiency · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Skill and Proficiency"
       },
       {
         "tok": "{{k_f14_fSkillAndProficiency_NA}}",
-        "label": "Skill and Proficiency · Exempt"
+        "label": "Skill and Proficiency · Exempt",
+        "ord": "Exempt",
+        "item": "Skill and Proficiency"
       },
       {
         "tok": "{{k_f14_fKnowledge_S}}",
-        "label": "Knowledge · Satisfied"
+        "label": "Knowledge · Satisfied",
+        "ord": "Satisfied",
+        "item": "Knowledge"
       },
       {
         "tok": "{{k_f14_fKnowledge_U}}",
-        "label": "Knowledge · Not satisfied"
+        "label": "Knowledge · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Knowledge"
       },
       {
         "tok": "{{k_f14_fKnowledge_NA}}",
-        "label": "Knowledge · Exempt"
+        "label": "Knowledge · Exempt",
+        "ord": "Exempt",
+        "item": "Knowledge"
       },
       {
         "tok": "{{k_f14_fSituationalAwareness_S}}",
-        "label": "Situational Awareness · Satisfied"
+        "label": "Situational Awareness · Satisfied",
+        "ord": "Satisfied",
+        "item": "Situational Awareness"
       },
       {
         "tok": "{{k_f14_fSituationalAwareness_U}}",
-        "label": "Situational Awareness · Not satisfied"
+        "label": "Situational Awareness · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Situational Awareness"
       },
       {
         "tok": "{{k_f14_fSituationalAwareness_NA}}",
-        "label": "Situational Awareness · Exempt"
+        "label": "Situational Awareness · Exempt",
+        "ord": "Exempt",
+        "item": "Situational Awareness"
       },
       {
         "tok": "{{k_f14_fJudgment_S}}",
-        "label": "Judgment · Satisfied"
+        "label": "Judgment · Satisfied",
+        "ord": "Satisfied",
+        "item": "Judgment"
       },
       {
         "tok": "{{k_f14_fJudgment_U}}",
-        "label": "Judgment · Not satisfied"
+        "label": "Judgment · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Judgment"
       },
       {
         "tok": "{{k_f14_fJudgment_NA}}",
-        "label": "Judgment · Exempt"
+        "label": "Judgment · Exempt",
+        "ord": "Exempt",
+        "item": "Judgment"
       },
       {
         "tok": "{{k_f15_fInstructingCommunication_S}}",
-        "label": "Instructing / Communication · Satisfied"
+        "label": "Instructing / Communication · Satisfied",
+        "ord": "Satisfied",
+        "item": "Instructing / Communication"
       },
       {
         "tok": "{{k_f15_fInstructingCommunication_U}}",
-        "label": "Instructing / Communication · Not satisfied"
+        "label": "Instructing / Communication · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Instructing / Communication"
       },
       {
         "tok": "{{k_f15_fInstructingCommunication_NA}}",
-        "label": "Instructing / Communication · Exempt"
+        "label": "Instructing / Communication · Exempt",
+        "ord": "Exempt",
+        "item": "Instructing / Communication"
       },
       {
         "tok": "{{k_f15_fDemonstrationAndGuidanceIn_S}}",
-        "label": "Demonstration and Guidance in Flight · Satisfied"
+        "label": "Demonstration and Guidance in Flight · Satisfied",
+        "ord": "Satisfied",
+        "item": "Demonstration and Guidance in Flight"
       },
       {
         "tok": "{{k_f15_fDemonstrationAndGuidanceIn_U}}",
-        "label": "Demonstration and Guidance in Flight · Not satisfied"
+        "label": "Demonstration and Guidance in Flight · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Demonstration and Guidance in Flight"
       },
       {
         "tok": "{{k_f15_fDemonstrationAndGuidanceIn_NA}}",
-        "label": "Demonstration and Guidance in Flight · Exempt"
+        "label": "Demonstration and Guidance in Flight · Exempt",
+        "ord": "Exempt",
+        "item": "Demonstration and Guidance in Flight"
       },
       {
         "tok": "{{k_f15_fDrawTheAttentionTechnique_S}}",
-        "label": "Draw the Attention Technique · Satisfied"
+        "label": "Draw the Attention Technique · Satisfied",
+        "ord": "Satisfied",
+        "item": "Draw the Attention Technique"
       },
       {
         "tok": "{{k_f15_fDrawTheAttentionTechnique_U}}",
-        "label": "Draw the Attention Technique · Not satisfied"
+        "label": "Draw the Attention Technique · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Draw the Attention Technique"
       },
       {
         "tok": "{{k_f15_fDrawTheAttentionTechnique_NA}}",
-        "label": "Draw the Attention Technique · Exempt"
+        "label": "Draw the Attention Technique · Exempt",
+        "ord": "Exempt",
+        "item": "Draw the Attention Technique"
       },
       {
         "tok": "{{k_f15_fInterveneTheStudentIn_S}}",
-        "label": "Intervene the Student in Flight · Satisfied"
+        "label": "Intervene the Student in Flight · Satisfied",
+        "ord": "Satisfied",
+        "item": "Intervene the Student in Flight"
       },
       {
         "tok": "{{k_f15_fInterveneTheStudentIn_U}}",
-        "label": "Intervene the Student in Flight · Not satisfied"
+        "label": "Intervene the Student in Flight · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Intervene the Student in Flight"
       },
       {
         "tok": "{{k_f15_fInterveneTheStudentIn_NA}}",
-        "label": "Intervene the Student in Flight · Exempt"
+        "label": "Intervene the Student in Flight · Exempt",
+        "ord": "Exempt",
+        "item": "Intervene the Student in Flight"
       },
       {
         "tok": "{{k_f15_fManeuveringPlanning_S}}",
-        "label": "Maneuvering Planning · Satisfied"
+        "label": "Maneuvering Planning · Satisfied",
+        "ord": "Satisfied",
+        "item": "Maneuvering Planning"
       },
       {
         "tok": "{{k_f15_fManeuveringPlanning_U}}",
-        "label": "Maneuvering Planning · Not satisfied"
+        "label": "Maneuvering Planning · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Maneuvering Planning"
       },
       {
         "tok": "{{k_f15_fManeuveringPlanning_NA}}",
-        "label": "Maneuvering Planning · Exempt"
+        "label": "Maneuvering Planning · Exempt",
+        "ord": "Exempt",
+        "item": "Maneuvering Planning"
       },
       {
         "tok": "{{k_f15_fErrorDetection_S}}",
-        "label": "Error Detection · Satisfied"
+        "label": "Error Detection · Satisfied",
+        "ord": "Satisfied",
+        "item": "Error Detection"
       },
       {
         "tok": "{{k_f15_fErrorDetection_U}}",
-        "label": "Error Detection · Not satisfied"
+        "label": "Error Detection · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Error Detection"
       },
       {
         "tok": "{{k_f15_fErrorDetection_NA}}",
-        "label": "Error Detection · Exempt"
+        "label": "Error Detection · Exempt",
+        "ord": "Exempt",
+        "item": "Error Detection"
       },
       {
         "tok": "{{k_f15_fDistractionTechnique_S}}",
-        "label": "Distraction Technique · Satisfied"
+        "label": "Distraction Technique · Satisfied",
+        "ord": "Satisfied",
+        "item": "Distraction Technique"
       },
       {
         "tok": "{{k_f15_fDistractionTechnique_U}}",
-        "label": "Distraction Technique · Not satisfied"
+        "label": "Distraction Technique · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Distraction Technique"
       },
       {
         "tok": "{{k_f15_fDistractionTechnique_NA}}",
-        "label": "Distraction Technique · Exempt"
+        "label": "Distraction Technique · Exempt",
+        "ord": "Exempt",
+        "item": "Distraction Technique"
       },
       {
         "tok": "{{k_f15_fInflightTeachingAtmosphere_S}}",
-        "label": "Inflight Teaching Atmosphere · Satisfied"
+        "label": "Inflight Teaching Atmosphere · Satisfied",
+        "ord": "Satisfied",
+        "item": "Inflight Teaching Atmosphere"
       },
       {
         "tok": "{{k_f15_fInflightTeachingAtmosphere_U}}",
-        "label": "Inflight Teaching Atmosphere · Not satisfied"
+        "label": "Inflight Teaching Atmosphere · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Inflight Teaching Atmosphere"
       },
       {
         "tok": "{{k_f15_fInflightTeachingAtmosphere_NA}}",
-        "label": "Inflight Teaching Atmosphere · Exempt"
+        "label": "Inflight Teaching Atmosphere · Exempt",
+        "ord": "Exempt",
+        "item": "Inflight Teaching Atmosphere"
       },
       {
         "tok": "{{k_f15_fGhostingControlTechnique_S}}",
-        "label": "Ghosting Control Technique · Satisfied"
+        "label": "Ghosting Control Technique · Satisfied",
+        "ord": "Satisfied",
+        "item": "Ghosting Control Technique"
       },
       {
         "tok": "{{k_f15_fGhostingControlTechnique_U}}",
-        "label": "Ghosting Control Technique · Not satisfied"
+        "label": "Ghosting Control Technique · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Ghosting Control Technique"
       },
       {
         "tok": "{{k_f15_fGhostingControlTechnique_NA}}",
-        "label": "Ghosting Control Technique · Exempt"
+        "label": "Ghosting Control Technique · Exempt",
+        "ord": "Exempt",
+        "item": "Ghosting Control Technique"
       },
       {
         "tok": "{{k_f15_fImmediateChangeOfTeaching_S}}",
-        "label": "Immediate Change of Teaching · Satisfied"
+        "label": "Immediate Change of Teaching · Satisfied",
+        "ord": "Satisfied",
+        "item": "Immediate Change of Teaching"
       },
       {
         "tok": "{{k_f15_fImmediateChangeOfTeaching_U}}",
-        "label": "Immediate Change of Teaching · Not satisfied"
+        "label": "Immediate Change of Teaching · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Immediate Change of Teaching"
       },
       {
         "tok": "{{k_f15_fImmediateChangeOfTeaching_NA}}",
-        "label": "Immediate Change of Teaching · Exempt"
+        "label": "Immediate Change of Teaching · Exempt",
+        "ord": "Exempt",
+        "item": "Immediate Change of Teaching"
       },
       {
         "tok": "{{k_f15_fInflightEndOfTraining_S}}",
-        "label": "Inflight 'End of Training' · Satisfied"
+        "label": "Inflight 'End of Training' · Satisfied",
+        "ord": "Satisfied",
+        "item": "Inflight 'End of Training'"
       },
       {
         "tok": "{{k_f15_fInflightEndOfTraining_U}}",
-        "label": "Inflight 'End of Training' · Not satisfied"
+        "label": "Inflight 'End of Training' · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Inflight 'End of Training'"
       },
       {
         "tok": "{{k_f15_fInflightEndOfTraining_NA}}",
-        "label": "Inflight 'End of Training' · Exempt"
+        "label": "Inflight 'End of Training' · Exempt",
+        "ord": "Exempt",
+        "item": "Inflight 'End of Training'"
       },
       {
         "tok": "{{k_f15_fAcceptableEnvelopeOfFault_S}}",
-        "label": "Acceptable Envelope of Fault · Satisfied"
+        "label": "Acceptable Envelope of Fault · Satisfied",
+        "ord": "Satisfied",
+        "item": "Acceptable Envelope of Fault"
       },
       {
         "tok": "{{k_f15_fAcceptableEnvelopeOfFault_U}}",
-        "label": "Acceptable Envelope of Fault · Not satisfied"
+        "label": "Acceptable Envelope of Fault · Not satisfied",
+        "ord": "Not satisfied",
+        "item": "Acceptable Envelope of Fault"
       },
       {
         "tok": "{{k_f15_fAcceptableEnvelopeOfFault_NA}}",
-        "label": "Acceptable Envelope of Fault · Exempt"
+        "label": "Acceptable Envelope of Fault · Exempt",
+        "ord": "Exempt",
+        "item": "Acceptable Envelope of Fault"
       },
       {
         "tok": "{{k_overall_excellent}}",
-        "label": "Excellent"
+        "label": "Excellent",
+        "ord": "Excellent"
       },
       {
         "tok": "{{k_overall_verygood}}",
-        "label": "Very good"
+        "label": "Very good",
+        "ord": "Very good"
       },
       {
         "tok": "{{k_overall_good}}",
-        "label": "Good"
+        "label": "Good",
+        "ord": "Good"
       },
       {
         "tok": "{{k_overall_fair}}",
-        "label": "Fair"
+        "label": "Fair",
+        "ord": "Fair"
       },
       {
         "tok": "{{k_overall_poor}}",
-        "label": "Poor"
+        "label": "Poor",
+        "ord": "Poor"
       }
     ],
     "tables": [],
@@ -2564,6 +3483,7 @@ var TOKEN_MAP = {
   "FRAE": {
     "abbr": "FRAE",
     "docx": "D-0507-FRAE-001.docx",
+    "orderWarn": [],
     "byLabel": [
       {
         "label": "PIC Name — First Name",
@@ -2582,267 +3502,333 @@ var TOKEN_MAP = {
     "boxes": [
       {
         "tok": "{{k_role_PIC}}",
-        "label": "PIC — pilot in command"
+        "label": "PIC — pilot in command",
+        "ord": "PIC — pilot in command"
       },
       {
         "tok": "{{k_role_Student}}",
-        "label": "Student — student pilot"
+        "label": "Student — student pilot",
+        "ord": "Student — student pilot"
       },
       {
         "tok": "{{k_aircraftReg_HS-VVD}}",
-        "label": "HS-VVD"
+        "label": "HS-VVD",
+        "ord": "HS-VVD"
       },
       {
         "tok": "{{k_aircraftReg_HS-VVB}}",
-        "label": "HS-VVB"
+        "label": "HS-VVB",
+        "ord": "HS-VVB"
       },
       {
         "tok": "{{k_aircraftReg_HS-CCM}}",
-        "label": "HS-CCM"
+        "label": "HS-CCM",
+        "ord": "HS-CCM"
       },
       {
         "tok": "{{k_aircraftReg_HS-VST}}",
-        "label": "HS-VST"
+        "label": "HS-VST",
+        "ord": "HS-VST"
       },
       {
         "tok": "{{k_aircraftReg_HS-POP}}",
-        "label": "HS-POP"
+        "label": "HS-POP",
+        "ord": "HS-POP"
       },
       {
         "tok": "{{k_aircraftReg_HS-BTM}}",
-        "label": "HS-BTM"
+        "label": "HS-BTM",
+        "ord": "HS-BTM"
       },
       {
         "tok": "{{k_flightType_VFR}}",
-        "label": "VFR"
+        "label": "VFR",
+        "ord": "VFR"
       },
       {
         "tok": "{{k_flightType_IFR}}",
-        "label": "IFR"
+        "label": "IFR",
+        "ord": "IFR"
       },
       {
         "tok": "{{k_s1Sigmet}}",
-        "label": "Convective sigmet (red) penetration"
+        "label": "Convective sigmet (red) penetration",
+        "item": "Convective sigmet (red) penetration"
       },
       {
         "tok": "{{k_s1Thunder}}",
-        "label": "Thunderstorm penetration"
+        "label": "Thunderstorm penetration",
+        "item": "Thunderstorm penetration"
       },
       {
         "tok": "{{k_s1Freezing}}",
-        "label": "Possible freezing rain / fog"
+        "label": "Possible freezing rain / fog",
+        "item": "Possible freezing rain / fog"
       },
       {
         "tok": "{{k_s1Autopilot}}",
-        "label": "Autopilot INOPS"
+        "label": "Autopilot INOPS",
+        "item": "Autopilot INOPS"
       },
       {
         "tok": "{{k_s1AfterMx}}",
-        "label": "First flight after maintenance"
+        "label": "First flight after maintenance",
+        "item": "First flight after maintenance"
       },
       {
         "tok": "{{k_s1Icing_none}}",
-        "label": "None"
+        "label": "None",
+        "ord": "None"
       },
       {
         "tok": "{{k_s1Icing_light}}",
-        "label": "Light"
+        "label": "Light",
+        "ord": "Light"
       },
       {
         "tok": "{{k_s1Icing_moderate}}",
-        "label": "Moderate"
+        "label": "Moderate",
+        "ord": "Moderate"
       },
       {
         "tok": "{{k_s1Icing_severe}}",
-        "label": "Severe SLD"
+        "label": "Severe SLD",
+        "ord": "Severe SLD"
       },
       {
         "tok": "{{k_s1PrevFlight_1st}}",
-        "label": "1st"
+        "label": "1st",
+        "ord": "1st"
       },
       {
         "tok": "{{k_s1PrevFlight_2nd}}",
-        "label": "2nd"
+        "label": "2nd",
+        "ord": "2nd"
       },
       {
         "tok": "{{k_s1PrevFlight_3rd}}",
-        "label": "3rd"
+        "label": "3rd",
+        "ord": "3rd"
       },
       {
         "tok": "{{k_s1PrevFlight_gt3}}",
-        "label": "More than 3rd"
+        "label": "More than 3rd",
+        "ord": "More than 3rd"
       },
       {
         "tok": "{{k_s2NotCurrent}}",
-        "label": "Not 90-day current"
+        "label": "Not 90-day current",
+        "item": "Not 90-day current"
       },
       {
         "tok": "{{k_s2Fatigue}}",
-        "label": "Fatigue or inadequate rest"
+        "label": "Fatigue or inadequate rest",
+        "item": "Fatigue or inadequate rest"
       },
       {
         "tok": "{{k_s2AfterWork}}",
-        "label": "Going to fly immediately after workday"
+        "label": "Going to fly immediately after workday",
+        "item": "Going to fly immediately after workday"
       },
       {
         "tok": "{{k_s2Illness}}",
-        "label": "Illness, cold, flu"
+        "label": "Illness, cold, flu",
+        "item": "Illness, cold, flu"
       },
       {
         "tok": "{{k_s2Personal}}",
-        "label": "Personal relationship issue"
+        "label": "Personal relationship issue",
+        "item": "Personal relationship issue"
       },
       {
         "tok": "{{k_s2Business}}",
-        "label": "Business issue"
+        "label": "Business issue",
+        "item": "Business issue"
       },
       {
         "tok": "{{k_s2Hunger}}",
-        "label": "Starving or eating less food"
+        "label": "Starving or eating less food",
+        "item": "Starving or eating less food"
       },
       {
         "tok": "{{k_s3Wind}}",
-        "label": "Wind / gust > 20 kt"
+        "label": "Wind / gust > 20 kt",
+        "item": "Wind / gust > 20 kt"
       },
       {
         "tok": "{{k_s3Crosswind}}",
-        "label": "Crosswind > 12 kt / runway width < 50 ft"
+        "label": "Crosswind > 12 kt / runway width < 50 ft",
+        "item": "Crosswind > 12 kt / runway width < 50 ft"
       },
       {
         "tok": "{{k_s3Night}}",
-        "label": "Night operation"
+        "label": "Night operation",
+        "item": "Night operation"
       },
       {
         "tok": "{{k_s3Precip}}",
-        "label": "Precipitation"
+        "label": "Precipitation",
+        "item": "Precipitation"
       },
       {
         "tok": "{{k_s3MaxWeight}}",
-        "label": "Near maximum take-off weight"
+        "label": "Near maximum take-off weight",
+        "item": "Near maximum take-off weight"
       },
       {
         "tok": "{{k_s3Terrain}}",
-        "label": "Steep terrain nearby"
+        "label": "Steep terrain nearby",
+        "item": "Steep terrain nearby"
       },
       {
         "tok": "{{k_s3Runway_dry}}",
-        "label": "Dry"
+        "label": "Dry",
+        "ord": "Dry"
       },
       {
         "tok": "{{k_s3Runway_wet}}",
-        "label": "Wet"
+        "label": "Wet",
+        "ord": "Wet"
       },
       {
         "tok": "{{k_s3Runway_standing}}",
-        "label": "Standing water"
+        "label": "Standing water",
+        "ord": "Standing water"
       },
       {
         "tok": "{{k_s3Runway_soft}}",
-        "label": "Soft field"
+        "label": "Soft field",
+        "ord": "Soft field"
       },
       {
         "tok": "{{k_s3Runway_short}}",
-        "label": "Runway < 2,000 ft"
+        "label": "Runway < 2,000 ft",
+        "ord": "Runway < 2,000 ft"
       },
       {
         "tok": "{{k_s3Wx}}",
-        "label": "DEP: ceilings < 500 ft and/or visibility < 1 SM"
+        "label": "DEP: ceilings < 500 ft and/or visibility < 1 SM",
+        "item": "DEP: ceilings < 500 ft and/or visibility < 1 SM"
       },
       {
         "tok": "{{k_s4Water}}",
-        "label": "Water crossing beyond glide distance"
+        "label": "Water crossing beyond glide distance",
+        "item": "Water crossing beyond glide distance"
       },
       {
         "tok": "{{k_s4Mountain}}",
-        "label": "Mountain range crossing beyond glide distance"
+        "label": "Mountain range crossing beyond glide distance",
+        "item": "Mountain range crossing beyond glide distance"
       },
       {
         "tok": "{{k_s4NightIMC}}",
-        "label": "Night or ground-level IMC"
+        "label": "Night or ground-level IMC",
+        "item": "Night or ground-level IMC"
       },
       {
         "tok": "{{k_s4LowPressure}}",
-        "label": "Passing within 75 NM of a low-pressure system"
+        "label": "Passing within 75 NM of a low-pressure system",
+        "item": "Passing within 75 NM of a low-pressure system"
       },
       {
         "tok": "{{k_s5Wind}}",
-        "label": "Wind / gust > 20 kt"
+        "label": "Wind / gust > 20 kt",
+        "item": "Wind / gust > 20 kt"
       },
       {
         "tok": "{{k_s5Crosswind}}",
-        "label": "Crosswind > 12 kt / runway width < 50 ft"
+        "label": "Crosswind > 12 kt / runway width < 50 ft",
+        "item": "Crosswind > 12 kt / runway width < 50 ft"
       },
       {
         "tok": "{{k_s5Night}}",
-        "label": "Night operation"
+        "label": "Night operation",
+        "item": "Night operation"
       },
       {
         "tok": "{{k_s5Precip}}",
-        "label": "Precipitation"
+        "label": "Precipitation",
+        "item": "Precipitation"
       },
       {
         "tok": "{{k_s5Terrain}}",
-        "label": "Steep terrain nearby"
+        "label": "Steep terrain nearby",
+        "item": "Steep terrain nearby"
       },
       {
         "tok": "{{k_s5Windshear}}",
-        "label": "Low level windshear"
+        "label": "Low level windshear",
+        "item": "Low level windshear"
       },
       {
         "tok": "{{k_s5Temp}}",
-        "label": "Temperature < 0 °C"
+        "label": "Temperature < 0 °C",
+        "item": "Temperature < 0 °C"
       },
       {
         "tok": "{{k_s5Spread}}",
-        "label": "Temperature / dewpoint spread < 3 °C"
+        "label": "Temperature / dewpoint spread < 3 °C",
+        "item": "Temperature / dewpoint spread < 3 °C"
       },
       {
         "tok": "{{k_s5Unfamiliar}}",
-        "label": "Unfamiliar airport"
+        "label": "Unfamiliar airport",
+        "item": "Unfamiliar airport"
       },
       {
         "tok": "{{k_s5NoTower}}",
-        "label": "No operating tower"
+        "label": "No operating tower",
+        "item": "No operating tower"
       },
       {
         "tok": "{{k_s5NoRadar}}",
-        "label": "No radar coverage for approach"
+        "label": "No radar coverage for approach",
+        "item": "No radar coverage for approach"
       },
       {
         "tok": "{{k_s5Fuel}}",
-        "label": "Less than 1 hr 30 min fuel at destination"
+        "label": "Less than 1 hr 30 min fuel at destination",
+        "item": "Less than 1 hr 30 min fuel at destination"
       },
       {
         "tok": "{{k_s5Runway_dry}}",
-        "label": "Dry"
+        "label": "Dry",
+        "ord": "Dry"
       },
       {
         "tok": "{{k_s5Runway_wet}}",
-        "label": "Wet"
+        "label": "Wet",
+        "ord": "Wet"
       },
       {
         "tok": "{{k_s5Runway_standing}}",
-        "label": "Standing water"
+        "label": "Standing water",
+        "ord": "Standing water"
       },
       {
         "tok": "{{k_s5Runway_soft}}",
-        "label": "Soft field"
+        "label": "Soft field",
+        "ord": "Soft field"
       },
       {
         "tok": "{{k_s5Runway_short}}",
-        "label": "Runway < 2,000 ft"
+        "label": "Runway < 2,000 ft",
+        "ord": "Runway < 2,000 ft"
       },
       {
         "tok": "{{k_s5Wx}}",
-        "label": "ARR: ceilings < 500 ft and/or visibility < 1 SM"
+        "label": "ARR: ceilings < 500 ft and/or visibility < 1 SM",
+        "item": "ARR: ceilings < 500 ft and/or visibility < 1 SM"
       },
       {
         "tok": "{{k_decision_GO}}",
-        "label": "GO"
+        "label": "GO",
+        "ord": "GO"
       },
       {
         "tok": "{{k_decision_NO-GO}}",
-        "label": "NO-GO"
+        "label": "NO-GO",
+        "ord": "NO-GO"
       }
     ],
     "tables": [],
@@ -2897,6 +3883,7 @@ var TOKEN_MAP = {
   "FTR": {
     "abbr": "FTR",
     "docx": "D-0507-FTR-001.docx",
+    "orderWarn": [],
     "byLabel": [
       {
         "label": "Aircraft Type:",
@@ -2951,127 +3938,182 @@ var TOKEN_MAP = {
     "boxes": [
       {
         "tok": "{{k_reason_rts}}",
-        "label": "Return to service"
+        "label": "Return to service",
+        "ord": "Return to service"
       },
       {
         "tok": "{{k_reason_majrepair}}",
-        "label": "Post-major repair"
+        "label": "Post-major repair",
+        "ord": "Post-major repair"
       },
       {
         "tok": "{{k_reason_component}}",
-        "label": "Post-component change"
+        "label": "Post-component change",
+        "ord": "Post-component change"
       },
       {
         "tok": "{{k_reason_periodic}}",
-        "label": "Periodic check"
+        "label": "Periodic check",
+        "ord": "Periodic check"
       },
       {
         "tok": "{{k_reason_other}}",
-        "label": "Other"
+        "label": "Other",
+        "ord": "Other"
       },
       {
         "tok": "{{k_checks_E1_S}}",
-        "label": "Engine start · Sat"
+        "label": "Engine start · Sat",
+        "ord": "Sat",
+        "item": "Engine start"
       },
       {
         "tok": "{{k_checks_E1_U}}",
-        "label": "Engine start · Unsat"
+        "label": "Engine start · Unsat",
+        "ord": "Unsat",
+        "item": "Engine start"
       },
       {
         "tok": "{{k_checks_E2_S}}",
-        "label": "Run-up · Sat"
+        "label": "Run-up · Sat",
+        "ord": "Sat",
+        "item": "Run-up"
       },
       {
         "tok": "{{k_checks_E2_U}}",
-        "label": "Run-up · Unsat"
+        "label": "Run-up · Unsat",
+        "ord": "Unsat",
+        "item": "Run-up"
       },
       {
         "tok": "{{k_checks_T1_S}}",
-        "label": "Take-off performance · Sat"
+        "label": "Take-off performance · Sat",
+        "ord": "Sat",
+        "item": "Take-off performance"
       },
       {
         "tok": "{{k_checks_T1_U}}",
-        "label": "Take-off performance · Unsat"
+        "label": "Take-off performance · Unsat",
+        "ord": "Unsat",
+        "item": "Take-off performance"
       },
       {
         "tok": "{{k_checks_T2_S}}",
-        "label": "Climb performance · Sat"
+        "label": "Climb performance · Sat",
+        "ord": "Sat",
+        "item": "Climb performance"
       },
       {
         "tok": "{{k_checks_T2_U}}",
-        "label": "Climb performance · Unsat"
+        "label": "Climb performance · Unsat",
+        "ord": "Unsat",
+        "item": "Climb performance"
       },
       {
         "tok": "{{k_checks_C1_S}}",
-        "label": "Engine power (cruise) · Sat"
+        "label": "Engine power (cruise) · Sat",
+        "ord": "Sat",
+        "item": "Engine power (cruise)"
       },
       {
         "tok": "{{k_checks_C1_U}}",
-        "label": "Engine power (cruise) · Unsat"
+        "label": "Engine power (cruise) · Unsat",
+        "ord": "Unsat",
+        "item": "Engine power (cruise)"
       },
       {
         "tok": "{{k_checks_C2_S}}",
-        "label": "Fuel system · Sat"
+        "label": "Fuel system · Sat",
+        "ord": "Sat",
+        "item": "Fuel system"
       },
       {
         "tok": "{{k_checks_C2_U}}",
-        "label": "Fuel system · Unsat"
+        "label": "Fuel system · Unsat",
+        "ord": "Unsat",
+        "item": "Fuel system"
       },
       {
         "tok": "{{k_checks_H1_S}}",
-        "label": "Stall (if required) · Sat"
+        "label": "Stall (if required) · Sat",
+        "ord": "Sat",
+        "item": "Stall (if required)"
       },
       {
         "tok": "{{k_checks_H1_U}}",
-        "label": "Stall (if required) · Unsat"
+        "label": "Stall (if required) · Unsat",
+        "ord": "Unsat",
+        "item": "Stall (if required)"
       },
       {
         "tok": "{{k_checks_H2_S}}",
-        "label": "Control response · Sat"
+        "label": "Control response · Sat",
+        "ord": "Sat",
+        "item": "Control response"
       },
       {
         "tok": "{{k_checks_H2_U}}",
-        "label": "Control response · Unsat"
+        "label": "Control response · Unsat",
+        "ord": "Unsat",
+        "item": "Control response"
       },
       {
         "tok": "{{k_checks_A1_S}}",
-        "label": "Approach · Sat"
+        "label": "Approach · Sat",
+        "ord": "Sat",
+        "item": "Approach"
       },
       {
         "tok": "{{k_checks_A1_U}}",
-        "label": "Approach · Unsat"
+        "label": "Approach · Unsat",
+        "ord": "Unsat",
+        "item": "Approach"
       },
       {
         "tok": "{{k_checks_A2_S}}",
-        "label": "Landing · Sat"
+        "label": "Landing · Sat",
+        "ord": "Sat",
+        "item": "Landing"
       },
       {
         "tok": "{{k_checks_A2_U}}",
-        "label": "Landing · Unsat"
+        "label": "Landing · Unsat",
+        "ord": "Unsat",
+        "item": "Landing"
       },
       {
         "tok": "{{k_checks_P1_S}}",
-        "label": "Engine shutdown · Sat"
+        "label": "Engine shutdown · Sat",
+        "ord": "Sat",
+        "item": "Engine shutdown"
       },
       {
         "tok": "{{k_checks_P1_U}}",
-        "label": "Engine shutdown · Unsat"
+        "label": "Engine shutdown · Unsat",
+        "ord": "Unsat",
+        "item": "Engine shutdown"
       },
       {
         "tok": "{{k_checks_P2_S}}",
-        "label": "Inspection after flight · Sat"
+        "label": "Inspection after flight · Sat",
+        "ord": "Sat",
+        "item": "Inspection after flight"
       },
       {
         "tok": "{{k_checks_P2_U}}",
-        "label": "Inspection after flight · Unsat"
+        "label": "Inspection after flight · Unsat",
+        "ord": "Unsat",
+        "item": "Inspection after flight"
       },
       {
         "tok": "{{k_verdict_serviceable}}",
-        "label": "Serviceable — approved for return to service"
+        "label": "Serviceable — approved for return to service",
+        "ord": "Serviceable — approved for return to service"
       },
       {
         "tok": "{{k_verdict_unserviceable}}",
-        "label": "Unserviceable — defects require rectification first"
+        "label": "Unserviceable — defects require rectification first",
+        "ord": "Unserviceable — defects require rectification first"
       }
     ],
     "tables": [],
@@ -3132,6 +4174,7 @@ var TOKEN_MAP = {
   "HIF": {
     "abbr": "HIF",
     "docx": "D-0507-HIF-001.docx",
+    "orderWarn": [],
     "byLabel": [
       {
         "label": "Hazard Title:",
@@ -3198,11 +4241,13 @@ var TOKEN_MAP = {
       },
       {
         "tok": "{{k_residualOk_yes}}",
-        "label": "Yes"
+        "label": "Yes",
+        "ord": "Yes"
       },
       {
         "tok": "{{k_residualOk_no}}",
-        "label": "No — requires further action"
+        "label": "No — requires further action",
+        "ord": "No — requires further action"
       }
     ],
     "tables": [],
@@ -3245,6 +4290,7 @@ var TOKEN_MAP = {
   "MOC": {
     "abbr": "MOC",
     "docx": "D-0507-MOC-001.docx",
+    "orderWarn": [],
     "byLabel": [
       {
         "label": "MoC Reference Number",
@@ -3301,67 +4347,83 @@ var TOKEN_MAP = {
     "boxes": [
       {
         "tok": "{{k_category_personnel}}",
-        "label": "Personnel"
+        "label": "Personnel",
+        "ord": "Personnel"
       },
       {
         "tok": "{{k_category_equipment}}",
-        "label": "Equipment / fleet"
+        "label": "Equipment / fleet",
+        "ord": "Equipment / fleet"
       },
       {
         "tok": "{{k_category_procedure}}",
-        "label": "Procedure / SOP"
+        "label": "Procedure / SOP",
+        "ord": "Procedure / SOP"
       },
       {
         "tok": "{{k_category_regulatory}}",
-        "label": "Regulatory"
+        "label": "Regulatory",
+        "ord": "Regulatory"
       },
       {
         "tok": "{{k_category_other}}",
-        "label": "Other"
+        "label": "Other",
+        "ord": "Other"
       },
       {
         "tok": "{{k_priority_routine}}",
-        "label": "Routine"
+        "label": "Routine",
+        "ord": "Routine"
       },
       {
         "tok": "{{k_priority_urgent}}",
-        "label": "Urgent"
+        "label": "Urgent",
+        "ord": "Urgent"
       },
       {
         "tok": "{{k_priority_emergency}}",
-        "label": "Emergency"
+        "label": "Emergency",
+        "ord": "Emergency"
       },
       {
         "tok": "{{k_overallRisk_low}}",
-        "label": "Low"
+        "label": "Low",
+        "ord": "Low"
       },
       {
         "tok": "{{k_overallRisk_medium}}",
-        "label": "Medium"
+        "label": "Medium",
+        "ord": "Medium"
       },
       {
         "tok": "{{k_overallRisk_high}}",
-        "label": "High"
+        "label": "High",
+        "ord": "High"
       },
       {
         "tok": "{{k_overallRisk_rejected}}",
-        "label": "Not acceptable — change rejected"
+        "label": "Not acceptable — change rejected",
+        "ord": "Not acceptable — change rejected"
       },
       {
         "tok": "{{k_caatNotify_yes}}",
-        "label": "Yes"
+        "label": "Yes",
+        "ord": "Yes"
       },
       {
         "tok": "{{k_caatNotify_no}}",
-        "label": "No"
+        "label": "No",
+        "ord": "No"
       },
       {
         "tok": "{{k_trainReq_yes}}",
-        "label": "Yes"
+        "label": "Yes",
+        "ord": "Yes"
       },
       {
         "tok": "{{k_trainReq_no}}",
-        "label": "No"
+        "label": "No",
+        "ord": "No"
       }
     ],
     "tables": [
@@ -3517,6 +4579,7 @@ var TOKEN_MAP = {
   "PCR-FI": {
     "abbr": "PCR-FI",
     "docx": "D-0507-PCR-FI-001.docx",
+    "orderWarn": [],
     "byLabel": [
       {
         "label": "Instructor Name",
@@ -3579,39 +4642,48 @@ var TOKEN_MAP = {
     "boxes": [
       {
         "tok": "{{k_tier_t1annual}}",
-        "label": "Tier 1 — Annual IPC"
+        "label": "Tier 1 — Annual IPC",
+        "ord": "Tier 1 — Annual IPC"
       },
       {
         "tok": "{{k_tier_t1initial}}",
-        "label": "Tier 1 — Initial IPC"
+        "label": "Tier 1 — Initial IPC",
+        "ord": "Tier 1 — Initial IPC"
       },
       {
         "tok": "{{k_tier_t1postcor}}",
-        "label": "Tier 1 — Post-corrective"
+        "label": "Tier 1 — Post-corrective",
+        "ord": "Tier 1 — Post-corrective"
       },
       {
         "tok": "{{k_tier_t1postabs}}",
-        "label": "Tier 1 — Post-absence"
+        "label": "Tier 1 — Post-absence",
+        "ord": "Tier 1 — Post-absence"
       },
       {
         "tok": "{{k_tier_t1directed}}",
-        "label": "Tier 1 — Directed"
+        "label": "Tier 1 — Directed",
+        "ord": "Tier 1 — Directed"
       },
       {
         "tok": "{{k_tier_t2lpc}}",
-        "label": "Tier 2 — LPC+"
+        "label": "Tier 2 — LPC+",
+        "ord": "Tier 2 — LPC+"
       },
       {
         "tok": "{{k_tier_t3aoc}}",
-        "label": "Tier 3 — AoC"
-      },
-      {
-        "tok": "{{k_combined_yes}}",
-        "label": "Yes"
+        "label": "Tier 3 — AoC",
+        "ord": "Tier 3 — AoC"
       },
       {
         "tok": "{{k_combined_no}}",
-        "label": "No"
+        "label": "No",
+        "ord": "No"
+      },
+      {
+        "tok": "{{k_combined_yes}}",
+        "label": "Yes",
+        "ord": "Yes"
       },
       {
         "tok": "{{k_g1_1}}",
@@ -3755,27 +4827,33 @@ var TOKEN_MAP = {
       },
       {
         "tok": "{{k_result_pass}}",
-        "label": "Pass"
+        "label": "Pass",
+        "ord": "Pass"
       },
       {
         "tok": "{{k_result_marginal}}",
-        "label": "Marginal pass"
+        "label": "Marginal pass",
+        "ord": "Marginal pass"
       },
       {
         "tok": "{{k_result_fail}}",
-        "label": "Fail"
+        "label": "Fail",
+        "ord": "Fail"
       },
       {
         "tok": "{{k_result_unsat}}",
-        "label": "Unsatisfactory"
+        "label": "Unsatisfactory",
+        "ord": "Unsatisfactory"
       },
       {
         "tok": "{{k_correctiveInit_yes}}",
-        "label": "Yes"
+        "label": "Yes",
+        "ord": "Yes"
       },
       {
         "tok": "{{k_correctiveInit_no}}",
-        "label": "No"
+        "label": "No",
+        "ord": "No"
       }
     ],
     "tables": [],
@@ -3812,6 +4890,7 @@ var TOKEN_MAP = {
   "PCR-TKI": {
     "abbr": "PCR-TKI",
     "docx": "D-0507-PCR-TKI-001.docx",
+    "orderWarn": [],
     "byLabel": [
       {
         "label": "Instructor Name",
@@ -3878,23 +4957,28 @@ var TOKEN_MAP = {
     "boxes": [
       {
         "tok": "{{k_ipcType_annual}}",
-        "label": "Annual IPC"
+        "label": "Annual IPC",
+        "ord": "Annual IPC"
       },
       {
         "tok": "{{k_ipcType_initial}}",
-        "label": "Initial IPC"
+        "label": "Initial IPC",
+        "ord": "Initial IPC"
       },
       {
         "tok": "{{k_ipcType_postcor}}",
-        "label": "Post-corrective IPC"
+        "label": "Post-corrective IPC",
+        "ord": "Post-corrective IPC"
       },
       {
         "tok": "{{k_ipcType_postabs}}",
-        "label": "Post-absence IPC"
+        "label": "Post-absence IPC",
+        "ord": "Post-absence IPC"
       },
       {
         "tok": "{{k_ipcType_directed}}",
-        "label": "Directed IPC"
+        "label": "Directed IPC",
+        "ord": "Directed IPC"
       },
       {
         "tok": "{{k_g1_1}}",
@@ -4018,27 +5102,33 @@ var TOKEN_MAP = {
       },
       {
         "tok": "{{k_result_pass}}",
-        "label": "Pass"
+        "label": "Pass",
+        "ord": "Pass"
       },
       {
         "tok": "{{k_result_marginal}}",
-        "label": "Marginal pass"
+        "label": "Marginal pass",
+        "ord": "Marginal pass"
       },
       {
         "tok": "{{k_result_fail}}",
-        "label": "Fail"
+        "label": "Fail",
+        "ord": "Fail"
       },
       {
         "tok": "{{k_result_unsat}}",
-        "label": "Unsatisfactory"
+        "label": "Unsatisfactory",
+        "ord": "Unsatisfactory"
       },
       {
         "tok": "{{k_correctiveInit_yes}}",
-        "label": "Yes"
+        "label": "Yes",
+        "ord": "Yes"
       },
       {
         "tok": "{{k_correctiveInit_no}}",
-        "label": "No"
+        "label": "No",
+        "ord": "No"
       }
     ],
     "tables": [],
@@ -4075,6 +5165,7 @@ var TOKEN_MAP = {
   "PWR": {
     "abbr": "PWR",
     "docx": "D-0507-PWR-001.docx",
+    "orderWarn": [],
     "byLabel": [
       {
         "label": "Full Name",
@@ -4131,7 +5222,8 @@ var TOKEN_MAP = {
     "boxes": [
       {
         "tok": "{{k_isMinor}}",
-        "label": "Passenger is a minor (under 18). A parent or legal guardian must sign."
+        "label": "Passenger is a minor (under 18). A parent or legal guardian must sign.",
+        "item": "Passenger is a minor (under 18). A parent or legal guardian must sign."
       }
     ],
     "tables": [],
@@ -4168,6 +5260,7 @@ var TOKEN_MAP = {
   "RTR": {
     "abbr": "RTR",
     "docx": "D-0507-RTR-001.docx",
+    "orderWarn": [],
     "byLabel": [
       {
         "label": "Instructor Name",
@@ -4233,55 +5326,68 @@ var TOKEN_MAP = {
     "boxes": [
       {
         "tok": "{{k_trainType_annual}}",
-        "label": "Annual seminar"
+        "label": "Annual seminar",
+        "ord": "Annual seminar"
       },
       {
         "tok": "{{k_trainType_perf}}",
-        "label": "Trigger-based (performance)"
+        "label": "Trigger-based (performance)",
+        "ord": "Trigger-based (performance)"
       },
       {
         "tok": "{{k_trainType_regulatory}}",
-        "label": "Trigger-based (regulatory)"
+        "label": "Trigger-based (regulatory)",
+        "ord": "Trigger-based (regulatory)"
       },
       {
         "tok": "{{k_trainType_safety}}",
-        "label": "Trigger-based (safety occurrence)"
+        "label": "Trigger-based (safety occurrence)",
+        "ord": "Trigger-based (safety occurrence)"
       },
       {
         "tok": "{{k_trainType_renewal}}",
-        "label": "Rating renewal"
+        "label": "Rating renewal",
+        "ord": "Rating renewal"
       },
       {
         "tok": "{{k_topics_regulatory}}",
-        "label": "Regulatory updates (CAAT / ICAO)"
+        "label": "Regulatory updates (CAAT / ICAO)",
+        "ord": "Regulatory updates (CAAT / ICAO)"
       },
       {
         "tok": "{{k_topics_teaching}}",
-        "label": "Teaching and learning techniques"
+        "label": "Teaching and learning techniques",
+        "ord": "Teaching and learning techniques"
       },
       {
         "tok": "{{k_topics_humanfac}}",
-        "label": "Human factors and fatigue management"
+        "label": "Human factors and fatigue management",
+        "ord": "Human factors and fatigue management"
       },
       {
         "tok": "{{k_topics_safety}}",
-        "label": "Flight safety and SMS awareness"
+        "label": "Flight safety and SMS awareness",
+        "ord": "Flight safety and SMS awareness"
       },
       {
         "tok": "{{k_topics_grading}}",
-        "label": "Standardisation and grading standards"
+        "label": "Standardisation and grading standards",
+        "ord": "Standardisation and grading standards"
       },
       {
         "tok": "{{k_topics_other}}",
-        "label": "Other"
+        "label": "Other",
+        "ord": "Other"
       },
       {
         "tok": "{{k_outcome_sat}}",
-        "label": "Satisfactory"
+        "label": "Satisfactory",
+        "ord": "Satisfactory"
       },
       {
         "tok": "{{k_outcome_unsat}}",
-        "label": "Unsatisfactory"
+        "label": "Unsatisfactory",
+        "ord": "Unsatisfactory"
       }
     ],
     "tables": [],
@@ -4324,6 +5430,7 @@ var TOKEN_MAP = {
   "SDF": {
     "abbr": "SDF",
     "docx": "D-0507-SDF-001.docx",
+    "orderWarn": [],
     "byLabel": [
       {
         "label": "Name",
@@ -4374,31 +5481,38 @@ var TOKEN_MAP = {
     "boxes": [
       {
         "tok": "{{k_applyFor_away2w}}",
-        "label": "Flight Instructor who left the company for more than 2 weeks"
+        "label": "Flight Instructor who left the company for more than 2 weeks",
+        "ord": "Flight Instructor who left the company for more than 2 weeks"
       },
       {
         "tok": "{{k_applyFor_dualDuty}}",
-        "label": "Flight Instructor or Student with dual duty as air personnel"
+        "label": "Flight Instructor or Student with dual duty as air personnel",
+        "ord": "Flight Instructor or Student with dual duty as air personnel"
       },
       {
         "tok": "{{k_applyFor_otherFly}}",
-        "label": "Flight Instructor or Student with other flying (recreational or aviation-related)"
+        "label": "Flight Instructor or Student with other flying (recreational or aviation-related)",
+        "ord": "Flight Instructor or Student with other flying (recreational or aviation-related)"
       },
       {
         "tok": "{{k_youAre_instructor}}",
-        "label": "Instructor"
+        "label": "Instructor",
+        "ord": "Instructor"
       },
       {
         "tok": "{{k_youAre_student}}",
-        "label": "Current Student"
+        "label": "Current Student",
+        "ord": "Current Student"
       },
       {
         "tok": "{{k_youAre_alumni}}",
-        "label": "Alumni / Recurrent"
+        "label": "Alumni / Recurrent",
+        "ord": "Alumni / Recurrent"
       },
       {
         "tok": "{{k_ftlConfirm}}",
-        "label": "FTL Compliance Confirmation: I confirm the totals above include hours from ALL operators. After today's planned duty with D-0507, my flight hours will not exceed the FTL limits: 7 days ≤ 28 hr / 28 days ≤ 100 hr / 365 days ≤ 1,000 hr. I understand that inaccurate declaration is a regulatory offence under Thai civil aviation law."
+        "label": "FTL Compliance Confirmation: I confirm the totals above include hours from ALL operators. After today's planned duty with D-0507, my flight hours will not exceed the FTL limits: 7 days ≤ 28 hr / 28 days ≤ 100 hr / 365 days ≤ 1,000 hr. I understand that inaccurate declaration is a regulatory offence under Thai civil aviation law.",
+        "item": "FTL Compliance Confirmation: I confirm the totals above include hours from ALL operators. After today's planned duty with D-0507, my flight hours will not exceed the FTL limits: 7 days ≤ 28 hr / 28 days ≤ 100 hr / 365 days ≤ 1,000 hr. I understand that inaccurate declaration is a regulatory offence under Thai civil aviation law."
       }
     ],
     "tables": [],
@@ -4447,6 +5561,7 @@ var TOKEN_MAP = {
   "SEF": {
     "abbr": "SEF",
     "docx": "D-0507-SEF-001.docx",
+    "orderWarn": [],
     "byLabel": [
       {
         "label": "Instructor Name",
@@ -4477,1199 +5592,1792 @@ var TOKEN_MAP = {
     "boxes": [
       {
         "tok": "{{k_p1_pTheCourseAsA_excellent}}",
-        "label": "The course as a whole was · Excellent"
+        "label": "The course as a whole was · Excellent",
+        "ord": "Excellent",
+        "item": "The course as a whole was"
       },
       {
         "tok": "{{k_p1_pTheCourseAsA_good}}",
-        "label": "The course as a whole was · Good"
+        "label": "The course as a whole was · Good",
+        "ord": "Good",
+        "item": "The course as a whole was"
       },
       {
         "tok": "{{k_p1_pTheCourseAsA_fair}}",
-        "label": "The course as a whole was · Fair"
+        "label": "The course as a whole was · Fair",
+        "ord": "Fair",
+        "item": "The course as a whole was"
       },
       {
         "tok": "{{k_p1_pTheCourseAsA_poor}}",
-        "label": "The course as a whole was · Poor"
+        "label": "The course as a whole was · Poor",
+        "ord": "Poor",
+        "item": "The course as a whole was"
       },
       {
         "tok": "{{k_p1_pTheCourseAsA_verypoor}}",
-        "label": "The course as a whole was · Very poor"
+        "label": "The course as a whole was · Very poor",
+        "ord": "Very poor",
+        "item": "The course as a whole was"
       },
       {
         "tok": "{{k_p1_pTheCourseAsA_na}}",
-        "label": "The course as a whole was · N/A"
+        "label": "The course as a whole was · N/A",
+        "ord": "N/A",
+        "item": "The course as a whole was"
       },
       {
         "tok": "{{k_p1_pTheCourseContentWas_excellent}}",
-        "label": "The course content was · Excellent"
+        "label": "The course content was · Excellent",
+        "ord": "Excellent",
+        "item": "The course content was"
       },
       {
         "tok": "{{k_p1_pTheCourseContentWas_good}}",
-        "label": "The course content was · Good"
+        "label": "The course content was · Good",
+        "ord": "Good",
+        "item": "The course content was"
       },
       {
         "tok": "{{k_p1_pTheCourseContentWas_fair}}",
-        "label": "The course content was · Fair"
+        "label": "The course content was · Fair",
+        "ord": "Fair",
+        "item": "The course content was"
       },
       {
         "tok": "{{k_p1_pTheCourseContentWas_poor}}",
-        "label": "The course content was · Poor"
+        "label": "The course content was · Poor",
+        "ord": "Poor",
+        "item": "The course content was"
       },
       {
         "tok": "{{k_p1_pTheCourseContentWas_verypoor}}",
-        "label": "The course content was · Very poor"
+        "label": "The course content was · Very poor",
+        "ord": "Very poor",
+        "item": "The course content was"
       },
       {
         "tok": "{{k_p1_pTheCourseContentWas_na}}",
-        "label": "The course content was · N/A"
+        "label": "The course content was · N/A",
+        "ord": "N/A",
+        "item": "The course content was"
       },
       {
         "tok": "{{k_p1_pClarityOfStudyMaterial_excellent}}",
-        "label": "Clarity of study material was · Excellent"
+        "label": "Clarity of study material was · Excellent",
+        "ord": "Excellent",
+        "item": "Clarity of study material was"
       },
       {
         "tok": "{{k_p1_pClarityOfStudyMaterial_good}}",
-        "label": "Clarity of study material was · Good"
+        "label": "Clarity of study material was · Good",
+        "ord": "Good",
+        "item": "Clarity of study material was"
       },
       {
         "tok": "{{k_p1_pClarityOfStudyMaterial_fair}}",
-        "label": "Clarity of study material was · Fair"
+        "label": "Clarity of study material was · Fair",
+        "ord": "Fair",
+        "item": "Clarity of study material was"
       },
       {
         "tok": "{{k_p1_pClarityOfStudyMaterial_poor}}",
-        "label": "Clarity of study material was · Poor"
+        "label": "Clarity of study material was · Poor",
+        "ord": "Poor",
+        "item": "Clarity of study material was"
       },
       {
         "tok": "{{k_p1_pClarityOfStudyMaterial_verypoor}}",
-        "label": "Clarity of study material was · Very poor"
+        "label": "Clarity of study material was · Very poor",
+        "ord": "Very poor",
+        "item": "Clarity of study material was"
       },
       {
         "tok": "{{k_p1_pClarityOfStudyMaterial_na}}",
-        "label": "Clarity of study material was · N/A"
+        "label": "Clarity of study material was · N/A",
+        "ord": "N/A",
+        "item": "Clarity of study material was"
       },
       {
         "tok": "{{k_p1_pExplanationsByTheContents_excellent}}",
-        "label": "Explanations by the contents were · Excellent"
+        "label": "Explanations by the contents were · Excellent",
+        "ord": "Excellent",
+        "item": "Explanations by the contents were"
       },
       {
         "tok": "{{k_p1_pExplanationsByTheContents_good}}",
-        "label": "Explanations by the contents were · Good"
+        "label": "Explanations by the contents were · Good",
+        "ord": "Good",
+        "item": "Explanations by the contents were"
       },
       {
         "tok": "{{k_p1_pExplanationsByTheContents_fair}}",
-        "label": "Explanations by the contents were · Fair"
+        "label": "Explanations by the contents were · Fair",
+        "ord": "Fair",
+        "item": "Explanations by the contents were"
       },
       {
         "tok": "{{k_p1_pExplanationsByTheContents_poor}}",
-        "label": "Explanations by the contents were · Poor"
+        "label": "Explanations by the contents were · Poor",
+        "ord": "Poor",
+        "item": "Explanations by the contents were"
       },
       {
         "tok": "{{k_p1_pExplanationsByTheContents_verypoor}}",
-        "label": "Explanations by the contents were · Very poor"
+        "label": "Explanations by the contents were · Very poor",
+        "ord": "Very poor",
+        "item": "Explanations by the contents were"
       },
       {
         "tok": "{{k_p1_pExplanationsByTheContents_na}}",
-        "label": "Explanations by the contents were · N/A"
+        "label": "Explanations by the contents were · N/A",
+        "ord": "N/A",
+        "item": "Explanations by the contents were"
       },
       {
         "tok": "{{k_p1_pTheUseOfExamples_excellent}}",
-        "label": "The use of examples and illustrations was · Excellent"
+        "label": "The use of examples and illustrations was · Excellent",
+        "ord": "Excellent",
+        "item": "The use of examples and illustrations was"
       },
       {
         "tok": "{{k_p1_pTheUseOfExamples_good}}",
-        "label": "The use of examples and illustrations was · Good"
+        "label": "The use of examples and illustrations was · Good",
+        "ord": "Good",
+        "item": "The use of examples and illustrations was"
       },
       {
         "tok": "{{k_p1_pTheUseOfExamples_fair}}",
-        "label": "The use of examples and illustrations was · Fair"
+        "label": "The use of examples and illustrations was · Fair",
+        "ord": "Fair",
+        "item": "The use of examples and illustrations was"
       },
       {
         "tok": "{{k_p1_pTheUseOfExamples_poor}}",
-        "label": "The use of examples and illustrations was · Poor"
+        "label": "The use of examples and illustrations was · Poor",
+        "ord": "Poor",
+        "item": "The use of examples and illustrations was"
       },
       {
         "tok": "{{k_p1_pTheUseOfExamples_verypoor}}",
-        "label": "The use of examples and illustrations was · Very poor"
+        "label": "The use of examples and illustrations was · Very poor",
+        "ord": "Very poor",
+        "item": "The use of examples and illustrations was"
       },
       {
         "tok": "{{k_p1_pTheUseOfExamples_na}}",
-        "label": "The use of examples and illustrations was · N/A"
+        "label": "The use of examples and illustrations was · N/A",
+        "ord": "N/A",
+        "item": "The use of examples and illustrations was"
       },
       {
         "tok": "{{k_p1_pAvailabilityOfExtraHelp_excellent}}",
-        "label": "Availability of extra help when needed was · Excellent"
+        "label": "Availability of extra help when needed was · Excellent",
+        "ord": "Excellent",
+        "item": "Availability of extra help when needed was"
       },
       {
         "tok": "{{k_p1_pAvailabilityOfExtraHelp_good}}",
-        "label": "Availability of extra help when needed was · Good"
+        "label": "Availability of extra help when needed was · Good",
+        "ord": "Good",
+        "item": "Availability of extra help when needed was"
       },
       {
         "tok": "{{k_p1_pAvailabilityOfExtraHelp_fair}}",
-        "label": "Availability of extra help when needed was · Fair"
+        "label": "Availability of extra help when needed was · Fair",
+        "ord": "Fair",
+        "item": "Availability of extra help when needed was"
       },
       {
         "tok": "{{k_p1_pAvailabilityOfExtraHelp_poor}}",
-        "label": "Availability of extra help when needed was · Poor"
+        "label": "Availability of extra help when needed was · Poor",
+        "ord": "Poor",
+        "item": "Availability of extra help when needed was"
       },
       {
         "tok": "{{k_p1_pAvailabilityOfExtraHelp_verypoor}}",
-        "label": "Availability of extra help when needed was · Very poor"
+        "label": "Availability of extra help when needed was · Very poor",
+        "ord": "Very poor",
+        "item": "Availability of extra help when needed was"
       },
       {
         "tok": "{{k_p1_pAvailabilityOfExtraHelp_na}}",
-        "label": "Availability of extra help when needed was · N/A"
+        "label": "Availability of extra help when needed was · N/A",
+        "ord": "N/A",
+        "item": "Availability of extra help when needed was"
       },
       {
         "tok": "{{k_p1_pUseOfTimeIn_excellent}}",
-        "label": "Use of time in each subject was · Excellent"
+        "label": "Use of time in each subject was · Excellent",
+        "ord": "Excellent",
+        "item": "Use of time in each subject was"
       },
       {
         "tok": "{{k_p1_pUseOfTimeIn_good}}",
-        "label": "Use of time in each subject was · Good"
+        "label": "Use of time in each subject was · Good",
+        "ord": "Good",
+        "item": "Use of time in each subject was"
       },
       {
         "tok": "{{k_p1_pUseOfTimeIn_fair}}",
-        "label": "Use of time in each subject was · Fair"
+        "label": "Use of time in each subject was · Fair",
+        "ord": "Fair",
+        "item": "Use of time in each subject was"
       },
       {
         "tok": "{{k_p1_pUseOfTimeIn_poor}}",
-        "label": "Use of time in each subject was · Poor"
+        "label": "Use of time in each subject was · Poor",
+        "ord": "Poor",
+        "item": "Use of time in each subject was"
       },
       {
         "tok": "{{k_p1_pUseOfTimeIn_verypoor}}",
-        "label": "Use of time in each subject was · Very poor"
+        "label": "Use of time in each subject was · Very poor",
+        "ord": "Very poor",
+        "item": "Use of time in each subject was"
       },
       {
         "tok": "{{k_p1_pUseOfTimeIn_na}}",
-        "label": "Use of time in each subject was · N/A"
+        "label": "Use of time in each subject was · N/A",
+        "ord": "N/A",
+        "item": "Use of time in each subject was"
       },
       {
         "tok": "{{k_p1_pAmountYouLearnedWas_excellent}}",
-        "label": "Amount you learned was · Excellent"
+        "label": "Amount you learned was · Excellent",
+        "ord": "Excellent",
+        "item": "Amount you learned was"
       },
       {
         "tok": "{{k_p1_pAmountYouLearnedWas_good}}",
-        "label": "Amount you learned was · Good"
+        "label": "Amount you learned was · Good",
+        "ord": "Good",
+        "item": "Amount you learned was"
       },
       {
         "tok": "{{k_p1_pAmountYouLearnedWas_fair}}",
-        "label": "Amount you learned was · Fair"
+        "label": "Amount you learned was · Fair",
+        "ord": "Fair",
+        "item": "Amount you learned was"
       },
       {
         "tok": "{{k_p1_pAmountYouLearnedWas_poor}}",
-        "label": "Amount you learned was · Poor"
+        "label": "Amount you learned was · Poor",
+        "ord": "Poor",
+        "item": "Amount you learned was"
       },
       {
         "tok": "{{k_p1_pAmountYouLearnedWas_verypoor}}",
-        "label": "Amount you learned was · Very poor"
+        "label": "Amount you learned was · Very poor",
+        "ord": "Very poor",
+        "item": "Amount you learned was"
       },
       {
         "tok": "{{k_p1_pAmountYouLearnedWas_na}}",
-        "label": "Amount you learned was · N/A"
+        "label": "Amount you learned was · N/A",
+        "ord": "N/A",
+        "item": "Amount you learned was"
       },
       {
         "tok": "{{k_p1_pRelevanceOfCourseContent_excellent}}",
-        "label": "Relevance of course content was · Excellent"
+        "label": "Relevance of course content was · Excellent",
+        "ord": "Excellent",
+        "item": "Relevance of course content was"
       },
       {
         "tok": "{{k_p1_pRelevanceOfCourseContent_good}}",
-        "label": "Relevance of course content was · Good"
+        "label": "Relevance of course content was · Good",
+        "ord": "Good",
+        "item": "Relevance of course content was"
       },
       {
         "tok": "{{k_p1_pRelevanceOfCourseContent_fair}}",
-        "label": "Relevance of course content was · Fair"
+        "label": "Relevance of course content was · Fair",
+        "ord": "Fair",
+        "item": "Relevance of course content was"
       },
       {
         "tok": "{{k_p1_pRelevanceOfCourseContent_poor}}",
-        "label": "Relevance of course content was · Poor"
+        "label": "Relevance of course content was · Poor",
+        "ord": "Poor",
+        "item": "Relevance of course content was"
       },
       {
         "tok": "{{k_p1_pRelevanceOfCourseContent_verypoor}}",
-        "label": "Relevance of course content was · Very poor"
+        "label": "Relevance of course content was · Very poor",
+        "ord": "Very poor",
+        "item": "Relevance of course content was"
       },
       {
         "tok": "{{k_p1_pRelevanceOfCourseContent_na}}",
-        "label": "Relevance of course content was · N/A"
+        "label": "Relevance of course content was · N/A",
+        "ord": "N/A",
+        "item": "Relevance of course content was"
       },
       {
         "tok": "{{k_p2_pTheCourseAsA2_excellent}}",
-        "label": "The course as a whole was · Excellent"
+        "label": "The course as a whole was · Excellent",
+        "ord": "Excellent",
+        "item": "The course as a whole was"
       },
       {
         "tok": "{{k_p2_pTheCourseAsA2_good}}",
-        "label": "The course as a whole was · Good"
+        "label": "The course as a whole was · Good",
+        "ord": "Good",
+        "item": "The course as a whole was"
       },
       {
         "tok": "{{k_p2_pTheCourseAsA2_fair}}",
-        "label": "The course as a whole was · Fair"
+        "label": "The course as a whole was · Fair",
+        "ord": "Fair",
+        "item": "The course as a whole was"
       },
       {
         "tok": "{{k_p2_pTheCourseAsA2_poor}}",
-        "label": "The course as a whole was · Poor"
+        "label": "The course as a whole was · Poor",
+        "ord": "Poor",
+        "item": "The course as a whole was"
       },
       {
         "tok": "{{k_p2_pTheCourseAsA2_verypoor}}",
-        "label": "The course as a whole was · Very poor"
+        "label": "The course as a whole was · Very poor",
+        "ord": "Very poor",
+        "item": "The course as a whole was"
       },
       {
         "tok": "{{k_p2_pTheCourseAsA2_na}}",
-        "label": "The course as a whole was · N/A"
+        "label": "The course as a whole was · N/A",
+        "ord": "N/A",
+        "item": "The course as a whole was"
       },
       {
         "tok": "{{k_p2_pTheCourseContentWas2_excellent}}",
-        "label": "The course content was · Excellent"
+        "label": "The course content was · Excellent",
+        "ord": "Excellent",
+        "item": "The course content was"
       },
       {
         "tok": "{{k_p2_pTheCourseContentWas2_good}}",
-        "label": "The course content was · Good"
+        "label": "The course content was · Good",
+        "ord": "Good",
+        "item": "The course content was"
       },
       {
         "tok": "{{k_p2_pTheCourseContentWas2_fair}}",
-        "label": "The course content was · Fair"
+        "label": "The course content was · Fair",
+        "ord": "Fair",
+        "item": "The course content was"
       },
       {
         "tok": "{{k_p2_pTheCourseContentWas2_poor}}",
-        "label": "The course content was · Poor"
+        "label": "The course content was · Poor",
+        "ord": "Poor",
+        "item": "The course content was"
       },
       {
         "tok": "{{k_p2_pTheCourseContentWas2_verypoor}}",
-        "label": "The course content was · Very poor"
+        "label": "The course content was · Very poor",
+        "ord": "Very poor",
+        "item": "The course content was"
       },
       {
         "tok": "{{k_p2_pTheCourseContentWas2_na}}",
-        "label": "The course content was · N/A"
+        "label": "The course content was · N/A",
+        "ord": "N/A",
+        "item": "The course content was"
       },
       {
         "tok": "{{k_p2_pTheInstructorsContributionTo_excellent}}",
-        "label": "The instructor's contribution to the course was · Excellent"
+        "label": "The instructor's contribution to the course was · Excellent",
+        "ord": "Excellent",
+        "item": "The instructor's contribution to the course was"
       },
       {
         "tok": "{{k_p2_pTheInstructorsContributionTo_good}}",
-        "label": "The instructor's contribution to the course was · Good"
+        "label": "The instructor's contribution to the course was · Good",
+        "ord": "Good",
+        "item": "The instructor's contribution to the course was"
       },
       {
         "tok": "{{k_p2_pTheInstructorsContributionTo_fair}}",
-        "label": "The instructor's contribution to the course was · Fair"
+        "label": "The instructor's contribution to the course was · Fair",
+        "ord": "Fair",
+        "item": "The instructor's contribution to the course was"
       },
       {
         "tok": "{{k_p2_pTheInstructorsContributionTo_poor}}",
-        "label": "The instructor's contribution to the course was · Poor"
+        "label": "The instructor's contribution to the course was · Poor",
+        "ord": "Poor",
+        "item": "The instructor's contribution to the course was"
       },
       {
         "tok": "{{k_p2_pTheInstructorsContributionTo_verypoor}}",
-        "label": "The instructor's contribution to the course was · Very poor"
+        "label": "The instructor's contribution to the course was · Very poor",
+        "ord": "Very poor",
+        "item": "The instructor's contribution to the course was"
       },
       {
         "tok": "{{k_p2_pTheInstructorsContributionTo_na}}",
-        "label": "The instructor's contribution to the course was · N/A"
+        "label": "The instructor's contribution to the course was · N/A",
+        "ord": "N/A",
+        "item": "The instructor's contribution to the course was"
       },
       {
         "tok": "{{k_p2_pTheInstructorsEffectivenessIn_excellent}}",
-        "label": "The instructor's effectiveness in teaching the subject matter was · Excellent"
+        "label": "The instructor's effectiveness in teaching the subject matter was · Excellent",
+        "ord": "Excellent",
+        "item": "The instructor's effectiveness in teaching the subject matter was"
       },
       {
         "tok": "{{k_p2_pTheInstructorsEffectivenessIn_good}}",
-        "label": "The instructor's effectiveness in teaching the subject matter was · Good"
+        "label": "The instructor's effectiveness in teaching the subject matter was · Good",
+        "ord": "Good",
+        "item": "The instructor's effectiveness in teaching the subject matter was"
       },
       {
         "tok": "{{k_p2_pTheInstructorsEffectivenessIn_fair}}",
-        "label": "The instructor's effectiveness in teaching the subject matter was · Fair"
+        "label": "The instructor's effectiveness in teaching the subject matter was · Fair",
+        "ord": "Fair",
+        "item": "The instructor's effectiveness in teaching the subject matter was"
       },
       {
         "tok": "{{k_p2_pTheInstructorsEffectivenessIn_poor}}",
-        "label": "The instructor's effectiveness in teaching the subject matter was · Poor"
+        "label": "The instructor's effectiveness in teaching the subject matter was · Poor",
+        "ord": "Poor",
+        "item": "The instructor's effectiveness in teaching the subject matter was"
       },
       {
         "tok": "{{k_p2_pTheInstructorsEffectivenessIn_verypoor}}",
-        "label": "The instructor's effectiveness in teaching the subject matter was · Very poor"
+        "label": "The instructor's effectiveness in teaching the subject matter was · Very poor",
+        "ord": "Very poor",
+        "item": "The instructor's effectiveness in teaching the subject matter was"
       },
       {
         "tok": "{{k_p2_pTheInstructorsEffectivenessIn_na}}",
-        "label": "The instructor's effectiveness in teaching the subject matter was · N/A"
+        "label": "The instructor's effectiveness in teaching the subject matter was · N/A",
+        "ord": "N/A",
+        "item": "The instructor's effectiveness in teaching the subject matter was"
       },
       {
         "tok": "{{k_p2_pCourseOrganisationWas_excellent}}",
-        "label": "Course organisation was · Excellent"
+        "label": "Course organisation was · Excellent",
+        "ord": "Excellent",
+        "item": "Course organisation was"
       },
       {
         "tok": "{{k_p2_pCourseOrganisationWas_good}}",
-        "label": "Course organisation was · Good"
+        "label": "Course organisation was · Good",
+        "ord": "Good",
+        "item": "Course organisation was"
       },
       {
         "tok": "{{k_p2_pCourseOrganisationWas_fair}}",
-        "label": "Course organisation was · Fair"
+        "label": "Course organisation was · Fair",
+        "ord": "Fair",
+        "item": "Course organisation was"
       },
       {
         "tok": "{{k_p2_pCourseOrganisationWas_poor}}",
-        "label": "Course organisation was · Poor"
+        "label": "Course organisation was · Poor",
+        "ord": "Poor",
+        "item": "Course organisation was"
       },
       {
         "tok": "{{k_p2_pCourseOrganisationWas_verypoor}}",
-        "label": "Course organisation was · Very poor"
+        "label": "Course organisation was · Very poor",
+        "ord": "Very poor",
+        "item": "Course organisation was"
       },
       {
         "tok": "{{k_p2_pCourseOrganisationWas_na}}",
-        "label": "Course organisation was · N/A"
+        "label": "Course organisation was · N/A",
+        "ord": "N/A",
+        "item": "Course organisation was"
       },
       {
         "tok": "{{k_p2_pClarityOfInstructorsVoice_excellent}}",
-        "label": "Clarity of instructor's voice was · Excellent"
+        "label": "Clarity of instructor's voice was · Excellent",
+        "ord": "Excellent",
+        "item": "Clarity of instructor's voice was"
       },
       {
         "tok": "{{k_p2_pClarityOfInstructorsVoice_good}}",
-        "label": "Clarity of instructor's voice was · Good"
+        "label": "Clarity of instructor's voice was · Good",
+        "ord": "Good",
+        "item": "Clarity of instructor's voice was"
       },
       {
         "tok": "{{k_p2_pClarityOfInstructorsVoice_fair}}",
-        "label": "Clarity of instructor's voice was · Fair"
+        "label": "Clarity of instructor's voice was · Fair",
+        "ord": "Fair",
+        "item": "Clarity of instructor's voice was"
       },
       {
         "tok": "{{k_p2_pClarityOfInstructorsVoice_poor}}",
-        "label": "Clarity of instructor's voice was · Poor"
+        "label": "Clarity of instructor's voice was · Poor",
+        "ord": "Poor",
+        "item": "Clarity of instructor's voice was"
       },
       {
         "tok": "{{k_p2_pClarityOfInstructorsVoice_verypoor}}",
-        "label": "Clarity of instructor's voice was · Very poor"
+        "label": "Clarity of instructor's voice was · Very poor",
+        "ord": "Very poor",
+        "item": "Clarity of instructor's voice was"
       },
       {
         "tok": "{{k_p2_pClarityOfInstructorsVoice_na}}",
-        "label": "Clarity of instructor's voice was · N/A"
+        "label": "Clarity of instructor's voice was · N/A",
+        "ord": "N/A",
+        "item": "Clarity of instructor's voice was"
       },
       {
         "tok": "{{k_p2_pExplanationsByInstructorWere_excellent}}",
-        "label": "Explanations by instructor were · Excellent"
+        "label": "Explanations by instructor were · Excellent",
+        "ord": "Excellent",
+        "item": "Explanations by instructor were"
       },
       {
         "tok": "{{k_p2_pExplanationsByInstructorWere_good}}",
-        "label": "Explanations by instructor were · Good"
+        "label": "Explanations by instructor were · Good",
+        "ord": "Good",
+        "item": "Explanations by instructor were"
       },
       {
         "tok": "{{k_p2_pExplanationsByInstructorWere_fair}}",
-        "label": "Explanations by instructor were · Fair"
+        "label": "Explanations by instructor were · Fair",
+        "ord": "Fair",
+        "item": "Explanations by instructor were"
       },
       {
         "tok": "{{k_p2_pExplanationsByInstructorWere_poor}}",
-        "label": "Explanations by instructor were · Poor"
+        "label": "Explanations by instructor were · Poor",
+        "ord": "Poor",
+        "item": "Explanations by instructor were"
       },
       {
         "tok": "{{k_p2_pExplanationsByInstructorWere_verypoor}}",
-        "label": "Explanations by instructor were · Very poor"
+        "label": "Explanations by instructor were · Very poor",
+        "ord": "Very poor",
+        "item": "Explanations by instructor were"
       },
       {
         "tok": "{{k_p2_pExplanationsByInstructorWere_na}}",
-        "label": "Explanations by instructor were · N/A"
+        "label": "Explanations by instructor were · N/A",
+        "ord": "N/A",
+        "item": "Explanations by instructor were"
       },
       {
         "tok": "{{k_p2_pInstructorsUseOfExamples_excellent}}",
-        "label": "Instructor's use of examples and illustrations was · Excellent"
+        "label": "Instructor's use of examples and illustrations was · Excellent",
+        "ord": "Excellent",
+        "item": "Instructor's use of examples and illustrations was"
       },
       {
         "tok": "{{k_p2_pInstructorsUseOfExamples_good}}",
-        "label": "Instructor's use of examples and illustrations was · Good"
+        "label": "Instructor's use of examples and illustrations was · Good",
+        "ord": "Good",
+        "item": "Instructor's use of examples and illustrations was"
       },
       {
         "tok": "{{k_p2_pInstructorsUseOfExamples_fair}}",
-        "label": "Instructor's use of examples and illustrations was · Fair"
+        "label": "Instructor's use of examples and illustrations was · Fair",
+        "ord": "Fair",
+        "item": "Instructor's use of examples and illustrations was"
       },
       {
         "tok": "{{k_p2_pInstructorsUseOfExamples_poor}}",
-        "label": "Instructor's use of examples and illustrations was · Poor"
+        "label": "Instructor's use of examples and illustrations was · Poor",
+        "ord": "Poor",
+        "item": "Instructor's use of examples and illustrations was"
       },
       {
         "tok": "{{k_p2_pInstructorsUseOfExamples_verypoor}}",
-        "label": "Instructor's use of examples and illustrations was · Very poor"
+        "label": "Instructor's use of examples and illustrations was · Very poor",
+        "ord": "Very poor",
+        "item": "Instructor's use of examples and illustrations was"
       },
       {
         "tok": "{{k_p2_pInstructorsUseOfExamples_na}}",
-        "label": "Instructor's use of examples and illustrations was · N/A"
+        "label": "Instructor's use of examples and illustrations was · N/A",
+        "ord": "N/A",
+        "item": "Instructor's use of examples and illustrations was"
       },
       {
         "tok": "{{k_p2_pQualityOfQuestionsOr_excellent}}",
-        "label": "Quality of questions or problems raised by the instructor was · Excellent"
+        "label": "Quality of questions or problems raised by the instructor was · Excellent",
+        "ord": "Excellent",
+        "item": "Quality of questions or problems raised by the instructor was"
       },
       {
         "tok": "{{k_p2_pQualityOfQuestionsOr_good}}",
-        "label": "Quality of questions or problems raised by the instructor was · Good"
+        "label": "Quality of questions or problems raised by the instructor was · Good",
+        "ord": "Good",
+        "item": "Quality of questions or problems raised by the instructor was"
       },
       {
         "tok": "{{k_p2_pQualityOfQuestionsOr_fair}}",
-        "label": "Quality of questions or problems raised by the instructor was · Fair"
+        "label": "Quality of questions or problems raised by the instructor was · Fair",
+        "ord": "Fair",
+        "item": "Quality of questions or problems raised by the instructor was"
       },
       {
         "tok": "{{k_p2_pQualityOfQuestionsOr_poor}}",
-        "label": "Quality of questions or problems raised by the instructor was · Poor"
+        "label": "Quality of questions or problems raised by the instructor was · Poor",
+        "ord": "Poor",
+        "item": "Quality of questions or problems raised by the instructor was"
       },
       {
         "tok": "{{k_p2_pQualityOfQuestionsOr_verypoor}}",
-        "label": "Quality of questions or problems raised by the instructor was · Very poor"
+        "label": "Quality of questions or problems raised by the instructor was · Very poor",
+        "ord": "Very poor",
+        "item": "Quality of questions or problems raised by the instructor was"
       },
       {
         "tok": "{{k_p2_pQualityOfQuestionsOr_na}}",
-        "label": "Quality of questions or problems raised by the instructor was · N/A"
+        "label": "Quality of questions or problems raised by the instructor was · N/A",
+        "ord": "N/A",
+        "item": "Quality of questions or problems raised by the instructor was"
       },
       {
         "tok": "{{k_p2_pStudentsConfidenceInInstructors_excellent}}",
-        "label": "Student's confidence in instructor's knowledge was · Excellent"
+        "label": "Student's confidence in instructor's knowledge was · Excellent",
+        "ord": "Excellent",
+        "item": "Student's confidence in instructor's knowledge was"
       },
       {
         "tok": "{{k_p2_pStudentsConfidenceInInstructors_good}}",
-        "label": "Student's confidence in instructor's knowledge was · Good"
+        "label": "Student's confidence in instructor's knowledge was · Good",
+        "ord": "Good",
+        "item": "Student's confidence in instructor's knowledge was"
       },
       {
         "tok": "{{k_p2_pStudentsConfidenceInInstructors_fair}}",
-        "label": "Student's confidence in instructor's knowledge was · Fair"
+        "label": "Student's confidence in instructor's knowledge was · Fair",
+        "ord": "Fair",
+        "item": "Student's confidence in instructor's knowledge was"
       },
       {
         "tok": "{{k_p2_pStudentsConfidenceInInstructors_poor}}",
-        "label": "Student's confidence in instructor's knowledge was · Poor"
+        "label": "Student's confidence in instructor's knowledge was · Poor",
+        "ord": "Poor",
+        "item": "Student's confidence in instructor's knowledge was"
       },
       {
         "tok": "{{k_p2_pStudentsConfidenceInInstructors_verypoor}}",
-        "label": "Student's confidence in instructor's knowledge was · Very poor"
+        "label": "Student's confidence in instructor's knowledge was · Very poor",
+        "ord": "Very poor",
+        "item": "Student's confidence in instructor's knowledge was"
       },
       {
         "tok": "{{k_p2_pStudentsConfidenceInInstructors_na}}",
-        "label": "Student's confidence in instructor's knowledge was · N/A"
+        "label": "Student's confidence in instructor's knowledge was · N/A",
+        "ord": "N/A",
+        "item": "Student's confidence in instructor's knowledge was"
       },
       {
         "tok": "{{k_p2_pInstructorsEnthusiasmWas_excellent}}",
-        "label": "Instructor's enthusiasm was · Excellent"
+        "label": "Instructor's enthusiasm was · Excellent",
+        "ord": "Excellent",
+        "item": "Instructor's enthusiasm was"
       },
       {
         "tok": "{{k_p2_pInstructorsEnthusiasmWas_good}}",
-        "label": "Instructor's enthusiasm was · Good"
+        "label": "Instructor's enthusiasm was · Good",
+        "ord": "Good",
+        "item": "Instructor's enthusiasm was"
       },
       {
         "tok": "{{k_p2_pInstructorsEnthusiasmWas_fair}}",
-        "label": "Instructor's enthusiasm was · Fair"
+        "label": "Instructor's enthusiasm was · Fair",
+        "ord": "Fair",
+        "item": "Instructor's enthusiasm was"
       },
       {
         "tok": "{{k_p2_pInstructorsEnthusiasmWas_poor}}",
-        "label": "Instructor's enthusiasm was · Poor"
+        "label": "Instructor's enthusiasm was · Poor",
+        "ord": "Poor",
+        "item": "Instructor's enthusiasm was"
       },
       {
         "tok": "{{k_p2_pInstructorsEnthusiasmWas_verypoor}}",
-        "label": "Instructor's enthusiasm was · Very poor"
+        "label": "Instructor's enthusiasm was · Very poor",
+        "ord": "Very poor",
+        "item": "Instructor's enthusiasm was"
       },
       {
         "tok": "{{k_p2_pInstructorsEnthusiasmWas_na}}",
-        "label": "Instructor's enthusiasm was · N/A"
+        "label": "Instructor's enthusiasm was · N/A",
+        "ord": "N/A",
+        "item": "Instructor's enthusiasm was"
       },
       {
         "tok": "{{k_p2_pEncouragementGivenToStudents_excellent}}",
-        "label": "Encouragement given to students to participate was · Excellent"
+        "label": "Encouragement given to students to participate was · Excellent",
+        "ord": "Excellent",
+        "item": "Encouragement given to students to participate was"
       },
       {
         "tok": "{{k_p2_pEncouragementGivenToStudents_good}}",
-        "label": "Encouragement given to students to participate was · Good"
+        "label": "Encouragement given to students to participate was · Good",
+        "ord": "Good",
+        "item": "Encouragement given to students to participate was"
       },
       {
         "tok": "{{k_p2_pEncouragementGivenToStudents_fair}}",
-        "label": "Encouragement given to students to participate was · Fair"
+        "label": "Encouragement given to students to participate was · Fair",
+        "ord": "Fair",
+        "item": "Encouragement given to students to participate was"
       },
       {
         "tok": "{{k_p2_pEncouragementGivenToStudents_poor}}",
-        "label": "Encouragement given to students to participate was · Poor"
+        "label": "Encouragement given to students to participate was · Poor",
+        "ord": "Poor",
+        "item": "Encouragement given to students to participate was"
       },
       {
         "tok": "{{k_p2_pEncouragementGivenToStudents_verypoor}}",
-        "label": "Encouragement given to students to participate was · Very poor"
+        "label": "Encouragement given to students to participate was · Very poor",
+        "ord": "Very poor",
+        "item": "Encouragement given to students to participate was"
       },
       {
         "tok": "{{k_p2_pEncouragementGivenToStudents_na}}",
-        "label": "Encouragement given to students to participate was · N/A"
+        "label": "Encouragement given to students to participate was · N/A",
+        "ord": "N/A",
+        "item": "Encouragement given to students to participate was"
       },
       {
         "tok": "{{k_p2_pAnswersToStudentQuestions_excellent}}",
-        "label": "Answers to student questions were · Excellent"
+        "label": "Answers to student questions were · Excellent",
+        "ord": "Excellent",
+        "item": "Answers to student questions were"
       },
       {
         "tok": "{{k_p2_pAnswersToStudentQuestions_good}}",
-        "label": "Answers to student questions were · Good"
+        "label": "Answers to student questions were · Good",
+        "ord": "Good",
+        "item": "Answers to student questions were"
       },
       {
         "tok": "{{k_p2_pAnswersToStudentQuestions_fair}}",
-        "label": "Answers to student questions were · Fair"
+        "label": "Answers to student questions were · Fair",
+        "ord": "Fair",
+        "item": "Answers to student questions were"
       },
       {
         "tok": "{{k_p2_pAnswersToStudentQuestions_poor}}",
-        "label": "Answers to student questions were · Poor"
+        "label": "Answers to student questions were · Poor",
+        "ord": "Poor",
+        "item": "Answers to student questions were"
       },
       {
         "tok": "{{k_p2_pAnswersToStudentQuestions_verypoor}}",
-        "label": "Answers to student questions were · Very poor"
+        "label": "Answers to student questions were · Very poor",
+        "ord": "Very poor",
+        "item": "Answers to student questions were"
       },
       {
         "tok": "{{k_p2_pAnswersToStudentQuestions_na}}",
-        "label": "Answers to student questions were · N/A"
+        "label": "Answers to student questions were · N/A",
+        "ord": "N/A",
+        "item": "Answers to student questions were"
       },
       {
         "tok": "{{k_p2_pAvailabilityOfExtraHelp2_excellent}}",
-        "label": "Availability of extra help when needed was · Excellent"
+        "label": "Availability of extra help when needed was · Excellent",
+        "ord": "Excellent",
+        "item": "Availability of extra help when needed was"
       },
       {
         "tok": "{{k_p2_pAvailabilityOfExtraHelp2_good}}",
-        "label": "Availability of extra help when needed was · Good"
+        "label": "Availability of extra help when needed was · Good",
+        "ord": "Good",
+        "item": "Availability of extra help when needed was"
       },
       {
         "tok": "{{k_p2_pAvailabilityOfExtraHelp2_fair}}",
-        "label": "Availability of extra help when needed was · Fair"
+        "label": "Availability of extra help when needed was · Fair",
+        "ord": "Fair",
+        "item": "Availability of extra help when needed was"
       },
       {
         "tok": "{{k_p2_pAvailabilityOfExtraHelp2_poor}}",
-        "label": "Availability of extra help when needed was · Poor"
+        "label": "Availability of extra help when needed was · Poor",
+        "ord": "Poor",
+        "item": "Availability of extra help when needed was"
       },
       {
         "tok": "{{k_p2_pAvailabilityOfExtraHelp2_verypoor}}",
-        "label": "Availability of extra help when needed was · Very poor"
+        "label": "Availability of extra help when needed was · Very poor",
+        "ord": "Very poor",
+        "item": "Availability of extra help when needed was"
       },
       {
         "tok": "{{k_p2_pAvailabilityOfExtraHelp2_na}}",
-        "label": "Availability of extra help when needed was · N/A"
+        "label": "Availability of extra help when needed was · N/A",
+        "ord": "N/A",
+        "item": "Availability of extra help when needed was"
       },
       {
         "tok": "{{k_p2_pUseOfClassTime_excellent}}",
-        "label": "Use of class time was · Excellent"
+        "label": "Use of class time was · Excellent",
+        "ord": "Excellent",
+        "item": "Use of class time was"
       },
       {
         "tok": "{{k_p2_pUseOfClassTime_good}}",
-        "label": "Use of class time was · Good"
+        "label": "Use of class time was · Good",
+        "ord": "Good",
+        "item": "Use of class time was"
       },
       {
         "tok": "{{k_p2_pUseOfClassTime_fair}}",
-        "label": "Use of class time was · Fair"
+        "label": "Use of class time was · Fair",
+        "ord": "Fair",
+        "item": "Use of class time was"
       },
       {
         "tok": "{{k_p2_pUseOfClassTime_poor}}",
-        "label": "Use of class time was · Poor"
+        "label": "Use of class time was · Poor",
+        "ord": "Poor",
+        "item": "Use of class time was"
       },
       {
         "tok": "{{k_p2_pUseOfClassTime_verypoor}}",
-        "label": "Use of class time was · Very poor"
+        "label": "Use of class time was · Very poor",
+        "ord": "Very poor",
+        "item": "Use of class time was"
       },
       {
         "tok": "{{k_p2_pUseOfClassTime_na}}",
-        "label": "Use of class time was · N/A"
+        "label": "Use of class time was · N/A",
+        "ord": "N/A",
+        "item": "Use of class time was"
       },
       {
         "tok": "{{k_p2_pInstructorsInterestInStudents_excellent}}",
-        "label": "Instructor's interest in student's progress was · Excellent"
+        "label": "Instructor's interest in student's progress was · Excellent",
+        "ord": "Excellent",
+        "item": "Instructor's interest in student's progress was"
       },
       {
         "tok": "{{k_p2_pInstructorsInterestInStudents_good}}",
-        "label": "Instructor's interest in student's progress was · Good"
+        "label": "Instructor's interest in student's progress was · Good",
+        "ord": "Good",
+        "item": "Instructor's interest in student's progress was"
       },
       {
         "tok": "{{k_p2_pInstructorsInterestInStudents_fair}}",
-        "label": "Instructor's interest in student's progress was · Fair"
+        "label": "Instructor's interest in student's progress was · Fair",
+        "ord": "Fair",
+        "item": "Instructor's interest in student's progress was"
       },
       {
         "tok": "{{k_p2_pInstructorsInterestInStudents_poor}}",
-        "label": "Instructor's interest in student's progress was · Poor"
+        "label": "Instructor's interest in student's progress was · Poor",
+        "ord": "Poor",
+        "item": "Instructor's interest in student's progress was"
       },
       {
         "tok": "{{k_p2_pInstructorsInterestInStudents_verypoor}}",
-        "label": "Instructor's interest in student's progress was · Very poor"
+        "label": "Instructor's interest in student's progress was · Very poor",
+        "ord": "Very poor",
+        "item": "Instructor's interest in student's progress was"
       },
       {
         "tok": "{{k_p2_pInstructorsInterestInStudents_na}}",
-        "label": "Instructor's interest in student's progress was · N/A"
+        "label": "Instructor's interest in student's progress was · N/A",
+        "ord": "N/A",
+        "item": "Instructor's interest in student's progress was"
       },
       {
         "tok": "{{k_p2_pAmountYouLearnedWas2_excellent}}",
-        "label": "Amount you learned was · Excellent"
+        "label": "Amount you learned was · Excellent",
+        "ord": "Excellent",
+        "item": "Amount you learned was"
       },
       {
         "tok": "{{k_p2_pAmountYouLearnedWas2_good}}",
-        "label": "Amount you learned was · Good"
+        "label": "Amount you learned was · Good",
+        "ord": "Good",
+        "item": "Amount you learned was"
       },
       {
         "tok": "{{k_p2_pAmountYouLearnedWas2_fair}}",
-        "label": "Amount you learned was · Fair"
+        "label": "Amount you learned was · Fair",
+        "ord": "Fair",
+        "item": "Amount you learned was"
       },
       {
         "tok": "{{k_p2_pAmountYouLearnedWas2_poor}}",
-        "label": "Amount you learned was · Poor"
+        "label": "Amount you learned was · Poor",
+        "ord": "Poor",
+        "item": "Amount you learned was"
       },
       {
         "tok": "{{k_p2_pAmountYouLearnedWas2_verypoor}}",
-        "label": "Amount you learned was · Very poor"
+        "label": "Amount you learned was · Very poor",
+        "ord": "Very poor",
+        "item": "Amount you learned was"
       },
       {
         "tok": "{{k_p2_pAmountYouLearnedWas2_na}}",
-        "label": "Amount you learned was · N/A"
+        "label": "Amount you learned was · N/A",
+        "ord": "N/A",
+        "item": "Amount you learned was"
       },
       {
         "tok": "{{k_p2_pRelevanceOfCourseContent2_excellent}}",
-        "label": "Relevance of course content was · Excellent"
+        "label": "Relevance of course content was · Excellent",
+        "ord": "Excellent",
+        "item": "Relevance of course content was"
       },
       {
         "tok": "{{k_p2_pRelevanceOfCourseContent2_good}}",
-        "label": "Relevance of course content was · Good"
+        "label": "Relevance of course content was · Good",
+        "ord": "Good",
+        "item": "Relevance of course content was"
       },
       {
         "tok": "{{k_p2_pRelevanceOfCourseContent2_fair}}",
-        "label": "Relevance of course content was · Fair"
+        "label": "Relevance of course content was · Fair",
+        "ord": "Fair",
+        "item": "Relevance of course content was"
       },
       {
         "tok": "{{k_p2_pRelevanceOfCourseContent2_poor}}",
-        "label": "Relevance of course content was · Poor"
+        "label": "Relevance of course content was · Poor",
+        "ord": "Poor",
+        "item": "Relevance of course content was"
       },
       {
         "tok": "{{k_p2_pRelevanceOfCourseContent2_verypoor}}",
-        "label": "Relevance of course content was · Very poor"
+        "label": "Relevance of course content was · Very poor",
+        "ord": "Very poor",
+        "item": "Relevance of course content was"
       },
       {
         "tok": "{{k_p2_pRelevanceOfCourseContent2_na}}",
-        "label": "Relevance of course content was · N/A"
+        "label": "Relevance of course content was · N/A",
+        "ord": "N/A",
+        "item": "Relevance of course content was"
       },
       {
         "tok": "{{k_p2_pGradingTechniquesWere_excellent}}",
-        "label": "Grading techniques were · Excellent"
+        "label": "Grading techniques were · Excellent",
+        "ord": "Excellent",
+        "item": "Grading techniques were"
       },
       {
         "tok": "{{k_p2_pGradingTechniquesWere_good}}",
-        "label": "Grading techniques were · Good"
+        "label": "Grading techniques were · Good",
+        "ord": "Good",
+        "item": "Grading techniques were"
       },
       {
         "tok": "{{k_p2_pGradingTechniquesWere_fair}}",
-        "label": "Grading techniques were · Fair"
+        "label": "Grading techniques were · Fair",
+        "ord": "Fair",
+        "item": "Grading techniques were"
       },
       {
         "tok": "{{k_p2_pGradingTechniquesWere_poor}}",
-        "label": "Grading techniques were · Poor"
+        "label": "Grading techniques were · Poor",
+        "ord": "Poor",
+        "item": "Grading techniques were"
       },
       {
         "tok": "{{k_p2_pGradingTechniquesWere_verypoor}}",
-        "label": "Grading techniques were · Very poor"
+        "label": "Grading techniques were · Very poor",
+        "ord": "Very poor",
+        "item": "Grading techniques were"
       },
       {
         "tok": "{{k_p2_pGradingTechniquesWere_na}}",
-        "label": "Grading techniques were · N/A"
+        "label": "Grading techniques were · N/A",
+        "ord": "N/A",
+        "item": "Grading techniques were"
       },
       {
         "tok": "{{k_p2_pAmountOfAssignedWork_excellent}}",
-        "label": "Amount of assigned work was · Excellent"
+        "label": "Amount of assigned work was · Excellent",
+        "ord": "Excellent",
+        "item": "Amount of assigned work was"
       },
       {
         "tok": "{{k_p2_pAmountOfAssignedWork_good}}",
-        "label": "Amount of assigned work was · Good"
+        "label": "Amount of assigned work was · Good",
+        "ord": "Good",
+        "item": "Amount of assigned work was"
       },
       {
         "tok": "{{k_p2_pAmountOfAssignedWork_fair}}",
-        "label": "Amount of assigned work was · Fair"
+        "label": "Amount of assigned work was · Fair",
+        "ord": "Fair",
+        "item": "Amount of assigned work was"
       },
       {
         "tok": "{{k_p2_pAmountOfAssignedWork_poor}}",
-        "label": "Amount of assigned work was · Poor"
+        "label": "Amount of assigned work was · Poor",
+        "ord": "Poor",
+        "item": "Amount of assigned work was"
       },
       {
         "tok": "{{k_p2_pAmountOfAssignedWork_verypoor}}",
-        "label": "Amount of assigned work was · Very poor"
+        "label": "Amount of assigned work was · Very poor",
+        "ord": "Very poor",
+        "item": "Amount of assigned work was"
       },
       {
         "tok": "{{k_p2_pAmountOfAssignedWork_na}}",
-        "label": "Amount of assigned work was · N/A"
+        "label": "Amount of assigned work was · N/A",
+        "ord": "N/A",
+        "item": "Amount of assigned work was"
       },
       {
         "tok": "{{k_p3_pTheTrainingAsA_excellent}}",
-        "label": "The training as a whole was · Excellent"
+        "label": "The training as a whole was · Excellent",
+        "ord": "Excellent",
+        "item": "The training as a whole was"
       },
       {
         "tok": "{{k_p3_pTheTrainingAsA_good}}",
-        "label": "The training as a whole was · Good"
+        "label": "The training as a whole was · Good",
+        "ord": "Good",
+        "item": "The training as a whole was"
       },
       {
         "tok": "{{k_p3_pTheTrainingAsA_fair}}",
-        "label": "The training as a whole was · Fair"
+        "label": "The training as a whole was · Fair",
+        "ord": "Fair",
+        "item": "The training as a whole was"
       },
       {
         "tok": "{{k_p3_pTheTrainingAsA_poor}}",
-        "label": "The training as a whole was · Poor"
+        "label": "The training as a whole was · Poor",
+        "ord": "Poor",
+        "item": "The training as a whole was"
       },
       {
         "tok": "{{k_p3_pTheTrainingAsA_verypoor}}",
-        "label": "The training as a whole was · Very poor"
+        "label": "The training as a whole was · Very poor",
+        "ord": "Very poor",
+        "item": "The training as a whole was"
       },
       {
         "tok": "{{k_p3_pTheTrainingAsA_na}}",
-        "label": "The training as a whole was · N/A"
+        "label": "The training as a whole was · N/A",
+        "ord": "N/A",
+        "item": "The training as a whole was"
       },
       {
         "tok": "{{k_p3_pTheContentWas_excellent}}",
-        "label": "The content was · Excellent"
+        "label": "The content was · Excellent",
+        "ord": "Excellent",
+        "item": "The content was"
       },
       {
         "tok": "{{k_p3_pTheContentWas_good}}",
-        "label": "The content was · Good"
+        "label": "The content was · Good",
+        "ord": "Good",
+        "item": "The content was"
       },
       {
         "tok": "{{k_p3_pTheContentWas_fair}}",
-        "label": "The content was · Fair"
+        "label": "The content was · Fair",
+        "ord": "Fair",
+        "item": "The content was"
       },
       {
         "tok": "{{k_p3_pTheContentWas_poor}}",
-        "label": "The content was · Poor"
+        "label": "The content was · Poor",
+        "ord": "Poor",
+        "item": "The content was"
       },
       {
         "tok": "{{k_p3_pTheContentWas_verypoor}}",
-        "label": "The content was · Very poor"
+        "label": "The content was · Very poor",
+        "ord": "Very poor",
+        "item": "The content was"
       },
       {
         "tok": "{{k_p3_pTheContentWas_na}}",
-        "label": "The content was · N/A"
+        "label": "The content was · N/A",
+        "ord": "N/A",
+        "item": "The content was"
       },
       {
         "tok": "{{k_p3_pTheInstructorsContributionTo2_excellent}}",
-        "label": "The instructor's contribution to the training was · Excellent"
+        "label": "The instructor's contribution to the training was · Excellent",
+        "ord": "Excellent",
+        "item": "The instructor's contribution to the training was"
       },
       {
         "tok": "{{k_p3_pTheInstructorsContributionTo2_good}}",
-        "label": "The instructor's contribution to the training was · Good"
+        "label": "The instructor's contribution to the training was · Good",
+        "ord": "Good",
+        "item": "The instructor's contribution to the training was"
       },
       {
         "tok": "{{k_p3_pTheInstructorsContributionTo2_fair}}",
-        "label": "The instructor's contribution to the training was · Fair"
+        "label": "The instructor's contribution to the training was · Fair",
+        "ord": "Fair",
+        "item": "The instructor's contribution to the training was"
       },
       {
         "tok": "{{k_p3_pTheInstructorsContributionTo2_poor}}",
-        "label": "The instructor's contribution to the training was · Poor"
+        "label": "The instructor's contribution to the training was · Poor",
+        "ord": "Poor",
+        "item": "The instructor's contribution to the training was"
       },
       {
         "tok": "{{k_p3_pTheInstructorsContributionTo2_verypoor}}",
-        "label": "The instructor's contribution to the training was · Very poor"
+        "label": "The instructor's contribution to the training was · Very poor",
+        "ord": "Very poor",
+        "item": "The instructor's contribution to the training was"
       },
       {
         "tok": "{{k_p3_pTheInstructorsContributionTo2_na}}",
-        "label": "The instructor's contribution to the training was · N/A"
+        "label": "The instructor's contribution to the training was · N/A",
+        "ord": "N/A",
+        "item": "The instructor's contribution to the training was"
       },
       {
         "tok": "{{k_p3_pTheInstructorsEffectivenessIn2_excellent}}",
-        "label": "The instructor's effectiveness in teaching the training matter was · Excellent"
+        "label": "The instructor's effectiveness in teaching the training matter was · Excellent",
+        "ord": "Excellent",
+        "item": "The instructor's effectiveness in teaching the training matter was"
       },
       {
         "tok": "{{k_p3_pTheInstructorsEffectivenessIn2_good}}",
-        "label": "The instructor's effectiveness in teaching the training matter was · Good"
+        "label": "The instructor's effectiveness in teaching the training matter was · Good",
+        "ord": "Good",
+        "item": "The instructor's effectiveness in teaching the training matter was"
       },
       {
         "tok": "{{k_p3_pTheInstructorsEffectivenessIn2_fair}}",
-        "label": "The instructor's effectiveness in teaching the training matter was · Fair"
+        "label": "The instructor's effectiveness in teaching the training matter was · Fair",
+        "ord": "Fair",
+        "item": "The instructor's effectiveness in teaching the training matter was"
       },
       {
         "tok": "{{k_p3_pTheInstructorsEffectivenessIn2_poor}}",
-        "label": "The instructor's effectiveness in teaching the training matter was · Poor"
+        "label": "The instructor's effectiveness in teaching the training matter was · Poor",
+        "ord": "Poor",
+        "item": "The instructor's effectiveness in teaching the training matter was"
       },
       {
         "tok": "{{k_p3_pTheInstructorsEffectivenessIn2_verypoor}}",
-        "label": "The instructor's effectiveness in teaching the training matter was · Very poor"
+        "label": "The instructor's effectiveness in teaching the training matter was · Very poor",
+        "ord": "Very poor",
+        "item": "The instructor's effectiveness in teaching the training matter was"
       },
       {
         "tok": "{{k_p3_pTheInstructorsEffectivenessIn2_na}}",
-        "label": "The instructor's effectiveness in teaching the training matter was · N/A"
+        "label": "The instructor's effectiveness in teaching the training matter was · N/A",
+        "ord": "N/A",
+        "item": "The instructor's effectiveness in teaching the training matter was"
       },
       {
         "tok": "{{k_p3_pHowWasTheTraining_excellent}}",
-        "label": "How was the training conducted by instructor · Excellent"
+        "label": "How was the training conducted by instructor · Excellent",
+        "ord": "Excellent",
+        "item": "How was the training conducted by instructor"
       },
       {
         "tok": "{{k_p3_pHowWasTheTraining_good}}",
-        "label": "How was the training conducted by instructor · Good"
+        "label": "How was the training conducted by instructor · Good",
+        "ord": "Good",
+        "item": "How was the training conducted by instructor"
       },
       {
         "tok": "{{k_p3_pHowWasTheTraining_fair}}",
-        "label": "How was the training conducted by instructor · Fair"
+        "label": "How was the training conducted by instructor · Fair",
+        "ord": "Fair",
+        "item": "How was the training conducted by instructor"
       },
       {
         "tok": "{{k_p3_pHowWasTheTraining_poor}}",
-        "label": "How was the training conducted by instructor · Poor"
+        "label": "How was the training conducted by instructor · Poor",
+        "ord": "Poor",
+        "item": "How was the training conducted by instructor"
       },
       {
         "tok": "{{k_p3_pHowWasTheTraining_verypoor}}",
-        "label": "How was the training conducted by instructor · Very poor"
+        "label": "How was the training conducted by instructor · Very poor",
+        "ord": "Very poor",
+        "item": "How was the training conducted by instructor"
       },
       {
         "tok": "{{k_p3_pHowWasTheTraining_na}}",
-        "label": "How was the training conducted by instructor · N/A"
+        "label": "How was the training conducted by instructor · N/A",
+        "ord": "N/A",
+        "item": "How was the training conducted by instructor"
       },
       {
         "tok": "{{k_p3_pClarityOfInstructorsVoice2_excellent}}",
-        "label": "Clarity of instructor's voice was · Excellent"
+        "label": "Clarity of instructor's voice was · Excellent",
+        "ord": "Excellent",
+        "item": "Clarity of instructor's voice was"
       },
       {
         "tok": "{{k_p3_pClarityOfInstructorsVoice2_good}}",
-        "label": "Clarity of instructor's voice was · Good"
+        "label": "Clarity of instructor's voice was · Good",
+        "ord": "Good",
+        "item": "Clarity of instructor's voice was"
       },
       {
         "tok": "{{k_p3_pClarityOfInstructorsVoice2_fair}}",
-        "label": "Clarity of instructor's voice was · Fair"
+        "label": "Clarity of instructor's voice was · Fair",
+        "ord": "Fair",
+        "item": "Clarity of instructor's voice was"
       },
       {
         "tok": "{{k_p3_pClarityOfInstructorsVoice2_poor}}",
-        "label": "Clarity of instructor's voice was · Poor"
+        "label": "Clarity of instructor's voice was · Poor",
+        "ord": "Poor",
+        "item": "Clarity of instructor's voice was"
       },
       {
         "tok": "{{k_p3_pClarityOfInstructorsVoice2_verypoor}}",
-        "label": "Clarity of instructor's voice was · Very poor"
+        "label": "Clarity of instructor's voice was · Very poor",
+        "ord": "Very poor",
+        "item": "Clarity of instructor's voice was"
       },
       {
         "tok": "{{k_p3_pClarityOfInstructorsVoice2_na}}",
-        "label": "Clarity of instructor's voice was · N/A"
+        "label": "Clarity of instructor's voice was · N/A",
+        "ord": "N/A",
+        "item": "Clarity of instructor's voice was"
       },
       {
         "tok": "{{k_p3_pExplanationsByInstructorWere2_excellent}}",
-        "label": "Explanations by instructor were · Excellent"
+        "label": "Explanations by instructor were · Excellent",
+        "ord": "Excellent",
+        "item": "Explanations by instructor were"
       },
       {
         "tok": "{{k_p3_pExplanationsByInstructorWere2_good}}",
-        "label": "Explanations by instructor were · Good"
+        "label": "Explanations by instructor were · Good",
+        "ord": "Good",
+        "item": "Explanations by instructor were"
       },
       {
         "tok": "{{k_p3_pExplanationsByInstructorWere2_fair}}",
-        "label": "Explanations by instructor were · Fair"
+        "label": "Explanations by instructor were · Fair",
+        "ord": "Fair",
+        "item": "Explanations by instructor were"
       },
       {
         "tok": "{{k_p3_pExplanationsByInstructorWere2_poor}}",
-        "label": "Explanations by instructor were · Poor"
+        "label": "Explanations by instructor were · Poor",
+        "ord": "Poor",
+        "item": "Explanations by instructor were"
       },
       {
         "tok": "{{k_p3_pExplanationsByInstructorWere2_verypoor}}",
-        "label": "Explanations by instructor were · Very poor"
+        "label": "Explanations by instructor were · Very poor",
+        "ord": "Very poor",
+        "item": "Explanations by instructor were"
       },
       {
         "tok": "{{k_p3_pExplanationsByInstructorWere2_na}}",
-        "label": "Explanations by instructor were · N/A"
+        "label": "Explanations by instructor were · N/A",
+        "ord": "N/A",
+        "item": "Explanations by instructor were"
       },
       {
         "tok": "{{k_p3_pInstructorsUseOfExamples2_excellent}}",
-        "label": "Instructor's use of examples and illustrations was · Excellent"
+        "label": "Instructor's use of examples and illustrations was · Excellent",
+        "ord": "Excellent",
+        "item": "Instructor's use of examples and illustrations was"
       },
       {
         "tok": "{{k_p3_pInstructorsUseOfExamples2_good}}",
-        "label": "Instructor's use of examples and illustrations was · Good"
+        "label": "Instructor's use of examples and illustrations was · Good",
+        "ord": "Good",
+        "item": "Instructor's use of examples and illustrations was"
       },
       {
         "tok": "{{k_p3_pInstructorsUseOfExamples2_fair}}",
-        "label": "Instructor's use of examples and illustrations was · Fair"
+        "label": "Instructor's use of examples and illustrations was · Fair",
+        "ord": "Fair",
+        "item": "Instructor's use of examples and illustrations was"
       },
       {
         "tok": "{{k_p3_pInstructorsUseOfExamples2_poor}}",
-        "label": "Instructor's use of examples and illustrations was · Poor"
+        "label": "Instructor's use of examples and illustrations was · Poor",
+        "ord": "Poor",
+        "item": "Instructor's use of examples and illustrations was"
       },
       {
         "tok": "{{k_p3_pInstructorsUseOfExamples2_verypoor}}",
-        "label": "Instructor's use of examples and illustrations was · Very poor"
+        "label": "Instructor's use of examples and illustrations was · Very poor",
+        "ord": "Very poor",
+        "item": "Instructor's use of examples and illustrations was"
       },
       {
         "tok": "{{k_p3_pInstructorsUseOfExamples2_na}}",
-        "label": "Instructor's use of examples and illustrations was · N/A"
+        "label": "Instructor's use of examples and illustrations was · N/A",
+        "ord": "N/A",
+        "item": "Instructor's use of examples and illustrations was"
       },
       {
         "tok": "{{k_p3_pQualityOfQuestionsOr2_excellent}}",
-        "label": "Quality of questions or problems raised by the instructor was · Excellent"
+        "label": "Quality of questions or problems raised by the instructor was · Excellent",
+        "ord": "Excellent",
+        "item": "Quality of questions or problems raised by the instructor was"
       },
       {
         "tok": "{{k_p3_pQualityOfQuestionsOr2_good}}",
-        "label": "Quality of questions or problems raised by the instructor was · Good"
+        "label": "Quality of questions or problems raised by the instructor was · Good",
+        "ord": "Good",
+        "item": "Quality of questions or problems raised by the instructor was"
       },
       {
         "tok": "{{k_p3_pQualityOfQuestionsOr2_fair}}",
-        "label": "Quality of questions or problems raised by the instructor was · Fair"
+        "label": "Quality of questions or problems raised by the instructor was · Fair",
+        "ord": "Fair",
+        "item": "Quality of questions or problems raised by the instructor was"
       },
       {
         "tok": "{{k_p3_pQualityOfQuestionsOr2_poor}}",
-        "label": "Quality of questions or problems raised by the instructor was · Poor"
+        "label": "Quality of questions or problems raised by the instructor was · Poor",
+        "ord": "Poor",
+        "item": "Quality of questions or problems raised by the instructor was"
       },
       {
         "tok": "{{k_p3_pQualityOfQuestionsOr2_verypoor}}",
-        "label": "Quality of questions or problems raised by the instructor was · Very poor"
+        "label": "Quality of questions or problems raised by the instructor was · Very poor",
+        "ord": "Very poor",
+        "item": "Quality of questions or problems raised by the instructor was"
       },
       {
         "tok": "{{k_p3_pQualityOfQuestionsOr2_na}}",
-        "label": "Quality of questions or problems raised by the instructor was · N/A"
+        "label": "Quality of questions or problems raised by the instructor was · N/A",
+        "ord": "N/A",
+        "item": "Quality of questions or problems raised by the instructor was"
       },
       {
         "tok": "{{k_p3_pStudentsConfidenceInInstructors2_excellent}}",
-        "label": "Student's confidence in instructor's knowledge was · Excellent"
+        "label": "Student's confidence in instructor's knowledge was · Excellent",
+        "ord": "Excellent",
+        "item": "Student's confidence in instructor's knowledge was"
       },
       {
         "tok": "{{k_p3_pStudentsConfidenceInInstructors2_good}}",
-        "label": "Student's confidence in instructor's knowledge was · Good"
+        "label": "Student's confidence in instructor's knowledge was · Good",
+        "ord": "Good",
+        "item": "Student's confidence in instructor's knowledge was"
       },
       {
         "tok": "{{k_p3_pStudentsConfidenceInInstructors2_fair}}",
-        "label": "Student's confidence in instructor's knowledge was · Fair"
+        "label": "Student's confidence in instructor's knowledge was · Fair",
+        "ord": "Fair",
+        "item": "Student's confidence in instructor's knowledge was"
       },
       {
         "tok": "{{k_p3_pStudentsConfidenceInInstructors2_poor}}",
-        "label": "Student's confidence in instructor's knowledge was · Poor"
+        "label": "Student's confidence in instructor's knowledge was · Poor",
+        "ord": "Poor",
+        "item": "Student's confidence in instructor's knowledge was"
       },
       {
         "tok": "{{k_p3_pStudentsConfidenceInInstructors2_verypoor}}",
-        "label": "Student's confidence in instructor's knowledge was · Very poor"
+        "label": "Student's confidence in instructor's knowledge was · Very poor",
+        "ord": "Very poor",
+        "item": "Student's confidence in instructor's knowledge was"
       },
       {
         "tok": "{{k_p3_pStudentsConfidenceInInstructors2_na}}",
-        "label": "Student's confidence in instructor's knowledge was · N/A"
+        "label": "Student's confidence in instructor's knowledge was · N/A",
+        "ord": "N/A",
+        "item": "Student's confidence in instructor's knowledge was"
       },
       {
         "tok": "{{k_p3_pInstructorsEnthusiasmWas2_excellent}}",
-        "label": "Instructor's enthusiasm was · Excellent"
+        "label": "Instructor's enthusiasm was · Excellent",
+        "ord": "Excellent",
+        "item": "Instructor's enthusiasm was"
       },
       {
         "tok": "{{k_p3_pInstructorsEnthusiasmWas2_good}}",
-        "label": "Instructor's enthusiasm was · Good"
+        "label": "Instructor's enthusiasm was · Good",
+        "ord": "Good",
+        "item": "Instructor's enthusiasm was"
       },
       {
         "tok": "{{k_p3_pInstructorsEnthusiasmWas2_fair}}",
-        "label": "Instructor's enthusiasm was · Fair"
+        "label": "Instructor's enthusiasm was · Fair",
+        "ord": "Fair",
+        "item": "Instructor's enthusiasm was"
       },
       {
         "tok": "{{k_p3_pInstructorsEnthusiasmWas2_poor}}",
-        "label": "Instructor's enthusiasm was · Poor"
+        "label": "Instructor's enthusiasm was · Poor",
+        "ord": "Poor",
+        "item": "Instructor's enthusiasm was"
       },
       {
         "tok": "{{k_p3_pInstructorsEnthusiasmWas2_verypoor}}",
-        "label": "Instructor's enthusiasm was · Very poor"
+        "label": "Instructor's enthusiasm was · Very poor",
+        "ord": "Very poor",
+        "item": "Instructor's enthusiasm was"
       },
       {
         "tok": "{{k_p3_pInstructorsEnthusiasmWas2_na}}",
-        "label": "Instructor's enthusiasm was · N/A"
+        "label": "Instructor's enthusiasm was · N/A",
+        "ord": "N/A",
+        "item": "Instructor's enthusiasm was"
       },
       {
         "tok": "{{k_p3_pEncouragementGivenToStudents2_excellent}}",
-        "label": "Encouragement given to students to participate was · Excellent"
+        "label": "Encouragement given to students to participate was · Excellent",
+        "ord": "Excellent",
+        "item": "Encouragement given to students to participate was"
       },
       {
         "tok": "{{k_p3_pEncouragementGivenToStudents2_good}}",
-        "label": "Encouragement given to students to participate was · Good"
+        "label": "Encouragement given to students to participate was · Good",
+        "ord": "Good",
+        "item": "Encouragement given to students to participate was"
       },
       {
         "tok": "{{k_p3_pEncouragementGivenToStudents2_fair}}",
-        "label": "Encouragement given to students to participate was · Fair"
+        "label": "Encouragement given to students to participate was · Fair",
+        "ord": "Fair",
+        "item": "Encouragement given to students to participate was"
       },
       {
         "tok": "{{k_p3_pEncouragementGivenToStudents2_poor}}",
-        "label": "Encouragement given to students to participate was · Poor"
+        "label": "Encouragement given to students to participate was · Poor",
+        "ord": "Poor",
+        "item": "Encouragement given to students to participate was"
       },
       {
         "tok": "{{k_p3_pEncouragementGivenToStudents2_verypoor}}",
-        "label": "Encouragement given to students to participate was · Very poor"
+        "label": "Encouragement given to students to participate was · Very poor",
+        "ord": "Very poor",
+        "item": "Encouragement given to students to participate was"
       },
       {
         "tok": "{{k_p3_pEncouragementGivenToStudents2_na}}",
-        "label": "Encouragement given to students to participate was · N/A"
+        "label": "Encouragement given to students to participate was · N/A",
+        "ord": "N/A",
+        "item": "Encouragement given to students to participate was"
       },
       {
         "tok": "{{k_p3_pAnswersToStudentQuestions2_excellent}}",
-        "label": "Answers to student questions were · Excellent"
+        "label": "Answers to student questions were · Excellent",
+        "ord": "Excellent",
+        "item": "Answers to student questions were"
       },
       {
         "tok": "{{k_p3_pAnswersToStudentQuestions2_good}}",
-        "label": "Answers to student questions were · Good"
+        "label": "Answers to student questions were · Good",
+        "ord": "Good",
+        "item": "Answers to student questions were"
       },
       {
         "tok": "{{k_p3_pAnswersToStudentQuestions2_fair}}",
-        "label": "Answers to student questions were · Fair"
+        "label": "Answers to student questions were · Fair",
+        "ord": "Fair",
+        "item": "Answers to student questions were"
       },
       {
         "tok": "{{k_p3_pAnswersToStudentQuestions2_poor}}",
-        "label": "Answers to student questions were · Poor"
+        "label": "Answers to student questions were · Poor",
+        "ord": "Poor",
+        "item": "Answers to student questions were"
       },
       {
         "tok": "{{k_p3_pAnswersToStudentQuestions2_verypoor}}",
-        "label": "Answers to student questions were · Very poor"
+        "label": "Answers to student questions were · Very poor",
+        "ord": "Very poor",
+        "item": "Answers to student questions were"
       },
       {
         "tok": "{{k_p3_pAnswersToStudentQuestions2_na}}",
-        "label": "Answers to student questions were · N/A"
+        "label": "Answers to student questions were · N/A",
+        "ord": "N/A",
+        "item": "Answers to student questions were"
       },
       {
         "tok": "{{k_p3_pInstructorHelpWhenNeeded_excellent}}",
-        "label": "Instructor help when needed was · Excellent"
+        "label": "Instructor help when needed was · Excellent",
+        "ord": "Excellent",
+        "item": "Instructor help when needed was"
       },
       {
         "tok": "{{k_p3_pInstructorHelpWhenNeeded_good}}",
-        "label": "Instructor help when needed was · Good"
+        "label": "Instructor help when needed was · Good",
+        "ord": "Good",
+        "item": "Instructor help when needed was"
       },
       {
         "tok": "{{k_p3_pInstructorHelpWhenNeeded_fair}}",
-        "label": "Instructor help when needed was · Fair"
+        "label": "Instructor help when needed was · Fair",
+        "ord": "Fair",
+        "item": "Instructor help when needed was"
       },
       {
         "tok": "{{k_p3_pInstructorHelpWhenNeeded_poor}}",
-        "label": "Instructor help when needed was · Poor"
+        "label": "Instructor help when needed was · Poor",
+        "ord": "Poor",
+        "item": "Instructor help when needed was"
       },
       {
         "tok": "{{k_p3_pInstructorHelpWhenNeeded_verypoor}}",
-        "label": "Instructor help when needed was · Very poor"
+        "label": "Instructor help when needed was · Very poor",
+        "ord": "Very poor",
+        "item": "Instructor help when needed was"
       },
       {
         "tok": "{{k_p3_pInstructorHelpWhenNeeded_na}}",
-        "label": "Instructor help when needed was · N/A"
+        "label": "Instructor help when needed was · N/A",
+        "ord": "N/A",
+        "item": "Instructor help when needed was"
       },
       {
         "tok": "{{k_p3_pUseOfTrainingTime_excellent}}",
-        "label": "Use of training time was · Excellent"
+        "label": "Use of training time was · Excellent",
+        "ord": "Excellent",
+        "item": "Use of training time was"
       },
       {
         "tok": "{{k_p3_pUseOfTrainingTime_good}}",
-        "label": "Use of training time was · Good"
+        "label": "Use of training time was · Good",
+        "ord": "Good",
+        "item": "Use of training time was"
       },
       {
         "tok": "{{k_p3_pUseOfTrainingTime_fair}}",
-        "label": "Use of training time was · Fair"
+        "label": "Use of training time was · Fair",
+        "ord": "Fair",
+        "item": "Use of training time was"
       },
       {
         "tok": "{{k_p3_pUseOfTrainingTime_poor}}",
-        "label": "Use of training time was · Poor"
+        "label": "Use of training time was · Poor",
+        "ord": "Poor",
+        "item": "Use of training time was"
       },
       {
         "tok": "{{k_p3_pUseOfTrainingTime_verypoor}}",
-        "label": "Use of training time was · Very poor"
+        "label": "Use of training time was · Very poor",
+        "ord": "Very poor",
+        "item": "Use of training time was"
       },
       {
         "tok": "{{k_p3_pUseOfTrainingTime_na}}",
-        "label": "Use of training time was · N/A"
+        "label": "Use of training time was · N/A",
+        "ord": "N/A",
+        "item": "Use of training time was"
       },
       {
         "tok": "{{k_p3_pInstructorsInterestInStudents2_excellent}}",
-        "label": "Instructor's interest in student's progress was · Excellent"
+        "label": "Instructor's interest in student's progress was · Excellent",
+        "ord": "Excellent",
+        "item": "Instructor's interest in student's progress was"
       },
       {
         "tok": "{{k_p3_pInstructorsInterestInStudents2_good}}",
-        "label": "Instructor's interest in student's progress was · Good"
+        "label": "Instructor's interest in student's progress was · Good",
+        "ord": "Good",
+        "item": "Instructor's interest in student's progress was"
       },
       {
         "tok": "{{k_p3_pInstructorsInterestInStudents2_fair}}",
-        "label": "Instructor's interest in student's progress was · Fair"
+        "label": "Instructor's interest in student's progress was · Fair",
+        "ord": "Fair",
+        "item": "Instructor's interest in student's progress was"
       },
       {
         "tok": "{{k_p3_pInstructorsInterestInStudents2_poor}}",
-        "label": "Instructor's interest in student's progress was · Poor"
+        "label": "Instructor's interest in student's progress was · Poor",
+        "ord": "Poor",
+        "item": "Instructor's interest in student's progress was"
       },
       {
         "tok": "{{k_p3_pInstructorsInterestInStudents2_verypoor}}",
-        "label": "Instructor's interest in student's progress was · Very poor"
+        "label": "Instructor's interest in student's progress was · Very poor",
+        "ord": "Very poor",
+        "item": "Instructor's interest in student's progress was"
       },
       {
         "tok": "{{k_p3_pInstructorsInterestInStudents2_na}}",
-        "label": "Instructor's interest in student's progress was · N/A"
+        "label": "Instructor's interest in student's progress was · N/A",
+        "ord": "N/A",
+        "item": "Instructor's interest in student's progress was"
       },
       {
         "tok": "{{k_p3_pAmountYouLearnedWas3_excellent}}",
-        "label": "Amount you learned was · Excellent"
+        "label": "Amount you learned was · Excellent",
+        "ord": "Excellent",
+        "item": "Amount you learned was"
       },
       {
         "tok": "{{k_p3_pAmountYouLearnedWas3_good}}",
-        "label": "Amount you learned was · Good"
+        "label": "Amount you learned was · Good",
+        "ord": "Good",
+        "item": "Amount you learned was"
       },
       {
         "tok": "{{k_p3_pAmountYouLearnedWas3_fair}}",
-        "label": "Amount you learned was · Fair"
+        "label": "Amount you learned was · Fair",
+        "ord": "Fair",
+        "item": "Amount you learned was"
       },
       {
         "tok": "{{k_p3_pAmountYouLearnedWas3_poor}}",
-        "label": "Amount you learned was · Poor"
+        "label": "Amount you learned was · Poor",
+        "ord": "Poor",
+        "item": "Amount you learned was"
       },
       {
         "tok": "{{k_p3_pAmountYouLearnedWas3_verypoor}}",
-        "label": "Amount you learned was · Very poor"
+        "label": "Amount you learned was · Very poor",
+        "ord": "Very poor",
+        "item": "Amount you learned was"
       },
       {
         "tok": "{{k_p3_pAmountYouLearnedWas3_na}}",
-        "label": "Amount you learned was · N/A"
+        "label": "Amount you learned was · N/A",
+        "ord": "N/A",
+        "item": "Amount you learned was"
       },
       {
         "tok": "{{k_p3_pRelevanceOfTrainingContent_excellent}}",
-        "label": "Relevance of training content was · Excellent"
+        "label": "Relevance of training content was · Excellent",
+        "ord": "Excellent",
+        "item": "Relevance of training content was"
       },
       {
         "tok": "{{k_p3_pRelevanceOfTrainingContent_good}}",
-        "label": "Relevance of training content was · Good"
+        "label": "Relevance of training content was · Good",
+        "ord": "Good",
+        "item": "Relevance of training content was"
       },
       {
         "tok": "{{k_p3_pRelevanceOfTrainingContent_fair}}",
-        "label": "Relevance of training content was · Fair"
+        "label": "Relevance of training content was · Fair",
+        "ord": "Fair",
+        "item": "Relevance of training content was"
       },
       {
         "tok": "{{k_p3_pRelevanceOfTrainingContent_poor}}",
-        "label": "Relevance of training content was · Poor"
+        "label": "Relevance of training content was · Poor",
+        "ord": "Poor",
+        "item": "Relevance of training content was"
       },
       {
         "tok": "{{k_p3_pRelevanceOfTrainingContent_verypoor}}",
-        "label": "Relevance of training content was · Very poor"
+        "label": "Relevance of training content was · Very poor",
+        "ord": "Very poor",
+        "item": "Relevance of training content was"
       },
       {
         "tok": "{{k_p3_pRelevanceOfTrainingContent_na}}",
-        "label": "Relevance of training content was · N/A"
+        "label": "Relevance of training content was · N/A",
+        "ord": "N/A",
+        "item": "Relevance of training content was"
       },
       {
         "tok": "{{k_p3_pGradingTechniquesWere2_excellent}}",
-        "label": "Grading techniques were · Excellent"
+        "label": "Grading techniques were · Excellent",
+        "ord": "Excellent",
+        "item": "Grading techniques were"
       },
       {
         "tok": "{{k_p3_pGradingTechniquesWere2_good}}",
-        "label": "Grading techniques were · Good"
+        "label": "Grading techniques were · Good",
+        "ord": "Good",
+        "item": "Grading techniques were"
       },
       {
         "tok": "{{k_p3_pGradingTechniquesWere2_fair}}",
-        "label": "Grading techniques were · Fair"
+        "label": "Grading techniques were · Fair",
+        "ord": "Fair",
+        "item": "Grading techniques were"
       },
       {
         "tok": "{{k_p3_pGradingTechniquesWere2_poor}}",
-        "label": "Grading techniques were · Poor"
+        "label": "Grading techniques were · Poor",
+        "ord": "Poor",
+        "item": "Grading techniques were"
       },
       {
         "tok": "{{k_p3_pGradingTechniquesWere2_verypoor}}",
-        "label": "Grading techniques were · Very poor"
+        "label": "Grading techniques were · Very poor",
+        "ord": "Very poor",
+        "item": "Grading techniques were"
       },
       {
         "tok": "{{k_p3_pGradingTechniquesWere2_na}}",
-        "label": "Grading techniques were · N/A"
+        "label": "Grading techniques were · N/A",
+        "ord": "N/A",
+        "item": "Grading techniques were"
       },
       {
         "tok": "{{k_p3_pAmountOfDiscussedTopics_excellent}}",
-        "label": "Amount of discussed topics was · Excellent"
+        "label": "Amount of discussed topics was · Excellent",
+        "ord": "Excellent",
+        "item": "Amount of discussed topics was"
       },
       {
         "tok": "{{k_p3_pAmountOfDiscussedTopics_good}}",
-        "label": "Amount of discussed topics was · Good"
+        "label": "Amount of discussed topics was · Good",
+        "ord": "Good",
+        "item": "Amount of discussed topics was"
       },
       {
         "tok": "{{k_p3_pAmountOfDiscussedTopics_fair}}",
-        "label": "Amount of discussed topics was · Fair"
+        "label": "Amount of discussed topics was · Fair",
+        "ord": "Fair",
+        "item": "Amount of discussed topics was"
       },
       {
         "tok": "{{k_p3_pAmountOfDiscussedTopics_poor}}",
-        "label": "Amount of discussed topics was · Poor"
+        "label": "Amount of discussed topics was · Poor",
+        "ord": "Poor",
+        "item": "Amount of discussed topics was"
       },
       {
         "tok": "{{k_p3_pAmountOfDiscussedTopics_verypoor}}",
-        "label": "Amount of discussed topics was · Very poor"
+        "label": "Amount of discussed topics was · Very poor",
+        "ord": "Very poor",
+        "item": "Amount of discussed topics was"
       },
       {
         "tok": "{{k_p3_pAmountOfDiscussedTopics_na}}",
-        "label": "Amount of discussed topics was · N/A"
+        "label": "Amount of discussed topics was · N/A",
+        "ord": "N/A",
+        "item": "Amount of discussed topics was"
       },
       {
         "tok": "{{k_ownEffort_excellent}}",
-        "label": "Excellent"
+        "label": "Excellent",
+        "ord": "Excellent"
       },
       {
         "tok": "{{k_ownEffort_good}}",
-        "label": "Good"
+        "label": "Good",
+        "ord": "Good"
       },
       {
         "tok": "{{k_ownEffort_fair}}",
-        "label": "Fair"
+        "label": "Fair",
+        "ord": "Fair"
       },
       {
         "tok": "{{k_ownEffort_poor}}",
-        "label": "Poor"
+        "label": "Poor",
+        "ord": "Poor"
       },
       {
         "tok": "{{k_ownEffort_verypoor}}",
-        "label": "Very poor"
+        "label": "Very poor",
+        "ord": "Very poor"
       }
     ],
     "tables": [],
@@ -5712,6 +7420,7 @@ var TOKEN_MAP = {
   "STR": {
     "abbr": "STR",
     "docx": "D-0507-STR-001.docx",
+    "orderWarn": [],
     "byLabel": [
       {
         "label": "Instructor Name",
@@ -5789,111 +7498,138 @@ var TOKEN_MAP = {
     "boxes": [
       {
         "tok": "{{k_category_FI}}",
-        "label": "FI"
+        "label": "FI",
+        "ord": "FI"
       },
       {
         "tok": "{{k_category_TKI}}",
-        "label": "TKI"
+        "label": "TKI",
+        "ord": "TKI"
       },
       {
         "tok": "{{k_category_Both}}",
-        "label": "Both"
+        "label": "Both",
+        "ord": "Both"
       },
       {
         "tok": "{{k_trainType_annual}}",
-        "label": "Annual"
+        "label": "Annual",
+        "ord": "Annual"
       },
       {
         "tok": "{{k_trainType_initial}}",
-        "label": "Initial"
+        "label": "Initial",
+        "ord": "Initial"
       },
       {
         "tok": "{{k_trainType_triggered}}",
-        "label": "Triggered"
+        "label": "Triggered",
+        "ord": "Triggered"
       },
       {
         "tok": "{{k_trainType_corrective}}",
-        "label": "Corrective"
+        "label": "Corrective",
+        "ord": "Corrective"
       },
       {
         "tok": "{{k_topics_sop}}",
-        "label": "SOPs — flight operations"
+        "label": "SOPs — flight operations",
+        "ord": "SOPs — flight operations"
       },
       {
         "tok": "{{k_topics_emerg}}",
-        "label": "Emergency procedures"
+        "label": "Emergency procedures",
+        "ord": "Emergency procedures"
       },
       {
         "tok": "{{k_topics_brief}}",
-        "label": "Pre/post-flight briefing"
+        "label": "Pre/post-flight briefing",
+        "ord": "Pre/post-flight briefing"
       },
       {
         "tok": "{{k_topics_manoeuvre}}",
-        "label": "Flight manoeuvres / drills"
+        "label": "Flight manoeuvres / drills",
+        "ord": "Flight manoeuvres / drills"
       },
       {
         "tok": "{{k_topics_checklist}}",
-        "label": "Use of checklists"
+        "label": "Use of checklists",
+        "ord": "Use of checklists"
       },
       {
         "tok": "{{k_topics_technique}}",
-        "label": "Instructional techniques"
+        "label": "Instructional techniques",
+        "ord": "Instructional techniques"
       },
       {
         "tok": "{{k_topics_feedback}}",
-        "label": "Student feedback methods"
+        "label": "Student feedback methods",
+        "ord": "Student feedback methods"
       },
       {
         "tok": "{{k_topics_classroom}}",
-        "label": "Classroom management"
+        "label": "Classroom management",
+        "ord": "Classroom management"
       },
       {
         "tok": "{{k_topics_pedagogy}}",
-        "label": "Teaching methodology"
+        "label": "Teaching methodology",
+        "ord": "Teaching methodology"
       },
       {
         "tok": "{{k_topics_assess}}",
-        "label": "Student assessment methods"
+        "label": "Student assessment methods",
+        "ord": "Student assessment methods"
       },
       {
         "tok": "{{k_topics_compliance}}",
-        "label": "Regulatory compliance"
+        "label": "Regulatory compliance",
+        "ord": "Regulatory compliance"
       },
       {
         "tok": "{{k_topics_hpa}}",
-        "label": "High-performance aeroplane (T206H)"
+        "label": "High-performance aeroplane (T206H)",
+        "ord": "High-performance aeroplane (T206H)"
       },
       {
         "tok": "{{k_topics_avionics}}",
-        "label": "Advanced avionics / G1000"
+        "label": "Advanced avionics / G1000",
+        "ord": "Advanced avionics / G1000"
       },
       {
         "tok": "{{k_topics_docs}}",
-        "label": "Documentation / flight logs"
+        "label": "Documentation / flight logs",
+        "ord": "Documentation / flight logs"
       },
       {
         "tok": "{{k_topics_other}}",
-        "label": "Other"
+        "label": "Other",
+        "ord": "Other"
       },
       {
         "tok": "{{k_method_observation}}",
-        "label": "Observation"
+        "label": "Observation",
+        "ord": "Observation"
       },
       {
         "tok": "{{k_method_oral}}",
-        "label": "Oral"
+        "label": "Oral",
+        "ord": "Oral"
       },
       {
         "tok": "{{k_method_practical}}",
-        "label": "Practical"
+        "label": "Practical",
+        "ord": "Practical"
       },
       {
         "tok": "{{k_outcome_standardised}}",
-        "label": "Standardised"
+        "label": "Standardised",
+        "ord": "Standardised"
       },
       {
         "tok": "{{k_outcome_followup}}",
-        "label": "Requires follow-up"
+        "label": "Requires follow-up",
+        "ord": "Requires follow-up"
       }
     ],
     "tables": [],
@@ -5930,6 +7666,7 @@ var TOKEN_MAP = {
   "VSR": {
     "abbr": "VSR",
     "docx": "D-0507-VSR-001.docx",
+    "orderWarn": [],
     "byLabel": [
       {
         "label": "Name (optional):",
@@ -5972,23 +7709,28 @@ var TOKEN_MAP = {
     "boxes": [
       {
         "tok": "{{k_evType_hazard}}",
-        "label": "Safety hazard"
+        "label": "Safety hazard",
+        "ord": "Safety hazard"
       },
       {
         "tok": "{{k_evType_incident}}",
-        "label": "Incident"
+        "label": "Incident",
+        "ord": "Incident"
       },
       {
         "tok": "{{k_evType_nearmiss}}",
-        "label": "Near-miss"
+        "label": "Near-miss",
+        "ord": "Near-miss"
       },
       {
         "tok": "{{k_evType_unsafe}}",
-        "label": "Unsafe act / condition"
+        "label": "Unsafe act / condition",
+        "ord": "Unsafe act / condition"
       },
       {
         "tok": "{{k_evType_other}}",
-        "label": "Other"
+        "label": "Other",
+        "ord": "Other"
       }
     ],
     "tables": [],

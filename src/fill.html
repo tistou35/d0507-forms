@@ -174,6 +174,18 @@ function headBox(c,next){
 function shown(v,f){
   if(v===undefined||v===null||v==='') return '—';
   if(typeof v==='boolean') return v?'✓':'—';
+  // ตารางติ๊ก — เก็บเป็น { ข้อ: ค่า } แสดงเป็นรายชื่อข้อที่ติ๊ก ไม่ใช่ [object Object]
+  if(v&&typeof v==='object'&&!Array.isArray(v)&&f&&f.type==='checklist'){
+    const nm=o=>o?LL(o.n)||o.v:'';
+    const on=(f.items||[]).filter(it=>v[it.id]).map(it=>{
+      const lab=LL(it)||it.th||it.id;
+      const opt=(f.opts||[]).find(o=>o.v===v[it.id]);
+      const val=opt?nm(opt):v[it.id];
+      return (f.opts&&f.opts.length>1)?`${lab} — ${val}`:lab;
+    });
+    if(!on.length) return '—';
+    return on.join('\n')+`  (${on.length}/${(f.items||[]).length})`;
+  }
   // ตารางแถวซ้ำ — แถวว่างไม่ต้องแสดง คนตรวจทานจะได้เห็นเฉพาะที่กรอกจริง
   if(Array.isArray(v)&&v.length&&typeof v[0]==='object'){
     const cols=(f&&f.cols)||[];
@@ -286,7 +298,7 @@ async function send(){
       submitterEmail:u.email||'',
       submittedAt:firebase.firestore.FieldValue.serverTimestamp(),
       computed:FK.computed(),
-      data:FK.data,
+      data:FK.visibleData(),
     };
     await ref.set(sub);
 

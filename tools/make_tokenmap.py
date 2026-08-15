@@ -82,6 +82,51 @@ def score(a, b):
     return base
 
 
+def box_same(tok_label, doc_label):
+    """ชื่อตัวเลือกของ token กับข้อความข้าง ☐ ในกระดาษ หมายถึงอันเดียวกันไหม
+
+    ใช้การ "อยู่ใน" เป็นหลัก ไม่ใช่คะแนนคำทับกัน เพราะตัวเลือกจริงมักเป็นคำสั้น
+    อย่าง No / Yes / High ซึ่งถูกตัดทิ้งเป็น stopword ไปหมดถ้าใช้ words()
+    ข้อความข้าง ☐ ในกระดาษมักมีหางต่อท้าย ("No   Date notified to HT: ___")
+    """
+    a, b = norm_full(tok_label), norm_full(doc_label)
+    if not a or not b: return True          # ไม่มีข้อมูลให้เทียบ อย่าเพิ่งเตือน
+    if a == b or a in b or b in a: return True
+    return score(tok_label, doc_label) >= 0.34
+
+
+def docx_box_labels(path):
+    """ป้ายกำกับของ ☐ แต่ละช่อง เรียงตามที่ปรากฏจริงในเอกสาร
+
+    ใช้ตรวจว่า token ที่จะวางเรียงตรงกับกระดาษไหม — การนับจำนวนเท่ากันพิสูจน์
+    ไม่ได้ว่าเรียงถูก ASF เคยจำนวนตรง (16 = 16) แต่เลื่อนไปหนึ่งช่องตั้งแต่ข้อที่ 5
+    ทำให้ใบที่ออกมาติ๊กผิดข้อโดยไม่มีอะไรฟ้อง
+    """
+    import docx
+    d = docx.Document(path)
+    out = []
+    for t in d.tables:
+        for r in t.rows:
+            seen = []
+            for c in r.cells:
+                if c._element in seen: continue
+                seen.append(c._element)
+                n = c.text.count('☐')
+                if not n: continue
+                # ข้อความที่ตามหลัง ☐ แต่ละตัวในเซลล์นี้ = ชื่อตัวเลือก
+                # ("☐ Ground Course ☐ Flight Training" -> สองตัวเลือก)
+                segs = [s.strip(' :·—-') for s in c.text.split('☐')[1:]]
+                segs = [re.split(r'\n', s)[0].strip() for s in segs]
+                if any(segs):
+                    out += [(s or '') for s in (segs + [''] * n)[:n]]
+                else:
+                    # ☐ อยู่ในคอลัมน์ของตัวเอง — ชื่อรายการอยู่เซลล์แรกของแถว
+                    lab = next((x.text.strip() for x in r.cells
+                                if x.text.strip() and '☐' not in x.text), '')
+                    out += [lab] * n
+    return out
+
+
 def docx_parts(path):
     """คืน (เซลล์ทั้งหมดตามลำดับ, บรรทัดที่มีเส้นประให้กรอก)"""
     import docx
@@ -155,12 +200,14 @@ def build(abbr, verbose=False):
 
         # ช่องติ๊กและตัวเลือก — เก็บไว้ใส่แทน ☐ ตามลำดับ
         if f.get('type') == 'check':
-            boxes.append({'tok': '{{k_%s}}' % f['k'], 'label': (f.get('label') or {}).get('en') or ''})
+            lb = (f.get('label') or {}).get('en') or ''
+            boxes.append({'tok': '{{k_%s}}' % f['k'], 'label': lb, 'item': lb})
             continue
         if f.get('type') in ('select', 'multi') and f.get('opt'):
             for o in f['opt']:
+                nm = (o.get('n') or {}).get('en') or o['v']
                 boxes.append({'tok': '{{k_%s_%s}}' % (f['k'], o['v']),
-                              'label': (o.get('n') or {}).get('en') or o['v']})
+                              'label': nm, 'ord': nm})
             continue
 
         # เกรด 1–5 — กระดาษพิมพ์เป็น ☐ ห้าช่องต่อหนึ่งหัวข้อ แล้วมีช่องเขียนเกรดต่อท้าย
@@ -175,9 +222,10 @@ def build(abbr, verbose=False):
             opts = f.get('opts') or [{'v': 'S'}, {'v': 'U'}, {'v': 'NA'}]
             for it in f.get('items') or []:
                 for o in opts:
+                    nm = (o.get('n') or {}).get('en') or o['v']
                     boxes.append({'tok': '{{k_%s_%s_%s}}' % (f['k'], it['id'], o['v']),
-                                  'label': '%s · %s' % (it.get('en') or it['id'],
-                                                        (o.get('n') or {}).get('en') or o['v'])})
+                                  'label': '%s · %s' % (it.get('en') or it['id'], nm),
+                                  'ord': nm, 'item': it.get('en') or it.get('th') or it['id']})
             continue
 
         # แถวซ้ำ — ส่งโครงตารางไปให้ฝั่ง Apps Script หาตารางที่หัวคอลัมน์ตรงกัน
@@ -249,9 +297,24 @@ def build(abbr, verbose=False):
         known = {b['tok']: b for b in boxes}
         boxes = [known.get(t, {'tok': t, 'label': ''}) for t in want]
 
+    # ลำดับช่องติ๊กต้องตรงกับกระดาษ ไม่ใช่แค่จำนวนเท่ากัน
+    order_warn = []
+    if len(boxes) == n_box_docx:
+        docl = docx_box_labels(dp)
+        for i, b in enumerate(boxes):
+            if i >= len(docl): break
+            # กระดาษวางช่องติ๊กสองแบบ — ☐ ต่อท้ายชื่อตัวเลือก (ข้างข้อความ)
+            # หรือ ☐ อยู่ในคอลัมน์ของตัวเองโดยชื่อรายการอยู่หัวแถว (ตารางให้คะแนน)
+            # จึงต้องยอมให้ตรงกับอันใดอันหนึ่ง ไม่งั้นตารางให้คะแนนจะเตือนทุกช่อง
+            cand = [c for c in (b.get('ord'), b.get('item'), b.get('label')) if c]
+            if cand and not any(box_same(c, docl[i]) for c in cand):
+                order_warn.append('ช่องที่ %d: เอกสารว่า "%s" · token คือ %s'
+                                  % (i + 1, docl[i][:44], b['tok']))
+
     return {
         'abbr': abbr,
         'docx': 'D-0507-%s-001.docx' % abbr,
+        'orderWarn': order_warn,
         'byLabel': by_label,
         'byLine': by_line,
         'boxes': boxes,
@@ -283,6 +346,11 @@ def main():
         report.append('%-6s วางอัตโนมัติ %2d (เซลล์ %d · เส้นประ %d) · ตาราง %d · ต่อท้ายส่วนอนุมัติ %d · วางมือ %d · ช่องติ๊ก %d%s'
                       % (a, auto, len(m['byLabel']), len(m['byLine']), len(m['tables']),
                          len(m['approval']), len(note), len(m['boxes']), warn))
+        if m.get('orderWarn'):
+            report.append('       🔴 ลำดับช่องติ๊กไม่ตรงกระดาษ %d จุด — ใบที่ออกมาจะติ๊กผิดข้อ'
+                          % len(m['orderWarn']))
+            for w in m['orderWarn'][:4]:
+                report.append('          ' + w)
         if note:
             report.append('       ต้องวางมือ: ' + ', '.join(x['label'] for x in note[:6])
                           + (' …อีก %d' % (len(note) - 6) if len(note) > 6 else ''))

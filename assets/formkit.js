@@ -239,6 +239,30 @@
   };
   FormKit.prototype.blocked = function () { return this.gates().some(g => g.level === 'stop'); };
 
+  /**
+   * ข้อมูลที่จะบันทึกจริง — ตัดค่าของช่องที่เงื่อนไขซ่อนอยู่ออก
+   *
+   * ผู้กรอกเปลี่ยนใจได้ เช่น ASF เลือก "บินเดี่ยวกลางคืน" ติ๊กครบแล้วเปลี่ยนเป็น
+   * "บินเดี่ยวครั้งแรก" — ส่วนกลางคืนหายไปจากจอ แต่ค่ายังค้างใน data
+   * ถ้าบันทึกทั้งก้อน ใบที่ออกมาจะระบุว่าครูรับรองเกณฑ์กลางคืนไว้ ทั้งที่ไม่ได้รับรอง
+   * เป็นเอกสารควบคุมที่ยืนยันสิ่งที่ไม่เคยเกิดขึ้น — ห้ามให้หลุดออกไป
+   *
+   * เก็บไว้ใน this.data ตามเดิม เพื่อให้สลับกลับมาแล้วค่าไม่หาย ตัดเฉพาะตอนบันทึก
+   */
+  FormKit.prototype.visibleData = function () {
+    const ctx = this.ctx(), out = {};
+    const keep = {};
+    (this.def.sections || []).forEach(s => {
+      if (!evalCond(s.showIf, ctx)) return;
+      (s.fields || []).forEach(f => { if (evalCond(f.showIf, ctx)) keep[f.k] = true; });
+    });
+    Object.keys(this.data).forEach(k => {
+      // คีย์ที่ไม่ใช่ฟิลด์ในนิยามฟอร์ม (ระบบใส่เอง) เก็บไว้เสมอ
+      if (!this.fields[k] || keep[k]) out[k] = this.data[k];
+    });
+    return out;
+  };
+
   /* ตรวจฟิลด์บังคับเฉพาะส่วนที่ party นี้รับผิดชอบ
      ส่ง secs มาได้เพื่อตรวจเฉพาะบางส่วน (ใช้นับตัวเลขค้างบนหัว tab) */
   FormKit.prototype.validate = function (secs) {

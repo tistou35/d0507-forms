@@ -17,6 +17,20 @@
     "skip": ["{{k_t1}}", "{{k_t2}}", "{{k_t3}}", "{{k_t4}}"]
   },
 
+  "ASF": {
+    "_why": "กระดาษวาง Night Hours & Landings ไว้ตำแหน่งที่ 5 ต่อจาก Flight Hours แต่ในนิยามฟอร์มข้อนี้ย้ายไปอยู่กลุ่มบินกลางคืน (เพื่อไม่บังคับติ๊กตอนบินกลางวัน) ลำดับ token จึงเลื่อนจากช่องที่ 5 ลงไปทั้งหมด — ต้องเรียงตามกระดาษเอง",
+    "boxes": [
+      "{{k_soloType_initial}}", "{{k_soloType_localxc}}", "{{k_soloType_night}}",
+      "{{k_preHours_hours_Y}}",
+      "{{k_nightKnow_nightHours_Y}}",
+      "{{k_knowledge_systems_Y}}", "{{k_knowledge_aero_Y}}", "{{k_knowledge_emerg_Y}}",
+      "{{k_knowledge_law_Y}}", "{{k_knowledge_wx_Y}}", "{{k_knowledge_preflight_Y}}",
+      "{{k_knowledge_radio_Y}}",
+      "{{k_nightKnow_vision_Y}}", "{{k_nightKnow_lighting_Y}}",
+      "{{k_nightKnow_disorient_Y}}", "{{k_nightKnow_nav_Y}}"
+    ]
+  },
+
   "APF": {
     "_why": "คำรับรองในกระดาษเป็นความเรียง ไม่มีช่องติ๊ก — การลงนามคือการรับรอง ระบบทำเป็น checkbox เพื่อบังคับให้อ่านก่อนส่ง",
     "skip": ["{{k_declare}}"]

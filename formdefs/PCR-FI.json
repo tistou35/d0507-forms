@@ -55,9 +55,10 @@
         { "k": "venue", "type": "text", "req": true, "half": true,
           "label": { "th": "สถานที่ / สนามบิน / พื้นที่ฝึก", "en": "Venue / airfield / training area" } },
         { "k": "combined", "type": "select",
+          "_optOrder": "เรียงตามกระดาษ — ต้นฉบับเขียน \u2610 No \u2610 Yes สลับกับใบอื่น",
           "opt": [
-            { "v": "yes", "n": { "th": "ใช่", "en": "Yes" } },
-            { "v": "no",  "n": { "th": "ไม่ใช่", "en": "No" } } ],
+            { "v": "no",  "n": { "th": "ไม่ใช่", "en": "No" } },
+            { "v": "yes", "n": { "th": "ใช่", "en": "Yes" } } ],
           "label": { "th": "เป็นเที่ยวบินรวม (Combined sortie) — ระบุในหมายเหตุ",
                      "en": "Combined sortie — note in Remarks (Section C.2)" } }
       ]
