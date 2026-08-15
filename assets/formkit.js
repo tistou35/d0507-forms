@@ -392,7 +392,7 @@
         const cols = f.opts || [{ v: 'S' }, { v: 'U' }, { v: 'NA' }];
         body = (f.items || []).map(it => `
           <div class="fk-item">
-            <span class="txt">${it.id ? `<span class="id">${esc(it.id)}</span>` : ''}${esc(L(it, this.lang) || it.th || '')}
+            <span class="txt">${it.id && !f.hideIds ? `<span class="id">${esc(it.id)}</span>` : ''}${esc(L(it, this.lang) || it.th || '')}
               ${it.how ? `<span class="id" style="color:var(--g-500);margin-top:3px">${esc(it.how)}</span>` : ''}</span>
             <span class="fk-suna${cols.length > 3 ? ' many' : ''}">${cols.map(c =>
               `<button type="button" data-cl="${esc(f.k)}" data-item="${esc(it.id)}" data-v="${esc(c.v)}"

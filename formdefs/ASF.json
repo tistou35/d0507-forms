@@ -66,7 +66,7 @@
       "desc": { "th": "ครูการบินตรวจยืนยันทีละข้อ — กดซ้ำเพื่อยกเลิกได้",
                 "en": "The instructor verifies each item. Tap again to clear." },
       "fields": [
-        { "k": "preHours", "type": "checklist", "req": true,
+        { "k": "preHours", "type": "checklist", "req": true, "hideIds": true,
           "label": { "th": "ตรวจยืนยันแล้ว", "en": "Verified" },
           "opts": [ { "v": "Y", "n": { "th": "✓", "en": "✓" } } ],
           "items": [
@@ -78,7 +78,7 @@
       "k": "D", "tab": "T2", "party": "pair",
       "title": { "th": "ความรู้ที่จำเป็น", "en": "Essential knowledge" },
       "fields": [
-        { "k": "knowledge", "type": "checklist", "req": true,
+        { "k": "knowledge", "type": "checklist", "req": true, "hideIds": true,
           "label": { "th": "ตรวจยืนยันแล้ว", "en": "Verified" },
           "opts": [ { "v": "Y", "n": { "th": "✓", "en": "✓" } } ],
           "items": [
@@ -97,7 +97,7 @@
       "desc": { "th": "ต้องตรวจครบทุกข้อจึงจะส่งใบได้ — เกณฑ์ชั่วโมงกลางคืนอยู่ในนี้ด้วย",
                 "en": "All items must be verified before the form can be submitted, including the night hour minima." },
       "fields": [
-        { "k": "nightKnow", "type": "checklist", "reqIf": "soloType == 'night'",
+        { "k": "nightKnow", "type": "checklist", "reqIf": "soloType == 'night'", "hideIds": true,
           "label": { "th": "ตรวจยืนยันแล้ว", "en": "Verified" },
           "opts": [ { "v": "Y", "n": { "th": "✓", "en": "✓" } } ],
           "items": [
