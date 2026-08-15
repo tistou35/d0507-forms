@@ -64,6 +64,20 @@
       </section>
 
       <section>
+        <div class="sh"><h2>ผู้ดูแลระบบ</h2><span class="en">Administrators</span></div>
+        <div class="card">
+          <p class="hint" style="margin-bottom:12px">ผู้ดูแลระบบเท่านั้นที่เข้า
+            <b>ทะเบียนเอกสาร · จัดการฟอร์ม · ผังผู้อนุมัติ · ตั้งค่าระบบ</b> ได้ ·
+            เจ้าหน้าที่คนอื่นยังใช้คิวงานและอนุมัติได้ตามปกติ</p>
+          <div id="adminWarn"></div>
+          <div id="adminList">—</div>
+          <div class="acts" style="margin-top:14px">
+            <button class="fb" id="addMeAdmin">เพิ่มตัวเองเป็นผู้ดูแลระบบ</button>
+          </div>
+        </div>
+      </section>
+
+      <section>
         <div class="sh"><h2>ทะเบียนเอกสาร</h2><span class="en">Form register</span></div>
         <div class="card">
           <p class="hint" style="margin-bottom:12px">ทะเบียนฉบับเต็มมี control code · สถานะ LEF · หมายเหตุ
@@ -137,6 +151,15 @@ async function boot(){
     `<div class="note"><b>ต้องเข้าสู่ระบบก่อน</b> — หน้านี้เขียนข้อมูลด้วยสิทธิ์ของบัญชีที่เข้าสู่ระบบ
      <br><a class="big pri" style="margin-top:12px;display:inline-flex" href="@@BASE@@staff-login/">เข้าสู่ระบบ</a></div>`;
   if (!ok) return;
+  // ซ่อนเมนูอย่างเดียวไม่พอ — พิมพ์ URL ตรงก็เข้าได้ ต้องกันที่หน้าด้วย
+  // (rules กันชั้นสุดท้ายอยู่แล้ว นี่คือให้ผู้ใช้เห็นเหตุผลแทนที่จะเจอ error)
+  if (!A.isAdmin()) {
+    document.getElementById('body').classList.add('hide');
+    document.getElementById('gate').innerHTML =
+      `<div class="warn"><b>${A.esc(A.t('adminOnly'))}</b><br>${A.esc(A.t('adminOnlySub'))}
+       <br><a class="big sec" style="margin-top:12px;display:inline-flex" href="@@BASE@@queue/">${A.esc(A.t('backToQueue'))}</a></div>`;
+    return;
+  }
 
   document.getElementById('me').innerHTML =
     `<dt>อีเมล</dt><dd>${A.esc(A.user.email)}</dd>
@@ -174,9 +197,63 @@ async function boot(){
     } catch(e){}
   }
 
+  admins();
   chips(document.getElementById('roles'), ROLE_KEYS, ROLES, k => A.L(A.ROLE_N[k]) || k);
   chips(document.getElementById('pos'), POS_KEYS, POS, k => k + ' · ' + POS_N[k]);
   check(); dir();
+}
+
+/* รายชื่อผู้ดูแลระบบ — ตราบใดที่ config/admins ยังไม่มี เจ้าหน้าที่ทุกคนเป็น admin ชั่วคราว
+   ตรงกับที่เขียนไว้ใน rules · ต้องเตือนให้ตั้งคนแรกทันที ไม่งั้นสิทธิ์เปิดกว้างค้างไว้ */
+async function admins(){
+  const warn = document.getElementById('adminWarn');
+  const box  = document.getElementById('adminList');
+  let uids = [], names = {};
+  let exists = false;
+  try {
+    const d = await A.db.collection('config').doc('admins').get();
+    exists = d.exists;
+    uids = (d.exists && d.data().uids) || [];
+    names = (d.exists && d.data().names) || {};
+  } catch(e){ box.innerHTML = `<p class="hint">อ่านไม่ได้: ${A.esc(e.code)}</p>`; return; }
+
+  warn.innerHTML = (!exists || !uids.length)
+    ? `<div class="fk-gate warn" style="margin-bottom:12px"><span>
+        <b>ยังไม่ได้ตั้งผู้ดูแลระบบ</b> — ตอนนี้เจ้าหน้าที่ทุกคนแก้ทะเบียนและผังผู้อนุมัติได้
+        กด “เพิ่มตัวเองเป็นผู้ดูแลระบบ” เพื่อปิดช่องนี้</span></div>`
+    : '';
+
+  box.innerHTML = uids.length
+    ? `<div class="twrap"><table class="reg"><thead><tr><th>ชื่อ</th><th>uid</th><th></th></tr></thead><tbody>` +
+      uids.map(u => `<tr><td class="nm">${A.esc(names[u] || '—')}</td>
+        <td class="mono" style="font-size:12px">${A.esc(u)}</td>
+        <td>${uids.length > 1 ? `<button class="fb" data-rmadmin="${A.esc(u)}">เอาออก</button>`
+             : '<span class="hint">คนสุดท้าย เอาออกไม่ได้</span>'}</td></tr>`).join('') +
+      `</tbody></table></div>`
+    : '<p class="hint">ยังไม่มีใครในรายชื่อ</p>';
+
+  box.querySelectorAll('[data-rmadmin]').forEach(b => b.addEventListener('click', async () => {
+    if (!confirm('เอาคนนี้ออกจากผู้ดูแลระบบ?')) return;
+    const left = uids.filter(x => x !== b.dataset.rmadmin);
+    const nn = Object.assign({}, names); delete nn[b.dataset.rmadmin];
+    await A.db.collection('config').doc('admins').set({ uids: left, names: nn,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    log('เอาออกจากผู้ดูแลระบบแล้ว', 'green-600');
+    A.admins = left; admins();
+  }));
+
+  document.getElementById('addMeAdmin').onclick = async () => {
+    if (uids.indexOf(A.user.uid) >= 0) return alert('คุณอยู่ในรายชื่อแล้ว');
+    const nn = Object.assign({}, names);
+    nn[A.user.uid] = A.user.displayName || A.user.email;
+    try {
+      await A.db.collection('config').doc('admins').set({
+        uids: uids.concat([A.user.uid]), names: nn,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      log('เพิ่มตัวเองเป็นผู้ดูแลระบบแล้ว', 'green-600');
+      A.admins = uids.concat([A.user.uid]); admins();
+    } catch(e){ log('เพิ่มไม่สำเร็จ: ' + (e.code || e.message), 'red-600'); }
+  };
 }
 
 async function check(){

@@ -24,6 +24,19 @@ service cloud.firestore {
     // ฝั่งนักเรียนล็อกอินแบบ anonymous เพื่อให้ส่งฟอร์มได้โดยไม่ต้องสมัคร
     function anon()      { return signedIn() && request.auth.token.firebase.sign_in_provider == 'anonymous'; }
 
+    // ── ผู้ดูแลระบบ — แก้ทะเบียน นิยามฟอร์ม ผังผู้อนุมัติ ────
+    // เก็บรายชื่อ uid ไว้ที่ config/admins
+    //
+    // ตอนเริ่มต้น เอกสารนั้นยังไม่มี → เจ้าหน้าที่ทุกคนเป็น admin ชั่วคราว
+    // เพื่อให้ตั้งคนแรกได้ พอบันทึกรายชื่อครั้งแรกแล้ว เหลือเฉพาะ uid ในรายชื่อ
+    // ⚠️ อย่าปล่อยให้ไม่มี config/admins นาน — ตั้งคนแรกทันทีหลังวาง rules
+    function adminsDoc()  { return /databases/$(database)/documents/config/admins; }
+    function noAdminYet() { return !exists(adminsDoc()); }
+    function admin() {
+      return staff() && (noAdminYet()
+        || get(adminsDoc()).data.uids.hasAny([request.auth.uid]));
+    }
+
     // ── โปรไฟล์ + บทบาท · ผู้ใช้แก้ role ตัวเองไม่ได้ ────────
     match /users/{uid} {
       allow read:  if isSelf(uid) || staff();
@@ -35,7 +48,7 @@ service cloud.firestore {
     // ห้ามมีอีเมลหรือเบอร์โทรเด็ดขาด (seed.mjs ตรวจให้แล้ว)
     match /publicDirectory/{doc} {
       allow read:  if true;
-      allow write: if staff();
+      allow write: if admin();
     }
 
     // ── ทะเบียนฟอร์มฉบับเต็ม ────────────────────────────────
@@ -43,14 +56,14 @@ service cloud.firestore {
     // เว็บ host แบบสาธารณะจึงฝังในไฟล์ไม่ได้ ต้องอ่านจากที่นี่หลัง login
     match /registry/{doc} {
       allow read:  if staff();
-      allow write: if staff();
+      allow write: if admin();
     }
 
     // ── นิยามฟอร์ม — หน้าสาธารณะต้องใช้จึงอ่านได้ทั้งโลก ────
     // ห้ามใส่ข้อมูลควบคุมภายใน (control code / สถานะ LEF) ลงในนิยามฟอร์ม
     match /formDefs/{formCode} {
       allow read:  if true;
-      allow write: if staff();
+      allow write: if admin();
 
       // สำเนาแช่แข็งของแต่ละรุ่นที่ publish — เขียนได้ครั้งเดียว แก้ไม่ได้ ลบไม่ได้
       // record ที่กรอกไว้ผูกกับรุ่นนี้ ถ้าแก้ย้อนหลังได้จะไม่ใช่เอกสารควบคุมอีกต่อไป
@@ -108,7 +121,8 @@ service cloud.firestore {
     // ── รายชื่อเจ้าหน้าที่ฉบับเต็ม — มี LINE ID และอีเมล ─────
     // ห้ามอ่านโดยไม่ล็อกอินเด็ดขาด ต่างจาก publicDirectory ที่โลกอ่านได้
     match /staffDirectory/{docId} {
-      allow read, write: if staff();
+      allow read:  if staff();
+      allow write: if admin();
     }
 
     // ── ผังผู้อนุมัติ + ข้อความแจ้งเตือน ─────────────────────
@@ -116,7 +130,7 @@ service cloud.firestore {
     // แต่แก้ได้เฉพาะเจ้าหน้าที่
     match /config/{docId} {
       allow read:  if signedIn();
-      allow write: if staff();
+      allow write: if admin();
     }
 
     // ── คิวแจ้งเตือน — เว็บเขียน Apps Script อ่านไปยิง ──────

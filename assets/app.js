@@ -16,6 +16,12 @@
   A.reg = null;        // ตั้งค่าโดยหน้าเว็บ — เริ่มจากชุดสาธารณะ
   A.full = false;      // true เมื่อโหลดทะเบียนเต็มจาก Firestore สำเร็จ
   A.isStaff = () => !!A.user && !A.user.isAnonymous;
+  /* admin = แก้ทะเบียน นิยามฟอร์ม ผังผู้อนุมัติ ตั้งค่าระบบได้
+     รายชื่ออยู่ที่ config/admins — ยังไม่มีเอกสารนั้น = เจ้าหน้าที่ทุกคนเป็น admin ชั่วคราว
+     (ต้องตรงกับ rules ไม่งั้นหน้าจอโชว์ปุ่มที่กดแล้วโดนปฏิเสธ) */
+  A.admins = null;
+  A.isAdmin = () => A.isStaff() && (A.admins === null || !A.admins.length
+                                    || A.admins.indexOf(A.user.uid) >= 0);
 
   /* ── auth ─────────────────────────────────────────────── */
   A.initAuth = function (cfg, onChange) {
@@ -30,6 +36,13 @@
           const d = await A.db.collection('users').doc(A.user.uid).get();
           if (d.exists && Array.isArray(d.data().roles)) A.roles = d.data().roles;
         } catch (e) { /* ยังไม่มี users/{uid} หรือ rule ไม่อนุญาต */ }
+      }
+      A.admins = null;
+      if (A.user) {
+        try {
+          const d = await A.db.collection('config').doc('admins').get();
+          A.admins = (d.exists && d.data().uids) || [];
+        } catch (e) { A.admins = null; }
       }
       A.full = false;
       if (A.user && A.reg) await A.hydrate();
@@ -72,6 +85,7 @@
              <span class="who"><b>${A.esc(A.t('signIn'))}</b><span>${A.esc(A.t('signInSub'))}</span></span></a>`;
     }
     document.querySelectorAll('.staffonly').forEach(el => el.classList.toggle('hide', !A.isStaff()));
+    document.querySelectorAll('.adminonly').forEach(el => el.classList.toggle('hide', !A.isAdmin()));
   };
 
   A.ROLE_N = {
@@ -218,6 +232,10 @@
 
     /* หน้าอนุมัติ */
     mustSignIn:  { th: 'ต้องเข้าสู่ระบบก่อน — หน้านี้เป็นของเจ้าหน้าที่', en: 'Staff sign-in required' },
+    adminOnly:   { th: 'หน้านี้สำหรับผู้ดูแลระบบเท่านั้น',
+                   en: 'This page is for system administrators only' },
+    adminOnlySub:{ th: 'บัญชีของคุณยังไม่อยู่ในรายชื่อผู้ดูแลระบบ — ติดต่อผู้ดูแลเพื่อขอสิทธิ์',
+                   en: 'Your account is not in the administrator list — ask an administrator for access.' },
     loading:     { th: 'กำลังโหลด…', en: 'Loading…' },
     noTask:      { th: 'ไม่ได้ระบุงานที่จะอนุมัติ — เข้าจากหน้าคิวงาน', en: 'No task specified — open it from your queue' },
     taskGone:    { th: 'ไม่พบงานนี้แล้ว อาจถูกดำเนินการไปแล้ว', en: 'Task not found — it may already be handled' },

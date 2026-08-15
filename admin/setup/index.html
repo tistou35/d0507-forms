@@ -39,16 +39,16 @@
   <a class="nav staffonly" data-nav="queue" href="../../queue/">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l4 4L14 8"/><path d="M10 13l4 4L22 8"/></svg>
     <span><span class="t" data-t="navQueue">งานของฉัน</span><span class="en" data-t2="navQueue">My queue</span></span><span class="pill amb" data-cnt="queue">0</span></a>
-  <a class="nav staffonly" data-nav="register" href="../../admin/register/">
+  <a class="nav staffonly adminonly" data-nav="register" href="../../admin/register/">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h8.5L19 7v14.5H6z"/><path d="M14 2.5V7h5"/><path d="M9 12h7M9 15.5h7"/></svg>
     <span><span class="t" data-t="navReg">ทะเบียนเอกสาร</span><span class="en" data-t2="navReg">Register · LEF</span></span></a>
-  <a class="nav staffonly" data-nav="fadmin" href="../../admin/forms/">
+  <a class="nav staffonly adminonly" data-nav="fadmin" href="../../admin/forms/">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 12h16M4 19h9"/><circle cx="18.5" cy="19" r="2.5"/></svg>
     <span><span class="t" data-t="navForms">จัดการฟอร์ม</span><span class="en" data-t2="navForms">Form management</span></span></a>
-  <a class="nav staffonly" data-nav="aprv" href="../../admin/approvals/">
+  <a class="nav staffonly adminonly" data-nav="aprv" href="../../admin/approvals/">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l2.5 2.5L16 8"/><path d="M20.5 12a8.5 8.5 0 1 1-4.2-7.3"/></svg>
     <span><span class="t" data-t="navAprv">ผังผู้อนุมัติ</span><span class="en" data-t2="navAprv">Approvals</span></span></a>
-  <a class="nav staffonly" data-nav="setup" href="../../admin/setup/">
+  <a class="nav staffonly adminonly" data-nav="setup" href="../../admin/setup/">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>
     <span><span class="t" data-t="navSetup">ตั้งค่าระบบ</span><span class="en" data-t2="navSetup">Admin setup</span></span></a>
   <a class="nav staffonly" data-nav="audit" href="../../../d0507-audit/">
@@ -118,6 +118,20 @@
       </section>
 
       <section>
+        <div class="sh"><h2>ผู้ดูแลระบบ</h2><span class="en">Administrators</span></div>
+        <div class="card">
+          <p class="hint" style="margin-bottom:12px">ผู้ดูแลระบบเท่านั้นที่เข้า
+            <b>ทะเบียนเอกสาร · จัดการฟอร์ม · ผังผู้อนุมัติ · ตั้งค่าระบบ</b> ได้ ·
+            เจ้าหน้าที่คนอื่นยังใช้คิวงานและอนุมัติได้ตามปกติ</p>
+          <div id="adminWarn"></div>
+          <div id="adminList">—</div>
+          <div class="acts" style="margin-top:14px">
+            <button class="fb" id="addMeAdmin">เพิ่มตัวเองเป็นผู้ดูแลระบบ</button>
+          </div>
+        </div>
+      </section>
+
+      <section>
         <div class="sh"><h2>ทะเบียนเอกสาร</h2><span class="en">Form register</span></div>
         <div class="card">
           <p class="hint" style="margin-bottom:12px">ทะเบียนฉบับเต็มมี control code · สถานะ LEF · หมายเหตุ
@@ -148,7 +162,7 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg><span data-t="navAll">คลังฟอร์ม</span></a>
   <a data-nav="queue" class="staffonly" href="../../queue/">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l4 4L14 8"/><path d="M10 13l4 4L22 8"/></svg><span data-t="navQueue">งานของฉัน</span></a>
-  <a data-nav="register" class="staffonly" href="../../admin/register/">
+  <a data-nav="register" class="staffonly adminonly" href="../../admin/register/">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h8.5L19 7v14.5H6z"/><path d="M14 2.5V7h5"/><path d="M9 12h7M9 15.5h7"/></svg><span data-t="navRegSh">ทะเบียน</span></a>
 </nav>
 <footer>D-0507 Flight Training Co., Ltd. · Controlled Document System</footer>
@@ -157,7 +171,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="../../assets/app.js?v=d91c4ce8"></script>
+<script src="../../assets/app.js?v=70d3c646"></script>
 <script>D0507.GAS_URL='https://script.google.com/macros/s/AKfycby7rFFVxd92wPImX4m8pv8nHqTrK3Iq0O32A34844DAg1rP8N3RfgKEyGvAUkQu-NXd/exec';</script>
 <script>
 "use strict";
@@ -207,6 +221,15 @@ async function boot(){
     `<div class="note"><b>ต้องเข้าสู่ระบบก่อน</b> — หน้านี้เขียนข้อมูลด้วยสิทธิ์ของบัญชีที่เข้าสู่ระบบ
      <br><a class="big pri" style="margin-top:12px;display:inline-flex" href="../../staff-login/">เข้าสู่ระบบ</a></div>`;
   if (!ok) return;
+  // ซ่อนเมนูอย่างเดียวไม่พอ — พิมพ์ URL ตรงก็เข้าได้ ต้องกันที่หน้าด้วย
+  // (rules กันชั้นสุดท้ายอยู่แล้ว นี่คือให้ผู้ใช้เห็นเหตุผลแทนที่จะเจอ error)
+  if (!A.isAdmin()) {
+    document.getElementById('body').classList.add('hide');
+    document.getElementById('gate').innerHTML =
+      `<div class="warn"><b>${A.esc(A.t('adminOnly'))}</b><br>${A.esc(A.t('adminOnlySub'))}
+       <br><a class="big sec" style="margin-top:12px;display:inline-flex" href="../../queue/">${A.esc(A.t('backToQueue'))}</a></div>`;
+    return;
+  }
 
   document.getElementById('me').innerHTML =
     `<dt>อีเมล</dt><dd>${A.esc(A.user.email)}</dd>
@@ -244,9 +267,63 @@ async function boot(){
     } catch(e){}
   }
 
+  admins();
   chips(document.getElementById('roles'), ROLE_KEYS, ROLES, k => A.L(A.ROLE_N[k]) || k);
   chips(document.getElementById('pos'), POS_KEYS, POS, k => k + ' · ' + POS_N[k]);
   check(); dir();
+}
+
+/* รายชื่อผู้ดูแลระบบ — ตราบใดที่ config/admins ยังไม่มี เจ้าหน้าที่ทุกคนเป็น admin ชั่วคราว
+   ตรงกับที่เขียนไว้ใน rules · ต้องเตือนให้ตั้งคนแรกทันที ไม่งั้นสิทธิ์เปิดกว้างค้างไว้ */
+async function admins(){
+  const warn = document.getElementById('adminWarn');
+  const box  = document.getElementById('adminList');
+  let uids = [], names = {};
+  let exists = false;
+  try {
+    const d = await A.db.collection('config').doc('admins').get();
+    exists = d.exists;
+    uids = (d.exists && d.data().uids) || [];
+    names = (d.exists && d.data().names) || {};
+  } catch(e){ box.innerHTML = `<p class="hint">อ่านไม่ได้: ${A.esc(e.code)}</p>`; return; }
+
+  warn.innerHTML = (!exists || !uids.length)
+    ? `<div class="fk-gate warn" style="margin-bottom:12px"><span>
+        <b>ยังไม่ได้ตั้งผู้ดูแลระบบ</b> — ตอนนี้เจ้าหน้าที่ทุกคนแก้ทะเบียนและผังผู้อนุมัติได้
+        กด “เพิ่มตัวเองเป็นผู้ดูแลระบบ” เพื่อปิดช่องนี้</span></div>`
+    : '';
+
+  box.innerHTML = uids.length
+    ? `<div class="twrap"><table class="reg"><thead><tr><th>ชื่อ</th><th>uid</th><th></th></tr></thead><tbody>` +
+      uids.map(u => `<tr><td class="nm">${A.esc(names[u] || '—')}</td>
+        <td class="mono" style="font-size:12px">${A.esc(u)}</td>
+        <td>${uids.length > 1 ? `<button class="fb" data-rmadmin="${A.esc(u)}">เอาออก</button>`
+             : '<span class="hint">คนสุดท้าย เอาออกไม่ได้</span>'}</td></tr>`).join('') +
+      `</tbody></table></div>`
+    : '<p class="hint">ยังไม่มีใครในรายชื่อ</p>';
+
+  box.querySelectorAll('[data-rmadmin]').forEach(b => b.addEventListener('click', async () => {
+    if (!confirm('เอาคนนี้ออกจากผู้ดูแลระบบ?')) return;
+    const left = uids.filter(x => x !== b.dataset.rmadmin);
+    const nn = Object.assign({}, names); delete nn[b.dataset.rmadmin];
+    await A.db.collection('config').doc('admins').set({ uids: left, names: nn,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    log('เอาออกจากผู้ดูแลระบบแล้ว', 'green-600');
+    A.admins = left; admins();
+  }));
+
+  document.getElementById('addMeAdmin').onclick = async () => {
+    if (uids.indexOf(A.user.uid) >= 0) return alert('คุณอยู่ในรายชื่อแล้ว');
+    const nn = Object.assign({}, names);
+    nn[A.user.uid] = A.user.displayName || A.user.email;
+    try {
+      await A.db.collection('config').doc('admins').set({
+        uids: uids.concat([A.user.uid]), names: nn,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      log('เพิ่มตัวเองเป็นผู้ดูแลระบบแล้ว', 'green-600');
+      A.admins = uids.concat([A.user.uid]); admins();
+    } catch(e){ log('เพิ่มไม่สำเร็จ: ' + (e.code || e.message), 'red-600'); }
+  };
 }
 
 async function check(){

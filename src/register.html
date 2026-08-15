@@ -56,6 +56,13 @@ function paint(){
     `<div class="note"><b>ต้องเข้าสู่ระบบก่อน</b> — ทะเบียนเอกสารเป็นข้อมูลภายใน
      <br><a class="big pri" style="margin-top:12px" href="@@BASE@@staff-login/">เข้าสู่ระบบ</a></div>`;
   if(!ok) return;
+  if (!A.isAdmin()){
+    document.getElementById('body').classList.add('hide');
+    document.getElementById('gate').innerHTML =
+      `<div class="warn"><b>${A.esc(A.t('adminOnly'))}</b><br>${A.esc(A.t('adminOnlySub'))}
+       <br><a class="big sec" style="margin-top:12px;display:inline-flex" href="@@BASE@@queue/">${A.esc(A.t('backToQueue'))}</a></div>`;
+    return;
+  }
   const F=REG.forms, c=k=>F.filter(f=>f.st===k).length;
   document.getElementById('stats').innerHTML=[
     ['grn',c('ok'),'พร้อมใช้ ครบทั้งสามช่องทาง'],
