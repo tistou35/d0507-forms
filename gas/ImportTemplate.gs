@@ -22,7 +22,7 @@
 
 /* ใบที่จะทำเมื่อกด Run โดยไม่เลือกฟังก์ชัน — เมนูเลือกฟังก์ชันในเว็บกดยาก
    แก้บรรทัดนี้แล้ว push ใหม่ ง่ายและแน่นอนกว่า */
-var RUN_LIST = ['ASF', 'PCR-FI'];
+var RUN_LIST = ['ASF'];
 
 function importTemplate(abbr) {
   if (!abbr) return RUN_LIST.map(function (a) { return importTemplate(a); });
@@ -103,6 +103,16 @@ function fillTokens_(doc, map) {
     if (!target) { left.push(it.tok + '  ← ' + it.label + ' (ไม่มีช่องว่างข้างเคียง)'); return; }
     usedCells[cell.key] = true;
     target.setText(it.tok);
+    placed++;
+  });
+
+  // 1b) เซลล์ที่มีทั้งป้ายและเส้นประอยู่ในตัวเอง ("Aircraft Type: ______")
+  //     ต้องแทนเส้นประในเซลล์นั้น ไม่ใช่เขียนลงเซลล์ข้าง ๆ ซึ่งเป็นป้ายของช่องถัดไป
+  (map.byCell || []).forEach(function (it) {
+    var cell = findCellByText_(body, it.cell, usedCells);
+    if (!cell) { left.push(it.tok + '  ← ' + it.cell); return; }
+    usedCells[cell.key] = true;
+    cell.tbl.getRow(cell.r).getCell(cell.c).setText(it.head + it.tok);
     placed++;
   });
 

@@ -82,6 +82,22 @@ def score(a, b):
     return base
 
 
+def cell_head(cell):
+    """เซลล์ที่มีทั้งป้ายและเส้นประให้กรอกอยู่ในตัวเอง — คืนข้อความที่ต้องเก็บไว้
+
+    "Aircraft Type: ______"        -> "Aircraft Type: "        (ตัดเส้นประทิ้ง)
+    "Date:  ___ / ___ / ______"    -> "Date:  "                (โครงวันที่ทิ้งทั้งชุด)
+    "Aircraft Reg.:  HS-___"       -> "Aircraft Reg.:  HS-"    (เก็บ HS- ที่พิมพ์ไว้)
+    ไม่เข้าเงื่อนไข -> None แปลว่าเป็นป้ายเฉย ๆ ค่าไปอยู่เซลล์ถัดไป
+    """
+    if '_' not in cell or '\n' in cell.strip(): return None
+    # ตัดหางที่เป็นแต่ตัวยึดตำแหน่ง (เส้นประ ทับ จุด เว้นวรรค) ออกให้หมด
+    head = re.sub(r'[_\s/.\-]*$', '', cell)
+    if not re.search(r'_', cell[len(head):]): return None
+    # เหลือแต่ป้ายล้วน ๆ ยังไม่พอ ต้องมีตัวคั่นหรือข้อความนำหน้าจริง
+    return head + (' ' if head and not head.endswith((' ', '-', ':')) else '')
+
+
 def box_same(tok_label, doc_label):
     """ชื่อตัวเลือกของ token กับข้อความข้าง ☐ ในกระดาษ หมายถึงอันเดียวกันไหม
 
@@ -184,7 +200,7 @@ def build(abbr, verbose=False):
     avail = {}
     for c in short: avail[c] = avail.get(c, 0) + 1
 
-    by_label, by_line, boxes, unmatched, approval, tables = [], [], [], [], [], []
+    by_label, by_line, by_cell, boxes, unmatched, approval, tables = [], [], [], [], [], [], []
     used_lines = set()
 
     def take(c):
@@ -251,7 +267,14 @@ def build(abbr, verbose=False):
             hit = next((cellset[x] for x in (en, th)
                         if x and x in cellset and avail.get(cellset[x], 0) > 0), None)
         if hit and take(hit):
-            by_label.append({'label': hit, 'tok': tok})
+            # เซลล์ที่มีเส้นประอยู่ในตัวเอง ("Aircraft Type: ______") ต้องแทนเส้นประ
+            # ในเซลล์นั้น ไม่ใช่เขียนลงเซลล์ข้าง ๆ ซึ่งมักมีป้ายของช่องถัดไปอยู่แล้ว
+            # เคยพลาดตรงนี้: ASF หายไปสี่ช่อง (แบบ ทะเบียน วันที่ บทเรียน) แบบเงียบ ๆ
+            head = cell_head(hit)
+            if head is not None:
+                by_cell.append({'cell': hit, 'head': head, 'tok': tok})
+            else:
+                by_label.append({'label': hit, 'tok': tok})
             continue
 
         # 2) บรรทัดเส้นประในเซลล์ — "Signature: ______"
@@ -287,6 +310,15 @@ def build(abbr, verbose=False):
     for lab, tok in (ov.get('labels') or {}).items():
         by_label = [b for b in by_label if b['label'] != lab and b['tok'] != tok]
         by_label.append({'label': lab, 'tok': tok})
+    # cells: เซลล์ที่มีทั้งป้ายและตัวยึดตำแหน่งอยู่ด้วยกัน ระบุ head เองได้
+    # ("Aircraft Reg.:  HS-___" อยากได้ head แค่ "Aircraft Reg.: " เพราะค่ามี HS- อยู่แล้ว)
+    for cell, spec in (ov.get('cells') or {}).items():
+        tok = spec['tok'] if isinstance(spec, dict) else spec
+        head = spec.get('head') if isinstance(spec, dict) else None
+        if head is None: head = cell_head(cell) or ''
+        by_cell = [b for b in by_cell if b['tok'] != tok and b['cell'] != cell]
+        by_cell.append({'cell': cell, 'head': head, 'tok': tok})
+        unmatched = [u for u in unmatched if u['tok'] != tok]
     skip = set(ov.get('skip') or [])
     if skip:
         boxes = [b for b in boxes if b['tok'] not in skip]
@@ -317,6 +349,7 @@ def build(abbr, verbose=False):
         'orderWarn': order_warn,
         'byLabel': by_label,
         'byLine': by_line,
+        'byCell': by_cell,
         'boxes': boxes,
         'tables': tables,
         'boxesInDocx': n_box_docx,
@@ -339,12 +372,12 @@ def main():
         if not m:
             report.append('%-6s ข้าม — %s' % (a, note[0])); continue
         maps[a] = m
-        auto = len(m['byLabel']) + len(m['byLine'])
+        auto = len(m['byLabel']) + len(m['byLine']) + len(m['byCell'])
         warn = ''
         if len(m['boxes']) != m['boxesInDocx']:
             warn = '  ⚠️ ช่องติ๊กในนิยามฟอร์ม %d ≠ ☐ ในเอกสาร %d' % (len(m['boxes']), m['boxesInDocx'])
-        report.append('%-6s วางอัตโนมัติ %2d (เซลล์ %d · เส้นประ %d) · ตาราง %d · ต่อท้ายส่วนอนุมัติ %d · วางมือ %d · ช่องติ๊ก %d%s'
-                      % (a, auto, len(m['byLabel']), len(m['byLine']), len(m['tables']),
+        report.append('%-6s วางอัตโนมัติ %2d (เซลล์ %d · ในเซลล์ %d · เส้นประ %d) · ตาราง %d · ต่อท้ายส่วนอนุมัติ %d · วางมือ %d · ช่องติ๊ก %d%s'
+                      % (a, auto, len(m['byLabel']), len(m['byCell']), len(m['byLine']), len(m['tables']),
                          len(m['approval']), len(note), len(m['boxes']), warn))
         if m.get('orderWarn'):
             report.append('       🔴 ลำดับช่องติ๊กไม่ตรงกระดาษ %d จุด — ใบที่ออกมาจะติ๊กผิดข้อ'

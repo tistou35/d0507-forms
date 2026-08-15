@@ -75,6 +75,7 @@ var TOKEN_MAP = {
       }
     ],
     "byLine": [],
+    "byCell": [],
     "boxes": [
       {
         "tok": "{{k_decCat_assessment}}",
@@ -170,27 +171,38 @@ var TOKEN_MAP = {
         "tok": "{{insContact}}"
       },
       {
-        "label": "Aircraft Type:  _______________________",
-        "tok": "{{acType}}"
-      },
-      {
-        "label": "Date:  ___ / ___ / ______",
-        "tok": "{{fltDate}}"
-      },
-      {
-        "label": "Lesson of Flight:  ___________",
-        "tok": "{{lesson}}"
-      },
-      {
-        "label": "Instructor Licence No.:  _______________________________",
-        "tok": "{{insLicence}}"
-      },
-      {
         "label": "Instructor Signature:",
         "tok": "{{sig_insSign}}"
       }
     ],
     "byLine": [],
+    "byCell": [
+      {
+        "cell": "Aircraft Type:  _______________________",
+        "head": "Aircraft Type:",
+        "tok": "{{acType}}"
+      },
+      {
+        "cell": "Date:  ___ / ___ / ______",
+        "head": "Date:",
+        "tok": "{{fltDate}}"
+      },
+      {
+        "cell": "Lesson of Flight:  ___________",
+        "head": "Lesson of Flight:",
+        "tok": "{{lesson}}"
+      },
+      {
+        "cell": "Instructor Licence No.:  _______________________________",
+        "head": "Instructor Licence No.:",
+        "tok": "{{insLicence}}"
+      },
+      {
+        "cell": "Aircraft Reg.:  HS-___",
+        "head": "Aircraft Reg.:  ",
+        "tok": "{{acReg}}"
+      }
+    ],
     "boxes": [
       {
         "tok": "{{k_soloType_initial}}",
@@ -314,14 +326,7 @@ var TOKEN_MAP = {
         "sign": true
       }
     ],
-    "manual": [
-      {
-        "tok": "{{acReg}}",
-        "label": "Aircraft registration",
-        "labelTh": "ทะเบียนอากาศยาน",
-        "sign": false
-      }
-    ]
+    "manual": []
   },
   "DAF": {
     "abbr": "DAF",
@@ -400,6 +405,7 @@ var TOKEN_MAP = {
         "tok": "{{suspendDays}}"
       }
     ],
+    "byCell": [],
     "boxes": [
       {
         "tok": "{{k_infCat_sop}}",
@@ -561,6 +567,7 @@ var TOKEN_MAP = {
       }
     ],
     "byLine": [],
+    "byCell": [],
     "boxes": [
       {
         "tok": "{{k_copyType_hard}}",
@@ -672,6 +679,7 @@ var TOKEN_MAP = {
       }
     ],
     "byLine": [],
+    "byCell": [],
     "boxes": [
       {
         "tok": "{{k_changeType_minor}}",
@@ -786,6 +794,7 @@ var TOKEN_MAP = {
       }
     ],
     "byLine": [],
+    "byCell": [],
     "boxes": [
       {
         "tok": "{{k_courseType_ground}}",
@@ -1399,6 +1408,7 @@ var TOKEN_MAP = {
       }
     ],
     "byLine": [],
+    "byCell": [],
     "boxes": [
       {
         "tok": "{{k_trainType_ground}}",
@@ -3499,6 +3509,7 @@ var TOKEN_MAP = {
       }
     ],
     "byLine": [],
+    "byCell": [],
     "boxes": [
       {
         "tok": "{{k_role_PIC}}",
@@ -3935,6 +3946,7 @@ var TOKEN_MAP = {
       }
     ],
     "byLine": [],
+    "byCell": [],
     "boxes": [
       {
         "tok": "{{k_reason_rts}}",
@@ -4226,6 +4238,7 @@ var TOKEN_MAP = {
       }
     ],
     "byLine": [],
+    "byCell": [],
     "boxes": [
       {
         "tok": "{{k_riskLevel_H}}",
@@ -4344,6 +4357,7 @@ var TOKEN_MAP = {
         "tok": "{{caatDate}}"
       }
     ],
+    "byCell": [],
     "boxes": [
       {
         "tok": "{{k_category_personnel}}",
@@ -4639,6 +4653,7 @@ var TOKEN_MAP = {
         "tok": "{{fiAckDate}}"
       }
     ],
+    "byCell": [],
     "boxes": [
       {
         "tok": "{{k_tier_t1annual}}",
@@ -4954,6 +4969,7 @@ var TOKEN_MAP = {
         "tok": "{{tkiAckDate}}"
       }
     ],
+    "byCell": [],
     "boxes": [
       {
         "tok": "{{k_ipcType_annual}}",
@@ -5219,6 +5235,7 @@ var TOKEN_MAP = {
         "tok": "{{signDate}}"
       }
     ],
+    "byCell": [],
     "boxes": [
       {
         "tok": "{{k_isMinor}}",
@@ -5323,6 +5340,7 @@ var TOKEN_MAP = {
         "tok": "{{insAckDate}}"
       }
     ],
+    "byCell": [],
     "boxes": [
       {
         "tok": "{{k_trainType_annual}}",
@@ -5478,6 +5496,7 @@ var TOKEN_MAP = {
       }
     ],
     "byLine": [],
+    "byCell": [],
     "boxes": [
       {
         "tok": "{{k_applyFor_away2w}}",
@@ -5589,6 +5608,7 @@ var TOKEN_MAP = {
       }
     ],
     "byLine": [],
+    "byCell": [],
     "boxes": [
       {
         "tok": "{{k_p1_pTheCourseAsA_excellent}}",
@@ -7495,6 +7515,7 @@ var TOKEN_MAP = {
         "tok": "{{insAckDate}}"
       }
     ],
+    "byCell": [],
     "boxes": [
       {
         "tok": "{{k_category_FI}}",
@@ -7706,6 +7727,7 @@ var TOKEN_MAP = {
       }
     ],
     "byLine": [],
+    "byCell": [],
     "boxes": [
       {
         "tok": "{{k_evType_hazard}}",
