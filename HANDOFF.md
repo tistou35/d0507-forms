@@ -257,3 +257,17 @@ export LC_ALL=en_US.UTF-8; pbcopy < gas/Code.gs
 ```
 
 แล้ว Cmd+A / Cmd+V ในไฟล์ที่ตรงกัน — **อย่าพิมพ์** เพราะ editor เติมวงเล็บเอง
+
+## เพิ่มฟอร์มใหม่
+
+ขั้นตอนเต็มอยู่ที่ [ADD_FORM.md](ADD_FORM.md) · เรียกใช้เป็น skill ได้ที่ `.claude/skills/add-form/`
+
+```bash
+python3 tools/check_form.py          # ตรวจทุกใบ
+python3 tools/check_form.py SDF      # ตรวจใบเดียว
+```
+
+ตัวตรวจจับสามชั้น: นิยามฟอร์ม ↔ ทะเบียน (Issue/Rev) · นิยามฟอร์ม ↔ แม่แบบ PDF
+(ช่องให้คะแนนหายไป · token ไม่มีที่มา) · ความสมเหตุสมผลของนิยามฟอร์มเอง
+
+**ต้องผ่านก่อน commit** — ออก exit 1 เมื่อเจอปัญหา ใช้ใน CI ได้
