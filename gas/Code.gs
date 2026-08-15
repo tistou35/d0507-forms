@@ -216,7 +216,10 @@ function makePdf_(folder, abbr, s) {
     var flat = flatten_(data);
     // ค่าคำนวณทุกตัว ไม่ใช่แค่ score — SDF ใช้ t7 / t28 / t365 ในแม่แบบ
     // ถ้าดึงเฉพาะ score ช่องสรุปชั่วโมงในเอกสารจะว่างโดยไม่มีอะไรฟ้อง
-    var all = Object.assign({}, flat, ticks_(data), s.computed || {}, {
+    // ติ๊กจากค่าคำนวณด้วย — HIF ติ๊กระดับความเสี่ยง High/Medium/Low ที่มาจากตาราง
+    // ไม่ใช่ช่องที่ผู้กรอกเลือกเอง ถ้าไม่รวมตรงนี้ ช่องติ๊กในเอกสารจะว่างเสมอ
+    var all = Object.assign({}, flat, ticks_(Object.assign({}, data, s.computed || {})),
+                            s.computed || {}, {
       tracking: s.tracking, doc: s.doc || '', issue: s.issue || '', rev: s.rev || '',
       defRev: s.defRev || '', submitter: s.submitterName || '',
       submittedAt: docStamp_(s.submittedAt),
