@@ -18,15 +18,17 @@
   },
 
   "parties": [
-    { "k": "stu", "n": { "th": "นักเรียน", "en": "Student" }, "auth": "public" },
-    { "k": "fi",  "n": { "th": "ครูการบิน", "en": "Flight Instructor" }, "auth": "role:ins" },
-    { "k": "ht",  "n": { "th": "หัวหน้าครูฝึก", "en": "Head of Training" }, "auth": "role:mgt" }
+    { "k": "pair", "n": { "th": "นักเรียนและครูการบิน", "en": "Student and instructor" }, "auth": "public" },
+    { "k": "ht",   "n": { "th": "หัวหน้าครูฝึก", "en": "Head of Training" }, "auth": "role:mgt" }
   ],
 
   "sections": [
     {
-      "k": "A", "tab": "T1", "party": "stu",
+      "k": "A", "tab": "T1", "party": "pair",
       "title": { "th": "นักเรียนและครูการบิน", "en": "Student and instructor" },
+      "desc": {
+        "th": "ใบนี้นักเรียนกับครูการบินกรอกด้วยกันในคราวเดียว แล้วจึงส่งให้หัวหน้าครูฝึกอนุมัติ",
+        "en": "Student and instructor complete this together in one sitting, then send it to the Head of Training for authorisation." },
       "fields": [
         { "k": "stuName", "type": "text", "req": true, "half": true,
           "label": { "th": "ชื่อนักเรียน", "en": "Student name" } },
@@ -39,7 +41,7 @@
       ]
     },
     {
-      "k": "B", "tab": "T1", "party": "stu",
+      "k": "B", "tab": "T1", "party": "pair",
       "title": { "th": "เที่ยวบิน", "en": "Flight details" },
       "fields": [
         { "k": "acType", "type": "text", "req": true, "half": true,
@@ -59,55 +61,56 @@
       ]
     },
     {
-      "k": "C", "tab": "T2", "party": "fi",
+      "k": "C", "tab": "T2", "party": "pair",
       "title": { "th": "ชั่วโมงบินและจำนวนครั้งขึ้นลง", "en": "Flight hours and landings" },
-      "desc": { "th": "ครูการบินต้องตรวจยืนยันทุกข้อด้วยตนเองก่อนอนุญาต",
-                "en": "The instructor shall personally verify each item before authorising." },
+      "desc": { "th": "ครูการบินตรวจยืนยันทีละข้อ — กดซ้ำเพื่อยกเลิกได้",
+                "en": "The instructor verifies each item. Tap again to clear." },
       "fields": [
-        { "k": "c1Hours", "type": "check", "req": true,
-          "label": { "th": "ชั่วโมงบินและจำนวนครั้งขึ้นลง (ฝึกมาแล้ว ≥ 15 ชม. · ขึ้นลง ≥ 50 ครั้ง)",
-                     "en": "Flight hours & landings (≥ 15 hr training | ≥ 50 take-off and landing)" } },
-        { "k": "c2Night", "type": "check", "reqIf": "soloType == 'night'",
-          "label": { "th": "ชั่วโมงบินกลางคืนและขึ้นลงกลางคืน (ฝึกกลางคืน ≥ 3 ชม. · ขึ้นลงกลางคืน ≥ 5 ครั้ง)",
-                     "en": "Night hours & landings (≥ 3 hr night training | ≥ 5 night T/O and landing)" } }
+        { "k": "preHours", "type": "checklist", "req": true,
+          "label": { "th": "ตรวจยืนยันแล้ว", "en": "Verified" },
+          "opts": [ { "v": "Y", "n": { "th": "✓", "en": "✓" } } ],
+          "items": [
+            { "id": "hours", "th": "ชั่วโมงบินและจำนวนครั้งขึ้นลง", "en": "Flight hours & landings",
+              "how": "ฝึกมาแล้ว ≥ 15 ชม. · ขึ้นลง ≥ 50 ครั้ง" } ] }
       ]
     },
     {
-      "k": "D", "tab": "T2", "party": "fi",
+      "k": "D", "tab": "T2", "party": "pair",
       "title": { "th": "ความรู้ที่จำเป็น", "en": "Essential knowledge" },
       "fields": [
-        { "k": "k1Systems", "type": "check", "req": true,
-          "label": { "th": "ระบบอากาศยานและการบังคับควบคุม", "en": "Aircraft systems & flight controls" } },
-        { "k": "k2Aero", "type": "check", "req": true,
-          "label": { "th": "หลักอากาศพลศาสตร์", "en": "Aerodynamics" } },
-        { "k": "k3Emerg", "type": "check", "req": true,
-          "label": { "th": "ขั้นตอนฉุกเฉิน", "en": "Emergency procedures" } },
-        { "k": "k4Law", "type": "check", "req": true,
-          "label": { "th": "ห้วงอากาศ กฎหมายและระเบียบการบิน", "en": "Airspace, air laws & regulations" } },
-        { "k": "k5Wx", "type": "check", "req": true,
-          "label": { "th": "อุตุนิยมวิทยา — การแปลผลและการตัดสินใจ", "en": "Weather — interpretation & decision-making" } },
-        { "k": "k6Preflight", "type": "check", "req": true,
-          "label": { "th": "ขั้นตอนก่อนบินและเอกสารประกอบ", "en": "Pre-flight procedures & documentation" } },
-        { "k": "k7Radio", "type": "check", "req": true,
-          "label": { "th": "ขั้นตอนการติดต่อสื่อสารทางวิทยุ", "en": "Radio communication procedures" } }
+        { "k": "knowledge", "type": "checklist", "req": true,
+          "label": { "th": "ตรวจยืนยันแล้ว", "en": "Verified" },
+          "opts": [ { "v": "Y", "n": { "th": "✓", "en": "✓" } } ],
+          "items": [
+            { "id": "systems",   "th": "ระบบอากาศยานและการบังคับควบคุม", "en": "Aircraft systems & flight controls" },
+            { "id": "aero",      "th": "หลักอากาศพลศาสตร์", "en": "Aerodynamics" },
+            { "id": "emerg",     "th": "ขั้นตอนฉุกเฉิน", "en": "Emergency procedures" },
+            { "id": "law",       "th": "ห้วงอากาศ กฎหมายและระเบียบการบิน", "en": "Airspace, air laws & regulations" },
+            { "id": "wx",        "th": "อุตุนิยมวิทยา — การแปลผลและการตัดสินใจ", "en": "Weather — interpretation & decision-making" },
+            { "id": "preflight", "th": "ขั้นตอนก่อนบินและเอกสารประกอบ", "en": "Pre-flight procedures & documentation" },
+            { "id": "radio",     "th": "ขั้นตอนการติดต่อสื่อสารทางวิทยุ", "en": "Radio communication procedures" } ] }
       ]
     },
     {
-      "k": "E", "tab": "T2", "party": "fi", "showIf": "soloType == 'night'",
+      "k": "E", "tab": "T2", "party": "pair", "showIf": "soloType == 'night'",
       "title": { "th": "เพิ่มเติมสำหรับบินเดี่ยวกลางคืน", "en": "Night solo — additional" },
+      "desc": { "th": "ต้องตรวจครบทุกข้อจึงจะส่งใบได้ — เกณฑ์ชั่วโมงกลางคืนอยู่ในนี้ด้วย",
+                "en": "All items must be verified before the form can be submitted, including the night hour minima." },
       "fields": [
-        { "k": "n1Vision", "type": "check", "reqIf": "soloType == 'night'",
-          "label": { "th": "การมองเห็นกลางคืนและสรีรวิทยา", "en": "Night vision & physiology" } },
-        { "k": "n2Lighting", "type": "check", "reqIf": "soloType == 'night'",
-          "label": { "th": "ระบบไฟของอากาศยาน", "en": "Aircraft lighting systems" } },
-        { "k": "n3Disorient", "type": "check", "reqIf": "soloType == 'night'",
-          "label": { "th": "การหลงสภาพการบิน — การรู้ตัวและการแก้ไข", "en": "Spatial disorientation — recognition & recovery" } },
-        { "k": "n4Nav", "type": "check", "reqIf": "soloType == 'night'",
-          "label": { "th": "การเดินอากาศกลางคืน", "en": "Night navigation" } }
+        { "k": "nightKnow", "type": "checklist", "reqIf": "soloType == 'night'",
+          "label": { "th": "ตรวจยืนยันแล้ว", "en": "Verified" },
+          "opts": [ { "v": "Y", "n": { "th": "✓", "en": "✓" } } ],
+          "items": [
+            { "id": "nightHours", "th": "ชั่วโมงบินกลางคืนและขึ้นลงกลางคืน", "en": "Night hours & landings",
+              "how": "ฝึกกลางคืน ≥ 3 ชม. · ขึ้นลงกลางคืน ≥ 5 ครั้ง" },
+            { "id": "vision",    "th": "การมองเห็นกลางคืนและสรีรวิทยา", "en": "Night vision & physiology" },
+            { "id": "lighting",  "th": "ระบบไฟของอากาศยาน", "en": "Aircraft lighting systems" },
+            { "id": "disorient", "th": "การหลงสภาพการบิน — การรู้ตัวและการแก้ไข", "en": "Spatial disorientation — recognition & recovery" },
+            { "id": "nav",       "th": "การเดินอากาศกลางคืน", "en": "Night navigation" } ] }
       ]
     },
     {
-      "k": "F", "tab": "T3", "party": "fi",
+      "k": "F", "tab": "T3", "party": "pair",
       "title": { "th": "ครูการบินรับรอง", "en": "Instructor certification" },
       "fields": [
         { "k": "insLicence", "type": "text", "req": true,
@@ -133,19 +136,14 @@
   ],
 
   "gates": [
-    { "when": "soloType == 'night' && c2Night != true", "level": "stop",
-      "short": { "th": "ชั่วโมงกลางคืนไม่ครบ", "en": "NIGHT MINIMA" },
-      "msg": { "th": "บินเดี่ยวกลางคืนต้องผ่านเกณฑ์ชั่วโมงกลางคืนและจำนวนครั้งขึ้นลงกลางคืนก่อน",
-               "en": "Night solo requires the night hours and night landing minima to be verified first." } },
     { "when": "soloType == 'initial'", "level": "info",
       "msg": { "th": "บินเดี่ยวครั้งแรก — ต้องได้รับอนุมัติจากหัวหน้าครูฝึกก่อนออกบินทุกกรณี",
                "en": "Initial solo always requires Head of Training authorisation before the flight." } }
   ],
 
   "route": [
-    { "step": 1, "party": "stu", "sign": false },
-    { "step": 2, "party": "fi", "sign": true, "assignedBy": "submitter", "slaDays": 1 },
-    { "step": 3, "party": "ht", "sign": true, "assignedBy": "later", "pool": "HT",
+    { "step": 1, "party": "pair", "sign": true },
+    { "step": 2, "party": "ht", "sign": true, "assignedBy": "later", "pool": "HT",
       "canDelegate": true, "slaDays": 1 }
   ],
 

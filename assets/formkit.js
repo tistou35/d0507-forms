@@ -704,7 +704,10 @@
       b.addEventListener('click', () => {
         const k = b.dataset.cl;
         const cur = Object.assign({}, self.data[k] || {});
-        cur[b.dataset.item] = b.dataset.v;
+        // กดค่าเดิมซ้ำ = ยกเลิก — ตารางช่องเดียว (ASF ที่ครูติ๊กยืนยันทีละข้อ)
+        // ถ้าไม่มีทางถอน กดพลาดครั้งเดียวก็ลบไม่ได้ กลายเป็นการรับรองที่ไม่ได้ตั้งใจ
+        if (cur[b.dataset.item] === b.dataset.v) delete cur[b.dataset.item];
+        else cur[b.dataset.item] = b.dataset.v;
         self.set(k, cur); rerender();
       }));
 

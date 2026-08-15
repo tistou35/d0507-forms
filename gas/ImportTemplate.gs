@@ -22,7 +22,7 @@
 
 /* ใบที่จะทำเมื่อกด Run โดยไม่เลือกฟังก์ชัน — เมนูเลือกฟังก์ชันในเว็บกดยาก
    แก้บรรทัดนี้แล้ว push ใหม่ ง่ายและแน่นอนกว่า */
-var RUN_LIST = ['DRC', 'MOC'];
+var RUN_LIST = ['ASF'];
 
 function importTemplate(abbr) {
   if (!abbr) return RUN_LIST.map(function (a) { return importTemplate(a); });

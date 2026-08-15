@@ -195,68 +195,61 @@ var TOKEN_MAP = {
         "label": "Night solo local / cross-country"
       },
       {
-        "tok": "{{k_c1Hours}}",
-        "label": "Flight hours & landings (≥ 15 hr training | ≥ 50 take-off and landing)"
+        "tok": "{{k_preHours_hours_Y}}",
+        "label": "Flight hours & landings · ✓"
       },
       {
-        "tok": "{{k_c2Night}}",
-        "label": "Night hours & landings (≥ 3 hr night training | ≥ 5 night T/O and landing)"
+        "tok": "{{k_knowledge_systems_Y}}",
+        "label": "Aircraft systems & flight controls · ✓"
       },
       {
-        "tok": "{{k_k1Systems}}",
-        "label": "Aircraft systems & flight controls"
+        "tok": "{{k_knowledge_aero_Y}}",
+        "label": "Aerodynamics · ✓"
       },
       {
-        "tok": "{{k_k2Aero}}",
-        "label": "Aerodynamics"
+        "tok": "{{k_knowledge_emerg_Y}}",
+        "label": "Emergency procedures · ✓"
       },
       {
-        "tok": "{{k_k3Emerg}}",
-        "label": "Emergency procedures"
+        "tok": "{{k_knowledge_law_Y}}",
+        "label": "Airspace, air laws & regulations · ✓"
       },
       {
-        "tok": "{{k_k4Law}}",
-        "label": "Airspace, air laws & regulations"
+        "tok": "{{k_knowledge_wx_Y}}",
+        "label": "Weather — interpretation & decision-making · ✓"
       },
       {
-        "tok": "{{k_k5Wx}}",
-        "label": "Weather — interpretation & decision-making"
+        "tok": "{{k_knowledge_preflight_Y}}",
+        "label": "Pre-flight procedures & documentation · ✓"
       },
       {
-        "tok": "{{k_k6Preflight}}",
-        "label": "Pre-flight procedures & documentation"
+        "tok": "{{k_knowledge_radio_Y}}",
+        "label": "Radio communication procedures · ✓"
       },
       {
-        "tok": "{{k_k7Radio}}",
-        "label": "Radio communication procedures"
+        "tok": "{{k_nightKnow_nightHours_Y}}",
+        "label": "Night hours & landings · ✓"
       },
       {
-        "tok": "{{k_n1Vision}}",
-        "label": "Night vision & physiology"
+        "tok": "{{k_nightKnow_vision_Y}}",
+        "label": "Night vision & physiology · ✓"
       },
       {
-        "tok": "{{k_n2Lighting}}",
-        "label": "Aircraft lighting systems"
+        "tok": "{{k_nightKnow_lighting_Y}}",
+        "label": "Aircraft lighting systems · ✓"
       },
       {
-        "tok": "{{k_n3Disorient}}",
-        "label": "Spatial disorientation — recognition & recovery"
+        "tok": "{{k_nightKnow_disorient_Y}}",
+        "label": "Spatial disorientation — recognition & recovery · ✓"
       },
       {
-        "tok": "{{k_n4Nav}}",
-        "label": "Night navigation"
+        "tok": "{{k_nightKnow_nav_Y}}",
+        "label": "Night navigation · ✓"
       }
     ],
     "tables": [],
     "boxesInDocx": 16,
-    "approval": [],
-    "manual": [
-      {
-        "tok": "{{acReg}}",
-        "label": "Aircraft registration",
-        "labelTh": "ทะเบียนอากาศยาน",
-        "sign": false
-      },
+    "approval": [
       {
         "tok": "{{htName}}",
         "label": "Head of Training name",
@@ -280,6 +273,14 @@ var TOKEN_MAP = {
         "label": "Head of Training signature",
         "labelTh": "ลายเซ็นหัวหน้าครูฝึก",
         "sign": true
+      }
+    ],
+    "manual": [
+      {
+        "tok": "{{acReg}}",
+        "label": "Aircraft registration",
+        "labelTh": "ทะเบียนอากาศยาน",
+        "sign": false
       }
     ]
   },
