@@ -163,6 +163,9 @@ const LL=(o)=>FormKit.L(o,A.lang);
    ก่อนหน้านี้โชว์ "0 คะแนนความเสี่ยงรวม" กับฟอร์มที่ไม่มีคะแนน ซึ่งอ่านแล้วเข้าใจผิด */
 function headBox(c,next){
   const hl=DEF.ui&&DEF.ui.headline;
+  // ไม่มีระบบคะแนน ก็ไม่ต้องมีกล่องตัวเลข — บอกแค่ว่าส่งแล้วไปไหนต่อ
+  if(!FK.scored()) return next
+    ? `<div class="rvnext" style="margin-bottom:14px">${A.esc(next)}</div>` : '';
   const big=hl ? (c[hl.value]===undefined?0:c[hl.value]) : c.score;
   const lab=hl ? FormKit.L(hl,A.lang)+' · '+A.t('limit')+' '+hl.of
                : FormKit.L({th:'คะแนนความเสี่ยงรวม',en:'Total risk score'},A.lang);

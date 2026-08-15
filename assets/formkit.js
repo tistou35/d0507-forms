@@ -232,6 +232,18 @@
     return out;
   };
 
+  /**
+   * ฟอร์มนี้มีตัวเลขสรุปให้แสดงบนหัวไหม
+   *   score จาก compute (FRAE รวมคะแนนความเสี่ยง) หรือ ui.headline (SDF ใช้ชั่วโมง FTL)
+   * ใบที่ไม่มีทั้งสองอย่าง เช่น ASF DRC DRF ไม่ต้องมีแถบตัวเลข —
+   * เคยขึ้น "0 คะแนนความเสี่ยงรวม" ซึ่งชวนให้เข้าใจว่าประเมินแล้วได้ศูนย์
+   * ทั้งที่ใบนั้นไม่มีระบบคะแนนตั้งแต่แรก
+   */
+  FormKit.prototype.scored = function () {
+    return !!(this.def.ui && this.def.ui.headline)
+      || (this.def.compute || []).some(x => x.k === 'score' || x.op === 'sumScore');
+  };
+
   /* gate ที่กำลังทำงานอยู่ตอนนี้ */
   FormKit.prototype.gates = function () {
     const ctx = this.ctx();
@@ -535,7 +547,7 @@
     /* แถบบนหัวแสดงตัวเลขที่ต้องเห็นตลอดขณะกรอก
        ฟอร์มที่มีคะแนนรวม (FRAE) ใช้ score · ฟอร์มอื่นระบุเองที่ ui.headline (SDF ใช้ชั่วโมง FTL) */
     const hl = this.def.ui && this.def.ui.headline;
-    const scored = !!hl || (this.def.compute || []).some(x => x.k === 'score' || x.op === 'sumScore');
+    const scored = this.scored();
     const tabs = this.tabs(ctx);
     const other = this.lang === 'th' ? 'en' : 'th';
     let html = '';
