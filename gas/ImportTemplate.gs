@@ -91,7 +91,11 @@ function fillTokens_(doc, map) {
 
   // ที่ make_tokenmap.py จับคู่ไม่ได้ตั้งแต่ต้น ต้องขึ้นรายการด้วย
   // ไม่งั้นช่องพวกนี้หายเงียบ ๆ ทั้งที่เป็นเหตุผลที่ทำบล็อกเตือนนี้ขึ้นมา
-  var left = (map.manual || []).map(function (m) { return m.tok + '  ← ' + m.label; });
+  /* ช่องจริงที่กระดาษไม่มีที่ให้ ต้องต่อท้ายเป็นตาราง ไม่ใช่แค่ขึ้นรายการให้วางมือ
+     ไม่งั้นสิ่งที่ผู้กรอกเขียนไว้จะไม่ไปถึงเอกสารเลย เช่น EFM ที่ช่องความเห็น
+     ของผู้ประเมินหายทั้งช่อง ทั้งที่กรอกมาแล้ว */
+  var extra = (map.manual || []).slice();
+  var left = [];
 
   /* รายการ "ยังไม่ได้วาง" ต้องไม่เป็น token ที่ใช้งานได้เอง
      ไม่งั้นตอนออกเอกสาร ตัวแทนค่าจะไปเติมให้ในบล็อกเตือนนั้นเลย
@@ -183,8 +187,8 @@ function fillTokens_(doc, map) {
       });
   });
 
-  // 6) ส่วนอนุมัติ — ระบบมีขั้นนี้ กระดาษเดิมไม่มี จึงต่อท้ายให้
-  var appended = appendApproval_(body, map.approval || []);
+  // 6) ส่วนอนุมัติ + ช่องที่กระดาษไม่มีที่ให้ — ต่อท้ายเป็นตาราง
+  var appended = appendApproval_(body, map.approval || [], extra);
 
   // 7) ที่เหลือ บอกให้ชัด ไม่ปล่อยไปเจอเอาตอน PDF ออกมาแล้วช่องว่าง
   if (left.length) {
@@ -231,14 +235,19 @@ function findTableByHead_(body, cols) {
   return null;
 }
 
-/** ตารางบันทึกการอนุมัติ ต่อท้ายเอกสาร — หน้าตาเดียวกันทุกใบ */
-function appendApproval_(body, ap) {
-  if (!ap.length) return 0;
+/**
+ * ตารางต่อท้ายเอกสาร — ส่วนอนุมัติ และช่องที่กระดาษไม่มีที่ให้
+ * extra คือช่องจริงที่จับคู่กับกระดาษไม่ได้ ต้องขึ้นเอกสารด้วย
+ * ไม่งั้นสิ่งที่ผู้กรอกเขียนไว้จะหายไปเฉย ๆ โดยไม่มีใครรู้
+ */
+function appendApproval_(body, ap, extra) {
+  extra = extra || [];
+  if (!ap.length && !extra.length) return 0;
   body.appendParagraph('');
-  body.appendParagraph('APPROVAL / การอนุมัติ')
+  body.appendParagraph(ap.length ? 'APPROVAL / การอนุมัติ' : 'ADDITIONAL / เพิ่มเติม')
       .setAttributes(mono_(10, '#0D1B2A', true));
 
-  var rows = ap.map(function (f) {
+  var rows = ap.concat(extra).map(function (f) {
     var lab = f.label + (f.labelTh ? ' / ' + f.labelTh : '');
     return [lab, f.tok];
   });
@@ -248,9 +257,8 @@ function appendApproval_(body, ap) {
     var row = tbl.getRow(r);
     row.getCell(0).setWidth(180).setAttributes(mono_(9, '#3A4652'));
     row.getCell(1).setWidth(320).setAttributes(mono_(9));
-    if (ap[r].sign) row.getCell(1).setAttributes(mono_(9)); // token รูปลายเซ็น
   }
-  return ap.length;
+  return rows.length;
 }
 
 /**
