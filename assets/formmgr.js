@@ -64,9 +64,13 @@
       .concat((def.sections || []).flatMap(s => (s.fields || []).flatMap(f => [f.showIf, f.reqIf])))
       .concat((def.gates || []).map(x => x.when))
       .concat((def.route || []).map(x => x.onlyIf));
+    const KNOWN_TOK = ['true','false','anyStarBelow','anyBelow','filled','score','has'];
     for (const expr of refs) {
-      for (const tok of String(expr || '').match(/[a-zA-Z_]\w*/g) || []) {
-        if (['true','false','anyStarBelow','filled','score'].includes(tok)) continue;
+      // ตัดค่าในเครื่องหมายคำพูดออกก่อน — "decCat == 'other'" ไม่ได้อ้างฟิลด์ชื่อ other
+      // เคยพลาดแบบเดียวกันมาแล้วที่ build.py กับ "decision == 'GO'"
+      const bare = String(expr || '').replace(/'[^']*'|"[^"]*"/g, ' ');
+      for (const tok of bare.match(/[a-zA-Z_]\w*/g) || []) {
+        if (KNOWN_TOK.includes(tok)) continue;
         if (!keys.has(tok) && !computed.has(tok))
           e.push(`เงื่อนไขอ้าง "${tok}" ที่ไม่ใช่ฟิลด์หรือค่าคำนวณ`);
       }
