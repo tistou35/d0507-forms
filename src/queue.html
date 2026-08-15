@@ -13,6 +13,7 @@
       <h1>งานที่รอคุณ</h1>
       <p class="sub">ฟอร์มที่ถูกส่งถึงคุณในระบบนี้ — งาน CAR อยู่ที่ระบบตรวจสอบ ต้องเข้าสู่ระบบแยก</p></div></div>
     <div id="out"><p class="note">กำลังโหลด…</p></div>
+    <section id="pool" style="margin-top:28px"></section>
   </main>
 </div>
 @@BOTNAV@@
@@ -39,6 +40,42 @@ function load(){
       <br><a class="big pri" style="margin-top:12px" href="@@BASE@@staff-login/">เข้าสู่ระบบ</a></div>`;
     return;
   }
+  // งานในกองรอ — ใบที่ส่งมาโดยยังไม่ระบุผู้อนุมัติ ใครมีสิทธิ์ตามบทบาทก็กดรับได้
+  A.db.collection('tasks').where('state','==','pool').get()
+   .then(async ps=>{
+      let recv=[];
+      try{
+        const d=await A.db.collection('publicDirectory').doc('instructors').get();
+        const me=((d.exists&&d.data().list)||[]).find(x=>x.id===A.user.uid);
+        recv=(me&&me.recv)||[];
+      }catch(e){ recv=[]; }
+      const mine=ps.docs.filter(d=>{ const p=d.data().pool; return !p||recv.includes(p); });
+      const el=document.getElementById('pool');
+      if(!el||!mine.length) return;
+      el.innerHTML=`<div class="sh"><h2>${A.esc(A.t('poolTitle'))}</h2>
+          <span class="en">Unassigned</span></div>
+        <p class="sub" style="margin-bottom:14px">${A.esc(A.t('poolSub'))}</p>
+        <div class="stats">`+mine.map(d=>{
+          const t=d.data();
+          return `<div class="stat sky"><div class="top">
+            <span><span class="ti">${A.esc(t.title||t.formCode)}</span>
+            <span class="en">${A.esc(t.tracking||'')}</span></span></div>
+            <p class="note">${A.esc(A.t('fromWho'))}: ${A.esc(t.fromName||'—')}</p>
+            <div class="acts" style="margin-top:10px">
+              <button class="fb" data-claim="${A.esc(d.id)}">${A.esc(A.t('claim'))}</button></div></div>`;
+        }).join('')+`</div>`;
+      el.querySelectorAll('[data-claim]').forEach(b=>b.addEventListener('click',async()=>{
+        b.disabled=true; b.textContent=A.t('working');
+        try{
+          await A.db.collection('tasks').doc(b.dataset.claim).update({
+            assigneeUid:A.user.uid, assigneeName:A.user.displayName||A.user.email,
+            state:'open', claimedAt:firebase.firestore.FieldValue.serverTimestamp() });
+          location.href='@@BASE@@approve/?t='+encodeURIComponent(b.dataset.claim);
+        }catch(e){ b.disabled=false; b.textContent=A.esc(e.code||e.message); }
+      }));
+   })
+   .catch(()=>{ /* ยังไม่มีสิทธิ์อ่านกองรอ — ไม่ใช่เรื่องคอขาดบาดตาย */ });
+
   A.db.collection('tasks').where('assigneeUid','==',A.user.uid).where('state','==','open').get()
    .then(s=>{
       document.querySelectorAll('[data-cnt="queue"]').forEach(e=>e.textContent=s.size);

@@ -77,11 +77,15 @@ service cloud.firestore {
       let d = request.resource.data;
       return d.keys().hasAll(['formCode', 'tracking', 'status', 'assigneeUid', 'submittedAt'])
           && d.status == 'pending'
-          && d.assigneeUid is string && d.assigneeUid.size() > 0
+          // มีผู้รับระบุตัว หรือระบุกองที่รับผิดชอบ — อย่างใดอย่างหนึ่งต้องมี
+          // ปล่อยให้ว่างทั้งคู่ = ใบลอยไม่มีใครรับผิดชอบ
+          && d.assigneeUid is string
+          && (d.assigneeUid.size() > 0
+              || (d.assignTo is string && d.assignTo.size() > 0))
           && d.formCode  is string && d.formCode.size()  <= 40
           && d.tracking  is string && d.tracking.size()  <= 60
           && d.submittedAt == request.time   // ใช้เวลาเซิร์ฟเวอร์ ปลอมย้อนหลังไม่ได้
-          && d.keys().size() <= 20;
+          && d.keys().size() <= 22;
     }
 
     match /submissions/{subId} {

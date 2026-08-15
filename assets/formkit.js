@@ -243,7 +243,8 @@
     ctx = ctx || this.ctx();
     const live = (this.def.sections || []).filter(s => evalCond(s.showIf, ctx));
     return defs.map(t => {
-      const secs = live.filter(s => (s.tab || defs[0].k) === t.k);
+      const secs = live.filter(s => (s.tab || defs[0].k) === t.k)
+        .filter(s => !(s.hideOthers && this.party && s.party !== this.party));
       let sc = 0, ans = 0, tot = 0;
       secs.forEach(s => (s.fields || []).forEach(f => {
         if (f.type === 'static' || !evalCond(f.showIf, ctx)) return;
@@ -400,6 +401,9 @@
 
   FormKit.prototype.sectionHtml = function (s, ctx) {
     const mine = !this.party || s.party === this.party;
+    // hideOthers = ฝ่ายอื่นไม่ต้องเห็นส่วนนี้เลย ต่างจาก blind ที่ยังขึ้นกล่องอธิบาย
+    // ใช้กับส่วนอนุมัติ — คนกรอกไม่ต้องเห็นช่องที่ตัวเองแตะไม่ได้
+    if (s.hideOthers && !mine) return '';
     const pn = (this.def.parties || []).find(p => p.k === s.party);
     const hidden = s.blind && !mine;
     return `<section class="fk-sec">
@@ -409,9 +413,27 @@
       ${s.desc ? `<p class="desc">${esc(L(s.desc, this.lang))}</p>` : ''}
       ${hidden
         ? `<p class="fk-static">${esc(T('blind', this.lang))}</p>`
-        : (s.fields || []).filter(f => evalCond(f.showIf, ctx))
-            .map(f => this.row(f) || this.field(f)).join('')}
+        : this.fieldsHtml(s, ctx)}
     </section>`;
+  };
+
+  /* ช่องที่ตั้ง half:true จะจับคู่กันเป็นสองคอลัมน์
+     ใช้กับคู่ที่อ่านคู่กันถึงจะเข้าใจ เช่น เวลาออก–เวลาถึง */
+  FormKit.prototype.fieldsHtml = function (s, ctx) {
+    const live = (s.fields || []).filter(f => evalCond(f.showIf, ctx));
+    let out = '', pair = [];
+    const flush = () => {
+      if (!pair.length) return;
+      out += `<div class="fk-2col">${pair.join('')}</div>`;
+      pair = [];
+    };
+    for (const f of live) {
+      const html = this.row(f) || this.field(f);
+      if (f.half) { pair.push(html); if (pair.length === 2) flush(); }
+      else { flush(); out += html; }
+    }
+    flush();
+    return out;
   };
 
   FormKit.prototype.routeHtml = function (ctx) {

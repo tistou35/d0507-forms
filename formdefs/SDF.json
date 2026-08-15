@@ -215,18 +215,20 @@
           "type": "time",
           "req": true,
           "label": {
-            "th": "เวลาออก (DEP)",
-            "en": "Last flight time — DEP"
-          }
+            "th": "เวลาออกของเที่ยวบินที่บินล่าสุด (DEP of latest flight)",
+            "en": "DEP of latest flight"
+          },
+          "half": true
         },
         {
           "k": "arrTime",
           "type": "time",
           "req": true,
           "label": {
-            "th": "เวลาถึง (ARR)",
-            "en": "Last flight time — ARR"
-          }
+            "th": "เวลาถึงของเที่ยวบินที่บินล่าสุด (ARR of latest flight)",
+            "en": "ARR of latest flight"
+          },
+          "half": true
         }
       ]
     },
@@ -396,7 +398,8 @@
             "en": "Approver signature"
           }
         }
-      ]
+      ],
+      "hideOthers": true
     }
   ],
   "compute": [
@@ -521,13 +524,14 @@
       "step": 2,
       "party": "app",
       "sign": true,
-      "assignedBy": "submitter",
+      "assignedBy": "later",
       "canDelegate": true,
       "notify": [
         "line",
         "email"
       ],
-      "slaDays": 1
+      "slaDays": 1,
+      "pool": "HT"
     }
   ],
   "export": {
