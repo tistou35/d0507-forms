@@ -413,8 +413,10 @@ footer{text-align:center;color:var(--g-400);font-size:12px;padding:22px}
 .fk-suna button[aria-pressed="true"][data-v="S"]{background:var(--green-100);color:var(--green-600);border-color:var(--green-600)}
 .fk-suna button[aria-pressed="true"][data-v="U"]{background:var(--red-100);color:var(--red-600);border-color:var(--red-600)}
 .fk-suna button[aria-pressed="true"][data-v="NA"]{background:var(--g-100);color:var(--g-600);border-color:var(--g-400)}
-.fk-item{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;
-  padding:12px 0;border-bottom:1px dashed var(--g-100);flex-wrap:wrap}
+/* ปุ่มติ๊กสูง 44px อยู่แล้ว (เกณฑ์พื้นที่กดบนมือถือ) แถวจึงไม่ต้องเว้นบน-ล่างมาก
+   ASF มี 12 ข้อ · FTR 12 · SEF 49 — ลด 12px เหลือ 6px สั้นลงเห็นได้ชัดในใบยาว */
+.fk-item{display:flex;gap:14px;align-items:center;justify-content:space-between;
+  padding:6px 0;border-bottom:1px dashed var(--g-100);flex-wrap:wrap}
 .fk-item:last-child{border-bottom:0}
 .fk-item .txt{flex:1;min-width:200px;font-size:13.5px;line-height:1.5}
 .fk-item .id{font-family:var(--font-mono);font-size:11px;color:var(--g-400);display:block}
