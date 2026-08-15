@@ -22,7 +22,7 @@
 
 /* ใบที่จะทำเมื่อกด Run โดยไม่เลือกฟังก์ชัน — เมนูเลือกฟังก์ชันในเว็บกดยาก
    แก้บรรทัดนี้แล้ว push ใหม่ ง่ายและแน่นอนกว่า */
-var RUN_LIST = ['ASF'];
+var RUN_LIST = ['EFM'];
 
 function importTemplate(abbr) {
   if (!abbr) return RUN_LIST.map(function (a) { return importTemplate(a); });
@@ -92,6 +92,12 @@ function fillTokens_(doc, map) {
   // ที่ make_tokenmap.py จับคู่ไม่ได้ตั้งแต่ต้น ต้องขึ้นรายการด้วย
   // ไม่งั้นช่องพวกนี้หายเงียบ ๆ ทั้งที่เป็นเหตุผลที่ทำบล็อกเตือนนี้ขึ้นมา
   var left = (map.manual || []).map(function (m) { return m.tok + '  ← ' + m.label; });
+
+  /* รายการ "ยังไม่ได้วาง" ต้องไม่เป็น token ที่ใช้งานได้เอง
+     ไม่งั้นตอนออกเอกสาร ตัวแทนค่าจะไปเติมให้ในบล็อกเตือนนั้นเลย
+     เคยเกิดกับ EFM — ลายเซ็นผู้ประเมินไปโผล่หน้าสุดท้ายในบล็อกเตือน
+     แทนที่จะอยู่ในช่องลายเซ็น แล้วดูเผิน ๆ เหมือนเอกสารมีลายเซ็นครบ */
+  var inert = function (s) { return s.replace(/\{\{/g, '⟦').replace(/\}\}/g, '⟧'); };
 
   // 1) ป้ายในเซลล์ -> ช่องว่างที่คู่กัน (ขวาก่อน แล้วล่าง)
   //    ป้ายซ้ำกันได้ในใบเดียว เช่น PWR มี "Phone Number" ทั้งของผู้โดยสารและผู้ปกครอง
@@ -185,9 +191,9 @@ function fillTokens_(doc, map) {
     body.appendParagraph('').setAttributes(mono_(8));
     body.appendParagraph('⚠️ TOKEN ที่ยังไม่ได้วาง — ' + left.length + ' รายการ')
         .setAttributes(mono_(10, '#C0392B', true));
-    body.appendParagraph('คัดลอกไปวางในช่องที่ถูกต้องของเอกสาร แล้วลบบล็อกนี้ทิ้ง')
+    body.appendParagraph('เขียน ⟦…⟧ แทน {{…}} ไว้กัน token ทำงานเอง — ตอนวางให้เปลี่ยนกลับเป็นปีกกาคู่')
         .setAttributes(mono_(8.5, '#777777'));
-    left.forEach(function (x) { body.appendParagraph(x).setAttributes(mono_(9)); });
+    left.forEach(function (x) { body.appendParagraph(inert(x)).setAttributes(mono_(9)); });
   }
 
   return { placed: placed, appended: appended, left: left, boxNote: boxNote };

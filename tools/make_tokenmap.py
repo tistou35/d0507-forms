@@ -310,6 +310,8 @@ def build(abbr, verbose=False):
     for lab, tok in (ov.get('labels') or {}).items():
         by_label = [b for b in by_label if b['label'] != lab and b['tok'] != tok]
         by_label.append({'label': lab, 'tok': tok})
+        # ระบุเองแล้วก็ไม่ต้องค้างอยู่ในรายการวางมืออีก
+        unmatched = [u for u in unmatched if u['tok'] != tok]
     # cells: เซลล์ที่มีทั้งป้ายและตัวยึดตำแหน่งอยู่ด้วยกัน ระบุ head เองได้
     # ("Aircraft Reg.:  HS-___" อยากได้ head แค่ "Aircraft Reg.: " เพราะค่ามี HS- อยู่แล้ว)
     for cell, spec in (ov.get('cells') or {}).items():

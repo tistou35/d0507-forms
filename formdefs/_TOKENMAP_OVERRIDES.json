@@ -108,5 +108,11 @@
       "Risk Score (L×S):": "{{riskScore}}",
       "Risk Level:": "{{riskLevel}}"
     }
+  },
+  "EFM": {
+    "_why": "ป้าย \"Signature:\" ในกระดาษสั้นเกินกว่าจะจับคู่อัตโนมัติกับ \"Evaluator signature\" ในนิยามฟอร์ม (คำว่า signature กว้างเกินไป ตัวจับคู่จึงไม่กล้าเดา) ระบุเองให้ชัด",
+    "labels": {
+      "Signature:": "{{sig_evSign}}"
+    }
   }
 }

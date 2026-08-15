@@ -1406,17 +1406,6 @@
           "half": true
         },
         {
-          "k": "evDate",
-          "type": "date",
-          "label": {
-            "th": "วันที่",
-            "en": "Date"
-          },
-          "req": true,
-          "prefill": "today",
-          "half": true
-        },
-        {
           "k": "evSign",
           "type": "sign",
           "req": true,

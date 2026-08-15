@@ -1405,6 +1405,10 @@ var TOKEN_MAP = {
       {
         "label": "Evaluator Name:",
         "tok": "{{evName}}"
+      },
+      {
+        "label": "Signature:",
+        "tok": "{{sig_evSign}}"
       }
     ],
     "byLine": [],
@@ -3475,18 +3479,6 @@ var TOKEN_MAP = {
         "label": "Comments",
         "labelTh": "ความเห็นเพิ่มเติม",
         "sign": false
-      },
-      {
-        "tok": "{{evDate}}",
-        "label": "Date",
-        "labelTh": "วันที่",
-        "sign": false
-      },
-      {
-        "tok": "{{sig_evSign}}",
-        "label": "Evaluator signature",
-        "labelTh": "ลายเซ็นผู้ประเมิน",
-        "sign": true
       }
     ]
   },

@@ -128,8 +128,9 @@ def efm():
                 {'v': 'fair',      'n': {'th': 'พอใช้', 'en': 'Fair'}},
                 {'v': 'poor',      'n': {'th': 'ต้องปรับปรุง', 'en': 'Poor'}}]),
             txt('evComment', 'ความเห็นเพิ่มเติม', 'Comments', type='textarea'),
+            # ไม่มีช่องวันที่ของผู้ประเมินแยกต่างหาก — กระดาษมีช่อง Date อยู่หัวฟอร์มแล้ว
+            # ใส่สองที่จะกลายเป็นวันที่สองค่าในใบเดียว ซึ่งเป็นข้อบกพร่องของนิยามฟอร์ม ไม่ใช่ของกระดาษ
             txt('evName', 'ชื่อผู้ประเมิน', 'Evaluator name', req=True, half=True),
-            txt('evDate', 'วันที่', 'Date', type='date', req=True, prefill='today', half=True),
             sign('evSign', 'ลายเซ็นผู้ประเมิน', 'Evaluator signature'),
         ]})
 
