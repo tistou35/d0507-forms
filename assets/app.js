@@ -141,6 +141,7 @@
     navRegSh:   { th: 'ทะเบียน', en: 'Register' },
     navForms:   { th: 'จัดการฟอร์ม', en: 'Form management' },
     navSetup:   { th: 'ตั้งค่าระบบ', en: 'Admin setup' },
+    navAprv:    { th: 'ผังผู้อนุมัติ', en: 'Approvals' },
     navAudit:   { th: 'งานตรวจสอบ', en: 'Audit' },
     auditNote:  { th: 'Audit ↗ login แยก', en: 'งานตรวจสอบ ↗ แยก login' },
     searchPh:   { th: 'ค้นหาฟอร์ม', en: 'Search forms' },
@@ -262,6 +263,32 @@
                     en: 'A controlled record must have an identifiable owner.' },
     needLoginBody:{ th: 'ใบนี้จบทันทีที่ส่ง ไม่มีขั้นอนุมัติต่อ จึงต้องเป็นเจ้าหน้าที่ที่เข้าสู่ระบบแล้วเป็นผู้ส่ง — หรือเลือกผู้ทำการประเมินเป็น Student เพื่อให้ครูการบินลงนามอนุญาต',
                     en: 'This record is complete on submission with no approval step, so it must be filed by a signed-in staff member — or set the assessor to Student so an instructor authorises it.' },
+  };
+
+  /* ── ผังผู้อนุมัติ ──────────────────────────────────────
+     ใครอนุมัติฟอร์มไหนมาจาก config/approvals ที่ admin ตั้งได้
+     ไม่ใช่ค่าที่ฝังตอน build — ย้ายตำแหน่งหรือเปลี่ยนคนไม่ต้อง build ใหม่
+     อ่านไม่ได้ (ยังไม่ล็อกอิน หรือยังไม่เคยตั้ง) ก็ตกกลับไปใช้ค่าในนิยามฟอร์ม */
+  A.APPROVALS = null;
+  A.loadApprovals = async function () {
+    if (A.APPROVALS) return A.APPROVALS;
+    try {
+      const d = await A.db.collection('config').doc('approvals').get();
+      A.APPROVALS = (d.exists && d.data().byForm) || {};
+    } catch (e) { A.APPROVALS = {}; }
+    return A.APPROVALS;
+  };
+  /* คืนกติกาอนุมัติของฟอร์มหนึ่งใบ — def ใช้เป็นค่าสำรองเมื่อยังไม่ได้ตั้งใน config */
+  A.approvalOf = function (abbr, def, regEntry) {
+    const cfg = (A.APPROVALS || {})[abbr];
+    if (cfg) return cfg;
+    const step = def && (def.route || [])[1];
+    if (!step) return { mode: 'none', position: '' };
+    return {
+      mode: step.assignedBy === 'submitter' ? 'pick' : 'pool',
+      position: step.pool || (regEntry && regEntry.assignTo) || '',
+      escalateDays: 2, rejectDays: 7,
+    };
   };
 
   A.onLang = [];               // หน้าเว็บลงทะเบียนไว้ให้เรียกเมื่อเปลี่ยนภาษา

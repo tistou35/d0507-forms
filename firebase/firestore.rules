@@ -105,6 +105,27 @@ service cloud.firestore {
 
     // ── คิวงาน — เฉพาะงานของระบบฟอร์มนี้ ────────────────────
     // งาน CAR อยู่คนละโปรเจกต์ จึงรวมมาที่นี่ไม่ได้
+    // ── รายชื่อเจ้าหน้าที่ฉบับเต็ม — มี LINE ID และอีเมล ─────
+    // ห้ามอ่านโดยไม่ล็อกอินเด็ดขาด ต่างจาก publicDirectory ที่โลกอ่านได้
+    match /staffDirectory/{docId} {
+      allow read, write: if staff();
+    }
+
+    // ── ผังผู้อนุมัติ + ข้อความแจ้งเตือน ─────────────────────
+    // อ่านได้ทุกคนที่ล็อกอิน (ฝั่งส่งฟอร์มต้องรู้ว่าใครอนุมัติ)
+    // แต่แก้ได้เฉพาะเจ้าหน้าที่
+    match /config/{docId} {
+      allow read:  if signedIn();
+      allow write: if staff();
+    }
+
+    // ── คิวแจ้งเตือน — เว็บเขียน Apps Script อ่านไปยิง ──────
+    // อ่านไม่ได้จากเว็บ เพราะมี LINE user ID อยู่ในนั้น
+    match /notifyQueue/{qid} {
+      allow create: if signedIn();
+      allow read, update, delete: if false;
+    }
+
     match /tasks/{taskId} {
       allow read:   if staff();
       allow create: if staff() || anon();

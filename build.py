@@ -205,6 +205,7 @@ def main():
         ('fill.html',        'fill/index.html',                '../',   'all'),
         ('submit.html',      'submit/index.html',              '../',   'all'),
         ('approve.html',     'approve/index.html',             '../',   'queue'),
+        ('approvals.html',   'admin/approvals/index.html',     '../../','aprv'),
     ]
     VER = asset_versions()
     for src, out, base, active in pages:

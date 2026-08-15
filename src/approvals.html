@@ -1,0 +1,264 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ผังผู้อนุมัติ — D-0507 Flight Training</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="@@BASE@@assets/app.css">
+<style>
+.aprow{display:grid;grid-template-columns:1fr 150px 150px 92px 92px;gap:12px;align-items:center;
+  padding:11px 14px;border-bottom:1px solid var(--g-100)}
+.aprow:last-child{border-bottom:0}
+.aprow .cd{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--sky-600)}
+.aprow .nm{font-size:14px;font-weight:600;font-family:var(--font-sans);line-height:1.3}
+.aprow select,.aprow input{width:100%;min-height:40px;border-radius:8px;padding:0 10px;
+  border:1px solid var(--border-med);background:var(--surface);color:var(--fg-1);font-size:13.5px}
+.aphead{display:grid;grid-template-columns:1fr 150px 150px 92px 92px;gap:12px;padding:0 14px 8px;
+  font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--g-400)}
+@media(max-width:900px){
+  .aphead{display:none}
+  .aprow{grid-template-columns:1fr 1fr;gap:8px}
+  .aprow>:first-child{grid-column:1/-1}
+}
+.tplrow{margin-bottom:18px}
+.tplrow label{font-size:14px;font-weight:600;font-family:var(--font-sans);display:flex;
+  align-items:center;gap:10px}
+.tplrow textarea{width:100%;min-height:86px;border-radius:8px;padding:11px 13px;margin-top:7px;
+  border:1px solid var(--border-med);background:var(--surface);color:var(--fg-1);
+  font-family:var(--font-mono);font-size:12.5px;line-height:1.7;resize:vertical}
+.tplrow .pv{background:#06C755;color:#fff;border-radius:12px;padding:11px 14px;margin-top:8px;
+  font-size:13.5px;line-height:1.6;white-space:pre-wrap;max-width:420px}
+.toks{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.toks button{border:1px solid var(--border-med);background:var(--surface);border-radius:6px;
+  padding:4px 9px;font-family:var(--font-mono);font-size:11.5px;cursor:pointer;color:var(--sky-600)}
+.toks button:hover{border-color:var(--sky-500);background:var(--sky-100)}
+.sw{position:relative;width:46px;height:26px;flex:none}
+.sw input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer}
+.sw i{position:absolute;inset:0;border-radius:99px;background:var(--g-200);transition:background .15s}
+.sw i::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;
+  background:#fff;transition:transform .15s}
+.sw input:checked + i{background:var(--green-600)}
+.sw input:checked + i::after{transform:translateX(20px)}
+</style>
+</head><body>
+@@TOPBAR@@
+<div class="body">
+@@RAIL@@
+  <main class="main">
+    <div class="greet"><div>
+      <p class="eyebrow">ผู้ดูแลระบบ · APPROVALS &amp; NOTIFICATIONS</p>
+      <h1>ผังผู้อนุมัติ</h1>
+      <p class="sub">กำหนดว่าฟอร์มไหนตำแหน่งไหนเป็นผู้อนุมัติ และข้อความที่ส่งแจ้งใน LINE</p></div>
+      <button class="obtn" id="save">บันทึกทั้งหมด</button>
+    </div>
+
+    <div id="gate"></div>
+
+    <div id="body" class="hide">
+      <section>
+        <div class="sh"><h2>ใครอนุมัติฟอร์มไหน</h2><span class="en">Approver by form</span></div>
+        <p class="sub" style="margin-bottom:14px">ผูกกับ<b>ตำแหน่ง</b>ไม่ใช่ตัวบุคคล —
+          คนย้ายตำแหน่งหรือลาออก ไม่ต้องมาไล่แก้ทุกฟอร์ม</p>
+        <div class="card" style="padding:14px 0">
+          <div class="aphead">
+            <span>ฟอร์ม</span><span>ตำแหน่งผู้อนุมัติ</span><span>วิธีจ่ายงาน</span>
+            <span>ส่งต่อ (วัน)</span><span>ตีกลับ (วัน)</span>
+          </div>
+          <div id="rows"></div>
+        </div>
+      </section>
+
+      <section>
+        <div class="sh"><h2>ข้อความแจ้งเตือน LINE</h2><span class="en">Notification templates</span>
+          <span class="rt"><label class="sw" style="display:inline-block;vertical-align:middle">
+            <input type="checkbox" id="notifyOn"><i></i></label></span></div>
+        <p class="sub" style="margin-bottom:14px">ใช้ตัวแทนในวงเล็บเหลี่ยมแบบเดียวกับระบบ Flight Plan —
+          กดปุ่มตัวแทนเพื่อแทรกลงในข้อความ</p>
+        <div class="card"><div id="tpls"></div></div>
+      </section>
+
+      <section>
+        <div class="sh"><h2>ผลการทำงาน</h2><span class="en">Log</span></div>
+        <div class="card"><pre id="out" style="font-family:var(--font-mono);font-size:12.5px;
+          white-space:pre-wrap;margin:0;line-height:1.7">—</pre></div>
+      </section>
+    </div>
+  </main>
+</div>
+@@BOTNAV@@
+<footer>D-0507 Flight Training Co., Ltd. · Controlled Document System</footer>
+
+<script>window.BASE='@@BASE@@';</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="@@BASE@@assets/app.js"></script>
+<script>
+"use strict";
+const REG = @@REG@@, DEFS = @@DEFS@@, A = D0507;
+
+const POS_KEYS = ['ACM','HT','CMM','SM','CFI','FI','TKI','ME','OPS','AD'];
+const MODES = [
+  ['none',  'ไม่ต้องอนุมัติ'],
+  ['pool',  'เข้ากองรอ · ใครก็รับได้'],
+  ['pick',  'ผู้ส่งเลือกคนเอง'],
+  ['named', 'ตามชื่อที่ระบุในฟอร์ม'],
+];
+
+/* ตัวแทนในข้อความ — วงเล็บเหลี่ยมแบบเดียวกับ Flight Plan app */
+const TOKENS = [
+  ['[Form]',     'ชื่อฟอร์ม',              'แบบแจ้งข้อมูลด้วยตนเอง'],
+  ['[Code]',     'รหัสเอกสาร',             'D-0507-SDF-001'],
+  ['[No.]',      'เลขที่ใบ',               'SDF-20260815-9ZBV'],
+  ['[From]',     'ผู้ส่ง',                 'ธนวัฒน์ ว.'],
+  ['[By]',       'ผู้ทำรายการ',            'ครูสมชาย'],
+  ['[To]',       'ผู้รับมอบหมายต่อ',        'ครูสมหญิง'],
+  ['[Position]', 'ตำแหน่งที่ต้องอนุมัติ',   'HT'],
+  ['[Note]',     'เหตุผล / ความเห็น',      'ชั่วโมงไม่ตรงกับ LOG ME'],
+  ['[Days]',     'จำนวนวันที่ค้าง',         '2'],
+  ['[Date]',     'วันที่',                 '15 AUG 2026'],
+  ['[Link]',     'ลิงก์เปิดงาน',            'https://…/approve/?t=…'],
+];
+
+const EVENTS = [
+  ['assigned',  'มีงานรออนุมัติ',       '📋 [Form] [No.]\nจาก [From]\nรอ [Position] อนุมัติ\n[Link]'],
+  ['delegated', 'มอบหมายต่อ',          '🔁 [Form] [No.]\n[By] มอบหมายต่อให้ [To]\n[Note]\n[Link]'],
+  ['escalated', 'ส่งต่อเพราะไม่ตอบ',    '⏭️ [Form] [No.] ค้าง [Days] วัน\nส่งต่อให้ [To] แล้ว\n[Link]'],
+  ['approved',  'อนุมัติแล้ว',          '✅ [Form] [No.] อนุมัติแล้วโดย [By]\n[Link]'],
+  ['rejected',  'ตีกลับให้แก้',         '↩️ [Form] [No.] ถูกตีกลับโดย [By]\nเหตุผล: [Note]\n[Link]'],
+  ['overdue',   'เตือนงานค้าง',         '⏰ [Form] [No.] ค้างเกิน [Days] วัน\nรอ [Position]\n[Link]'],
+  ['autoreject','ตีกลับอัตโนมัติ',      '🚫 [Form] [No.] ไม่มีผู้อนุมัติภายใน [Days] วัน — ตีกลับอัตโนมัติ\n[Link]'],
+];
+
+let APPROVALS = {}, NOTIFY = { enabled: false, events: {}, templates: {} };
+
+A.reg = REG;
+A.initAuth(@@FBCFG@@, boot);
+
+function log(s, cls){
+  const el = document.getElementById('out');
+  if (el.textContent === '—') el.textContent = '';
+  el.innerHTML += (cls ? `<span style="color:var(--${cls})">${A.esc(s)}</span>` : A.esc(s)) + '\n';
+}
+
+async function boot(){
+  const ok = A.isStaff();
+  document.getElementById('body').classList.toggle('hide', !ok);
+  document.getElementById('save').style.display = ok ? '' : 'none';
+  document.getElementById('gate').innerHTML = ok ? '' :
+    `<div class="note"><b>${A.esc(A.t('mustSignIn'))}</b>
+     <br><a class="big pri" style="margin-top:12px;display:inline-flex" href="@@BASE@@staff-login/">${A.esc(A.t('signIn'))}</a></div>`;
+  if (!ok) return;
+
+  try {
+    const [a, n] = await Promise.all([
+      A.db.collection('config').doc('approvals').get(),
+      A.db.collection('config').doc('notify').get(),
+    ]);
+    APPROVALS = (a.exists && a.data().byForm) || {};
+    if (n.exists) NOTIFY = Object.assign(NOTIFY, n.data());
+  } catch(e){ log('อ่านค่าเดิมไม่ได้: ' + (e.code || e.message), 'red-600'); }
+
+  // ฟอร์มที่ยังไม่เคยตั้ง — เอาค่าจากทะเบียนและนิยามฟอร์มมาเป็นค่าตั้งต้น
+  REG.forms.forEach(f => {
+    if (APPROVALS[f.abbr]) return;
+    const def = DEFS[f.abbr];
+    const step = def && (def.route || [])[1];
+    if (!step) return;                       // ฟอร์มที่ไม่มีขั้นอนุมัติ ไม่ต้องมีแถว
+    APPROVALS[f.abbr] = {
+      position: step.pool || f.assignTo || '',
+      mode: step.assignedBy === 'submitter' ? 'pick' : 'pool',
+      escalateDays: 2, rejectDays: 7,
+    };
+  });
+  EVENTS.forEach(([k, , d]) => {
+    if (NOTIFY.templates[k] === undefined) NOTIFY.templates[k] = d;
+    if (NOTIFY.events[k] === undefined) NOTIFY.events[k] = true;
+  });
+
+  rows(); tpls();
+}
+
+function rows(){
+  const el = document.getElementById('rows');
+  const codes = Object.keys(APPROVALS).sort();
+  if (!codes.length){ el.innerHTML = '<p class="note">ยังไม่มีฟอร์มที่มีขั้นอนุมัติ</p>'; return; }
+  el.innerHTML = codes.map(c => {
+    const f = REG.forms.find(x => x.abbr === c) || { abbr: c };
+    const v = APPROVALS[c];
+    return `<div class="aprow" data-c="${A.esc(c)}">
+      <div><span class="cd">${A.esc(f.doc || c)}</span>
+        <div class="nm">${A.esc(A.nm(f))}</div></div>
+      <select data-k="position">
+        <option value="">— ยังไม่กำหนด —</option>
+        ${POS_KEYS.map(p => `<option value="${p}"${v.position===p?' selected':''}>${p}</option>`).join('')}
+      </select>
+      <select data-k="mode">
+        ${MODES.map(m => `<option value="${m[0]}"${v.mode===m[0]?' selected':''}>${A.esc(m[1])}</option>`).join('')}
+      </select>
+      <input data-k="escalateDays" type="number" min="0" step="1" value="${Number(v.escalateDays)||0}">
+      <input data-k="rejectDays" type="number" min="0" step="1" value="${Number(v.rejectDays)||0}">
+    </div>`;
+  }).join('');
+  el.querySelectorAll('[data-k]').forEach(inp => inp.addEventListener('change', () => {
+    const c = inp.closest('.aprow').dataset.c, k = inp.dataset.k;
+    APPROVALS[c][k] = inp.type === 'number' ? Number(inp.value) : inp.value;
+  }));
+}
+
+function tpls(){
+  document.getElementById('notifyOn').checked = !!NOTIFY.enabled;
+  document.getElementById('tpls').innerHTML = EVENTS.map(([k, label]) => `
+    <div class="tplrow" data-e="${k}">
+      <label><span class="sw"><input type="checkbox" data-on ${NOTIFY.events[k]?'checked':''}><i></i></span>
+        ${A.esc(label)}</label>
+      <textarea data-tpl>${A.esc(NOTIFY.templates[k] || '')}</textarea>
+      <div class="toks">${TOKENS.map(t =>
+        `<button type="button" data-tok="${A.esc(t[0])}" title="${A.esc(t[1])}">${A.esc(t[0])}</button>`).join('')}</div>
+      <div class="pv"></div>
+    </div>`).join('');
+
+  document.querySelectorAll('.tplrow').forEach(row => {
+    const k = row.dataset.e;
+    const ta = row.querySelector('[data-tpl]');
+    const pv = () => { row.querySelector('.pv').textContent = preview(ta.value); };
+    ta.addEventListener('input', () => { NOTIFY.templates[k] = ta.value; pv(); });
+    row.querySelector('[data-on]').addEventListener('change', e => { NOTIFY.events[k] = e.target.checked; });
+    row.querySelectorAll('[data-tok]').forEach(b => b.addEventListener('click', () => {
+      const p = ta.selectionStart || ta.value.length;
+      ta.value = ta.value.slice(0, p) + b.dataset.tok + ta.value.slice(ta.selectionEnd || p);
+      NOTIFY.templates[k] = ta.value; ta.focus(); pv();
+    }));
+    pv();
+  });
+  document.getElementById('notifyOn').addEventListener('change', e => { NOTIFY.enabled = e.target.checked; });
+}
+
+/* แทนตัวแทนด้วยตัวอย่าง — ให้เห็นหน้าตาข้อความจริงก่อนบันทึก */
+function preview(t){
+  let s = String(t || '');
+  TOKENS.forEach(([tok, , ex]) => { s = s.split(tok).join(ex); });
+  return s;
+}
+
+document.getElementById('save').addEventListener('click', async () => {
+  const btn = document.getElementById('save'); btn.disabled = true;
+  try {
+    const bad = Object.entries(APPROVALS)
+      .filter(([, v]) => v.mode !== 'none' && !v.position).map(([c]) => c);
+    if (bad.length) throw new Error('ยังไม่ได้เลือกตำแหน่งผู้อนุมัติของ: ' + bad.join(', '));
+
+    await A.db.collection('config').doc('approvals').set({
+      byForm: APPROVALS, updatedBy: A.user.email,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    log('config/approvals — บันทึก ' + Object.keys(APPROVALS).length + ' ฟอร์ม', 'green-600');
+
+    await A.db.collection('config').doc('notify').set({
+      enabled: NOTIFY.enabled, events: NOTIFY.events, templates: NOTIFY.templates,
+      updatedBy: A.user.email,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    log('config/notify — ' + (NOTIFY.enabled ? 'เปิดแจ้งเตือน' : 'ปิดแจ้งเตือน') +
+        ' · ' + Object.values(NOTIFY.events).filter(Boolean).length + ' เหตุการณ์', 'green-600');
+  } catch(e){ log('ล้มเหลว: ' + e.message, 'red-600'); }
+  btn.disabled = false;
+});
+</script>
+</body></html>

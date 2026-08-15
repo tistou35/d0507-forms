@@ -41,10 +41,17 @@
             <div class="fk-opts" id="roles"></div>
           </div>
           <div class="fk-f">
-            <label>รับฟอร์มประเภทไหนได้</label>
-            <p class="hint">นักเรียนจะเลือกคุณเป็นผู้รับได้เมื่อฟอร์มนั้นส่งถึงบทบาทนี้ ·
-              FRAE และ PWR → FI · SDF → HT · SEF → CMM · APF → ACM · ไม่เลือกเลย = ไม่ปรากฏในตัวเลือก</p>
-            <div class="fk-opts" id="recv"></div>
+            <label>ตำแหน่งในองค์กร</label>
+            <p class="hint">ตำแหน่งเป็นตัวกำหนดว่าคุณอนุมัติฟอร์มไหนได้ — ผังผู้อนุมัติตั้งที่หน้า
+              <a href="@@BASE@@admin/approvals/">ผังผู้อนุมัติ</a> · มีได้หลายตำแหน่ง ·
+              ไม่เลือกเลย = ไม่ปรากฏในตัวเลือกผู้รับและไม่ได้รับงานอนุมัติ</p>
+            <div class="fk-opts" id="pos"></div>
+          </div>
+          <div class="fk-f">
+            <label for="line">LINE user ID</label>
+            <p class="hint">สำหรับแจ้งเตือนเมื่อมีงานรออนุมัติ · ขึ้นต้นด้วย U ตามด้วยตัวเลขและอักษร 32 ตัว ·
+              <b>เก็บไว้เฉพาะเจ้าหน้าที่ ไม่ออกหน้าเว็บสาธารณะ</b> · เว้นว่างได้ = ไม่รับแจ้งเตือน LINE</p>
+            <input id="line" type="text" placeholder="U1234567890abcdef1234567890abcdef">
           </div>
           <div class="acts"><button class="big pri" id="saveMe">บันทึกโปรไฟล์</button></div>
         </div>
@@ -94,8 +101,15 @@
 const REG = @@REG@@;
 const A = D0507;
 const ROLE_KEYS = ['stu','ins','mnt','ops','mgt'];
-const RECV_KEYS = ['FI','HT','CMM','ACM'];
-let ROLES = new Set(), RECV = new Set(), NEWREG = null;
+/* ตำแหน่งในองค์กรตาม OMA — คนหนึ่งมีได้หลายตำแหน่ง (HT ที่เป็น FI ด้วยเป็นเรื่องปกติ)
+   ต่างจาก 'บทบาท' ที่บอกว่าเห็นฟอร์มกลุ่มไหน */
+const POS_KEYS = ['ACM','HT','CMM','SM','CFI','FI','TKI','ME','OPS','AD'];
+const POS_N = {
+  ACM:'Accountable Manager', HT:'Head of Training', CMM:'Compliance Monitoring Manager',
+  SM:'Safety Manager', CFI:'Chief Flight Instructor', FI:'Flight Instructor',
+  TKI:'Theoretical Knowledge Instructor', ME:'Maintenance Engineer',
+  OPS:'Operations / Dispatch', AD:'Administration' };
+let ROLES = new Set(), POS = new Set(), NEWREG = null;
 
 A.reg = REG;
 A.initAuth(@@FBCFG@@, boot);
@@ -142,14 +156,26 @@ async function boot(){
     document.getElementById('nm').value = A.user.displayName || A.user.email.split('@')[0];
   if (!ROLES.size) ['ins','mgt'].forEach(r => ROLES.add(r));
 
+  // staffDirectory เก็บ LINE ID และอีเมล จึงอ่านได้เฉพาะเจ้าหน้าที่
   try {
-    const d = await A.db.collection('publicDirectory').doc('instructors').get();
+    const d = await A.db.collection('staffDirectory').doc('current').get();
     const mine = ((d.exists && d.data().list) || []).find(x => x.id === A.user.uid);
-    (mine && mine.recv || ['FI']).forEach(r => RECV.add(r));
-  } catch(e){ RECV.add('FI'); }
+    if (mine) {
+      (mine.positions || []).forEach(x => POS.add(x));
+      document.getElementById('line').value = mine.lineUserId || '';
+    }
+  } catch(e){ /* ยังไม่มี */ }
+  if (!POS.size) {
+    // ย้ายของเดิมจาก publicDirectory.recv มาเป็นตำแหน่งตั้งต้น
+    try {
+      const d = await A.db.collection('publicDirectory').doc('instructors').get();
+      const mine = ((d.exists && d.data().list) || []).find(x => x.id === A.user.uid);
+      (mine && mine.recv || []).forEach(r => POS.add(r));
+    } catch(e){}
+  }
 
   chips(document.getElementById('roles'), ROLE_KEYS, ROLES, k => A.L(A.ROLE_N[k]) || k);
-  chips(document.getElementById('recv'), RECV_KEYS, RECV, k => k);
+  chips(document.getElementById('pos'), POS_KEYS, POS, k => k + ' · ' + POS_N[k]);
   check(); dir();
 }
 
@@ -157,7 +183,8 @@ async function check(){
   const rows = [];
   for (const [label, path, get] of [
       ['โปรไฟล์และบทบาทของฉัน', 'users/{uid}', () => A.db.collection('users').doc(A.user.uid).get()],
-      ['รายชื่อผู้รับฟอร์ม', 'publicDirectory/instructors', () => A.db.collection('publicDirectory').doc('instructors').get()],
+      ['รายชื่อเจ้าหน้าที่ (เต็ม)', 'staffDirectory/current', () => A.db.collection('staffDirectory').doc('current').get()],
+      ['รายชื่อผู้รับฟอร์ม (สาธารณะ)', 'publicDirectory/instructors', () => A.db.collection('publicDirectory').doc('instructors').get()],
       ['ทะเบียนเอกสาร', 'registry/current', () => A.db.collection('registry').doc('current').get()]]) {
     let st = 'red', txt = 'ยังไม่มี';
     try {
@@ -211,19 +238,34 @@ document.getElementById('saveMe').addEventListener('click', async () => {
       updatedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
     log('users/' + A.user.uid + ' — บันทึกแล้ว · บทบาท: ' + [...ROLES].join(', '), 'green-600');
 
+    const line = document.getElementById('line').value.trim();
+    if (line && !/^U[0-9a-f]{32}$/i.test(line))
+      throw new Error('LINE user ID ต้องเป็น U ตามด้วยอักษร 32 ตัว — ที่กรอกมาไม่ใช่รูปแบบนั้น');
+
+    // 1) staffDirectory — ข้อมูลเต็ม เจ้าหน้าที่เท่านั้นที่อ่านได้
+    const sref = A.db.collection('staffDirectory').doc('current');
+    const sd = await sref.get();
+    const slist = ((sd.exists && sd.data().list) || []).filter(x => x.id !== A.user.uid);
+    slist.push({ id: A.user.uid, name, position: cert, positions: [...POS],
+                 lineUserId: line, email: A.user.email, active: true });
+    await sref.set({ list: slist, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    log('staffDirectory/current — ' + slist.length + ' คน · ตำแหน่ง: ' +
+        ([...POS].join(', ') || 'ยังไม่ได้เลือก') +
+        (line ? ' · มี LINE ID' : ' · ยังไม่มี LINE ID'), 'green-600');
+
+    // 2) publicDirectory — สำเนาที่ตัดอีเมลและ LINE ID ออก ฝั่งนักเรียนใช้เลือกผู้รับ
     const ref = A.db.collection('publicDirectory').doc('instructors');
     const d = await ref.get();
     const list = ((d.exists && d.data().list) || []).filter(x => x.id !== A.user.uid);
-    if (RECV.size) {
-      const entry = { id: A.user.uid, name, role: cert, recv: [...RECV] };
+    if (POS.size) {
+      const entry = { id: A.user.uid, name, role: cert, recv: [...POS] };
       // ด่านกันข้อมูลติดต่อหลุดเข้าเอกสารที่อ่านได้ทั้งโลก
       if (/@|\d{9,}/.test(JSON.stringify(entry)))
         throw new Error('ชื่อหรือตำแหน่งมีอีเมลหรือเบอร์โทรอยู่ — เอาออกก่อน');
       list.push(entry);
     }
     await ref.set({ list, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-    log('publicDirectory/instructors — ' + list.length + ' คน' +
-        (RECV.size ? ' · คุณรับ: ' + [...RECV].join(', ') : ' · คุณไม่อยู่ในรายชื่อ (ไม่ได้เลือกประเภทฟอร์ม)'), 'green-600');
+    log('publicDirectory/instructors — ' + list.length + ' คน (ไม่มีอีเมล ไม่มี LINE ID)', 'green-600');
     check(); dir();
   } catch(e){ log('ล้มเหลว: ' + e.message, 'red-600'); }
   btn.disabled = false;

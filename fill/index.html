@@ -71,7 +71,7 @@ dialog .df{padding:14px 22px;border-top:1px solid var(--g-100);display:flex;gap:
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="../assets/app.js?v=1b821011"></script>
+<script src="../assets/app.js?v=d91c4ce8"></script>
 <script>D0507.GAS_URL='https://script.google.com/macros/s/AKfycby7rFFVxd92wPImX4m8pv8nHqTrK3Iq0O32A34844DAg1rP8N3RfgKEyGvAUkQu-NXd/exec';</script>
 <script src="../assets/formkit.js?v=64ac5806"></script>
 <script>
@@ -93,16 +93,16 @@ function needsApproval(){ return !!nextStep(); }
 /* ต้องเลือกผู้อนุมัติตอนส่งไหม
    assignedBy 'submitter' = ผู้ส่งเลือกเอง (FRAE — นักเรียนเลือกครู)
    assignedBy 'later'     = ส่งไปก่อน ระบบจับคู่ทีหลัง (SDF — เข้ากองรอผู้มีสิทธิ์รับ) */
-function pickAtSend(){
-  const st=nextStep();
-  return !!st && st.assignedBy==='submitter';
-}
+/* กติกาอนุมัติมาจาก config/approvals (admin ตั้ง) ตกกลับไปใช้ค่าในนิยามฟอร์มถ้ายังไม่ได้ตั้ง */
+function approval(){ return A.approvalOf(F.abbr, DEF, F); }
+function pickAtSend(){ return !!nextStep() && approval().mode==='pick'; }
 
 /* รายชื่อครูที่รับฟอร์มประเภทนี้ — อ่านได้ทั้งโลก มีแค่ชื่อกับตำแหน่ง ไม่มีอีเมล */
 async function loadDir(){
   try{
+    await A.loadApprovals();
     const d=await A.db.collection('publicDirectory').doc('instructors').get();
-    const want=F.assignTo;
+    const want=approval().position || F.assignTo;
     DIR=((d.exists&&d.data().list)||[]).filter(x=>!want||(x.recv||[]).includes(want));
   }catch(e){ DIR=[]; }
 }
@@ -297,7 +297,7 @@ async function send(){
       step: done?steps.length:2,
       assigneeUid: PICK||'',
       // ใบที่ยังไม่มีผู้รับต้องบอกว่าใครมีสิทธิ์รับไปอนุมัติ ไม่งั้นตกหล่นไม่มีใครรับผิดชอบ
-      assignTo: (!PICK && st ? (st.pool || F.assignTo || '') : ''),
+      assignTo: (!PICK && st ? (approval().position || st.pool || F.assignTo || '') : ''),
       submitterUid:u.uid, submitterName:FK.data.picFirst?`${FK.data.picFirst} ${FK.data.picLast||''}`.trim():(u.displayName||''),
       submitterEmail:u.email||'',
       submittedAt:firebase.firestore.FieldValue.serverTimestamp(),
@@ -314,7 +314,7 @@ async function send(){
         assigneeUid:PICK||'', assigneeName:who.name||'',
         // ยังไม่มีผู้รับ = อยู่ในกองรอ ให้ผู้มีสิทธิ์ตามบทบาทมากดรับ
         state: PICK?'open':'pool',
-        pool: PICK?'':(st&&st.pool)||F.assignTo||'',
+        pool: PICK?'':(approval().position||(st&&st.pool)||F.assignTo||''),
         step:2,
         fromUid:u.uid, fromName:sub.submitterName,
         createdAt:firebase.firestore.FieldValue.serverTimestamp(),
