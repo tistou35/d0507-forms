@@ -47,7 +47,10 @@ dialog .df{padding:14px 22px;border-top:1px solid var(--g-100);display:flex;gap:
 "use strict";
 const REG=@@REG@@, DEFS=@@DEFS@@, A=D0507;
 const code=new URLSearchParams(location.search).get('c')||'';
-const F=REG.forms.find(f=>f.abbr===code);
+/* หน้านี้ฝังเฉพาะฟอร์มสาธารณะ (7 ใบ) ทะเบียนเต็มอยู่ Firestore อ่านได้เฉพาะเจ้าหน้าที่
+   ฟอร์มของเจ้าหน้าที่อีก 12 ใบจึงต้องรอ hydrate ก่อน ไม่งั้นขึ้น "ไม่พบฟอร์มนี้"
+   ทั้งที่นิยามฟอร์มมีครบและ publish แล้ว */
+let F=REG.forms.find(f=>f.abbr===code);
 const DEF=DEFS[code];
 let FK=null, DIR=[], PICK='';   // DIR = รายชื่อผู้รับฟอร์ม · PICK = คนที่เลือกไว้
 
@@ -76,13 +79,24 @@ async function loadDir(){
   }catch(e){ DIR=[]; }
 }
 A.reg = REG;
-A.initAuth(@@FBCFG@@, boot); boot();
+/* ยังไม่เจอในชุดสาธารณะ = อาจเป็นฟอร์มของเจ้าหน้าที่ — ดึงทะเบียนเต็มมาหาอีกที
+   ต้องรอ login ให้เสร็จก่อน rule ถึงจะยอมให้อ่าน registry/current */
+let looked=false;
+async function findInFull(){
+  if(!F){ await A.hydrate(); F = A.reg.forms.find(f=>f.abbr===code) || null; }
+  looked=true;
+}
+A.initAuth(@@FBCFG@@, async ()=>{ await findInFull(); boot(); });
+boot();
 // เปลี่ยนภาษาแล้ว render ใหม่ทั้งใบ — ข้อมูลที่กรอกไว้อยู่ใน FK.data ไม่หาย
 A.onLang.push(()=>{ if(FK) FK.lang=A.lang; boot(); });
 
 function boot(){
   const head=document.getElementById('head');
-  if(!F){ head.innerHTML=`<div class="warn"><b>${A.esc(A.t('notFound'))}</b></div>`; return; }
+  // ยังไม่ได้ลองดึงทะเบียนเต็ม อย่าเพิ่งบอกว่าไม่มี — เดี๋ยวขึ้นแล้วหายวูบ
+  if(!F){ head.innerHTML = looked
+      ? `<div class="warn"><b>${A.esc(A.t('notFound'))}</b></div>`
+      : `<div class="warn">${A.esc(A.t('loading'))}</div>`; return; }
   head.innerHTML=`<div class="fhero"><div class="band">
       <p class="o">D-0507 Flight Training Co., Ltd.</p><h1>${A.esc(A.nm(F))}</h1>
       <p class="en">${A.esc(A.lang==='en'?(F.th||''):(F.t||''))}</p></div>
