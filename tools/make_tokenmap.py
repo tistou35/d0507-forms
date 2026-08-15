@@ -163,6 +163,34 @@ def build(abbr, verbose=False):
                               'label': (o.get('n') or {}).get('en') or o['v']})
             continue
 
+        # เกรด 1–5 — กระดาษพิมพ์เป็น ☐ ห้าช่องต่อหนึ่งหัวข้อ แล้วมีช่องเขียนเกรดต่อท้าย
+        if f.get('type') == 'grade':
+            for n in range(1, (f.get('max') or 5) + 1):
+                boxes.append({'tok': '{{k_%s_%s}}' % (f['k'], n),
+                              'label': '%s = %d' % ((f.get('label') or {}).get('en') or f['k'], n)})
+            continue
+
+        # ตารางให้คะแนน — หนึ่งข้อได้ ☐ เท่าจำนวนคอลัมน์ เรียงซ้ายไปขวาเหมือนกระดาษ
+        if f.get('type') == 'checklist':
+            opts = f.get('opts') or [{'v': 'S'}, {'v': 'U'}, {'v': 'NA'}]
+            for it in f.get('items') or []:
+                for o in opts:
+                    boxes.append({'tok': '{{k_%s_%s_%s}}' % (f['k'], it['id'], o['v']),
+                                  'label': '%s · %s' % (it.get('en') or it['id'],
+                                                        (o.get('n') or {}).get('en') or o['v'])})
+            continue
+
+        # แถวซ้ำ — token ต่อช่อง ต่อแถว ตามที่ flatten_ แตกไว้ฝั่ง Apps Script
+        if f.get('type') == 'table':
+            for r in range(1, (f.get('rows') or 1) + 1):
+                for c in f.get('cols') or []:
+                    unmatched.append({
+                        'tok': '{{%s_%d_%s}}' % (f['k'], r, c['k']),
+                        'label': '%s แถว %d · %s' % ((f.get('label') or {}).get('en') or f['k'],
+                                                     r, (c.get('label') or {}).get('en') or c['k']),
+                        'labelTh': '', 'sign': False})
+            continue
+
         lab_en, lab_th = (f.get('label') or {}).get('en'), (f.get('label') or {}).get('th')
         en, th = norm(lab_en), norm(lab_th)
         anchor = field_anchor(f)

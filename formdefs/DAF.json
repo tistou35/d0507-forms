@@ -1,0 +1,149 @@
+{
+  "code": "DAF",
+  "doc": "D-0507-DAF-001",
+  "control": "AD-DAF-301-A",
+  "issue": "01",
+  "rev": "00",
+  "eff": "14 SEP 2022",
+  "title": { "th": "แบบบันทึกการดำเนินการทางวินัย", "en": "Disciplinary Action Form" },
+  "retain": "OMA A.10",
+
+  "ui": {
+    "compact": true,
+    "tabs": [
+      { "k": "T1", "th": "ผู้ถูกดำเนินการ", "en": "Subject" },
+      { "k": "T2", "th": "การกระทำผิด", "en": "Infringement" },
+      { "k": "T3", "th": "โทษและลงนาม", "en": "Action & sign" }
+    ]
+  },
+
+  "parties": [
+    { "k": "mgr", "n": { "th": "ผู้บังคับบัญชา", "en": "Issuing manager" }, "auth": "role:mgt" },
+    { "k": "acm", "n": { "th": "ผู้จัดการฝ่ายรับผิดชอบ", "en": "Accountable Manager" }, "auth": "role:mgt" }
+  ],
+
+  "sections": [
+    {
+      "k": "A", "tab": "T1", "party": "mgr",
+      "title": { "th": "ผู้ถูกดำเนินการ", "en": "Subject details" },
+      "desc": {
+        "th": "เอกสารลับ — เข้าถึงได้เฉพาะผู้มีอำนาจหน้าที่ เก็บแยกจากแฟ้มฝึกอบรมปกติ",
+        "en": "CONFIDENTIAL disciplinary record. Access restricted to authorised personnel only." },
+      "fields": [
+        { "k": "subName", "type": "text", "req": true, "half": true,
+          "label": { "th": "ชื่อ-นามสกุล", "en": "Full name" } },
+        { "k": "subId", "type": "text", "req": true, "half": true,
+          "label": { "th": "เลขบัตรประชาชน / เลขใบอนุญาต", "en": "ID / Licence No." } },
+        { "k": "recDate", "type": "date", "req": true, "prefill": "today", "half": true,
+          "label": { "th": "วันที่บันทึก", "en": "Date of record" } },
+        { "k": "subRole", "type": "text", "req": true, "half": true,
+          "label": { "th": "ตำแหน่ง", "en": "Role / position" } },
+        { "k": "subDept", "type": "text", "half": true,
+          "label": { "th": "หน่วยงาน", "en": "Department" } },
+        { "k": "incDate", "type": "date", "req": true, "half": true,
+          "label": { "th": "วันที่เกิดเหตุ", "en": "Incident date" } }
+      ]
+    },
+    {
+      "k": "B", "tab": "T2", "party": "mgr",
+      "title": { "th": "การกระทำผิด", "en": "Infringement" },
+      "fields": [
+        { "k": "infCat", "type": "multi", "req": true,
+          "label": { "th": "ประเภทการกระทำผิด", "en": "Category of infringement" },
+          "opt": [
+            { "v": "sop",       "n": { "th": "ฝ่าฝืน SOP หรือขั้นตอนปฏิบัติ", "en": "Breach of SOP / procedure" } },
+            { "v": "caat",      "n": { "th": "ฝ่าฝืนกฎ CAAT", "en": "Violation of CAAT regulation" } },
+            { "v": "unsafe",    "n": { "th": "การกระทำที่ไม่ปลอดภัย", "en": "Unsafe act" } },
+            { "v": "misconduct","n": { "th": "ประพฤติมิชอบ", "en": "Misconduct" } },
+            { "v": "negligence","n": { "th": "ประมาทเลินเล่อ", "en": "Negligence" } },
+            { "v": "insub",     "n": { "th": "ขัดคำสั่งผู้บังคับบัญชา", "en": "Insubordination" } },
+            { "v": "dishonesty","n": { "th": "ทุจริต / ปลอมแปลงเอกสาร", "en": "Dishonesty / falsification" } },
+            { "v": "other",     "n": { "th": "อื่น ๆ", "en": "Other" } } ] },
+        { "k": "infOther", "type": "text", "showIf": "infCat has 'other'", "reqIf": "infCat has 'other'",
+          "label": { "th": "ระบุประเภทอื่น", "en": "Other — specify" } },
+        { "k": "infRef", "type": "text",
+          "label": { "th": "อ้างอิง (กฎ / SOP / นโยบาย)", "en": "Reference (regulation / SOP / policy)" } },
+        { "k": "account", "type": "textarea", "req": true,
+          "label": { "th": "เล่าเหตุการณ์ตามข้อเท็จจริงเรียงตามลำดับเวลา",
+                     "en": "Provide a factual and chronological account of the incident or behaviour" } }
+      ]
+    },
+    {
+      "k": "C", "tab": "T3", "party": "mgr",
+      "title": { "th": "โทษทางวินัย", "en": "Disciplinary action" },
+      "fields": [
+        { "k": "actLevel", "type": "select", "req": true,
+          "label": { "th": "ระดับโทษ", "en": "Action level" },
+          "opt": [
+            { "v": "verbal",    "n": { "th": "ตักเตือนด้วยวาจา", "en": "Verbal warning" } },
+            { "v": "written",   "n": { "th": "ตักเตือนเป็นลายลักษณ์อักษร", "en": "Written warning" } },
+            { "v": "suspend",   "n": { "th": "พักงาน", "en": "Suspension" } },
+            { "v": "terminate", "n": { "th": "เลิกจ้าง / พ้นสภาพ", "en": "Termination / expulsion" } },
+            { "v": "training",  "n": { "th": "ต้องอบรมเพิ่มเติม", "en": "Additional training required" } },
+            { "v": "licence",   "n": { "th": "เสนอ CAAT พักใช้ใบอนุญาต", "en": "Licence suspension request to CAAT" } },
+            { "v": "other",     "n": { "th": "อื่น ๆ", "en": "Other" } } ] },
+        { "k": "suspendDays", "type": "number", "min": 1, "showIf": "actLevel == 'suspend'",
+          "reqIf": "actLevel == 'suspend'", "half": true,
+          "label": { "th": "จำนวนวันที่พักงาน", "en": "Suspension (days)" } },
+        { "k": "actOther", "type": "text", "showIf": "actLevel == 'other'", "reqIf": "actLevel == 'other'",
+          "label": { "th": "ระบุโทษอื่น", "en": "Other — specify" } },
+        { "k": "effDate", "type": "date", "req": true, "half": true,
+          "label": { "th": "วันที่มีผล", "en": "Effective date" } },
+        { "k": "duration", "type": "text", "half": true,
+          "label": { "th": "ระยะเวลา (ถ้ามี)", "en": "Duration (if applicable)" } },
+        { "k": "appealBy", "type": "date", "req": true, "half": true,
+          "label": { "th": "ยื่นอุทธรณ์ได้ถึงวันที่", "en": "Right of appeal deadline" } },
+        { "k": "reviewBy", "type": "text", "half": true,
+          "label": { "th": "ผู้ทบทวน", "en": "Reviewed by" } },
+        { "k": "remark", "type": "textarea",
+          "label": { "th": "หมายเหตุ / เงื่อนไขพิเศษ", "en": "Remarks / special conditions" } }
+      ]
+    },
+    {
+      "k": "D", "tab": "T3", "party": "mgr",
+      "title": { "th": "การรับทราบและลงนาม", "en": "Acknowledgement and signature" },
+      "fields": [
+        { "k": "ackNote", "type": "static",
+          "label": { "th": "ผู้ถูกดำเนินการรับทราบการกระทำผิดและโทษที่ได้รับ และเข้าใจว่ามีสิทธิอุทธรณ์ภายใน 14 วัน",
+                     "en": "The subject acknowledges the infringement and the action imposed, and understands the right to appeal within fourteen (14) days." } },
+        { "k": "subSign", "type": "sign", "req": true,
+          "label": { "th": "ลายเซ็นผู้ถูกดำเนินการ", "en": "Subject signature" } },
+        { "k": "mgrName", "type": "text", "req": true, "half": true,
+          "label": { "th": "ผู้ออกคำสั่ง", "en": "Issued by (manager)" } },
+        { "k": "mgrDate", "type": "date", "req": true, "prefill": "today", "half": true,
+          "label": { "th": "วันที่", "en": "Date" } },
+        { "k": "mgrSign", "type": "sign", "req": true,
+          "label": { "th": "ลายเซ็นผู้ออกคำสั่ง", "en": "Issuing manager signature" } }
+      ]
+    },
+    {
+      "k": "E", "tab": "T3", "party": "acm", "hideOthers": true,
+      "title": { "th": "รับรองโดยผู้จัดการฝ่ายรับผิดชอบ", "en": "Accountable Manager endorsement" },
+      "fields": [
+        { "k": "acmName", "type": "text", "req": true, "half": true,
+          "label": { "th": "ชื่อผู้จัดการฝ่ายรับผิดชอบ", "en": "Accountable Manager name" } },
+        { "k": "acmDate", "type": "date", "req": true, "half": true,
+          "label": { "th": "วันที่รับรอง", "en": "Date endorsed" } },
+        { "k": "acmComment", "type": "textarea",
+          "label": { "th": "ความเห็น", "en": "Comment" } },
+        { "k": "acmSign", "type": "sign", "req": true,
+          "label": { "th": "ลายเซ็นผู้จัดการฝ่ายรับผิดชอบ", "en": "Accountable Manager signature" } }
+      ]
+    }
+  ],
+
+  "gates": [
+    { "when": "actLevel == 'terminate' || actLevel == 'licence'", "level": "warn",
+      "short": { "th": "โทษร้ายแรง", "en": "SEVERE" },
+      "msg": { "th": "โทษระดับนี้ต้องผ่านการรับรองจากผู้จัดการฝ่ายรับผิดชอบก่อนมีผล และต้องแจ้ง CAAT ตามที่กฎกำหนด",
+               "en": "This action requires Accountable Manager endorsement before it takes effect, and CAAT notification where required." } }
+  ],
+
+  "route": [
+    { "step": 1, "party": "mgr", "sign": true },
+    { "step": 2, "party": "acm", "sign": true, "assignedBy": "later", "pool": "ACM",
+      "canDelegate": true, "slaDays": 5 }
+  ],
+
+  "export": { "docx": "D-0507-DAF-001.docx", "lockUntilComplete": true }
+}

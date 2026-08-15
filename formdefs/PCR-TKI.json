@@ -1,0 +1,155 @@
+{
+  "code": "PCR-TKI",
+  "doc": "D-0507-PCR-TKI-001",
+  "control": "IM-PCR-TKI-302-A",
+  "issue": "01",
+  "rev": "01",
+  "eff": "06 JUN 2026",
+  "title": { "th": "บันทึกการตรวจสมรรถนะครูภาคทฤษฎี",
+             "en": "In-House Proficiency Check Record — Theoretical Knowledge Instructor" },
+  "retain": "OMA A.10",
+
+  "ui": {
+    "compact": true,
+    "tabs": [
+      { "k": "T1", "th": "ข้อมูลการตรวจ", "en": "Check details" },
+      { "k": "T2", "th": "การประเมิน", "en": "Evaluation" },
+      { "k": "T3", "th": "ผลและลงนาม", "en": "Outcome & sign" }
+    ]
+  },
+
+  "parties": [
+    { "k": "con", "n": { "th": "ผู้ทำการตรวจ (HT / CFI / CTKI)", "en": "Conductor (HT / CFI / CTKI)" }, "auth": "role:mgt" },
+    { "k": "tki", "n": { "th": "ครูภาคทฤษฎีผู้รับการตรวจ", "en": "Theoretical Knowledge Instructor" }, "auth": "role:ins" }
+  ],
+
+  "sections": [
+    {
+      "k": "A", "tab": "T1", "party": "con",
+      "title": { "th": "ข้อมูลครูและการตรวจ", "en": "Instructor and check details" },
+      "desc": {
+        "th": "บันทึกผลการตรวจ IPC ภายในของครูภาคทฤษฎี (Tier 1 ตาม OMA D.2.9) · ผลไม่ผ่านจะเปิดการอบรมแก้ไขมาตรฐานตาม D.2.8",
+        "en": "Records TKI in-house IPC outcomes (Tier 1, OMA D.2.9). A fail outcome initiates D.2.8 corrective standardisation." },
+      "fields": [
+        { "k": "insName", "type": "text", "req": true, "half": true,
+          "label": { "th": "ชื่อครูภาคทฤษฎี", "en": "Instructor name" } },
+        { "k": "certNo", "type": "text", "req": true, "half": true,
+          "label": { "th": "เลขที่ใบรับรอง CAAT", "en": "CAAT certificate No." } },
+        { "k": "checkDate", "type": "date", "req": true, "prefill": "today", "half": true,
+          "label": { "th": "วันที่ตรวจ", "en": "Date of check" } },
+        { "k": "duration", "type": "number", "req": true, "min": 0, "step": 0.1, "half": true,
+          "label": { "th": "ระยะเวลา (ชม.)", "en": "Duration (hrs)" } },
+        { "k": "conductor", "type": "text", "req": true, "half": true,
+          "label": { "th": "ผู้ทำการตรวจ (HT / CFI / CTKI)", "en": "Conductor (HT / CFI / CTKI)" } },
+        { "k": "ipcType", "type": "select", "req": true, "half": true,
+          "label": { "th": "ประเภท IPC", "en": "IPC type" },
+          "opt": [
+            { "v": "annual",   "n": { "th": "IPC ประจำปี", "en": "Annual IPC" } },
+            { "v": "initial",  "n": { "th": "IPC แรกเข้า", "en": "Initial IPC" } },
+            { "v": "postcor",  "n": { "th": "IPC หลังการแก้ไขมาตรฐาน", "en": "Post-corrective IPC" } },
+            { "v": "postabs",  "n": { "th": "IPC หลังหยุดปฏิบัติหน้าที่", "en": "Post-absence IPC" } },
+            { "v": "directed", "n": { "th": "IPC ตามคำสั่ง", "en": "Directed IPC" } } ] },
+        { "k": "subject", "type": "text", "req": true, "half": true,
+          "label": { "th": "วิชา / โมดูลที่สอน", "en": "Subject / module taught" } },
+        { "k": "venue", "type": "text", "req": true, "half": true,
+          "label": { "th": "สถานที่ / ห้องเรียน", "en": "Venue / classroom" } },
+        { "k": "students", "type": "number", "min": 0, "half": true,
+          "label": { "th": "จำนวนนักเรียนในชั้น", "en": "No. of students in class" } }
+      ]
+    },
+    {
+      "k": "B", "tab": "T2", "party": "con",
+      "title": { "th": "การประเมินครูภาคทฤษฎี", "en": "Theoretical Knowledge Instructor evaluation" },
+      "desc": {
+        "th": "เกณฑ์การให้คะแนนตาม IM-ECA-301-A · ★ = การถ่ายทอดเนื้อหาที่เกี่ยวกับความปลอดภัย เกรด 1 หรือ 2 = ไม่ผ่านทันที · เกณฑ์ผ่าน คือเกรด 3 ขึ้นไปทุกข้อ",
+        "en": "Grading per IM-ECA-301-A. ★ = delivery of safety-critical content: grade 1 or 2 is an automatic fail. Pass standard: grade 3+ in ALL areas." },
+      "fields": [
+        { "k": "g1", "type": "grade", "max": 5, "req": true,
+          "label": { "th": "การวางแผนบทเรียน", "en": "Lesson planning" } },
+        { "k": "g2", "type": "grade", "max": 5, "req": true, "star": true,
+          "label": { "th": "การถ่ายทอด (รวมเนื้อหาด้านความปลอดภัย)", "en": "Delivery (including safety-critical content)" } },
+        { "k": "g3", "type": "grade", "max": 5, "req": true,
+          "label": { "th": "การมีส่วนร่วมของนักเรียน", "en": "Student engagement" } },
+        { "k": "g4", "type": "grade", "max": 5, "req": true,
+          "label": { "th": "การวัดและประเมินผล", "en": "Assessment" } },
+        { "k": "g5", "type": "grade", "max": 5, "req": true,
+          "label": { "th": "การบริหารชั้นเรียน", "en": "Classroom management" } },
+        { "k": "g6", "type": "grade", "max": 5, "req": true,
+          "label": { "th": "การจัดทำเอกสาร", "en": "Documentation" } }
+      ]
+    },
+    {
+      "k": "C", "tab": "T3", "party": "con",
+      "title": { "th": "ผลการตรวจ", "en": "Outcome" },
+      "fields": [
+        { "k": "result", "type": "select", "req": true,
+          "label": { "th": "ผล", "en": "Result" },
+          "opt": [
+            { "v": "pass",     "n": { "th": "ผ่าน", "en": "Pass" } },
+            { "v": "marginal", "n": { "th": "ผ่านแบบมีเงื่อนไข", "en": "Marginal pass" } },
+            { "v": "fail",     "n": { "th": "ไม่ผ่าน", "en": "Fail" } },
+            { "v": "unsat",    "n": { "th": "ต่ำกว่าเกณฑ์อย่างมาก", "en": "Unsatisfactory" } } ] },
+        { "k": "remarks", "type": "textarea",
+          "label": { "th": "ความเห็นผู้ตรวจ / ข้อที่ควรปรับปรุง", "en": "Conductor remarks / areas for improvement" } },
+        { "k": "followup", "type": "textarea", "reqIf": "result == 'marginal' || result == 'fail' || result == 'unsat'",
+          "label": { "th": "การติดตามผลที่ต้องทำ", "en": "Follow-up action required" } },
+        { "k": "recheckDue", "type": "date", "half": true,
+          "label": { "th": "กำหนดตรวจซ้ำ (ถ้ามี)", "en": "Re-check due date (if applicable)" } },
+        { "k": "correctiveInit", "type": "select",
+          "opt": [
+            { "v": "yes", "n": { "th": "ใช่", "en": "Yes" } },
+            { "v": "no",  "n": { "th": "ไม่ใช่", "en": "No" } } ],
+          "label": { "th": "เปิดการอบรมแก้ไขมาตรฐานตาม D.2.8 แล้ว", "en": "D.2.8 corrective standardisation initiated" } },
+        { "k": "htNotified", "type": "date", "showIf": "correctiveInit == 'yes'", "half": true,
+          "label": { "th": "วันที่แจ้งหัวหน้าครูฝึก", "en": "Date notified to HT" } }
+      ]
+    },
+    {
+      "k": "D", "tab": "T3", "party": "con",
+      "title": { "th": "ลงนามผู้ตรวจ", "en": "Conductor signature" },
+      "fields": [
+        { "k": "conName", "type": "text", "req": true, "half": true,
+          "label": { "th": "ชื่อผู้ตรวจ", "en": "Conductor name" } },
+        { "k": "conDate", "type": "date", "req": true, "prefill": "today", "half": true,
+          "label": { "th": "วันที่", "en": "Date" } },
+        { "k": "conSign", "type": "sign", "req": true,
+          "label": { "th": "ลายเซ็นผู้ตรวจ", "en": "Conductor signature" } }
+      ]
+    },
+    {
+      "k": "E", "tab": "T3", "party": "tki", "hideOthers": true,
+      "title": { "th": "ครูภาคทฤษฎีรับทราบ", "en": "Instructor acknowledgement" },
+      "fields": [
+        { "k": "tkiAckName", "type": "text", "req": true, "half": true,
+          "label": { "th": "ชื่อครูภาคทฤษฎี", "en": "Instructor name" } },
+        { "k": "tkiAckDate", "type": "date", "req": true, "half": true,
+          "label": { "th": "วันที่", "en": "Date" } },
+        { "k": "tkiSign", "type": "sign", "req": true,
+          "label": { "th": "ลายเซ็นครูภาคทฤษฎี", "en": "Instructor signature" } }
+      ]
+    }
+  ],
+
+  "compute": [
+    { "k": "total", "op": "sum", "of": ["g1", "g2", "g3", "g4", "g5", "g6"] },
+    { "k": "pct", "op": "pct", "of": "total", "max": 30 }
+  ],
+
+  "gates": [
+    { "when": "anyStarBelow(3)", "level": "stop",
+      "short": { "th": "ไม่ผ่าน — ข้อความปลอดภัย", "en": "SAFETY FAIL" },
+      "msg": { "th": "ไม่ผ่าน — การถ่ายทอดเนื้อหาด้านความปลอดภัยได้เกรดต่ำกว่า 3 ถือว่าไม่ผ่านทันที แม้คะแนนรวมจะถึงเกณฑ์",
+               "en": "Automatic fail — delivery of safety-critical content graded below 3 fails the check regardless of total score." } },
+    { "when": "anyBelow(3)", "level": "warn",
+      "short": { "th": "มีข้อต่ำกว่าเกณฑ์", "en": "BELOW STD" },
+      "msg": { "th": "เกณฑ์ผ่านคือเกรด 3 ขึ้นไปทุกข้อ — มีข้อที่ต่ำกว่าเกณฑ์ ให้พิจารณาผลเป็น Marginal Pass หรือ Fail ตามกรอบใน OMA D.2.9",
+               "en": "Pass standard is grade 3+ in every area. Determine Marginal Pass or Fail per the OMA D.2.9 outcome framework." } }
+  ],
+
+  "route": [
+    { "step": 1, "party": "con", "sign": true },
+    { "step": 2, "party": "tki", "sign": true, "assignedBy": "submitter", "slaDays": 2 }
+  ],
+
+  "export": { "docx": "D-0507-PCR-TKI-001.docx", "lockUntilComplete": true }
+}

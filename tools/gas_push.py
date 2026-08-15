@@ -94,8 +94,41 @@ def push(only=None):
     print('\nส่งขึ้นแล้ว %d ไฟล์' % len(files))
 
 
+def deploy(note=''):
+    """สร้าง version ใหม่แล้วชี้ deployment เดิมมาที่ version นั้น
+
+    ต้องเป็น deployment เดิมเท่านั้น — สร้างใหม่ URL จะเปลี่ยน
+    แล้ว GAS_URL ที่ฝังอยู่ในทุกหน้าเว็บจะชี้ไปที่เก่าทันที
+    """
+    ver = api('POST', SCRIPT_ID + '/versions',
+              {'description': note or 'deploy'})['versionNumber']
+    print('สร้าง version %s' % ver)
+
+    deps = api('GET', SCRIPT_ID + '/deployments').get('deployments', [])
+    live = [d for d in deps
+            if (d.get('deploymentConfig') or {}).get('versionNumber') is not None]
+    if not live:
+        sys.exit('ไม่พบ deployment เดิม — ต้องสร้างครั้งแรกในเว็บก่อน')
+    if len(live) > 1:
+        print('⚠️ มี deployment มากกว่าหนึ่ง จะอัปเดตทุกตัว:')
+
+    for d in live:
+        cfg = d['deploymentConfig']
+        api('PUT', SCRIPT_ID + '/deployments/' + d['deploymentId'],
+            {'deploymentConfig': {
+                'scriptId': SCRIPT_ID, 'versionNumber': ver,
+                'manifestFileName': cfg.get('manifestFileName', 'appsscript'),
+                'description': note or cfg.get('description', '')}})
+        url = next((e['entryPointType'] == 'WEB_APP' and e['webApp']['url']
+                    for e in d.get('entryPoints', [])
+                    if e.get('entryPointType') == 'WEB_APP'), None)
+        print('  %s → version %s' % (d['deploymentId'][:24] + '…', ver))
+        if url: print('  %s' % url)
+
+
 if __name__ == '__main__':
     cmd = sys.argv[1] if len(sys.argv) > 1 else 'pull'
     if cmd == 'pull': pull()
     elif cmd == 'push': push(sys.argv[2:] or None)
-    else: sys.exit('ใช้: gas_push.py pull|push [ชื่อไฟล์...]')
+    elif cmd == 'deploy': deploy(' '.join(sys.argv[2:]))
+    else: sys.exit('ใช้: gas_push.py pull|push [ชื่อไฟล์...]|deploy [คำอธิบาย]')

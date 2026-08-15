@@ -184,8 +184,25 @@ function flatten_(data) {
   Object.keys(data).forEach(function (k) {
     var v = data[k];
     if (v === null || v === undefined) { out[k] = ''; return; }
+
+    /* ตารางแถวซ้ำ — แตกเป็น <key>_<แถว>_<คอลัมน์> เริ่มนับที่ 1 ให้ตรงเลขแถวบนกระดาษ
+       ถ้าปล่อยเป็นก้อนเดียว DRC จะได้เอกสารทั้งแปดบรรทัดยัดในช่องเดียว */
+    if (Array.isArray(v) && v.length && typeof v[0] === 'object') {
+      v.forEach(function (row, i) {
+        Object.keys(row || {}).forEach(function (c) {
+          var cv = row[c];
+          out[k + '_' + (i + 1) + '_' + c] = typeof cv === 'string' ? docDate_(cv) : (cv == null ? '' : cv);
+        });
+      });
+      out[k] = v.length;                       // ไว้ใช้เป็นจำนวนแถวที่กรอกจริง
+      return;
+    }
     if (Array.isArray(v)) { out[k] = v.join(', '); return; }
+
+    /* checklist — แตกเป็น <key>_<ข้อ> เพื่อให้แม่แบบอ้างทีละข้อได้
+       ส่วนช่องติ๊กของแต่ละข้อสร้างใน ticks_ */
     if (typeof v === 'object') {
+      Object.keys(v).forEach(function (i) { out[k + '_' + i] = v[i]; });
       out[k] = Object.keys(v).map(function (i) { return i + '=' + v[i]; }).join(' · ');
       return;
     }
@@ -263,10 +280,21 @@ function ticks_(data) {
   Object.keys(data).forEach(function (k) {
     var v = data[k];
     if (typeof v === 'boolean') { out['k_' + k] = v ? TICK : BOX; return; }
+    // เกรดเก็บเป็นตัวเลข ไม่ใช่สตริง — ถ้าเช็คแค่ string ช่องติ๊กเกรดของ PCR จะว่างทั้งใบ
+    if (typeof v === 'number') { out['k_' + k + '_' + v] = TICK; return; }
     if (typeof v === 'string' && v && v.indexOf('data:image') !== 0) {
       out['k_' + k + '_' + v] = TICK;               // ตัวที่เลือก
     }
-    if (Array.isArray(v)) v.forEach(function (x) { out['k_' + k + '_' + x] = TICK; });
+    if (Array.isArray(v)) v.forEach(function (x) {
+      if (typeof x !== 'object') out['k_' + k + '_' + x] = TICK;
+    });
+    /* checklist — หนึ่งข้อหนึ่งแถว หลายคอลัมน์ ต้องได้ ☑ ตรงคอลัมน์ที่เลือก
+       token: k_<field>_<ข้อ>_<ค่า>  เช่น k_teach_TheCourseAsA_excellent */
+    if (v && typeof v === 'object' && !Array.isArray(v)) {
+      Object.keys(v).forEach(function (i) {
+        if (v[i]) out['k_' + k + '_' + i + '_' + v[i]] = TICK;
+      });
+    }
   });
   return out;
 }

@@ -21,7 +21,8 @@
 
 /* ใบที่จะทำเมื่อกด Run โดยไม่เลือกฟังก์ชัน — เมนูเลือกฟังก์ชันในเว็บกดยาก
    แก้บรรทัดนี้แล้ว push ใหม่ ง่ายและแน่นอนกว่า */
-var RUN_LIST = ['VSR', 'PWR', 'HIF'];
+var RUN_LIST = ['APF', 'ASF', 'DAF', 'DRC', 'DRF', 'EFC', 'EFM', 'FTR',
+                'MOC', 'PCR-FI', 'PCR-TKI', 'RTR', 'SEF', 'STR'];
 
 function importTemplate(abbr) {
   if (!abbr) return RUN_LIST.map(function (a) { return importTemplate(a); });

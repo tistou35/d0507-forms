@@ -1,0 +1,121 @@
+{
+  "code": "DRF",
+  "doc": "D-0507-DRF-001",
+  "control": "QA-DRF-301-A",
+  "issue": "01",
+  "rev": "00",
+  "eff": "20 AUG 2020",
+  "title": { "th": "แบบขอแก้ไขเอกสารควบคุม", "en": "Document Revision Form" },
+  "retain": "OMA A.10",
+
+  "ui": {
+    "compact": true,
+    "tabs": [
+      { "k": "T1", "th": "ผู้ขอแก้ไข", "en": "Requester" },
+      { "k": "T2", "th": "เนื้อหาที่ขอแก้", "en": "Change" },
+      { "k": "T3", "th": "เหตุผลและอนุมัติ", "en": "Reason & approval" }
+    ]
+  },
+
+  "parties": [
+    { "k": "req", "n": { "th": "ผู้ขอแก้ไข", "en": "Requester" }, "auth": "public" },
+    { "k": "qm",  "n": { "th": "ผู้จัดการฝ่ายควบคุมคุณภาพ", "en": "Compliance Monitoring Manager" }, "auth": "role:mgt" }
+  ],
+
+  "sections": [
+    {
+      "k": "A", "tab": "T1", "party": "req",
+      "title": { "th": "ผู้ขอแก้ไข", "en": "Requester" },
+      "fields": [
+        { "k": "reqNo", "type": "text", "half": true,
+          "label": { "th": "เลขที่คำขอ", "en": "Request No." },
+          "hint": { "th": "เว้นว่างได้ ฝ่ายควบคุมคุณภาพจะออกเลขให้", "en": "Leave blank — QA will assign." } },
+        { "k": "reqDate", "type": "date", "req": true, "prefill": "today", "half": true,
+          "label": { "th": "วันที่", "en": "Date" } },
+        { "k": "reqBy", "type": "text", "req": true, "half": true,
+          "label": { "th": "ผู้ขอแก้ไข", "en": "Requested by" } },
+        { "k": "reqDept", "type": "text", "req": true, "half": true,
+          "label": { "th": "หน่วยงาน", "en": "Department" } }
+      ]
+    },
+    {
+      "k": "B", "tab": "T2", "party": "req",
+      "title": { "th": "เอกสารที่ขอแก้ไข", "en": "Document affected" },
+      "fields": [
+        { "k": "docTitle", "type": "text", "req": true, "half": true,
+          "label": { "th": "ชื่อเอกสาร", "en": "Document title" } },
+        { "k": "docCode", "type": "text", "req": true, "half": true,
+          "label": { "th": "รหัสเอกสาร", "en": "Document code" } },
+        { "k": "curRev", "type": "text", "req": true, "half": true,
+          "label": { "th": "Issue / Rev ปัจจุบัน", "en": "Current issue / rev." } },
+        { "k": "sectionAff", "type": "text", "req": true, "half": true,
+          "label": { "th": "หัวข้อ / หน้าที่เกี่ยวข้อง", "en": "Section / page affected" } },
+        { "k": "changeType", "type": "select", "req": true,
+          "label": { "th": "ลักษณะการแก้ไข", "en": "Type of change" },
+          "opt": [
+            { "v": "minor",    "n": { "th": "แก้ไขเล็กน้อย", "en": "Minor correction" } },
+            { "v": "major",    "n": { "th": "แก้ไขสาระสำคัญ", "en": "Major revision" } },
+            { "v": "new",      "n": { "th": "เพิ่มหัวข้อใหม่", "en": "New section" } },
+            { "v": "delete",   "n": { "th": "ยกเลิกหัวข้อ", "en": "Delete section" } },
+            { "v": "regulatory","n": { "th": "ปรับตามกฎที่เปลี่ยน", "en": "Regulatory update" } } ] },
+        { "k": "curText", "type": "textarea", "req": true,
+          "label": { "th": "ข้อความเดิม", "en": "Current text / content" },
+          "hint": { "th": "คัดลอกมาตามต้นฉบับทุกตัวอักษร ใช้เทียบตอนทำบันทึกการแก้ไข",
+                    "en": "Copy verbatim from the source — this is what the revision record compares against." } },
+        { "k": "newText", "type": "textarea", "req": true,
+          "label": { "th": "ข้อความที่เสนอแก้เป็น", "en": "Proposed text / content" } }
+      ]
+    },
+    {
+      "k": "C", "tab": "T3", "party": "req",
+      "title": { "th": "เหตุผล", "en": "Reason for change" },
+      "fields": [
+        { "k": "reason", "type": "multi", "req": true,
+          "label": { "th": "เหตุผล", "en": "Reason" },
+          "opt": [
+            { "v": "regulatory","n": { "th": "ข้อกำหนดของกฎ", "en": "Regulatory requirement" } },
+            { "v": "operational","n": { "th": "ความจำเป็นในการปฏิบัติงาน", "en": "Operational need" } },
+            { "v": "error",     "n": { "th": "แก้ไขข้อผิดพลาด", "en": "Error correction" } },
+            { "v": "practice",  "n": { "th": "ปรับตามแนวปฏิบัติที่ดี", "en": "Best practice update" } },
+            { "v": "directive", "n": { "th": "คำสั่ง CAAT", "en": "CAAT directive" } } ] },
+        { "k": "explain", "type": "textarea",
+          "label": { "th": "คำอธิบายเพิ่มเติม", "en": "Additional explanation" } },
+        { "k": "reqSign", "type": "sign", "req": true,
+          "label": { "th": "ลายเซ็นผู้ขอแก้ไข", "en": "Requester signature" } }
+      ]
+    },
+    {
+      "k": "D", "tab": "T3", "party": "qm", "hideOthers": true,
+      "title": { "th": "การทบทวนและอนุมัติ", "en": "Review and approval" },
+      "fields": [
+        { "k": "qmName", "type": "text", "req": true, "half": true,
+          "label": { "th": "ผู้ทบทวน (QM)", "en": "Reviewed by (QM)" } },
+        { "k": "qmDate", "type": "date", "req": true, "half": true,
+          "label": { "th": "วันที่ทบทวน", "en": "Date reviewed" } },
+        { "k": "approvedBy", "type": "text", "req": true, "half": true,
+          "label": { "th": "ผู้อนุมัติ", "en": "Approved by" } },
+        { "k": "newEff", "type": "date", "req": true, "half": true,
+          "label": { "th": "วันที่มีผลบังคับใช้", "en": "Effective date" } },
+        { "k": "qmComment", "type": "textarea",
+          "label": { "th": "ความเห็น", "en": "Comment" } },
+        { "k": "qmSign", "type": "sign", "req": true,
+          "label": { "th": "ลายเซ็นผู้ทบทวน", "en": "Reviewer signature" } }
+      ]
+    }
+  ],
+
+  "gates": [
+    { "when": "changeType == 'major' || changeType == 'regulatory'", "level": "warn",
+      "short": { "th": "แก้สาระสำคัญ", "en": "MAJOR" },
+      "msg": { "th": "การแก้ไขสาระสำคัญหรือแก้ตามกฎ ต้องออก Issue/Rev ใหม่และปรับ LEP ก่อนแจกจ่าย",
+               "en": "A major or regulatory change requires a new Issue/Rev and an updated LEP before distribution." } }
+  ],
+
+  "route": [
+    { "step": 1, "party": "req", "sign": true },
+    { "step": 2, "party": "qm", "sign": true, "assignedBy": "later", "pool": "CMM",
+      "canDelegate": true, "slaDays": 7 }
+  ],
+
+  "export": { "docx": "D-0507-DRF-001.docx", "lockUntilComplete": true }
+}

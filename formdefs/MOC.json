@@ -1,0 +1,224 @@
+{
+  "code": "MOC",
+  "doc": "D-0507-MOC-001",
+  "control": "D-0507-MOC-001",
+  "_effNote": "ต้นฉบับ .docx และทะเบียนไม่มีวันที่มีผลบังคับใช้ — ต้องกำหนดและลงนามก่อนประกาศใช้จริง",
+  "issue": "01",
+  "rev": "00",
+  "eff": "",
+  "title": { "th": "แบบบริหารการเปลี่ยนแปลง", "en": "Management of Change (MoC) Form" },
+  "retain": "OMA A.10",
+
+  "ui": {
+    "compact": true,
+    "tabs": [
+      { "k": "T1", "th": "การเปลี่ยนแปลง", "en": "Change" },
+      { "k": "T2", "th": "ความเสี่ยงและกฎ", "en": "Risk & compliance" },
+      { "k": "T3", "th": "เอกสารและอบรม", "en": "Documents & training" },
+      { "k": "T4", "th": "แผนและอนุมัติ", "en": "Plan & approval" }
+    ]
+  },
+
+  "parties": [
+    { "k": "sub", "n": { "th": "ผู้เสนอการเปลี่ยนแปลง", "en": "Submitter" }, "auth": "public" },
+    { "k": "sm",  "n": { "th": "ผู้จัดการนิรภัย", "en": "Safety Manager" }, "auth": "role:mgt" },
+    { "k": "acm", "n": { "th": "ผู้จัดการฝ่ายรับผิดชอบ", "en": "Accountable Manager" }, "auth": "role:mgt" }
+  ],
+
+  "sections": [
+    {
+      "k": "1", "tab": "T1", "party": "sub",
+      "title": { "th": "ระบุการเปลี่ยนแปลง", "en": "Change identification" },
+      "fields": [
+        { "k": "mocRef", "type": "text", "half": true,
+          "label": { "th": "เลขอ้างอิง MoC", "en": "MoC reference number" },
+          "hint": { "th": "เว้นว่างได้ ฝ่ายนิรภัยจะออกเลขให้", "en": "Leave blank — Safety will assign." } },
+        { "k": "subDate", "type": "date", "req": true, "prefill": "today", "half": true,
+          "label": { "th": "วันที่เสนอ", "en": "Date of submission" } },
+        { "k": "subBy", "type": "text", "req": true,
+          "label": { "th": "ผู้เสนอ (ชื่อ / ตำแหน่ง)", "en": "Submitted by (name / position)" } },
+        { "k": "category", "type": "select", "req": true, "half": true,
+          "label": { "th": "ประเภทการเปลี่ยนแปลง", "en": "Change category" },
+          "opt": [
+            { "v": "personnel", "n": { "th": "บุคลากร", "en": "Personnel" } },
+            { "v": "equipment", "n": { "th": "อุปกรณ์ / ฝูงบิน", "en": "Equipment / fleet" } },
+            { "v": "procedure", "n": { "th": "ขั้นตอนปฏิบัติ / SOP", "en": "Procedure / SOP" } },
+            { "v": "regulatory","n": { "th": "กฎระเบียบ", "en": "Regulatory" } },
+            { "v": "other",     "n": { "th": "อื่น ๆ", "en": "Other" } } ] },
+        { "k": "priority", "type": "select", "req": true, "half": true,
+          "label": { "th": "ระดับความเร่งด่วน", "en": "Priority" },
+          "opt": [
+            { "v": "routine",   "n": { "th": "ปกติ", "en": "Routine" } },
+            { "v": "urgent",    "n": { "th": "เร่งด่วน", "en": "Urgent" } },
+            { "v": "emergency", "n": { "th": "ฉุกเฉิน", "en": "Emergency" } } ] },
+        { "k": "propEff", "type": "date", "req": true, "half": true,
+          "label": { "th": "วันที่เสนอให้มีผล", "en": "Proposed effective date" } }
+      ]
+    },
+    {
+      "k": "2", "tab": "T1", "party": "sub",
+      "title": { "th": "รายละเอียดการเปลี่ยนแปลง", "en": "Description of change" },
+      "fields": [
+        { "k": "beforeState", "type": "textarea", "req": true,
+          "label": { "th": "สภาพปัจจุบัน (ก่อนเปลี่ยน)", "en": "Current state (before change)" } },
+        { "k": "afterState", "type": "textarea", "req": true,
+          "label": { "th": "สิ่งที่เสนอให้เปลี่ยนเป็น (หลังเปลี่ยน)", "en": "Proposed change (after change)" } },
+        { "k": "justification", "type": "textarea", "req": true,
+          "label": { "th": "เหตุผลความจำเป็น", "en": "Reason / justification for change" } },
+        { "k": "scope", "type": "textarea", "req": true,
+          "label": { "th": "ขอบเขตของการเปลี่ยนแปลง", "en": "Scope of change" } }
+      ]
+    },
+    {
+      "k": "3", "tab": "T2", "party": "sub",
+      "title": { "th": "การประเมินความเสี่ยงด้านนิรภัย", "en": "Safety and risk assessment" },
+      "fields": [
+        { "k": "hazards", "type": "table", "req": true, "rows": 3, "max": 15,
+          "label": { "th": "อันตราย / ความเสี่ยงที่ระบุได้", "en": "Identified hazards / risks" },
+          "cols": [
+            { "k": "hazard",     "type": "text", "w": "30%",
+              "label": { "th": "อันตราย / ความเสี่ยง", "en": "Hazard / risk" } },
+            { "k": "likelihood", "type": "text", "w": "12%",
+              "label": { "th": "โอกาสเกิด", "en": "Likelihood" } },
+            { "k": "severity",   "type": "text", "w": "12%",
+              "label": { "th": "ความรุนแรง", "en": "Severity" } },
+            { "k": "level",      "type": "text", "w": "13%",
+              "label": { "th": "ระดับความเสี่ยง", "en": "Risk level" } },
+            { "k": "mitigation", "type": "text", "w": "33%",
+              "label": { "th": "มาตรการลดความเสี่ยง", "en": "Mitigation measure" } } ] },
+        { "k": "overallRisk", "type": "select", "req": true,
+          "label": { "th": "ผลการประเมินความเสี่ยงโดยรวม", "en": "Overall risk determination" },
+          "opt": [
+            { "v": "low",      "n": { "th": "ต่ำ", "en": "Low" } },
+            { "v": "medium",   "n": { "th": "ปานกลาง", "en": "Medium" } },
+            { "v": "high",     "n": { "th": "สูง", "en": "High" } },
+            { "v": "rejected", "n": { "th": "ยอมรับไม่ได้ — ไม่อนุมัติการเปลี่ยนแปลง", "en": "Not acceptable — change rejected" } } ] }
+      ]
+    },
+    {
+      "k": "4", "tab": "T2", "party": "sub",
+      "title": { "th": "การทบทวนด้านกฎระเบียบ", "en": "Regulatory and compliance review" },
+      "fields": [
+        { "k": "regs", "type": "table", "rows": 3, "max": 10,
+          "label": { "th": "กฎหรือมาตรฐานที่เกี่ยวข้อง", "en": "Applicable regulations / standards" },
+          "cols": [
+            { "k": "reg",    "type": "text", "w": "38%",
+              "label": { "th": "กฎ / มาตรฐาน", "en": "Regulation / standard" } },
+            { "k": "ref",    "type": "text", "w": "22%",
+              "label": { "th": "อ้างอิง", "en": "Reference" } },
+            { "k": "action", "type": "text", "w": "40%",
+              "label": { "th": "สิ่งที่ต้องทำเพื่อให้เป็นไปตามกฎ", "en": "Compliance action required" } } ] },
+        { "k": "caatNotify", "type": "select",
+          "opt": [
+            { "v": "yes", "n": { "th": "ใช่", "en": "Yes" } },
+            { "v": "no",  "n": { "th": "ไม่ใช่", "en": "No" } } ],
+          "label": { "th": "ต้องแจ้ง CAAT", "en": "CAAT notification required" } },
+        { "k": "caatDate", "type": "date", "showIf": "caatNotify == 'yes'", "reqIf": "caatNotify == 'yes'", "half": true,
+          "label": { "th": "วันที่แจ้ง CAAT", "en": "Date notified to CAAT" } }
+      ]
+    },
+    {
+      "k": "5", "tab": "T3", "party": "sub",
+      "title": { "th": "เอกสารควบคุมที่ได้รับผลกระทบ", "en": "Affected controlled documents" },
+      "fields": [
+        { "k": "docsAffected", "type": "table", "rows": 4, "max": 20,
+          "label": { "th": "รายการเอกสาร", "en": "Document list" },
+          "cols": [
+            { "k": "code",   "type": "text", "w": "24%",
+              "label": { "th": "รหัสเอกสาร", "en": "Document code" } },
+            { "k": "title",  "type": "text", "w": "44%",
+              "label": { "th": "ชื่อเอกสาร", "en": "Document title" } },
+            { "k": "action", "type": "text", "w": "32%",
+              "label": { "th": "สิ่งที่ต้องแก้", "en": "Action required" } } ] }
+      ]
+    },
+    {
+      "k": "6", "tab": "T3", "party": "sub",
+      "title": { "th": "ความจำเป็นในการฝึกอบรม", "en": "Training requirements" },
+      "fields": [
+        { "k": "trainReq", "type": "select",
+          "opt": [
+            { "v": "yes", "n": { "th": "ใช่", "en": "Yes" } },
+            { "v": "no",  "n": { "th": "ไม่ใช่", "en": "No" } } ],
+          "label": { "th": "ต้องมีการฝึกอบรม", "en": "Training required" } },
+        { "k": "trainDesc", "type": "textarea", "showIf": "trainReq == 'yes'", "reqIf": "trainReq == 'yes'",
+          "label": { "th": "รายละเอียดการฝึกอบรม", "en": "Training description" } },
+        { "k": "trainWho", "type": "text", "showIf": "trainReq == 'yes'", "reqIf": "trainReq == 'yes'", "half": true,
+          "label": { "th": "กลุ่มเป้าหมาย", "en": "Target personnel" } },
+        { "k": "trainBy", "type": "date", "showIf": "trainReq == 'yes'", "reqIf": "trainReq == 'yes'", "half": true,
+          "label": { "th": "กำหนดแล้วเสร็จ", "en": "Required completion date" } }
+      ]
+    },
+    {
+      "k": "7", "tab": "T4", "party": "sub",
+      "title": { "th": "แผนการดำเนินการ", "en": "Implementation plan" },
+      "fields": [
+        { "k": "plan", "type": "table", "req": true, "rows": 5, "max": 20,
+          "label": { "th": "ขั้นตอนการดำเนินการ", "en": "Action steps" },
+          "cols": [
+            { "k": "action", "type": "text", "w": "38%",
+              "label": { "th": "การดำเนินการ / ขั้นตอน", "en": "Action / step" } },
+            { "k": "owner",  "type": "text", "w": "24%",
+              "label": { "th": "ผู้รับผิดชอบ", "en": "Responsible person" } },
+            { "k": "target", "type": "date", "w": "20%",
+              "label": { "th": "กำหนดเสร็จ", "en": "Target date" } },
+            { "k": "status", "type": "text", "w": "18%",
+              "label": { "th": "สถานะ", "en": "Status" } } ] },
+        { "k": "subSign", "type": "sign", "req": true,
+          "label": { "th": "ลายเซ็นผู้เสนอ", "en": "Submitter signature" } }
+      ]
+    },
+    {
+      "k": "8", "tab": "T4", "party": "sm", "hideOthers": true,
+      "title": { "th": "ทบทวนด้านนิรภัย", "en": "Safety review" },
+      "fields": [
+        { "k": "smName", "type": "text", "req": true, "half": true,
+          "label": { "th": "ชื่อผู้จัดการนิรภัย", "en": "Safety Manager name" } },
+        { "k": "smDate", "type": "date", "req": true, "half": true,
+          "label": { "th": "วันที่ทบทวน", "en": "Date reviewed" } },
+        { "k": "smComment", "type": "textarea",
+          "label": { "th": "ความเห็นด้านนิรภัย", "en": "Safety comment" } },
+        { "k": "smSign", "type": "sign", "req": true,
+          "label": { "th": "ลายเซ็นผู้จัดการนิรภัย", "en": "Safety Manager signature" } }
+      ]
+    },
+    {
+      "k": "9", "tab": "T4", "party": "acm", "hideOthers": true,
+      "title": { "th": "อนุมัติโดยผู้จัดการฝ่ายรับผิดชอบ", "en": "Accountable Manager approval" },
+      "fields": [
+        { "k": "acmName", "type": "text", "req": true, "half": true,
+          "label": { "th": "ชื่อผู้จัดการฝ่ายรับผิดชอบ", "en": "Accountable Manager name" } },
+        { "k": "acmDate", "type": "date", "req": true, "half": true,
+          "label": { "th": "วันที่อนุมัติ", "en": "Date approved" } },
+        { "k": "acmComment", "type": "textarea",
+          "label": { "th": "ความเห็น", "en": "Comment" } },
+        { "k": "acmSign", "type": "sign", "req": true,
+          "label": { "th": "ลายเซ็นผู้จัดการฝ่ายรับผิดชอบ", "en": "Accountable Manager signature" } }
+      ]
+    }
+  ],
+
+  "gates": [
+    { "when": "overallRisk == 'rejected'", "level": "stop",
+      "short": { "th": "ความเสี่ยงยอมรับไม่ได้", "en": "NOT ACCEPTABLE" },
+      "msg": { "th": "ความเสี่ยงอยู่ในระดับที่ยอมรับไม่ได้ — ต้องปรับมาตรการลดความเสี่ยงแล้วประเมินใหม่ก่อนเสนออนุมัติ",
+               "en": "Risk is not acceptable — revise the mitigation measures and reassess before submitting for approval." } },
+    { "when": "overallRisk == 'high'", "level": "warn",
+      "short": { "th": "ความเสี่ยงสูง", "en": "HIGH RISK" },
+      "msg": { "th": "ความเสี่ยงสูง — ต้องผ่านการทบทวนของผู้จัดการนิรภัยและอนุมัติโดยผู้จัดการฝ่ายรับผิดชอบก่อนเริ่มดำเนินการ",
+               "en": "High risk — requires Safety Manager review and Accountable Manager approval before implementation." } },
+    { "when": "priority == 'emergency'", "level": "info",
+      "msg": { "th": "การเปลี่ยนแปลงฉุกเฉิน — ดำเนินการก่อนได้ แต่ต้องบันทึกและเสนอให้ครบวงจรอนุมัติย้อนหลังโดยไม่ชักช้า",
+               "en": "Emergency change — may proceed first, but must be recorded and taken through the full approval cycle without delay." } }
+  ],
+
+  "route": [
+    { "step": 1, "party": "sub", "sign": true },
+    { "step": 2, "party": "sm", "sign": true, "assignedBy": "later", "pool": "SM",
+      "canDelegate": true, "slaDays": 5 },
+    { "step": 3, "party": "acm", "sign": true, "assignedBy": "later", "pool": "ACM",
+      "canDelegate": true, "slaDays": 7 }
+  ],
+
+  "export": { "docx": "D-0507-MOC-001.docx", "lockUntilComplete": true }
+}

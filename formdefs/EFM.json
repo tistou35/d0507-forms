@@ -1,0 +1,1514 @@
+{
+  "code": "EFM",
+  "doc": "D-0507-EFM-001",
+  "control": "QA-EFM-301-B",
+  "issue": "01",
+  "rev": "00",
+  "eff": "20 NOV 2024",
+  "title": {
+    "th": "แบบประเมินความคืบหน้า",
+    "en": "Progress and Evaluation Form"
+  },
+  "retain": "OMA A.10",
+  "ui": {
+    "compact": true,
+    "tabs": [
+      {
+        "k": "T1",
+        "th": "ข้อมูล",
+        "en": "Details"
+      },
+      {
+        "k": "T2",
+        "th": "การสอน",
+        "en": "Teaching"
+      },
+      {
+        "k": "T3",
+        "th": "ภาคอากาศ",
+        "en": "Flight items"
+      },
+      {
+        "k": "T4",
+        "th": "สรุป",
+        "en": "Summary"
+      }
+    ]
+  },
+  "parties": [
+    {
+      "k": "ev",
+      "n": {
+        "th": "ผู้ประเมิน",
+        "en": "Evaluator"
+      },
+      "auth": "role:ins"
+    },
+    {
+      "k": "ht",
+      "n": {
+        "th": "หัวหน้าครูฝึก",
+        "en": "Head of Training"
+      },
+      "auth": "role:mgt"
+    }
+  ],
+  "sections": [
+    {
+      "k": "A",
+      "tab": "T1",
+      "party": "ev",
+      "title": {
+        "th": "ข้อมูลการประเมิน",
+        "en": "Evaluation details"
+      },
+      "fields": [
+        {
+          "k": "evalDate",
+          "type": "date",
+          "label": {
+            "th": "วันที่",
+            "en": "Date"
+          },
+          "req": true,
+          "prefill": "today",
+          "half": true
+        },
+        {
+          "k": "trainee",
+          "type": "text",
+          "label": {
+            "th": "ชื่อผู้รับการประเมิน",
+            "en": "Trainee name"
+          },
+          "req": true,
+          "half": true
+        },
+        {
+          "k": "trainType",
+          "type": "select",
+          "label": {
+            "th": "ประเภทการฝึก",
+            "en": "Type of training"
+          },
+          "req": true,
+          "opt": [
+            {
+              "v": "ground",
+              "n": {
+                "th": "ภาคพื้น",
+                "en": "Ground"
+              }
+            },
+            {
+              "v": "flight",
+              "n": {
+                "th": "ภาคอากาศ",
+                "en": "Flight"
+              }
+            },
+            {
+              "v": "simulator",
+              "n": {
+                "th": "เครื่องฝึกบินจำลอง",
+                "en": "Simulator"
+              }
+            },
+            {
+              "v": "recurrent",
+              "n": {
+                "th": "ทบทวน",
+                "en": "Recurrent"
+              }
+            },
+            {
+              "v": "progressive",
+              "n": {
+                "th": "ตรวจความก้าวหน้า / ตรวจมาตรฐาน",
+                "en": "Progressive / standard check"
+              }
+            }
+          ]
+        },
+        {
+          "k": "subject",
+          "type": "text",
+          "label": {
+            "th": "วิชา / ภารกิจ",
+            "en": "Subject / mission"
+          },
+          "req": true,
+          "half": true
+        },
+        {
+          "k": "classNo",
+          "type": "text",
+          "label": {
+            "th": "รุ่น / ชั้นเรียน",
+            "en": "Class"
+          },
+          "half": true
+        }
+      ]
+    },
+    {
+      "k": "B",
+      "tab": "T2",
+      "party": "ev",
+      "title": {
+        "th": "ประเมินการสอนและเนื้อหา",
+        "en": "Teaching and content evaluation"
+      },
+      "fields": [
+        {
+          "k": "teach",
+          "type": "checklist",
+          "req": true,
+          "label": {
+            "th": "ให้ระดับแต่ละหัวข้อ",
+            "en": "Rate each criterion"
+          },
+          "opts": [
+            {
+              "v": "excellent",
+              "n": {
+                "th": "ดีมาก",
+                "en": "Excellent"
+              }
+            },
+            {
+              "v": "verygood",
+              "n": {
+                "th": "ดี",
+                "en": "Very good"
+              }
+            },
+            {
+              "v": "good",
+              "n": {
+                "th": "ค่อนข้างดี",
+                "en": "Good"
+              }
+            },
+            {
+              "v": "fair",
+              "n": {
+                "th": "พอใช้",
+                "en": "Fair"
+              }
+            },
+            {
+              "v": "poor",
+              "n": {
+                "th": "ต้องปรับปรุง",
+                "en": "Poor"
+              }
+            },
+            {
+              "v": "na",
+              "n": {
+                "th": "ไม่เกี่ยวข้อง",
+                "en": "N/A"
+              }
+            }
+          ],
+          "items": [
+            {
+              "id": "tTheContentInThe",
+              "th": "The content in the lesson was",
+              "en": "The content in the lesson was"
+            },
+            {
+              "id": "tTheInstructorsContributionTo",
+              "th": "The instructor's contribution to the training/course was",
+              "en": "The instructor's contribution to the training/course was"
+            },
+            {
+              "id": "tTheInstructorsEffectivenessIn",
+              "th": "The instructor's effectiveness in teaching the subject matter was",
+              "en": "The instructor's effectiveness in teaching the subject matter was"
+            },
+            {
+              "id": "tClarityOfInstructorsVoice",
+              "th": "Clarity of instructor's voice was",
+              "en": "Clarity of instructor's voice was"
+            },
+            {
+              "id": "tExplanationsByInstructorWere",
+              "th": "Explanations by instructor were",
+              "en": "Explanations by instructor were"
+            },
+            {
+              "id": "tInstructorsUseOfExamples",
+              "th": "Instructor's use of examples and illustrations was",
+              "en": "Instructor's use of examples and illustrations was"
+            },
+            {
+              "id": "tQualityOfQuestionsOr",
+              "th": "Quality of questions or problems raised by the instructor was",
+              "en": "Quality of questions or problems raised by the instructor was"
+            },
+            {
+              "id": "tStudentsConfidenceInInstructors",
+              "th": "Student's confidence in instructor's knowledge was",
+              "en": "Student's confidence in instructor's knowledge was"
+            },
+            {
+              "id": "tInstructorsEnthusiasmWas",
+              "th": "Instructor's enthusiasm was",
+              "en": "Instructor's enthusiasm was"
+            },
+            {
+              "id": "tEncouragementGivenToStudents",
+              "th": "Encouragement given to students to express themselves was",
+              "en": "Encouragement given to students to express themselves was"
+            },
+            {
+              "id": "tAnswersToStudentQuestions",
+              "th": "Answers to student questions were",
+              "en": "Answers to student questions were"
+            },
+            {
+              "id": "tAvailabilityOfExtraHelp",
+              "th": "Availability of extra help when needed was",
+              "en": "Availability of extra help when needed was"
+            },
+            {
+              "id": "tUseOfClassTime",
+              "th": "Use of class time was",
+              "en": "Use of class time was"
+            },
+            {
+              "id": "tInstructorsInterestInStudents",
+              "th": "Instructor's interest in student's progress was",
+              "en": "Instructor's interest in student's progress was"
+            },
+            {
+              "id": "tAmountYouLearnedWas",
+              "th": "Amount you learned was",
+              "en": "Amount you learned was"
+            },
+            {
+              "id": "tRelevanceOfCoursetrainingContent",
+              "th": "Relevance of course/training content was",
+              "en": "Relevance of course/training content was"
+            },
+            {
+              "id": "tGradingTechniquesWere",
+              "th": "Grading techniques were",
+              "en": "Grading techniques were"
+            },
+            {
+              "id": "tReasonablenessOfAssignedWork",
+              "th": "Reasonableness of assigned work was",
+              "en": "Reasonableness of assigned work was"
+            },
+            {
+              "id": "tClarityOfStudentRequirements",
+              "th": "Clarity of student requirements was",
+              "en": "Clarity of student requirements was"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "k": "F1",
+      "tab": "T3",
+      "party": "ev",
+      "title": {
+        "th": "Planning of Flight",
+        "en": "Planning of Flight"
+      },
+      "fields": [
+        {
+          "k": "f1",
+          "type": "checklist",
+          "label": {
+            "th": "ผลการประเมิน",
+            "en": "Result"
+          },
+          "opts": [
+            {
+              "v": "S",
+              "n": {
+                "th": "ผ่าน",
+                "en": "Satisfied"
+              }
+            },
+            {
+              "v": "U",
+              "n": {
+                "th": "ไม่ผ่าน",
+                "en": "Not satisfied"
+              }
+            },
+            {
+              "v": "NA",
+              "n": {
+                "th": "ยกเว้น",
+                "en": "Exempt"
+              }
+            }
+          ],
+          "items": [
+            {
+              "id": "fRouteSelection",
+              "th": "Route Selection",
+              "en": "Route Selection"
+            },
+            {
+              "id": "fFuelPlanning",
+              "th": "Fuel Planning",
+              "en": "Fuel Planning"
+            },
+            {
+              "id": "fComplianceWithRegulations",
+              "th": "Compliance with Regulations",
+              "en": "Compliance with Regulations"
+            },
+            {
+              "id": "fMassAndBalance",
+              "th": "Mass and Balance",
+              "en": "Mass and Balance"
+            },
+            {
+              "id": "fMapVfrNavigationLog",
+              "th": "Map, VFR Navigation Log, Dead Reckoning",
+              "en": "Map, VFR Navigation Log, Dead Reckoning"
+            },
+            {
+              "id": "fPreflightInspectionAndServicing",
+              "th": "Preflight Inspection and Servicing",
+              "en": "Preflight Inspection and Servicing"
+            },
+            {
+              "id": "fCockpitManagement",
+              "th": "Cockpit Management",
+              "en": "Cockpit Management"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "k": "F2",
+      "tab": "T3",
+      "party": "ev",
+      "title": {
+        "th": "ATC Procedures",
+        "en": "ATC Procedures"
+      },
+      "fields": [
+        {
+          "k": "f2",
+          "type": "checklist",
+          "label": {
+            "th": "ผลการประเมิน",
+            "en": "Result"
+          },
+          "opts": [
+            {
+              "v": "S",
+              "n": {
+                "th": "ผ่าน",
+                "en": "Satisfied"
+              }
+            },
+            {
+              "v": "U",
+              "n": {
+                "th": "ไม่ผ่าน",
+                "en": "Not satisfied"
+              }
+            },
+            {
+              "v": "NA",
+              "n": {
+                "th": "ยกเว้น",
+                "en": "Exempt"
+              }
+            }
+          ],
+          "items": [
+            {
+              "id": "fKnowledgeOfAtcProcedures",
+              "th": "Knowledge of ATC Procedures",
+              "en": "Knowledge of ATC Procedures"
+            },
+            {
+              "id": "fAbilityToCommunicateAtc",
+              "th": "Ability to Communicate ATC Procedures",
+              "en": "Ability to Communicate ATC Procedures"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "k": "F3",
+      "tab": "T3",
+      "party": "ev",
+      "title": {
+        "th": "Route Procedures",
+        "en": "Route Procedures"
+      },
+      "fields": [
+        {
+          "k": "f3",
+          "type": "checklist",
+          "label": {
+            "th": "ผลการประเมิน",
+            "en": "Result"
+          },
+          "opts": [
+            {
+              "v": "S",
+              "n": {
+                "th": "ผ่าน",
+                "en": "Satisfied"
+              }
+            },
+            {
+              "v": "U",
+              "n": {
+                "th": "ไม่ผ่าน",
+                "en": "Not satisfied"
+              }
+            },
+            {
+              "v": "NA",
+              "n": {
+                "th": "ยกเว้น",
+                "en": "Exempt"
+              }
+            }
+          ],
+          "items": [
+            {
+              "id": "fExplanationOfRouteProcedures",
+              "th": "Explanation of Route Procedures",
+              "en": "Explanation of Route Procedures"
+            },
+            {
+              "id": "fProperUseOfRoute",
+              "th": "Proper Use of Route Procedures",
+              "en": "Proper Use of Route Procedures"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "k": "F4",
+      "tab": "T3",
+      "party": "ev",
+      "title": {
+        "th": "Communications",
+        "en": "Communications"
+      },
+      "fields": [
+        {
+          "k": "f4",
+          "type": "checklist",
+          "label": {
+            "th": "ผลการประเมิน",
+            "en": "Result"
+          },
+          "opts": [
+            {
+              "v": "S",
+              "n": {
+                "th": "ผ่าน",
+                "en": "Satisfied"
+              }
+            },
+            {
+              "v": "U",
+              "n": {
+                "th": "ไม่ผ่าน",
+                "en": "Not satisfied"
+              }
+            },
+            {
+              "v": "NA",
+              "n": {
+                "th": "ยกเว้น",
+                "en": "Exempt"
+              }
+            }
+          ],
+          "items": [
+            {
+              "id": "fCommunicationWithAtc",
+              "th": "Communication with ATC",
+              "en": "Communication with ATC"
+            },
+            {
+              "id": "fCommunicationWithOtherAircraft",
+              "th": "Communication with Other Aircraft",
+              "en": "Communication with Other Aircraft"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "k": "F5",
+      "tab": "T3",
+      "party": "ev",
+      "title": {
+        "th": "Meteorology",
+        "en": "Meteorology"
+      },
+      "fields": [
+        {
+          "k": "f5",
+          "type": "checklist",
+          "label": {
+            "th": "ผลการประเมิน",
+            "en": "Result"
+          },
+          "opts": [
+            {
+              "v": "S",
+              "n": {
+                "th": "ผ่าน",
+                "en": "Satisfied"
+              }
+            },
+            {
+              "v": "U",
+              "n": {
+                "th": "ไม่ผ่าน",
+                "en": "Not satisfied"
+              }
+            },
+            {
+              "v": "NA",
+              "n": {
+                "th": "ยกเว้น",
+                "en": "Exempt"
+              }
+            }
+          ],
+          "items": [
+            {
+              "id": "fInterpretationOfWeatherReports",
+              "th": "Interpretation of Weather Reports",
+              "en": "Interpretation of Weather Reports"
+            },
+            {
+              "id": "fInterpretationOfWeatherForecasts",
+              "th": "Interpretation of Weather Forecasts",
+              "en": "Interpretation of Weather Forecasts"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "k": "F6",
+      "tab": "T3",
+      "party": "ev",
+      "title": {
+        "th": "Technical Questions of Actual Interest",
+        "en": "Technical Questions of Actual Interest"
+      },
+      "fields": [
+        {
+          "k": "f6",
+          "type": "checklist",
+          "label": {
+            "th": "ผลการประเมิน",
+            "en": "Result"
+          },
+          "opts": [
+            {
+              "v": "S",
+              "n": {
+                "th": "ผ่าน",
+                "en": "Satisfied"
+              }
+            },
+            {
+              "v": "U",
+              "n": {
+                "th": "ไม่ผ่าน",
+                "en": "Not satisfied"
+              }
+            },
+            {
+              "v": "NA",
+              "n": {
+                "th": "ยกเว้น",
+                "en": "Exempt"
+              }
+            }
+          ],
+          "items": [
+            {
+              "id": "fAbilityToAnswerTechnical",
+              "th": "Ability to Answer Technical Questions",
+              "en": "Ability to Answer Technical Questions"
+            },
+            {
+              "id": "fRelevanceOfTechnicalKnowledge",
+              "th": "Relevance of Technical Knowledge",
+              "en": "Relevance of Technical Knowledge"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "k": "F7",
+      "tab": "T3",
+      "party": "ev",
+      "title": {
+        "th": "Company Regulations",
+        "en": "Company Regulations"
+      },
+      "fields": [
+        {
+          "k": "f7",
+          "type": "checklist",
+          "label": {
+            "th": "ผลการประเมิน",
+            "en": "Result"
+          },
+          "opts": [
+            {
+              "v": "S",
+              "n": {
+                "th": "ผ่าน",
+                "en": "Satisfied"
+              }
+            },
+            {
+              "v": "U",
+              "n": {
+                "th": "ไม่ผ่าน",
+                "en": "Not satisfied"
+              }
+            },
+            {
+              "v": "NA",
+              "n": {
+                "th": "ยกเว้น",
+                "en": "Exempt"
+              }
+            }
+          ],
+          "items": [
+            {
+              "id": "fAdherenceToCompanyPolicies",
+              "th": "Adherence to Company Policies",
+              "en": "Adherence to Company Policies"
+            },
+            {
+              "id": "fKnowledgeOfCompanyRegulations",
+              "th": "Knowledge of Company Regulations",
+              "en": "Knowledge of Company Regulations"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "k": "F8",
+      "tab": "T3",
+      "party": "ev",
+      "title": {
+        "th": "Emergency Equipment and Procedures",
+        "en": "Emergency Equipment and Procedures"
+      },
+      "fields": [
+        {
+          "k": "f8",
+          "type": "checklist",
+          "label": {
+            "th": "ผลการประเมิน",
+            "en": "Result"
+          },
+          "opts": [
+            {
+              "v": "S",
+              "n": {
+                "th": "ผ่าน",
+                "en": "Satisfied"
+              }
+            },
+            {
+              "v": "U",
+              "n": {
+                "th": "ไม่ผ่าน",
+                "en": "Not satisfied"
+              }
+            },
+            {
+              "v": "NA",
+              "n": {
+                "th": "ยกเว้น",
+                "en": "Exempt"
+              }
+            }
+          ],
+          "items": [
+            {
+              "id": "fKnowledgeOfEmergencyEquipment",
+              "th": "Knowledge of Emergency Equipment",
+              "en": "Knowledge of Emergency Equipment"
+            },
+            {
+              "id": "fDemonstrationOfEmergencyProcedures",
+              "th": "Demonstration of Emergency Procedures",
+              "en": "Demonstration of Emergency Procedures"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "k": "F9",
+      "tab": "T3",
+      "party": "ev",
+      "title": {
+        "th": "Crew's Cooperation",
+        "en": "Crew's Cooperation"
+      },
+      "fields": [
+        {
+          "k": "f9",
+          "type": "checklist",
+          "label": {
+            "th": "ผลการประเมิน",
+            "en": "Result"
+          },
+          "opts": [
+            {
+              "v": "S",
+              "n": {
+                "th": "ผ่าน",
+                "en": "Satisfied"
+              }
+            },
+            {
+              "v": "U",
+              "n": {
+                "th": "ไม่ผ่าน",
+                "en": "Not satisfied"
+              }
+            },
+            {
+              "v": "NA",
+              "n": {
+                "th": "ยกเว้น",
+                "en": "Exempt"
+              }
+            }
+          ],
+          "items": [
+            {
+              "id": "fFosteringCrewCooperation",
+              "th": "Fostering Crew Cooperation",
+              "en": "Fostering Crew Cooperation"
+            },
+            {
+              "id": "fCoordinationDuringFlight",
+              "th": "Coordination During Flight",
+              "en": "Coordination During Flight"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "k": "F10",
+      "tab": "T3",
+      "party": "ev",
+      "title": {
+        "th": "Judgment and Efficiency",
+        "en": "Judgment and Efficiency"
+      },
+      "fields": [
+        {
+          "k": "f10",
+          "type": "checklist",
+          "label": {
+            "th": "ผลการประเมิน",
+            "en": "Result"
+          },
+          "opts": [
+            {
+              "v": "S",
+              "n": {
+                "th": "ผ่าน",
+                "en": "Satisfied"
+              }
+            },
+            {
+              "v": "U",
+              "n": {
+                "th": "ไม่ผ่าน",
+                "en": "Not satisfied"
+              }
+            },
+            {
+              "v": "NA",
+              "n": {
+                "th": "ยกเว้น",
+                "en": "Exempt"
+              }
+            }
+          ],
+          "items": [
+            {
+              "id": "fDecisionmakingDuringFlight",
+              "th": "Decision-Making During Flight",
+              "en": "Decision-Making During Flight"
+            },
+            {
+              "id": "fEfficiencyInFlightOperations",
+              "th": "Efficiency in Flight Operations",
+              "en": "Efficiency in Flight Operations"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "k": "F11",
+      "tab": "T3",
+      "party": "ev",
+      "title": {
+        "th": "Aircraft Systems",
+        "en": "Aircraft Systems"
+      },
+      "fields": [
+        {
+          "k": "f11",
+          "type": "checklist",
+          "label": {
+            "th": "ผลการประเมิน",
+            "en": "Result"
+          },
+          "opts": [
+            {
+              "v": "S",
+              "n": {
+                "th": "ผ่าน",
+                "en": "Satisfied"
+              }
+            },
+            {
+              "v": "U",
+              "n": {
+                "th": "ไม่ผ่าน",
+                "en": "Not satisfied"
+              }
+            },
+            {
+              "v": "NA",
+              "n": {
+                "th": "ยกเว้น",
+                "en": "Exempt"
+              }
+            }
+          ],
+          "items": [
+            {
+              "id": "fKnowledgeOfAircraftSystems",
+              "th": "Knowledge of Aircraft Systems",
+              "en": "Knowledge of Aircraft Systems"
+            },
+            {
+              "id": "fApplicationOfSystemsKnowledge",
+              "th": "Application of Systems Knowledge During Flight",
+              "en": "Application of Systems Knowledge During Flight"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "k": "F12",
+      "tab": "T3",
+      "party": "ev",
+      "title": {
+        "th": "Flying (Smooth Handling, Accuracy)",
+        "en": "Flying (Smooth Handling, Accuracy)"
+      },
+      "fields": [
+        {
+          "k": "f12",
+          "type": "checklist",
+          "label": {
+            "th": "ผลการประเมิน",
+            "en": "Result"
+          },
+          "opts": [
+            {
+              "v": "S",
+              "n": {
+                "th": "ผ่าน",
+                "en": "Satisfied"
+              }
+            },
+            {
+              "v": "U",
+              "n": {
+                "th": "ไม่ผ่าน",
+                "en": "Not satisfied"
+              }
+            },
+            {
+              "v": "NA",
+              "n": {
+                "th": "ยกเว้น",
+                "en": "Exempt"
+              }
+            }
+          ],
+          "items": [
+            {
+              "id": "fEngineStarting",
+              "th": "Engine Starting",
+              "en": "Engine Starting"
+            },
+            {
+              "id": "fTaxiing",
+              "th": "Taxiing",
+              "en": "Taxiing"
+            },
+            {
+              "id": "fPretakeoffCheck",
+              "th": "Pre-Takeoff Check",
+              "en": "Pre-Takeoff Check"
+            },
+            {
+              "id": "fNormalAndCrossWind",
+              "th": "Normal and Cross Wind Takeoff and Climb",
+              "en": "Normal and Cross Wind Takeoff and Climb"
+            },
+            {
+              "id": "fShortfieldTakeoffAndClimb",
+              "th": "Short-Field Takeoff and Climb",
+              "en": "Short-Field Takeoff and Climb"
+            },
+            {
+              "id": "fSoftfieldTakeoffAndClimb",
+              "th": "Soft-Field Takeoff and Climb",
+              "en": "Soft-Field Takeoff and Climb"
+            },
+            {
+              "id": "fStraightAndLevelFlight",
+              "th": "Straight and Level Flight",
+              "en": "Straight and Level Flight"
+            },
+            {
+              "id": "fLevelTurns",
+              "th": "Level Turns",
+              "en": "Level Turns"
+            },
+            {
+              "id": "fStraightClimbsAndClimbing",
+              "th": "Straight Climbs and Climbing Turns",
+              "en": "Straight Climbs and Climbing Turns"
+            },
+            {
+              "id": "fStraightDescentAndDescending",
+              "th": "Straight Descent and Descending Turns",
+              "en": "Straight Descent and Descending Turns"
+            },
+            {
+              "id": "fPoweronStalls",
+              "th": "Power-On Stalls",
+              "en": "Power-On Stalls"
+            },
+            {
+              "id": "fPoweroffStalls",
+              "th": "Power-Off Stalls",
+              "en": "Power-Off Stalls"
+            },
+            {
+              "id": "fManeuveringDuringSlowFlight",
+              "th": "Maneuvering during Slow Flight",
+              "en": "Maneuvering during Slow Flight"
+            },
+            {
+              "id": "fSteepTurns",
+              "th": "Steep Turns",
+              "en": "Steep Turns"
+            },
+            {
+              "id": "fEmergencyDescent",
+              "th": "Emergency Descent",
+              "en": "Emergency Descent"
+            },
+            {
+              "id": "fEmergencyApproachAndLanding",
+              "th": "Emergency Approach and Landing",
+              "en": "Emergency Approach and Landing"
+            },
+            {
+              "id": "fSystemsAndEquipmentMalfunction",
+              "th": "Systems and Equipment Malfunction",
+              "en": "Systems and Equipment Malfunction"
+            },
+            {
+              "id": "fNormalAndCrosswindApproach",
+              "th": "Normal and Crosswind Approach and Landing",
+              "en": "Normal and Crosswind Approach and Landing"
+            },
+            {
+              "id": "fSoftFieldApproachAnd",
+              "th": "Soft Field Approach and Landing",
+              "en": "Soft Field Approach and Landing"
+            },
+            {
+              "id": "fShortFieldApproachAnd",
+              "th": "Short Field Approach and Landing",
+              "en": "Short Field Approach and Landing"
+            },
+            {
+              "id": "fLostCommunicationProcedure",
+              "th": "Lost Communication & Procedure",
+              "en": "Lost Communication & Procedure"
+            },
+            {
+              "id": "fGoaround",
+              "th": "Go-Around",
+              "en": "Go-Around"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "k": "F13",
+      "tab": "T3",
+      "party": "ev",
+      "title": {
+        "th": "Debrief (Key Point, Content & Accuracy, Assessment, Timing)",
+        "en": "Debrief (Key Point, Content & Accuracy, Assessment, Timing)"
+      },
+      "fields": [
+        {
+          "k": "f13",
+          "type": "checklist",
+          "label": {
+            "th": "ผลการประเมิน",
+            "en": "Result"
+          },
+          "opts": [
+            {
+              "v": "S",
+              "n": {
+                "th": "ผ่าน",
+                "en": "Satisfied"
+              }
+            },
+            {
+              "v": "U",
+              "n": {
+                "th": "ไม่ผ่าน",
+                "en": "Not satisfied"
+              }
+            },
+            {
+              "v": "NA",
+              "n": {
+                "th": "ยกเว้น",
+                "en": "Exempt"
+              }
+            }
+          ],
+          "items": [
+            {
+              "id": "fDeclarationOfResult",
+              "th": "Declaration of Result",
+              "en": "Declaration of Result"
+            },
+            {
+              "id": "fReasonOfTheResult",
+              "th": "Reason of the Result",
+              "en": "Reason of the Result"
+            },
+            {
+              "id": "fRatingAndPerformanceObtained",
+              "th": "Rating and Performance Obtained",
+              "en": "Rating and Performance Obtained"
+            },
+            {
+              "id": "fGuidanceForTheNext",
+              "th": "Guidance for the Next Step",
+              "en": "Guidance for the Next Step"
+            },
+            {
+              "id": "fBalancingOfDebriefGood",
+              "th": "Balancing of Debrief: Good and Bad Side",
+              "en": "Balancing of Debrief: Good and Bad Side"
+            },
+            {
+              "id": "fPleasantDebriefAtmosphere",
+              "th": "Pleasant Debrief Atmosphere",
+              "en": "Pleasant Debrief Atmosphere"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "k": "F14",
+      "tab": "T3",
+      "party": "ev",
+      "title": {
+        "th": "Airmanship",
+        "en": "Airmanship"
+      },
+      "fields": [
+        {
+          "k": "f14",
+          "type": "checklist",
+          "label": {
+            "th": "ผลการประเมิน",
+            "en": "Result"
+          },
+          "opts": [
+            {
+              "v": "S",
+              "n": {
+                "th": "ผ่าน",
+                "en": "Satisfied"
+              }
+            },
+            {
+              "v": "U",
+              "n": {
+                "th": "ไม่ผ่าน",
+                "en": "Not satisfied"
+              }
+            },
+            {
+              "v": "NA",
+              "n": {
+                "th": "ยกเว้น",
+                "en": "Exempt"
+              }
+            }
+          ],
+          "items": [
+            {
+              "id": "fDiscipline",
+              "th": "Discipline",
+              "en": "Discipline"
+            },
+            {
+              "id": "fSkillAndProficiency",
+              "th": "Skill and Proficiency",
+              "en": "Skill and Proficiency"
+            },
+            {
+              "id": "fKnowledge",
+              "th": "Knowledge",
+              "en": "Knowledge"
+            },
+            {
+              "id": "fSituationalAwareness",
+              "th": "Situational Awareness",
+              "en": "Situational Awareness"
+            },
+            {
+              "id": "fJudgment",
+              "th": "Judgment",
+              "en": "Judgment"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "k": "F15",
+      "tab": "T3",
+      "party": "ev",
+      "title": {
+        "th": "Flight Teaching Skill and Evaluation",
+        "en": "Flight Teaching Skill and Evaluation"
+      },
+      "fields": [
+        {
+          "k": "f15",
+          "type": "checklist",
+          "label": {
+            "th": "ผลการประเมิน",
+            "en": "Result"
+          },
+          "opts": [
+            {
+              "v": "S",
+              "n": {
+                "th": "ผ่าน",
+                "en": "Satisfied"
+              }
+            },
+            {
+              "v": "U",
+              "n": {
+                "th": "ไม่ผ่าน",
+                "en": "Not satisfied"
+              }
+            },
+            {
+              "v": "NA",
+              "n": {
+                "th": "ยกเว้น",
+                "en": "Exempt"
+              }
+            }
+          ],
+          "items": [
+            {
+              "id": "fInstructingCommunication",
+              "th": "Instructing / Communication",
+              "en": "Instructing / Communication"
+            },
+            {
+              "id": "fDemonstrationAndGuidanceIn",
+              "th": "Demonstration and Guidance in Flight",
+              "en": "Demonstration and Guidance in Flight"
+            },
+            {
+              "id": "fDrawTheAttentionTechnique",
+              "th": "Draw the Attention Technique",
+              "en": "Draw the Attention Technique"
+            },
+            {
+              "id": "fInterveneTheStudentIn",
+              "th": "Intervene the Student in Flight",
+              "en": "Intervene the Student in Flight"
+            },
+            {
+              "id": "fManeuveringPlanning",
+              "th": "Maneuvering Planning",
+              "en": "Maneuvering Planning"
+            },
+            {
+              "id": "fErrorDetection",
+              "th": "Error Detection",
+              "en": "Error Detection"
+            },
+            {
+              "id": "fDistractionTechnique",
+              "th": "Distraction Technique",
+              "en": "Distraction Technique"
+            },
+            {
+              "id": "fInflightTeachingAtmosphere",
+              "th": "Inflight Teaching Atmosphere",
+              "en": "Inflight Teaching Atmosphere"
+            },
+            {
+              "id": "fGhostingControlTechnique",
+              "th": "Ghosting Control Technique",
+              "en": "Ghosting Control Technique"
+            },
+            {
+              "id": "fImmediateChangeOfTeaching",
+              "th": "Immediate Change of Teaching",
+              "en": "Immediate Change of Teaching"
+            },
+            {
+              "id": "fInflightEndOfTraining",
+              "th": "Inflight 'End of Training'",
+              "en": "Inflight 'End of Training'"
+            },
+            {
+              "id": "fAcceptableEnvelopeOfFault",
+              "th": "Acceptable Envelope of Fault",
+              "en": "Acceptable Envelope of Fault"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "k": "Z",
+      "tab": "T4",
+      "party": "ev",
+      "title": {
+        "th": "สรุปและลงนาม",
+        "en": "Overall assessment and signature"
+      },
+      "fields": [
+        {
+          "k": "overall",
+          "type": "select",
+          "label": {
+            "th": "ผลประเมินโดยรวม",
+            "en": "Overall assessment"
+          },
+          "req": true,
+          "opt": [
+            {
+              "v": "excellent",
+              "n": {
+                "th": "ดีมาก",
+                "en": "Excellent"
+              }
+            },
+            {
+              "v": "verygood",
+              "n": {
+                "th": "ดี",
+                "en": "Very good"
+              }
+            },
+            {
+              "v": "good",
+              "n": {
+                "th": "ค่อนข้างดี",
+                "en": "Good"
+              }
+            },
+            {
+              "v": "fair",
+              "n": {
+                "th": "พอใช้",
+                "en": "Fair"
+              }
+            },
+            {
+              "v": "poor",
+              "n": {
+                "th": "ต้องปรับปรุง",
+                "en": "Poor"
+              }
+            }
+          ]
+        },
+        {
+          "k": "evComment",
+          "type": "textarea",
+          "label": {
+            "th": "ความเห็นเพิ่มเติม",
+            "en": "Comments"
+          }
+        },
+        {
+          "k": "evName",
+          "type": "text",
+          "label": {
+            "th": "ชื่อผู้ประเมิน",
+            "en": "Evaluator name"
+          },
+          "req": true,
+          "half": true
+        },
+        {
+          "k": "evDate",
+          "type": "date",
+          "label": {
+            "th": "วันที่",
+            "en": "Date"
+          },
+          "req": true,
+          "prefill": "today",
+          "half": true
+        },
+        {
+          "k": "evSign",
+          "type": "sign",
+          "req": true,
+          "label": {
+            "th": "ลายเซ็นผู้ประเมิน",
+            "en": "Evaluator signature"
+          }
+        }
+      ]
+    },
+    {
+      "k": "HT",
+      "tab": "T4",
+      "party": "ht",
+      "hideOthers": true,
+      "title": {
+        "th": "หัวหน้าครูฝึกรับรอง",
+        "en": "Head of Training endorsement"
+      },
+      "fields": [
+        {
+          "k": "htName",
+          "type": "text",
+          "label": {
+            "th": "ชื่อหัวหน้าครูฝึก",
+            "en": "Head of Training name"
+          },
+          "req": true,
+          "half": true
+        },
+        {
+          "k": "htDate",
+          "type": "date",
+          "label": {
+            "th": "วันที่",
+            "en": "Date"
+          },
+          "req": true,
+          "half": true
+        },
+        {
+          "k": "htComment",
+          "type": "textarea",
+          "label": {
+            "th": "ความเห็น",
+            "en": "Comment"
+          }
+        },
+        {
+          "k": "htSign",
+          "type": "sign",
+          "req": true,
+          "label": {
+            "th": "ลายเซ็นหัวหน้าครูฝึก",
+            "en": "Head of Training signature"
+          }
+        }
+      ]
+    }
+  ],
+  "gates": [
+    {
+      "when": "overall == 'poor'",
+      "level": "warn",
+      "short": {
+        "th": "ต้องปรับปรุง",
+        "en": "POOR"
+      },
+      "msg": {
+        "th": "ผลประเมินอยู่ในระดับต้องปรับปรุง — ต้องวางแผนฝึกเพิ่มเติมและระบุในความเห็นก่อนส่ง",
+        "en": "Rated Poor — record an additional training plan in the comments before submitting."
+      }
+    }
+  ],
+  "route": [
+    {
+      "step": 1,
+      "party": "ev",
+      "sign": true
+    },
+    {
+      "step": 2,
+      "party": "ht",
+      "sign": true,
+      "assignedBy": "later",
+      "pool": "HT",
+      "canDelegate": true,
+      "slaDays": 5
+    }
+  ],
+  "export": {
+    "docx": "D-0507-EFM-001.docx",
+    "lockUntilComplete": true
+  }
+}

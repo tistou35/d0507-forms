@@ -1,0 +1,160 @@
+{
+  "code": "FTR",
+  "doc": "D-0507-FTR-001",
+  "control": "ME-FTR-301-A",
+  "issue": "01",
+  "rev": "00",
+  "eff": "27 JAN 2021",
+  "title": { "th": "รายงานการบินทดสอบ", "en": "Flight Test Report" },
+  "retain": "OMA A.10",
+
+  "ui": {
+    "compact": true,
+    "tabs": [
+      { "k": "T1", "th": "อากาศยานและงานซ่อม", "en": "Aircraft & maintenance" },
+      { "k": "T2", "th": "รายการตรวจ", "en": "Test items" },
+      { "k": "T3", "th": "สรุปและลงนาม", "en": "Result & sign" }
+    ]
+  },
+
+  "parties": [
+    { "k": "tp", "n": { "th": "นักบินทดสอบ", "en": "Test pilot" }, "auth": "role:ins" },
+    { "k": "me", "n": { "th": "ฝ่ายซ่อมบำรุง", "en": "Maintenance" }, "auth": "role:mgt" }
+  ],
+
+  "sections": [
+    {
+      "k": "A", "tab": "T1", "party": "tp",
+      "title": { "th": "อากาศยานและงานซ่อมบำรุง", "en": "Aircraft and maintenance" },
+      "desc": { "th": "บันทึกการบินทดสอบหลังงานซ่อมบำรุง — ใช้เป็นเอกสารประกอบการนำอากาศยานกลับเข้าประจำการ",
+                "en": "Post-maintenance test flight record — return to service documentation." },
+      "fields": [
+        { "k": "acType", "type": "text", "req": true, "half": true,
+          "label": { "th": "แบบอากาศยาน", "en": "Aircraft type" } },
+        { "k": "acReg", "type": "text", "req": true, "half": true, "def": "HS-",
+          "label": { "th": "ทะเบียน", "en": "Registration" }, "ph": "HS-___" },
+        { "k": "testDate", "type": "date", "req": true, "prefill": "today", "half": true,
+          "label": { "th": "วันที่ทดสอบ", "en": "Date of test" } },
+        { "k": "workOrder", "type": "text", "req": true, "half": true,
+          "label": { "th": "เลขที่ใบสั่งงาน", "en": "Work order No." } },
+        { "k": "mxPerformed", "type": "textarea", "req": true,
+          "label": { "th": "งานซ่อมบำรุงที่ทำ", "en": "Maintenance performed" } },
+        { "k": "reason", "type": "select", "req": true,
+          "label": { "th": "เหตุที่ต้องบินทดสอบ", "en": "Reason for test flight" },
+          "opt": [
+            { "v": "rts",       "n": { "th": "นำกลับเข้าประจำการ", "en": "Return to service" } },
+            { "v": "majrepair", "n": { "th": "หลังซ่อมใหญ่", "en": "Post-major repair" } },
+            { "v": "component", "n": { "th": "หลังเปลี่ยนอุปกรณ์", "en": "Post-component change" } },
+            { "v": "periodic",  "n": { "th": "ตรวจตามระยะ", "en": "Periodic check" } },
+            { "v": "other",     "n": { "th": "อื่น ๆ", "en": "Other" } } ] },
+        { "k": "reasonOther", "type": "text", "showIf": "reason == 'other'", "reqIf": "reason == 'other'",
+          "label": { "th": "ระบุเหตุอื่น", "en": "Other — specify" } }
+      ]
+    },
+    {
+      "k": "B", "tab": "T1", "party": "tp",
+      "title": { "th": "รายละเอียดเที่ยวบินทดสอบ", "en": "Test flight details" },
+      "fields": [
+        { "k": "testPilot", "type": "text", "req": true, "half": true,
+          "label": { "th": "นักบินทดสอบ", "en": "Test pilot" } },
+        { "k": "depAd", "type": "text", "req": true, "half": true,
+          "label": { "th": "สนามบินต้นทาง", "en": "Departure aerodrome" } },
+        { "k": "depTime", "type": "time", "req": true, "half": true,
+          "label": { "th": "เวลาออก", "en": "Departure time" } },
+        { "k": "arrTime", "type": "time", "req": true, "half": true,
+          "label": { "th": "เวลาถึง", "en": "Arrival time" } },
+        { "k": "totalTime", "type": "number", "req": true, "min": 0, "step": 0.1, "half": true,
+          "label": { "th": "ชั่วโมงบินรวม", "en": "Total flight time" } },
+        { "k": "testAlt", "type": "text", "half": true,
+          "label": { "th": "ระดับความสูงที่ทดสอบ", "en": "Test altitude" } }
+      ]
+    },
+    {
+      "k": "C", "tab": "T2", "party": "tp",
+      "title": { "th": "รายการตรวจในการบินทดสอบ", "en": "Test items" },
+      "desc": { "th": "ข้อที่ไม่ได้ทดสอบในเที่ยวบินนี้ ให้เลือก N/A ไม่ใช่เว้นว่าง",
+                "en": "Mark N/A for items not tested on this flight — do not leave them blank." },
+      "fields": [
+        { "k": "checks", "type": "checklist", "req": true,
+          "label": { "th": "ผลการตรวจแต่ละรายการ", "en": "Result of each item" },
+          "opts": [
+            { "v": "S",  "n": { "th": "ผ่าน", "en": "Sat" } },
+            { "v": "U",  "n": { "th": "ไม่ผ่าน", "en": "Unsat" } },
+            { "v": "NA", "n": { "th": "ไม่ได้ทดสอบ", "en": "N/A" } } ],
+          "items": [
+            { "id": "E1", "th": "ติดเครื่องยนต์", "en": "Engine start",
+              "how": "ขั้นตอนติดเครื่องปกติ · ไม่มีเสียงหรือการสั่นผิดปกติ" },
+            { "id": "E2", "th": "รันอัพ", "en": "Run-up",
+              "how": "ตรวจแมกนีโต · ตรวจ carb heat · แรงดันและอุณหภูมิน้ำมันปกติ" },
+            { "id": "T1", "th": "สมรรถนะการวิ่งขึ้น", "en": "Take-off performance",
+              "how": "วิ่งขึ้นปกติ · ยกหัวที่ความเร็วถูกต้อง · ไม่มีปัญหาการบังคับทิศทาง" },
+            { "id": "T2", "th": "สมรรถนะการไต่", "en": "Climb performance",
+              "how": "อัตราไต่ตาม AFM · ค่าเครื่องยนต์ปกติ" },
+            { "id": "C1", "th": "กำลังเครื่องยนต์ช่วงบินระดับ", "en": "Engine power (cruise)",
+              "how": "รอบและอัตราสิ้นเปลืองอยู่ในเกณฑ์ · ไม่มีการสั่นผิดปกติ" },
+            { "id": "C2", "th": "ระบบเชื้อเพลิง", "en": "Fuel system",
+              "how": "สลับถังแล้วเครื่องเดินเรียบ · แรงดันเชื้อเพลิงปกติ" },
+            { "id": "H1", "th": "การร่วงหล่น (ถ้าต้องทดสอบ)", "en": "Stall (if required)",
+              "how": "ความเร็วและสัญญาณเตือนตาม AFM · แก้ไขกลับสู่การบินปกติได้" },
+            { "id": "H2", "th": "การตอบสนองของชุดบังคับ", "en": "Control response",
+              "how": "ทุกชุดบังคับตอบสนองและให้ความรู้สึกปกติ · ไม่หลวมหรือฝืด" },
+            { "id": "A1", "th": "การเข้าสู่สนาม", "en": "Approach",
+              "how": "ความเร็วเข้าสู่สนามปกติ · แฟลปทำงานเรียบร้อย" },
+            { "id": "A2", "th": "การลงสัมผัสพื้น", "en": "Landing",
+              "how": "แฟลร์และแตะพื้นปกติ · บังคับทิศทางได้เรียบร้อย" },
+            { "id": "P1", "th": "การดับเครื่องยนต์", "en": "Engine shutdown",
+              "how": "ดับเครื่องปกติ · ไม่มีสิ่งบอกเหตุผิดปกติหลังบิน" },
+            { "id": "P2", "th": "การตรวจหลังบิน", "en": "Inspection after flight",
+              "how": "ไม่พบการรั่ว ความเสียหาย หรือข้อบกพร่องหลังบิน" } ] }
+      ]
+    },
+    {
+      "k": "D", "tab": "T3", "party": "tp",
+      "title": { "th": "สรุปผลและลงนาม", "en": "Result and signature" },
+      "fields": [
+        { "k": "verdict", "type": "select", "req": true,
+          "label": { "th": "สรุปสภาพอากาศยาน", "en": "Aircraft status" },
+          "opt": [
+            { "v": "serviceable",   "n": { "th": "ใช้การได้ — อนุมัติให้กลับเข้าประจำการ", "en": "Serviceable — approved for return to service" } },
+            { "v": "unserviceable", "n": { "th": "ใช้การไม่ได้ — ต้องแก้ไขข้อบกพร่องก่อน", "en": "Unserviceable — defects require rectification first" } } ] },
+        { "k": "defects", "type": "textarea", "reqIf": "verdict == 'unserviceable'",
+          "label": { "th": "ข้อบกพร่องที่พบ", "en": "Defects found" } },
+        { "k": "tpLicence", "type": "text", "req": true, "half": true,
+          "label": { "th": "เลขที่ใบอนุญาตนักบินทดสอบ", "en": "Test pilot licence No." } },
+        { "k": "tpDate", "type": "date", "req": true, "prefill": "today", "half": true,
+          "label": { "th": "วันที่", "en": "Date" } },
+        { "k": "tpSign", "type": "sign", "req": true,
+          "label": { "th": "ลายเซ็นนักบินทดสอบ", "en": "Test pilot signature" } }
+      ]
+    },
+    {
+      "k": "E", "tab": "T3", "party": "me", "hideOthers": true,
+      "title": { "th": "ฝ่ายซ่อมบำรุงรับทราบ", "en": "Maintenance acceptance" },
+      "fields": [
+        { "k": "meName", "type": "text", "req": true, "half": true,
+          "label": { "th": "ชื่อผู้รับผิดชอบฝ่ายซ่อมบำรุง", "en": "Maintenance name" } },
+        { "k": "meDate", "type": "date", "req": true, "half": true,
+          "label": { "th": "วันที่", "en": "Date" } },
+        { "k": "meComment", "type": "textarea",
+          "label": { "th": "ความเห็น / การดำเนินการต่อ", "en": "Comment / further action" } },
+        { "k": "meSign", "type": "sign", "req": true,
+          "label": { "th": "ลายเซ็นฝ่ายซ่อมบำรุง", "en": "Maintenance signature" } }
+      ]
+    }
+  ],
+
+  "gates": [
+    { "when": "verdict == 'unserviceable'", "level": "warn",
+      "short": { "th": "ใช้การไม่ได้", "en": "U/S" },
+      "msg": { "th": "อากาศยานใช้การไม่ได้ — ห้ามนำกลับเข้าประจำการจนกว่าจะแก้ไขข้อบกพร่องและบินทดสอบใหม่ผ่าน",
+               "en": "Aircraft unserviceable — it must not return to service until the defects are rectified and a further test flight passes." } }
+  ],
+
+  "route": [
+    { "step": 1, "party": "tp", "sign": true },
+    { "step": 2, "party": "me", "sign": true, "assignedBy": "later", "pool": "ME",
+      "canDelegate": true, "slaDays": 2 }
+  ],
+
+  "export": { "docx": "D-0507-FTR-001.docx", "lockUntilComplete": true }
+}

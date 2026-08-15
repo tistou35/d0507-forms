@@ -1,0 +1,162 @@
+{
+  "code": "PCR-FI",
+  "doc": "D-0507-PCR-FI-001",
+  "control": "IM-PCR-FI-301-A",
+  "issue": "01",
+  "rev": "01",
+  "eff": "06 JUN 2026",
+  "title": { "th": "บันทึกการตรวจสมรรถนะครูการบิน", "en": "In-House Proficiency Check Record — Flight Instructor" },
+  "retain": "OMA A.10",
+
+  "ui": {
+    "compact": true,
+    "tabs": [
+      { "k": "T1", "th": "ข้อมูลการตรวจ", "en": "Check details" },
+      { "k": "T2", "th": "การประเมิน", "en": "Evaluation" },
+      { "k": "T3", "th": "ผลและลงนาม", "en": "Outcome & sign" }
+    ]
+  },
+
+  "parties": [
+    { "k": "con", "n": { "th": "ผู้ทำการตรวจ (HT / CFI / CTKI)", "en": "Conductor (HT / CFI / CTKI)" }, "auth": "role:mgt" },
+    { "k": "fi",  "n": { "th": "ครูการบินผู้รับการตรวจ", "en": "Flight Instructor" }, "auth": "role:ins" }
+  ],
+
+  "sections": [
+    {
+      "k": "A", "tab": "T1", "party": "con",
+      "title": { "th": "ข้อมูลครูและการตรวจ", "en": "Instructor and check details" },
+      "desc": {
+        "th": "ครอบคลุมการตรวจทั้งสามระดับ — Tier 1 IPC ภายใน · Tier 2 LPC+ สังเกตการสอน · Tier 3 ประเมินสมรรถนะ (AoC)",
+        "en": "Covers all three proficiency tiers — Tier 1 in-house IPC · Tier 2 LPC+ instructional observation · Tier 3 Assessment of Competence (AoC)." },
+      "fields": [
+        { "k": "insName", "type": "text", "req": true, "half": true,
+          "label": { "th": "ชื่อครูการบิน", "en": "Instructor name" } },
+        { "k": "certNo", "type": "text", "req": true, "half": true,
+          "label": { "th": "เลขที่ใบรับรอง CAAT", "en": "CAAT certificate No." } },
+        { "k": "checkDate", "type": "date", "req": true, "prefill": "today", "half": true,
+          "label": { "th": "วันที่ตรวจ", "en": "Date of check" } },
+        { "k": "duration", "type": "number", "req": true, "min": 0, "step": 0.1, "half": true,
+          "label": { "th": "ระยะเวลา (ชม.)", "en": "Duration (hrs)" } },
+        { "k": "conductor", "type": "text", "req": true, "half": true,
+          "label": { "th": "ผู้ทำการตรวจ (HT / CFI / CTKI)", "en": "Conductor (HT / CFI / CTKI)" } },
+        { "k": "tier", "type": "select", "req": true,
+          "label": { "th": "ระดับการตรวจ / ประเภท IPC", "en": "Tier / IPC type" },
+          "opt": [
+            { "v": "t1annual",  "n": { "th": "Tier 1 — IPC ประจำปี", "en": "Tier 1 — Annual IPC" } },
+            { "v": "t1initial", "n": { "th": "Tier 1 — IPC แรกเข้า", "en": "Tier 1 — Initial IPC" } },
+            { "v": "t1postcor", "n": { "th": "Tier 1 — หลังการแก้ไขมาตรฐาน", "en": "Tier 1 — Post-corrective" } },
+            { "v": "t1postabs", "n": { "th": "Tier 1 — หลังหยุดปฏิบัติหน้าที่", "en": "Tier 1 — Post-absence" } },
+            { "v": "t1directed","n": { "th": "Tier 1 — ตามคำสั่ง", "en": "Tier 1 — Directed" } },
+            { "v": "t2lpc",     "n": { "th": "Tier 2 — LPC+", "en": "Tier 2 — LPC+" } },
+            { "v": "t3aoc",     "n": { "th": "Tier 3 — ประเมินสมรรถนะ (AoC)", "en": "Tier 3 — AoC" } } ] },
+        { "k": "acReg", "type": "text", "req": true, "half": true,
+          "label": { "th": "แบบ / ทะเบียนอากาศยาน", "en": "Aircraft type / registration" } },
+        { "k": "venue", "type": "text", "req": true, "half": true,
+          "label": { "th": "สถานที่ / สนามบิน / พื้นที่ฝึก", "en": "Venue / airfield / training area" } },
+        { "k": "combined", "type": "select",
+          "opt": [
+            { "v": "yes", "n": { "th": "ใช่", "en": "Yes" } },
+            { "v": "no",  "n": { "th": "ไม่ใช่", "en": "No" } } ],
+          "label": { "th": "เป็นเที่ยวบินรวม (Combined sortie) — ระบุในหมายเหตุ",
+                     "en": "Combined sortie — note in Remarks (Section C.2)" } }
+      ]
+    },
+    {
+      "k": "B", "tab": "T2", "party": "con",
+      "title": { "th": "การประเมินครูการบิน", "en": "Flight Instructor evaluation" },
+      "desc": {
+        "th": "เกณฑ์การให้คะแนนตาม IM-ECA-301-A · ★ = ข้อสำคัญด้านความปลอดภัย เกรด 1 หรือ 2 = ไม่ผ่านทันที · เกณฑ์ผ่าน คือเกรด 3 ขึ้นไปทุกข้อ",
+        "en": "Grading per IM-ECA-301-A. ★ = safety-critical: grade 1 or 2 is an automatic fail. Pass standard: grade 3+ in ALL areas." },
+      "fields": [
+        { "k": "g1", "type": "grade", "max": 5, "req": true,
+          "label": { "th": "การบรีฟก่อนบิน", "en": "Pre-flight briefing" } },
+        { "k": "g2", "type": "grade", "max": 5, "req": true,
+          "label": { "th": "การสาธิตและเทคนิค", "en": "Demonstration and technique" } },
+        { "k": "g3", "type": "grade", "max": 5, "req": true,
+          "label": { "th": "การบรรยายประกอบการสอน", "en": "Instructional patter" } },
+        { "k": "g4", "type": "grade", "max": 5, "req": true,
+          "label": { "th": "การดูแลนักเรียน", "en": "Student management" } },
+        { "k": "g5", "type": "grade", "max": 5, "req": true, "star": true,
+          "label": { "th": "ความปลอดภัยและวินัยการบิน", "en": "Safety and airmanship" } },
+        { "k": "g6", "type": "grade", "max": 5, "req": true,
+          "label": { "th": "การบรีฟหลังบิน", "en": "Post-flight debrief" } },
+        { "k": "g7", "type": "grade", "max": 5, "req": true,
+          "label": { "th": "การจัดทำเอกสาร", "en": "Documentation" } }
+      ]
+    },
+    {
+      "k": "C", "tab": "T3", "party": "con",
+      "title": { "th": "ผลการตรวจ", "en": "Outcome" },
+      "fields": [
+        { "k": "result", "type": "select", "req": true,
+          "label": { "th": "ผล", "en": "Result" },
+          "opt": [
+            { "v": "pass",     "n": { "th": "ผ่าน", "en": "Pass" } },
+            { "v": "marginal", "n": { "th": "ผ่านแบบมีเงื่อนไข", "en": "Marginal pass" } },
+            { "v": "fail",     "n": { "th": "ไม่ผ่าน", "en": "Fail" } },
+            { "v": "unsat",    "n": { "th": "ต่ำกว่าเกณฑ์อย่างมาก", "en": "Unsatisfactory" } } ] },
+        { "k": "remarks", "type": "textarea",
+          "label": { "th": "ความเห็นผู้ตรวจ / ข้อที่ควรปรับปรุง", "en": "Conductor remarks / areas for improvement" } },
+        { "k": "followup", "type": "textarea", "reqIf": "result == 'marginal' || result == 'fail' || result == 'unsat'",
+          "label": { "th": "การติดตามผลที่ต้องทำ", "en": "Follow-up action required" } },
+        { "k": "recheckDue", "type": "date", "half": true,
+          "label": { "th": "กำหนดตรวจซ้ำ (ถ้ามี)", "en": "Re-check due date (if applicable)" } },
+        { "k": "correctiveInit", "type": "select",
+          "opt": [
+            { "v": "yes", "n": { "th": "ใช่", "en": "Yes" } },
+            { "v": "no",  "n": { "th": "ไม่ใช่", "en": "No" } } ],
+          "label": { "th": "เปิดการอบรมแก้ไขมาตรฐานตาม D.2.8 แล้ว", "en": "D.2.8 corrective standardisation initiated" } },
+        { "k": "htNotified", "type": "date", "showIf": "correctiveInit == 'yes'", "half": true,
+          "label": { "th": "วันที่แจ้งหัวหน้าครูฝึก", "en": "Date notified to HT" } }
+      ]
+    },
+    {
+      "k": "D", "tab": "T3", "party": "con",
+      "title": { "th": "ลงนามผู้ตรวจ", "en": "Conductor signature" },
+      "fields": [
+        { "k": "conName", "type": "text", "req": true, "half": true,
+          "label": { "th": "ชื่อผู้ตรวจ", "en": "Conductor name" } },
+        { "k": "conDate", "type": "date", "req": true, "prefill": "today", "half": true,
+          "label": { "th": "วันที่", "en": "Date" } },
+        { "k": "conSign", "type": "sign", "req": true,
+          "label": { "th": "ลายเซ็นผู้ตรวจ", "en": "Conductor signature" } }
+      ]
+    },
+    {
+      "k": "E", "tab": "T3", "party": "fi", "hideOthers": true,
+      "title": { "th": "ครูการบินรับทราบ", "en": "Flight Instructor acknowledgement" },
+      "fields": [
+        { "k": "fiAckName", "type": "text", "req": true, "half": true,
+          "label": { "th": "ชื่อครูการบิน", "en": "Flight Instructor name" } },
+        { "k": "fiAckDate", "type": "date", "req": true, "half": true,
+          "label": { "th": "วันที่", "en": "Date" } },
+        { "k": "fiSign", "type": "sign", "req": true,
+          "label": { "th": "ลายเซ็นครูการบิน", "en": "Flight Instructor signature" } }
+      ]
+    }
+  ],
+
+  "compute": [
+    { "k": "total", "op": "sum", "of": ["g1", "g2", "g3", "g4", "g5", "g6", "g7"] },
+    { "k": "pct", "op": "pct", "of": "total", "max": 35 }
+  ],
+
+  "gates": [
+    { "when": "anyStarBelow(3)", "level": "stop",
+      "short": { "th": "ไม่ผ่าน — ข้อความปลอดภัย", "en": "SAFETY FAIL" },
+      "msg": { "th": "ไม่ผ่าน — ข้อที่เป็น safety-critical ได้เกรดต่ำกว่า 3 ถือว่าไม่ผ่านทันที แม้คะแนนรวมจะถึงเกณฑ์",
+               "en": "Automatic fail — a safety-critical area graded below 3 fails the check regardless of total score." } },
+    { "when": "anyBelow(3)", "level": "warn",
+      "short": { "th": "มีข้อต่ำกว่าเกณฑ์", "en": "BELOW STD" },
+      "msg": { "th": "เกณฑ์ผ่านคือเกรด 3 ขึ้นไปทุกข้อ — มีข้อที่ต่ำกว่าเกณฑ์ ให้พิจารณาผลเป็น Marginal Pass หรือ Fail ตามกรอบใน OMA D.2.9",
+               "en": "Pass standard is grade 3+ in every area. Determine Marginal Pass or Fail per the OMA D.2.9 outcome framework." } }
+  ],
+
+  "route": [
+    { "step": 1, "party": "con", "sign": true },
+    { "step": 2, "party": "fi", "sign": true, "assignedBy": "submitter", "slaDays": 2 }
+  ],
+
+  "export": { "docx": "D-0507-PCR-FI-001.docx", "lockUntilComplete": true }
+}

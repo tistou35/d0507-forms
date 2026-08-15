@@ -1,0 +1,144 @@
+{
+  "code": "RTR",
+  "doc": "D-0507-RTR-001",
+  "control": "IM-RTR-301-A",
+  "issue": "01",
+  "rev": "00",
+  "eff": "06 JUN 2026",
+  "title": { "th": "บันทึกการอบรมทบทวน", "en": "Refresher Training Record" },
+  "retain": "OMA A.10",
+
+  "ui": {
+    "compact": true,
+    "tabs": [
+      { "k": "T1", "th": "ครูและการอบรม", "en": "Instructor & session" },
+      { "k": "T2", "th": "หัวข้อและผล", "en": "Topics & outcome" },
+      { "k": "T3", "th": "ลงนาม", "en": "Signatures" }
+    ]
+  },
+
+  "parties": [
+    { "k": "ins", "n": { "th": "ครูผู้รับการอบรม", "en": "Instructor" }, "auth": "role:ins" },
+    { "k": "ht",  "n": { "th": "หัวหน้าครูฝึก", "en": "Head of Training" }, "auth": "role:mgt" }
+  ],
+
+  "sections": [
+    {
+      "k": "A", "tab": "T1", "party": "ht",
+      "title": { "th": "ข้อมูลครู", "en": "Instructor details" },
+      "fields": [
+        { "k": "insName", "type": "text", "req": true, "half": true,
+          "label": { "th": "ชื่อครู", "en": "Instructor name" } },
+        { "k": "fiCertNo", "type": "text", "req": true, "half": true,
+          "label": { "th": "เลขที่ใบรับรองครูการบิน", "en": "FI certificate No." } },
+        { "k": "ratings", "type": "text", "half": true,
+          "label": { "th": "ศักย์การบินที่ถือ", "en": "Instructor rating(s)" } },
+        { "k": "certExpiry", "type": "date", "req": true, "half": true,
+          "label": { "th": "วันหมดอายุใบรับรอง", "en": "Certificate expiry date" } }
+      ]
+    },
+    {
+      "k": "B", "tab": "T1", "party": "ht",
+      "title": { "th": "รายละเอียดการอบรม", "en": "Training session details" },
+      "fields": [
+        { "k": "trainDate", "type": "date", "req": true, "prefill": "today", "half": true,
+          "label": { "th": "วันที่อบรม", "en": "Date of training" } },
+        { "k": "duration", "type": "number", "req": true, "min": 0, "step": 0.5, "half": true,
+          "label": { "th": "ระยะเวลา (ชม.)", "en": "Duration (hours)" } },
+        { "k": "venue", "type": "text", "req": true,
+          "label": { "th": "สถานที่", "en": "Venue / location" } },
+        { "k": "trainType", "type": "select", "req": true,
+          "label": { "th": "ประเภทการอบรม", "en": "Training type" },
+          "opt": [
+            { "v": "annual",     "n": { "th": "สัมมนาประจำปี", "en": "Annual seminar" } },
+            { "v": "perf",       "n": { "th": "ตามเหตุ — สมรรถนะ", "en": "Trigger-based (performance)" } },
+            { "v": "regulatory", "n": { "th": "ตามเหตุ — กฎเปลี่ยน", "en": "Trigger-based (regulatory)" } },
+            { "v": "safety",     "n": { "th": "ตามเหตุ — เหตุด้านนิรภัย", "en": "Trigger-based (safety occurrence)" } },
+            { "v": "renewal",    "n": { "th": "ต่ออายุศักย์การบิน", "en": "Rating renewal" } } ] }
+      ]
+    },
+    {
+      "k": "C", "tab": "T2", "party": "ht",
+      "title": { "th": "หัวข้อที่อบรม", "en": "Topics covered" },
+      "desc": { "th": "อ้างอิงหลักสูตรสัมมนาตาม OMA D.2.7", "en": "Ref. D.2.7 seminar syllabus" },
+      "fields": [
+        { "k": "topics", "type": "multi", "req": true,
+          "label": { "th": "เลือกได้หลายข้อ", "en": "Select all that apply" },
+          "opt": [
+            { "v": "regulatory","n": { "th": "กฎที่เปลี่ยนแปลง (CAAT / ICAO)", "en": "Regulatory updates (CAAT / ICAO)" } },
+            { "v": "teaching",  "n": { "th": "เทคนิคการสอนและการเรียนรู้", "en": "Teaching and learning techniques" } },
+            { "v": "humanfac",  "n": { "th": "ปัจจัยมนุษย์และการจัดการความล้า", "en": "Human factors and fatigue management" } },
+            { "v": "safety",    "n": { "th": "ความปลอดภัยการบินและความตระหนัก SMS", "en": "Flight safety and SMS awareness" } },
+            { "v": "grading",   "n": { "th": "มาตรฐานการให้คะแนนและการทำให้เป็นมาตรฐานเดียวกัน", "en": "Standardisation and grading standards" } },
+            { "v": "other",     "n": { "th": "อื่น ๆ", "en": "Other" } } ] },
+        { "k": "topicOther", "type": "text", "showIf": "topics has 'other'", "reqIf": "topics has 'other'",
+          "label": { "th": "ระบุหัวข้ออื่น", "en": "Other — specify" } }
+      ]
+    },
+    {
+      "k": "D", "tab": "T2", "party": "ht",
+      "title": { "th": "ผู้ฝึกอบรม", "en": "Trainer / facilitator" },
+      "fields": [
+        { "k": "trainerName", "type": "text", "req": true, "half": true,
+          "label": { "th": "ชื่อผู้ฝึกอบรม", "en": "Trainer name" } },
+        { "k": "trainerRole", "type": "text", "req": true, "half": true,
+          "label": { "th": "คุณวุฒิ / บทบาท", "en": "Qualification / role" } }
+      ]
+    },
+    {
+      "k": "E", "tab": "T2", "party": "ht",
+      "title": { "th": "ผลการประเมิน", "en": "Assessment outcome" },
+      "fields": [
+        { "k": "outcome", "type": "select", "req": true,
+          "label": { "th": "ผลรวม", "en": "Overall outcome" },
+          "opt": [
+            { "v": "sat",   "n": { "th": "ผ่าน", "en": "Satisfactory" } },
+            { "v": "unsat", "n": { "th": "ไม่ผ่าน", "en": "Unsatisfactory" } } ] },
+        { "k": "comments", "type": "textarea", "reqIf": "outcome == 'unsat'",
+          "label": { "th": "ความเห็น / การติดตามผล", "en": "Comments / follow-up action" } },
+        { "k": "nextDue", "type": "date", "req": true, "half": true,
+          "label": { "th": "กำหนดอบรมทบทวนครั้งถัดไป", "en": "Date of next due refresher" } },
+        { "k": "scheduledBy", "type": "text", "half": true,
+          "label": { "th": "ผู้กำหนดตาราง (ISM)", "en": "Scheduled by (ISM)" } }
+      ]
+    },
+    {
+      "k": "F", "tab": "T3", "party": "ht",
+      "title": { "th": "ลงนามหัวหน้าครูฝึก", "en": "Head of Training signature" },
+      "fields": [
+        { "k": "htName", "type": "text", "req": true, "half": true,
+          "label": { "th": "ชื่อหัวหน้าครูฝึก", "en": "Head of Training name" } },
+        { "k": "htDate", "type": "date", "req": true, "prefill": "today", "half": true,
+          "label": { "th": "วันที่", "en": "Date" } },
+        { "k": "htSign", "type": "sign", "req": true,
+          "label": { "th": "ลายเซ็นหัวหน้าครูฝึก", "en": "Head of Training signature" } }
+      ]
+    },
+    {
+      "k": "G", "tab": "T3", "party": "ins", "hideOthers": true,
+      "title": { "th": "ครูรับทราบ", "en": "Instructor acknowledgement" },
+      "fields": [
+        { "k": "insAckName", "type": "text", "req": true, "half": true,
+          "label": { "th": "ชื่อครู", "en": "Instructor name" } },
+        { "k": "insAckDate", "type": "date", "req": true, "half": true,
+          "label": { "th": "วันที่", "en": "Date" } },
+        { "k": "insSign", "type": "sign", "req": true,
+          "label": { "th": "ลายเซ็นครู", "en": "Instructor signature" } }
+      ]
+    }
+  ],
+
+  "gates": [
+    { "when": "outcome == 'unsat'", "level": "warn",
+      "short": { "th": "ไม่ผ่าน", "en": "UNSAT" },
+      "msg": { "th": "ผลไม่ผ่าน — ต้องบันทึกการติดตามผล และพิจารณาเปิดการอบรมแก้ไขมาตรฐานตาม OMA D.2.8",
+               "en": "Unsatisfactory — record the follow-up action and consider initiating corrective standardisation per OMA D.2.8." } }
+  ],
+
+  "route": [
+    { "step": 1, "party": "ht", "sign": true },
+    { "step": 2, "party": "ins", "sign": true, "assignedBy": "submitter", "slaDays": 7 }
+  ],
+
+  "export": { "docx": "D-0507-RTR-001.docx", "lockUntilComplete": true }
+}

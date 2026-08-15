@@ -403,7 +403,11 @@ footer{text-align:center;color:var(--g-400);font-size:12px;padding:22px}
   padding:8px 18px;font-size:14px;cursor:pointer;font-family:var(--font-sans);color:var(--fg-1)}
 .fk-opt[aria-pressed="true"]{border-color:var(--sky-500);border-width:2px;
   background:var(--sky-100);color:var(--sky-600);font-weight:600}
-.fk-suna{display:flex;gap:6px}
+.fk-suna{display:flex;gap:6px;flex-wrap:wrap}
+/* สเกล 5-6 ระดับ (SEF · EFM) ปุ่มต้องแคบลง ไม่งั้นล้นจอมือถือ */
+.fk-suna.many button{min-width:38px;font-size:11px;padding:0 5px;line-height:1.2}
+/* ค่าที่เลือกต้องเห็นชัดแม้ค่าไม่ใช่ S/U/NA — กฎเฉพาะสีข้างล่างจะทับอีกที */
+.fk-suna button[aria-pressed="true"]{background:var(--sky-500);color:#fff;border-color:var(--sky-500)}
 .fk-suna button{min-width:52px;min-height:44px;border-radius:8px;border:1px solid var(--border-med);
   background:var(--surface);font-weight:700;font-size:13.5px;cursor:pointer;font-family:var(--font-sans)}
 .fk-suna button[aria-pressed="true"][data-v="S"]{background:var(--green-100);color:var(--green-600);border-color:var(--green-600)}
@@ -530,6 +534,20 @@ footer{text-align:center;color:var(--g-400);font-size:12px;padding:22px}
 .fk-opts.sm .fk-opt[aria-pressed="true"] em{color:var(--sky-600)}
 .fk-signwrap{position:relative}
 .fk-signwrap [data-clearsign]{position:absolute;right:10px;bottom:10px}
+
+/* ตารางแถวซ้ำ — เลื่อนแนวนอนในกรอบตัวเอง หน้าเว็บทั้งหน้าต้องไม่เลื่อนตาม */
+.fk-tw{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:8px}
+.fk-tbl{border-collapse:collapse;width:100%;min-width:520px}
+.fk-tbl th{text-align:left;font-size:11px;font-weight:700;color:var(--g-500);
+  padding:4px 6px;border-bottom:1px solid var(--g-200);white-space:nowrap}
+.fk-tbl td{padding:2px 3px;border-bottom:1px solid var(--g-100)}
+.fk-tbl input{width:100%;padding:6px 8px;font-size:13px;border:1px solid transparent;
+  border-radius:4px;background:transparent;color:inherit}
+.fk-tbl input:hover:not(:disabled){border-color:var(--g-200)}
+.fk-tbl input:focus{border-color:var(--sky-500);background:var(--bg-card);outline:none}
+.fk-tbl .fk-trm{width:32px}
+.fk-tbl .fk-trm button{padding:2px 8px;line-height:1.4;color:var(--g-400)}
+.fk-tbl .fk-trm button:hover{color:var(--red-500)}
 
 /* top เท่ากับความสูง .topbar พอดี — topbar สูง 64px ทุกขนาดจอ
    เคยตั้ง 56px บนมือถือ ทำให้แถบคะแนนมุดใต้ topbar ไป 8px */

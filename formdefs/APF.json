@@ -1,0 +1,130 @@
+{
+  "code": "APF",
+  "doc": "D-0507-APF-001",
+  "control": "AD/APF/301-A",
+  "issue": "01",
+  "rev": "00",
+  "eff": "14 SEP 2022",
+  "title": { "th": "แบบอุทธรณ์", "en": "Appeal Form" },
+  "retain": "OMA A.10",
+
+  "ui": {
+    "compact": true,
+    "tabs": [
+      { "k": "T1", "th": "ผู้อุทธรณ์", "en": "Appellant" },
+      { "k": "T2", "th": "คำวินิจฉัยที่อุทธรณ์", "en": "Decision" },
+      { "k": "T3", "th": "เหตุผลและลงนาม", "en": "Grounds & sign" }
+    ]
+  },
+
+  "parties": [
+    { "k": "app", "n": { "th": "ผู้อุทธรณ์", "en": "Appellant" }, "auth": "public" },
+    { "k": "acm", "n": { "th": "ผู้จัดการฝ่ายรับผิดชอบ", "en": "Accountable Manager" }, "auth": "role:mgt" }
+  ],
+
+  "sections": [
+    {
+      "k": "A", "tab": "T1", "party": "app",
+      "title": { "th": "ผู้อุทธรณ์", "en": "Appellant details" },
+      "desc": {
+        "th": "ผู้ที่ได้รับผลกระทบจากคำวินิจฉัยของ ATO มีสิทธิยื่นอุทธรณ์ ต้องยื่นภายใน 14 วันนับจากวันที่มีคำวินิจฉัย",
+        "en": "Anyone adversely affected by a decision of the ATO may appeal. Must be lodged within 14 calendar days of the original decision." },
+      "fields": [
+        { "k": "appName", "type": "text", "req": true, "half": true,
+          "label": { "th": "ชื่อ-นามสกุล", "en": "Full name" } },
+        { "k": "appId", "type": "text", "req": true, "half": true,
+          "label": { "th": "เลขบัตรประชาชน / เลขใบอนุญาต", "en": "ID / Licence No." } },
+        { "k": "appDate", "type": "date", "req": true, "prefill": "today", "half": true,
+          "label": { "th": "วันที่ยื่นอุทธรณ์", "en": "Date of appeal" } },
+        { "k": "appRole", "type": "text", "req": true, "half": true,
+          "label": { "th": "สถานะ / หลักสูตร", "en": "Role / course" } },
+        { "k": "appPhone", "type": "tel", "req": true, "half": true,
+          "label": { "th": "เบอร์ติดต่อ", "en": "Contact no." } },
+        { "k": "appEmail", "type": "email", "req": true, "half": true,
+          "label": { "th": "อีเมล", "en": "Email" } }
+      ]
+    },
+    {
+      "k": "B", "tab": "T2", "party": "app",
+      "title": { "th": "คำวินิจฉัยที่ขออุทธรณ์", "en": "Decision being appealed" },
+      "fields": [
+        { "k": "decNature", "type": "text", "req": true,
+          "label": { "th": "คำวินิจฉัยเรื่องใด", "en": "Nature of decision" } },
+        { "k": "decDate", "type": "date", "req": true, "half": true,
+          "label": { "th": "วันที่มีคำวินิจฉัย", "en": "Decision date" } },
+        { "k": "decBy", "type": "text", "req": true, "half": true,
+          "label": { "th": "ผู้มีคำวินิจฉัย", "en": "Decision made by" } },
+        { "k": "decCat", "type": "select", "req": true,
+          "label": { "th": "ประเภท", "en": "Category" },
+          "opt": [
+            { "v": "assessment",  "n": { "th": "ผลการประเมิน", "en": "Assessment result" } },
+            { "v": "exam",        "n": { "th": "การสอบไม่ผ่าน", "en": "Examination failure" } },
+            { "v": "enrolment",   "n": { "th": "การรับเข้าเรียน", "en": "Enrolment decision" } },
+            { "v": "disciplinary","n": { "th": "การลงโทษทางวินัย", "en": "Disciplinary action" } },
+            { "v": "other",       "n": { "th": "อื่น ๆ", "en": "Other" } } ] },
+        { "k": "decOther", "type": "text", "showIf": "decCat == 'other'", "reqIf": "decCat == 'other'",
+          "label": { "th": "ระบุประเภทอื่น", "en": "Other — specify" } }
+      ]
+    },
+    {
+      "k": "C", "tab": "T3", "party": "app",
+      "title": { "th": "เหตุผลในการอุทธรณ์", "en": "Grounds for appeal" },
+      "fields": [
+        { "k": "grounds", "type": "textarea", "req": true,
+          "label": { "th": "ระบุเหตุผลที่ใช้อุทธรณ์ พร้อมอ้างอิงกฎ ระเบียบ ขั้นตอน หรือข้อเท็จจริงที่เกี่ยวข้อง",
+                     "en": "State the specific grounds on which this appeal is based (cite relevant regulations, procedures, or facts)" } },
+        { "k": "evidence", "type": "textarea",
+          "label": { "th": "เอกสารหรือหลักฐานที่แนบ", "en": "Documents, records, or evidence attached in support" } }
+      ]
+    },
+    {
+      "k": "D", "tab": "T3", "party": "app",
+      "title": { "th": "คำรับรองและลงนาม", "en": "Declaration and signature" },
+      "fields": [
+        { "k": "declare", "type": "check", "req": true,
+          "label": { "th": "ข้าพเจ้าขอรับรองว่าข้อมูลในคำอุทธรณ์นี้เป็นความจริงและครบถ้วน และเข้าใจว่าต้องยื่นภายใน 14 วันนับจากวันที่มีคำวินิจฉัย",
+                     "en": "I declare that the information provided is truthful and complete, and I understand an appeal must be submitted within 14 calendar days of the original decision." } },
+        { "k": "appSign", "type": "sign", "req": true,
+          "label": { "th": "ลายเซ็นผู้อุทธรณ์", "en": "Appellant signature" } },
+        { "k": "submitDate", "type": "date", "req": true, "prefill": "today", "half": true,
+          "label": { "th": "วันที่ยื่น", "en": "Date submitted" } },
+        { "k": "recvBy", "type": "text", "half": true,
+          "label": { "th": "ผู้รับเรื่อง (ธุรการ)", "en": "Received by (Admin)" } }
+      ]
+    },
+    {
+      "k": "E", "tab": "T3", "party": "acm", "hideOthers": true,
+      "title": { "th": "ผลการพิจารณา", "en": "Appeal outcome" },
+      "fields": [
+        { "k": "outcome", "type": "select", "req": true,
+          "label": { "th": "ผลการพิจารณา", "en": "Outcome" },
+          "opt": [
+            { "v": "upheld",  "n": { "th": "อุทธรณ์ฟังขึ้น", "en": "Appeal upheld" } },
+            { "v": "partly",  "n": { "th": "อุทธรณ์ฟังขึ้นบางส่วน", "en": "Appeal partly upheld" } },
+            { "v": "dismissed","n": { "th": "ยกอุทธรณ์", "en": "Appeal dismissed" } } ] },
+        { "k": "notifyDate", "type": "date", "req": true, "half": true,
+          "label": { "th": "วันที่แจ้งผล", "en": "Date notified" } },
+        { "k": "decidedBy", "type": "text", "req": true, "half": true,
+          "label": { "th": "ผู้พิจารณา", "en": "Decided by" } },
+        { "k": "acmRemark", "type": "textarea",
+          "label": { "th": "หมายเหตุ / การดำเนินการ", "en": "Remarks / action taken" } },
+        { "k": "acmSign", "type": "sign", "req": true,
+          "label": { "th": "ลายเซ็นผู้พิจารณา", "en": "Signature" } }
+      ]
+    }
+  ],
+
+  "gates": [
+    { "when": "decDate != '' && appDate != ''", "level": "info",
+      "msg": { "th": "ต้องยื่นอุทธรณ์ภายใน 14 วันนับจากวันที่มีคำวินิจฉัย — ตรวจวันที่ทั้งสองช่องให้ตรงกับความเป็นจริงก่อนส่ง",
+               "en": "An appeal must be lodged within 14 calendar days of the decision. Check both dates before submitting." } }
+  ],
+
+  "route": [
+    { "step": 1, "party": "app", "sign": true },
+    { "step": 2, "party": "acm", "sign": true, "assignedBy": "later", "pool": "ACM",
+      "canDelegate": true, "slaDays": 7 }
+  ],
+
+  "export": { "docx": "D-0507-APF-001.docx", "lockUntilComplete": true }
+}

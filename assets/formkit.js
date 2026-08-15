@@ -21,8 +21,8 @@
     readonly:   { th: 'อ่านอย่างเดียว', en: 'read only' },
     blind:      { th: 'ส่วนนี้ถูกซ่อนไว้จนกว่าคุณจะส่งส่วนของตัวเอง — ตามข้อกำหนดที่ให้แต่ละฝ่ายประเมินอย่างอิสระ',
                   en: 'Hidden until you submit your own part — each party assesses independently.' },
-    tableTodo:  { th: 'ตารางแถวซ้ำ — จะเปิดใช้เมื่อใส่ข้อมูลฟอร์มที่ต้องใช้ (ALR รายวัน · MRF timesheet)',
-                  en: 'Repeating table — enabled when a form that needs it is defined (daily ALR · MRF timesheet).' },
+    rowAdd:     { th: 'เพิ่มแถว', en: 'Add row' },
+    rowDel:     { th: 'ลบแถวที่', en: 'Delete row' },
     clearSign:  { th: 'ล้างลายเซ็น', en: 'Clear signature' },
     route:      { th: 'ลำดับอนุมัติ', en: 'Approval route' },
     step:       { th: 'ขั้นที่', en: 'Step' },
@@ -62,6 +62,7 @@
     if (fn) {
       const arg = fn[2].trim().replace(/^['"]|['"]$/g, '');
       if (fn[1] === 'anyStarBelow') return ctx.__anyStarBelow(Number(arg));
+      if (fn[1] === 'anyBelow') return ctx.__anyBelow(Number(arg));
       if (fn[1] === 'filled') return ctx[arg] !== undefined && ctx[arg] !== '' && ctx[arg] !== null;
       return false;
     }
@@ -145,6 +146,15 @@
     d = d || new Date();
     return p2(d.getHours()) + ':' + p2(d.getMinutes());
   }
+  /* แถวของ field ชนิด table — เติมให้ครบ rows ขั้นต่ำเสมอ
+     กระดาษพิมพ์แถวว่างไว้ให้เขียน หน้าจอจึงควรมีแถวว่างรออยู่เท่ากัน ไม่ใช่เริ่มจากศูนย์ */
+  function tableRows(f, v) {
+    const arr = Array.isArray(v) ? v.slice() : [];
+    const min = f.rows || 1;
+    while (arr.length < min) arr.push({});
+    return arr;
+  }
+
   /* ISO -> DD/MM/YYYY · ช่อง <input type="date"> แสดงตาม locale ของเบราว์เซอร์
      ซึ่งบังคับไม่ได้ จึงต้องมีบรรทัดกำกับว่าวันที่ที่เลือกคือวันไหนกันแน่ */
   function dmy(iso) {
@@ -186,10 +196,14 @@
   FormKit.prototype.ctx = function () {
     const c = Object.assign({}, this.data, this.computed());
     const self = this;
-    c.__anyStarBelow = n => Object.keys(self.fields).some(k => {
+    // เกรดที่ยังไม่ได้ให้ ไม่นับว่าต่ำกว่าเกณฑ์ — ไม่งั้นฟอร์มเปล่าจะขึ้นว่าไม่ผ่านทันที
+    const below = (n, starOnly) => Object.keys(self.fields).some(k => {
       const f = self.fields[k];
-      return f.type === 'grade' && f.star && self.data[k] !== undefined && Number(self.data[k]) < n;
+      if (f.type !== 'grade' || (starOnly && !f.star)) return false;
+      return self.data[k] !== undefined && self.data[k] !== '' && Number(self.data[k]) < n;
     });
+    c.__anyStarBelow = n => below(n, true);
+    c.__anyBelow = n => below(n, false);
     return c;
   };
 
@@ -371,13 +385,18 @@
 
       case 'checklist': {
         const st = v || {};
+        /* ตารางให้คะแนน — หัวข้อเป็นแถว ตัวเลือกเป็นคอลัมน์
+           จำนวนคอลัมน์ตั้งได้: FTR ใช้ 3 (ผ่าน/ไม่ผ่าน/ไม่ได้ทดสอบ)
+           EFC ใช้ 2 · SEF กับ EFM ใช้ 6 (Excellent…N/A) ตามที่กระดาษวางไว้
+           ไม่ระบุ = S/U/NA แบบเดิม ฟอร์มที่ทำไว้ก่อนหน้าจึงไม่ต้องแก้ */
+        const cols = f.opts || [{ v: 'S' }, { v: 'U' }, { v: 'NA' }];
         body = (f.items || []).map(it => `
           <div class="fk-item">
-            <span class="txt"><span class="id">${esc(it.id)}</span>${esc(L(it, this.lang) || it.th || '')}
+            <span class="txt">${it.id ? `<span class="id">${esc(it.id)}</span>` : ''}${esc(L(it, this.lang) || it.th || '')}
               ${it.how ? `<span class="id" style="color:var(--g-500);margin-top:3px">${esc(it.how)}</span>` : ''}</span>
-            <span class="fk-suna">${['S', 'U', 'NA'].map(x =>
-              `<button type="button" data-cl="${esc(f.k)}" data-item="${esc(it.id)}" data-v="${x}"
-                 aria-pressed="${st[it.id] === x}"${dis}>${x}</button>`).join('')}</span>
+            <span class="fk-suna${cols.length > 3 ? ' many' : ''}">${cols.map(c =>
+              `<button type="button" data-cl="${esc(f.k)}" data-item="${esc(it.id)}" data-v="${esc(c.v)}"
+                 aria-pressed="${st[it.id] === c.v}"${dis}>${esc(c.n ? L(c.n, this.lang) : c.v)}</button>`).join('')}</span>
           </div>`).join('');
         break;
       }
@@ -387,9 +406,28 @@
           ${ro ? '' : `<button type="button" class="fb sm" data-clearsign>${esc(T('clearSign', this.lang))}</button>`}</div>`;
         break;
 
-      case 'table':
-        body = `<div class="fk-static">${esc(T('tableTodo', this.lang))}</div>`;
+      /* แถวซ้ำ — DRC รายการเอกสารที่รับ · MOC แผนดำเนินการ
+         ค่าเก็บเป็น array ของ object ทุกแถวมีคีย์ตาม cols[].k
+         แถวว่างทั้งแถวไม่นับเป็นข้อมูล ตอนส่งออกจึงไม่กินบรรทัดในเอกสาร */
+      case 'table': {
+        const cols = f.cols || [];
+        const rows = tableRows(f, v);
+        const head = cols.map(c =>
+          `<th${c.w ? ` style="width:${esc(c.w)}"` : ''}>${esc(L(c.label, this.lang))}</th>`).join('');
+        const body_ = rows.map((row, ri) => `<tr>${cols.map(c => {
+          const cv = row[c.k] == null ? '' : row[c.k];
+          const t = ['number', 'date', 'time'].includes(c.type) ? c.type : 'text';
+          return `<td><input type="${t}" data-tk="${esc(f.k)}" data-tr="${ri}" data-tc="${esc(c.k)}"
+            value="${esc(cv)}"${ro ? ' disabled' : ''}></td>`;
+        }).join('')}${ro ? '' : `<td class="fk-trm"><button type="button" class="fb sm"
+            data-tdel="${esc(f.k)}" data-tr="${ri}"
+            aria-label="${esc(T('rowDel', this.lang))} ${ri + 1}">×</button></td>`}</tr>`).join('');
+        body = `<div class="fk-tw"><table class="fk-tbl"><thead><tr>${head}${ro ? '' : '<th></th>'}</tr></thead>
+          <tbody>${body_}</tbody></table></div>`
+          + (ro || (f.max && rows.length >= f.max) ? '' :
+            `<button type="button" class="fb sm" data-tadd="${esc(f.k)}">+ ${esc(T('rowAdd', this.lang))}</button>`);
         break;
+      }
 
       default: {
         const t = ['number', 'date', 'time', 'email', 'tel'].includes(f.type) ? f.type : 'text';
@@ -567,6 +605,31 @@
         rerender();
       });
     });
+
+    // ตารางแถวซ้ำ — เขียนค่าลงช่องโดยไม่ rerender ระหว่างพิมพ์ กัน focus หลุดเหมือน mask
+    el.querySelectorAll('input[data-tk]').forEach(i =>
+      i.addEventListener('change', () => {
+        const k = i.dataset.tk, ri = Number(i.dataset.tr);
+        const f = self.fields[k] || {};
+        const arr = tableRows(f, self.data[k]).map(r => Object.assign({}, r));
+        arr[ri][i.dataset.tc] = i.type === 'number' ? Number(i.value) : i.value;
+        self.set(k, arr); rerender();
+      }));
+
+    el.querySelectorAll('[data-tadd]').forEach(b =>
+      b.addEventListener('click', () => {
+        const k = b.dataset.tadd, f = self.fields[k] || {};
+        self.set(k, tableRows(f, self.data[k]).concat([{}])); rerender();
+      }));
+
+    el.querySelectorAll('[data-tdel]').forEach(b =>
+      b.addEventListener('click', () => {
+        const k = b.dataset.tdel, f = self.fields[k] || {};
+        const arr = tableRows(f, self.data[k]).slice();
+        arr.splice(Number(b.dataset.tr), 1);
+        // ไม่ให้เหลือศูนย์แถว ไม่งั้นตารางหายไปทั้งอันจนไม่รู้ว่ายังมีช่องนี้อยู่
+        self.set(k, arr.length ? arr : [{}]); rerender();
+      }));
 
     el.querySelectorAll('.fk-opt[data-k],.fk-grade button[data-k]').forEach(b =>
       b.addEventListener('click', () => {
