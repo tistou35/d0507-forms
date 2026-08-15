@@ -281,7 +281,8 @@
     "เดี่ยวครั้งแรก",
     "นักเรียนบินเดี่ยว",
     "asf"
-   ]
+   ],
+   "assignTo": "FI"
   },
   {
    "doc": "D-0507-GSP-001",
@@ -695,7 +696,7 @@
   },
   {
    "doc": "D-0507-PWR-001",
-   "code": "AD/PWR/301-A",
+   "code": "AD/PWR/301-C",
    "abbr": "PWR",
    "t": "Passenger Waiver and Release Form",
    "th": "หนังสือสละสิทธิ์เรียกร้องของผู้โดยสาร",
@@ -721,7 +722,7 @@
    ],
    "sys": "here",
    "public": true,
-   "assignTo": "FI",
+   "assignTo": "HT",
    "kw": [
     "ผู้โดยสาร",
     "พาคนขึ้น",
@@ -1200,7 +1201,8 @@
     "safety",
     "vsr",
     "เกือบเกิดเหตุ"
-   ]
+   ],
+   "assignTo": "SM"
   },
   {
    "doc": "D-0507-HIF-001",
@@ -1237,7 +1239,8 @@
     "hazard",
     "hif",
     "ความเสี่ยง"
-   ]
+   ],
+   "assignTo": "SM"
   },
   {
    "doc": "D-0507-MOC-001",

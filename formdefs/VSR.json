@@ -1,0 +1,104 @@
+{
+  "code": "VSR",
+  "doc": "D-0507-VSR-001",
+  "control": "SM-VSR-303-A",
+  "issue": "01",
+  "rev": "00",
+  "eff": "01 MAR 2020",
+  "title": { "th": "รายงานนิรภัยโดยสมัครใจ", "en": "Voluntary Safety Report" },
+  "retain": "OMA A.10",
+
+  "ui": {
+    "compact": true,
+    "tabs": [
+      { "k": "T1", "th": "ผู้รายงาน", "en": "Reporter" },
+      { "k": "T2", "th": "เหตุการณ์", "en": "Event" }
+    ]
+  },
+
+  "parties": [
+    { "k": "rep", "n": { "th": "ผู้รายงาน", "en": "Reporter" }, "auth": "public" },
+    { "k": "sm",  "n": { "th": "ผู้จัดการนิรภัย", "en": "Safety Manager" }, "auth": "role:mgt" }
+  ],
+
+  "sections": [
+    {
+      "k": "A", "tab": "T1", "party": "rep",
+      "title": { "th": "ผู้รายงาน", "en": "Reporter" },
+      "desc": {
+        "th": "รายงานนี้ส่งโดยสมัครใจ · ข้อมูลใช้เพื่อความปลอดภัยเท่านั้น ไม่ใช้ลงโทษ · ชื่อและช่องทางติดต่อไม่บังคับกรอก",
+        "en": "Submitted voluntarily. Used for safety purposes only, never for punitive action. Name and contact are optional." },
+      "fields": [
+        { "k": "repName", "type": "text", "half": true,
+          "label": { "th": "ชื่อ (ไม่บังคับ)", "en": "Name (optional)" } },
+        { "k": "repDate", "type": "date", "req": true, "prefill": "today", "half": true,
+          "label": { "th": "วันที่รายงาน", "en": "Date of report" } },
+        { "k": "repRole", "type": "text", "half": true,
+          "label": { "th": "ตำแหน่ง / หน้าที่ (ไม่บังคับ)", "en": "Position / role (optional)" } },
+        { "k": "repContact", "type": "text", "half": true,
+          "label": { "th": "ช่องทางติดต่อ (ไม่บังคับ)", "en": "Contact (optional)" },
+          "hint": { "th": "กรอกไว้เผื่อฝ่ายนิรภัยต้องสอบถามเพิ่ม — เว้นว่างได้ รายงานยังใช้ได้เต็มที่",
+                    "en": "So Safety can follow up — leave blank and the report still counts." } }
+      ]
+    },
+    {
+      "k": "B", "tab": "T2", "party": "rep",
+      "title": { "th": "เหตุการณ์", "en": "Event" },
+      "fields": [
+        { "k": "evDate", "type": "date", "req": true, "half": true,
+          "label": { "th": "วันที่เกิดเหตุ", "en": "Date of event" } },
+        { "k": "evTime", "type": "time", "half": true,
+          "label": { "th": "เวลา", "en": "Time" } },
+        { "k": "evPlace", "type": "text", "req": true, "half": true,
+          "label": { "th": "สถานที่", "en": "Location" } },
+        { "k": "evAircraft", "type": "text", "half": true,
+          "label": { "th": "อากาศยาน (ถ้ามี)", "en": "Aircraft (if applicable)" } },
+        { "k": "evType", "type": "multi", "req": true,
+          "label": { "th": "ประเภทของรายงาน", "en": "Type of report" },
+          "opt": [
+            { "v": "hazard",  "n": { "th": "อันตรายด้านนิรภัย", "en": "Safety hazard" } },
+            { "v": "incident","n": { "th": "อุบัติการณ์", "en": "Incident" } },
+            { "v": "nearmiss","n": { "th": "เกือบเกิดเหตุ", "en": "Near-miss" } },
+            { "v": "unsafe",  "n": { "th": "การกระทำหรือสภาพที่ไม่ปลอดภัย", "en": "Unsafe act / condition" } },
+            { "v": "other",   "n": { "th": "อื่น ๆ", "en": "Other" } } ] },
+        { "k": "evOther", "type": "text", "showIf": "evType has 'other'",
+          "label": { "th": "ระบุประเภทอื่น", "en": "Other — specify" } },
+        { "k": "descr", "type": "textarea", "req": true,
+          "label": { "th": "เล่าว่าเกิดอะไรขึ้น ท่านสังเกตเห็นอะไร หรือถ้าปล่อยไว้อาจเกิดอะไรขึ้น",
+                     "en": "Describe what happened, what you observed, or what could have happened if uncorrected" } },
+        { "k": "suggest", "type": "textarea",
+          "label": { "th": "ข้อเสนอแนะในการแก้ไข (ถ้ามี)", "en": "Suggested action (optional)" } }
+      ]
+    },
+    {
+      "k": "C", "tab": "T2", "party": "sm", "hideOthers": true,
+      "title": { "th": "สำหรับสำนักงานนิรภัย", "en": "For SMS office use only" },
+      "fields": [
+        { "k": "smName", "type": "text", "req": true, "half": true,
+          "label": { "th": "ผู้รับรายงาน", "en": "Received by" } },
+        { "k": "smDate", "type": "date", "req": true, "half": true,
+          "label": { "th": "วันที่รับ", "en": "Date received" } },
+        { "k": "smLog", "type": "text", "half": true,
+          "label": { "th": "เลขทะเบียนรับ", "en": "Log No." } },
+        { "k": "smAction", "type": "textarea",
+          "label": { "th": "การดำเนินการ", "en": "Action taken" } },
+        { "k": "smSign", "type": "sign", "req": true,
+          "label": { "th": "ลายเซ็นผู้รับรายงาน", "en": "Signature" } }
+      ]
+    }
+  ],
+
+  "gates": [
+    { "when": "repName == ''", "level": "info",
+      "msg": { "th": "ไม่ได้ระบุชื่อ — รายงานนิรภัยโดยสมัครใจไม่บังคับให้ระบุตัวตน ระบบรับรายงานตามปกติ",
+               "en": "No name given — voluntary safety reports may be anonymous. The report is accepted as normal." } }
+  ],
+
+  "route": [
+    { "step": 1, "party": "rep", "sign": false },
+    { "step": 2, "party": "sm", "sign": true, "assignedBy": "later", "pool": "SM",
+      "canDelegate": true, "slaDays": 2 }
+  ],
+
+  "export": { "docx": "D-0507-VSR-001.docx", "lockUntilComplete": true }
+}

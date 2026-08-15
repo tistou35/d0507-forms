@@ -1,0 +1,144 @@
+{
+  "code": "HIF",
+  "doc": "D-0507-HIF-001",
+  "control": "SM-HIF-301-A",
+  "issue": "01",
+  "rev": "00",
+  "eff": "24 AUG 2021",
+  "title": { "th": "แบบระบุอันตราย", "en": "Hazard Identification Form" },
+  "retain": "OMA A.10",
+
+  "ui": {
+    "compact": true,
+    "tabs": [
+      { "k": "T1", "th": "อันตรายที่พบ", "en": "Hazard" },
+      { "k": "T2", "th": "ประเมินความเสี่ยง", "en": "Risk assessment" },
+      { "k": "T3", "th": "ลงนาม", "en": "Sign" }
+    ],
+    "headline": { "value": "riskScore", "of": 25,
+                  "th": "คะแนนความเสี่ยง (โอกาส × ความรุนแรง)",
+                  "en": "Risk score (likelihood × severity)" }
+  },
+
+  "parties": [
+    { "k": "rep", "n": { "th": "ผู้แจ้ง", "en": "Reporter" }, "auth": "public" },
+    { "k": "sm",  "n": { "th": "ผู้จัดการนิรภัย", "en": "Safety Manager" }, "auth": "role:mgt" }
+  ],
+
+  "sections": [
+    {
+      "k": "A", "tab": "T1", "party": "rep",
+      "title": { "th": "ข้อมูลอันตราย", "en": "Hazard details" },
+      "fields": [
+        { "k": "title", "type": "text", "req": true,
+          "label": { "th": "หัวข้ออันตราย", "en": "Hazard title" } },
+        { "k": "foundDate", "type": "date", "req": true, "prefill": "today", "half": true,
+          "label": { "th": "วันที่พบ", "en": "Date identified" } },
+        { "k": "refNo", "type": "text", "half": true,
+          "label": { "th": "เลขอ้างอิง", "en": "Ref. No." },
+          "hint": { "th": "ไม่บังคับ — สำนักงานนิรภัยออกให้ภายหลัง",
+                    "en": "Optional — issued by the SMS office" } },
+        { "k": "byName", "type": "text", "req": true, "half": true,
+          "label": { "th": "ผู้ระบุอันตราย", "en": "Identified by" } },
+        { "k": "dept", "type": "text", "half": true,
+          "label": { "th": "ฝ่าย", "en": "Department" } },
+        { "k": "location", "type": "text", "req": true,
+          "label": { "th": "สถานที่", "en": "Location" } },
+        { "k": "descr", "type": "textarea", "req": true,
+          "label": { "th": "อธิบายอันตราย สภาพที่ไม่ปลอดภัย หรือต้นเหตุที่อาจก่อให้เกิดอันตราย",
+                     "en": "Describe the hazard, unsafe condition, or potential source of harm" } }
+      ]
+    },
+    {
+      "k": "B", "tab": "T2", "party": "rep",
+      "title": { "th": "ประเมินความเสี่ยง", "en": "Risk assessment" },
+      "desc": { "th": "ระบบเทียบกับเมทริกซ์ความเสี่ยงในเอกสารให้เอง — ไม่ใช่แค่คูณกัน เพราะความรุนแรงถูกถ่วงน้ำหนักมากกว่า",
+                "en": "Matched against the matrix in the document — not a plain product; severity is weighted more heavily." },
+      "fields": [
+        { "k": "lik", "type": "select", "req": true,
+          "label": { "th": "โอกาสเกิด", "en": "Likelihood" },
+          "opt": [
+            { "v": "1", "n": { "th": "1 — แทบไม่เกิด", "en": "1 — Rare" } },
+            { "v": "2", "n": { "th": "2 — ไม่น่าเกิด", "en": "2 — Unlikely" } },
+            { "v": "3", "n": { "th": "3 — เป็นไปได้", "en": "3 — Possible" } },
+            { "v": "4", "n": { "th": "4 — น่าจะเกิด", "en": "4 — Likely" } },
+            { "v": "5", "n": { "th": "5 — เกิดแน่นอน", "en": "5 — Almost certain" } } ] },
+        { "k": "sev", "type": "select", "req": true,
+          "label": { "th": "ความรุนแรง", "en": "Severity" },
+          "opt": [
+            { "v": "1", "n": { "th": "1 — เล็กน้อยมาก", "en": "1 — Negligible" } },
+            { "v": "2", "n": { "th": "2 — เล็กน้อย", "en": "2 — Minor" } },
+            { "v": "3", "n": { "th": "3 — ปานกลาง", "en": "3 — Marginal" } },
+            { "v": "4", "n": { "th": "4 — วิกฤต", "en": "4 — Critical" } },
+            { "v": "5", "n": { "th": "5 — หายนะ", "en": "5 — Catastrophic" } } ] },
+        { "k": "mitigation", "type": "textarea", "req": true,
+          "label": { "th": "มาตรการลดความเสี่ยงที่เสนอ", "en": "Proposed mitigation" } },
+        { "k": "residualOk", "type": "select", "req": true,
+          "label": { "th": "ความเสี่ยงคงเหลือยอมรับได้หรือไม่", "en": "Residual risk acceptable" },
+          "opt": [
+            { "v": "yes", "n": { "th": "ยอมรับได้", "en": "Yes" } },
+            { "v": "no",  "n": { "th": "ยอมรับไม่ได้ — ต้องมีมาตรการเพิ่ม",
+                                 "en": "No — requires further action" } } ] }
+      ]
+    },
+    {
+      "k": "C", "tab": "T3", "party": "rep",
+      "title": { "th": "ลงนามผู้จัดทำ", "en": "Prepared by" },
+      "fields": [
+        { "k": "prepSign", "type": "sign", "req": true,
+          "label": { "th": "ลายเซ็นผู้จัดทำ", "en": "Prepared by — signature" } }
+      ]
+    },
+    {
+      "k": "D", "tab": "T3", "party": "sm", "hideOthers": true,
+      "title": { "th": "ผู้จัดการนิรภัยพิจารณา", "en": "Safety Manager review" },
+      "fields": [
+        { "k": "smName", "type": "text", "req": true, "half": true,
+          "label": { "th": "ชื่อผู้จัดการนิรภัย", "en": "Safety Manager name" } },
+        { "k": "smDate", "type": "date", "req": true, "half": true,
+          "label": { "th": "วันที่พิจารณา", "en": "Date reviewed" } },
+        { "k": "smComment", "type": "textarea",
+          "label": { "th": "ความเห็น", "en": "Comment" } },
+        { "k": "smSign", "type": "sign", "req": true,
+          "label": { "th": "ลายเซ็นผู้จัดการนิรภัย", "en": "Safety Manager signature" } }
+      ]
+    }
+  ],
+
+  "compute": [
+    { "k": "riskScore", "op": "mul", "of": ["lik", "sev"] },
+    { "k": "riskLevel", "op": "matrix", "of": ["sev", "lik"],
+      "table": {
+        "5": ["A","A","H","H","H"],
+        "4": ["L","A","A","H","H"],
+        "3": ["L","L","A","A","H"],
+        "2": ["L","L","L","L","A"],
+        "1": ["L","L","L","L","L"]
+      } }
+  ],
+
+  "gates": [
+    { "when": "riskLevel == 'H'", "level": "stop",
+      "short": { "th": "ความเสี่ยงสูง", "en": "HIGH RISK" },
+      "msg": { "th": "ความเสี่ยงสูง — ต้องดำเนินการทันที ห้ามปล่อยไว้ ผู้จัดการนิรภัยต้องพิจารณาโดยเร็วที่สุด",
+               "en": "High risk — immediate action required." } },
+    { "when": "riskLevel == 'A'", "level": "warn",
+      "short": { "th": "ความเสี่ยงปานกลาง", "en": "MEDIUM RISK" },
+      "msg": { "th": "ความเสี่ยงปานกลาง — ต้องมีมาตรการรองรับ",
+               "en": "Medium risk — action required." } },
+    { "when": "riskLevel == 'L'", "level": "info",
+      "short": { "th": "ความเสี่ยงต่ำ", "en": "LOW RISK" },
+      "msg": { "th": "ความเสี่ยงต่ำ — เฝ้าติดตาม", "en": "Low risk — monitor." } },
+    { "when": "residualOk == 'no'", "level": "warn",
+      "msg": { "th": "ความเสี่ยงคงเหลือยอมรับไม่ได้ — ต้องเสนอมาตรการเพิ่มก่อนปิดเรื่อง",
+               "en": "Residual risk not acceptable — further action must be proposed." } }
+  ],
+
+  "route": [
+    { "step": 1, "party": "rep", "sign": true },
+    { "step": 2, "party": "sm", "sign": true, "assignedBy": "later", "pool": "SM",
+      "canDelegate": true, "slaDays": 2 }
+  ],
+
+  "export": { "docx": "D-0507-HIF-001.docx", "lockUntilComplete": true }
+}

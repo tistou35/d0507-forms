@@ -1,0 +1,120 @@
+{
+  "code": "PWR",
+  "doc": "D-0507-PWR-001",
+  "control": "AD/PWR/301-C",
+  "issue": "01",
+  "rev": "02",
+  "eff": "18 JUL 2024",
+  "title": { "th": "หนังสือสละสิทธิ์เรียกร้องของผู้โดยสาร", "en": "Passenger Waiver and Release Form" },
+  "retain": "OMA A.10",
+
+  "ui": {
+    "compact": true,
+    "tabs": [
+      { "k": "T1", "th": "ผู้โดยสาร", "en": "Passenger" },
+      { "k": "T2", "th": "ผู้ปกครอง", "en": "Guardian" },
+      { "k": "T3", "th": "ยอมรับและลงนาม", "en": "Accept & sign" }
+    ]
+  },
+
+  "parties": [
+    { "k": "pax", "n": { "th": "ผู้โดยสาร", "en": "Passenger" }, "auth": "public" },
+    { "k": "ht",  "n": { "th": "หัวหน้าครูฝึก", "en": "Head of Training" }, "auth": "role:mgt" }
+  ],
+
+  "sections": [
+    {
+      "k": "A", "tab": "T1", "party": "pax",
+      "title": { "th": "A · ข้อมูลผู้โดยสาร", "en": "A · Passenger details" },
+      "fields": [
+        { "k": "isMinor", "type": "check",
+          "label": { "th": "ผู้โดยสารอายุต่ำกว่า 18 ปี — ต้องมีบิดามารดาหรือผู้ปกครองตามกฎหมายลงนามแทน",
+                     "en": "Passenger is a minor (under 18). A parent or legal guardian must sign." } },
+        { "k": "paxName", "type": "text", "req": true,
+          "label": { "th": "ชื่อ–นามสกุล", "en": "Full name" } },
+        { "k": "paxDob", "type": "date", "req": true, "half": true,
+          "label": { "th": "วันเกิด", "en": "Date of birth" } },
+        { "k": "paxAge", "type": "number", "req": true, "min": 0, "half": true,
+          "label": { "th": "อายุ", "en": "Age" } },
+        { "k": "paxPhone", "type": "tel", "req": true, "half": true,
+          "label": { "th": "เบอร์โทรศัพท์", "en": "Phone number" } },
+        { "k": "paxEmail", "type": "email", "req": true, "half": true,
+          "label": { "th": "อีเมล", "en": "Email address" } },
+        { "k": "paxId", "type": "text", "req": true,
+          "label": { "th": "เลขบัตรประชาชน / หนังสือเดินทาง", "en": "ID / Passport No." } },
+        { "k": "paxAddr", "type": "textarea", "req": true,
+          "label": { "th": "ที่อยู่", "en": "Address" } }
+      ]
+    },
+    {
+      "k": "B", "tab": "T2", "party": "pax", "showIf": "isMinor == true",
+      "title": { "th": "B · ผู้เยาว์", "en": "B · Minor passenger" },
+      "desc": { "th": "กรอกเมื่อผู้โดยสารอายุต่ำกว่า 18 ปี", "en": "Complete if the passenger is under 18." },
+      "fields": [
+        { "k": "gName", "type": "text", "reqIf": "isMinor == true",
+          "label": { "th": "ชื่อบิดามารดา / ผู้ปกครองตามกฎหมาย", "en": "Parent / legal guardian name" } },
+        { "k": "gRel", "type": "text", "reqIf": "isMinor == true", "half": true,
+          "label": { "th": "ความสัมพันธ์กับผู้เยาว์", "en": "Relationship to minor" } },
+        { "k": "gPhone", "type": "tel", "reqIf": "isMinor == true", "half": true,
+          "label": { "th": "เบอร์โทรศัพท์", "en": "Phone number" } },
+        { "k": "gId", "type": "text", "reqIf": "isMinor == true",
+          "label": { "th": "เลขบัตรประชาชน / หนังสือเดินทาง (ผู้ปกครอง)",
+                     "en": "ID / Passport No. (guardian)" } }
+      ]
+    },
+    {
+      "k": "C", "tab": "T3", "party": "pax",
+      "title": { "th": "C · ข้อตกลงและลายเซ็น", "en": "C · Terms and signature" },
+      "desc": { "th": "โปรดอ่านอย่างละเอียดก่อนลงนาม การลงนามถือว่าท่านได้อ่าน เข้าใจ และยอมรับข้อตกลงทั้งหมด",
+                "en": "Please read carefully before signing. By signing you confirm you have read, understood, and accepted all terms." },
+      "fields": [
+        { "k": "t1", "type": "check", "req": true,
+          "label": { "th": "1 · รับทราบความเสี่ยงและความรับผิดชอบ — ข้าพเจ้าทราบว่าข้าพเจ้าไม่ใช่พนักงานของบริษัท และการโดยสารอากาศยานมีความเสี่ยงโดยสภาพ",
+                     "en": "1 · Acknowledgment of Risk and Responsibility — I acknowledge that I am not a company employee and that flight carries inherent risk." } },
+        { "k": "t2", "type": "check", "req": true,
+          "label": { "th": "2 · การปลดเปลื้องความรับผิด ชดใช้ค่าเสียหาย และสละสิทธิ์เรียกร้อง",
+                     "en": "2 · Release, Indemnification, and Waiver of Claims" } },
+        { "k": "t3", "type": "check", "req": true,
+          "label": { "th": "3 · ความประพฤติและคำรับรองว่าจะไม่ก่อความวุ่นวาย — ข้าพเจ้าจะปฏิบัติตามคำสั่งของนักบินและเจ้าหน้าที่อย่างเคร่งครัด",
+                     "en": "3 · Conduct and Unruly Passenger Declaration — I will comply strictly with all instructions." } },
+        { "k": "t4", "type": "check", "req": true,
+          "label": { "th": "4 · คำรับรองความเข้าใจ — ข้าพเจ้าบรรลุนิติภาวะแล้ว ได้อ่านและเข้าใจเนื้อหาทั้งหมดโดยตลอด",
+                     "en": "4 · Declaration of Understanding — I am of legal age and have read and fully understood the contents." } },
+        { "k": "paxSign", "type": "sign", "req": true,
+          "label": { "th": "ลายเซ็นผู้โดยสาร (หากเป็นผู้เยาว์ ให้ผู้ปกครองลงนาม)",
+                     "en": "Passenger signature (if minor: parent / legal guardian)" } },
+        { "k": "signDate", "type": "date", "req": true, "prefill": "today",
+          "label": { "th": "วันที่ลงนาม", "en": "Date signed" } }
+      ]
+    },
+    {
+      "k": "D", "tab": "T3", "party": "ht", "hideOthers": true,
+      "title": { "th": "อนุมัติโดยหัวหน้าครูฝึก", "en": "Approved by Head of Training" },
+      "fields": [
+        { "k": "htName", "type": "text", "req": true, "half": true,
+          "label": { "th": "ชื่อหัวหน้าครูฝึก", "en": "Head of Training name" } },
+        { "k": "htDate", "type": "date", "req": true, "half": true,
+          "label": { "th": "วันที่อนุมัติ", "en": "Date approved" } },
+        { "k": "htSign", "type": "sign", "req": true,
+          "label": { "th": "ลายเซ็นหัวหน้าครูฝึก", "en": "Head of Training signature" } }
+      ]
+    }
+  ],
+
+  "gates": [
+    { "when": "isMinor == true", "level": "info",
+      "msg": { "th": "ผู้เยาว์ — ต้องกรอกข้อมูลผู้ปกครองในแท็บที่ 2 และให้ผู้ปกครองเป็นผู้ลงนาม",
+               "en": "Minor — complete the guardian tab and have the guardian sign." } },
+    { "when": "paxAge < 18 && isMinor == false", "level": "warn",
+      "msg": { "th": "อายุที่กรอกต่ำกว่า 18 ปี แต่ยังไม่ได้ติ๊กว่าเป็นผู้เยาว์ — ตรวจสอบอีกครั้ง",
+               "en": "Age entered is under 18 but the minor box is not ticked — please check." } }
+  ],
+
+  "route": [
+    { "step": 1, "party": "pax", "sign": true },
+    { "step": 2, "party": "ht", "sign": true, "assignedBy": "later", "pool": "HT",
+      "canDelegate": true, "slaDays": 1 }
+  ],
+
+  "export": { "docx": "D-0507-PWR-001.docx", "lockUntilComplete": true }
+}

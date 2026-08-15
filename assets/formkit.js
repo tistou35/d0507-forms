@@ -65,6 +65,15 @@
       if (fn[1] === 'filled') return ctx[arg] !== undefined && ctx[arg] !== '' && ctx[arg] !== null;
       return false;
     }
+    /* "evType has other" — ใช้กับ multi ที่เก็บเป็น array
+       ไม่มีตัวนี้ก็เขียนเงื่อนไข "ติ๊กข้อนี้ไหม" กับช่องเลือกหลายค่าไม่ได้เลย */
+    const hasM = expr.match(/^(\w+)\s+has\s+(.+)$/);
+    if (hasM) {
+      const v = ctx[hasM[1]];
+      const want = hasM[2].trim().replace(/^['"]|['"]$/g, '');
+      return Array.isArray(v) ? v.indexOf(want) >= 0 : String(v) === want;
+    }
+
     for (const op of OPS) {
       const i = expr.indexOf(op);
       if (i < 0) continue;
@@ -194,6 +203,17 @@
       else if (c.op === 'sum') out[c.k] = (c.of || []).reduce((a, k) => a + (Number(this.data[k]) || 0), 0);
       else if (c.op === 'pct') out[c.k] = c.max ? Math.round((Number(out[c.of] ?? this.data[c.of]) || 0) / c.max * 100) : 0;
       else if (c.op === 'count') out[c.k] = (c.of || []).filter(k => this.data[k]).length;
+      else if (c.op === 'mul')
+        out[c.k] = (c.of || []).reduce((a, k) => a * (Number(this.data[k]) || 0), 1);
+      /* ตารางเปิดสองแกน — ใช้กับเมทริกซ์ความเสี่ยงที่ไม่ใช่ผลคูณ
+         เมทริกซ์ใน HIF ถ่วงน้ำหนักความรุนแรงมากกว่าโอกาส
+         คะแนน 8 เป็นได้ทั้งส้ม (รุนแรง4×โอกาส2) และเขียว (รุนแรง2×โอกาส4)
+         ใช้สูตรคูณแล้วแบ่งช่วงจึงให้ผลผิดจากเอกสาร */
+      else if (c.op === 'matrix') {
+        const row = c.table && c.table[this.data[(c.of || [])[0]]];
+        const col = Number(this.data[(c.of || [])[1]]);
+        out[c.k] = (row && row[col - 1]) || '';
+      }
     }
     return out;
   };

@@ -76,12 +76,15 @@ def load_defs():
         for r in d.get('route', []):
             if r.get('party') not in parties:
                 errs.append(f"{name}: route ขั้น {r.get('step')} อ้าง party '{r.get('party')}' ที่ไม่มี")
-        for expr in [s.get('showIf') for s in d.get('sections', [])] + \
-                    [g.get('when') for g in d.get('gates', [])]:
+        exprs = [s.get('showIf') for s in d.get('sections', [])] \
+              + [g.get('when') for g in d.get('gates', [])] \
+              + [f.get('showIf') for s in d.get('sections', []) for f in s.get('fields', [])] \
+              + [f.get('reqIf') for s in d.get('sections', []) for f in s.get('fields', [])]
+        for expr in exprs:
             # ตัดค่าคงที่ในเครื่องหมายคำพูดทิ้งก่อน มิฉะนั้น 'GO' จะถูกนับเป็นชื่อฟิลด์
             bare = re.sub(r"'[^']*'|\"[^\"]*\"", ' ', expr or '')
             for tok in re.findall(r'\b([a-zA-Z_]\w*)\b', bare):
-                if tok in ('true', 'false', 'anyStarBelow', 'filled', 'score'):
+                if tok in ('true', 'false', 'anyStarBelow', 'filled', 'score', 'has'):
                     continue
                 if tok not in keys and tok not in {c2.get('k') for c2 in d.get('compute', [])}:
                     errs.append(f"{name}: เงื่อนไขอ้าง '{tok}' ที่ไม่ใช่ฟิลด์หรือค่าคำนวณ")
