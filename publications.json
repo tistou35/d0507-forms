@@ -211,30 +211,42 @@
       "file": "",
       "by": "HT"
     },
-    {
-      "id": "CHT-VTBD-AD",
-      "cat": "chart",
-      "src": "aip",
-      "icao": "VTBD",
-      "chart": "Aerodrome Chart - ICAO AD 2-VTBD-2-1",
-      "th": "VTBD ผังสนามบิน",
-      "en": "VTBD Aerodrome Chart",
-      "airac": "2608",
-      "file": "https://aip.caat.or.th/2026-08-06-AIRAC/graphics/292780.pdf",
-      "resolvedAt": "2026-08-06"
-    },
-    {
-      "id": "CHT-VTBD-ILS21L",
-      "cat": "chart",
-      "src": "aip",
-      "icao": "VTBD",
-      "chart": "Instrument Approach Chart - ICAO - ILS or LOC y RWY 21L AD 2-VTBD-8-9",
-      "th": "VTBD ILS/LOC y RWY 21L",
-      "en": "VTBD ILS or LOC y RWY 21L",
-      "airac": "2608",
-      "file": "https://aip.caat.or.th/2026-08-06-AIRAC/graphics/299094.pdf",
-      "resolvedAt": "2026-08-06"
-    }
+    { "id": "AD-VTBD", "cat": "chart", "src": "aip", "icao": "VTBD",
+      "th": "ดอนเมือง", "en": "Bangkok/Don Mueang Intl",
+      "airac": "", "eff": "", "ap": "", "op": "", "nap": 0, "nop": 0 },
+    { "id": "AD-VTBU", "cat": "chart", "src": "aip", "icao": "VTBU",
+      "th": "อู่ตะเภา", "en": "Rayong/U-Tapao Pattaya Intl",
+      "airac": "", "eff": "", "ap": "", "op": "", "nap": 0, "nop": 0 },
+    { "id": "AD-VTPP", "cat": "chart", "src": "aip", "icao": "VTPP",
+      "th": "พิษณุโลก", "en": "Phitsanulok",
+      "airac": "", "eff": "", "ap": "", "op": "", "nap": 0, "nop": 0 },
+    { "id": "AD-VTPH", "cat": "chart", "src": "aip", "icao": "VTPH",
+      "th": "หัวหิน", "en": "Prachuap Khiri Khan/Hua Hin",
+      "airac": "", "eff": "", "ap": "", "op": "", "nap": 0, "nop": 0 },
+    { "id": "AD-VTUK", "cat": "chart", "src": "aip", "icao": "VTUK",
+      "th": "ขอนแก่น", "en": "Khon Kaen",
+      "airac": "", "eff": "", "ap": "", "op": "", "nap": 0, "nop": 0 },
+    { "id": "AD-VTUD", "cat": "chart", "src": "aip", "icao": "VTUD",
+      "th": "อุดรธานี", "en": "Udon Thani",
+      "airac": "", "eff": "", "ap": "", "op": "", "nap": 0, "nop": 0 },
+    { "id": "AD-VTUU", "cat": "chart", "src": "aip", "icao": "VTUU",
+      "th": "อุบลราชธานี", "en": "Ubon Ratchathani",
+      "airac": "", "eff": "", "ap": "", "op": "", "nap": 0, "nop": 0 },
+    { "id": "AD-VTUQ", "cat": "chart", "src": "aip", "icao": "VTUQ",
+      "th": "นครราชสีมา", "en": "Nakhon Ratchasima",
+      "airac": "", "eff": "", "ap": "", "op": "", "nap": 0, "nop": 0 },
+    { "id": "AD-VTUW", "cat": "chart", "src": "aip", "icao": "VTUW",
+      "th": "นครพนม", "en": "Nakhon Phanom",
+      "airac": "", "eff": "", "ap": "", "op": "", "nap": 0, "nop": 0 },
+    { "id": "AD-VTUI", "cat": "chart", "src": "aip", "icao": "VTUI",
+      "th": "สกลนคร", "en": "Sakon Nakhon",
+      "airac": "", "eff": "", "ap": "", "op": "", "nap": 0, "nop": 0 },
+    { "id": "AD-VTUV", "cat": "chart", "src": "aip", "icao": "VTUV",
+      "th": "ร้อยเอ็ด", "en": "Roi Et",
+      "airac": "", "eff": "", "ap": "", "op": "", "nap": 0, "nop": 0 },
+    { "id": "AD-VTUL", "cat": "chart", "src": "aip", "icao": "VTUL",
+      "th": "เลย", "en": "Loei",
+      "airac": "", "eff": "", "ap": "", "op": "", "nap": 0, "nop": 0 }
   ],
   "tabs": [
     {
@@ -253,5 +265,16 @@
       "en": "Airport & approach chart"
     }
   ],
-  "_chartNote": "ตัวระบุตัวตนของแผนภูมิคือ icao + chart (ชื่อเต็ม) ไม่ใช่เลขไฟล์ — เลขไฟล์ของ eAIP เปลี่ยนเมื่อแผนภูมิถูกแก้ และเลขเก่ายังเปิดได้ในโฟลเดอร์รอบใหม่ ถ้าเก็บเลขไว้จะได้ฉบับที่ถูกยกเลิกแล้วโดยไม่มีอะไรเตือน รันใหม่ทุกรอบ AIRAC: python3 tools/aip_charts.py resolve"
+  "_chartNote": [
+    "หนึ่งรายการ = หนึ่งสนามบิน ไม่ใช่หนึ่งแผนภูมิ — 12 สนามบินมี 185 ชุด ลงทีละใบก็อ่านไม่ไหว",
+    "ap / op = ลิงก์โฟลเดอร์ใน Drive · ap คือ 'Airport chart' (ผังสนามบิน) · op คือ 'Chart' (แผนภูมิปฏิบัติการ)",
+    "nap / nop = จำนวนชุดในโฟลเดอร์นั้น ไว้ให้เห็นว่าครบไหมโดยไม่ต้องเปิด",
+    "",
+    "ห้ามกรอกช่องพวกนี้เอง — gas/AipSync.gs เป็นคนเขียนตอนดึงแต่ละรอบ",
+    "แล้ว python3 tools/aip_pubs.py <manifest id> คัดลอกมาลงไฟล์นี้",
+    "ลิงก์โฟลเดอร์ไม่เปลี่ยนตามรอบ เพราะ aipAdFolder_ เปลี่ยนแค่ชื่อ ไม่ได้สร้างโฟลเดอร์ใหม่",
+    "",
+    "ห้ามเก็บเลขไฟล์ของ eAIP ไว้ที่ไหนทั้งสิ้น — เลขเปลี่ยนเมื่อแผนภูมิถูกแก้",
+    "และเลขเก่ายังเปิดได้ในโฟลเดอร์รอบใหม่ จะได้ฉบับที่ถูกยกเลิกแล้วโดยไม่มีอะไรเตือน"
+  ]
 }

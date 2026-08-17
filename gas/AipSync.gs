@@ -337,7 +337,9 @@ function aipStart() {
     } catch (e) { Logger.log('  %s ❌ %s', icao, e.message); }
   });
 
-  var st = { issue: iss, items: items, i: 0, done: 0, fail: [],
+  var nx = null;
+  try { nx = aipNextIssue_(); } catch (e) {}
+  var st = { issue: iss, next: nx, items: items, i: 0, done: 0, fail: [],
              links: {}, cleaned: {}, startedAt: new Date().toISOString() };
   aipWrite_(st);
   Logger.log('คิวรวม %s ใบ — เริ่มดาวน์โหลด', items.length);
@@ -471,9 +473,30 @@ function aipManifest_(st) {
   });
   list.sort(function (a, b) { return a.set < b.set ? -1 : a.set > b.set ? 1 : 0; });
 
+  /* สรุปรายสนามบินสำหรับหน้าเว็บ — หนึ่งแถวต่อหนึ่งสนามบิน ไม่ใช่ต่อหนึ่งแผนภูมิ
+     ลิงก์ชี้ที่โฟลเดอร์ ไม่ใช่ไฟล์ เพราะ aipAdFolder_ เปลี่ยนแค่ชื่อทุกรอบ
+     id โฟลเดอร์จึงคงเดิม ลิงก์ในเว็บไม่ตายเมื่อเปลี่ยนรอบ */
+  var ads = {};
+  list.forEach(function (s) {
+    var a = ads[s.icao] || (ads[s.icao] = { icao: s.icao, ap: '', op: '', nap: 0, nop: 0 });
+    if (s.sub === 'Airport chart') { a.ap = s.folderId; a.nap++; }
+    else { a.op = s.folderId; a.nop++; }
+  });
+  Object.keys(ads).forEach(function (k) {
+    ['ap', 'op'].forEach(function (f) {
+      if (!ads[k][f]) return;
+      try {
+        DriveApp.getFolderById(ads[k][f])
+          .setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+      } catch (e) { Logger.log('🔴 แชร์โฟลเดอร์ %s %s ไม่ได้: %s', k, f, e.message); }
+    });
+  });
+
   var root = aipRoot_();
   var doc = { issue: st.issue, generatedAt: st.finishedAt, rootId: root.getId(),
-              files: st.done, sets: list.length, data: list };
+              files: st.done, sets: list.length,
+              ads: Object.keys(ads).map(function (k) { return ads[k]; }),
+              data: list };
   var it2 = root.getFilesByName(AIP_MANIFEST), s = JSON.stringify(doc);
   var f = it2.hasNext() ? it2.next() : root.createFile(AIP_MANIFEST, s, MimeType.PLAIN_TEXT);
   f.setContent(s);
@@ -517,6 +540,50 @@ function aipTidy() {
   rcs.forEach(function (f) { f.setTrashed(true); });   // ใช้แล้วทิ้ง กันลบซ้ำรอบหน้า
   Logger.log('เก็บกวาดแล้ว — ทิ้ง %s ใบ (ข้าม %s) · รวมเหลือ %s ไฟล์',
              gone, miss, rc.merged);
+}
+
+/**
+ * ── สถานะสำหรับหน้าเว็บ ─────────────────────────────────────
+ * หน้า "สนามบินและแผนภูมิ" ถามตัวนี้ ไม่ได้อ่านจาก Firestore
+ * เพราะสถานะการดึงเป็นของฝั่งนี้อยู่แล้ว เก็บซ้ำอีกที่มีแต่จะไม่ตรงกัน
+ */
+function aipStatusJson_() {
+  var st = aipRead_();
+  if (!st) return { started: false };
+  var ads = [];
+  try {
+    var root = aipRoot_(), it = root.getFilesByName(AIP_MANIFEST);
+    if (it.hasNext()) ads = JSON.parse(it.next().getBlob().getDataAsString()).ads || [];
+  } catch (e) {}
+  return {
+    started: true,
+    issue: st.issue,                      // { date, text, amdt }
+    next: st.next || null,                // ฉบับถัดไปที่ CAAT ประกาศ
+    i: st.i, total: st.items.length, done: st.done,
+    fail: st.fail.length, failFirst: st.fail.slice(0, 3),
+    finishedAt: st.finishedAt || '',
+    ads: ads,
+  };
+}
+
+/**
+ * ตั้งคิวแล้วปล่อยให้ trigger เดินต่อ — ไม่ดึงยาวคาไว้ใน request
+ * ปุ่มบนหน้าเว็บเรียกตัวนี้ จะได้ตอบกลับเร็ว แล้วให้หน้าเว็บถามสถานะเอาเอง
+ */
+function aipBegin_() {
+  var st = aipRead_();
+  if (st && !st.finishedAt) { aipEnsureTrigger_(); return 'กำลังดึงอยู่แล้ว'; }
+  var iss = aipCurrentIssue_(), items = [];
+  AIP_ADS.forEach(function (icao) {
+    try { items = items.concat(aipCharts_(icao, iss.date)); }
+    catch (e) { Logger.log('%s ❌ %s', icao, e.message); }
+  });
+  var nx = null;
+  try { nx = aipNextIssue_(); } catch (e) {}
+  aipWrite_({ issue: iss, next: nx, items: items, i: 0, done: 0, fail: [],
+              links: {}, cleaned: {}, startedAt: new Date().toISOString() });
+  aipEnsureTrigger_();
+  return 'เริ่มแล้ว — ' + items.length + ' ใบ';
 }
 
 /* ── ดูสถานะ / ยกเลิก ─────────────────────────────────────── */

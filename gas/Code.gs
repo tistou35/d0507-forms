@@ -29,6 +29,18 @@ function doPost(e) {
   try {
     var body = JSON.parse(e.postData.contents);
     var who = verifyToken_(body.idToken);          // ตรวจว่า token มาจากโปรเจกต์เราจริง
+
+    /* งานดึงแผนภูมิ AIP — เจ้าหน้าที่ที่ล็อกอินแล้วเท่านั้น
+       เว็บแอปนี้เปิดแบบ ANYONE_ANONYMOUS เพราะนักเรียนต้องส่งฟอร์มได้
+       แต่ปุ่มนี้ลบและเขียนทับไฟล์กว่า 350 ใบใน Drive ปล่อยให้ใครก็กดได้ไม่ได้
+       นักเรียนที่ล็อกอินแบบ anonymous จึงต้องกันออกด้วย ไม่ใช่แค่ "มี token" */
+    if (body.action === 'aipSync' || body.action === 'aipStatus') {
+      if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบเจ้าหน้าที่ก่อน');
+      if (body.action === 'aipStatus') return json_({ ok: true, result: aipStatusJson_() });
+      var msg = aipBegin_();
+      return json_({ ok: true, result: { note: msg, status: aipStatusJson_() } });
+    }
+
     var out = exportSubmission_(body.submission, who);
     return json_({ ok: true, result: out });
   } catch (err) {

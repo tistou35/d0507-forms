@@ -26,6 +26,55 @@
 .cell .k{font-size:11.5px;color:var(--g-500);font-family:var(--font-mono)}
 .cell .k b{display:block;font-size:13px;color:var(--fg-1);font-weight:600;font-family:var(--font-sans)}
 
+/* แถวสนามบิน: ICAO | วันมีผล | ผังสนามบิน | แผนภูมิปฏิบัติการ
+   หนึ่งแถวต่อหนึ่งสนามบิน ไม่ใช่ต่อหนึ่งแผนภูมิ — 12 สนามบินมี 185 ชุด
+   สิ่งที่คนเปิดหน้านี้อยากรู้คือ "ของสนามบินนี้เป็นรอบปัจจุบันไหม" ไม่ใช่รายชื่อทุกใบ */
+/* คอลัมน์ป้ายตรึงความกว้างไว้ ไม่ใช้ auto — ป้าย "หมดรอบแล้ว" ยาวกว่า "ใช้อยู่"
+   ถ้าปล่อยให้ยืดตามข้อความ ปุ่มของแถวที่หมดรอบจะเยื้องไปแถวเดียว อ่านแล้วสะดุด */
+/* คอลัมน์แรกกว้างพอให้ ICAO กับป้าย "อัปเดตแล้ว" อยู่บรรทัดเดียวกัน
+   แคบกว่านี้ป้ายจะตกบรรทัด แล้วแถวสูงขึ้นทั้งตาราง */
+.adrow{display:grid;grid-template-columns:172px 122px 96px 1fr 1fr;gap:9px;align-items:center;
+  padding:8px 12px;border:1px solid var(--border-light);border-radius:8px;
+  background:var(--surface);margin-bottom:6px}
+.adrow .badge{text-align:center}
+.adrow .ad b{font-family:var(--font-mono);font-size:15px;font-weight:700;letter-spacing:.4px}
+.adrow .ad span{display:block;font-size:11.5px;color:var(--g-500);line-height:1.3}
+.adrow .eff{font-family:var(--font-mono);font-size:12px;color:var(--fg-1);white-space:nowrap}
+.adrow .eff span{display:block;font-size:10.5px;color:var(--g-500)}
+.adrow .eff.no{color:var(--g-400)}
+a.gof,span.gof{justify-items:center;gap:7px;grid-auto-flow:column;font-size:12px}
+a.gof i,span.gof i{font-style:normal;font-family:var(--font-mono);font-size:10.5px;font-weight:700;
+  padding:1px 6px;border-radius:99px;background:rgba(255,255,255,.2)}
+span.gof i{background:var(--g-200);color:var(--g-500)}
+/* จอแคบ: ชื่อกับวันที่อยู่บรรทัดเดียว ป้ายไปมุมขวา ปุ่มสองอันเรียงล่าง
+   ไม่ปล่อยให้ป้ายกินทั้งบรรทัด เพราะสิบสองสนามบินจะยาวเกินหน้าจอไปมาก */
+@media(max-width:820px){
+  .adrow{grid-template-columns:1fr auto;gap:6px 9px;padding:9px 11px}
+  .adrow .ad {grid-area:1/1}
+  .adrow .eff{grid-area:1/2;text-align:right}
+  .adrow .badge{grid-area:2/2;justify-self:end}
+  .adrow .go:nth-of-type(1){grid-area:2/1}
+  .adrow .go:nth-of-type(2){grid-area:3/1/auto/-1}
+}
+
+/* แถบควบคุมเหนือรายการสนามบิน */
+.cbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  padding:10px 14px;margin-bottom:9px;border:1px solid var(--border-light);border-radius:8px;
+  background:var(--g-50)}
+.cbar .nx b{display:block;font-size:13px}
+.cbar .nx span{font-size:11.5px;color:var(--g-500)}
+.cbar .prog{min-width:230px}
+.cbar .prog span{display:block;margin-top:4px;font-size:11.5px;color:var(--g-500);
+  font-family:var(--font-mono)}
+.cbar .bar{height:7px;border-radius:99px;background:var(--g-200);overflow:hidden}
+.cbar .bar i{display:block;height:100%;background:var(--navy-900);border-radius:99px;
+  transition:width .4s ease}
+.adrow .ad{white-space:nowrap}
+/* ต้องประกาศ display เอง — กฎชื่อสนามบิน (.ad span) ทำให้ span ทุกตัวเป็น block */
+.adrow .ad .fresh{display:inline-block;margin-left:7px;font-size:10px;font-weight:700;
+  padding:1px 6px;border-radius:99px;
+  background:var(--green-100);color:var(--green-600);vertical-align:2px}
+
 /* แถวทั่วไป (ปฏิบัติการ · แผนภูมิ) */
 .prow{display:grid;grid-template-columns:1fr auto auto auto;gap:12px;align-items:center;
   padding:10px 14px;border:1px solid var(--border-light);border-radius:8px;
@@ -100,6 +149,17 @@ h2.psec .d{font-family:var(--font-sans);font-size:12.5px;color:var(--fg-2);font-
 const PUB = @@PUBS@@, AIRAC = @@AIRAC@@, A = D0507;
 let PUBS = PUB.pubs.slice(), TAB = (PUB.tabs[0]||{}).k, PRINTALL = false;
 
+/* สถานะการดึงแผนภูมิมาจาก Apps Script โดยตรง ไม่ได้เก็บซ้ำใน Firestore
+   ฝั่งนั้นเป็นเจ้าของงานอยู่แล้ว เก็บสองที่เมื่อไรก็ไม่ตรงกันเมื่อนั้น
+   ค่าที่ฝังมากับไฟล์ (publications.json) เป็นตัวสำรองให้คนที่ยังไม่ล็อกอิน */
+let SYNC = null, BUSY = null, POLL = 0;
+const FRESH_DAYS = 3;                    // ติดป้าย "อัปเดตแล้ว" กี่วันหลังดึงเสร็จ
+
+const daysSince = iso => {
+  const t = Date.parse(iso||''); if (!t) return null;
+  return Math.floor((Date.now() - t) / 86400000);
+};
+
 A.reg = { forms: [], status: {}, lefcount: {} };
 
 /* ทะเบียนฉบับเต็มอยู่ Firestore เหมือนทะเบียนฟอร์ม — แก้ที่เดียวเห็นทุกเครื่อง
@@ -110,11 +170,17 @@ async function hydrate(){
     if (d.exists && (d.data().pubs||[]).length) PUBS = d.data().pubs;
   }catch(e){ /* rule ไม่อนุญาต หรือยังไม่ได้อัปโหลด — ใช้ของในไฟล์ */ }
   paint();
+  loadSync();          // สถานะการดึงแผนภูมิ — เฉพาะเจ้าหน้าที่ที่ล็อกอินแล้ว
 }
 
 // ทะเบียนเอกสารใช้คีย์ th/en ส่วนหมวดกับแท็บใช้ n/en — รับทั้งสองแบบ
 const LL = o => !o ? '' : (A.lang==='en' ? (o.en || o.th || o.n) : (o.th || o.n || o.en));
 const dmy = s => { const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||''); return m? m[3]+'/'+m[2]+'/'+m[1] : ''; };
+/* วันที่แบบคู่มือ: DD MMM YYYY — แผนภูมิใช้แบบนี้เพราะตรงกับที่ AIP พิมพ์บนใบ
+   เทียบกันได้ทันทีโดยไม่ต้องแปลงในหัว */
+const MON = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+const dmmm = s => { const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||'');
+  return m ? m[3]+' '+MON[+m[2]-1]+' '+m[1] : ''; };
 const today = () => { const d=new Date();
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
 
@@ -140,7 +206,8 @@ function state(p){
   if (!p) return { k:'none', t:{th:'ยังไม่มี',en:'Missing'} };
   if (p.cat === 'chart'){
     const c = airacRange(p.airac);
-    if (!c) return { k:'none', t:{th:'ยังไม่ระบุรอบ',en:'No cycle'} };
+    // ยังไม่เคยดึง — ต่างจาก "ดึงแล้วแต่หมดรอบ" ต้องแยกให้ออก ไม่งั้นอ่านผิดว่าปลอดภัย
+    if (!c) return { k:'none', t:{th:'ยังไม่ดึง',en:'Not synced'} };
     const t = today();
     if (t > c.to)   return { k:'out',  t:{th:'หมดรอบแล้ว',en:'Expired'}, sub:c.to };
     if (t < c.from) return { k:'next', t:{th:'ยังไม่ถึงกำหนด',en:'Not yet effective'}, sub:c.from };
@@ -188,6 +255,65 @@ function acHtml(){
       <div class="mdl"><b>${A.esc(f.model)}</b><span>${A.esc((f.regs||[]).join(' · ') || '—')}</span></div>
       ${cell(find('normal', f.model), LL(PUB.cats.normal))}
       ${cell(find('emerg',  f.model), LL(PUB.cats.emerg))}</div>`).join('');
+}
+
+/* แท็บสนามบิน — หนึ่งแถวต่อหนึ่งสนามบิน
+   ลิงก์ชี้ไปที่ "โฟลเดอร์" ไม่ใช่ไฟล์ เพราะแผนภูมิของสนามบินหนึ่งแห่งมีเป็นสิบใบ
+   และ AipSync เปลี่ยนแค่ชื่อโฟลเดอร์ทุกรอบ ลิงก์จึงไม่ตายเมื่อเปลี่ยนรอบ */
+/* แถบควบคุมเหนือรายการสนามบิน — รอบถัดไป + ปุ่มอัปเดต + ความคืบหน้า
+   ปุ่มมีไว้เผื่อกรณีเร่งด่วน ระบบดึงเองอยู่แล้วเมื่อถึงวันมีผล
+   จึงต้องเขียนให้ชัดว่าไม่ต้องกด ไม่งั้นคนจะกดทุกวันเพราะไม่แน่ใจ */
+function chartBar(){
+  const s = SYNC;
+  const nextEff = (s && s.next && s.next.date) || (AIRAC[1]||{}).from || '';
+  const auto = A.L({th:'ระบบดึงเองเมื่อถึงวันมีผล — ปกติไม่ต้องกด',
+                    en:'Syncs itself on the effective date — you normally need not press this'});
+  const nx = nextEff
+    ? `<b>${A.esc(A.L({th:'รอบถัดไปมีผล',en:'Next effective'}))} ${A.esc(dmmm(nextEff))}</b>
+       <span>${A.esc(auto)}</span>`
+    : `<b>${A.esc(A.L({th:'ยังไม่ทราบรอบถัดไป',en:'Next issue unknown'}))}</b><span>${A.esc(auto)}</span>`;
+
+  let right = '';
+  if (BUSY){
+    const pct = BUSY.total ? Math.round(BUSY.i / BUSY.total * 100) : 0;
+    right = `<div class="prog"><div class="bar"><i style="width:${pct}%"></i></div>
+      <span>${A.esc(A.L({th:'กำลังดึง',en:'Syncing'}))} ${BUSY.i}/${BUSY.total} · ${pct}%${
+        BUSY.fail ? ' · ' + A.esc(A.L({th:'ผิดพลาด',en:'failed'})) + ' ' + BUSY.fail : ''}</span></div>`;
+  } else if (A.isStaff()){
+    right = `<button class="fb" id="sync">⟳ <span>${A.esc(A.L({th:'อัปเดตเดี๋ยวนี้',en:'Update now'}))}</span></button>`;
+  }
+  return `<div class="cbar noprint"><div class="nx">${nx}</div>${right}</div>`;
+}
+
+function chartHtml(){
+  const list = PUBS.filter(p => p.cat === 'chart')
+                   .sort((a,b) => (a.icao||'').localeCompare(b.icao||''));
+  if (!list.length) return `<p class="sub" style="padding:9px 14px;border:1px dashed var(--border-med);border-radius:8px">${A.esc(T('none'))}</p>`;
+  const c = PUB.cats.chart;
+  const fold = (url, label, n) => url
+    ? `<a class="go gof" href="${A.esc(fileUrl(url))}" target="_blank" rel="noopener">${A.esc(label)}<i>${n||0}</i></a>`
+    : `<span class="go gof">${A.esc(label)}<i>—</i></span>`;
+  return `<h2 class="psec">${A.esc(LL(c))}<span class="d">${A.esc(c.d||'')}</span></h2>` +
+    chartBar() +
+    list.map(p => {
+      const s = state(p);
+      // ยังไม่เคยดึงก็เว้นไว้ — ป้ายสถานะข้าง ๆ บอกอยู่แล้ว เขียนซ้ำสองที่รกเปล่า ๆ
+      const eff = p.eff
+        ? `<b>${A.esc(dmmm(p.eff))}</b><span>AIRAC ${A.esc(p.airac||'—')}</span>`
+        : `<b>—</b>`;
+      /* ป้าย "อัปเดตแล้ว" อยู่ 3 วันหลังดึงเสร็จ แล้วหายไปเอง
+         เป็นการบอกว่า "เพิ่งแตะของนี้" ไม่ใช่บอกว่า "ของนี้ยังใช้ได้"
+         สองอย่างนี้ต่างกัน ป้ายสถานะข้าง ๆ เป็นตัวบอกว่ายังใช้ได้หรือไม่ */
+      const d = daysSince(p.syncedAt);
+      const fresh = (d !== null && d <= FRESH_DAYS)
+        ? `<span class="fresh">${A.esc(A.L({th:'อัปเดตแล้ว',en:'Updated'}))}</span>` : '';
+      return `<div class="adrow">
+        <div class="ad"><b>${A.esc(p.icao||'')}</b>${fresh}<span>${A.esc(LL(p))}</span></div>
+        <div class="eff${p.eff?'':' no'}">${eff}</div>
+        <span class="badge b-${s.k}">${A.esc(A.L(s.t))}</span>
+        ${fold(p.ap, A.L({th:'ผังสนามบิน',en:'Aerodrome'}), p.nap)}
+        ${fold(p.op, A.L({th:'แผนภูมิปฏิบัติการ',en:'Operation'}), p.nop)}</div>`;
+    }).join('');
 }
 
 function listHtml(tab){
@@ -242,7 +368,62 @@ function paint(){
   document.getElementById('out').innerHTML = PUB.tabs.map(tb => `
     <section style="${(PRINTALL || TAB === tb.k) ? '' : 'display:none'}">
       ${PRINTALL ? `<h2 class="psec">${A.esc(LL(tb))}</h2>` : ''}
-      ${tb.k === 'ac' ? acHtml() : listHtml(tb.k)}</section>`).join('');
+      ${tb.k === 'ac' ? acHtml() : tb.k === 'chart' ? chartHtml() : listHtml(tb.k)}</section>`).join('');
+
+  const b = document.getElementById('sync');
+  if (b) b.onclick = () => startSync(b);
+}
+
+/* ── ดึงแผนภูมิ ──────────────────────────────────────────────
+   ค่าที่ได้จาก Apps Script ทับค่าที่ฝังมากับไฟล์ เพราะฝั่งนั้นสดกว่าเสมอ
+   ทับเฉพาะช่องที่ระบบดึงเป็นคนเขียน (ap/op/นับ/รอบ) ไม่แตะชื่อสนามบินที่คนตั้ง */
+function applySync(){
+  if (!SYNC || !SYNC.started) return;
+  const by = {};
+  (SYNC.ads||[]).forEach(a => by[a.icao] = a);
+  const eff = (SYNC.issue||{}).date || '';
+  PUBS.forEach(p => {
+    if (p.cat !== 'chart') return;
+    const a = by[p.icao];
+    if (!a) return;
+    p.ap = a.ap || ''; p.op = a.op || '';
+    p.nap = a.nap || 0; p.nop = a.nop || 0;
+    p.eff = eff;
+    p.airac = (SYNC.issue||{}).cycle || p.airac || '';
+    p.syncedAt = SYNC.finishedAt || p.syncedAt || '';
+  });
+}
+
+async function loadSync(){
+  if (!A.isStaff()) return;              // คนทั่วไปเห็นค่าที่ฝังมากับไฟล์
+  const r = await A.gas('aipStatus');
+  if (!r.ok) return;
+  SYNC = r.result;
+  BUSY = (SYNC.started && !SYNC.finishedAt)
+    ? { i: SYNC.i, total: SYNC.total, fail: SYNC.fail } : null;
+  applySync(); paint();
+  if (BUSY) schedulePoll();
+}
+
+/* ถามสถานะทุก 10 วิระหว่างที่ยังดึงอยู่ — ตัวดึงเดินทีละรอบ 5 นาทีตาม trigger
+   ตัวเลขจึงขยับเป็นช่วง ไม่ใช่ไหลตลอด เขียนไว้กันคนคิดว่าค้าง */
+function schedulePoll(){
+  clearTimeout(POLL);
+  POLL = setTimeout(loadSync, 10000);
+}
+
+async function startSync(btn){
+  btn.disabled = true;
+  BUSY = { i: 0, total: 0, fail: 0 }; paint();
+  const r = await A.gas('aipSync');
+  if (!r.ok){
+    BUSY = null; paint();
+    alert(A.L({th:'เริ่มไม่สำเร็จ: ',en:'Could not start: '}) + r.error);
+    return;
+  }
+  SYNC = r.result.status;
+  BUSY = { i: SYNC.i||0, total: SYNC.total||0, fail: SYNC.fail||0 };
+  paint(); schedulePoll();
 }
 
 document.getElementById('prt').addEventListener('click', () => {

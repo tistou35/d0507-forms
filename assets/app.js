@@ -394,6 +394,25 @@
      จึงถือว่า "ส่งแล้ว" เมื่อ fetch ไม่ throw และให้ผู้ใช้เปิดโฟลเดอร์ตรวจเองได้ */
   A.GAS_URL = '';        // ตั้งค่าโดย build.py จาก firebase/config.json
 
+  /* เรียกงานฝั่ง Apps Script ที่ไม่ใช่การส่งออกใบฟอร์ม (เช่น ดึงแผนภูมิ AIP)
+     ตัวนี้ต้องอ่าน response ให้ได้จริง ต่างจาก exportSubmission ที่ยอมรับว่าอ่านไม่ได้ */
+  A.gas = async function (action, extra) {
+    if (!A.GAS_URL) return { ok: false, error: 'ยังไม่ได้ตั้ง URL ของตัวส่งออก' };
+    const u = firebase.auth().currentUser;
+    if (!u) return { ok: false, error: 'ต้องเข้าสู่ระบบก่อน' };
+    try {
+      const res = await fetch(A.GAS_URL, {
+        method: 'POST', redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(Object.assign({ idToken: await u.getIdToken(), action }, extra || {})),
+      });
+      const out = await res.json();
+      return out.ok ? { ok: true, result: out.result } : { ok: false, error: out.error };
+    } catch (e) {
+      return { ok: false, error: e.message };
+    }
+  };
+
   A.exportSubmission = async function (submission) {
     if (!A.GAS_URL) return { ok: false, error: 'ยังไม่ได้ตั้ง URL ของตัวส่งออก' };
     if (submission.status !== 'complete')
