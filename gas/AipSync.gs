@@ -30,7 +30,10 @@ var AIP_ADS = ['VTBD', 'VTBU', 'VTUU', 'VTUD', 'VTUW', 'VTUI',
 var AIP_STATE = 'AIP_SYNC_STATE.json';   // ไฟล์คิวใน subfolder AIP
 var AIP_MANIFEST = 'AIP_MANIFEST.json';  // ใบส่งงานให้ tools/aip_merge.py
 var AIP_RECEIPT = 'AIP_MERGED.json';     // ใบเสร็จที่ aip_merge.py เขียนกลับมา
-var AIP_BUDGET_MS = 4.5 * 60 * 1000;     // หยุดก่อนโดนตัดที่ 6 นาที
+/* หยุดก่อนโดนตัดที่ 6 นาที และต้องจบก่อน trigger รอบถัดไป (ทุก 5 นาที) ด้วย
+   เดิมตั้งไว้ 4.5 นาที เหลือขอบแค่ 30 วินาที ตัวถัดไปจึงซ้อนเข้ามาบ่อย
+   ลดเหลือ 3.5 นาที ให้มีเวลาเซฟ state และปล่อยล็อกทัน */
+var AIP_BUDGET_MS = 3.5 * 60 * 1000;
 
 /* ── โฟลเดอร์ ─────────────────────────────────────────────── */
 function aipRoot_() {
@@ -333,6 +336,15 @@ function aipWrite_(st) {
 
 /* ── เริ่มรอบใหม่ ─────────────────────────────────────────── */
 function aipStart() {
+  /* กันสั่งเริ่มซ้อนกับตัวที่กำลังเดินคิวอยู่ — เริ่มใหม่จะเขียนทับ state
+     ตัวที่กำลังเดินอยู่จะยังถือ state เก่าในหน่วยความจำแล้วเซฟทับกลับ ตำแหน่งเพี้ยน */
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(1000)) {
+    Logger.log('🔴 มีงานดึงทำงานอยู่ — ถ้าจะเริ่มใหม่จริง ให้ aipStop() ก่อน');
+    return;
+  }
+  lock.releaseLock();
+
   var iss = aipCurrentIssue_();
   Logger.log('ฉบับที่ใช้อยู่: %s (%s) %s', iss.text, iss.date, iss.amdt);
 
@@ -369,9 +381,24 @@ function aipClearTrigger_() {
 
 /* ── เดินคิวทีละชุด ───────────────────────────────────────── */
 function aipStep() {
+  /* กันสองตัวเดินคิวพร้อมกัน — trigger ยิงทุก 5 นาที แต่รอบหนึ่งใช้ได้ถึง 4.5 นาที
+     เหลือขอบแค่ 30 วินาที ตัวถัดไปจึงซ้อนเข้ามาได้ง่าย ๆ
+     ซ้อนแล้วทั้งคู่อ่าน state ก้อนเดียวกัน แล้วดาวน์โหลดรายการเดิมซ้ำทั้งชุด
+     (ของจริงเคยได้ VTBD 212 ไฟล์ ทั้งที่มี 125 ใบ)
+     ตัวที่จับล็อกไม่ได้ให้ถอยเงียบ ๆ เดี๋ยว trigger รอบหน้ามาต่อเอง */
+  var lock = LockService.getScriptLock();
+  if (!lock.tryLock(1000)) { Logger.log('มีตัวเดินคิวทำงานอยู่ — ข้ามรอบนี้'); return; }
+  try {
+    aipStepLocked_();
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function aipStepLocked_() {
   var st = aipRead_();
   if (!st || st.i >= st.items.length) { aipFinish_(st); return; }
-  var t0 = Date.now(), eff = st.issue.text;
+  var t0 = Date.now(), eff = st.issue.text, sinceSave = 0;
 
   while (st.i < st.items.length && Date.now() - t0 < AIP_BUDGET_MS) {
     var it = st.items[st.i];
@@ -386,6 +413,18 @@ function aipStep() {
         st.cleaned[it.icao] = true;
       }
       var sub = aipSub_(folder, it.sub);
+
+      /* มีชื่อนี้อยู่แล้วก็ข้าม — ทำให้รันซ้ำได้โดยไม่เกิดไฟล์ซ้ำ
+         จำเป็นเพราะ execution ที่ถูกตัดกลางคันจะทำให้ st.i ย้อนกลับไปจุดที่เซฟล่าสุด
+         แล้วรายการช่วงนั้นถูกดาวน์โหลดใหม่ ล็อกกันได้แค่การทำพร้อมกัน ไม่ได้กันการทำซ้ำ */
+      var ex = sub.getFilesByName(it.name);
+      if (ex.hasNext()) {
+        var old = ex.next();
+        it.fileId = old.getId(); it.folderId = sub.getId();
+        st.done++; st.i++; sinceSave++;
+        continue;
+      }
+
       var blob = UrlFetchApp.fetch(it.url, { muteHttpExceptions: true }).getBlob();
       var file = sub.createFile(blob.setName(it.name));
       file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
@@ -398,6 +437,9 @@ function aipStep() {
       st.fail.push(it.icao + ' · ' + it.name + ' — ' + e.message);
     }
     st.i++;
+    /* เซฟระหว่างทาง — เดิมเขียนหลังจบลูปอย่างเดียว
+       ถูกตัดกลางคันทีไรความคืบหน้าหายทั้งก้อน แล้วเริ่มดาวน์โหลดซ้ำจากจุดเดิม */
+    if (++sinceSave >= 25) { aipWrite_(st); sinceSave = 0; }
   }
   aipWrite_(st);
   Logger.log('คืบหน้า %s/%s (ผิดพลาด %s)', st.i, st.items.length, st.fail.length);
