@@ -290,8 +290,12 @@ function chartHtml(){
                    .sort((a,b) => (a.icao||'').localeCompare(b.icao||''));
   if (!list.length) return `<p class="sub" style="padding:9px 14px;border:1px dashed var(--border-med);border-radius:8px">${A.esc(T('none'))}</p>`;
   const c = PUB.cats.chart;
+  /* ต้องเป็น URL ของ "โฟลเดอร์" ไม่ใช่ fileUrl() ที่สร้าง /file/d/<id>/view
+     รูปแบบไฟล์ใช้กับโฟลเดอร์ไม่ได้ กดแล้วขึ้นหน้าไม่พบ */
+  const folderUrl = f => !f ? '' :
+    (/^https?:/.test(f) ? f : 'https://drive.google.com/drive/folders/' + f);
   const fold = (url, label, n) => url
-    ? `<a class="go gof" href="${A.esc(fileUrl(url))}" target="_blank" rel="noopener">${A.esc(label)}<i>${n||0}</i></a>`
+    ? `<a class="go gof" href="${A.esc(folderUrl(url))}" target="_blank" rel="noopener">${A.esc(label)}<i>${n||0}</i></a>`
     : `<span class="go gof">${A.esc(label)}<i>—</i></span>`;
   return `<h2 class="psec">${A.esc(LL(c))}<span class="d">${A.esc(c.d||'')}</span></h2>` +
     chartBar() +
