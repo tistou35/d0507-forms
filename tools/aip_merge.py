@@ -127,6 +127,7 @@ def main(argv):
         fid, dry = argv[0], '-n' in argv
         mf = manifest(fid)
     iss = mf.get('issue', {})
+    eff = iss.get('date', '')
     data = mf['data']
     multi = [s for s in data if len(s['files']) > 1]
     print('ฉบับ %s (%s) · %d ไฟล์ → %d ชุด · ต้องรวม %d ชุด%s'
@@ -136,14 +137,28 @@ def main(argv):
     tk = None if dry else token()
     trash, merged, fail = [], 0, []
 
+    # ใบส่งงานที่สร้างจากไฟล์ใน Drive อาจไม่มี url ต้นทาง — หาเองจาก eAIP
+    # จับคู่ด้วย (icao, ชื่อชุด, เลขหน้า) ซึ่ง aip_name.py คำนวณได้เหมือนฝั่ง Apps Script
+    need = any(not f.get('url') for s in multi for f in s['files'])
+    src = {}
+    if need:
+        from aip_charts import charts
+        from aip_name import sets as _sets
+        print('   ใบส่งงานไม่มี url ต้นทาง — หาเองจาก eAIP')
+        for icao in sorted({s['icao'] for s in multi}):
+            for g in _sets(icao, charts(icao, eff)):
+                for r, _t, u, _p in g['pages']:
+                    src[(icao, g['name'], r)] = u
+
     for s in multi:
         title = s['set']
         try:
-            parts = [get(f['url'], tries=3) if f.get('url') else None
-                     for f in s['files']]
-            # ใบส่งงานรุ่นแรกไม่ได้เก็บ url ไว้ — ดึงจาก eAIP ตามชื่อแทน
-            if any(p is None for p in parts):
-                raise RuntimeError('ใบส่งงานไม่มี url ของหน้า — อัปเดต AipSync.gs แล้วรันใหม่')
+            parts = []
+            for f in s['files']:
+                u = f.get('url') or src.get((s['icao'], s['set'], f.get('ref', '')))
+                if not u:
+                    raise RuntimeError('หา url ของหน้า %s ไม่เจอ' % f.get('ref'))
+                parts.append(get(u, tries=3))
             for i, p in enumerate(parts):
                 if p[:4] != b'%PDF':
                     raise RuntimeError('หน้า %s ไม่ใช่ PDF' % s['files'][i]['ref'])

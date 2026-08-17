@@ -493,17 +493,37 @@ function aipFinish_(st) {
  * ยังไม่รัน Python ก็ใช้งานได้ — แค่ได้ไฟล์แยกหน้าเหมือนเดิม ไม่ใช่ของเสีย
  */
 function aipManifest_(st) {
-  var sets = {};
-  st.items.forEach(function (it) {
-    if (!it.fileId) return;                 // ใบที่ดาวน์โหลดไม่สำเร็จ
-    var k = it.icao + '|' + it.sub + '|' + it.set;
-    if (!sets[k]) sets[k] = { icao: it.icao, sub: it.sub, set: it.set,
-                              folderId: it.folderId, files: [] };
-    // ใส่ url ต้นทางมาด้วย เพราะฝั่ง Python อ่านไฟล์ใน Drive ไม่ได้ (สโคป drive.file)
-    // ต้องไปโหลดจาก aip.caat.or.th ใหม่ — เป็นแหล่งเดียวกับที่ไฟล์นี้โหลดมา
-    sets[k].files.push({ id: it.fileId, name: it.name, ref: it.ref,
-                         title: it.title, url: it.url });
-  });
+  /* อ่านจากโฟลเดอร์จริงใน Drive ไม่ใช่จากสิ่งที่คิวจดไว้
+     เคยทำแบบเชื่อคิว (it.fileId) แล้วได้ manifest ว่างเปล่าทั้งที่ไฟล์ครบ 356 ใบ
+     เพราะ state หลุดระหว่างทาง ซึ่งเป็นเรื่องที่เกิดได้เสมอกับงานยาวหลายรอบ trigger
+     ของจริงในโฟลเดอร์คือสิ่งที่คนจะเปิดใช้ manifest จึงต้องบรรยายของจริง
+
+     ชื่อไฟล์เป็น "<ชื่อชุด> (AD 2-XXXX-n-m).pdf" อยู่แล้ว จึงแยกกลับเป็นชุดกับเลขหน้าได้ */
+  var urlOf = {};
+  (st && st.items || []).forEach(function (it) { if (it.name) urlOf[it.name] = it.url; });
+
+  var sets = {}, root = aipRoot_(), fol = root.getFolders();
+  while (fol.hasNext()) {
+    var ad = fol.next(), icao = ad.getName().split(' ')[0];
+    if (!/^[A-Z]{4}$/.test(icao)) continue;
+    ['Airport chart', 'Chart'].forEach(function (subName) {
+      var it2 = ad.getFoldersByName(subName);
+      if (!it2.hasNext()) return;
+      var sub = it2.next(), fid = sub.getId(), fs = sub.getFiles();
+      while (fs.hasNext()) {
+        var f = fs.next(), nm = f.getName();
+        var m = nm.match(/^(.*?)\s*\(AD\s+2-[A-Z]{4}-([\d-]+)\)\.pdf$/i);
+        var setName = m ? m[1] : nm.replace(/\.pdf$/i, '');
+        var ref = m ? m[2] : '';
+        var k = icao + '|' + subName + '|' + setName;
+        if (!sets[k]) sets[k] = { icao: icao, sub: subName, set: setName,
+                                  folderId: fid, files: [] };
+        // url ต้นทางใส่มาด้วยถ้ายังมีในคิว — ฝั่ง Python อ่านไฟล์ใน Drive ไม่ได้
+        // (สโคป drive.file) ต้องไปโหลดจาก aip.caat.or.th ใหม่ ซึ่งเป็นแหล่งเดียวกัน
+        sets[k].files.push({ id: f.getId(), name: nm, ref: ref, url: urlOf[nm] || '' });
+      }
+    });
+  }
 
   // เรียงหน้าแบบตัวเลข — เรียงแบบตัวอักษรจะได้ 6-10 มาก่อน 6-9
   var key = function (r) {
@@ -542,7 +562,6 @@ function aipManifest_(st) {
     });
   });
 
-  var root = aipRoot_();
   var doc = { issue: st.issue, generatedAt: st.finishedAt, rootId: root.getId(),
               files: st.done, sets: list.length,
               ads: Object.keys(ads).map(function (k) { return ads[k]; }),
@@ -634,6 +653,17 @@ function aipBegin_() {
               links: {}, cleaned: {}, startedAt: new Date().toISOString() });
   aipEnsureTrigger_();
   return 'เริ่มแล้ว — ' + items.length + ' ใบ';
+}
+
+/**
+ * สร้างใบส่งงานใหม่จากไฟล์ที่มีอยู่ใน Drive — ไม่ดาวน์โหลดอะไรเพิ่ม
+ * ใช้เมื่อดึงครบแล้วแต่ใบส่งงานออกมาว่างหรือไม่ครบ
+ */
+function aipRemanifest() {
+  var st = aipRead_();
+  if (!st) { Logger.log('ไม่มีสถานะการดึง — เรียก aipSetup() ก่อน'); return; }
+  if (!st.finishedAt) st.finishedAt = new Date().toISOString();
+  aipManifest_(st);
 }
 
 /* ── ดูสถานะ / ยกเลิก ─────────────────────────────────────── */

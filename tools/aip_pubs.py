@@ -21,7 +21,7 @@
 # ไม่ลบสนามบินที่หายไปจาก manifest และไม่แตะรายการหมวดอื่น
 # ทะเบียนเป็นเอกสารควบคุม การหายไปของรายการต้องเป็นการตัดสินใจของคน ไม่ใช่ผลข้างเคียง
 # ============================================================
-import json, os, sys, urllib.request
+import json, os, re, sys, urllib.request
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(HERE, 'tools'))
@@ -30,11 +30,61 @@ from aip_merge import manifest
 PUBS = os.path.join(HERE, 'publications.json')
 
 
+def from_drive(root_id):
+    """สรุปรายสนามบินจากโฟลเดอร์จริงใน Drive โดยไม่ผ่านใบส่งงาน
+
+    ใช้เมื่อใบส่งงานยังไม่พร้อม — ของจริงในโฟลเดอร์คือสิ่งที่คนจะเปิดใช้
+    นับ "ชุด" ไม่ใช่ "ไฟล์" เพราะหน้าเว็บบอกจำนวนชุด (หลายหน้าคือใบเดียว)
+    """
+    import urllib.parse
+    from gas_push import token, SSLCTX      # Python จาก python.org ต้องชี้ CA เอง
+    tk = token()
+
+    def q(query):
+        u = ('https://www.googleapis.com/drive/v3/files?q=%s'
+             '&fields=files(id,name,mimeType)&pageSize=1000'
+             % urllib.parse.quote(query))
+        req = urllib.request.Request(u, headers={'Authorization': 'Bearer ' + tk})
+        return json.load(urllib.request.urlopen(req, context=SSLCTX, timeout=60))['files']
+
+    FOLDER = 'application/vnd.google-apps.folder'
+    ads, eff = {}, ''
+    for ad in q("'%s' in parents and mimeType='%s' and trashed=false" % (root_id, FOLDER)):
+        parts = ad['name'].split(' ', 1)
+        icao = parts[0]
+        if len(icao) != 4 or not icao.isalpha():
+            continue
+        if len(parts) > 1 and not eff:
+            eff = parts[1]
+        a = {'icao': icao, 'ap': '', 'op': '', 'nap': 0, 'nop': 0}
+        for sub in q("'%s' in parents and mimeType='%s' and trashed=false" % (ad['id'], FOLDER)):
+            files = q("'%s' in parents and trashed=false" % sub['id'])
+            # ชื่อไฟล์คือ "<ชื่อชุด> (AD 2-XXXX-n-m).pdf" — ตัดเลขหน้าออกแล้วนับชุด
+            names = {re.sub(r'\s*\(AD\s+2-[A-Z]{4}-[\d-]+\)\.pdf$', '', f['name'], flags=re.I)
+                     for f in files}
+            if sub['name'] == 'Airport chart':
+                a['ap'], a['nap'] = sub['id'], len(names)
+            else:
+                a['op'], a['nop'] = sub['id'], len(names)
+        ads[icao] = a
+    return ads, eff
+
+
 def main(argv):
     if not argv:
-        sys.exit('ใช้: aip_pubs.py <manifest id> [-n]')
+        sys.exit('ใช้: aip_pubs.py <manifest id> [-n]\n'
+                 '     aip_pubs.py --drive <root folder id> [-n]   อ่านจากโฟลเดอร์ตรง ๆ')
     dry = '-n' in argv
-    mf = manifest(argv[0])
+
+    if argv[0] == '--drive':
+        ads, eff_txt = from_drive(argv[1])
+        MON = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC']
+        m = re.match(r'(\d{1,2})\s+([A-Z]{3})\s+(\d{4})', eff_txt or '')
+        eff_iso = ('%s-%02d-%02d' % (m.group(3), MON.index(m.group(2).upper()) + 1,
+                                     int(m.group(1)))) if m else ''
+        mf = {'issue': {'date': eff_iso, 'text': eff_txt}, 'ads': list(ads.values())}
+    else:
+        mf = manifest(argv[0])
     ads = {a['icao']: a for a in mf.get('ads', [])}
     if not ads:
         sys.exit('ใบส่งงานไม่มีส่วน ads — อัปเดต AipSync.gs แล้วรัน aipStart ใหม่')
