@@ -94,6 +94,93 @@ function aipCurrentIssue_() {
            cycle: calc && calc.date === date ? calc.cycle : '' };
 }
 
+/**
+ * ฉบับถัดไปตามที่ CAAT ประกาศ — อ่านจากตาราง Next Issues
+ * คืน { date: '2026-09-03', text: '03 SEP 2026' } หรือ null ถ้ายังไม่ประกาศ
+ */
+function aipNextIssue_() {
+  var html = aipFetch_(AIP_SITE + '/');
+  var i = html.search(/Next\s+Issues/i);
+  if (i < 0) return null;
+  var block = html.slice(i, i + 6000);
+  var m = block.match(/(\d{4}-\d{2}-\d{2})-AIRAC\/html\/index-en-GB\.html/);
+  var t = block.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ');
+  var dm = t.match(/(\d{1,2}\s+[A-Z]{3}\s+\d{4})/);
+  if (!m && !dm) return null;
+  var date = m ? m[1] : null;
+  if (!date && dm) {                       // มีแต่ข้อความ ยังไม่มีลิงก์
+    var MON = { JAN:0,FEB:1,MAR:2,APR:3,MAY:4,JUN:5,
+                JUL:6,AUG:7,SEP:8,OCT:9,NOV:10,DEC:11 };
+    var p = dm[1].split(/\s+/);
+    var d2 = new Date(Date.UTC(+p[2], MON[p[1].toUpperCase()], +p[0]));
+    date = d2.toISOString().slice(0, 10);
+  }
+  return { date: date, text: dm ? dm[1] : date };
+}
+
+/** เวลา n นาฬิกาตามเวลาไทยของวันที่กำหนด — คืนเป็น Date จริง */
+function aipAtLocal_(ymd, hour) {
+  var p = ymd.split('-');
+  // เวลาไทยคือ UTC+7 — 03:00 ไทย = 20:00 UTC ของเมื่อวาน
+  return new Date(Date.UTC(+p[0], +p[1] - 1, +p[2], hour - 7, 0, 0));
+}
+
+/**
+ * ตั้งนาฬิกาปลุกครั้งเดียวสำหรับฉบับถัดไป
+ *
+ * ไม่ใช้ trigger รายวัน เพราะใน 28 วันมีวันที่ต้องทำงานจริงแค่วันเดียว
+ * อีก 27 วันคือปลุกมาดูแล้วนอนต่อ
+ */
+function aipSchedule_(when, why) {
+  ScriptApp.getProjectTriggers().forEach(function (t) {
+    if (t.getHandlerFunction() === 'aipWake') ScriptApp.deleteTrigger(t);
+  });
+  var now = Date.now();
+  if (when.getTime() < now + 60000) when = new Date(now + 5 * 60000);
+  ScriptApp.newTrigger('aipWake').timeBased().at(when).create();
+  Logger.log('ตั้งเวลาตื่นถัดไป %s (%s)',
+    Utilities.formatDate(when, 'Asia/Bangkok', 'dd MMM yyyy HH:mm'), why);
+}
+
+/**
+ * ── ตัวที่นาฬิกาปลุกเรียก ────────────────────────────────────
+ * ตื่นตีสามของวัน Effective date แล้ว "ตรวจก่อนดึง"
+ *
+ * ทำไมต้องตรวจ ไม่ดึงเลย:
+ * รอบ AIRAC มีผลเวลา 0000 UTC ซึ่งตรงกับ 07:00 เวลาไทย
+ * ตีสามของวัน Effective date จึงเป็น 20:00 UTC ของเมื่อวาน — ยังไม่ถึงเวลามีผล
+ * ถ้าดึงเลยตอนนั้นจะได้ฉบับเก่ามาทั้งชุด โดยที่ทุกอย่างดูปกติ ไม่มี error
+ * และ CAAT เองก็อาจอัปเดตหน้าเว็บช้ากว่านั้นอีก
+ *
+ * จึงตื่นมาดูว่าเว็บพลิกเป็นฉบับใหม่แล้วหรือยัง ยังไม่พลิกก็นอนต่ออีกสองชั่วโมง
+ * ยอมตื่นเก้อไม่กี่ครั้ง ดีกว่าได้แผนภูมิหมดอายุไปอยู่บนเครื่อง
+ */
+function aipWake() {
+  var iss = aipCurrentIssue_(), st = aipRead_();
+  var had = st && st.issue ? st.issue.date : null;
+
+  if (had && iss.date === had) {
+    var p = PropertiesService.getScriptProperties();
+    var n = (+p.getProperty('AIP_WAIT') || 0) + 1;
+    if (n > 8) {                       // ตื่นเก้อ 8 ครั้ง = ราว 16 ชั่วโมง
+      p.deleteProperty('AIP_WAIT');
+      Logger.log('🔴 เลยวัน Effective date มา 16 ชม. แล้วเว็บยังเป็นฉบับ %s ' +
+                 '— ตรวจ aip.caat.or.th ด้วยตัวเอง', iss.text);
+      var nx = aipNextIssue_();
+      if (nx) aipSchedule_(aipAtLocal_(nx.date, 3), 'ฉบับ ' + nx.text);
+      return;
+    }
+    p.setProperty('AIP_WAIT', String(n));
+    Logger.log('เว็บยังเป็นฉบับ %s — ตื่นดูใหม่อีก 2 ชม. (ครั้งที่ %s)', iss.text, n);
+    aipSchedule_(new Date(Date.now() + 2 * 3600000), 'รอเว็บพลิกฉบับ');
+    return;
+  }
+
+  PropertiesService.getScriptProperties().deleteProperty('AIP_WAIT');
+  Logger.log('เว็บพลิกเป็นฉบับ %s แล้ว — เริ่มดึง', iss.text);
+  aipStart();
+}
+
 /** รอบ AIRAC ที่ครอบวันนี้ — หมุดเดียวกับ tools/airac.py */
 function aipCycleOn_(when) {
   var anchor = Date.UTC(2020, 0, 2), CYC = 28 * 86400000;
@@ -326,6 +413,16 @@ function aipFinish_(st) {
   aipWrite_(st);
   aipManifest_(st);
 
+  // ตั้งนาฬิกาปลุกของฉบับถัดไปทันทีที่ดึงรอบนี้เสร็จ — ไม่มีวันไหนต้องปลุกเปล่า
+  try {
+    var nx = aipNextIssue_();
+    if (nx && nx.date > st.issue.date) aipSchedule_(aipAtLocal_(nx.date, 3), 'ฉบับ ' + nx.text);
+    else {
+      // CAAT ยังไม่ประกาศฉบับถัดไป — กลับมาดูอีกทีอีกเจ็ดวัน
+      aipSchedule_(new Date(Date.now() + 7 * 86400000), 'ยังไม่ประกาศฉบับถัดไป');
+    }
+  } catch (e) { Logger.log('🔴 ตั้งเวลาตื่นถัดไปไม่สำเร็จ: %s', e.message); }
+
   Logger.log('เสร็จ — %s/%s ใบ · ผิดพลาด %s', st.done, st.items.length, st.fail.length);
   st.fail.slice(0, 10).forEach(function (m) { Logger.log('  🔴 ' + m); });
   Object.keys(folders).forEach(function (k) { Logger.log('  %s  %s', k, folders[k]); });
@@ -430,6 +527,31 @@ function aipStatus() {
     st.issue.text, st.issue.amdt, st.i, st.items.length, st.fail.length,
     st.finishedAt ? ' · เสร็จแล้ว' : ' · กำลังทำ');
   st.fail.slice(0, 20).forEach(function (m) { Logger.log('  🔴 ' + m); });
+
+  var wake = ScriptApp.getProjectTriggers().filter(function (t) {
+    return t.getHandlerFunction() === 'aipWake';
+  });
+  Logger.log(wake.length ? 'นาฬิกาปลุกถัดไป: ตั้งไว้แล้ว'
+                         : '⚠️ ไม่มีนาฬิกาปลุก — เรียก aipArm() เพื่อตั้งใหม่');
+  try {
+    var nx = aipNextIssue_();
+    if (nx) Logger.log('CAAT ประกาศฉบับถัดไป: %s', nx.text);
+  } catch (e) {}
+}
+
+/**
+ * ตั้งนาฬิกาปลุกใหม่โดยไม่ต้องดึงอะไร — ใช้เมื่อ trigger หาย
+ * (เช่น ย้ายโปรเจกต์ หรือเผลอลบ trigger ทิ้ง)
+ */
+function aipArm() {
+  var nx = aipNextIssue_(), st = aipRead_();
+  if (!nx) { Logger.log('CAAT ยังไม่ประกาศฉบับถัดไป — ตั้งไว้อีกเจ็ดวัน');
+             aipSchedule_(new Date(Date.now() + 7 * 86400000), 'รอประกาศ'); return; }
+  if (st && st.issue && nx.date <= st.issue.date) {
+    Logger.log('ฉบับถัดไป (%s) ยังไม่ใหม่กว่าที่ดึงไว้ — ตั้งไว้อีกเจ็ดวัน', nx.text);
+    aipSchedule_(new Date(Date.now() + 7 * 86400000), 'รอประกาศ'); return;
+  }
+  aipSchedule_(aipAtLocal_(nx.date, 3), 'ฉบับ ' + nx.text);
 }
 
 function aipStop() { aipClearTrigger_(); Logger.log('หยุดแล้ว — เรียก aipStep() เองเพื่อทำต่อ'); }
@@ -446,15 +568,11 @@ function aipStop() { aipClearTrigger_(); Logger.log('หยุดแล้ว �
  * ดูความคืบหน้าด้วย aipStatus()
  */
 function aipSetup() {
-  var has = ScriptApp.getProjectTriggers().some(function (t) {
-    return t.getHandlerFunction() === 'aipDaily';
+  // ของเดิมเคยปลุกทุกวัน — ไม่ต้องแล้ว ใช้นาฬิกาปลุกตามวันจริงแทน
+  ScriptApp.getProjectTriggers().forEach(function (t) {
+    if (t.getHandlerFunction() === 'aipDaily') ScriptApp.deleteTrigger(t);
   });
-  if (has) Logger.log('มี trigger รายวันอยู่แล้ว');
-  else {
-    ScriptApp.newTrigger('aipDaily').timeBased().everyDays(1).atHour(3).create();
-    Logger.log('ตั้ง trigger รายวันแล้ว (ตีสาม) — เฝ้าวันเปลี่ยนฉบับให้เอง');
-  }
-  aipStart();
+  aipStart();     // aipFinish_ จะตั้งเวลาตื่นของฉบับถัดไปให้เองตอนดึงเสร็จ
 }
 
 /**
@@ -469,4 +587,21 @@ function aipDaily() {
   }
   Logger.log('ฉบับใหม่ %s — เริ่มดึง', iss.text);
   aipStart();
+}
+
+/**
+ * ทดสอบตัวคำนวณเวลาโดยไม่แตะ Drive และไม่ตั้ง trigger
+ * ดูว่าอ่านวันจากเว็บได้ถูก และจะตื่นตอนไหนจริง ๆ
+ */
+function aipDryRun() {
+  var cur = aipCurrentIssue_(), nx = aipNextIssue_();
+  Logger.log('ใช้อยู่:     %s (%s) %s', cur.text, cur.date, cur.amdt);
+  Logger.log('ถัดไป:      %s', nx ? nx.text + ' (' + nx.date + ')' : '— ยังไม่ประกาศ');
+  if (!nx) return;
+  var w = aipAtLocal_(nx.date, 3);
+  Logger.log('จะตื่น:     %s เวลาไทย',
+    Utilities.formatDate(w, 'Asia/Bangkok', 'dd MMM yyyy HH:mm'));
+  Logger.log('เทียบ UTC:  %s — รอบมีผล 0000 UTC ของ %s',
+    Utilities.formatDate(w, 'UTC', 'dd MMM yyyy HH:mm'), nx.date);
+  Logger.log('ตอนตื่นถ้าเว็บยังไม่พลิก จะนอนต่อทีละ 2 ชม. (สูงสุด 8 ครั้ง) แล้วค่อยดึง');
 }
