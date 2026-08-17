@@ -173,6 +173,14 @@ def main():
     for f in reg['forms']:
         f['hasDef'] = f['abbr'] in defs
 
+    # ทะเบียนเช็กลิสต์และเอกสารเผยแพร่ — คนละชุดกับฟอร์ม
+    pubs_path = os.path.join(HERE, 'publications.json')
+    PUBS = json.load(open(pubs_path, encoding='utf-8')) if os.path.exists(pubs_path) else {'pubs': []}
+    PUBS = {k: v for k, v in PUBS.items() if not k.startswith('_')}
+    sys.path.insert(0, os.path.join(HERE, 'tools'))
+    from airac import table as airac_table
+    AIRAC = airac_table(10)
+
     pub = public_view(reg)
     # ⚠️ ทุกหน้าที่ host แบบสาธารณะฝังได้เฉพาะ pub — ทะเบียนเต็มอยู่ Firestore เท่านั้น
     FB, todo, GAS = firebase_config()
@@ -209,11 +217,13 @@ def main():
         ('submit.html',      'submit/index.html',              '../',   'all'),
         ('approve.html',     'approve/index.html',             '../',   'queue'),
         ('approvals.html',   'admin/approvals/index.html',     '../../','aprv'),
+        ('pubs.html',        'pubs/index.html',                '../',   'pubs'),
     ]
     VER = asset_versions()
     for src, out, base, active in pages:
         sub = {'@@REG@@': R, '@@REGPUB@@': P, '@@FBCFG@@': FB, '@@GASURL@@': GAS,
-               '@@STATS@@': jsonjs(stats), '@@DEFS@@': jsonjs(defs)}
+               '@@STATS@@': jsonjs(stats), '@@DEFS@@': jsonjs(defs),
+               '@@PUBS@@': jsonjs(PUBS), '@@AIRAC@@': jsonjs(AIRAC)}
         n = emit(src, os.path.join(HERE, out), base, active, sub, VER)
         total += n
         print('  built: %-30s %7d bytes' % (out, n))

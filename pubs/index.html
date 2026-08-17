@@ -1,0 +1,295 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>เช็กลิสต์และเอกสารเผยแพร่ — D-0507 Flight Training</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="../assets/app.css?v=4040a492">
+<style>
+.pcat{margin-top:30px}
+.pcat h2{font-family:var(--font-display);font-size:17px;display:flex;align-items:center;gap:10px}
+.pcat .pill{font-size:11px;padding:2px 9px;border-radius:99px;font-family:var(--font-sans);font-weight:400}
+.pcat p.d{font-size:13px;color:var(--fg-2);margin:3px 0 12px}
+.prow{display:grid;grid-template-columns:1fr auto auto auto;gap:14px;align-items:center;
+  padding:12px 16px;border:1px solid var(--border-light);border-radius:8px;
+  background:var(--surface);margin-bottom:8px}
+.prow .nm{font-size:14.5px;line-height:1.4}
+.prow .nm b{font-weight:600}
+.prow .nm span{display:block;font-size:11.5px;color:var(--g-500);font-family:var(--font-mono)}
+.prow .ed{font-family:var(--font-mono);font-size:12.5px;color:var(--fg-2);white-space:nowrap;text-align:right}
+.prow .ed b{display:block;color:var(--fg-1);font-size:13.5px}
+.badge{font-size:11.5px;font-weight:600;padding:4px 11px;border-radius:99px;white-space:nowrap}
+.b-ok{background:var(--green-100);color:var(--green-600)}
+.b-soon{background:var(--amber-100);color:var(--amber-600)}
+.b-out{background:var(--red-100);color:var(--red-600)}
+.b-none{background:var(--g-100);color:var(--g-600)}
+.b-next{background:var(--sky-100);color:var(--sky-600)}
+.prow a.go,.prow span.go{min-height:40px;padding:0 15px;border-radius:8px;display:grid;place-items:center;
+  font-size:13px;text-decoration:none;white-space:nowrap}
+.prow a.go{background:var(--navy-900);color:#fff}
+.prow span.go{background:var(--g-100);color:var(--g-400)}
+@media(max-width:760px){.prow{grid-template-columns:1fr auto}.prow .ed{grid-column:1}}
+
+/* พิมพ์ = ได้สารบัญฉบับปัจจุบัน ใช้เป็นเอกสารควบคุมได้เลย */
+@media print{
+  .topbar,.rail,.botnav,footer,.filters,.noprint{display:none !important}
+  .body{display:block}.main{padding:0;max-width:none}
+  .prow{break-inside:avoid;border:0;border-bottom:1px solid #ccc;border-radius:0;padding:7px 0}
+  .prow a.go,.prow span.go{display:none}
+  .printhead{display:block !important;margin-bottom:16px;border-bottom:2px solid #0D1B2A;padding-bottom:8px}
+  .badge{border:1px solid #999;background:none !important;color:#000 !important}
+}
+.printhead{display:none}
+</style>
+</head><body>
+<div class="topbar">
+  <a class="brand" href="../" style="text-decoration:none">
+    <svg viewBox="0 0 320 72" fill="none" role="img" aria-label="D0507 Flight Training">
+      <g transform="translate(8,12)"><path d="M4 28 L44 20 L52 22 L44 26 L48 36 L40 34 L36 28 Z" fill="#fff"/>
+      <path d="M18 24 L44 20 L40 34 L22 30 Z" fill="#4A90D9"/><path d="M4 28 L14 22 L16 26 L8 30 Z" fill="#4A90D9"/></g>
+      <text x="70" y="36" font-family="'Arial Narrow',Arial,sans-serif" font-size="28" font-weight="800" letter-spacing="-0.5" fill="#fff">D0507</text>
+      <text x="71" y="54" font-family="'Arial Narrow',Arial,sans-serif" font-size="14" font-weight="600" letter-spacing="4" fill="#4A90D9">FLIGHT TRAINING</text>
+    </svg>
+    <span class="div"></span>
+    <span><span class="nm" data-t="brand">ระบบฟอร์มออนไลน์</span><span class="en" data-t2="brand">Forms &amp; Approvals</span></span>
+  </a>
+  <div class="tsearch" onclick="location.href='../all/'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
+    <span><span data-t="searchPh">ค้นหาฟอร์ม</span> · <span data-t2="searchPh">Search forms</span></span><span class="k">⌘K</span>
+  </div>
+  <div class="tright">
+    <div class="langsw" role="group" aria-label="ภาษา · Language">
+      <button type="button" data-lang="th" aria-pressed="true">ไทย</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+    <div id="authbox" style="display:flex;align-items:center;gap:14px"></div>
+  </div>
+</div>
+<div class="body">
+<nav class="rail">
+  <span class="lab"><span data-t="menu">เมนู</span> · <span data-t2="menu">Menu</span></span>
+  <a class="nav" data-nav="home" href="../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>
+    <span><span class="t" data-t="navHome">หน้าหลัก</span><span class="en" data-t2="navHome">Home</span></span></a>
+  <a class="nav" data-nav="all" href="../all/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg>
+    <span><span class="t" data-t="navAll">คลังฟอร์ม</span><span class="en" data-t2="navAll">All forms</span></span><span class="pill gry" data-cnt="forms">—</span></a>
+  <a class="nav staffonly" data-nav="queue" href="../queue/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l4 4L14 8"/><path d="M10 13l4 4L22 8"/></svg>
+    <span><span class="t" data-t="navQueue">งานของฉัน</span><span class="en" data-t2="navQueue">My queue</span></span><span class="pill amb" data-cnt="queue">0</span></a>
+  <a class="nav" data-nav="pubs" href="../pubs/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.5h6a2.5 2.5 0 0 1 2.5 2.5v13A2 2 0 0 0 10.5 18H4z"/><path d="M20 4.5h-6A2.5 2.5 0 0 0 11.5 7v13A2 2 0 0 1 13.5 18H20z"/></svg>
+    <span><span class="t" data-t="navPubs">เช็กลิสต์และเอกสาร</span><span class="en" data-t2="navPubs">Checklists · Publications</span></span></a>
+  <a class="nav staffonly adminonly" data-nav="register" href="../admin/register/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h8.5L19 7v14.5H6z"/><path d="M14 2.5V7h5"/><path d="M9 12h7M9 15.5h7"/></svg>
+    <span><span class="t" data-t="navReg">ทะเบียนเอกสาร</span><span class="en" data-t2="navReg">Register · LEF</span></span></a>
+  <a class="nav staffonly adminonly" data-nav="fadmin" href="../admin/forms/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 12h16M4 19h9"/><circle cx="18.5" cy="19" r="2.5"/></svg>
+    <span><span class="t" data-t="navForms">จัดการฟอร์ม</span><span class="en" data-t2="navForms">Form management</span></span></a>
+  <a class="nav staffonly adminonly" data-nav="aprv" href="../admin/approvals/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l2.5 2.5L16 8"/><path d="M20.5 12a8.5 8.5 0 1 1-4.2-7.3"/></svg>
+    <span><span class="t" data-t="navAprv">ผังผู้อนุมัติ</span><span class="en" data-t2="navAprv">Approvals</span></span></a>
+  <a class="nav staffonly adminonly" data-nav="setup" href="../admin/setup/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>
+    <span><span class="t" data-t="navSetup">ตั้งค่าระบบ</span><span class="en" data-t2="navSetup">Admin setup</span></span></a>
+  <a class="nav staffonly" data-nav="audit" href="../../d0507-audit/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.4 15.4L21 21"/></svg>
+    <span><span class="t" data-t="navAudit">งานตรวจสอบ</span><span class="en" data-t="auditNote">Audit ↗ login แยก</span></span></a>
+
+  <div class="railfoot">
+    <svg class="q" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9.2"/><path d="M9.4 9.2a2.7 2.7 0 1 1 3.4 2.6c-.6.2-.8.7-.8 1.3v.6"/><circle cx="12" cy="17" r=".9" fill="currentColor" stroke="none"/></svg>
+    <b data-t="helpTitle">ไม่รู้ว่าต้องใช้ฟอร์มไหน?</b>
+    <p data-t="helpBody">พิมพ์สิ่งที่อยากทำในช่องค้นหา ระบบจะหาให้ข้ามทุกระบบ</p>
+  </div>
+</nav>
+  <main class="main">
+    <div class="printhead">
+      <h1 style="font-size:19px">D-0507 Flight Training Co., Ltd. — รายการเช็กลิสต์และเอกสารเผยแพร่ที่ใช้อยู่</h1>
+      <p class="sub" id="phead"></p>
+    </div>
+
+    <div class="greet noprint">
+      <div><p class="eyebrow"><span data-t="pubs">เช็กลิสต์และเอกสาร</span> · <span data-t2="pubs">CHECKLISTS &amp; PUBLICATIONS</span></p>
+        <h1 id="hd">—</h1>
+        <p class="sub" data-t="pubsSub">เอกสารที่ต้องพิมพ์ไปใช้ — ระบบคุมว่าฉบับไหนเป็นฉบับปัจจุบัน แผนภูมิการบินคุมตามรอบ AIRAC</p></div>
+      <button class="fb" id="prt">🖨 <span data-t="printList">พิมพ์รายการ</span></button>
+    </div>
+
+    <div id="warn"></div>
+
+    <section class="noprint">
+      <div class="filters">
+        <input id="q" type="search">
+      </div>
+      <div class="filters" id="fmodel"></div>
+    </section>
+
+    <p class="sub noprint" id="cnt" style="margin:10px 0 0"></p>
+    <div id="out"></div>
+  </main>
+</div>
+<nav class="botnav">
+  <a data-nav="home" href="../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg><span data-t="navHome">หน้าหลัก</span></a>
+  <a data-nav="all" href="../all/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg><span data-t="navAll">คลังฟอร์ม</span></a>
+  <a data-nav="queue" class="staffonly" href="../queue/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l4 4L14 8"/><path d="M10 13l4 4L22 8"/></svg><span data-t="navQueue">งานของฉัน</span></a>
+  <a class="on" data-nav="pubs" href="../pubs/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.5h6a2.5 2.5 0 0 1 2.5 2.5v13A2 2 0 0 0 10.5 18H4z"/><path d="M20 4.5h-6A2.5 2.5 0 0 0 11.5 7v13A2 2 0 0 1 13.5 18H20z"/></svg>
+    <span data-t="navPubs">เช็กลิสต์</span></a>
+  <a data-nav="register" class="staffonly adminonly" href="../admin/register/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h8.5L19 7v14.5H6z"/><path d="M14 2.5V7h5"/><path d="M9 12h7M9 15.5h7"/></svg><span data-t="navRegSh">ทะเบียน</span></a>
+</nav>
+<footer>D-0507 Flight Training Co., Ltd. · Controlled Document System</footer>
+<script>window.BASE='../';</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="../assets/app.js?v=1a135dbc"></script>
+<script>
+"use strict";
+const PUB = {"cats":{"normal":{"n":"เช็กลิสต์ปกติ","en":"Normal checklist","cl":"b","d":"ใช้ประจำทุกเที่ยวบิน — ต้องเป็นฉบับที่ตรงกับแบบเครื่อง"},"emerg":{"n":"เช็กลิสต์ฉุกเฉิน","en":"Emergency checklist","cl":"r","d":"ต้องอยู่บนเครื่องทุกเที่ยวบิน และตรงกับแบบเครื่อง"},"brief":{"n":"เช็กลิสต์การบรีฟ","en":"Briefing checklist","cl":"a","d":"ใช้บรีฟก่อนและหลังบิน"},"chart":{"n":"แผนภูมิการบิน","en":"Aeronautical chart","cl":"c","d":"ดาวน์โหลดจาก AIP Thailand — มีอายุตามรอบ AIRAC"}},"fleet":[{"model":"C172M","regs":[]},{"model":"C172N","regs":[]},{"model":"C172S","regs":[]},{"model":"C182T","regs":[]},{"model":"C206H","regs":[],"note":"OMA D.2.8 เรียกแบบนี้ว่า T206H (เทอร์โบ) — ต้องเลือกให้ตรงกันก่อนออกฉบับจริง"}],"pubs":[{"id":"CL-NORM-C172M","cat":"normal","model":"C172M","src":"inhouse","th":"เช็กลิสต์ปกติ C172M","en":"Normal Checklist C172M","ed":"","rev":"","eff":"","file":"","by":"HT"},{"id":"CL-NORM-C172N","cat":"normal","model":"C172N","src":"inhouse","th":"เช็กลิสต์ปกติ C172N","en":"Normal Checklist C172N","ed":"","rev":"","eff":"","file":"","by":"HT"},{"id":"CL-NORM-C172S","cat":"normal","model":"C172S","src":"inhouse","th":"เช็กลิสต์ปกติ C172S","en":"Normal Checklist C172S","ed":"","rev":"","eff":"","file":"","by":"HT"},{"id":"CL-NORM-C182T","cat":"normal","model":"C182T","src":"inhouse","th":"เช็กลิสต์ปกติ C182T","en":"Normal Checklist C182T","ed":"","rev":"","eff":"","file":"","by":"HT"},{"id":"CL-NORM-C206H","cat":"normal","model":"C206H","src":"inhouse","th":"เช็กลิสต์ปกติ C206H","en":"Normal Checklist C206H","ed":"","rev":"","eff":"","file":"","by":"HT"},{"id":"CL-EMER-C172M","cat":"emerg","model":"C172M","src":"inhouse","th":"เช็กลิสต์ฉุกเฉิน C172M","en":"Emergency Checklist C172M","ed":"","rev":"","eff":"","file":"","by":"HT"},{"id":"CL-EMER-C172N","cat":"emerg","model":"C172N","src":"inhouse","th":"เช็กลิสต์ฉุกเฉิน C172N","en":"Emergency Checklist C172N","ed":"","rev":"","eff":"","file":"","by":"HT"},{"id":"CL-EMER-C172S","cat":"emerg","model":"C172S","src":"inhouse","th":"เช็กลิสต์ฉุกเฉิน C172S","en":"Emergency Checklist C172S","ed":"","rev":"","eff":"","file":"","by":"HT"},{"id":"CL-EMER-C182T","cat":"emerg","model":"C182T","src":"inhouse","th":"เช็กลิสต์ฉุกเฉิน C182T","en":"Emergency Checklist C182T","ed":"","rev":"","eff":"","file":"","by":"HT"},{"id":"CL-EMER-C206H","cat":"emerg","model":"C206H","src":"inhouse","th":"เช็กลิสต์ฉุกเฉิน C206H","en":"Emergency Checklist C206H","ed":"","rev":"","eff":"","file":"","by":"HT"},{"id":"CL-BRIEF","cat":"brief","src":"inhouse","th":"เช็กลิสต์การบรีฟก่อนและหลังบิน","en":"Pre/Post-Flight Briefing Checklist","ed":"","rev":"","eff":"","file":"","by":"HT"}]}, AIRAC = [{"c":"2608","from":"2026-08-06","to":"2026-09-02"},{"c":"2609","from":"2026-09-03","to":"2026-09-30"},{"c":"2610","from":"2026-10-01","to":"2026-10-28"},{"c":"2611","from":"2026-10-29","to":"2026-11-25"},{"c":"2612","from":"2026-11-26","to":"2026-12-23"},{"c":"2613","from":"2026-12-24","to":"2027-01-20"},{"c":"2701","from":"2027-01-21","to":"2027-02-17"},{"c":"2702","from":"2027-02-18","to":"2027-03-17"},{"c":"2703","from":"2027-03-18","to":"2027-04-14"},{"c":"2704","from":"2027-04-15","to":"2027-05-12"},{"c":"2705","from":"2027-05-13","to":"2027-06-09"}], A = D0507;
+let PUBS = PUB.pubs.slice(), MODEL = '', Q = '';
+
+A.reg = { forms: [], status: {}, lefcount: {} };
+
+/* ทะเบียนฉบับเต็มอยู่ Firestore เหมือนทะเบียนฟอร์ม — แก้ที่เดียวเห็นทุกเครื่อง
+   ไฟล์ในรีโปเป็นโครงตั้งต้น ถ้ายังไม่เคยอัปโหลดก็ใช้โครงนั้นไปก่อน */
+async function hydrate(){
+  try{
+    const d = await A.db.collection('publications').doc('current').get();
+    if (d.exists && (d.data().pubs||[]).length) PUBS = d.data().pubs;
+  }catch(e){ /* rule ไม่อนุญาต หรือยังไม่ได้อัปโหลด — ใช้ของในไฟล์ */ }
+  paint();
+}
+
+// ทะเบียนเอกสารใช้คีย์ th/en ส่วนหมวดใช้ n/en — รับทั้งสองแบบ
+const LL = o => A.lang==='en' ? (o.en || o.th || o.n) : (o.th || o.n || o.en);
+const dmy = s => { const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||''); return m? m[3]+'/'+m[2]+'/'+m[1] : ''; };
+const today = () => { const d=new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
+
+/* คำนวณช่วงวันของรอบ AIRAC ใด ๆ จากหมุดเดียวกับ tools/airac.py
+   ต้องคำนวณเอง ไม่ใช่เปิดตารางที่ฝังมา เพราะตารางมีแต่รอบปัจจุบันกับอนาคต
+   ถ้าใช้ตารางอย่างเดียว chart รอบเก่าจะกลายเป็น "ไม่รู้จักรอบ" แทนที่จะเป็น
+   "หมดรอบแล้ว" ซึ่งกลบความเสี่ยงที่ระบบนี้ตั้งใจจะจับพอดี */
+const ANCHOR = Date.UTC(2020, 0, 2), DAY = 86400000, CYCLE = 28 * DAY;
+function airacRange(id){
+  const m = /^(\d{2})(\d{2})$/.exec(String(id||''));
+  if (!m) return null;
+  const year = 2000 + +m[1], n = +m[2];
+  let t = ANCHOR;
+  while (new Date(t).getUTCFullYear() < year) t += CYCLE;
+  if (new Date(t).getUTCFullYear() !== year) return null;
+  t += (n - 1) * CYCLE;
+  const from = new Date(t), to = new Date(t + CYCLE - DAY);
+  if (from.getUTCFullYear() !== year) return null;      // เลขรอบเกินที่ปีนั้นมี
+  return { from: from.toISOString().slice(0,10), to: to.toISOString().slice(0,10) };
+}
+
+/* สถานะของหนึ่งฉบับ — ตัวนี้คือหัวใจของหน้านี้
+   chart ยึดรอบ AIRAC · เอกสารที่ทำเองยึดว่ามีฉบับและไฟล์แล้วหรือยัง */
+function state(p){
+  if (p.cat === 'chart'){
+    const c = airacRange(p.airac);
+    if (!c) return { k:'none', t:{th:'ยังไม่ระบุรอบ',en:'No cycle'} };
+    const t = today();
+    if (t > c.to)   return { k:'out',  t:{th:'หมดรอบแล้ว',en:'Expired'}, sub:c.to };
+    if (t < c.from) return { k:'next', t:{th:'ยังไม่ถึงกำหนดใช้',en:'Not yet effective'}, sub:c.from };
+    const days = Math.round((new Date(c.to) - new Date(t)) / DAY);
+    if (days <= 7) return { k:'soon', t:{th:'เหลือ '+days+' วัน',en:days+' days left'}, sub:c.to };
+    return { k:'ok', t:{th:'ใช้อยู่',en:'Current'}, sub:c.to };
+  }
+  if (!p.file) return { k:'none', t:{th:'ยังไม่มีไฟล์',en:'No file'} };
+  if (!p.ed)   return { k:'none', t:{th:'ยังไม่ออกฉบับ',en:'Not issued'} };
+  return { k:'ok', t:{th:'ใช้อยู่',en:'Current'} };
+}
+
+const fileUrl = f => !f ? '' :
+  (/^https?:/.test(f) ? f : 'https://drive.google.com/file/d/'+f+'/view');
+
+function paint(){
+  const t = k => A.L({
+    pubs:{th:'เช็กลิสต์และเอกสารเผยแพร่',en:'Checklists & publications'},
+    all:{th:'ทุกแบบเครื่อง',en:'All types'},
+    open:{th:'เปิด / พิมพ์',en:'Open / print'},
+    nofile:{th:'ยังไม่มีไฟล์',en:'No file yet'},
+    ed:{th:'ฉบับ',en:'Edition'},
+    eff:{th:'มีผล',en:'Effective'},
+    cycle:{th:'รอบ',en:'Cycle'},
+    until:{th:'ถึง',en:'until'},
+    found:{th:'รายการ',en:'items'},
+  }[k]);
+  document.getElementById('hd').textContent = t('pubs');
+  document.getElementById('q').placeholder = A.L({th:'ค้นหาชื่อหรือรหัส',en:'Search name or code'});
+  document.getElementById('phead').textContent =
+    A.L({th:'พิมพ์เมื่อ ',en:'Printed '}) + dmy(today()) +
+    ' · AIRAC ' + (AIRAC[0]||{}).c + ' ' + A.L({th:'ถึง',en:'until'}) + ' ' + dmy((AIRAC[0]||{}).to);
+
+  // ตัวกรองแบบเครื่อง
+  const models = PUB.fleet.map(f=>f.model);
+  document.getElementById('fmodel').innerHTML =
+    [['',t('all')]].concat(models.map(m=>[m,m])).map(([v,lab])=>
+      `<button class="fb${MODEL===v?' on':''}" data-m="${A.esc(v)}">${A.esc(lab)}</button>`).join('');
+  document.getElementById('fmodel').querySelectorAll('[data-m]').forEach(b=>
+    b.onclick = () => { MODEL = b.dataset.m; paint(); });
+
+  const rows = PUBS.filter(p =>
+    (!MODEL || p.model === MODEL || !p.model) &&
+    (!Q || (p.th+' '+p.en+' '+p.id).toLowerCase().includes(Q.toLowerCase())));
+  document.getElementById('cnt').textContent = rows.length + ' ' + t('found');
+
+  // เตือนของที่หมดรอบหรือใกล้หมด — ขึ้นบนสุด ไม่ต้องไล่หา
+  const bad = PUBS.map(p=>({p,s:state(p)})).filter(x=>x.s.k==='out'||x.s.k==='soon');
+  document.getElementById('warn').innerHTML = !bad.length ? '' :
+    `<div class="fk-gate ${bad.some(x=>x.s.k==='out')?'stop':'warn'}" style="margin:14px 0">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"
+        stroke-linejoin="round"><path d="M12 3l9.5 17H2.5z"/><path d="M12 9.5v4.5"/>
+        <circle cx="12" cy="16.8" r=".9" fill="currentColor" stroke="none"/></svg>
+      <span>${A.esc(A.L({th:'ต้องปรับปรุง ',en:'Needs attention: '}))}${
+        bad.map(x=>A.esc(LL(x.p)+' ('+A.L(x.s.t)+')')).join(' · ')}</span></div>`;
+
+  const out = [];
+  for (const [ck, c] of Object.entries(PUB.cats)){
+    const list = rows.filter(p => p.cat === ck);
+    if (!list.length && (MODEL || Q)) continue;   // กรองอยู่ ไม่ต้องโชว์หมวดว่าง
+    out.push(`<div class="pcat"><h2>${A.esc(LL(c))}
+        <span class="pill sys-${A.esc(c.cl)}">${A.esc(list.length)}</span></h2>
+      <p class="d">${A.esc(c.d||'')}</p>` +
+      list.map(p => {
+        const s = state(p), u = fileUrl(p.file);
+        const ed = p.cat==='chart'
+          ? `<b>AIRAC ${A.esc(p.airac||'—')}</b>${s.sub?A.esc(t('until')+' '+dmy(s.sub)):''}`
+          : `<b>${A.esc(p.ed?p.ed+' / '+(p.rev||'00'):'—')}</b>${p.eff?A.esc(t('eff')+' '+dmy(p.eff)):''}`;
+        return `<div class="prow">
+          <div class="nm"><b>${A.esc(LL(p))}</b><span>${A.esc(p.id)}${p.model?' · '+A.esc(p.model):''}</span></div>
+          <div class="ed">${ed}</div>
+          <span class="badge b-${s.k}">${A.esc(A.L(s.t))}</span>
+          ${u ? `<a class="go" href="${A.esc(u)}" target="_blank" rel="noopener">${A.esc(t('open'))} ↗</a>`
+              : `<span class="go">${A.esc(t('nofile'))}</span>`}</div>`;
+      }).join('') + (list.length ? '' :
+        `<p class="sub" style="padding:10px 16px;border:1px dashed var(--border-med);border-radius:8px">${
+          A.esc(A.L({th:'ยังไม่มีรายการในหมวดนี้ — เพิ่มได้ที่ publications.json หรือหน้าตั้งค่าระบบ',
+                     en:'Nothing here yet — add entries in publications.json or via Admin setup'}))}</p>`)
+      + `</div>`);
+  }
+  document.getElementById('out').innerHTML = out.join('') ||
+    `<p class="sub">${A.esc(A.L({th:'ไม่พบรายการ',en:'Nothing found'}))}</p>`;
+}
+
+document.getElementById('q').addEventListener('input', e => { Q = e.target.value; paint(); });
+document.getElementById('prt').addEventListener('click', () => window.print());
+A.onLang.push(paint);
+
+// เรียกท้ายสุด — paint ใช้ตัวช่วย (dmy · state · fileUrl) ที่ประกาศด้วย const
+// ถ้าเรียกก่อนถึงบรรทัดประกาศจะพังทั้งหน้าเพราะยังเข้าถึงไม่ได้
+A.initAuth({
+  apiKey: "AIzaSyCVR8EiBJDT4Qr3KZ2DRPhmFzUksHTwAjg",
+  authDomain: "d0507-forms.firebaseapp.com",
+  projectId: "d0507-forms",
+  storageBucket: "d0507-forms.firebasestorage.app",
+  messagingSenderId: "38336897307",
+  appId: "1:38336897307:web:0e423f959e635a07faf3be"
+}, hydrate);
+paint();
+</script>
+</body></html>
