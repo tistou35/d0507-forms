@@ -3,6 +3,8 @@
     "ทะเบียนเช็กลิสต์และเอกสารเผยแพร่ — คนละชนิดกับ forms_register.json",
     "ฟอร์ม = กรอกแล้วส่ง · เอกสารในไฟล์นี้ = เปิดอ่าน/พิมพ์ไปใช้ ต้องมั่นใจว่าเป็นฉบับปัจจุบัน",
     "",
+    "tabs  แท็บบนหน้าเว็บ · cats.tab บอกว่าหมวดนั้นอยู่แท็บไหน",
+    "      แท็บ ac จับ normal คู่กับ emerg เป็นแถวเดียวต่อหนึ่งแบบเครื่อง",
     "src   inhouse = ทำเอง ต้องมีผู้อนุมัติ · aip = ดาวน์โหลดจาก AIP Thailand ตามรอบ AIRAC",
     "file  ไฟล์ใน Drive — ใส่ id หรือ URL เต็มก็ได้ เว้นว่าง = ยังไม่ได้อัปโหลด",
     "ed/rev  ฉบับ/แก้ไข ของเอกสารที่ทำเอง · airac  รอบของเอกสารที่ดาวน์โหลดมา",
@@ -10,63 +12,221 @@
     "เพิ่มฉบับใหม่: แก้ ed/rev (หรือ airac) + eff + file แล้วย้ายของเดิมเข้า sup",
     "sup = ฉบับที่ถูกแทนที่แล้ว เก็บไว้เพื่อการตรวจสอบย้อนหลัง ห้ามลบ"
   ],
-
   "cats": {
-    "normal": { "n": "เช็กลิสต์ปกติ", "en": "Normal checklist", "cl": "b",
-                "d": "ใช้ประจำทุกเที่ยวบิน — ต้องเป็นฉบับที่ตรงกับแบบเครื่อง" },
-    "emerg":  { "n": "เช็กลิสต์ฉุกเฉิน", "en": "Emergency checklist", "cl": "r",
-                "d": "ต้องอยู่บนเครื่องทุกเที่ยวบิน และตรงกับแบบเครื่อง" },
-    "brief":  { "n": "เช็กลิสต์การบรีฟ", "en": "Briefing checklist", "cl": "a",
-                "d": "ใช้บรีฟก่อนและหลังบิน" },
-    "chart":  { "n": "แผนภูมิการบิน", "en": "Aeronautical chart", "cl": "c",
-                "d": "ดาวน์โหลดจาก AIP Thailand — มีอายุตามรอบ AIRAC" }
+    "normal": {
+      "n": "เช็กลิสต์ปกติ",
+      "en": "Normal",
+      "cl": "b",
+      "d": "ใช้ประจำทุกเที่ยวบิน — ต้องเป็นฉบับที่ตรงกับแบบเครื่อง",
+      "tab": "ac",
+      "short": "ปกติ"
+    },
+    "emerg": {
+      "n": "เช็กลิสต์ฉุกเฉิน",
+      "en": "Emergency",
+      "cl": "r",
+      "d": "ต้องอยู่บนเครื่องทุกเที่ยวบิน และตรงกับแบบเครื่อง",
+      "tab": "ac",
+      "short": "ฉุกเฉิน"
+    },
+    "brief": {
+      "n": "เช็กลิสต์การบรีฟ",
+      "en": "Briefing checklist",
+      "cl": "a",
+      "d": "ใช้บรีฟก่อนและหลังบิน",
+      "tab": "ops"
+    },
+    "chart": {
+      "n": "แผนภูมิการบิน",
+      "en": "Aeronautical chart",
+      "cl": "c",
+      "d": "ดาวน์โหลดจาก AIP Thailand — มีอายุตามรอบ AIRAC",
+      "tab": "chart"
+    }
   },
-
   "fleet": [
-    { "model": "C172M", "regs": [] },
-    { "model": "C172N", "regs": [] },
-    { "model": "C172S", "regs": [] },
-    { "model": "C182T", "regs": [] },
-    { "model": "C206H", "regs": [],
-      "note": "OMA D.2.8 เรียกแบบนี้ว่า T206H (เทอร์โบ) — ต้องเลือกให้ตรงกันก่อนออกฉบับจริง" }
+    {
+      "model": "C172M",
+      "regs": []
+    },
+    {
+      "model": "C172N",
+      "regs": []
+    },
+    {
+      "model": "C172S",
+      "regs": []
+    },
+    {
+      "model": "C182T",
+      "regs": []
+    },
+    {
+      "model": "C206H",
+      "regs": [],
+      "note": "OMA D.2.8 เรียกแบบนี้ว่า T206H (เทอร์โบ) — ต้องเลือกให้ตรงกันก่อนออกฉบับจริง"
+    }
   ],
   "_fleetNote": "ยังไม่ได้ผูกทะเบียนกับแบบเครื่อง — ระบบมี HS-VVD VVB CCM VST POP BTM แต่ยังไม่รู้ว่าลำไหนแบบไหน ใส่ใน regs แล้วหน้าเว็บจะจับคู่ให้เอง",
-
   "pubs": [
-    { "id": "CL-NORM-C172M", "cat": "normal", "model": "C172M", "src": "inhouse",
-      "th": "เช็กลิสต์ปกติ C172M", "en": "Normal Checklist C172M",
-      "ed": "", "rev": "", "eff": "", "file": "", "by": "HT" },
-    { "id": "CL-NORM-C172N", "cat": "normal", "model": "C172N", "src": "inhouse",
-      "th": "เช็กลิสต์ปกติ C172N", "en": "Normal Checklist C172N",
-      "ed": "", "rev": "", "eff": "", "file": "", "by": "HT" },
-    { "id": "CL-NORM-C172S", "cat": "normal", "model": "C172S", "src": "inhouse",
-      "th": "เช็กลิสต์ปกติ C172S", "en": "Normal Checklist C172S",
-      "ed": "", "rev": "", "eff": "", "file": "", "by": "HT" },
-    { "id": "CL-NORM-C182T", "cat": "normal", "model": "C182T", "src": "inhouse",
-      "th": "เช็กลิสต์ปกติ C182T", "en": "Normal Checklist C182T",
-      "ed": "", "rev": "", "eff": "", "file": "", "by": "HT" },
-    { "id": "CL-NORM-C206H", "cat": "normal", "model": "C206H", "src": "inhouse",
-      "th": "เช็กลิสต์ปกติ C206H", "en": "Normal Checklist C206H",
-      "ed": "", "rev": "", "eff": "", "file": "", "by": "HT" },
-
-    { "id": "CL-EMER-C172M", "cat": "emerg", "model": "C172M", "src": "inhouse",
-      "th": "เช็กลิสต์ฉุกเฉิน C172M", "en": "Emergency Checklist C172M",
-      "ed": "", "rev": "", "eff": "", "file": "", "by": "HT" },
-    { "id": "CL-EMER-C172N", "cat": "emerg", "model": "C172N", "src": "inhouse",
-      "th": "เช็กลิสต์ฉุกเฉิน C172N", "en": "Emergency Checklist C172N",
-      "ed": "", "rev": "", "eff": "", "file": "", "by": "HT" },
-    { "id": "CL-EMER-C172S", "cat": "emerg", "model": "C172S", "src": "inhouse",
-      "th": "เช็กลิสต์ฉุกเฉิน C172S", "en": "Emergency Checklist C172S",
-      "ed": "", "rev": "", "eff": "", "file": "", "by": "HT" },
-    { "id": "CL-EMER-C182T", "cat": "emerg", "model": "C182T", "src": "inhouse",
-      "th": "เช็กลิสต์ฉุกเฉิน C182T", "en": "Emergency Checklist C182T",
-      "ed": "", "rev": "", "eff": "", "file": "", "by": "HT" },
-    { "id": "CL-EMER-C206H", "cat": "emerg", "model": "C206H", "src": "inhouse",
-      "th": "เช็กลิสต์ฉุกเฉิน C206H", "en": "Emergency Checklist C206H",
-      "ed": "", "rev": "", "eff": "", "file": "", "by": "HT" },
-
-    { "id": "CL-BRIEF", "cat": "brief", "src": "inhouse",
-      "th": "เช็กลิสต์การบรีฟก่อนและหลังบิน", "en": "Pre/Post-Flight Briefing Checklist",
-      "ed": "", "rev": "", "eff": "", "file": "", "by": "HT" }
+    {
+      "id": "CL-NORM-C172M",
+      "cat": "normal",
+      "model": "C172M",
+      "src": "inhouse",
+      "th": "เช็กลิสต์ปกติ C172M",
+      "en": "Normal Checklist C172M",
+      "ed": "",
+      "rev": "",
+      "eff": "",
+      "file": "",
+      "by": "HT"
+    },
+    {
+      "id": "CL-NORM-C172N",
+      "cat": "normal",
+      "model": "C172N",
+      "src": "inhouse",
+      "th": "เช็กลิสต์ปกติ C172N",
+      "en": "Normal Checklist C172N",
+      "ed": "",
+      "rev": "",
+      "eff": "",
+      "file": "",
+      "by": "HT"
+    },
+    {
+      "id": "CL-NORM-C172S",
+      "cat": "normal",
+      "model": "C172S",
+      "src": "inhouse",
+      "th": "เช็กลิสต์ปกติ C172S",
+      "en": "Normal Checklist C172S",
+      "ed": "",
+      "rev": "",
+      "eff": "",
+      "file": "",
+      "by": "HT"
+    },
+    {
+      "id": "CL-NORM-C182T",
+      "cat": "normal",
+      "model": "C182T",
+      "src": "inhouse",
+      "th": "เช็กลิสต์ปกติ C182T",
+      "en": "Normal Checklist C182T",
+      "ed": "",
+      "rev": "",
+      "eff": "",
+      "file": "",
+      "by": "HT"
+    },
+    {
+      "id": "CL-NORM-C206H",
+      "cat": "normal",
+      "model": "C206H",
+      "src": "inhouse",
+      "th": "เช็กลิสต์ปกติ C206H",
+      "en": "Normal Checklist C206H",
+      "ed": "",
+      "rev": "",
+      "eff": "",
+      "file": "",
+      "by": "HT"
+    },
+    {
+      "id": "CL-EMER-C172M",
+      "cat": "emerg",
+      "model": "C172M",
+      "src": "inhouse",
+      "th": "เช็กลิสต์ฉุกเฉิน C172M",
+      "en": "Emergency Checklist C172M",
+      "ed": "",
+      "rev": "",
+      "eff": "",
+      "file": "",
+      "by": "HT"
+    },
+    {
+      "id": "CL-EMER-C172N",
+      "cat": "emerg",
+      "model": "C172N",
+      "src": "inhouse",
+      "th": "เช็กลิสต์ฉุกเฉิน C172N",
+      "en": "Emergency Checklist C172N",
+      "ed": "",
+      "rev": "",
+      "eff": "",
+      "file": "",
+      "by": "HT"
+    },
+    {
+      "id": "CL-EMER-C172S",
+      "cat": "emerg",
+      "model": "C172S",
+      "src": "inhouse",
+      "th": "เช็กลิสต์ฉุกเฉิน C172S",
+      "en": "Emergency Checklist C172S",
+      "ed": "",
+      "rev": "",
+      "eff": "",
+      "file": "",
+      "by": "HT"
+    },
+    {
+      "id": "CL-EMER-C182T",
+      "cat": "emerg",
+      "model": "C182T",
+      "src": "inhouse",
+      "th": "เช็กลิสต์ฉุกเฉิน C182T",
+      "en": "Emergency Checklist C182T",
+      "ed": "",
+      "rev": "",
+      "eff": "",
+      "file": "",
+      "by": "HT"
+    },
+    {
+      "id": "CL-EMER-C206H",
+      "cat": "emerg",
+      "model": "C206H",
+      "src": "inhouse",
+      "th": "เช็กลิสต์ฉุกเฉิน C206H",
+      "en": "Emergency Checklist C206H",
+      "ed": "",
+      "rev": "",
+      "eff": "",
+      "file": "",
+      "by": "HT"
+    },
+    {
+      "id": "CL-BRIEF",
+      "cat": "brief",
+      "src": "inhouse",
+      "th": "เช็กลิสต์การบรีฟก่อนและหลังบิน",
+      "en": "Pre/Post-Flight Briefing Checklist",
+      "ed": "",
+      "rev": "",
+      "eff": "",
+      "file": "",
+      "by": "HT"
+    }
+  ],
+  "tabs": [
+    {
+      "k": "ac",
+      "n": "เช็กลิสต์ประจำเครื่อง",
+      "en": "A/C checklist"
+    },
+    {
+      "k": "ops",
+      "n": "เช็กลิสต์ปฏิบัติการ",
+      "en": "Operation checklist"
+    },
+    {
+      "k": "chart",
+      "n": "สนามบินและแผนภูมิ",
+      "en": "Airport & approach chart"
+    }
   ]
 }

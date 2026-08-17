@@ -4,40 +4,68 @@
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="@@BASE@@assets/app.css">
 <style>
-.pcat{margin-top:30px}
-.pcat h2{font-family:var(--font-display);font-size:17px;display:flex;align-items:center;gap:10px}
-.pcat .pill{font-size:11px;padding:2px 9px;border-radius:99px;font-family:var(--font-sans);font-weight:400}
-.pcat p.d{font-size:13px;color:var(--fg-2);margin:3px 0 12px}
-.prow{display:grid;grid-template-columns:1fr auto auto auto;gap:14px;align-items:center;
-  padding:12px 16px;border:1px solid var(--border-light);border-radius:8px;
-  background:var(--surface);margin-bottom:8px}
-.prow .nm{font-size:14.5px;line-height:1.4}
+/* แท็บ — หน้าตาเดียวกับแท็บในฟอร์ม จะได้ไม่ต้องเรียนรู้ใหม่ */
+.ptabs{display:flex;flex-wrap:wrap;gap:7px;margin:16px 0 4px}
+.ptab{min-height:42px;padding:0 15px;border-radius:999px;cursor:pointer;border:1px solid var(--border-med);
+  background:var(--surface);font-family:var(--font-sans);font-size:13.5px;color:var(--fg-2);
+  display:flex;align-items:center;gap:8px}
+.ptab[aria-selected="true"]{background:var(--navy-900);border-color:var(--navy-900);color:#fff}
+.ptab .b{font-family:var(--font-mono);font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:99px;
+  background:var(--g-100);color:var(--g-600)}
+.ptab[aria-selected="true"] .b{background:rgba(255,255,255,.18);color:#fff}
+.ptab .b.warn{background:var(--red-500);color:#fff}
+
+/* แถวเครื่องบิน: แบบเครื่อง | ปกติ | ฉุกเฉิน — เห็นครบในบรรทัดเดียว */
+.acrow{display:grid;grid-template-columns:112px 1fr 1fr;gap:10px;align-items:stretch;margin-bottom:7px}
+.acrow .mdl{display:flex;flex-direction:column;justify-content:center;padding:0 12px;
+  background:var(--navy-900);color:#fff;border-radius:8px}
+.acrow .mdl b{font-family:var(--font-display);font-size:15px}
+.acrow .mdl span{font-size:10.5px;color:rgba(255,255,255,.55);font-family:var(--font-mono)}
+.cell{display:grid;grid-template-columns:1fr auto auto;gap:9px;align-items:center;
+  padding:9px 12px;border:1px solid var(--border-light);border-radius:8px;background:var(--surface)}
+.cell .k{font-size:11.5px;color:var(--g-500);font-family:var(--font-mono)}
+.cell .k b{display:block;font-size:13px;color:var(--fg-1);font-weight:600;font-family:var(--font-sans)}
+
+/* แถวทั่วไป (ปฏิบัติการ · แผนภูมิ) */
+.prow{display:grid;grid-template-columns:1fr auto auto auto;gap:12px;align-items:center;
+  padding:10px 14px;border:1px solid var(--border-light);border-radius:8px;
+  background:var(--surface);margin-bottom:7px}
+.prow .nm{font-size:13.5px;line-height:1.35}
 .prow .nm b{font-weight:600}
-.prow .nm span{display:block;font-size:11.5px;color:var(--g-500);font-family:var(--font-mono)}
-.prow .ed{font-family:var(--font-mono);font-size:12.5px;color:var(--fg-2);white-space:nowrap;text-align:right}
-.prow .ed b{display:block;color:var(--fg-1);font-size:13.5px}
-.badge{font-size:11.5px;font-weight:600;padding:4px 11px;border-radius:99px;white-space:nowrap}
+.prow .nm span{display:block;font-size:11px;color:var(--g-500);font-family:var(--font-mono)}
+.prow .ed{font-family:var(--font-mono);font-size:11.5px;color:var(--fg-2);white-space:nowrap;text-align:right}
+
+.badge{font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px;white-space:nowrap}
 .b-ok{background:var(--green-100);color:var(--green-600)}
 .b-soon{background:var(--amber-100);color:var(--amber-600)}
 .b-out{background:var(--red-100);color:var(--red-600)}
-.b-none{background:var(--g-100);color:var(--g-600)}
 .b-next{background:var(--sky-100);color:var(--sky-600)}
-.prow a.go,.prow span.go{min-height:40px;padding:0 15px;border-radius:8px;display:grid;place-items:center;
-  font-size:13px;text-decoration:none;white-space:nowrap}
-.prow a.go{background:var(--navy-900);color:#fff}
-.prow span.go{background:var(--g-100);color:var(--g-400)}
-@media(max-width:760px){.prow{grid-template-columns:1fr auto}.prow .ed{grid-column:1}}
-
-/* พิมพ์ = ได้สารบัญฉบับปัจจุบัน ใช้เป็นเอกสารควบคุมได้เลย */
-@media print{
-  .topbar,.rail,.botnav,footer,.filters,.noprint{display:none !important}
-  .body{display:block}.main{padding:0;max-width:none}
-  .prow{break-inside:avoid;border:0;border-bottom:1px solid #ccc;border-radius:0;padding:7px 0}
-  .prow a.go,.prow span.go{display:none}
-  .printhead{display:block !important;margin-bottom:16px;border-bottom:2px solid #0D1B2A;padding-bottom:8px}
-  .badge{border:1px solid #999;background:none !important;color:#000 !important}
+.b-none{background:var(--g-100);color:var(--g-600)}
+a.go,span.go{min-height:34px;padding:0 12px;border-radius:7px;display:grid;place-items:center;
+  font-size:12.5px;text-decoration:none;white-space:nowrap}
+a.go{background:var(--navy-900);color:#fff}
+span.go{background:var(--g-100);color:var(--g-400)}
+@media(max-width:820px){
+  .acrow{grid-template-columns:1fr}
+  .acrow .mdl{flex-direction:row;align-items:baseline;gap:8px;padding:7px 12px}
 }
+
+h2.psec{font-family:var(--font-display);font-size:15px;margin:20px 0 9px}
+h2.psec .d{font-family:var(--font-sans);font-size:12.5px;color:var(--fg-2);font-weight:400;display:block;margin-top:2px}
 .printhead{display:none}
+
+/* พิมพ์ = ได้สารบัญฉบับปัจจุบันครบทุกแท็บในใบเดียว ใช้เป็นเอกสารควบคุมได้ */
+@media print{
+  .topbar,.rail,.botnav,footer,.noprint{display:none !important}
+  .body{display:block}.main{padding:0;max-width:none}
+  .acrow,.prow,.cell{break-inside:avoid}
+  .acrow .mdl{background:none;color:#000;border:1px solid #999}
+  .acrow .mdl span{color:#555}
+  a.go,span.go{display:none}
+  .printhead{display:block !important;margin-bottom:14px;border-bottom:2px solid #0D1B2A;padding-bottom:7px}
+  .badge{border:1px solid #999;background:none !important;color:#000 !important}
+  h2.psec{font-size:14px;margin:14px 0 7px;border-bottom:1px solid #ccc}
+}
 </style>
 </head><body>
 @@TOPBAR@@
@@ -45,27 +73,18 @@
 @@RAIL@@
   <main class="main">
     <div class="printhead">
-      <h1 style="font-size:19px">D-0507 Flight Training Co., Ltd. — รายการเช็กลิสต์และเอกสารเผยแพร่ที่ใช้อยู่</h1>
+      <h1 style="font-size:18px">D-0507 Flight Training Co., Ltd. — รายการเช็กลิสต์และเอกสารเผยแพร่ที่ใช้อยู่</h1>
       <p class="sub" id="phead"></p>
     </div>
 
     <div class="greet noprint">
       <div><p class="eyebrow"><span data-t="pubs">เช็กลิสต์และเอกสาร</span> · <span data-t2="pubs">CHECKLISTS &amp; PUBLICATIONS</span></p>
-        <h1 id="hd">—</h1>
-        <p class="sub" data-t="pubsSub">เอกสารที่ต้องพิมพ์ไปใช้ — ระบบคุมว่าฉบับไหนเป็นฉบับปัจจุบัน แผนภูมิการบินคุมตามรอบ AIRAC</p></div>
+        <h1 id="hd">—</h1></div>
       <button class="fb" id="prt">🖨 <span data-t="printList">พิมพ์รายการ</span></button>
     </div>
 
     <div id="warn"></div>
-
-    <section class="noprint">
-      <div class="filters">
-        <input id="q" type="search">
-      </div>
-      <div class="filters" id="fmodel"></div>
-    </section>
-
-    <p class="sub noprint" id="cnt" style="margin:10px 0 0"></p>
+    <div class="ptabs noprint" id="tabs" role="tablist"></div>
     <div id="out"></div>
   </main>
 </div>
@@ -79,7 +98,7 @@
 <script>
 "use strict";
 const PUB = @@PUBS@@, AIRAC = @@AIRAC@@, A = D0507;
-let PUBS = PUB.pubs.slice(), MODEL = '', Q = '';
+let PUBS = PUB.pubs.slice(), TAB = (PUB.tabs[0]||{}).k, PRINTALL = false;
 
 A.reg = { forms: [], status: {}, lefcount: {} };
 
@@ -93,13 +112,13 @@ async function hydrate(){
   paint();
 }
 
-// ทะเบียนเอกสารใช้คีย์ th/en ส่วนหมวดใช้ n/en — รับทั้งสองแบบ
-const LL = o => A.lang==='en' ? (o.en || o.th || o.n) : (o.th || o.n || o.en);
+// ทะเบียนเอกสารใช้คีย์ th/en ส่วนหมวดกับแท็บใช้ n/en — รับทั้งสองแบบ
+const LL = o => !o ? '' : (A.lang==='en' ? (o.en || o.th || o.n) : (o.th || o.n || o.en));
 const dmy = s => { const m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(s||''); return m? m[3]+'/'+m[2]+'/'+m[1] : ''; };
 const today = () => { const d=new Date();
   return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); };
 
-/* คำนวณช่วงวันของรอบ AIRAC ใด ๆ จากหมุดเดียวกับ tools/airac.py
+/* ช่วงวันของรอบ AIRAC ใด ๆ จากหมุดเดียวกับ tools/airac.py
    ต้องคำนวณเอง ไม่ใช่เปิดตารางที่ฝังมา เพราะตารางมีแต่รอบปัจจุบันกับอนาคต
    ถ้าใช้ตารางอย่างเดียว chart รอบเก่าจะกลายเป็น "ไม่รู้จักรอบ" แทนที่จะเป็น
    "หมดรอบแล้ว" ซึ่งกลบความเสี่ยงที่ระบบนี้ตั้งใจจะจับพอดี */
@@ -117,15 +136,14 @@ function airacRange(id){
   return { from: from.toISOString().slice(0,10), to: to.toISOString().slice(0,10) };
 }
 
-/* สถานะของหนึ่งฉบับ — ตัวนี้คือหัวใจของหน้านี้
-   chart ยึดรอบ AIRAC · เอกสารที่ทำเองยึดว่ามีฉบับและไฟล์แล้วหรือยัง */
 function state(p){
+  if (!p) return { k:'none', t:{th:'ยังไม่มี',en:'Missing'} };
   if (p.cat === 'chart'){
     const c = airacRange(p.airac);
     if (!c) return { k:'none', t:{th:'ยังไม่ระบุรอบ',en:'No cycle'} };
     const t = today();
     if (t > c.to)   return { k:'out',  t:{th:'หมดรอบแล้ว',en:'Expired'}, sub:c.to };
-    if (t < c.from) return { k:'next', t:{th:'ยังไม่ถึงกำหนดใช้',en:'Not yet effective'}, sub:c.from };
+    if (t < c.from) return { k:'next', t:{th:'ยังไม่ถึงกำหนด',en:'Not yet effective'}, sub:c.from };
     const days = Math.round((new Date(c.to) - new Date(t)) / DAY);
     if (days <= 7) return { k:'soon', t:{th:'เหลือ '+days+' วัน',en:days+' days left'}, sub:c.to };
     return { k:'ok', t:{th:'ใช้อยู่',en:'Current'}, sub:c.to };
@@ -137,39 +155,80 @@ function state(p){
 
 const fileUrl = f => !f ? '' :
   (/^https?:/.test(f) ? f : 'https://drive.google.com/file/d/'+f+'/view');
+const catsOf = tab => Object.entries(PUB.cats).filter(([,c]) => c.tab === tab).map(([k]) => k);
+const inTab  = (p, tab) => catsOf(tab).includes(p.cat);
+const T = k => A.L({
+  pubs:{th:'เช็กลิสต์และเอกสารเผยแพร่',en:'Checklists & publications'},
+  open:{th:'เปิด',en:'Open'},
+  nofile:{th:'ยังไม่มีไฟล์',en:'No file'},
+  eff:{th:'มีผล',en:'Eff'},
+  until:{th:'ถึง',en:'until'},
+  none:{th:'ยังไม่มีรายการในหมวดนี้ — เพิ่มได้ที่ publications.json',
+        en:'Nothing here yet — add entries in publications.json'},
+}[k]);
+
+/* หนึ่งช่อง = หนึ่งฉบับ ใช้ในแถวเครื่องบิน */
+function cell(p, label){
+  const s = state(p), u = p ? fileUrl(p.file) : '';
+  const ed = !p ? '—' : p.cat==='chart'
+    ? 'AIRAC ' + A.esc(p.airac||'—')
+    : (p.ed ? A.esc(p.ed+'/'+(p.rev||'00')) : '—');
+  return `<div class="cell">
+    <span class="k"><b>${A.esc(label)}</b>${ed}</span>
+    <span class="badge b-${s.k}">${A.esc(A.L(s.t))}</span>
+    ${u ? `<a class="go" href="${A.esc(u)}" target="_blank" rel="noopener">${A.esc(T('open'))} ↗</a>`
+        : `<span class="go">${A.esc(T('nofile'))}</span>`}</div>`;
+}
+
+/* แท็บเครื่องบิน — หนึ่งแถวต่อหนึ่งแบบ ปกติกับฉุกเฉินอยู่ข้างกัน
+   คนใช้จริงคิดว่า "วันนี้บินแบบไหน" ไม่ได้คิดว่า "เช็กลิสต์ประเภทไหน" */
+function acHtml(){
+  const find = (cat, m) => PUBS.find(p => p.cat===cat && p.model===m);
+  return PUB.fleet.map(f => `<div class="acrow">
+      <div class="mdl"><b>${A.esc(f.model)}</b><span>${A.esc((f.regs||[]).join(' · ') || '—')}</span></div>
+      ${cell(find('normal', f.model), LL(PUB.cats.normal))}
+      ${cell(find('emerg',  f.model), LL(PUB.cats.emerg))}</div>`).join('');
+}
+
+function listHtml(tab){
+  const out = [];
+  for (const ck of catsOf(tab)){
+    const c = PUB.cats[ck], list = PUBS.filter(p => p.cat === ck);
+    out.push(`<h2 class="psec">${A.esc(LL(c))}<span class="d">${A.esc(c.d||'')}</span></h2>`);
+    out.push(list.length ? list.map(p => {
+      const s = state(p), u = fileUrl(p.file);
+      const ed = p.cat==='chart'
+        ? `<b>AIRAC ${A.esc(p.airac||'—')}</b>${s.sub?' '+A.esc(T('until')+' '+dmy(s.sub)):''}`
+        : `<b>${A.esc(p.ed?p.ed+'/'+(p.rev||'00'):'—')}</b>${p.eff?' '+A.esc(T('eff')+' '+dmy(p.eff)):''}`;
+      return `<div class="prow">
+        <div class="nm"><b>${A.esc(LL(p))}</b><span>${A.esc(p.id)}</span></div>
+        <div class="ed">${ed}</div>
+        <span class="badge b-${s.k}">${A.esc(A.L(s.t))}</span>
+        ${u ? `<a class="go" href="${A.esc(u)}" target="_blank" rel="noopener">${A.esc(T('open'))} ↗</a>`
+            : `<span class="go">${A.esc(T('nofile'))}</span>`}</div>`;
+    }).join('') : `<p class="sub" style="padding:9px 14px;border:1px dashed var(--border-med);border-radius:8px">${A.esc(T('none'))}</p>`);
+  }
+  return out.join('');
+}
 
 function paint(){
-  const t = k => A.L({
-    pubs:{th:'เช็กลิสต์และเอกสารเผยแพร่',en:'Checklists & publications'},
-    all:{th:'ทุกแบบเครื่อง',en:'All types'},
-    open:{th:'เปิด / พิมพ์',en:'Open / print'},
-    nofile:{th:'ยังไม่มีไฟล์',en:'No file yet'},
-    ed:{th:'ฉบับ',en:'Edition'},
-    eff:{th:'มีผล',en:'Effective'},
-    cycle:{th:'รอบ',en:'Cycle'},
-    until:{th:'ถึง',en:'until'},
-    found:{th:'รายการ',en:'items'},
-  }[k]);
-  document.getElementById('hd').textContent = t('pubs');
-  document.getElementById('q').placeholder = A.L({th:'ค้นหาชื่อหรือรหัส',en:'Search name or code'});
+  document.getElementById('hd').textContent = T('pubs');
   document.getElementById('phead').textContent =
     A.L({th:'พิมพ์เมื่อ ',en:'Printed '}) + dmy(today()) +
-    ' · AIRAC ' + (AIRAC[0]||{}).c + ' ' + A.L({th:'ถึง',en:'until'}) + ' ' + dmy((AIRAC[0]||{}).to);
+    ' · AIRAC ' + (AIRAC[0]||{}).c + ' ' + T('until') + ' ' + dmy((AIRAC[0]||{}).to);
 
-  // ตัวกรองแบบเครื่อง
-  const models = PUB.fleet.map(f=>f.model);
-  document.getElementById('fmodel').innerHTML =
-    [['',t('all')]].concat(models.map(m=>[m,m])).map(([v,lab])=>
-      `<button class="fb${MODEL===v?' on':''}" data-m="${A.esc(v)}">${A.esc(lab)}</button>`).join('');
-  document.getElementById('fmodel').querySelectorAll('[data-m]').forEach(b=>
-    b.onclick = () => { MODEL = b.dataset.m; paint(); });
+  // ป้ายแท็บบอกจำนวน และขึ้นแดงถ้ามีของหมดรอบ/ใกล้หมดอยู่ในแท็บนั้น
+  document.getElementById('tabs').innerHTML = PUB.tabs.map(tb => {
+    const list = PUBS.filter(p => inTab(p, tb.k));
+    const bad = list.filter(p => ['out','soon'].includes(state(p).k)).length;
+    return `<button class="ptab" role="tab" data-k="${A.esc(tb.k)}"
+      aria-selected="${TAB===tb.k}">${A.esc(LL(tb))}
+      <span class="b${bad?' warn':''}">${bad? '!'+bad : list.length}</span></button>`;
+  }).join('');
+  document.getElementById('tabs').querySelectorAll('[data-k]').forEach(b =>
+    b.onclick = () => { TAB = b.dataset.k; paint(); });
 
-  const rows = PUBS.filter(p =>
-    (!MODEL || p.model === MODEL || !p.model) &&
-    (!Q || (p.th+' '+p.en+' '+p.id).toLowerCase().includes(Q.toLowerCase())));
-  document.getElementById('cnt').textContent = rows.length + ' ' + t('found');
-
-  // เตือนของที่หมดรอบหรือใกล้หมด — ขึ้นบนสุด ไม่ต้องไล่หา
+  // เตือนของที่หมดรอบหรือใกล้หมด — รวมทุกแท็บ ขึ้นบนสุด ไม่ต้องไล่หา
   const bad = PUBS.map(p=>({p,s:state(p)})).filter(x=>x.s.k==='out'||x.s.k==='soon');
   document.getElementById('warn').innerHTML = !bad.length ? '' :
     `<div class="fk-gate ${bad.some(x=>x.s.k==='out')?'stop':'warn'}" style="margin:14px 0">
@@ -179,40 +238,21 @@ function paint(){
       <span>${A.esc(A.L({th:'ต้องปรับปรุง ',en:'Needs attention: '}))}${
         bad.map(x=>A.esc(LL(x.p)+' ('+A.L(x.s.t)+')')).join(' · ')}</span></div>`;
 
-  const out = [];
-  for (const [ck, c] of Object.entries(PUB.cats)){
-    const list = rows.filter(p => p.cat === ck);
-    if (!list.length && (MODEL || Q)) continue;   // กรองอยู่ ไม่ต้องโชว์หมวดว่าง
-    out.push(`<div class="pcat"><h2>${A.esc(LL(c))}
-        <span class="pill sys-${A.esc(c.cl)}">${A.esc(list.length)}</span></h2>
-      <p class="d">${A.esc(c.d||'')}</p>` +
-      list.map(p => {
-        const s = state(p), u = fileUrl(p.file);
-        const ed = p.cat==='chart'
-          ? `<b>AIRAC ${A.esc(p.airac||'—')}</b>${s.sub?A.esc(t('until')+' '+dmy(s.sub)):''}`
-          : `<b>${A.esc(p.ed?p.ed+' / '+(p.rev||'00'):'—')}</b>${p.eff?A.esc(t('eff')+' '+dmy(p.eff)):''}`;
-        return `<div class="prow">
-          <div class="nm"><b>${A.esc(LL(p))}</b><span>${A.esc(p.id)}${p.model?' · '+A.esc(p.model):''}</span></div>
-          <div class="ed">${ed}</div>
-          <span class="badge b-${s.k}">${A.esc(A.L(s.t))}</span>
-          ${u ? `<a class="go" href="${A.esc(u)}" target="_blank" rel="noopener">${A.esc(t('open'))} ↗</a>`
-              : `<span class="go">${A.esc(t('nofile'))}</span>`}</div>`;
-      }).join('') + (list.length ? '' :
-        `<p class="sub" style="padding:10px 16px;border:1px dashed var(--border-med);border-radius:8px">${
-          A.esc(A.L({th:'ยังไม่มีรายการในหมวดนี้ — เพิ่มได้ที่ publications.json หรือหน้าตั้งค่าระบบ',
-                     en:'Nothing here yet — add entries in publications.json or via Admin setup'}))}</p>`)
-      + `</div>`);
-  }
-  document.getElementById('out').innerHTML = out.join('') ||
-    `<p class="sub">${A.esc(A.L({th:'ไม่พบรายการ',en:'Nothing found'}))}</p>`;
+  // พิมพ์ = ออกทุกแท็บ ไม่ใช่เฉพาะที่เปิดอยู่ จะได้เป็นสารบัญครบในใบเดียว
+  document.getElementById('out').innerHTML = PUB.tabs.map(tb => `
+    <section style="${(PRINTALL || TAB === tb.k) ? '' : 'display:none'}">
+      ${PRINTALL ? `<h2 class="psec">${A.esc(LL(tb))}</h2>` : ''}
+      ${tb.k === 'ac' ? acHtml() : listHtml(tb.k)}</section>`).join('');
 }
 
-document.getElementById('q').addEventListener('input', e => { Q = e.target.value; paint(); });
-document.getElementById('prt').addEventListener('click', () => window.print());
+document.getElementById('prt').addEventListener('click', () => {
+  PRINTALL = true; paint();
+  window.print();
+  PRINTALL = false; paint();
+});
 A.onLang.push(paint);
 
-// เรียกท้ายสุด — paint ใช้ตัวช่วย (dmy · state · fileUrl) ที่ประกาศด้วย const
-// ถ้าเรียกก่อนถึงบรรทัดประกาศจะพังทั้งหน้าเพราะยังเข้าถึงไม่ได้
+// เรียกท้ายสุด — paint ใช้ตัวช่วยที่ประกาศด้วย const ข้างบน
 A.initAuth(@@FBCFG@@, hydrate);
 paint();
 </script>
