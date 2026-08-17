@@ -24,12 +24,44 @@ from aip_charts import charts, cycle_date
 GS = os.path.join(HERE, 'gas', 'AipSync.gs')
 
 
-def gs_source():
-    """ตัดเฉพาะส่วนตั้งชื่อออกมาจากไฟล์จริง"""
+def gs_source(a='var AIP_KINDS', b='/* ── ตาราง AD 2.24'):
+    """ตัดโค้ดจริงออกมาจากไฟล์ — ไม่เขียนตรรกะขึ้นใหม่มาเทียบ"""
     src = open(GS, encoding='utf-8').read()
-    a = src.index('var AIP_KINDS')
-    b = src.index('/* ── ตาราง AD 2.24')
-    return src[a:b]
+    return src[src.index(a):src.index(b, src.index(a))]
+
+
+def check_extract(icao, date):
+    """เทียบ "ตัวอ่านตาราง" ไม่ใช่แค่ตัวตั้งชื่อ
+
+    บทเรียน: ครั้งหนึ่งสองฝั่งอ่านได้ 32 แถวเท่ากันทั้งคู่ แต่ฝั่ง Apps Script
+    ได้ชื่อที่มีเศษ HTML ปนมา (id="ID_1967371" row_id="">) เพราะ split กิน "<tr "
+    ไปด้วยแล้วเหลือแอตทริบิวต์ค้างหัวก้อน
+    การนับจำนวนแถวจับไม่ได้เลย ต้องเทียบตัวข้อความถึงจะเห็น
+    """
+    from aip_charts import fetch, charts
+    html = fetch('https://aip.caat.or.th/%s-AIRAC/html/eAIP/VT-AD-2.%s-en-GB.html'
+                 % (date, icao))
+    js = ("var AIP_SITE='https://aip.caat.or.th';"
+          "var html=require('fs').readFileSync('/dev/stdin','utf8');"
+          "function aipFetch_(){return html;}"
+          # สตับต้องคืนชื่อไม่ซ้ำ ไม่งั้น seen[] ใน aipCharts_ ยุบทุกแถวเหลือแถวเดียว
+          "function aipName_(i,r){return {sub:'x',set:r,ref:'',name:r};}\n"
+          + gs_source('function aipCharts_(', '/* ── คิวงาน')
+          + "console.log(JSON.stringify(aipCharts_('%s','%s').map(function(o){return o.title;})));"
+          % (icao, date))
+    p = subprocess.run(['node', '-e', js], input=html, capture_output=True, text=True)
+    if p.returncode:
+        return ['node ล้มเหลว: ' + p.stderr[:300]]
+    gs = json.loads(p.stdout)
+    py = list(charts(icao, date))
+    bad = []
+    if len(gs) != len(py):
+        bad.append('%s อ่านได้ไม่เท่ากัน — gs %d แถว · py %d แถว' % (icao, len(gs), len(py)))
+    for g, y in zip(sorted(gs), sorted(py)):
+        if g != y:
+            bad.append('%s ข้อความต่างกัน\n     py %r\n     gs %r' % (icao, y[:88], g[:88]))
+            break
+    return bad
 
 
 def run_node(pairs):
@@ -49,11 +81,23 @@ console.log(JSON.stringify(inp.map(function (p) {
 
 def main():
     code, date = cycle_date()
+
+    print('AIRAC %s · เทียบตัวอ่านตาราง %d สนามบิน' % (code, len(AD)))
+    ext = []
+    for a in AD:
+        ext += check_extract(a, date)
+    if ext:
+        print('🔴 ตัวอ่านตารางไม่ตรงกัน')
+        for e in ext[:10]:
+            print('  ' + e)
+        return 1
+    print('✅ อ่านตารางได้ข้อความตรงกันทุกสนามบิน')
+
     pairs = []
     for a in AD:
         for raw in charts(a, date):
             pairs.append([a, raw])
-    print('AIRAC %s · เทียบ %d ชื่อ' % (code, len(pairs)))
+    print('เทียบตัวตั้งชื่อ %d ชื่อ' % len(pairs))
 
     js = run_node(pairs)
     bad = []

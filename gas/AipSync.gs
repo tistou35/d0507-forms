@@ -294,6 +294,14 @@ function aipCharts_(icao, date) {
     var r = rows[i];
     var hm = r.match(/href="([^"]*graphics\/[^"]+\.pdf)"/i);
     if (!hm) continue;
+
+    /* split กิน "<tr " ไปด้วย เหลือแอตทริบิวต์ที่เหลือของแท็บนั้นค้างหัวก้อน
+       เช่น  id="ID_1967371" row_id="">  ซึ่ง <[^>]+> ลบไม่ออกเพราะไม่มี < นำหน้า
+       ถ้าไม่ตัดทิ้ง เศษนี้จะกลายเป็นส่วนหนึ่งของชื่อแผนภูมิทุกใบ
+       และเป็นบั๊กที่ "นับแถวได้เท่ากัน" จับไม่ได้ — ต้องดูตัวข้อความถึงจะเห็น */
+    var gt = r.indexOf('>');
+    if (gt >= 0) r = r.slice(gt + 1);
+
     var txt = r.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ')
                .replace(/TACLO[\s\S]*$/, '').replace(/\s+/g, ' ').trim();
     if (!txt) continue;
