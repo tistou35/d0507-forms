@@ -435,6 +435,29 @@ function aipStatus() {
 function aipStop() { aipClearTrigger_(); Logger.log('หยุดแล้ว — เรียก aipStep() เองเพื่อทำต่อ'); }
 
 /**
+ * ── กดครั้งเดียวตอนติดตั้ง ──────────────────────────────────
+ * ตั้ง trigger รายวัน แล้วเริ่มดึงรอบปัจจุบันทันที
+ * หลังจากนี้ไม่ต้องมากดอีก ระบบจะดึงเองทุกครั้งที่ CAAT เปลี่ยนฉบับ
+ *
+ * เลือกฟังก์ชันนี้ในตัวแก้ไข Apps Script แล้วกด Run
+ * ครั้งแรกจะขึ้นหน้าขออนุญาตเข้าถึง Drive — กดอนุญาต
+ *
+ * ใช้เวลาราวครึ่งชั่วโมง (356 ใบ แบ่งทำรอบละ 5 นาที) ปิดหน้าต่างได้เลย
+ * ดูความคืบหน้าด้วย aipStatus()
+ */
+function aipSetup() {
+  var has = ScriptApp.getProjectTriggers().some(function (t) {
+    return t.getHandlerFunction() === 'aipDaily';
+  });
+  if (has) Logger.log('มี trigger รายวันอยู่แล้ว');
+  else {
+    ScriptApp.newTrigger('aipDaily').timeBased().everyDays(1).atHour(3).create();
+    Logger.log('ตั้ง trigger รายวันแล้ว (ตีสาม) — เฝ้าวันเปลี่ยนฉบับให้เอง');
+  }
+  aipStart();
+}
+
+/**
  * ตัวที่ trigger รายวันเรียก — เริ่มดึงเองเมื่อ CAAT เปลี่ยนฉบับที่ใช้อยู่
  * ตั้ง trigger รายวันชี้มาที่ฟังก์ชันนี้ครั้งเดียว แล้วปล่อยได้เลย
  */
