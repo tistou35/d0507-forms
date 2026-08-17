@@ -210,6 +210,30 @@
       "eff": "",
       "file": "",
       "by": "HT"
+    },
+    {
+      "id": "CHT-VTBD-AD",
+      "cat": "chart",
+      "src": "aip",
+      "icao": "VTBD",
+      "chart": "Aerodrome Chart - ICAO AD 2-VTBD-2-1",
+      "th": "VTBD ผังสนามบิน",
+      "en": "VTBD Aerodrome Chart",
+      "airac": "2608",
+      "file": "https://aip.caat.or.th/2026-08-06-AIRAC/graphics/292780.pdf",
+      "resolvedAt": "2026-08-06"
+    },
+    {
+      "id": "CHT-VTBD-ILS21L",
+      "cat": "chart",
+      "src": "aip",
+      "icao": "VTBD",
+      "chart": "Instrument Approach Chart - ICAO - ILS or LOC y RWY 21L AD 2-VTBD-8-9",
+      "th": "VTBD ILS/LOC y RWY 21L",
+      "en": "VTBD ILS or LOC y RWY 21L",
+      "airac": "2608",
+      "file": "https://aip.caat.or.th/2026-08-06-AIRAC/graphics/299094.pdf",
+      "resolvedAt": "2026-08-06"
     }
   ],
   "tabs": [
@@ -228,5 +252,6 @@
       "n": "สนามบินและแผนภูมิ",
       "en": "Airport & approach chart"
     }
-  ]
+  ],
+  "_chartNote": "ตัวระบุตัวตนของแผนภูมิคือ icao + chart (ชื่อเต็ม) ไม่ใช่เลขไฟล์ — เลขไฟล์ของ eAIP เปลี่ยนเมื่อแผนภูมิถูกแก้ และเลขเก่ายังเปิดได้ในโฟลเดอร์รอบใหม่ ถ้าเก็บเลขไว้จะได้ฉบับที่ถูกยกเลิกแล้วโดยไม่มีอะไรเตือน รันใหม่ทุกรอบ AIRAC: python3 tools/aip_charts.py resolve"
 }
