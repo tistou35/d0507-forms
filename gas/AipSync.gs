@@ -552,15 +552,21 @@ function aipManifest_(st) {
     if (s.sub === 'Airport chart') { a.ap = s.folderId; a.nap++; }
     else { a.op = s.folderId; a.nop++; }
   });
+  /* พยายามแชร์ แต่ล้มเหลวไม่เป็นไร — โฟลเดอร์รับสิทธิ์ตกทอดจากโฟลเดอร์แม่อยู่แล้ว
+     (ทดสอบเปิดแบบไม่ล็อกอินผ่านทั้งสามระดับ) บางบัญชี/โดเมนปิดการแชร์แบบลิงก์ไว้
+     แล้ว setSharing จะโยน "Access denied: DriveApp" ซึ่งไม่ควรทำให้ทั้งงานล้ม
+     รวบเป็นบรรทัดเดียว ไม่ใช่ 24 บรรทัด */
+  var shareFail = 0;
   Object.keys(ads).forEach(function (k) {
     ['ap', 'op'].forEach(function (f) {
       if (!ads[k][f]) return;
       try {
         DriveApp.getFolderById(ads[k][f])
           .setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-      } catch (e) { Logger.log('🔴 แชร์โฟลเดอร์ %s %s ไม่ได้: %s', k, f, e.message); }
+      } catch (e) { shareFail++; }
     });
   });
+  if (shareFail) Logger.log('ตั้งค่าแชร์โฟลเดอร์ไม่ได้ %s อัน — ใช้สิทธิ์ที่ตกทอดจากโฟลเดอร์แม่แทน', shareFail);
 
   var doc = { issue: st.issue, generatedAt: st.finishedAt, rootId: root.getId(),
               files: st.done, sets: list.length,
@@ -569,9 +575,15 @@ function aipManifest_(st) {
   var it2 = root.getFilesByName(AIP_MANIFEST), s = JSON.stringify(doc);
   var f = it2.hasNext() ? it2.next() : root.createFile(AIP_MANIFEST, s, MimeType.PLAIN_TEXT);
   f.setContent(s);
-  // แชร์แบบลิงก์ เพราะ token ของ tools/ มีสโคปแค่ drive.file
-  // อ่านไฟล์ที่ Apps Script สร้างผ่าน Drive API ไม่ได้ ต้องดึงผ่านลิงก์แทน
-  f.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  /* พยายามแชร์แบบลิงก์ เพราะ token ของ tools/ มีสโคปแค่ drive.file
+     อ่านไฟล์ที่ Apps Script สร้างผ่าน Drive API ไม่ได้ ต้องดึงผ่านลิงก์แทน
+     แชร์ไม่ได้ก็ไม่ล้ม — ไฟล์รับสิทธิ์ตกทอดจากโฟลเดอร์แม่ได้เหมือนกัน
+     เดิมบรรทัดนี้ไม่มี try/catch เลยทำให้ aipRemanifest ตายทั้งงานทั้งที่ใบส่งงานเขียนเสร็จแล้ว */
+  try {
+    f.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  } catch (e) {
+    Logger.log('ตั้งค่าแชร์ใบส่งงานไม่ได้ (%s) — ถ้า Python อ่านไม่ออก ให้แชร์ไฟล์นี้เอง', e.message);
+  }
 
   var multi = list.filter(function (x) { return x.files.length > 1; }).length;
   Logger.log('ใบส่งงาน %s — %s ชุด (รวมหน้าได้ %s ชุด)', AIP_MANIFEST, list.length, multi);
