@@ -29,8 +29,17 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 PAGEREF = re.compile(r'AD\s+2-([A-Z]{4})-([\d-]+)\s*$', re.I)
 
 # ตัวขยายในวงเล็บที่บอกว่า "นี่คือหน้าถัดไปของใบเดิม" ไม่ใช่ใบใหม่
-CONT = re.compile(r'\((Verso|Tabular description[^)]*|Radio[^)]*|Waypoint[^)]*|'
-                  r'Continued[^)]*|Page \d+[^)]*)\)', re.I)
+#
+# สำรวจของจริงทั้ง 12 สนามบินแล้ว วงเล็บมีอยู่ห้าแบบเท่านั้น:
+#   หน้าต่อ  Verso · Tabular description [N] · Waypoint list table
+#            Radio communication failure table · Fix and point list table
+#   ไม่ใช่   (SID) (STAR) — เป็นชนิดของแผนภูมิ
+#            (NORTH) (SOUTH) — เป็นคนละใบจริง ๆ (VTUK มีทั้งคู่)
+#
+# ใช้กฎ "ลงท้ายด้วย table" ครอบไว้ด้วย เพราะหน้าตารางเป็นภาคผนวกของแผนภูมิเสมอ
+# และรอบหน้า CAAT อาจเพิ่มตารางชื่อใหม่ที่ยังไม่เคยเห็น
+CONT = re.compile(r'\((Verso|Tabular description[^)]*|Continued[^)]*|'
+                  r'Page \d+[^)]*|[^)]*\btable)\)', re.I)
 
 # ชนิด chart — เรียงจากเจาะจงไปกว้าง ตัวแรกที่ตรงคือคำตอบ
 # (kind, โฟลเดอร์ย่อย)
@@ -107,6 +116,11 @@ def parse(icao, raw):
             desig = hit.group(1)
             d = d[:hit.start()]
 
+    # ต้นทางพิมพ์ไม่สม่ำเสมอ — VTBU หน้า 8-9 เขียน "RWY 18" ส่วน 8-10 เขียน "RWY18"
+    # ทั้งที่เป็นแผนภูมิใบเดียวกัน ปล่อยไว้จะแยกเป็นสองชุด แล้วได้ชุดที่มีแต่หน้าตาราง
+    # ไม่มีหน้าแผนภูมิ  (มี 5 แห่งในรอบ 2608)
+    d = re.sub(r'\bRWY(\d)', r'RWY \1', d)
+
     d = re.sub(r'\s+', ' ', d).strip(' -,')
     if desig:
         d = (d + ' ' + desig).strip()
@@ -151,10 +165,20 @@ def check(only=None):
             if only or n > 3:
                 print('   %-52s %d หน้า  [%s]'
                       % (g['name'][:52], n, ','.join(p[0] for p in g['pages'])))
-            # ชุดเดียวกันต้องไม่มีหน้าเลขซ้ำ — ซ้ำ = จับผิดชุด
             refs = [p[0] for p in g['pages']]
+            # ── กฎที่วัดจากของจริงทั้ง 356 ใบแล้วเป็นจริงทุกใบ ──────────
+            # ชุดเดียวกันต้องไม่มีหน้าเลขซ้ำ — ซ้ำ = จับผิดชุด
             if len(set(refs)) != len(refs):
                 bad.append('%s · %s หน้าซ้ำ %s' % (a, g['name'], refs))
+            # เลขหน้าในชุดต้องเรียงติดกัน — ชุดคือแผนภูมิหนึ่งใบกับภาคผนวกที่พิมพ์ต่อกัน
+            # ถ้าโหว่ แปลว่าจับมารวมข้ามใบ หรือมีหน้าที่ควรอยู่ด้วยแต่ตกไปอยู่ชุดอื่น
+            k = [page_key(r) for r in refs]
+            if len(k) > 1 and any(k[i + 1][-1] - k[i][-1] != 1 for i in range(len(k) - 1)):
+                bad.append('%s · %s เลขหน้าไม่ติดกัน %s' % (a, g['name'], refs))
+            # ต้องมีหน้าแผนภูมิ ไม่ใช่มีแต่ภาคผนวก — เคยเจอตอน VTBU พิมพ์ RWY18/RWY 18
+            # ไม่ตรงกัน แล้วหน้าตารางหลุดไปตั้งชุดใหม่ของตัวเอง
+            if all(p[3] for p in g['pages']):
+                bad.append('%s · %s มีแต่ภาคผนวก ไม่มีหน้าแผนภูมิ' % (a, g['name']))
     print('\nรวม %d ไฟล์ → %d ชุด' % (tot_f, tot_s))
     for b in bad:
         print('  🔴 ' + b)

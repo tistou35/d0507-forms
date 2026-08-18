@@ -234,8 +234,12 @@ var AIP_LEAD = new RegExp(
   '|VFR\\s+OVERFLY\\s+PROCEDURE' +
   ')\\s*', 'i');
 
-/* วงเล็บที่แปลว่า "หน้าถัดไปของใบเดิม" ไม่ใช่ใบใหม่ */
-var AIP_CONT = /\((Verso|Tabular description[^)]*|Radio[^)]*|Waypoint[^)]*|Continued[^)]*|Page \d+[^)]*)\)/i;
+/* วงเล็บที่แปลว่า "หน้าถัดไปของใบเดิม" ไม่ใช่ใบใหม่ — ต้องตรงกับ CONT ใน aip_name.py
+   ของจริงมีห้าแบบ: Verso · Tabular description [N] · Waypoint list table ·
+   Radio communication failure table · Fix and point list table
+   ส่วน (SID) (STAR) คือชนิดแผนภูมิ และ (NORTH) (SOUTH) คือคนละใบจริง ๆ
+   กฎ "ลงท้ายด้วย table" ครอบตารางชื่อใหม่ที่อาจโผล่มารอบหน้า */
+var AIP_CONT = /\((Verso|Tabular description[^)]*|Continued[^)]*|Page \d+[^)]*|[^)]*\btable)\)/i;
 
 /**
  * ชื่อไฟล์และชื่อชุดจากชื่อแผนภูมิ
@@ -275,6 +279,11 @@ function aipName_(icao, raw) {
     var dm = desc.match(/\b([A-Z]{2,5}\d[A-Z])\b/);
     if (dm) { desig = dm[1]; desc = desc.slice(0, dm.index); }
   }
+  /* ต้นทางพิมพ์ไม่สม่ำเสมอ — VTBU หน้า 8-9 เขียน "RWY 18" ส่วน 8-10 เขียน "RWY18"
+     ทั้งที่เป็นแผนภูมิใบเดียวกัน ปล่อยไว้จะแยกเป็นสองชุด แล้วได้ชุดที่มีแต่หน้าตาราง
+     ไม่มีหน้าแผนภูมิ (มี 5 แห่งในรอบ 2608) */
+  desc = desc.replace(/\bRWY(\d)/g, 'RWY $1');
+
   desc = desc.replace(/\s+/g, ' ').replace(/^[\s\-,]+|[\s\-,]+$/g, '');
   if (desig) desc = (desc + ' ' + desig).replace(/^\s+/, '');
 
