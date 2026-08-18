@@ -677,6 +677,59 @@ function aipBegin_() {
 }
 
 /**
+ * ── เปลี่ยนชื่อไฟล์เดิมให้ตรงกับกฎตั้งชื่อปัจจุบัน ─────────────
+ * ใช้เมื่อแก้ aipName_ หลังจากดาวน์โหลดไปแล้ว
+ *
+ * จำเป็นเพราะ aipManifest_ จัดชุดจาก "ชื่อไฟล์ที่อยู่ใน Drive" ไม่ใช่จากกฎในโค้ด
+ * แก้กฎอย่างเดียวจึงไม่มีผลย้อนหลัง ไฟล์เก่ายังจับกลุ่มแบบเดิม
+ * (ของจริง: แก้ให้ "Fix and point list table" เป็นหน้าต่อแล้ว แต่ใบส่งงานยังได้ 185 ชุด)
+ *
+ * เปลี่ยนชื่อ ไม่ได้ดาวน์โหลดใหม่ จึงเร็วและไม่กิน quota
+ * id ไฟล์ไม่เปลี่ยนตอนเปลี่ยนชื่อ ลิงก์เดิมจึงไม่พัง
+ * รันซ้ำได้ ไม่มีอะไรให้เปลี่ยนก็จบเลย
+ */
+function aipRename() {
+  var st = aipRead_();
+  if (!st || !st.items) { Logger.log('ไม่มีสถานะการดึง'); return; }
+  var eff = st.issue.text, done = 0, miss = 0, same = 0;
+
+  // จัดรายการตามสนามบิน จะได้เปิดโฟลเดอร์ละครั้งเดียว
+  var byAd = {};
+  st.items.forEach(function (it) { (byAd[it.icao] = byAd[it.icao] || []).push(it); });
+
+  Object.keys(byAd).forEach(function (icao) {
+    var folder = aipAdFolder_(icao, eff);
+    /* ทำดัชนีจาก "เลขหน้า" ที่อยู่ท้ายชื่อไฟล์ ไม่ใช่ชื่อเต็ม
+       เพราะชื่อที่ state จดไว้อาจไม่ตรงกับชื่อจริงใน Drive (คนละรุ่นโค้ด)
+       ส่วนเลขหน้าเป็นของที่ eAIP กำหนด ไม่เปลี่ยนตามกฎตั้งชื่อของเรา */
+    var idx = {};
+    ['Airport chart', 'Chart'].forEach(function (sn) {
+      var got = folder.getFoldersByName(sn);
+      if (!got.hasNext()) return;
+      var fs = got.next().getFiles();
+      while (fs.hasNext()) {
+        var f = fs.next();
+        var m = f.getName().match(/\(AD\s+2-[A-Z]{4}-([\d-]+)\)\.pdf$/i);
+        if (m) idx[m[1]] = f;
+      }
+    });
+
+    byAd[icao].forEach(function (it) {
+      var nm = aipName_(icao, it.title);
+      var f = idx[nm.ref];
+      if (!f) { miss++; return; }
+      if (f.getName() === nm.name) { same++; }
+      else { f.setName(nm.name); done++; }
+      it.name = nm.name; it.set = nm.set; it.ref = nm.ref; it.sub = nm.sub;
+    });
+  });
+
+  aipWrite_(st);
+  Logger.log('เปลี่ยนชื่อ %s ใบ · ชื่อตรงอยู่แล้ว %s · หาไฟล์ไม่เจอ %s', done, same, miss);
+  aipManifest_(st);
+}
+
+/**
  * สร้างใบส่งงานใหม่จากไฟล์ที่มีอยู่ใน Drive — ไม่ดาวน์โหลดอะไรเพิ่ม
  * ใช้เมื่อดึงครบแล้วแต่ใบส่งงานออกมาว่างหรือไม่ครบ
  */
