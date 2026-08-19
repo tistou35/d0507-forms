@@ -140,8 +140,11 @@ function fillTokens_(doc, map) {
   });
 
   // 3) ช่องติ๊ก — แทนตามลำดับเฉพาะเมื่อจำนวนตรงกัน
+  /* map.boxesPartial = กระดาษมี ☐ มากกว่าที่ฟอร์มใช้ และช่องที่เหลือไม่มีใครติ๊กแล้ว
+     ตัวสร้าง TokenMap ตรวจลำดับ N ช่องแรกเทียบกระดาษให้แล้วก่อนตั้งธงนี้
+     ไม่ใช่การปิดตัวกัน แต่เป็นการบอกว่า "จำนวนไม่เท่ากันโดยตั้งใจ" */
   var boxes = map.boxes || [], boxNote;
-  if (boxes.length && boxes.length === map.boxesInDocx) {
+  if (boxes.length && (boxes.length === map.boxesInDocx || map.boxesPartial)) {
     var i = 0;
     while (i < boxes.length) {
       var rb = body.findText('☐');
@@ -151,7 +154,8 @@ function fillTokens_(doc, map) {
       eb.insertText(rb.getStartOffset(), boxes[i].tok);
       i++;
     }
-    boxNote = 'แทน ☐ แล้ว ' + i + ' ช่อง';
+    boxNote = 'แทน ☐ แล้ว ' + i + ' ช่อง'
+            + (map.boxesPartial ? ' (จาก ' + map.boxesInDocx + ' ☐ ที่เหลือปล่อยว่างตามตั้งใจ)' : '');
     placed += i;
   } else {
     boxNote = 'ช่องติ๊กวางมือ (นิยามฟอร์ม ' + boxes.length + ' ≠ ☐ ในเอกสาร ' + map.boxesInDocx + ')';

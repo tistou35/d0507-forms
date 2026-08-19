@@ -321,6 +321,21 @@ def build(abbr, verbose=False):
         by_cell = [b for b in by_cell if b['tok'] != tok and b['cell'] != cell]
         by_cell.append({'cell': cell, 'head': head, 'tok': tok})
         unmatched = [u for u in unmatched if u['tok'] != tok]
+    # manual: บังคับให้ต่อท้ายเอกสาร ไม่ต้องพยายามจับคู่กับป้ายบนกระดาษ
+    # ใช้เมื่อกระดาษไม่มีที่ให้จริง ๆ และตัวจับคู่ดันไปเจอป้ายที่ "ดูคล้าย" เข้า
+    # ของจริง: EFC ช่อง "รายงานผลรายวิชาจาก TrainHub" ถูกจับไปที่ป้าย "Result"
+    # ซึ่งเป็นช่องผลสอบ ถ้าช่องนั้นว่างอยู่ ชื่อไฟล์จะไปโผล่เป็นผลสอบเงียบ ๆ
+    for tok in (ov.get('manual') or []):
+        by_label = [b for b in by_label if b['tok'] != tok]
+        by_cell = [b for b in by_cell if b['tok'] != tok]
+        by_line = [b for b in by_line if b['tok'] != tok]
+        if not any(u['tok'] == tok for u in unmatched):
+            src = next((f for f in fields if '{{%s}}' % f['k'] == tok), None)
+            lb = (src or {}).get('label') or {}
+            unmatched.append({'tok': tok,
+                              'label': (lb.get('en') if isinstance(lb, dict) else lb) or tok,
+                              'labelTh': (lb.get('th') if isinstance(lb, dict) else '') or ''})
+
     skip = set(ov.get('skip') or [])
     if skip:
         boxes = [b for b in boxes if b['tok'] not in skip]
@@ -332,8 +347,14 @@ def build(abbr, verbose=False):
         boxes = [known.get(t, {'tok': t, 'label': ''}) for t in want]
 
     # ลำดับช่องติ๊กต้องตรงกับกระดาษ ไม่ใช่แค่จำนวนเท่ากัน
+    # boxesPartial: กระดาษมี ☐ มากกว่าที่ฟอร์มใช้ และ ☐ ที่เหลือไม่มีใครติ๊กแล้ว
+    # (EFC — ตารางรายวิชา 84 ช่องย้ายไปเป็นไฟล์แนบ เหลือ 10 ช่องแรกที่ยังใช้)
+    # ยอมให้วางเฉพาะ N ช่องแรกได้ แต่ยังตรวจลำดับเทียบกับกระดาษเหมือนเดิม
+    # ถ้าไม่ตรวจ ก็กลับไปเสี่ยงติ๊กเลื่อนช่องแบบที่ตัวกันนี้ตั้งใจกันตั้งแต่แรก
+    partial = bool(ov.get('boxesPartial')) and 0 < len(boxes) <= n_box_docx
+
     order_warn = []
-    if len(boxes) == n_box_docx:
+    if len(boxes) == n_box_docx or partial:
         docl = docx_box_labels(dp)
         for i, b in enumerate(boxes):
             if i >= len(docl): break
@@ -353,6 +374,7 @@ def build(abbr, verbose=False):
         'byLine': by_line,
         'byCell': by_cell,
         'boxes': boxes,
+        'boxesPartial': partial,
         'tables': tables,
         'boxesInDocx': n_box_docx,
         'approval': approval,
