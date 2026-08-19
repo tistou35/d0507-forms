@@ -115,7 +115,8 @@ function boot(){
     return;
   }
   // เก็บคำตอบเดิมไว้เมื่อ boot ซ้ำ (เช่นตอนสลับภาษา หรือ auth เปลี่ยนสถานะ)
-  const keep = FK ? FK.data : {};
+  // boot แรกใช้ค่าที่ส่งมาทาง ?p= ถ้ามี
+  const keep = FK ? FK.data : prefill();
   FK=new FormKit(DEF,{party:partyOf(),lang:A.lang,data:keep,onChange:()=>renderFoot()});
   FK.render(document.getElementById('form'));
   renderFoot();
@@ -129,6 +130,32 @@ function boot(){
 
    การจับคู่ตามบทบาทเป็นเรื่องของการ "เปิดใบที่ส่งมาแล้วเพื่อลงนาม"
    ซึ่งเป็นคนละหน้ากัน (คิวงาน) ไม่ใช่ตอนเริ่มใบใหม่ */
+/* ?p=<base64url ของ JSON> — ค่าที่ระบบต้นทาง (เช่น TrainHub) เติมมาให้ล่วงหน้า
+   เพื่อไม่ต้องคัดลอกผลการเรียนด้วยมือ
+
+   เป็นแค่ "ค่าตั้งต้น" เท่านั้น ผู้กรอกแก้ได้ทุกช่องก่อนส่ง
+
+   ฟิลด์ชนิด sign ถูกตัดทิ้งเสมอ ลิงก์ต้องปลอมลายเซ็นไม่ได้ ไม่ว่าใครสร้างลิงก์ */
+function prefill(){
+  const raw=new URLSearchParams(location.search).get('p');
+  if(!raw||!DEF) return {};
+  let o;
+  try{
+    const b64=raw.replace(/-/g,'+').replace(/_/g,'/');
+    const bin=atob(b64);
+    const bytes=Uint8Array.from(bin,ch=>ch.charCodeAt(0));
+    o=JSON.parse(new TextDecoder().decode(bytes));
+  }catch(e){ console.warn('[prefill] อ่านค่าที่ส่งมาไม่ได้',e); return {}; }
+  if(!o||typeof o!=='object'||Array.isArray(o)) return {};
+  const signKeys=new Set();
+  (DEF.sections||[]).forEach(sec=>(sec.fields||[]).forEach(f=>{
+    if(f.type==='sign') signKeys.add(f.k);
+  }));
+  const out={};
+  Object.keys(o).forEach(k=>{ if(!signKeys.has(k)) out[k]=o[k]; });
+  return out;
+}
+
 function partyOf(){
   if(!DEF) return null;
   const first=(DEF.route||[])[0];

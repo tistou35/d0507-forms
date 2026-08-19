@@ -3,7 +3,7 @@
   "doc": "D-0507-EFC-001",
   "control": "IM-EFC-303-A",
   "issue": "01",
-  "rev": "00",
+  "rev": "01",
   "eff": "20 AUG 2020",
   "title": {
     "th": "รายงานจบหลักสูตรหรือจบขั้นการฝึก",
@@ -655,6 +655,66 @@
               "id": "sRecurrentNight",
               "th": "Recurrent Night",
               "en": "Recurrent Night"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "k": "S7",
+      "tab": "T2",
+      "party": "ht",
+      "title": {
+        "th": "รายวิชา (ระบบการจัดการ / TrainHub)",
+        "en": "Subjects (management system / TrainHub)"
+      },
+      "fields": [
+        {
+          "k": "s7",
+          "type": "table",
+          "req": false,
+          "rows": 4,
+          "max": 30,
+          "label": {
+            "th": "ผลรายวิชา",
+            "en": "Subject results"
+          },
+          "cols": [
+            {
+              "k": "subject",
+              "type": "text",
+              "w": "46%",
+              "label": {
+                "th": "วิชา",
+                "en": "Subject"
+              }
+            },
+            {
+              "k": "score",
+              "type": "number",
+              "w": "14%",
+              "label": {
+                "th": "คะแนน (%)",
+                "en": "Score (%)"
+              }
+            },
+            {
+              "k": "result",
+              "type": "text",
+              "w": "16%",
+              "label": {
+                "th": "ผล",
+                "en": "Result"
+              }
+            },
+            {
+              "k": "passedOn",
+              "type": "date",
+              "w": "24%",
+              "label": {
+                "th": "วันที่ผ่าน",
+                "en": "Passed on"
+              }
             }
           ]
         }
