@@ -41,6 +41,18 @@ function doPost(e) {
       return json_({ ok: true, result: { note: msg, status: aipStatusJson_() } });
     }
 
+    /* ── ไฟล์แนบ ─────────────────────────────────────────────
+       บางฟอร์มไม่ได้ให้กรอกผลทีละหัวข้อ แต่แนบรายงานที่ออกจากระบบอื่นมาแทน
+       (EFC แนบรายงานรายวิชาจาก TrainHub)
+
+       ทำไมไม่เก็บใน Firestore: เอกสารหนึ่งใบจำกัด 1 MiB ไฟล์รายงานใหญ่กว่านั้น
+       ทำไมไม่ผ่าน Firebase Storage: ระบบนี้เก็บเอกสารทุกอย่างไว้ที่ Drive อยู่แล้ว
+       ไฟล์แนบต้องอยู่ที่เดียวกับ PDF ของใบนั้น ไม่งั้นตอนตรวจสอบต้องไล่หาสองที่ */
+    if (body.action === 'attach') {
+      if (who.anonymous && !body.code) throw new Error('ไม่ได้ระบุฟอร์ม');
+      return json_({ ok: true, result: attach_(body, who) });
+    }
+
     var out = exportSubmission_(body.submission, who);
     return json_({ ok: true, result: out });
   } catch (err) {
@@ -210,6 +222,16 @@ function flatten_(data) {
       return;
     }
     if (Array.isArray(v)) { out[k] = v.join(', '); return; }
+
+    /* ไฟล์แนบ — ในเอกสารต้องเห็น "ชื่อไฟล์" ไม่ใช่ id หรือขนาด
+       ถ้าปล่อยให้ตกไปเข้าเงื่อนไข checklist ข้างล่าง จะได้ข้อความแบบ
+       id=1AbC · name=report.pdf · size=204800 พิมพ์ลงเอกสารควบคุม */
+    if (v && typeof v === 'object' && v.id && v.name) {
+      out[k] = v.name;
+      out[k + '_url'] = v.url || '';
+      out[k + '_id'] = v.id;
+      return;
+    }
 
     /* checklist — แตกเป็น <key>_<ข้อ> เพื่อให้แม่แบบอ้างทีละข้อได้
        ส่วนช่องติ๊กของแต่ละข้อสร้างใน ticks_ */
@@ -410,4 +432,41 @@ function testFraeTemplate() {
   var old = folder.getFilesByName('FRAE-TEST-0001.pdf');
   while (old.hasNext()) old.next().setTrashed(true);   // ให้สร้างใหม่ทุกครั้ง
   testExport();
+}
+
+
+/**
+ * รับไฟล์แนบเข้าโฟลเดอร์ของฟอร์มนั้น — คืนข้อมูลย่อไว้เก็บในใบ
+ *
+ * เก็บแค่ id/ชื่อ/ขนาดไว้ใน Firestore ตัวไฟล์อยู่ Drive ที่เดียวกับ PDF ของใบ
+ * ตั้งชื่อไฟล์นำหน้าด้วยรหัสฟอร์มและเวลา จะได้เรียงตามลำดับและไม่ทับกัน
+ */
+function attach_(body, who) {
+  var MAX = 12 * 1024 * 1024;                 // 12 MB — เผื่อ base64 พองขึ้น ~33%
+  var name = String(body.name || 'attachment');
+  var b64 = String(body.b64 || '');
+  if (!b64) throw new Error('ไม่มีข้อมูลไฟล์');
+
+  var bytes = Utilities.base64Decode(b64);
+  if (bytes.length > MAX)
+    throw new Error('ไฟล์ใหญ่เกิน ' + Math.round(MAX / 1048576) + ' MB (ได้มา ' +
+                    Math.round(bytes.length / 1048576 * 10) / 10 + ' MB)');
+
+  var code = String(body.code || 'MISC').replace(/[^A-Za-z0-9_-]/g, '');
+  var folder = subFolder_(code);
+  var sub = folder.getFoldersByName('Attachments');
+  sub = sub.hasNext() ? sub.next() : folder.createFolder('Attachments');
+
+  var stamp = Utilities.formatDate(new Date(), 'Asia/Bangkok', 'yyyyMMdd-HHmmss');
+  var safe = name.replace(/[\\\/:*?"<>|]/g, '-').slice(0, 120);
+  var blob = Utilities.newBlob(bytes, body.mime || 'application/octet-stream',
+                               code + '-' + stamp + '-' + safe);
+  var f = sub.createFile(blob);
+  try {
+    f.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  } catch (e) {
+    // บางบัญชีปิดการแชร์แบบลิงก์ไว้ — ไฟล์ยังอยู่ เจ้าหน้าที่เปิดผ่าน Drive ได้
+  }
+  Logger.log('แนบไฟล์ %s (%s ไบต์) โดย %s', f.getName(), bytes.length, who.email || 'anonymous');
+  return { id: f.getId(), name: name, size: bytes.length, url: f.getUrl() };
 }

@@ -96,7 +96,9 @@ async function boot(){
     }catch(e){ DIR=[]; }
 
     const party=(DEF.route||[])[1] ? DEF.route[1].party : (DEF.parties||[])[1]?.k;
-    FK=new FormKit(DEF,{party:party,lang:A.lang,data:SUB.data||{},onChange:()=>paint()});
+    FK=new FormKit(DEF,{party:party,lang:A.lang,data:SUB.data||{},onChange:()=>paint(),
+    upload:async f=>{const r=await A.gas('attach',Object.assign({code:DEF.code},f));
+      return r.ok?r.result:{error:r.error};}});
     // เติมชื่อและวันที่ให้ผู้อนุมัติล่วงหน้า — ไม่ต้องพิมพ์ซ้ำทุกใบ
     (DEF.sections||[]).forEach(s=>{ if(s.party!==party) return;
       (s.fields||[]).forEach(f=>{

@@ -117,7 +117,9 @@ function boot(){
   // เก็บคำตอบเดิมไว้เมื่อ boot ซ้ำ (เช่นตอนสลับภาษา หรือ auth เปลี่ยนสถานะ)
   // boot แรกใช้ค่าที่ส่งมาทาง ?p= ถ้ามี
   const keep = FK ? FK.data : prefill();
-  FK=new FormKit(DEF,{party:partyOf(),lang:A.lang,data:keep,onChange:()=>renderFoot()});
+  FK=new FormKit(DEF,{party:partyOf(),lang:A.lang,data:keep,onChange:()=>renderFoot(),
+    upload:async f=>{const r=await A.gas('attach',Object.assign({code:DEF.code},f));
+      return r.ok?r.result:{error:r.error};}});
   FK.render(document.getElementById('form'));
   renderFoot();
   loadDir();

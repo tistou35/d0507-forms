@@ -117,6 +117,7 @@
     this.def = def;
     // ไม่ได้ส่งมาก็ตามภาษาที่ผู้ใช้เลือกไว้ทั้งเว็บ
     this.lang = opts.lang || (global.D0507 && global.D0507.lang) || 'th';
+    this.upload = opts.upload || null;      // ฟังก์ชันอัปโหลดไฟล์แนบ มาจากหน้าที่เรียก
     this.data = opts.data || {};
     this.party = opts.party || null;          // party ที่ผู้ใช้ปัจจุบันกรอกได้
     this.readonly = !!opts.readonly;
@@ -383,6 +384,29 @@
       case 'static':
         return `<div class="fk-f"><div class="fk-static">${L(f.text || f.label, this.lang)}</div></div>`;
 
+      /* ไฟล์แนบ — ใช้เมื่อผลลัพธ์ออกมาจากระบบอื่นแล้ว ไม่ต้องกรอกซ้ำทีละหัวข้อ
+         เก็บเฉพาะข้อมูลย่อของไฟล์ (id ชื่อ ขนาด) ตัวไฟล์ขึ้นไปอยู่ Drive ทันทีที่เลือก
+         อัปโหลดตอนเลือกไม่ใช่ตอนกดส่ง เพราะถ้าไฟล์ใหญ่หรือเน็ตหลุด
+         คนกรอกต้องรู้ตั้งแต่ตอนนั้น ไม่ใช่ตอนกดส่งแล้วเสียงานทั้งใบ */
+      case 'file': {
+        const at = v && v.id ? v : null;
+        body = `<div class="fk-file" data-fk="${esc(f.k)}">
+          ${at ? `<div class="fk-file-has">
+              <a href="${esc(at.url || '#')}" target="_blank" rel="noopener">${esc(at.name)}</a>
+              <span class="sz">${fileSize(at.size)}</span>
+              ${ro ? '' : `<button type="button" class="fk-file-x" data-fx="${esc(f.k)}">${
+                this.lang === 'en' ? 'Remove' : 'เอาออก'}</button>`}
+            </div>`
+            : ro ? `<span class="fk-file-none">${this.lang === 'en' ? 'No file' : 'ยังไม่มีไฟล์'}</span>`
+            : `<label class="fk-file-pick">
+                 <input type="file" data-fu="${esc(f.k)}" hidden${f.accept ? ` accept="${esc(f.accept)}"` : ''}>
+                 <span>${this.lang === 'en' ? 'Choose file' : 'เลือกไฟล์'}</span>
+               </label>`}
+          <div class="fk-file-msg" data-fm="${esc(f.k)}"></div>
+        </div>`;
+        break;
+      }
+
       case 'textarea':
         body = `<textarea id="${id}" data-k="${esc(f.k)}"${dis}>${esc(v || '')}</textarea>`; break;
 
@@ -624,6 +648,12 @@
 
   FormKit.prototype.set = function (k, v) { this.data[k] = v; this.onChange(k, v, this); };
 
+  function fileSize(n) {
+    n = Number(n) || 0;
+    return n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB'
+         : n >= 1024 ? Math.round(n / 1024) + ' KB' : n + ' B';
+  }
+
   FormKit.prototype.bind = function (el) {
     const self = this;
     const rerender = () => self.render(el);
@@ -641,6 +671,38 @@
         rerender();
       });
     });
+
+    /* ไฟล์แนบ — ส่งขึ้น Drive ผ่านตัวส่งออก แล้วเก็บแค่ข้อมูลย่อไว้ในใบ
+       ตัวอัปโหลดรับมาจากหน้าที่เรียก (opts.upload) formkit จึงไม่ผูกกับ Firebase เอง */
+    el.querySelectorAll('input[data-fu]').forEach(i =>
+      i.addEventListener('change', async () => {
+        const k = i.dataset.fu, file = i.files && i.files[0];
+        const msg = el.querySelector(`[data-fm="${CSS.escape(k)}"]`);
+        if (!file) return;
+        const say = (t, bad) => { if (msg) { msg.textContent = t; msg.className = 'fk-file-msg' + (bad ? ' bad' : ''); } };
+        if (!self.upload) { say('หน้านี้ยังไม่ได้ตั้งตัวอัปโหลด', true); return; }
+        const max = (self.fields[k] || {}).max || 12 * 1024 * 1024;
+        if (file.size > max) { say('ไฟล์ใหญ่เกิน ' + fileSize(max), true); i.value = ''; return; }
+        say(self.lang === 'en' ? 'Uploading…' : 'กำลังอัปโหลด…');
+        try {
+          const b64 = await new Promise((res, rej) => {
+            const r = new FileReader();
+            r.onload = () => res(String(r.result).split(',')[1] || '');
+            r.onerror = () => rej(new Error('อ่านไฟล์ไม่ได้'));
+            r.readAsDataURL(file);
+          });
+          const out = await self.upload({ name: file.name, mime: file.type, size: file.size, b64 });
+          if (!out || !out.id) throw new Error((out && out.error) || 'อัปโหลดไม่สำเร็จ');
+          self.set(k, { id: out.id, name: out.name || file.name, size: out.size || file.size, url: out.url || '' });
+          rerender();
+        } catch (e) {
+          say(e.message || String(e), true);
+          i.value = '';
+        }
+      }));
+
+    el.querySelectorAll('[data-fx]').forEach(b =>
+      b.addEventListener('click', () => { self.set(b.dataset.fx, null); rerender(); }));
 
     // ตารางแถวซ้ำ — เขียนค่าลงช่องโดยไม่ rerender ระหว่างพิมพ์ กัน focus หลุดเหมือน mask
     el.querySelectorAll('input[data-tk]').forEach(i =>

@@ -393,6 +393,28 @@ def main():
             report.append('       เส้นประในเอกสาร: ' + ' · '.join(l for l, _ in lines))
 
     out = os.path.join(HERE, 'gas', 'TokenMap.gs')
+
+    # ── รวมกับของเดิม ไม่ใช่เขียนทับ ──────────────────────────
+    # เดิมสั่งทำใบเดียวแล้วไฟล์เหลือใบเดียว อีก 16 ใบหายเงียบ ๆ
+    # ทั้งที่หัวไฟล์นี้เองบอกให้ใช้แบบ  make_tokenmap.py VSR HIF  ได้
+    # ตัวส่งออกอ่าน TOKEN_MAP ตัวนี้ ใบที่หายจึงพังด้วยข้อความ
+    # "ไม่มี X ใน TokenMap.gs" และรู้ตัวตอนมีคนกดส่งใบจริงเท่านั้น
+    if argv and os.path.exists(out):
+        try:
+            src = open(out, encoding='utf-8').read()
+            i = src.index('var TOKEN_MAP = ') + len('var TOKEN_MAP = ')
+            keep = json.loads(src[i:src.rindex(';')])
+        except Exception as e:
+            sys.exit('อ่าน TokenMap.gs เดิมไม่ได้ (%s)\n'
+                     'รันแบบไม่ระบุใบเพื่อสร้างใหม่ทั้งไฟล์' % e)
+        # ใบที่สั่งทำแล้วสร้างไม่สำเร็จ ต้องหายไปจริง ไม่ใช่ค้างของเก่าไว้
+        for a in [x for x in codes if x not in maps]:
+            keep.pop(a, None)
+        untouched = len([a for a in keep if a not in codes])
+        keep.update(maps)
+        maps = dict(sorted(keep.items()))
+        report.append('รวมกับของเดิม — คงไว้อีก %d ใบที่ไม่ได้สั่งทำรอบนี้' % untouched)
+
     with open(out, 'w', encoding='utf-8') as fh:
         fh.write('/**\n * TokenMap.gs — สร้างอัตโนมัติจาก tools/make_tokenmap.py\n'
                  ' * อย่าแก้ด้วยมือ · แก้ที่นิยามฟอร์มแล้วรันเครื่องมือใหม่\n'
