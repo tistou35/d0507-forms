@@ -589,3 +589,5 @@ footer{text-align:center;color:var(--g-400);font-size:12px;padding:22px}
   .gitem .by{white-space:normal}
 }
 @media print{ .gitem{break-inside:avoid} }
+/* ผู้ประเมินคนเดียวกันทั้งใบ — ยุบเหลือสองคอลัมน์ */
+.gitems.nb .gitem{grid-template-columns:minmax(180px,1fr) 2fr}

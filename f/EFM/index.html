@@ -2,7 +2,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>แบบประเมินความคืบหน้า — D-0507 Flight Training</title>
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="../../assets/app.css?v=d348ef99">
+<link rel="stylesheet" href="../../assets/app.css?v=94da8824">
 </head><body>
 <div class="topbar">
   <a class="brand" href="../../" style="text-decoration:none">
@@ -185,8 +185,14 @@ function paint(){
   if (F.guide && (F.guide.items || []).length) {
     document.getElementById('guidewrap').style.display = '';
     document.getElementById('guidehd').textContent = A.L(F.guide);
-    document.getElementById('guide').innerHTML = F.guide.items.map(g =>
-      `<div class="gitem"><b>${A.esc(g.n)}</b><span class="by">${A.esc(g.by)}</span>
+    /* ฟอร์มที่ผู้ประเมินเป็นคนเดียวกันทุกหัวข้อ (เช่น SEF นักเรียนประเมินทั้งใบ)
+       ไม่ต้องมีคอลัมน์ผู้ประเมินให้ซ้ำกันทุกแถว — บอกไว้ในหัวข้อพอ */
+    const anyBy = F.guide.items.some(g => g.by);
+    const box = document.getElementById('guide');
+    box.className = 'gitems' + (anyBy ? '' : ' nb');
+    box.innerHTML = F.guide.items.map(g =>
+      `<div class="gitem"><b>${A.esc(g.n)}</b>${
+        anyBy ? `<span class="by">${A.esc(g.by || '')}</span>` : ''}
         <span class="w">${A.esc(g.w)}</span></div>`).join('');
   }
 

@@ -109,8 +109,14 @@ function paint(){
   if (F.guide && (F.guide.items || []).length) {
     document.getElementById('guidewrap').style.display = '';
     document.getElementById('guidehd').textContent = A.L(F.guide);
-    document.getElementById('guide').innerHTML = F.guide.items.map(g =>
-      `<div class="gitem"><b>${A.esc(g.n)}</b><span class="by">${A.esc(g.by)}</span>
+    /* ฟอร์มที่ผู้ประเมินเป็นคนเดียวกันทุกหัวข้อ (เช่น SEF นักเรียนประเมินทั้งใบ)
+       ไม่ต้องมีคอลัมน์ผู้ประเมินให้ซ้ำกันทุกแถว — บอกไว้ในหัวข้อพอ */
+    const anyBy = F.guide.items.some(g => g.by);
+    const box = document.getElementById('guide');
+    box.className = 'gitems' + (anyBy ? '' : ' nb');
+    box.innerHTML = F.guide.items.map(g =>
+      `<div class="gitem"><b>${A.esc(g.n)}</b>${
+        anyBy ? `<span class="by">${A.esc(g.by || '')}</span>` : ''}
         <span class="w">${A.esc(g.w)}</span></div>`).join('');
   }
 
