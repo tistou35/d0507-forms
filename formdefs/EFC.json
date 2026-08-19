@@ -665,8 +665,8 @@
       "tab": "T2",
       "party": "ht",
       "title": {
-        "th": "รายวิชา (ระบบการจัดการ / TrainHub)",
-        "en": "Subjects (management system / TrainHub)"
+        "th": "รายวิชา (ระบบการจัดการ / TrainHub) — รายงานรายบุคคล",
+        "en": "Subjects (management system / TrainHub) — individual report"
       },
       "fields": [
         {
@@ -714,6 +714,66 @@
               "label": {
                 "th": "วันที่ผ่าน",
                 "en": "Passed on"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "k": "S8",
+      "tab": "T2",
+      "party": "ht",
+      "title": {
+        "th": "สรุปรายบุคคล — รายงานกลุ่ม (จบพร้อมกัน)",
+        "en": "Per-learner summary — group report (finished together)"
+      },
+      "fields": [
+        {
+          "k": "s8",
+          "type": "table",
+          "req": false,
+          "rows": 4,
+          "max": 60,
+          "label": {
+            "th": "ผู้เรียนที่จบหลักสูตร",
+            "en": "Learners completing the course"
+          },
+          "cols": [
+            {
+              "k": "learner",
+              "type": "text",
+              "w": "40%",
+              "label": {
+                "th": "ผู้เรียน",
+                "en": "Learner"
+              }
+            },
+            {
+              "k": "score",
+              "type": "number",
+              "w": "16%",
+              "label": {
+                "th": "คะแนนเฉลี่ย (%)",
+                "en": "Average (%)"
+              }
+            },
+            {
+              "k": "result",
+              "type": "text",
+              "w": "20%",
+              "label": {
+                "th": "ผล",
+                "en": "Result"
+              }
+            },
+            {
+              "k": "completedOn",
+              "type": "date",
+              "w": "24%",
+              "label": {
+                "th": "วันที่จบ",
+                "en": "Completed on"
               }
             }
           ]
