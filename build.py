@@ -237,8 +237,11 @@ def main():
         mini = {'systems': reg['systems'], 'roles': reg['roles'], 'status': reg['status'],
                 'forms': rel, 'lefcount': {'total': len(reg['forms'])}}
         # ฝังเฉพาะฟิลด์ที่เปิดสาธารณะได้ — code / lef / st / note / docx มาจาก Firestore ตอน login
+        # guide/blank เปิดสาธารณะได้ — เป็นคำอธิบายว่าฟอร์มครอบคลุมอะไรและฟอร์มเปล่าหน้าตาไหน
+        # ต่างจาก note ที่เป็นบันทึกภายใน (มาจาก Firestore ตอน login เท่านั้น)
         fpub = {k: f[k] for k in ('abbr','doc','t','th','sys','chain','public','r','with',
-                                  'assignTo','iss','rev','eff','jot','hasDef') if k in f}
+                                  'assignTo','iss','rev','eff','jot','hasDef',
+                                  'guide','blank') if k in f}
         sub = {'@@REG@@': jsonjs(mini), '@@FBCFG@@': FB, '@@GASURL@@': GAS, '@@FORM@@': jsonjs(fpub),
                '@@FTITLE@@': (f.get('th') or f.get('t') or f['abbr']).replace('"', "'")}
         total += emit('form.html', os.path.join(HERE, 'f', f['abbr'], 'index.html'),

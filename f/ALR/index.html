@@ -2,7 +2,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>บันทึกการใช้อากาศยานรายวัน — D-0507 Flight Training</title>
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="../../assets/app.css?v=4040a492">
+<link rel="stylesheet" href="../../assets/app.css?v=d348ef99">
 </head><body>
 <div class="topbar">
   <a class="brand" href="../../" style="text-decoration:none">
@@ -80,6 +80,11 @@
 
     <div class="acts" id="acts"></div>
     <div id="alerts"></div>
+
+    <div class="card" id="guidewrap" style="display:none">
+      <h3 id="guidehd"></h3>
+      <div class="gitems" id="guide"></div>
+    </div>
 
     <div class="card">
       <h3 data-t="whenWho">ฟอร์มนี้ใช้เมื่อไร · ใครเกี่ยวข้อง</h3>
@@ -169,7 +174,21 @@ function paint(){
   document.getElementById('acts').innerHTML =
     (t ? `<a class="big pri" href="${A.esc(t.url)}"${t.ext?' target="_blank" rel="noopener"':''}>${A.esc(t.label)}${t.ext?' ↗':''}</a>` :
          `<span class="big off">${A.esc(A.t('noOnline'))}</span>`) +
+    /* ฟอร์มที่ย้ายไปทำในระบบอื่นแล้ว คนยังต้องเห็นหน้าตาเอกสารได้
+       ไม่งั้นต้องไปรื้อไฟล์ .docx เอง ซึ่งคนทั่วไปเปิดไม่ได้ */
+    (F.blank ? `<a class="big sec" href="../../${A.esc(F.blank)}" target="_blank" rel="noopener">${
+        A.esc(A.L({th:'ดูฟอร์มเปล่า',en:'View blank form'}))} ↗</a>` : '') +
     `<a class="big sec" href="../../all/">${A.esc(A.t('backToAll'))}</a>`;
+
+  /* ขอบเขตการประเมิน — ใช้กับฟอร์มที่ตัวเอกสารอยู่ที่นี่เพื่อควบคุม
+     แต่การกรอกจริงไปทำที่ระบบอื่น หน้านี้จึงต้องบอกให้ชัดว่าครอบคลุมอะไรและใครเป็นผู้ประเมิน */
+  if (F.guide && (F.guide.items || []).length) {
+    document.getElementById('guidewrap').style.display = '';
+    document.getElementById('guidehd').textContent = A.L(F.guide);
+    document.getElementById('guide').innerHTML = F.guide.items.map(g =>
+      `<div class="gitem"><b>${A.esc(g.n)}</b><span class="by">${A.esc(g.by)}</span>
+        <span class="w">${A.esc(g.w)}</span></div>`).join('');
+  }
 
   const al = [];
   if (F.hasDef === false && F.sys === 'here' && !F.jot && !F.assignTo)

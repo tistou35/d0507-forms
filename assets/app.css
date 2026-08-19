@@ -573,3 +573,19 @@ footer{text-align:center;color:var(--g-400);font-size:12px;padding:22px}
   #fdf0d4 10px,#fdf0d4 20px);border:1px solid var(--amber-500);border-radius:8px;
   padding:13px 18px;font-size:13.5px;color:#5c3d08;line-height:1.6}
 .draftbar b{color:#3d2905}
+
+/* ── ขอบเขตการประเมินในหน้าฟอร์ม ──────────────────────────────
+   ใช้กับฟอร์มที่เก็บไว้ที่นี่เพื่อควบคุมเอกสาร แต่กรอกจริงในระบบอื่น
+   หน้าจึงต้องตอบให้ได้ว่า "ครอบคลุมอะไร" และ "ใครเป็นผู้ประเมิน" */
+.gitems{display:grid;gap:6px;margin-top:4px}
+.gitem{display:grid;grid-template-columns:minmax(150px,1.1fr) minmax(120px,.8fr) 1.4fr;
+  gap:10px;align-items:baseline;padding:9px 12px;border:1px solid var(--border-light);
+  border-radius:8px;background:var(--surface)}
+.gitem b{font-size:13.5px;font-weight:600}
+.gitem .by{font-family:var(--font-mono);font-size:11.5px;color:var(--sky-600);white-space:nowrap}
+.gitem .w{font-size:12.5px;color:var(--fg-2)}
+@media(max-width:760px){
+  .gitem{grid-template-columns:1fr;gap:2px}
+  .gitem .by{white-space:normal}
+}
+@media print{ .gitem{break-inside:avoid} }
