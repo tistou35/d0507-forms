@@ -1420,6 +1420,79 @@
    "public": false
   },
   {
+   "doc": "D-0507-MER-001",
+   "code": "",
+   "abbr": "MER",
+   "t": "Management Evaluation Report",
+   "th": "รายงานผลการทบทวนของฝ่ายบริหาร",
+   "iss": "01",
+   "rev": "00",
+   "eff": "",
+   "own": "QA",
+   "lef": [],
+   "jot": "",
+   "docx": "D-0507-MER-001.docx",
+   "st": "notinlef",
+   "chain": "audit",
+   "app": "audit",
+   "note": "OMM 5.2.3 อ้างถึงแบบฟอร์มนี้ · ยังไม่มีวันมีผล รออนุมัติจาก Accountable Manager",
+   "r": {
+    "mgt": "บันทึกผลการประชุมทบทวนของฝ่ายบริหารตามรอบ"
+   },
+   "with": [
+    "Accountable Manager",
+    "CMM",
+    "หัวหน้าฝ่าย"
+   ],
+   "sys": "audit",
+   "public": false,
+   "kw": [
+    "ทบทวน",
+    "ฝ่ายบริหาร",
+    "ประชุม",
+    "mer",
+    "management review",
+    "evaluation"
+   ]
+  },
+  {
+   "doc": "D-0507-CAP-001",
+   "code": "",
+   "abbr": "CAP",
+   "t": "Corrective Action Plan",
+   "th": "แผนการดำเนินการแก้ไข",
+   "iss": "01",
+   "rev": "00",
+   "eff": "",
+   "own": "QA",
+   "lef": [],
+   "jot": "",
+   "docx": "D-0507-CAP-001.docx",
+   "st": "notinlef",
+   "chain": "audit",
+   "app": "audit",
+   "note": "OMM 5.2.3 / 5.4 · ใช้คู่กับ CAR และ MER · ยังไม่มีวันมีผล รออนุมัติจาก Accountable Manager",
+   "r": {
+    "ins": "จัดทำแผนแก้ไขเมื่อเป็นผู้รับผิดชอบ",
+    "mnt": "จัดทำแผนแก้ไขเมื่อเป็นผู้รับผิดชอบ",
+    "ops": "จัดทำแผนแก้ไขเมื่อเป็นผู้รับผิดชอบ",
+    "mgt": "ตรวจรับแผนและติดตามความคืบหน้าในบทบาท CMM"
+   },
+   "with": [
+    "ผู้รับผิดชอบ",
+    "CMM"
+   ],
+   "sys": "audit",
+   "public": false,
+   "kw": [
+    "แผนแก้ไข",
+    "แก้ไข",
+    "cap",
+    "corrective action plan",
+    "ป้องกันการเกิดซ้ำ"
+   ]
+  },
+  {
    "doc": "",
    "code": "",
    "abbr": "ACPL-TR",
