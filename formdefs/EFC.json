@@ -703,6 +703,534 @@
    },
    "fields": [
     {
+     "k": "reportCourse",
+     "type": "select",
+     "label": {
+      "th": "หลักสูตรที่รายงานผล (TrainHub)",
+      "en": "Course being reported (TrainHub)"
+     },
+     "hint": {
+      "th": "เลือกแล้วรายวิชาของหลักสูตรนั้นจะขึ้นในตารางด้านล่าง · ถ้ามาจากลิงก์ TrainHub ตารางถูกเติมมาแล้ว ไม่ต้องเลือก",
+      "en": "Choosing a course fills the subject table below. Coming from a TrainHub link, it is already filled."
+     },
+     "seedInto": "s7",
+     "opt": [
+      {
+       "v": "f09c1566-9212-48b6-9758-7c13273af7fe",
+       "n": {
+        "th": "Cessna  T206H Familiarization",
+        "en": "Cessna  T206H Familiarization"
+       },
+       "seed": [
+        {
+         "subject": "C T206H Familiarization",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        }
+       ]
+      },
+      {
+       "v": "f758880b-7f2f-4265-a84c-8333cc18210f",
+       "n": {
+        "th": "D-0507 Accountable Manager Programme",
+        "en": "D-0507 Accountable Manager Programme"
+       },
+       "seed": [
+        {
+         "subject": "S-01 Operation Manual Familiarization",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-02 Quality Assurance Familiarization",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-05 Rule and Regulation:",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-14 — Safety Management System (SMS) Training",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-15 — Emergency Response Planning (ERP)",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        }
+       ]
+      },
+      {
+       "v": "d375de64-fc87-47c5-8c0c-fed83cf2a4c4",
+       "n": {
+        "th": "D-0507 Flight Instructor Standardisation Programme",
+        "en": "D-0507 Flight Instructor Standardisation Programme"
+       },
+       "seed": [
+        {
+         "subject": "S-01 Operation Manual Familiarization",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-02 Quality Assurance Familiarization",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-04 SOP Familiarization Training",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-05 Rule and Regulation:",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-06 Human factor / Aviation Health",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-07 Airmanship",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-08 Navigational Skills",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-09 Aircraft System",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-10 Weather",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-11 — Teaching, Learning and Instructional Techniques",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-12 — Flight Safety, Incident and Accident Prevention",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-13 — Training Procedure Manual Familiarisation",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-14 — Safety Management System (SMS) Training",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-15 — Emergency Response Planning (ERP)",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        }
+       ]
+      },
+      {
+       "v": "1b0b4749-4848-4f0a-9848-c4e71fbe667d",
+       "n": {
+        "th": "D-0507 Maintenance Manager Programme",
+        "en": "D-0507 Maintenance Manager Programme"
+       },
+       "seed": [
+        {
+         "subject": "S-01 Operation Manual Familiarization",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-02 Quality Assurance Familiarization",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-09 Aircraft System",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-12 — Flight Safety, Incident and Accident Prevention",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-14 — Safety Management System (SMS) Training",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-15 — Emergency Response Planning (ERP)",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        }
+       ]
+      },
+      {
+       "v": "0b4e73dd-224f-49cf-9852-9cf935d0553d",
+       "n": {
+        "th": "D-0507 Maintenance Personnel Training",
+        "en": "D-0507 Maintenance Personnel Training"
+       },
+       "seed": [
+        {
+         "subject": "S-01 Operation Manual Familiarization",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-02 Quality Assurance Familiarization",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-04 SOP Familiarization Training",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-09 Aircraft System",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-12 — Flight Safety, Incident and Accident Prevention",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-14 — Safety Management System (SMS) Training",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-15 — Emergency Response Planning (ERP)",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        }
+       ]
+      },
+      {
+       "v": "538737cb-c947-48e8-8543-97e0d408ab54",
+       "n": {
+        "th": "D-0507 Theoretical Knowledge Instructor Programme",
+        "en": "D-0507 Theoretical Knowledge Instructor Programme"
+       },
+       "seed": [
+        {
+         "subject": "S-01 Operation Manual Familiarization",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-02 Quality Assurance Familiarization",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-04 SOP Familiarization Training",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-05 Rule and Regulation:",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-06 Human factor / Aviation Health",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-07 Airmanship",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-11 — Teaching, Learning and Instructional Techniques",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-12 — Flight Safety, Incident and Accident Prevention",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-13 — Training Procedure Manual Familiarisation",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-14 — Safety Management System (SMS) Training",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-15 — Emergency Response Planning (ERP)",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        }
+       ]
+      },
+      {
+       "v": "9205fce4-ea12-41a5-b648-469b9e8794f6",
+       "n": {
+        "th": "PPL Ground School",
+        "en": "PPL Ground School"
+       },
+       "seed": [
+        {
+         "subject": "010 Airlaw",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "021 Aircraft General Knowledge",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "031 Mass and Balance",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "032 Performance (Aeroplane)",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "033 FLIGHT PLANNING AND MONITORING",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "040 HUMAN PERFORMANCE AND LIMITATIONS",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "050 Meteorology",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "061 GENERAL NAVIGATION",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "062 RADIO NAVIGATION",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "070 OPERATIONAL PROCEDURES",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "081 PRINCIPLES OF FLIGHT (AEROPLANE)",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "091 VFR COMMUNICATIONS",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        }
+       ]
+      },
+      {
+       "v": "ae8eb145-dd0d-4924-af29-a0f2168fb2b9",
+       "n": {
+        "th": "Safety Management Manual",
+        "en": "Safety Management Manual"
+       },
+       "seed": [
+        {
+         "subject": "Safety Management System",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        }
+       ]
+      },
+      {
+       "v": "3a34964c-ca0b-4347-84a3-448ea18c5331",
+       "n": {
+        "th": "Staff Training",
+        "en": "Staff Training"
+       },
+       "seed": [
+        {
+         "subject": "S-01 Operation Manual Familiarization",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-02 Quality Assurance Familiarization",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-03 Safety Management Familiarization",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-04 SOP Familiarization Training",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-05 Rule and Regulation:",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-06 Human factor / Aviation Health",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-07 Airmanship",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-08 Navigational Skills",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-09 Aircraft System",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-10 Weather",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-11 — Teaching, Learning and Instructional Techniques",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-12 — Flight Safety, Incident and Accident Prevention",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-13 — Training Procedure Manual Familiarisation",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-14 — Safety Management System (SMS) Training",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        },
+        {
+         "subject": "S-15 — Emergency Response Planning (ERP)",
+         "score": null,
+         "result": "",
+         "passedOn": ""
+        }
+       ]
+      }
+     ]
+    },
+    {
      "k": "s7",
      "type": "table",
      "req": false,

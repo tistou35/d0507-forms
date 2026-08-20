@@ -749,10 +749,38 @@
         self.set(k, arr.length ? arr : [{}]); rerender();
       }));
 
+    /* ── เลือกคอร์สแล้วเติมรายวิชาลงตาราง ────────────────────
+       กติกาที่สำคัญที่สุด: เติมเฉพาะตอนตารางยังว่างจริง
+
+       คนที่มาจากลิงก์ TrainHub จะได้ทั้งคอร์สและผลรายวิชามาพร้อมกัน
+       ถ้าเติมทับ จะล้างคะแนน ผล และวันที่ที่ส่งมาทิ้ง เหลือแต่ชื่อวิชา
+       กลายเป็นต้องกรอกเองทุกช่อง ซึ่งทำลายจุดประสงค์ทั้งหมด
+
+       คนที่เปลี่ยนคอร์สเองทีหลังทั้งที่กรอกไปแล้ว ต้องถามก่อนล้าง */
+    const blankRow = r => !r || Object.keys(r).every(c => r[c] === '' || r[c] == null);
+    FormKit.prototype._seed = function (f, val, ask) {
+      const tgt = f.seedInto, opt = (f.opt || []).find(o => String(o.v) === String(val));
+      if (!tgt || !opt || !Array.isArray(opt.seed)) return;
+      const cur = this.data[tgt];
+      const empty = !Array.isArray(cur) || !cur.length || cur.every(blankRow);
+      if (!empty) {
+        if (!ask) return;                       // มาจากลิงก์ — ของที่ส่งมาสมบูรณ์กว่า ห้ามแตะ
+        const msg = this.lang === 'en'
+          ? 'Changing the course clears the subject results already entered. Continue?'
+          : 'เปลี่ยนคอร์สจะล้างผลรายวิชาที่กรอกไว้ ยืนยันหรือไม่';
+        if (!global.confirm(msg)) return;
+      }
+      this.set(tgt, opt.seed.map(r => Object.assign({}, r)));
+    };
+
     el.querySelectorAll('.fk-opt[data-k],.fk-grade button[data-k]').forEach(b =>
       b.addEventListener('click', () => {
         const raw = b.dataset.v;
-        self.set(b.dataset.k, isNaN(Number(raw)) ? raw : Number(raw));
+        const val = isNaN(Number(raw)) ? raw : Number(raw);
+        self.set(b.dataset.k, val);
+        // ผู้ใช้กดเลือกเอง จึงถามก่อนล้างได้ (ต่างจากค่าที่มาจากลิงก์)
+        const f = self.fields[b.dataset.k];
+        if (f && f.seedInto) self._seed(f, val, true);
         rerender();
       }));
 

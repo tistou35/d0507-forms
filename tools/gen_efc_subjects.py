@@ -31,88 +31,62 @@ OPTS = [OD([("v", "S"), ("n", OD([("th", "ผ่าน"), ("en", "Satisfied")]))
 
 
 def build(cat):
-    courses = cat.get('courses') or []
-    dflt = cat.get('defaultScoreMax') or 100
+    """ช่องเลือกคอร์ส พร้อมรายวิชาของแต่ละคอร์สไว้เติมลงตาราง s7
 
-    pick = OD([
-        ("k", "reportCourse"), ("type", "select"), ("req", True),
-        ("label", OD([("th", "หลักสูตรที่รายงานผล"), ("en", "Course being reported")])),
-        ("hint", OD([("th", "เลือกแล้วรายวิชาของหลักสูตรนั้นจะขึ้นด้านล่าง"),
-                     ("en", "Choosing a course shows its subjects below")])),
+    เติมชื่อวิชาอย่างเดียว ไม่เติมคะแนน/ผล/วันที่ — สองอย่างนั้นเป็นข้อเท็จจริง
+    ที่ต้องมาจาก TrainHub หรือจากผู้ลงนาม ไม่ใช่จากหลักสูตร
+
+    ชื่อวิชาต้องตรงกับที่ prefill ส่งมาเป๊ะ (ตกลงกับ trainhub-spec-63 แล้วว่า
+    ส่งชื่อเปล่าไม่มีเลขลำดับนำหน้า) ไม่งั้นเวลาเทียบกันจะดูเหมือนคนละวิชา
+    """
+    courses = [c for c in (cat.get('courses') or []) if c.get('use')]
+    return OD([
+        ("k", "reportCourse"), ("type", "select"),
+        ("label", OD([("th", "หลักสูตรที่รายงานผล (TrainHub)"),
+                      ("en", "Course being reported (TrainHub)")])),
+        ("hint", OD([("th", "เลือกแล้วรายวิชาของหลักสูตรนั้นจะขึ้นในตารางด้านล่าง "
+                            "· ถ้ามาจากลิงก์ TrainHub ตารางถูกเติมมาแล้ว ไม่ต้องเลือก"),
+                     ("en", "Choosing a course fills the subject table below. "
+                            "Coming from a TrainHub link, it is already filled.")])),
+        ("seedInto", "s7"),
         ("opt", [OD([("v", c['id']),
-                     ("n", OD([("th", c.get('nameTh') or c['name']), ("en", c['name'])]))])
+                     ("n", OD([("th", c['name']), ("en", c['name'])])),
+                     ("seed", [OD([("subject", s['name']), ("score", None),
+                                   ("result", ""), ("passedOn", "")])
+                               for s in c['subjects']])])
                  for c in courses]),
     ])
-
-    secs = []
-    for c in courses:
-        items = []
-        for s in c.get('subjects') or []:
-            it = OD([("id", s['id']),
-                     ("th", s.get('nameTh') or s['name']),
-                     ("en", s['name'])])
-            if s.get('group'):
-                it['how'] = s['group']
-            items.append(it)
-        if not items:
-            print('  ⚠️ %s ไม่มีรายวิชา — ข้าม' % c['id'])
-            continue
-        secs.append(OD([
-            ("k", "SUB_" + c['id'].upper()),
-            ("tab", "T2"), ("party", "ht"),
-            ("showIf", "reportCourse == '%s'" % c['id']),
-            ("title", OD([("th", c.get('nameTh') or c['name']), ("en", c['name'])])),
-            ("fields", [OD([
-                ("k", "sub_" + c['id']), ("type", "checklist"), ("req", True),
-                ("label", OD([("th", "คะแนนและผลรายวิชา"),
-                              ("en", "Subject score and result")])),
-                ("score", True),
-                ("scoreMax", c.get('scoreMax') or dflt),
-                ("opts", OPTS),
-                ("items", items),
-            ])]),
-        ]))
-    return pick, secs
 
 
 def main(argv):
     dry = '-n' in argv
     cat = json.load(open(CAT, encoding='utf-8'))
-    if not (cat.get('courses') or []):
-        sys.exit('ยังไม่มีข้อมูลหลักสูตรใน %s\n'
-                 'ต้องได้รายการคอร์สและรายวิชาจาก TrainHub ก่อน — ห้ามพิมพ์เอง'
-                 % os.path.relpath(CAT, HERE))
+    use = [c for c in (cat.get('courses') or []) if c.get('use')]
+    if not use:
+        sys.exit('ยังไม่มีหลักสูตรที่ใช้ได้ใน %s' % os.path.relpath(CAT, HERE))
 
     d = json.load(open(DEF, encoding='utf-8'), object_pairs_hook=OD)
-    pick, secs = build(cat)
+    pick = build(cat)
 
-    # ตัดของเดิมที่เคยสร้างไว้ออกก่อน แล้วใส่ชุดใหม่ — จะได้ไม่ค้างของหลักสูตรที่ถูกยกเลิก
-    d['sections'] = [s for s in d['sections'] if not str(s.get('k', '')).startswith('SUB_')]
+    s7 = next((s for s in d['sections'] if any(f['k'] == 's7' for f in s.get('fields', []))), None)
+    if s7 is None:
+        sys.exit('ไม่พบ section ที่มีตาราง s7 ใน EFC.json')
+
+    s7['fields'] = [pick] + [f for f in s7['fields'] if f.get('k') != 'reportCourse']
     for s in d['sections']:
-        s['fields'] = [f for f in s.get('fields', []) if f.get('k') != 'reportCourse']
+        if s is not s7:
+            s['fields'] = [f for f in s.get('fields', []) if f.get('k') != 'reportCourse']
 
-    # ช่องเลือกหลักสูตรอยู่ต้นแท็บรายวิชา ก่อนคำอธิบาย
-    r = next((s for s in d['sections'] if s.get('k') == 'R'), None)
-    if r is None:
-        sys.exit('ไม่พบ section R (แท็บรายวิชา) ใน EFC.json')
-    r['fields'] = [pick] + [f for f in r['fields'] if f.get('k') != 'reportCourse']
-
-    i = d['sections'].index(r) + 1
-    d['sections'][i:i] = secs
-
-    n_sub = sum(len(s['fields'][0]['items']) for s in secs)
-    print('หลักสูตร %d · รายวิชารวม %d · section ที่สร้าง %d'
-          % (len(pick['opt']), n_sub, len(secs)))
-    for s in secs:
-        print('   %-16s %2d วิชา  showIf: %s'
-              % (s['k'], len(s['fields'][0]['items']), s['showIf']))
+    print('หลักสูตรที่เลือกได้ %d · รายวิชารวม %d'
+          % (len(use), sum(len(c['subjects']) for c in use)))
+    for c in use:
+        print('   %-52s %2d วิชา' % (c['name'][:52], len(c['subjects'])))
     if dry:
         print('\nไม่ได้เขียนไฟล์ — เอา -n ออกเพื่อเขียนจริง')
         return 0
     json.dump(d, open(DEF, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     open(DEF, 'a', encoding='utf-8').write('\n')
     print('\nเขียน formdefs/EFC.json แล้ว — ขั้นต่อไป: python3 build.py')
-    print('แล้วอย่าลืม tools/make_tokenmap.py EFC + importTemplate ให้แม่แบบ PDF ตรงกัน')
     return 0
 
 
