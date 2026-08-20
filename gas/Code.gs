@@ -302,6 +302,7 @@ function makePdf_(folder, abbr, s) {
       part.replaceText('\\{\\{k_[a-zA-Z0-9_\\-]+\\}\\}', '☐');
       part.replaceText('\\{\\{[a-zA-Z0-9_]+\\}\\}', '');   // token อื่นที่เหลือให้ว่างไว้
     });
+    overflowNote_(b, data);
     dropEmptyRows_(b);
     doc.saveAndClose();
     blob = copy.getAs('application/pdf').setName(name);
@@ -484,35 +485,40 @@ function attach_(body, who) {
 /**
  * ชื่อวิชาพร้อมผลสอบ สำหรับคอลัมน์เดียวบนกระดาษ
  *
- * ตัดสินจากข้อมูลของผู้เรียนคนนั้น ไม่ใช่จากหลักสูตร — ในหลักสูตรทุกวิชามีสอบ
- * แต่ผู้เรียนอาจไม่มีผลสอบรายวิชาแล้วผ่านด้วยการสอบท้ายคอร์สแทน
+ * ── ทำไมต้องเป็นรายการที่อนุญาต ไม่ใช่การอนุมานจากคะแนน ──────
+ * TrainHub ส่ง result มา 5 สถานะ และสองในนั้นมาพร้อม score เป็น null เหมือนกัน
+ *   Completed  วิชานี้ไม่มีชุดข้อสอบของตัวเอง และดูวิดีโอครบแล้ว
+ *   รอสอบ      มีข้อสอบ ดูวิดีโอครบ แต่ยังไม่ได้สอบเลยสักครั้ง
  *
- * ไม่เดาแทนคนกรอก: ถ้าไม่มีทั้งผลรายวิชาและผลท้ายคอร์ส คืนชื่อวิชาเปล่า
- * เติม [Completed] ให้ทั้งที่ยังไม่มีหลักฐาน จะกลายเป็นบันทึกที่อ้างเกินจริง
+ * ถ้าตัดสินจาก "ไม่มีคะแนน" อย่างเดียว รอสอบ จะถูกพิมพ์เป็น [Completed]
+ * กลายเป็นบันทึกว่าเรียนจบวิชานั้นแล้ว ทั้งที่ยังไม่เคยสอบ
+ * เป็นเอกสารที่ CAAT ตรวจ จึงต้องดูค่าที่ระบบต้นทางบอกมาตรง ๆ เท่านั้น
+ *
+ * สถานะที่ไม่รู้จักตกไปที่ "ชื่อวิชาเปล่า" เสมอ — ถ้า TrainHub เพิ่มสถานะใหม่
+ * แล้วไม่มีใครบอก เอกสารจะเงียบไว้ ดีกว่าพิมพ์สิ่งที่ไม่จริง
  */
 function rowShown_(row, data) {
   row = row || {}; data = data || {};
   var name = String(row.subject || row.learner || '').trim();
   if (!name) return '';
 
-  var hasScore = row.score !== null && row.score !== undefined && row.score !== '';
   var res = String(row.result || '').trim();
+  var sc = row.score;
+  var hasScore = sc !== null && sc !== undefined && sc !== '';
 
-  if (hasScore && res) {
-    var pass = /ผ่าน/.test(res) && !/ไม่ผ่าน/.test(res);
-    return name + ' [(' + row.score + '): ' + (pass ? 'pass' : 'fail') + ']';
+  if (res === 'ผ่าน')    return name + (hasScore ? ' [(' + sc + '): pass]' : ' [pass]');
+  if (res === 'ไม่ผ่าน')  return name + (hasScore ? ' [(' + sc + '): fail]' : ' [fail]');
+  if (/^completed$/i.test(res)) return name + ' [Completed]';
+
+  /* ไม่มีผลจากต้นทางเลย (แถวที่คนกรอกเองจากรายวิชาที่ระบบเติมให้)
+     ใช้กติกาที่เจ้าของงานกำหนด — จบด้วยการสอบท้ายคอร์ส/ท้ายขั้นที่ผ่านแล้ว */
+  if (!res && !hasScore) {
+    var ct = String(data.examType || '');
+    var done = (ct === 'endcourse' || ct === 'endflight' || ct === 'stage')
+               && String(data.result || '') === 'passed';
+    return done ? name + ' [Completed]' : name;
   }
-
-  /* TrainHub บอกมาตรง ๆ ว่ายังไม่จบ — ห้ามเติม [Completed] เด็ดขาด
-     เคยพลาดตอนทดสอบ: แถว "ยังไม่จบ" ที่ไม่มีคะแนน เข้าเงื่อนไขท้ายคอร์สผ่าน
-     แล้วได้ [Completed] ทั้งที่ระบบบอกชัดว่ายังไม่จบ = บันทึกเท็จ */
-  if (/ยังไม่จบ|ไม่ผ่าน|not\s*complete/i.test(res)) return name;
-
-  // ไม่มีผลรายวิชา — ดูว่าสอบท้ายคอร์ส/ท้ายขั้นผ่านแล้วหรือยัง
-  var ct = String(data.examType || '');
-  var courseDone = (ct === 'endcourse' || ct === 'endflight' || ct === 'stage')
-                   && String(data.result || '') === 'passed';
-  return courseDone ? name + ' [Completed]' : name;
+  return name;                       // รอสอบ · ยังไม่จบ · สถานะที่ยังไม่รู้จัก
 }
 
 
@@ -541,4 +547,34 @@ function dropEmptyRows_(body) {
     }
   }
   if (gone) Logger.log('ลบแถวว่างในเอกสาร %s แถว', gone);
+}
+
+
+/**
+ * เตือนเมื่อข้อมูลมีมากกว่าที่กระดาษรองรับ
+ *
+ * ตารางใน Word ขยายเองไม่ได้ แม่แบบเผื่อแถวไว้จำนวนหนึ่ง (EFC เผื่อ 18 แถว)
+ * ถ้าหลักสูตรไหนมีวิชามากกว่านั้น แถวส่วนเกินจะไม่ถูกพิมพ์ และไม่มีอะไรบอก
+ * เอกสารจะดูสมบูรณ์ทั้งที่ขาดข้อมูล ซึ่งอันตรายกว่าเอกสารที่ขาดแล้วรู้ตัว
+ *
+ * นับ token ที่แม่แบบมีจริง เทียบกับจำนวนแถวข้อมูล แล้วเขียนบรรทัดเตือนลงเอกสาร
+ * ให้คนที่เปิดอ่านเห็น ไม่ใช่แค่ขึ้นใน log ที่ไม่มีใครดู
+ */
+function overflowNote_(body, data) {
+  var txt = body.getText();
+  Object.keys(data || {}).forEach(function (k) {
+    var v = data[k];
+    if (!Array.isArray(v) || !v.length || typeof v[0] !== 'object') return;
+    var slots = 0;
+    for (var i = 1; i <= 200; i++) {
+      if (txt.indexOf('{{' + k + '_' + i + '_') >= 0) slots = i; else if (i > 1) break;
+    }
+    if (!slots || v.length <= slots) return;
+    var over = v.length - slots;
+    body.appendParagraph('⚠️ มีข้อมูลเกินที่เอกสารรองรับ ' + over + ' รายการ ' +
+      '(ตาราง ' + k + ' มี ' + v.length + ' แถว แต่แบบฟอร์มพิมพ์ได้ ' + slots + ') ' +
+      '— ต้องแนบต่อท้ายหรือขยายแบบฟอร์ม')
+      .setAttributes({ FOREGROUND_COLOR: '#B42318', BOLD: true, FONT_SIZE: 9 });
+    Logger.log('🔴 %s มี %s แถว เกินที่แม่แบบรองรับ %s', k, v.length, slots);
+  });
 }
