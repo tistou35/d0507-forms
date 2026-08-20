@@ -225,6 +225,7 @@ function flatten_(data) {
            แต่สอบท้ายคอร์สผ่าน  → "ชื่อวิชา [Completed]"
            นอกนั้น              → ชื่อวิชาเปล่า ๆ ไม่เติมอะไรที่ไม่มีหลักฐานรองรับ */
         out[k + '_' + (i + 1) + '_shown'] = rowShown_(row, data);
+        out[k + '_' + (i + 1) + '_mark'] = rowMark_(row, data);
       });
       out[k] = v.length;                       // ไว้ใช้เป็นจำนวนแถวที่กรอกจริง
       return;
@@ -498,17 +499,36 @@ function attach_(body, who) {
  * แล้วไม่มีใครบอก เอกสารจะเงียบไว้ ดีกว่าพิมพ์สิ่งที่ไม่จริง
  */
 function rowShown_(row, data) {
-  row = row || {}; data = data || {};
-  var name = String(row.subject || row.learner || '').trim();
+  var name = String((row || {}).subject || (row || {}).learner || '').trim();
   if (!name) return '';
+  var m = rowMark_(row, data);
+  return m ? name + ' ' + m : name;
+}
 
+/**
+ * เฉพาะส่วนผลสอบ สำหรับคอลัมน์ที่สองของตาราง — คืน '' เมื่อไม่มีผลที่ยืนยันได้
+ *
+ * ── ทำไมต้องเป็นรายการที่อนุญาต ไม่ใช่การอนุมานจากคะแนน ──────
+ * TrainHub ส่ง result มา 5 สถานะ และสองในนั้นมาพร้อม score เป็น null เหมือนกัน
+ *   Completed  วิชานั้นไม่มีชุดข้อสอบของตัวเอง และดูวิดีโอครบแล้ว
+ *   รอสอบ      มีข้อสอบ ดูวิดีโอครบ แต่ยังไม่เคยสอบเลยสักครั้ง
+ *
+ * ถ้าตัดสินจาก "ไม่มีคะแนน" อย่างเดียว รอสอบ จะถูกพิมพ์เป็น [Completed]
+ * กลายเป็นบันทึกว่าเรียนจบวิชานั้นแล้ว ทั้งที่ยังไม่เคยสอบ
+ * เป็นเอกสารที่ CAAT ตรวจ จึงต้องดูค่าที่ระบบต้นทางบอกมาตรง ๆ เท่านั้น
+ *
+ * สถานะที่ไม่รู้จักคืนค่าว่างเสมอ — ถ้า TrainHub เพิ่มสถานะใหม่แล้วไม่มีใครบอก
+ * ช่องผลจะว่างไว้ ดีกว่าพิมพ์สิ่งที่ไม่จริง
+ */
+function rowMark_(row, data) {
+  row = row || {}; data = data || {};
   var res = String(row.result || '').trim();
   var sc = row.score;
   var hasScore = sc !== null && sc !== undefined && sc !== '';
 
-  if (res === 'ผ่าน')    return name + (hasScore ? ' [(' + sc + '): pass]' : ' [pass]');
-  if (res === 'ไม่ผ่าน')  return name + (hasScore ? ' [(' + sc + '): fail]' : ' [fail]');
-  if (/^completed$/i.test(res)) return name + ' [Completed]';
+  if (res === 'ผ่าน')    return hasScore ? '[(' + sc + '): pass]' : '[pass]';
+  if (res === 'ไม่ผ่าน')  return hasScore ? '[(' + sc + '): fail]' : '[fail]';
+  if (/^completed$/i.test(res)) return '[Completed]';
 
   /* ไม่มีผลจากต้นทางเลย (แถวที่คนกรอกเองจากรายวิชาที่ระบบเติมให้)
      ใช้กติกาที่เจ้าของงานกำหนด — จบด้วยการสอบท้ายคอร์ส/ท้ายขั้นที่ผ่านแล้ว */
@@ -516,9 +536,9 @@ function rowShown_(row, data) {
     var ct = String(data.examType || '');
     var done = (ct === 'endcourse' || ct === 'endflight' || ct === 'stage')
                && String(data.result || '') === 'passed';
-    return done ? name + ' [Completed]' : name;
+    return done ? '[Completed]' : '';
   }
-  return name;                       // รอสอบ · ยังไม่จบ · สถานะที่ยังไม่รู้จัก
+  return '';                          // รอสอบ · ยังไม่จบ · สถานะที่ยังไม่รู้จัก
 }
 
 
