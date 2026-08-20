@@ -217,6 +217,14 @@ function flatten_(data) {
           var cv = row[c];
           out[k + '_' + (i + 1) + '_' + c] = typeof cv === 'string' ? docDate_(cv) : (cv == null ? '' : cv);
         });
+        /* ชื่อวิชาพร้อมผล — กระดาษมีคอลัมน์เดียวสำหรับ "Subject / Course Content"
+           จึงต้องรวมชื่อกับผลไว้ในช่องเดียว ให้อ่านได้ว่าผ่านด้วยอะไร
+
+           มีผลสอบท้ายวิชา      → "ชื่อวิชา [(90): pass]"
+           ไม่มีผลสอบท้ายวิชา
+           แต่สอบท้ายคอร์สผ่าน  → "ชื่อวิชา [Completed]"
+           นอกนั้น              → ชื่อวิชาเปล่า ๆ ไม่เติมอะไรที่ไม่มีหลักฐานรองรับ */
+        out[k + '_' + (i + 1) + '_shown'] = rowShown_(row, data);
       });
       out[k] = v.length;                       // ไว้ใช้เป็นจำนวนแถวที่กรอกจริง
       return;
@@ -469,4 +477,39 @@ function attach_(body, who) {
   }
   Logger.log('แนบไฟล์ %s (%s ไบต์) โดย %s', f.getName(), bytes.length, who.email || 'anonymous');
   return { id: f.getId(), name: name, size: bytes.length, url: f.getUrl() };
+}
+
+
+/**
+ * ชื่อวิชาพร้อมผลสอบ สำหรับคอลัมน์เดียวบนกระดาษ
+ *
+ * ตัดสินจากข้อมูลของผู้เรียนคนนั้น ไม่ใช่จากหลักสูตร — ในหลักสูตรทุกวิชามีสอบ
+ * แต่ผู้เรียนอาจไม่มีผลสอบรายวิชาแล้วผ่านด้วยการสอบท้ายคอร์สแทน
+ *
+ * ไม่เดาแทนคนกรอก: ถ้าไม่มีทั้งผลรายวิชาและผลท้ายคอร์ส คืนชื่อวิชาเปล่า
+ * เติม [Completed] ให้ทั้งที่ยังไม่มีหลักฐาน จะกลายเป็นบันทึกที่อ้างเกินจริง
+ */
+function rowShown_(row, data) {
+  row = row || {}; data = data || {};
+  var name = String(row.subject || row.learner || '').trim();
+  if (!name) return '';
+
+  var hasScore = row.score !== null && row.score !== undefined && row.score !== '';
+  var res = String(row.result || '').trim();
+
+  if (hasScore && res) {
+    var pass = /ผ่าน/.test(res) && !/ไม่ผ่าน/.test(res);
+    return name + ' [(' + row.score + '): ' + (pass ? 'pass' : 'fail') + ']';
+  }
+
+  /* TrainHub บอกมาตรง ๆ ว่ายังไม่จบ — ห้ามเติม [Completed] เด็ดขาด
+     เคยพลาดตอนทดสอบ: แถว "ยังไม่จบ" ที่ไม่มีคะแนน เข้าเงื่อนไขท้ายคอร์สผ่าน
+     แล้วได้ [Completed] ทั้งที่ระบบบอกชัดว่ายังไม่จบ = บันทึกเท็จ */
+  if (/ยังไม่จบ|ไม่ผ่าน|not\s*complete/i.test(res)) return name;
+
+  // ไม่มีผลรายวิชา — ดูว่าสอบท้ายคอร์ส/ท้ายขั้นผ่านแล้วหรือยัง
+  var ct = String(data.examType || '');
+  var courseDone = (ct === 'endcourse' || ct === 'endflight' || ct === 'stage')
+                   && String(data.result || '') === 'passed';
+  return courseDone ? name + ' [Completed]' : name;
 }
