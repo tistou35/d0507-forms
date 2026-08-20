@@ -381,8 +381,17 @@
     let body = '';
 
     switch (f.type) {
-      case 'static':
-        return `<div class="fk-f"><div class="fk-static">${L(f.text || f.label, this.lang)}</div></div>`;
+      /* {คีย์} ในข้อความจะถูกแทนด้วยค่าที่กรอกไว้
+         ใช้เมื่อคำอธิบายต้องอ้างถึงสิ่งที่ผู้ใช้เลือก เช่นแท็บรายวิชาของ EFC
+         ต้องบอกว่ากำลังรายงานหลักสูตรไหน ไม่งั้นเห็นแต่รายชื่อวิชาลอย ๆ
+         ยังไม่มีค่า = แทนด้วย — ไม่ปล่อยให้ {course} โผล่ให้ผู้ใช้เห็น */
+      case 'static': {
+        const raw = L(f.text || f.label, this.lang);
+        const ctx = Object.assign({}, this.data, this.computed());
+        return `<div class="fk-f"><div class="fk-static">${
+          String(raw).replace(/\{([a-zA-Z0-9_]+)\}/g, (m, k) =>
+            esc(ctx[k] == null || ctx[k] === '' ? '—' : String(ctx[k])))}</div></div>`;
+      }
 
       /* ไฟล์แนบ — ใช้เมื่อผลลัพธ์ออกมาจากระบบอื่นแล้ว ไม่ต้องกรอกซ้ำทีละหัวข้อ
          เก็บเฉพาะข้อมูลย่อของไฟล์ (id ชื่อ ขนาด) ตัวไฟล์ขึ้นไปอยู่ Drive ทันทีที่เลือก

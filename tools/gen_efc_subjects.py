@@ -72,10 +72,19 @@ def main(argv):
     if s7 is None:
         sys.exit('ไม่พบ section ที่มีตาราง s7 ใน EFC.json')
 
-    s7['fields'] = [pick] + [f for f in s7['fields'] if f.get('k') != 'reportCourse']
+    # บรรทัดบอกหลักสูตรที่กำลังรายงาน — ต้องเห็นคู่กับรายวิชาเสมอ
+    # รายชื่อวิชาลอย ๆ โดยไม่บอกว่าของหลักสูตรไหน ตรวจย้อนหลังไม่ได้
+    head = OD([
+        ("k", "courseHead"), ("type", "static"),
+        ("text", OD([("th", "หลักสูตร: {course}\nรายวิชาและผลด้านล่างเป็นของหลักสูตรนี้"),
+                     ("en", "Course: {course}\nThe subjects and results below belong to this course")])),
+    ])
+    keep = [f for f in s7['fields'] if f.get('k') not in ('reportCourse', 'courseHead')]
+    s7['fields'] = [pick, head] + keep
     for s in d['sections']:
         if s is not s7:
-            s['fields'] = [f for f in s.get('fields', []) if f.get('k') != 'reportCourse']
+            s['fields'] = [f for f in s.get('fields', [])
+                           if f.get('k') not in ('reportCourse', 'courseHead')]
 
     print('หลักสูตรที่เลือกได้ %d · รายวิชารวม %d'
           % (len(use), sum(len(c['subjects']) for c in use)))

@@ -1231,6 +1231,14 @@
      ]
     },
     {
+     "k": "courseHead",
+     "type": "static",
+     "text": {
+      "th": "หลักสูตร: {course}\nรายวิชาและผลด้านล่างเป็นของหลักสูตรนี้",
+      "en": "Course: {course}\nThe subjects and results below belong to this course"
+     }
+    },
+    {
      "k": "s7",
      "type": "table",
      "req": false,
