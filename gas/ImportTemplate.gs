@@ -79,10 +79,19 @@ function copyAsDoc_(fileId, name, parentId) {
 
 /** หาไฟล์ .docx ใน Drive ทั้งบัญชี — ชื่อต้องตรงเป๊ะ */
 function findDocx_(name) {
-  var it = DriveApp.getFilesByName(name);
-  if (!it.hasNext())
+  /* ชื่อไฟล์เดียวกันอาจมีหลายฉบับใน Drive — ออกฉบับแก้ไขแล้วอัปโหลดทับชื่อเดิม
+     ฉบับเก่ายังอยู่จนกว่าจะลบ ถ้าหยิบตัวแรกที่เจอจะได้ฉบับไหนก็ได้
+     แม่แบบที่สร้างจากฉบับเก่าจะดูปกติทุกอย่าง ไม่มีอะไรเตือน
+     จึงยึดฉบับที่แก้ไขล่าสุดเสมอ และบอกให้รู้เมื่อเจอมากกว่าหนึ่ง */
+  var it = DriveApp.getFilesByName(name), all = [];
+  while (it.hasNext()) all.push(it.next());
+  if (!all.length)
     throw new Error('ไม่พบ ' + name + ' ใน Drive — อัปโหลดไฟล์นี้เข้า Drive ก่อน (วางที่ไหนก็ได้)');
-  return it.next();
+  all.sort(function (a, b) { return b.getLastUpdated() - a.getLastUpdated(); });
+  if (all.length > 1)
+    Logger.log('⚠️ %s มี %s ฉบับใน Drive — ใช้ฉบับที่แก้ไขล่าสุด (%s) ลบฉบับเก่าทิ้งด้วย',
+      name, all.length, Utilities.formatDate(all[0].getLastUpdated(), 'Asia/Bangkok', 'dd MMM yyyy HH:mm'));
+  return all[0];
 }
 
 function fillTokens_(doc, map) {

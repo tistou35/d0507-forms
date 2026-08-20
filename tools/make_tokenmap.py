@@ -336,6 +336,14 @@ def build(abbr, verbose=False):
                               'label': (lb.get('en') if isinstance(lb, dict) else lb) or tok,
                               'labelTh': (lb.get('th') if isinstance(lb, dict) else '') or ''})
 
+    # skipTables: กระดาษไม่ได้วางตารางนั้นเป็นคอลัมน์แยกแล้ว
+    # EFC รวมชื่อวิชากับผลไว้คอลัมน์เดียว ({{s7_N_shown}}) ตามที่เอกสารฉบับแก้ไขทำ
+    # ถ้าไม่กัน ตัวสร้างจะพยายามหาหัวคอลัมน์ที่ไม่มีแล้ว แล้วโยน token ทั้งชุด
+    # ไปกองในบล็อก "ยังไม่ได้วาง" ท้ายเอกสาร (ของจริงเคยได้ 33 รายการ)
+    st = set(ov.get('skipTables') or [])
+    if st:
+        tables = [t for t in tables if t.get('k') not in st]
+
     skip = set(ov.get('skip') or [])
     if skip:
         boxes = [b for b in boxes if b['tok'] not in skip]

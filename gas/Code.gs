@@ -302,6 +302,7 @@ function makePdf_(folder, abbr, s) {
       part.replaceText('\\{\\{k_[a-zA-Z0-9_\\-]+\\}\\}', '☐');
       part.replaceText('\\{\\{[a-zA-Z0-9_]+\\}\\}', '');   // token อื่นที่เหลือให้ว่างไว้
     });
+    dropEmptyRows_(b);
     doc.saveAndClose();
     blob = copy.getAs('application/pdf').setName(name);
     copy.setTrashed(true);
@@ -512,4 +513,32 @@ function rowShown_(row, data) {
   var courseDone = (ct === 'endcourse' || ct === 'endflight' || ct === 'stage')
                    && String(data.result || '') === 'passed';
   return courseDone ? name + ' [Completed]' : name;
+}
+
+
+/**
+ * ลบแถวตารางที่ว่างเปล่าหลังแทนค่าแล้ว
+ *
+ * ตารางใน Word ขยายเองไม่ได้ แม่แบบจึงต้องเผื่อแถวไว้เกินจำนวนจริง
+ * (EFC เผื่อ 18 แถวสำหรับรายวิชา แต่หลักสูตรส่วนใหญ่มี 5–15 วิชา)
+ * ถ้าไม่ลบ จะได้เอกสารที่มีแถวว่างต่อท้ายทุกใบ ดูเหมือนกรอกไม่ครบ
+ *
+ * ลบเฉพาะแถวที่ "ทุกช่องว่างหมด" — แถวที่มีข้อความคงที่อย่างหัวตาราง
+ * หรือช่องติ๊ก ☐ ที่ยังไม่ได้ติ๊ก จะไม่ถูกแตะ เพราะไม่ได้ว่าง
+ * เก็บอย่างน้อยหนึ่งแถวไว้เสมอ ตารางที่ไม่มีแถวเลยทำให้เอกสารเสีย
+ */
+function dropEmptyRows_(body) {
+  var tables = body.getTables(), gone = 0;
+  for (var t = 0; t < tables.length; t++) {
+    var tb = tables[t];
+    for (var r = tb.getNumRows() - 1; r >= 1; r--) {
+      if (tb.getNumRows() <= 1) break;
+      var row = tb.getRow(r), blank = true;
+      for (var c = 0; c < row.getNumCells(); c++) {
+        if (row.getCell(c).getText().replace(/\s/g, '') !== '') { blank = false; break; }
+      }
+      if (blank) { tb.removeRow(r); gone++; }
+    }
+  }
+  if (gone) Logger.log('ลบแถวว่างในเอกสาร %s แถว', gone);
 }
