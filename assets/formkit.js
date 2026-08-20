@@ -450,10 +450,19 @@
            EFC ใช้ 2 · SEF กับ EFM ใช้ 6 (Excellent…N/A) ตามที่กระดาษวางไว้
            ไม่ระบุ = S/U/NA แบบเดิม ฟอร์มที่ทำไว้ก่อนหน้าจึงไม่ต้องแก้ */
         const cols = f.opts || [{ v: 'S' }, { v: 'U' }, { v: 'NA' }];
+        /* score: true — มีช่องกรอกคะแนนต่อหัวข้อด้วย (EFC เอาคะแนนรายวิชามาจาก TrainHub)
+           เก็บแยกคีย์ <k>__score เพื่อไม่ให้ปนกับผลผ่าน/ไม่ผ่านที่ผูกกับช่องติ๊กบนกระดาษ
+           ปนกันเมื่อไร ตัวสร้าง token จะแยกไม่ออกว่าอันไหนคือช่อง ☐ */
+        const sc = f.score ? (this.data[f.k + '__score'] || {}) : null;
         body = (f.items || []).map(it => `
-          <div class="fk-item">
+          <div class="fk-item${f.score ? ' has-score' : ''}">
             <span class="txt">${it.id && !f.hideIds ? `<span class="id">${esc(it.id)}</span>` : ''}${esc(L(it, this.lang) || it.th || '')}
               ${it.how ? `<span class="id" style="color:var(--g-500);margin-top:3px">${esc(it.how)}</span>` : ''}</span>
+            ${f.score ? `<input class="fk-score" type="number" inputmode="decimal"
+                 data-sc="${esc(f.k)}" data-item="${esc(it.id)}"
+                 value="${sc[it.id] == null ? '' : esc(sc[it.id])}"
+                 placeholder="${esc(f.scorePh || (this.lang === 'en' ? 'Score' : 'คะแนน'))}"
+                 ${f.scoreMax != null ? `max="${esc(f.scoreMax)}"` : ''} min="0"${dis}>` : ''}
             <span class="fk-suna${cols.length > 3 ? ' many' : ''}">${cols.map(c =>
               `<button type="button" data-cl="${esc(f.k)}" data-item="${esc(it.id)}" data-v="${esc(c.v)}"
                  aria-pressed="${st[it.id] === c.v}"${dis}>${esc(c.n ? L(c.n, this.lang) : c.v)}</button>`).join('')}</span>
@@ -699,6 +708,17 @@
           say(e.message || String(e), true);
           i.value = '';
         }
+      }));
+
+    /* คะแนนรายหัวข้อ — เขียนค่าโดยไม่ rerender ระหว่างพิมพ์ กัน focus หลุด
+       เหมือนที่ทำกับ mask และตารางแถวซ้ำ */
+    el.querySelectorAll('input[data-sc]').forEach(i =>
+      i.addEventListener('change', () => {
+        const k = i.dataset.sc + '__score';
+        const cur = Object.assign({}, self.data[k] || {});
+        if (i.value === '') delete cur[i.dataset.item];
+        else cur[i.dataset.item] = Number(i.value);
+        self.set(k, cur);
       }));
 
     el.querySelectorAll('[data-fx]').forEach(b =>

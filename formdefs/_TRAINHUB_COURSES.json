@@ -1,0 +1,1000 @@
+{
+ "_README": [
+  "โครงหลักสูตร → รายวิชา ของ TrainHub ใช้สร้างแท็บรายวิชาของ EFC",
+  "",
+  "ห้ามพิมพ์รายวิชาเองจากความจำ — ฟอร์มนี้เป็นเอกสารที่ CAAT ตรวจ",
+  "ถ้ารายวิชาไม่ตรงหลักสูตรจริง จะเป็นบันทึกที่ผิด",
+  "",
+  "อัปเดตไฟล์นี้จาก TrainHub แล้วรัน  python3 tools/gen_efc_subjects.py",
+  "",
+  "use=false คือคอร์สที่ไม่ให้เลือกในฟอร์ม พร้อมเหตุผลใน why",
+  "ค่าที่บันทึกลงใบคือ id (uuid) ไม่ใช่ชื่อ — เพราะมีคอร์สชื่อซ้ำกันในระบบ"
+ ],
+ "_source": "TrainHub (ดึงโดย trainhub-spec-63 · 20 AUG 2026)",
+ "scoreModel": {
+  "scale": "percent 0-100",
+  "pass_rule": "attempt.score >= subject.passing_score",
+  "default_passing_score": 80
+ },
+ "defaultScoreMax": 100,
+ "courses": [
+  {
+   "id": "f09c1566-9212-48b6-9758-7c13273af7fe",
+   "name": "Cessna  T206H Familiarization",
+   "published": true,
+   "use": true,
+   "subjects": [
+    {
+     "id": "C T206H",
+     "uuid": "07b39aac-2856-4f75-adb2-f5bcea3a2815",
+     "name": "C T206H Familiarization",
+     "order": 1,
+     "pass": 80
+    }
+   ]
+  },
+  {
+   "id": "f758880b-7f2f-4265-a84c-8333cc18210f",
+   "name": "D-0507 Accountable Manager Programme",
+   "published": true,
+   "use": true,
+   "subjects": [
+    {
+     "id": "S-01",
+     "uuid": "35e88015-524a-4d22-ade6-048fde1b3c4f",
+     "name": "S-01 Operation Manual Familiarization",
+     "order": 1,
+     "pass": 80
+    },
+    {
+     "id": "S-02",
+     "uuid": "f2447173-c691-4156-bbbe-c74a0d33c699",
+     "name": "S-02 Quality Assurance Familiarization",
+     "order": 2,
+     "pass": 80
+    },
+    {
+     "id": "S-05",
+     "uuid": "98df1cb1-2646-472d-b7d9-8c96d0bac720",
+     "name": "S-05 Rule and Regulation:",
+     "order": 3,
+     "pass": 80
+    },
+    {
+     "id": "S-14",
+     "uuid": "84bb7b45-5599-4e0c-86ea-06d3ab9874e0",
+     "name": "S-14 — Safety Management System (SMS) Training",
+     "order": 4,
+     "pass": 80
+    },
+    {
+     "id": "S-15",
+     "uuid": "0d07793c-eec9-4a56-87a5-611984cbcfa5",
+     "name": "S-15 — Emergency Response Planning (ERP)",
+     "order": 5,
+     "pass": 80
+    }
+   ]
+  },
+  {
+   "id": "d375de64-fc87-47c5-8c0c-fed83cf2a4c4",
+   "name": "D-0507 Flight Instructor Standardisation Programme",
+   "published": true,
+   "use": true,
+   "subjects": [
+    {
+     "id": "S-01",
+     "uuid": "35e88015-524a-4d22-ade6-048fde1b3c4f",
+     "name": "S-01 Operation Manual Familiarization",
+     "order": 1,
+     "pass": 80
+    },
+    {
+     "id": "S-02",
+     "uuid": "f2447173-c691-4156-bbbe-c74a0d33c699",
+     "name": "S-02 Quality Assurance Familiarization",
+     "order": 2,
+     "pass": 80
+    },
+    {
+     "id": "S-04",
+     "uuid": "07166f99-e574-4815-b524-59acaf5faaf6",
+     "name": "S-04 SOP Familiarization Training",
+     "order": 3,
+     "pass": 80
+    },
+    {
+     "id": "S-05",
+     "uuid": "98df1cb1-2646-472d-b7d9-8c96d0bac720",
+     "name": "S-05 Rule and Regulation:",
+     "order": 4,
+     "pass": 80
+    },
+    {
+     "id": "S-06",
+     "uuid": "81f0d23a-da56-4c18-9c98-089c9a6e6e78",
+     "name": "S-06 Human factor / Aviation Health",
+     "order": 5,
+     "pass": 80
+    },
+    {
+     "id": "S-07",
+     "uuid": "108e4870-d779-4e95-a1fc-a2ebeb05af37",
+     "name": "S-07 Airmanship",
+     "order": 6,
+     "pass": 80
+    },
+    {
+     "id": "S-08",
+     "uuid": "3e813855-333d-42d4-839c-d763a258816e",
+     "name": "S-08 Navigational Skills",
+     "order": 7,
+     "pass": 80
+    },
+    {
+     "id": "S-09",
+     "uuid": "127b6f31-9557-4f94-bf6d-3824ee37d763",
+     "name": "S-09 Aircraft System",
+     "order": 8,
+     "pass": 80
+    },
+    {
+     "id": "S-10",
+     "uuid": "5d87809a-9dcf-4a83-8943-ff7fe43f02e2",
+     "name": "S-10 Weather",
+     "order": 9,
+     "pass": 80
+    },
+    {
+     "id": "S-11",
+     "uuid": "51cf5432-30ea-4400-ba0a-6258c5b805c7",
+     "name": "S-11 — Teaching, Learning and Instructional Techniques",
+     "order": 10,
+     "pass": 80
+    },
+    {
+     "id": "S-12",
+     "uuid": "aa169324-1df4-4c7b-adac-a1dcad586a68",
+     "name": "S-12 — Flight Safety, Incident and Accident Prevention",
+     "order": 11,
+     "pass": 80
+    },
+    {
+     "id": "S-13",
+     "uuid": "d5b212f8-c223-4146-ab0d-9b5331f9fbe6",
+     "name": "S-13 — Training Procedure Manual Familiarisation",
+     "order": 12,
+     "pass": 80
+    },
+    {
+     "id": "S-14",
+     "uuid": "84bb7b45-5599-4e0c-86ea-06d3ab9874e0",
+     "name": "S-14 — Safety Management System (SMS) Training",
+     "order": 13,
+     "pass": 80
+    },
+    {
+     "id": "S-15",
+     "uuid": "0d07793c-eec9-4a56-87a5-611984cbcfa5",
+     "name": "S-15 — Emergency Response Planning (ERP)",
+     "order": 14,
+     "pass": 80
+    }
+   ]
+  },
+  {
+   "id": "1b0b4749-4848-4f0a-9848-c4e71fbe667d",
+   "name": "D-0507 Maintenance Manager Programme",
+   "published": true,
+   "use": true,
+   "subjects": [
+    {
+     "id": "S-01",
+     "uuid": "35e88015-524a-4d22-ade6-048fde1b3c4f",
+     "name": "S-01 Operation Manual Familiarization",
+     "order": 1,
+     "pass": 80
+    },
+    {
+     "id": "S-02",
+     "uuid": "f2447173-c691-4156-bbbe-c74a0d33c699",
+     "name": "S-02 Quality Assurance Familiarization",
+     "order": 2,
+     "pass": 80
+    },
+    {
+     "id": "S-09",
+     "uuid": "127b6f31-9557-4f94-bf6d-3824ee37d763",
+     "name": "S-09 Aircraft System",
+     "order": 3,
+     "pass": 80
+    },
+    {
+     "id": "S-12",
+     "uuid": "aa169324-1df4-4c7b-adac-a1dcad586a68",
+     "name": "S-12 — Flight Safety, Incident and Accident Prevention",
+     "order": 4,
+     "pass": 80
+    },
+    {
+     "id": "S-14",
+     "uuid": "84bb7b45-5599-4e0c-86ea-06d3ab9874e0",
+     "name": "S-14 — Safety Management System (SMS) Training",
+     "order": 5,
+     "pass": 80
+    },
+    {
+     "id": "S-15",
+     "uuid": "0d07793c-eec9-4a56-87a5-611984cbcfa5",
+     "name": "S-15 — Emergency Response Planning (ERP)",
+     "order": 6,
+     "pass": 80
+    }
+   ]
+  },
+  {
+   "id": "0b4e73dd-224f-49cf-9852-9cf935d0553d",
+   "name": "D-0507 Maintenance Personnel Training",
+   "published": true,
+   "use": true,
+   "subjects": [
+    {
+     "id": "S-01",
+     "uuid": "35e88015-524a-4d22-ade6-048fde1b3c4f",
+     "name": "S-01 Operation Manual Familiarization",
+     "order": 1,
+     "pass": 80
+    },
+    {
+     "id": "S-02",
+     "uuid": "f2447173-c691-4156-bbbe-c74a0d33c699",
+     "name": "S-02 Quality Assurance Familiarization",
+     "order": 2,
+     "pass": 80
+    },
+    {
+     "id": "S-04",
+     "uuid": "07166f99-e574-4815-b524-59acaf5faaf6",
+     "name": "S-04 SOP Familiarization Training",
+     "order": 3,
+     "pass": 80
+    },
+    {
+     "id": "S-09",
+     "uuid": "127b6f31-9557-4f94-bf6d-3824ee37d763",
+     "name": "S-09 Aircraft System",
+     "order": 4,
+     "pass": 80
+    },
+    {
+     "id": "S-12",
+     "uuid": "aa169324-1df4-4c7b-adac-a1dcad586a68",
+     "name": "S-12 — Flight Safety, Incident and Accident Prevention",
+     "order": 5,
+     "pass": 80
+    },
+    {
+     "id": "S-14",
+     "uuid": "84bb7b45-5599-4e0c-86ea-06d3ab9874e0",
+     "name": "S-14 — Safety Management System (SMS) Training",
+     "order": 6,
+     "pass": 80
+    },
+    {
+     "id": "S-15",
+     "uuid": "0d07793c-eec9-4a56-87a5-611984cbcfa5",
+     "name": "S-15 — Emergency Response Planning (ERP)",
+     "order": 7,
+     "pass": 80
+    }
+   ]
+  },
+  {
+   "id": "538737cb-c947-48e8-8543-97e0d408ab54",
+   "name": "D-0507 Theoretical Knowledge Instructor Programme",
+   "published": true,
+   "use": true,
+   "subjects": [
+    {
+     "id": "S-01",
+     "uuid": "35e88015-524a-4d22-ade6-048fde1b3c4f",
+     "name": "S-01 Operation Manual Familiarization",
+     "order": 1,
+     "pass": 80
+    },
+    {
+     "id": "S-02",
+     "uuid": "f2447173-c691-4156-bbbe-c74a0d33c699",
+     "name": "S-02 Quality Assurance Familiarization",
+     "order": 2,
+     "pass": 80
+    },
+    {
+     "id": "S-04",
+     "uuid": "07166f99-e574-4815-b524-59acaf5faaf6",
+     "name": "S-04 SOP Familiarization Training",
+     "order": 3,
+     "pass": 80
+    },
+    {
+     "id": "S-05",
+     "uuid": "98df1cb1-2646-472d-b7d9-8c96d0bac720",
+     "name": "S-05 Rule and Regulation:",
+     "order": 4,
+     "pass": 80
+    },
+    {
+     "id": "S-06",
+     "uuid": "81f0d23a-da56-4c18-9c98-089c9a6e6e78",
+     "name": "S-06 Human factor / Aviation Health",
+     "order": 5,
+     "pass": 80
+    },
+    {
+     "id": "S-07",
+     "uuid": "108e4870-d779-4e95-a1fc-a2ebeb05af37",
+     "name": "S-07 Airmanship",
+     "order": 6,
+     "pass": 80
+    },
+    {
+     "id": "S-11",
+     "uuid": "51cf5432-30ea-4400-ba0a-6258c5b805c7",
+     "name": "S-11 — Teaching, Learning and Instructional Techniques",
+     "order": 7,
+     "pass": 80
+    },
+    {
+     "id": "S-12",
+     "uuid": "aa169324-1df4-4c7b-adac-a1dcad586a68",
+     "name": "S-12 — Flight Safety, Incident and Accident Prevention",
+     "order": 8,
+     "pass": 80
+    },
+    {
+     "id": "S-13",
+     "uuid": "d5b212f8-c223-4146-ab0d-9b5331f9fbe6",
+     "name": "S-13 — Training Procedure Manual Familiarisation",
+     "order": 9,
+     "pass": 80
+    },
+    {
+     "id": "S-14",
+     "uuid": "84bb7b45-5599-4e0c-86ea-06d3ab9874e0",
+     "name": "S-14 — Safety Management System (SMS) Training",
+     "order": 10,
+     "pass": 80
+    },
+    {
+     "id": "S-15",
+     "uuid": "0d07793c-eec9-4a56-87a5-611984cbcfa5",
+     "name": "S-15 — Emergency Response Planning (ERP)",
+     "order": 11,
+     "pass": 80
+    }
+   ]
+  },
+  {
+   "id": "9205fce4-ea12-41a5-b648-469b9e8794f6",
+   "name": "PPL Ground School",
+   "published": true,
+   "use": true,
+   "subjects": [
+    {
+     "id": "010",
+     "uuid": "82ac4849-5958-49b4-8df4-1c7ab2c53c79",
+     "name": "010 Airlaw",
+     "order": 1,
+     "pass": 80
+    },
+    {
+     "id": "021",
+     "uuid": "2f54b701-187e-4185-8c7f-674653c2c063",
+     "name": "021 Aircraft General Knowledge",
+     "order": 2,
+     "pass": 80
+    },
+    {
+     "id": "031",
+     "uuid": "45c4ce45-3ba3-489e-84b3-3ab631dad18c",
+     "name": "031 Mass and Balance",
+     "order": 3,
+     "pass": 80
+    },
+    {
+     "id": "032",
+     "uuid": "5cfc99b9-d737-43e8-8bdc-e3018dc14aa3",
+     "name": "032 Performance (Aeroplane)",
+     "order": 4,
+     "pass": 80
+    },
+    {
+     "id": "033",
+     "uuid": "f31835eb-58e4-4a1d-bc65-3ee086138d96",
+     "name": "033 FLIGHT PLANNING AND MONITORING",
+     "order": 5,
+     "pass": 80
+    },
+    {
+     "id": "040",
+     "uuid": "b74cc38c-3c3f-4d2e-b9d6-48324b2358b6",
+     "name": "040 HUMAN PERFORMANCE AND LIMITATIONS",
+     "order": 6,
+     "pass": 80
+    },
+    {
+     "id": "050",
+     "uuid": "cc9391ec-6861-47d1-ac41-3430ad806f86",
+     "name": "050 Meteorology",
+     "order": 7,
+     "pass": 80
+    },
+    {
+     "id": "061",
+     "uuid": "5ef51ca0-dd8d-4811-afa5-1b0b9863b4db",
+     "name": "061 GENERAL NAVIGATION",
+     "order": 8,
+     "pass": 80
+    },
+    {
+     "id": "062",
+     "uuid": "64d16427-8fbb-4cde-8aef-47225ec8a3a4",
+     "name": "062 RADIO NAVIGATION",
+     "order": 9,
+     "pass": 80
+    },
+    {
+     "id": "070",
+     "uuid": "ae35bc8d-c933-44c9-890b-2096e9f37a9b",
+     "name": "070 OPERATIONAL PROCEDURES",
+     "order": 10,
+     "pass": 80
+    },
+    {
+     "id": "081",
+     "uuid": "526c0db7-511b-43a2-9064-6008f519f5cc",
+     "name": "081 PRINCIPLES OF FLIGHT (AEROPLANE)",
+     "order": 11,
+     "pass": 80
+    },
+    {
+     "id": "091",
+     "uuid": "81fa58e6-e31f-4e82-8b9d-dbce897e211f",
+     "name": "091 VFR COMMUNICATIONS",
+     "order": 12,
+     "pass": 80
+    }
+   ]
+  },
+  {
+   "id": "ae8eb145-dd0d-4924-af29-a0f2168fb2b9",
+   "name": "Safety Management Manual",
+   "published": true,
+   "use": true,
+   "subjects": [
+    {
+     "id": "Safety",
+     "uuid": "36585bcb-671e-457d-8b24-d471a3cd6f72",
+     "name": "Safety Management System",
+     "order": 1,
+     "pass": 80
+    }
+   ]
+  },
+  {
+   "id": "3a34964c-ca0b-4347-84a3-448ea18c5331",
+   "name": "Staff Training",
+   "published": true,
+   "use": true,
+   "subjects": [
+    {
+     "id": "S-01",
+     "uuid": "35e88015-524a-4d22-ade6-048fde1b3c4f",
+     "name": "S-01 Operation Manual Familiarization",
+     "order": 1,
+     "pass": 80
+    },
+    {
+     "id": "S-02",
+     "uuid": "f2447173-c691-4156-bbbe-c74a0d33c699",
+     "name": "S-02 Quality Assurance Familiarization",
+     "order": 2,
+     "pass": 80
+    },
+    {
+     "id": "S-03",
+     "uuid": "0c8e6a5b-5c99-4b86-be1f-f6cb4709f06e",
+     "name": "S-03 Safety Management Familiarization",
+     "order": 3,
+     "pass": 80
+    },
+    {
+     "id": "S-04",
+     "uuid": "07166f99-e574-4815-b524-59acaf5faaf6",
+     "name": "S-04 SOP Familiarization Training",
+     "order": 4,
+     "pass": 80
+    },
+    {
+     "id": "S-05",
+     "uuid": "98df1cb1-2646-472d-b7d9-8c96d0bac720",
+     "name": "S-05 Rule and Regulation:",
+     "order": 5,
+     "pass": 80
+    },
+    {
+     "id": "S-06",
+     "uuid": "81f0d23a-da56-4c18-9c98-089c9a6e6e78",
+     "name": "S-06 Human factor / Aviation Health",
+     "order": 6,
+     "pass": 80
+    },
+    {
+     "id": "S-07",
+     "uuid": "108e4870-d779-4e95-a1fc-a2ebeb05af37",
+     "name": "S-07 Airmanship",
+     "order": 7,
+     "pass": 80
+    },
+    {
+     "id": "S-08",
+     "uuid": "3e813855-333d-42d4-839c-d763a258816e",
+     "name": "S-08 Navigational Skills",
+     "order": 8,
+     "pass": 80
+    },
+    {
+     "id": "S-09",
+     "uuid": "127b6f31-9557-4f94-bf6d-3824ee37d763",
+     "name": "S-09 Aircraft System",
+     "order": 9,
+     "pass": 80
+    },
+    {
+     "id": "S-10",
+     "uuid": "5d87809a-9dcf-4a83-8943-ff7fe43f02e2",
+     "name": "S-10 Weather",
+     "order": 10,
+     "pass": 80
+    },
+    {
+     "id": "S-11",
+     "uuid": "51cf5432-30ea-4400-ba0a-6258c5b805c7",
+     "name": "S-11 — Teaching, Learning and Instructional Techniques",
+     "order": 11,
+     "pass": 80
+    },
+    {
+     "id": "S-12",
+     "uuid": "aa169324-1df4-4c7b-adac-a1dcad586a68",
+     "name": "S-12 — Flight Safety, Incident and Accident Prevention",
+     "order": 12,
+     "pass": 80
+    },
+    {
+     "id": "S-13",
+     "uuid": "d5b212f8-c223-4146-ab0d-9b5331f9fbe6",
+     "name": "S-13 — Training Procedure Manual Familiarisation",
+     "order": 13,
+     "pass": 80
+    },
+    {
+     "id": "S-14",
+     "uuid": "84bb7b45-5599-4e0c-86ea-06d3ab9874e0",
+     "name": "S-14 — Safety Management System (SMS) Training",
+     "order": 14,
+     "pass": 80
+    },
+    {
+     "id": "S-15",
+     "uuid": "0d07793c-eec9-4a56-87a5-611984cbcfa5",
+     "name": "S-15 — Emergency Response Planning (ERP)",
+     "order": 15,
+     "pass": 80
+    }
+   ]
+  },
+  {
+   "id": "b37545f6-14f7-444f-b81e-d32faff0898c",
+   "name": "D-0507 Administrative and Finance Staff Training",
+   "published": false,
+   "use": false,
+   "why": "ยังไม่เผยแพร่ให้ผู้เรียน ไม่ควรอ้างในเอกสารควบคุม",
+   "subjects": [
+    {
+     "id": "S-01",
+     "uuid": "35e88015-524a-4d22-ade6-048fde1b3c4f",
+     "name": "S-01 Operation Manual Familiarization",
+     "order": 1,
+     "pass": 80
+    },
+    {
+     "id": "S-02",
+     "uuid": "f2447173-c691-4156-bbbe-c74a0d33c699",
+     "name": "S-02 Quality Assurance Familiarization",
+     "order": 2,
+     "pass": 80
+    },
+    {
+     "id": "S-03",
+     "uuid": "0c8e6a5b-5c99-4b86-be1f-f6cb4709f06e",
+     "name": "S-03 Safety Management Familiarization",
+     "order": 3,
+     "pass": 80
+    },
+    {
+     "id": "S-04",
+     "uuid": "07166f99-e574-4815-b524-59acaf5faaf6",
+     "name": "S-04 SOP Familiarization Training",
+     "order": 4,
+     "pass": 80
+    },
+    {
+     "id": "S-15",
+     "uuid": "0d07793c-eec9-4a56-87a5-611984cbcfa5",
+     "name": "S-15 — Emergency Response Planning (ERP)",
+     "order": 5,
+     "pass": 80
+    }
+   ]
+  },
+  {
+   "id": "ebac7dcf-1286-460c-b898-4aaead530d4f",
+   "name": "D-0507 Compliance Monitoring Manager Programme",
+   "published": false,
+   "use": false,
+   "why": "ยังไม่เผยแพร่ให้ผู้เรียน ไม่ควรอ้างในเอกสารควบคุม",
+   "subjects": [
+    {
+     "id": "S-01",
+     "uuid": "35e88015-524a-4d22-ade6-048fde1b3c4f",
+     "name": "S-01 Operation Manual Familiarization",
+     "order": 1,
+     "pass": 80
+    },
+    {
+     "id": "S-02",
+     "uuid": "f2447173-c691-4156-bbbe-c74a0d33c699",
+     "name": "S-02 Quality Assurance Familiarization",
+     "order": 2,
+     "pass": 80
+    },
+    {
+     "id": "S-04",
+     "uuid": "07166f99-e574-4815-b524-59acaf5faaf6",
+     "name": "S-04 SOP Familiarization Training",
+     "order": 3,
+     "pass": 80
+    },
+    {
+     "id": "S-05",
+     "uuid": "98df1cb1-2646-472d-b7d9-8c96d0bac720",
+     "name": "S-05 Rule and Regulation:",
+     "order": 4,
+     "pass": 80
+    },
+    {
+     "id": "S-13",
+     "uuid": "d5b212f8-c223-4146-ab0d-9b5331f9fbe6",
+     "name": "S-13 — Training Procedure Manual Familiarisation",
+     "order": 5,
+     "pass": 80
+    },
+    {
+     "id": "S-14",
+     "uuid": "84bb7b45-5599-4e0c-86ea-06d3ab9874e0",
+     "name": "S-14 — Safety Management System (SMS) Training",
+     "order": 6,
+     "pass": 80
+    },
+    {
+     "id": "S-15",
+     "uuid": "0d07793c-eec9-4a56-87a5-611984cbcfa5",
+     "name": "S-15 — Emergency Response Planning (ERP)",
+     "order": 7,
+     "pass": 80
+    }
+   ]
+  },
+  {
+   "id": "599f4434-27a4-4335-aafd-3311633afa25",
+   "name": "D-0507 Compliance Monitoring Manager Programme",
+   "published": false,
+   "use": false,
+   "why": "ยังไม่เผยแพร่ให้ผู้เรียน ไม่ควรอ้างในเอกสารควบคุม",
+   "subjects": [
+    {
+     "id": "S-01",
+     "uuid": "35e88015-524a-4d22-ade6-048fde1b3c4f",
+     "name": "S-01 Operation Manual Familiarization",
+     "order": 1,
+     "pass": 80
+    },
+    {
+     "id": "S-02",
+     "uuid": "f2447173-c691-4156-bbbe-c74a0d33c699",
+     "name": "S-02 Quality Assurance Familiarization",
+     "order": 2,
+     "pass": 80
+    },
+    {
+     "id": "S-04",
+     "uuid": "07166f99-e574-4815-b524-59acaf5faaf6",
+     "name": "S-04 SOP Familiarization Training",
+     "order": 3,
+     "pass": 80
+    },
+    {
+     "id": "S-05",
+     "uuid": "98df1cb1-2646-472d-b7d9-8c96d0bac720",
+     "name": "S-05 Rule and Regulation:",
+     "order": 4,
+     "pass": 80
+    },
+    {
+     "id": "S-13",
+     "uuid": "d5b212f8-c223-4146-ab0d-9b5331f9fbe6",
+     "name": "S-13 — Training Procedure Manual Familiarisation",
+     "order": 5,
+     "pass": 80
+    },
+    {
+     "id": "S-14",
+     "uuid": "84bb7b45-5599-4e0c-86ea-06d3ab9874e0",
+     "name": "S-14 — Safety Management System (SMS) Training",
+     "order": 6,
+     "pass": 80
+    },
+    {
+     "id": "S-15",
+     "uuid": "0d07793c-eec9-4a56-87a5-611984cbcfa5",
+     "name": "S-15 — Emergency Response Planning (ERP)",
+     "order": 7,
+     "pass": 80
+    }
+   ]
+  },
+  {
+   "id": "f6c5ac06-b623-4e34-a369-1676c39a255b",
+   "name": "D-0507 Core Induction — Management System Basic Training",
+   "published": false,
+   "use": false,
+   "why": "ยังไม่เผยแพร่ให้ผู้เรียน ไม่ควรอ้างในเอกสารควบคุม",
+   "subjects": [
+    {
+     "id": "S-01",
+     "uuid": "35e88015-524a-4d22-ade6-048fde1b3c4f",
+     "name": "S-01 Operation Manual Familiarization",
+     "order": 1,
+     "pass": 80
+    },
+    {
+     "id": "S-02",
+     "uuid": "f2447173-c691-4156-bbbe-c74a0d33c699",
+     "name": "S-02 Quality Assurance Familiarization",
+     "order": 2,
+     "pass": 80
+    },
+    {
+     "id": "S-03",
+     "uuid": "0c8e6a5b-5c99-4b86-be1f-f6cb4709f06e",
+     "name": "S-03 Safety Management Familiarization",
+     "order": 3,
+     "pass": 80
+    },
+    {
+     "id": "S-04",
+     "uuid": "07166f99-e574-4815-b524-59acaf5faaf6",
+     "name": "S-04 SOP Familiarization Training",
+     "order": 4,
+     "pass": 80
+    },
+    {
+     "id": "S-15",
+     "uuid": "0d07793c-eec9-4a56-87a5-611984cbcfa5",
+     "name": "S-15 — Emergency Response Planning (ERP)",
+     "order": 5,
+     "pass": 80
+    }
+   ]
+  },
+  {
+   "id": "0e317feb-f861-465b-9d15-c1e0b78843df",
+   "name": "D-0507 Flight Operations Officer Training",
+   "published": false,
+   "use": false,
+   "why": "ยังไม่เผยแพร่ให้ผู้เรียน ไม่ควรอ้างในเอกสารควบคุม",
+   "subjects": [
+    {
+     "id": "S-01",
+     "uuid": "35e88015-524a-4d22-ade6-048fde1b3c4f",
+     "name": "S-01 Operation Manual Familiarization",
+     "order": 1,
+     "pass": 80
+    },
+    {
+     "id": "S-02",
+     "uuid": "f2447173-c691-4156-bbbe-c74a0d33c699",
+     "name": "S-02 Quality Assurance Familiarization",
+     "order": 2,
+     "pass": 80
+    },
+    {
+     "id": "S-04",
+     "uuid": "07166f99-e574-4815-b524-59acaf5faaf6",
+     "name": "S-04 SOP Familiarization Training",
+     "order": 3,
+     "pass": 80
+    },
+    {
+     "id": "S-05",
+     "uuid": "98df1cb1-2646-472d-b7d9-8c96d0bac720",
+     "name": "S-05 Rule and Regulation:",
+     "order": 4,
+     "pass": 80
+    },
+    {
+     "id": "S-06",
+     "uuid": "81f0d23a-da56-4c18-9c98-089c9a6e6e78",
+     "name": "S-06 Human factor / Aviation Health",
+     "order": 5,
+     "pass": 80
+    },
+    {
+     "id": "S-07",
+     "uuid": "108e4870-d779-4e95-a1fc-a2ebeb05af37",
+     "name": "S-07 Airmanship",
+     "order": 6,
+     "pass": 80
+    },
+    {
+     "id": "S-08",
+     "uuid": "3e813855-333d-42d4-839c-d763a258816e",
+     "name": "S-08 Navigational Skills",
+     "order": 7,
+     "pass": 80
+    },
+    {
+     "id": "S-10",
+     "uuid": "5d87809a-9dcf-4a83-8943-ff7fe43f02e2",
+     "name": "S-10 Weather",
+     "order": 8,
+     "pass": 80
+    },
+    {
+     "id": "S-12",
+     "uuid": "aa169324-1df4-4c7b-adac-a1dcad586a68",
+     "name": "S-12 — Flight Safety, Incident and Accident Prevention",
+     "order": 9,
+     "pass": 80
+    },
+    {
+     "id": "S-14",
+     "uuid": "84bb7b45-5599-4e0c-86ea-06d3ab9874e0",
+     "name": "S-14 — Safety Management System (SMS) Training",
+     "order": 10,
+     "pass": 80
+    },
+    {
+     "id": "S-15",
+     "uuid": "0d07793c-eec9-4a56-87a5-611984cbcfa5",
+     "name": "S-15 — Emergency Response Planning (ERP)",
+     "order": 11,
+     "pass": 80
+    }
+   ]
+  },
+  {
+   "id": "c05a42a7-15c4-4729-acb5-51fd8ac130ce",
+   "name": "D-0507 Safety Management System — Executive Level",
+   "published": false,
+   "use": false,
+   "why": "ยังไม่เผยแพร่ให้ผู้เรียน ไม่ควรอ้างในเอกสารควบคุม",
+   "subjects": [
+    {
+     "id": "S-14",
+     "uuid": "84bb7b45-5599-4e0c-86ea-06d3ab9874e0",
+     "name": "S-14 — Safety Management System (SMS) Training",
+     "order": 1,
+     "pass": 80
+    }
+   ]
+  },
+  {
+   "id": "1422fe6f-2c99-4064-843d-e409e96ed282",
+   "name": "D-0507 Safety Management System — Operational Level",
+   "published": false,
+   "use": false,
+   "why": "ยังไม่เผยแพร่ให้ผู้เรียน ไม่ควรอ้างในเอกสารควบคุม",
+   "subjects": [
+    {
+     "id": "S-14",
+     "uuid": "84bb7b45-5599-4e0c-86ea-06d3ab9874e0",
+     "name": "S-14 — Safety Management System (SMS) Training",
+     "order": 1,
+     "pass": 80
+    }
+   ]
+  },
+  {
+   "id": "b45830e1-65ad-469b-b3fb-6eb7c8040b5e",
+   "name": "D-0507 Safety Manager Programme",
+   "published": false,
+   "use": false,
+   "why": "ยังไม่เผยแพร่ให้ผู้เรียน ไม่ควรอ้างในเอกสารควบคุม",
+   "subjects": [
+    {
+     "id": "S-01",
+     "uuid": "35e88015-524a-4d22-ade6-048fde1b3c4f",
+     "name": "S-01 Operation Manual Familiarization",
+     "order": 1,
+     "pass": 80
+    },
+    {
+     "id": "S-02",
+     "uuid": "f2447173-c691-4156-bbbe-c74a0d33c699",
+     "name": "S-02 Quality Assurance Familiarization",
+     "order": 2,
+     "pass": 80
+    },
+    {
+     "id": "S-04",
+     "uuid": "07166f99-e574-4815-b524-59acaf5faaf6",
+     "name": "S-04 SOP Familiarization Training",
+     "order": 3,
+     "pass": 80
+    },
+    {
+     "id": "S-05",
+     "uuid": "98df1cb1-2646-472d-b7d9-8c96d0bac720",
+     "name": "S-05 Rule and Regulation:",
+     "order": 4,
+     "pass": 80
+    },
+    {
+     "id": "S-06",
+     "uuid": "81f0d23a-da56-4c18-9c98-089c9a6e6e78",
+     "name": "S-06 Human factor / Aviation Health",
+     "order": 5,
+     "pass": 80
+    },
+    {
+     "id": "S-07",
+     "uuid": "108e4870-d779-4e95-a1fc-a2ebeb05af37",
+     "name": "S-07 Airmanship",
+     "order": 6,
+     "pass": 80
+    },
+    {
+     "id": "S-12",
+     "uuid": "aa169324-1df4-4c7b-adac-a1dcad586a68",
+     "name": "S-12 — Flight Safety, Incident and Accident Prevention",
+     "order": 7,
+     "pass": 80
+    },
+    {
+     "id": "S-14",
+     "uuid": "84bb7b45-5599-4e0c-86ea-06d3ab9874e0",
+     "name": "S-14 — Safety Management System (SMS) Training",
+     "order": 8,
+     "pass": 80
+    },
+    {
+     "id": "S-15",
+     "uuid": "0d07793c-eec9-4a56-87a5-611984cbcfa5",
+     "name": "S-15 — Emergency Response Planning (ERP)",
+     "order": 9,
+     "pass": 80
+    }
+   ]
+  },
+  {
+   "id": "70903142-3e03-45dc-b9b1-5c6f5a8979ea",
+   "name": "PPL course Upgrade for LAPL",
+   "published": true,
+   "use": false,
+   "why": "ไม่มีรายวิชาในคอร์ส เลือกแล้วได้ตารางว่าง",
+   "subjects": []
+  }
+ ]
+}

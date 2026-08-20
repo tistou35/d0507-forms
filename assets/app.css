@@ -608,3 +608,13 @@ footer{text-align:center;color:var(--g-400);font-size:12px;padding:22px}
 .fk-file-msg{font-size:12px;color:var(--fg-2)}
 .fk-file-msg.bad{color:var(--red-600)}
 @media print{ .fk-file-pick,.fk-file-x{display:none} }
+
+/* ── คะแนนรายหัวข้อใน checklist ─────────────────────────────
+   ใช้กับฟอร์มที่บันทึกทั้งคะแนนและผลผ่าน/ไม่ผ่านต่อหนึ่งวิชา (EFC)
+   ช่องคะแนนแคบและชิดกับปุ่มผล เพื่อให้อ่านเป็นแถวเดียวจบ ไม่ต้องกวาดตาไกล */
+.fk-item.has-score .txt{flex:1 1 220px}
+.fk-score{flex:0 0 84px;width:84px;min-height:38px;padding:0 9px;border-radius:7px;
+  text-align:center;border:1px solid var(--border-med);background:var(--surface);
+  font-family:var(--font-mono);font-size:13px}
+.fk-score:focus{outline:2px solid var(--sky-500);outline-offset:1px}
+@media print{ .fk-score{border:0;padding:0} }
