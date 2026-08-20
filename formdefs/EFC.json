@@ -1,866 +1,899 @@
 {
-  "code": "EFC",
-  "doc": "D-0507-EFC-001",
-  "control": "IM-EFC-303-A",
-  "issue": "01",
-  "rev": "01",
-  "eff": "20 AUG 2020",
-  "title": {
-    "th": "รายงานจบหลักสูตรหรือจบขั้นการฝึก",
-    "en": "End of Course / Stage Report"
-  },
-  "retain": "OMA A.10",
-  "ui": {
-    "compact": true,
-    "tabs": [
-      {
-        "k": "T1",
-        "th": "หลักสูตรและผลสอบ",
-        "en": "Course & exam"
-      },
-      {
-        "k": "T2",
-        "th": "รายวิชา",
-        "en": "Subjects"
-      },
-      {
-        "k": "T3",
-        "th": "ลงนาม",
-        "en": "Sign"
-      }
-    ]
-  },
-  "parties": [
-    {
-      "k": "ht",
-      "n": {
-        "th": "หัวหน้าครูฝึก",
-        "en": "Head of Training"
-      },
-      "auth": "role:mgt"
-    }
-  ],
-  "sections": [
-    {
-      "k": "A",
-      "tab": "T1",
-      "party": "ht",
-      "title": {
-        "th": "ข้อมูลนักเรียนและหลักสูตร",
-        "en": "Student and course"
-      },
-      "fields": [
-        {
-          "k": "stuName",
-          "type": "text",
-          "label": {
-            "th": "ชื่อนักเรียน",
-            "en": "Student name"
-          },
-          "req": true,
-          "half": true
-        },
-        {
-          "k": "course",
-          "type": "text",
-          "label": {
-            "th": "หลักสูตรที่เข้ารับการฝึก",
-            "en": "Course attended"
-          },
-          "req": true,
-          "half": true
-        },
-        {
-          "k": "courseType",
-          "type": "select",
-          "label": {
-            "th": "ประเภทหลักสูตร",
-            "en": "Type of course"
-          },
-          "req": true,
-          "opt": [
-            {
-              "v": "ground",
-              "n": {
-                "th": "ภาคพื้น",
-                "en": "Ground course"
-              }
-            },
-            {
-              "v": "flight",
-              "n": {
-                "th": "ภาคอากาศ",
-                "en": "Flight training"
-              }
-            }
-          ]
-        },
-        {
-          "k": "completeDate",
-          "type": "date",
-          "label": {
-            "th": "วันที่จบหลักสูตร",
-            "en": "Completion date"
-          },
-          "req": true,
-          "prefill": "today",
-          "half": true
-        },
-        {
-          "k": "lastLogDate",
-          "type": "date",
-          "label": {
-            "th": "วันที่บันทึกการบินล่าสุด",
-            "en": "Last flight log date"
-          },
-          "half": true
-        }
-      ]
-    },
-    {
-      "k": "B",
-      "tab": "T1",
-      "party": "ht",
-      "title": {
-        "th": "ผลการสอบ",
-        "en": "Examination result"
-      },
-      "fields": [
-        {
-          "k": "examType",
-          "type": "select",
-          "label": {
-            "th": "ประเภทการสอบ",
-            "en": "Type of exam"
-          },
-          "req": true,
-          "opt": [
-            {
-              "v": "afterclass",
-              "n": {
-                "th": "ท้ายคาบเรียน",
-                "en": "After class"
-              }
-            },
-            {
-              "v": "stage",
-              "n": {
-                "th": "จบขั้นการฝึก",
-                "en": "Stage exam"
-              }
-            },
-            {
-              "v": "endcourse",
-              "n": {
-                "th": "จบหลักสูตร",
-                "en": "End-of-course"
-              }
-            },
-            {
-              "v": "progressive",
-              "n": {
-                "th": "ความก้าวหน้าภาคอากาศ",
-                "en": "Flight progressive"
-              }
-            },
-            {
-              "v": "endflight",
-              "n": {
-                "th": "จบหลักสูตรภาคอากาศ",
-                "en": "End-of-course flight"
-              }
-            }
-          ]
-        },
-        {
-          "k": "examScore",
-          "type": "number",
-          "label": {
-            "th": "คะแนนที่ได้",
-            "en": "Exam score"
-          },
-          "req": true,
-          "min": 0,
-          "half": true
-        },
-        {
-          "k": "totalScore",
-          "type": "number",
-          "label": {
-            "th": "คะแนนเต็ม",
-            "en": "Total score"
-          },
-          "req": true,
-          "min": 1,
-          "half": true
-        },
-        {
-          "k": "result",
-          "type": "select",
-          "label": {
-            "th": "ผล",
-            "en": "Result"
-          },
-          "req": true,
-          "opt": [
-            {
-              "v": "passed",
-              "n": {
-                "th": "ผ่าน",
-                "en": "Passed"
-              }
-            },
-            {
-              "v": "notpassed",
-              "n": {
-                "th": "ไม่ผ่าน",
-                "en": "Not passed"
-              }
-            },
-            {
-              "v": "repeat",
-              "n": {
-                "th": "ต้องเรียนซ้ำ",
-                "en": "Repeat"
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "k": "S1",
-      "tab": "T2",
-      "party": "ht",
-      "title": {
-        "th": "PPL — Private Pilot Licence",
-        "en": "PPL — Private Pilot Licence"
-      },
-      "fields": [
-        {
-          "k": "s1",
-          "type": "checklist",
-          "label": {
-            "th": "ผลรายวิชา",
-            "en": "Result by subject"
-          },
-          "opts": [
-            {
-              "v": "S",
-              "n": {
-                "th": "ผ่าน",
-                "en": "Satisfied"
-              }
-            },
-            {
-              "v": "U",
-              "n": {
-                "th": "ไม่ผ่าน",
-                "en": "Unsatisfied"
-              }
-            }
-          ],
-          "items": [
-            {
-              "id": "sIntroDiscoveringAviation",
-              "th": "[Intro] Discovering Aviation",
-              "en": "[Intro] Discovering Aviation"
-            },
-            {
-              "id": "sPpl01AirplaneSystems",
-              "th": "[PPL 01] Airplane Systems",
-              "en": "[PPL 01] Airplane Systems"
-            },
-            {
-              "id": "sPpl02AerodynamicPrinciples",
-              "th": "[PPL 02] Aerodynamic Principles",
-              "en": "[PPL 02] Aerodynamic Principles"
-            },
-            {
-              "id": "sPpl03TheFlight",
-              "th": "[PPL 03] The Flight Environment",
-              "en": "[PPL 03] The Flight Environment"
-            },
-            {
-              "id": "sPpl04CommunicationAnd",
-              "th": "[PPL 04] Communication and Flight Information",
-              "en": "[PPL 04] Communication and Flight Information"
-            },
-            {
-              "id": "sPpl05MeteorologyFor",
-              "th": "[PPL 05] Meteorology for Pilots and Interpreting Weather Data",
-              "en": "[PPL 05] Meteorology for Pilots and Interpreting Weather Data"
-            },
-            {
-              "id": "sPpl06AirplanePerformance",
-              "th": "[PPL 06] Airplane Performance & Technical Type",
-              "en": "[PPL 06] Airplane Performance & Technical Type"
-            },
-            {
-              "id": "sPpl07Navigation",
-              "th": "[PPL 07] Navigation",
-              "en": "[PPL 07] Navigation"
-            },
-            {
-              "id": "sPpl08ApplyingHuman",
-              "th": "[PPL 08] Applying Human Factor Principles",
-              "en": "[PPL 08] Applying Human Factor Principles"
-            },
-            {
-              "id": "sCpl061FlyingCrosscountry",
-              "th": "[CPL 06.1] Flying Cross-Country",
-              "en": "[CPL 06.1] Flying Cross-Country"
-            },
-            {
-              "id": "sPpl09AirLaws",
-              "th": "[PPL 09] Air Laws & Rule of the Air",
-              "en": "[PPL 09] Air Laws & Rule of the Air"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "k": "S2",
-      "tab": "T2",
-      "party": "ht",
-      "title": {
-        "th": "School Standard Subjects",
-        "en": "School Standard Subjects"
-      },
-      "fields": [
-        {
-          "k": "s2",
-          "type": "checklist",
-          "label": {
-            "th": "ผลรายวิชา",
-            "en": "Result by subject"
-          },
-          "opts": [
-            {
-              "v": "S",
-              "n": {
-                "th": "ผ่าน",
-                "en": "Satisfied"
-              }
-            },
-            {
-              "v": "U",
-              "n": {
-                "th": "ไม่ผ่าน",
-                "en": "Unsatisfied"
-              }
-            }
-          ],
-          "items": [
-            {
-              "id": "sDft01MathPhysics",
-              "th": "[DFT 01] Math & Physics for Aviation",
-              "en": "[DFT 01] Math & Physics for Aviation"
-            },
-            {
-              "id": "sDft02C172System",
-              "th": "[DFT 02] C-172 System",
-              "en": "[DFT 02] C-172 System"
-            },
-            {
-              "id": "sDft03NormalEmergency",
-              "th": "[DFT 03] Normal & Emergency Procedure",
-              "en": "[DFT 03] Normal & Emergency Procedure"
-            },
-            {
-              "id": "sDft04FundamentalOf",
-              "th": "[DFT 04] Fundamental of Psychology",
-              "en": "[DFT 04] Fundamental of Psychology"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "k": "S3",
-      "tab": "T2",
-      "party": "ht",
-      "title": {
-        "th": "ACPL — Addition Commercial Pilot Licence",
-        "en": "ACPL — Addition Commercial Pilot Licence"
-      },
-      "fields": [
-        {
-          "k": "s3",
-          "type": "checklist",
-          "label": {
-            "th": "ผลรายวิชา",
-            "en": "Result by subject"
-          },
-          "opts": [
-            {
-              "v": "S",
-              "n": {
-                "th": "ผ่าน",
-                "en": "Satisfied"
-              }
-            },
-            {
-              "v": "U",
-              "n": {
-                "th": "ไม่ผ่าน",
-                "en": "Unsatisfied"
-              }
-            }
-          ],
-          "items": [
-            {
-              "id": "sCpl01AdvanceSystems",
-              "th": "[CPL 01] Advance Systems 2",
-              "en": "[CPL 01] Advance Systems 2"
-            },
-            {
-              "id": "sCpl02Aerodynamic2",
-              "th": "[CPL 02] Aerodynamic 2",
-              "en": "[CPL 02] Aerodynamic 2"
-            },
-            {
-              "id": "sCpl031CommercialFlight",
-              "th": "[CPL 03.1] Commercial Flight Consideration",
-              "en": "[CPL 03.1] Commercial Flight Consideration"
-            },
-            {
-              "id": "sCpl032CommercialManeuver",
-              "th": "[CPL 03.2] Commercial Maneuver",
-              "en": "[CPL 03.2] Commercial Maneuver"
-            },
-            {
-              "id": "sCpl04AirplanePerformance",
-              "th": "[CPL 04] Airplane Performance 2",
-              "en": "[CPL 04] Airplane Performance 2"
-            },
-            {
-              "id": "sCpl05Navigation2",
-              "th": "[CPL 05] Navigation 2",
-              "en": "[CPL 05] Navigation 2"
-            },
-            {
-              "id": "sCpl062FlyingCross",
-              "th": "[CPL 06.2] Flying Cross Country",
-              "en": "[CPL 06.2] Flying Cross Country"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "k": "S4",
-      "tab": "T2",
-      "party": "ht",
-      "title": {
-        "th": "IR — Instrument Rating",
-        "en": "IR — Instrument Rating"
-      },
-      "fields": [
-        {
-          "k": "s4",
-          "type": "checklist",
-          "label": {
-            "th": "ผลรายวิชา",
-            "en": "Result by subject"
-          },
-          "opts": [
-            {
-              "v": "S",
-              "n": {
-                "th": "ผ่าน",
-                "en": "Satisfied"
-              }
-            },
-            {
-              "v": "U",
-              "n": {
-                "th": "ไม่ผ่าน",
-                "en": "Unsatisfied"
-              }
-            }
-          ],
-          "items": [
-            {
-              "id": "sIr01PrinciplesOf",
-              "th": "[IR 01] Principles of Instrument Flight",
-              "en": "[IR 01] Principles of Instrument Flight"
-            },
-            {
-              "id": "sIr02IfrFlight",
-              "th": "[IR 02] IFR Flight Environment",
-              "en": "[IR 02] IFR Flight Environment"
-            },
-            {
-              "id": "sIr03Departure",
-              "th": "[IR 03] Departure",
-              "en": "[IR 03] Departure"
-            },
-            {
-              "id": "sIr04Enroute",
-              "th": "[IR 04] Enroute",
-              "en": "[IR 04] Enroute"
-            },
-            {
-              "id": "sIr05Arrival",
-              "th": "[IR 05] Arrival",
-              "en": "[IR 05] Arrival"
-            },
-            {
-              "id": "sIr061Approach",
-              "th": "[IR 06.1] Approach",
-              "en": "[IR 06.1] Approach"
-            },
-            {
-              "id": "sIr062InstrumentApproaches",
-              "th": "[IR 06.2] Instrument Approaches",
-              "en": "[IR 06.2] Instrument Approaches"
-            },
-            {
-              "id": "sIr07Meteorology",
-              "th": "[IR 07] Meteorology",
-              "en": "[IR 07] Meteorology"
-            },
-            {
-              "id": "sIr08IfrFlight",
-              "th": "[IR 08] IFR Flight Considerations",
-              "en": "[IR 08] IFR Flight Considerations"
-            },
-            {
-              "id": "sIr09FlightRule",
-              "th": "[IR 09] Flight Rule",
-              "en": "[IR 09] Flight Rule"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "k": "S5",
-      "tab": "T2",
-      "party": "ht",
-      "title": {
-        "th": "IP — Instructor Rating",
-        "en": "IP — Instructor Rating"
-      },
-      "fields": [
-        {
-          "k": "s5",
-          "type": "checklist",
-          "label": {
-            "th": "ผลรายวิชา",
-            "en": "Result by subject"
-          },
-          "opts": [
-            {
-              "v": "S",
-              "n": {
-                "th": "ผ่าน",
-                "en": "Satisfied"
-              }
-            },
-            {
-              "v": "U",
-              "n": {
-                "th": "ไม่ผ่าน",
-                "en": "Unsatisfied"
-              }
-            }
-          ],
-          "items": [
-            {
-              "id": "sIp01FoundationOf",
-              "th": "[IP 01] Foundation of Learning",
-              "en": "[IP 01] Foundation of Learning"
-            },
-            {
-              "id": "sIp02TheArt",
-              "th": "[IP 02] The Art and Science of Teaching",
-              "en": "[IP 02] The Art and Science of Teaching"
-            },
-            {
-              "id": "sIp03ExploringHuman",
-              "th": "[IP 03] Exploring Human Factor",
-              "en": "[IP 03] Exploring Human Factor"
-            },
-            {
-              "id": "sIp04BecomingAn",
-              "th": "[IP 04] Becoming an Instructor",
-              "en": "[IP 04] Becoming an Instructor"
-            },
-            {
-              "id": "sIp05TheBasic",
-              "th": "[IP 05] The Basic Instructor",
-              "en": "[IP 05] The Basic Instructor"
-            },
-            {
-              "id": "sIp06TheAdvanced",
-              "th": "[IP 06] The Advanced Instructor",
-              "en": "[IP 06] The Advanced Instructor"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "k": "S6",
-      "tab": "T2",
-      "party": "ht",
-      "title": {
-        "th": "Recurrent Training",
-        "en": "Recurrent Training"
-      },
-      "fields": [
-        {
-          "k": "s6",
-          "type": "checklist",
-          "label": {
-            "th": "ผลรายวิชา",
-            "en": "Result by subject"
-          },
-          "opts": [
-            {
-              "v": "S",
-              "n": {
-                "th": "ผ่าน",
-                "en": "Satisfied"
-              }
-            },
-            {
-              "v": "U",
-              "n": {
-                "th": "ไม่ผ่าน",
-                "en": "Unsatisfied"
-              }
-            }
-          ],
-          "items": [
-            {
-              "id": "sRecurrentA",
-              "th": "Recurrent A",
-              "en": "Recurrent A"
-            },
-            {
-              "id": "sRecurrentE",
-              "th": "Recurrent E",
-              "en": "Recurrent E"
-            },
-            {
-              "id": "sRecurrentIr",
-              "th": "Recurrent IR",
-              "en": "Recurrent IR"
-            },
-            {
-              "id": "sRecurrentNight",
-              "th": "Recurrent Night",
-              "en": "Recurrent Night"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "k": "S7",
-      "tab": "T2",
-      "party": "ht",
-      "title": {
-        "th": "รายวิชา (ระบบการจัดการ / TrainHub) — รายงานรายบุคคล",
-        "en": "Subjects (management system / TrainHub) — individual report"
-      },
-      "fields": [
-        {
-          "k": "s7",
-          "type": "table",
-          "req": false,
-          "rows": 4,
-          "max": 30,
-          "label": {
-            "th": "ผลรายวิชา",
-            "en": "Subject results"
-          },
-          "cols": [
-            {
-              "k": "subject",
-              "type": "text",
-              "w": "46%",
-              "label": {
-                "th": "วิชา",
-                "en": "Subject"
-              }
-            },
-            {
-              "k": "score",
-              "type": "number",
-              "w": "14%",
-              "label": {
-                "th": "คะแนน (%)",
-                "en": "Score (%)"
-              }
-            },
-            {
-              "k": "result",
-              "type": "text",
-              "w": "16%",
-              "label": {
-                "th": "ผล",
-                "en": "Result"
-              }
-            },
-            {
-              "k": "passedOn",
-              "type": "date",
-              "w": "24%",
-              "label": {
-                "th": "วันที่ผ่าน",
-                "en": "Passed on"
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "k": "S8",
-      "tab": "T2",
-      "party": "ht",
-      "title": {
-        "th": "สรุปรายบุคคล — รายงานกลุ่ม (จบพร้อมกัน)",
-        "en": "Per-learner summary — group report (finished together)"
-      },
-      "fields": [
-        {
-          "k": "s8",
-          "type": "table",
-          "req": false,
-          "rows": 4,
-          "max": 60,
-          "label": {
-            "th": "ผู้เรียนที่จบหลักสูตร",
-            "en": "Learners completing the course"
-          },
-          "cols": [
-            {
-              "k": "learner",
-              "type": "text",
-              "w": "40%",
-              "label": {
-                "th": "ผู้เรียน",
-                "en": "Learner"
-              }
-            },
-            {
-              "k": "score",
-              "type": "number",
-              "w": "16%",
-              "label": {
-                "th": "คะแนนเฉลี่ย (%)",
-                "en": "Average (%)"
-              }
-            },
-            {
-              "k": "result",
-              "type": "text",
-              "w": "20%",
-              "label": {
-                "th": "ผล",
-                "en": "Result"
-              }
-            },
-            {
-              "k": "completedOn",
-              "type": "date",
-              "w": "24%",
-              "label": {
-                "th": "วันที่จบ",
-                "en": "Completed on"
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "k": "Z",
-      "tab": "T3",
-      "party": "ht",
-      "title": {
-        "th": "ลงนาม",
-        "en": "Signature"
-      },
-      "fields": [
-        {
-          "k": "htComment",
-          "type": "textarea",
-          "label": {
-            "th": "ความเห็น",
-            "en": "Comment"
-          }
-        },
-        {
-          "k": "htName",
-          "type": "text",
-          "label": {
-            "th": "ชื่อหัวหน้าครูฝึก",
-            "en": "Head of Training name"
-          },
-          "req": true,
-          "half": true
-        },
-        {
-          "k": "htDate",
-          "type": "date",
-          "label": {
-            "th": "วันที่",
-            "en": "Date"
-          },
-          "req": true,
-          "prefill": "today",
-          "half": true
-        },
-        {
-          "k": "htSign",
-          "type": "sign",
-          "req": true,
-          "label": {
-            "th": "ลายเซ็นหัวหน้าครูฝึก",
-            "en": "Head of Training signature"
-          }
-        }
-      ]
-    }
-  ],
-  "compute": [
-    {
-      "k": "pct",
-      "op": "pct",
-      "of": "examScore",
-      "max": 100
-    }
-  ],
-  "gates": [
-    {
-      "when": "result == 'notpassed'",
-      "level": "warn",
-      "short": {
-        "th": "ไม่ผ่าน",
-        "en": "NOT PASSED"
-      },
-      "msg": {
-        "th": "ไม่ผ่าน — ต้องระบุแผนการสอบซ่อมหรือเรียนซ้ำในความเห็นก่อนปิดรายงาน",
-        "en": "Not passed — record the re-sit or repeat plan in the comments before closing."
-      }
-    }
-  ],
-  "route": [
-    {
-      "step": 1,
-      "party": "ht",
-      "sign": true
-    }
-  ],
-  "export": {
-    "docx": "D-0507-EFC-001.docx",
-    "lockUntilComplete": true
+ "code": "EFC",
+ "doc": "D-0507-EFC-001",
+ "control": "IM-EFC-303-A",
+ "issue": "01",
+ "rev": "01",
+ "eff": "20 AUG 2020",
+ "title": {
+  "th": "รายงานจบหลักสูตรหรือจบขั้นการฝึก",
+  "en": "End of Course / Stage Report"
+ },
+ "retain": "OMA A.10",
+ "ui": {
+  "compact": true,
+  "tabs": [
+   {
+    "k": "T1",
+    "th": "หลักสูตรและผลสอบ",
+    "en": "Course & exam"
+   },
+   {
+    "k": "T2",
+    "th": "รายวิชา",
+    "en": "Subjects"
+   },
+   {
+    "k": "T3",
+    "th": "ลงนาม",
+    "en": "Sign"
+   }
+  ]
+ },
+ "parties": [
+  {
+   "k": "ht",
+   "n": {
+    "th": "หัวหน้าครูฝึก",
+    "en": "Head of Training"
+   },
+   "auth": "role:mgt"
   }
+ ],
+ "sections": [
+  {
+   "k": "A",
+   "tab": "T1",
+   "party": "ht",
+   "title": {
+    "th": "ข้อมูลนักเรียนและหลักสูตร",
+    "en": "Student and course"
+   },
+   "fields": [
+    {
+     "k": "stuName",
+     "type": "text",
+     "label": {
+      "th": "ชื่อนักเรียน",
+      "en": "Student name"
+     },
+     "req": true,
+     "half": true
+    },
+    {
+     "k": "course",
+     "type": "text",
+     "label": {
+      "th": "หลักสูตรที่เข้ารับการฝึก",
+      "en": "Course attended"
+     },
+     "req": true,
+     "half": true
+    },
+    {
+     "k": "courseType",
+     "type": "select",
+     "label": {
+      "th": "ประเภทหลักสูตร",
+      "en": "Type of course"
+     },
+     "req": true,
+     "opt": [
+      {
+       "v": "ground",
+       "n": {
+        "th": "ภาคพื้น",
+        "en": "Ground course"
+       }
+      },
+      {
+       "v": "flight",
+       "n": {
+        "th": "ภาคอากาศ",
+        "en": "Flight training"
+       }
+      }
+     ]
+    },
+    {
+     "k": "studyFrom",
+     "type": "date",
+     "half": true,
+     "label": {
+      "th": "วันที่เริ่มเรียน",
+      "en": "Study from"
+     }
+    },
+    {
+     "k": "studyTo",
+     "type": "date",
+     "half": true,
+     "label": {
+      "th": "วันที่เรียนจบ",
+      "en": "Study to"
+     }
+    },
+    {
+     "k": "learningHours",
+     "type": "number",
+     "half": true,
+     "min": 0,
+     "step": 0.1,
+     "label": {
+      "th": "ชั่วโมงเรียนที่นับให้",
+      "en": "Learning hours credited"
+     },
+     "hint": {
+      "th": "ชั่วโมงที่ระบบบันทึกการฝึกนับให้ ทศนิยม 1 ตำแหน่ง",
+      "en": "Hours credited by the training system, to 1 decimal"
+     }
+    },
+    {
+     "k": "completeDate",
+     "type": "date",
+     "label": {
+      "th": "วันที่จบหลักสูตร",
+      "en": "Completion date"
+     },
+     "req": true,
+     "prefill": "today",
+     "half": true
+    },
+    {
+     "k": "lastLogDate",
+     "type": "date",
+     "label": {
+      "th": "วันที่บันทึกการบินล่าสุด",
+      "en": "Last flight log date"
+     },
+     "half": true
+    }
+   ]
+  },
+  {
+   "k": "B",
+   "tab": "T1",
+   "party": "ht",
+   "title": {
+    "th": "ผลการสอบ",
+    "en": "Examination result"
+   },
+   "fields": [
+    {
+     "k": "examType",
+     "type": "select",
+     "label": {
+      "th": "ประเภทการสอบ",
+      "en": "Type of exam"
+     },
+     "req": true,
+     "opt": [
+      {
+       "v": "afterclass",
+       "n": {
+        "th": "ท้ายคาบเรียน",
+        "en": "After class"
+       }
+      },
+      {
+       "v": "stage",
+       "n": {
+        "th": "จบขั้นการฝึก",
+        "en": "Stage exam"
+       }
+      },
+      {
+       "v": "endcourse",
+       "n": {
+        "th": "จบหลักสูตร",
+        "en": "End-of-course"
+       }
+      },
+      {
+       "v": "progressive",
+       "n": {
+        "th": "ความก้าวหน้าภาคอากาศ",
+        "en": "Flight progressive"
+       }
+      },
+      {
+       "v": "endflight",
+       "n": {
+        "th": "จบหลักสูตรภาคอากาศ",
+        "en": "End-of-course flight"
+       }
+      }
+     ]
+    },
+    {
+     "k": "examScore",
+     "type": "number",
+     "label": {
+      "th": "คะแนนที่ได้",
+      "en": "Exam score"
+     },
+     "req": true,
+     "min": 0,
+     "half": true
+    },
+    {
+     "k": "totalScore",
+     "type": "number",
+     "label": {
+      "th": "คะแนนเต็ม",
+      "en": "Total score"
+     },
+     "req": true,
+     "min": 1,
+     "half": true
+    },
+    {
+     "k": "result",
+     "type": "select",
+     "label": {
+      "th": "ผล",
+      "en": "Result"
+     },
+     "req": true,
+     "opt": [
+      {
+       "v": "passed",
+       "n": {
+        "th": "ผ่าน",
+        "en": "Passed"
+       }
+      },
+      {
+       "v": "notpassed",
+       "n": {
+        "th": "ไม่ผ่าน",
+        "en": "Not passed"
+       }
+      },
+      {
+       "v": "repeat",
+       "n": {
+        "th": "ต้องเรียนซ้ำ",
+        "en": "Repeat"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "k": "S1",
+   "tab": "T2",
+   "party": "ht",
+   "title": {
+    "th": "PPL — Private Pilot Licence",
+    "en": "PPL — Private Pilot Licence"
+   },
+   "fields": [
+    {
+     "k": "s1",
+     "type": "checklist",
+     "label": {
+      "th": "ผลรายวิชา",
+      "en": "Result by subject"
+     },
+     "opts": [
+      {
+       "v": "S",
+       "n": {
+        "th": "ผ่าน",
+        "en": "Satisfied"
+       }
+      },
+      {
+       "v": "U",
+       "n": {
+        "th": "ไม่ผ่าน",
+        "en": "Unsatisfied"
+       }
+      }
+     ],
+     "items": [
+      {
+       "id": "sIntroDiscoveringAviation",
+       "th": "[Intro] Discovering Aviation",
+       "en": "[Intro] Discovering Aviation"
+      },
+      {
+       "id": "sPpl01AirplaneSystems",
+       "th": "[PPL 01] Airplane Systems",
+       "en": "[PPL 01] Airplane Systems"
+      },
+      {
+       "id": "sPpl02AerodynamicPrinciples",
+       "th": "[PPL 02] Aerodynamic Principles",
+       "en": "[PPL 02] Aerodynamic Principles"
+      },
+      {
+       "id": "sPpl03TheFlight",
+       "th": "[PPL 03] The Flight Environment",
+       "en": "[PPL 03] The Flight Environment"
+      },
+      {
+       "id": "sPpl04CommunicationAnd",
+       "th": "[PPL 04] Communication and Flight Information",
+       "en": "[PPL 04] Communication and Flight Information"
+      },
+      {
+       "id": "sPpl05MeteorologyFor",
+       "th": "[PPL 05] Meteorology for Pilots and Interpreting Weather Data",
+       "en": "[PPL 05] Meteorology for Pilots and Interpreting Weather Data"
+      },
+      {
+       "id": "sPpl06AirplanePerformance",
+       "th": "[PPL 06] Airplane Performance & Technical Type",
+       "en": "[PPL 06] Airplane Performance & Technical Type"
+      },
+      {
+       "id": "sPpl07Navigation",
+       "th": "[PPL 07] Navigation",
+       "en": "[PPL 07] Navigation"
+      },
+      {
+       "id": "sPpl08ApplyingHuman",
+       "th": "[PPL 08] Applying Human Factor Principles",
+       "en": "[PPL 08] Applying Human Factor Principles"
+      },
+      {
+       "id": "sCpl061FlyingCrosscountry",
+       "th": "[CPL 06.1] Flying Cross-Country",
+       "en": "[CPL 06.1] Flying Cross-Country"
+      },
+      {
+       "id": "sPpl09AirLaws",
+       "th": "[PPL 09] Air Laws & Rule of the Air",
+       "en": "[PPL 09] Air Laws & Rule of the Air"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "k": "S2",
+   "tab": "T2",
+   "party": "ht",
+   "title": {
+    "th": "School Standard Subjects",
+    "en": "School Standard Subjects"
+   },
+   "fields": [
+    {
+     "k": "s2",
+     "type": "checklist",
+     "label": {
+      "th": "ผลรายวิชา",
+      "en": "Result by subject"
+     },
+     "opts": [
+      {
+       "v": "S",
+       "n": {
+        "th": "ผ่าน",
+        "en": "Satisfied"
+       }
+      },
+      {
+       "v": "U",
+       "n": {
+        "th": "ไม่ผ่าน",
+        "en": "Unsatisfied"
+       }
+      }
+     ],
+     "items": [
+      {
+       "id": "sDft01MathPhysics",
+       "th": "[DFT 01] Math & Physics for Aviation",
+       "en": "[DFT 01] Math & Physics for Aviation"
+      },
+      {
+       "id": "sDft02C172System",
+       "th": "[DFT 02] C-172 System",
+       "en": "[DFT 02] C-172 System"
+      },
+      {
+       "id": "sDft03NormalEmergency",
+       "th": "[DFT 03] Normal & Emergency Procedure",
+       "en": "[DFT 03] Normal & Emergency Procedure"
+      },
+      {
+       "id": "sDft04FundamentalOf",
+       "th": "[DFT 04] Fundamental of Psychology",
+       "en": "[DFT 04] Fundamental of Psychology"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "k": "S3",
+   "tab": "T2",
+   "party": "ht",
+   "title": {
+    "th": "ACPL — Addition Commercial Pilot Licence",
+    "en": "ACPL — Addition Commercial Pilot Licence"
+   },
+   "fields": [
+    {
+     "k": "s3",
+     "type": "checklist",
+     "label": {
+      "th": "ผลรายวิชา",
+      "en": "Result by subject"
+     },
+     "opts": [
+      {
+       "v": "S",
+       "n": {
+        "th": "ผ่าน",
+        "en": "Satisfied"
+       }
+      },
+      {
+       "v": "U",
+       "n": {
+        "th": "ไม่ผ่าน",
+        "en": "Unsatisfied"
+       }
+      }
+     ],
+     "items": [
+      {
+       "id": "sCpl01AdvanceSystems",
+       "th": "[CPL 01] Advance Systems 2",
+       "en": "[CPL 01] Advance Systems 2"
+      },
+      {
+       "id": "sCpl02Aerodynamic2",
+       "th": "[CPL 02] Aerodynamic 2",
+       "en": "[CPL 02] Aerodynamic 2"
+      },
+      {
+       "id": "sCpl031CommercialFlight",
+       "th": "[CPL 03.1] Commercial Flight Consideration",
+       "en": "[CPL 03.1] Commercial Flight Consideration"
+      },
+      {
+       "id": "sCpl032CommercialManeuver",
+       "th": "[CPL 03.2] Commercial Maneuver",
+       "en": "[CPL 03.2] Commercial Maneuver"
+      },
+      {
+       "id": "sCpl04AirplanePerformance",
+       "th": "[CPL 04] Airplane Performance 2",
+       "en": "[CPL 04] Airplane Performance 2"
+      },
+      {
+       "id": "sCpl05Navigation2",
+       "th": "[CPL 05] Navigation 2",
+       "en": "[CPL 05] Navigation 2"
+      },
+      {
+       "id": "sCpl062FlyingCross",
+       "th": "[CPL 06.2] Flying Cross Country",
+       "en": "[CPL 06.2] Flying Cross Country"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "k": "S4",
+   "tab": "T2",
+   "party": "ht",
+   "title": {
+    "th": "IR — Instrument Rating",
+    "en": "IR — Instrument Rating"
+   },
+   "fields": [
+    {
+     "k": "s4",
+     "type": "checklist",
+     "label": {
+      "th": "ผลรายวิชา",
+      "en": "Result by subject"
+     },
+     "opts": [
+      {
+       "v": "S",
+       "n": {
+        "th": "ผ่าน",
+        "en": "Satisfied"
+       }
+      },
+      {
+       "v": "U",
+       "n": {
+        "th": "ไม่ผ่าน",
+        "en": "Unsatisfied"
+       }
+      }
+     ],
+     "items": [
+      {
+       "id": "sIr01PrinciplesOf",
+       "th": "[IR 01] Principles of Instrument Flight",
+       "en": "[IR 01] Principles of Instrument Flight"
+      },
+      {
+       "id": "sIr02IfrFlight",
+       "th": "[IR 02] IFR Flight Environment",
+       "en": "[IR 02] IFR Flight Environment"
+      },
+      {
+       "id": "sIr03Departure",
+       "th": "[IR 03] Departure",
+       "en": "[IR 03] Departure"
+      },
+      {
+       "id": "sIr04Enroute",
+       "th": "[IR 04] Enroute",
+       "en": "[IR 04] Enroute"
+      },
+      {
+       "id": "sIr05Arrival",
+       "th": "[IR 05] Arrival",
+       "en": "[IR 05] Arrival"
+      },
+      {
+       "id": "sIr061Approach",
+       "th": "[IR 06.1] Approach",
+       "en": "[IR 06.1] Approach"
+      },
+      {
+       "id": "sIr062InstrumentApproaches",
+       "th": "[IR 06.2] Instrument Approaches",
+       "en": "[IR 06.2] Instrument Approaches"
+      },
+      {
+       "id": "sIr07Meteorology",
+       "th": "[IR 07] Meteorology",
+       "en": "[IR 07] Meteorology"
+      },
+      {
+       "id": "sIr08IfrFlight",
+       "th": "[IR 08] IFR Flight Considerations",
+       "en": "[IR 08] IFR Flight Considerations"
+      },
+      {
+       "id": "sIr09FlightRule",
+       "th": "[IR 09] Flight Rule",
+       "en": "[IR 09] Flight Rule"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "k": "S5",
+   "tab": "T2",
+   "party": "ht",
+   "title": {
+    "th": "IP — Instructor Rating",
+    "en": "IP — Instructor Rating"
+   },
+   "fields": [
+    {
+     "k": "s5",
+     "type": "checklist",
+     "label": {
+      "th": "ผลรายวิชา",
+      "en": "Result by subject"
+     },
+     "opts": [
+      {
+       "v": "S",
+       "n": {
+        "th": "ผ่าน",
+        "en": "Satisfied"
+       }
+      },
+      {
+       "v": "U",
+       "n": {
+        "th": "ไม่ผ่าน",
+        "en": "Unsatisfied"
+       }
+      }
+     ],
+     "items": [
+      {
+       "id": "sIp01FoundationOf",
+       "th": "[IP 01] Foundation of Learning",
+       "en": "[IP 01] Foundation of Learning"
+      },
+      {
+       "id": "sIp02TheArt",
+       "th": "[IP 02] The Art and Science of Teaching",
+       "en": "[IP 02] The Art and Science of Teaching"
+      },
+      {
+       "id": "sIp03ExploringHuman",
+       "th": "[IP 03] Exploring Human Factor",
+       "en": "[IP 03] Exploring Human Factor"
+      },
+      {
+       "id": "sIp04BecomingAn",
+       "th": "[IP 04] Becoming an Instructor",
+       "en": "[IP 04] Becoming an Instructor"
+      },
+      {
+       "id": "sIp05TheBasic",
+       "th": "[IP 05] The Basic Instructor",
+       "en": "[IP 05] The Basic Instructor"
+      },
+      {
+       "id": "sIp06TheAdvanced",
+       "th": "[IP 06] The Advanced Instructor",
+       "en": "[IP 06] The Advanced Instructor"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "k": "S6",
+   "tab": "T2",
+   "party": "ht",
+   "title": {
+    "th": "Recurrent Training",
+    "en": "Recurrent Training"
+   },
+   "fields": [
+    {
+     "k": "s6",
+     "type": "checklist",
+     "label": {
+      "th": "ผลรายวิชา",
+      "en": "Result by subject"
+     },
+     "opts": [
+      {
+       "v": "S",
+       "n": {
+        "th": "ผ่าน",
+        "en": "Satisfied"
+       }
+      },
+      {
+       "v": "U",
+       "n": {
+        "th": "ไม่ผ่าน",
+        "en": "Unsatisfied"
+       }
+      }
+     ],
+     "items": [
+      {
+       "id": "sRecurrentA",
+       "th": "Recurrent A",
+       "en": "Recurrent A"
+      },
+      {
+       "id": "sRecurrentE",
+       "th": "Recurrent E",
+       "en": "Recurrent E"
+      },
+      {
+       "id": "sRecurrentIr",
+       "th": "Recurrent IR",
+       "en": "Recurrent IR"
+      },
+      {
+       "id": "sRecurrentNight",
+       "th": "Recurrent Night",
+       "en": "Recurrent Night"
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "k": "S7",
+   "tab": "T2",
+   "party": "ht",
+   "title": {
+    "th": "รายวิชา (ระบบการจัดการ / TrainHub) — รายงานรายบุคคล",
+    "en": "Subjects (management system / TrainHub) — individual report"
+   },
+   "fields": [
+    {
+     "k": "s7",
+     "type": "table",
+     "req": false,
+     "rows": 4,
+     "max": 30,
+     "label": {
+      "th": "ผลรายวิชา",
+      "en": "Subject results"
+     },
+     "cols": [
+      {
+       "k": "subject",
+       "type": "text",
+       "w": "46%",
+       "label": {
+        "th": "วิชา",
+        "en": "Subject"
+       }
+      },
+      {
+       "k": "score",
+       "type": "number",
+       "w": "14%",
+       "label": {
+        "th": "คะแนน (%)",
+        "en": "Score (%)"
+       }
+      },
+      {
+       "k": "result",
+       "type": "text",
+       "w": "16%",
+       "label": {
+        "th": "ผล",
+        "en": "Result"
+       }
+      },
+      {
+       "k": "passedOn",
+       "type": "date",
+       "w": "24%",
+       "label": {
+        "th": "วันที่ผ่าน",
+        "en": "Passed on"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "k": "S8",
+   "tab": "T2",
+   "party": "ht",
+   "title": {
+    "th": "สรุปรายบุคคล — รายงานกลุ่ม (จบพร้อมกัน)",
+    "en": "Per-learner summary — group report (finished together)"
+   },
+   "fields": [
+    {
+     "k": "s8",
+     "type": "table",
+     "req": false,
+     "rows": 4,
+     "max": 60,
+     "label": {
+      "th": "ผู้เรียนที่จบหลักสูตร",
+      "en": "Learners completing the course"
+     },
+     "cols": [
+      {
+       "k": "learner",
+       "type": "text",
+       "w": "40%",
+       "label": {
+        "th": "ผู้เรียน",
+        "en": "Learner"
+       }
+      },
+      {
+       "k": "score",
+       "type": "number",
+       "w": "16%",
+       "label": {
+        "th": "คะแนนเฉลี่ย (%)",
+        "en": "Average (%)"
+       }
+      },
+      {
+       "k": "result",
+       "type": "text",
+       "w": "20%",
+       "label": {
+        "th": "ผล",
+        "en": "Result"
+       }
+      },
+      {
+       "k": "completedOn",
+       "type": "date",
+       "w": "24%",
+       "label": {
+        "th": "วันที่จบ",
+        "en": "Completed on"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "k": "Z",
+   "tab": "T3",
+   "party": "ht",
+   "title": {
+    "th": "ลงนาม",
+    "en": "Signature"
+   },
+   "fields": [
+    {
+     "k": "htComment",
+     "type": "textarea",
+     "label": {
+      "th": "ความเห็น",
+      "en": "Comment"
+     }
+    },
+    {
+     "k": "htName",
+     "type": "text",
+     "label": {
+      "th": "ชื่อหัวหน้าครูฝึก",
+      "en": "Head of Training name"
+     },
+     "req": true,
+     "half": true
+    },
+    {
+     "k": "htDate",
+     "type": "date",
+     "label": {
+      "th": "วันที่",
+      "en": "Date"
+     },
+     "req": true,
+     "prefill": "today",
+     "half": true
+    },
+    {
+     "k": "htSign",
+     "type": "sign",
+     "req": true,
+     "label": {
+      "th": "ลายเซ็นหัวหน้าครูฝึก",
+      "en": "Head of Training signature"
+     }
+    }
+   ]
+  }
+ ],
+ "compute": [
+  {
+   "k": "pct",
+   "op": "pct",
+   "of": "examScore",
+   "max": 100
+  }
+ ],
+ "gates": [
+  {
+   "when": "result == 'notpassed'",
+   "level": "warn",
+   "short": {
+    "th": "ไม่ผ่าน",
+    "en": "NOT PASSED"
+   },
+   "msg": {
+    "th": "ไม่ผ่าน — ต้องระบุแผนการสอบซ่อมหรือเรียนซ้ำในความเห็นก่อนปิดรายงาน",
+    "en": "Not passed — record the re-sit or repeat plan in the comments before closing."
+   }
+  }
+ ],
+ "route": [
+  {
+   "step": 1,
+   "party": "ht",
+   "sign": true
+  }
+ ],
+ "export": {
+  "docx": "D-0507-EFC-001.docx",
+  "lockUntilComplete": true
+ }
 }
