@@ -857,59 +857,11 @@ var TOKEN_MAP = {
         "tok": "{{k_result_repeat}}",
         "label": "Repeat",
         "ord": "Repeat"
-      },
-      {
-        "tok": "{{k_s2_sDft01MathPhysics_S}}",
-        "label": "[DFT 01] Math & Physics for Aviation · Satisfied",
-        "ord": "Satisfied",
-        "item": "[DFT 01] Math & Physics for Aviation"
-      },
-      {
-        "tok": "{{k_s2_sDft01MathPhysics_U}}",
-        "label": "[DFT 01] Math & Physics for Aviation · Unsatisfied",
-        "ord": "Unsatisfied",
-        "item": "[DFT 01] Math & Physics for Aviation"
-      },
-      {
-        "tok": "{{k_s2_sDft02C172System_S}}",
-        "label": "[DFT 02] C-172 System · Satisfied",
-        "ord": "Satisfied",
-        "item": "[DFT 02] C-172 System"
-      },
-      {
-        "tok": "{{k_s2_sDft02C172System_U}}",
-        "label": "[DFT 02] C-172 System · Unsatisfied",
-        "ord": "Unsatisfied",
-        "item": "[DFT 02] C-172 System"
-      },
-      {
-        "tok": "{{k_s2_sDft03NormalEmergency_S}}",
-        "label": "[DFT 03] Normal & Emergency Procedure · Satisfied",
-        "ord": "Satisfied",
-        "item": "[DFT 03] Normal & Emergency Procedure"
-      },
-      {
-        "tok": "{{k_s2_sDft03NormalEmergency_U}}",
-        "label": "[DFT 03] Normal & Emergency Procedure · Unsatisfied",
-        "ord": "Unsatisfied",
-        "item": "[DFT 03] Normal & Emergency Procedure"
-      },
-      {
-        "tok": "{{k_s2_sDft04FundamentalOf_S}}",
-        "label": "[DFT 04] Fundamental of Psychology · Satisfied",
-        "ord": "Satisfied",
-        "item": "[DFT 04] Fundamental of Psychology"
-      },
-      {
-        "tok": "{{k_s2_sDft04FundamentalOf_U}}",
-        "label": "[DFT 04] Fundamental of Psychology · Unsatisfied",
-        "ord": "Unsatisfied",
-        "item": "[DFT 04] Fundamental of Psychology"
       }
     ],
     "boxesPartial": false,
     "tables": [],
-    "boxesInDocx": 18,
+    "boxesInDocx": 10,
     "approval": [],
     "manual": [
       {

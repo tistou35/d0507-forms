@@ -129,8 +129,7 @@
       "{{k_reportCourse_3a34964c-ca0b-4347-84a3-448ea18c5331}}"
     ],
     "skipTables": [
-      "s7",
-      "s8"
+      "s7"
     ],
     "_whyTables": "กระดาษฉบับแก้ไขรวมชื่อวิชากับผลไว้คอลัมน์เดียว ใช้ {{s7_N_shown}} จึงไม่มีหัวคอลัมน์ Subject/Score/Result/Passed on ให้จับคู่อีกแล้ว"
   }

@@ -262,63 +262,6 @@
    ]
   },
   {
-   "k": "S2",
-   "tab": "T2",
-   "party": "ht",
-   "title": {
-    "th": "School Standard Subjects",
-    "en": "School Standard Subjects"
-   },
-   "fields": [
-    {
-     "k": "s2",
-     "type": "checklist",
-     "label": {
-      "th": "ผลรายวิชา",
-      "en": "Result by subject"
-     },
-     "opts": [
-      {
-       "v": "S",
-       "n": {
-        "th": "ผ่าน",
-        "en": "Satisfied"
-       }
-      },
-      {
-       "v": "U",
-       "n": {
-        "th": "ไม่ผ่าน",
-        "en": "Unsatisfied"
-       }
-      }
-     ],
-     "items": [
-      {
-       "id": "sDft01MathPhysics",
-       "th": "[DFT 01] Math & Physics for Aviation",
-       "en": "[DFT 01] Math & Physics for Aviation"
-      },
-      {
-       "id": "sDft02C172System",
-       "th": "[DFT 02] C-172 System",
-       "en": "[DFT 02] C-172 System"
-      },
-      {
-       "id": "sDft03NormalEmergency",
-       "th": "[DFT 03] Normal & Emergency Procedure",
-       "en": "[DFT 03] Normal & Emergency Procedure"
-      },
-      {
-       "id": "sDft04FundamentalOf",
-       "th": "[DFT 04] Fundamental of Psychology",
-       "en": "[DFT 04] Fundamental of Psychology"
-      }
-     ]
-    }
-   ]
-  },
-  {
    "k": "S7",
    "tab": "T2",
    "party": "ht",
@@ -908,66 +851,6 @@
        "label": {
         "th": "วันที่ผ่าน",
         "en": "Passed on"
-       }
-      }
-     ]
-    }
-   ]
-  },
-  {
-   "k": "S8",
-   "tab": "T2",
-   "party": "ht",
-   "title": {
-    "th": "สรุปรายบุคคล — รายงานกลุ่ม (จบพร้อมกัน)",
-    "en": "Per-learner summary — group report (finished together)"
-   },
-   "fields": [
-    {
-     "k": "s8",
-     "type": "table",
-     "req": false,
-     "rows": 4,
-     "max": 60,
-     "label": {
-      "th": "ผู้เรียนที่จบหลักสูตร",
-      "en": "Learners completing the course"
-     },
-     "cols": [
-      {
-       "k": "learner",
-       "type": "text",
-       "w": "40%",
-       "label": {
-        "th": "ผู้เรียน",
-        "en": "Learner"
-       }
-      },
-      {
-       "k": "score",
-       "type": "number",
-       "w": "16%",
-       "label": {
-        "th": "คะแนนเฉลี่ย (%)",
-        "en": "Average (%)"
-       }
-      },
-      {
-       "k": "result",
-       "type": "text",
-       "w": "20%",
-       "label": {
-        "th": "ผล",
-        "en": "Result"
-       }
-      },
-      {
-       "k": "completedOn",
-       "type": "date",
-       "w": "24%",
-       "label": {
-        "th": "วันที่จบ",
-        "en": "Completed on"
        }
       }
      ]
