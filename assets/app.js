@@ -81,7 +81,8 @@
              <span>${A.roles.length ? A.esc(A.roleNames().join(' · ')) : A.esc(A.t('noRole'))}</span></span></span>
            <a class="acct" href="#" onclick="D0507.logout();return false" style="padding:0 16px">
              <span class="who"><b>${A.esc(A.t('signOut'))}</b><span>${A.esc(A.t('signOutSub'))}</span></span></a>`
-        : `<a class="acct" href="${base}staff-login/" style="padding:0 16px">
+        : `<a class="acct" href="${base}staff-login/?next=${
+             encodeURIComponent(location.pathname + location.search)}" style="padding:0 16px">
              <span class="who"><b>${A.esc(A.t('signIn'))}</b><span>${A.esc(A.t('signInSub'))}</span></span></a>`;
     }
     document.querySelectorAll('.staffonly').forEach(el => el.classList.toggle('hide', !A.isStaff()));

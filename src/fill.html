@@ -138,9 +138,22 @@ function boot(){
    เป็นแค่ "ค่าตั้งต้น" เท่านั้น ผู้กรอกแก้ได้ทุกช่องก่อนส่ง
 
    ฟิลด์ชนิด sign ถูกตัดทิ้งเสมอ ลิงก์ต้องปลอมลายเซ็นไม่ได้ ไม่ว่าใครสร้างลิงก์ */
-function prefill(){
+/* ค่าที่ส่งมาต้องรอดข้ามการล็อกอิน
+   EFC เป็นฟอร์มเจ้าหน้าที่ ต้องล็อกอินก่อนถึงจะมี DEF ให้เติม
+   ถ้าผู้ใช้กดเข้าสู่ระบบแล้วกลับมาโดยไม่มี query string ค่าจะหายเงียบ ๆ
+   จึงเก็บไว้ตั้งแต่ boot แรก แล้วอ่านคืนเมื่อ URL ไม่มีให้
+   ผูกกับรหัสฟอร์มและลบทิ้งหลังใช้ — จะได้ไม่ค้างไปโผล่ในใบอื่น */
+const PKEY='d0507.prefill.'+(new URLSearchParams(location.search).get('c')||'');
+(function stashP(){
   const raw=new URLSearchParams(location.search).get('p');
+  if(raw){ try{ sessionStorage.setItem(PKEY,raw); }catch(e){} }
+})();
+
+function prefill(){
+  let raw=new URLSearchParams(location.search).get('p');
+  if(!raw){ try{ raw=sessionStorage.getItem(PKEY); }catch(e){} }
   if(!raw||!DEF) return {};
+  try{ sessionStorage.removeItem(PKEY); }catch(e){}
   let o;
   try{
     const b64=raw.replace(/-/g,'+').replace(/_/g,'/');
@@ -269,7 +282,8 @@ function review(){
     modal(A.t('needLoginTitle'), A.t('needLoginSub'),
       `<p class="fk-static">${A.esc(A.t('needLoginBody'))}</p>`,
       `<button class="fb" value="cancel">${A.esc(A.t('goBack'))}</button>
-       <a class="big pri" href="@@BASE@@staff-login/">${A.esc(A.t('signIn'))}</a>`);
+       <a class="big pri" href="@@BASE@@staff-login/?next=${
+          encodeURIComponent(location.pathname + location.search)}">${A.esc(A.t('signIn'))}</a>`);
     return;
   }
   const picker = mustPick ? (DIR.length

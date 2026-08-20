@@ -26,6 +26,20 @@
 <script src="@@BASE@@assets/app.js"></script>
 <script>D0507.GAS_URL='@@GASURL@@';</script>
 <script>
-D0507.initAuth(@@FBCFG@@, u => { if (u) location.href = '@@BASE@@'; });
+/* พากลับหน้าที่ส่งมา ไม่ใช่เด้งหน้าหลักเสมอ
+   ลิงก์จาก TrainHub พาข้อมูลมาใน query string ถ้าเด้งหน้าหลัก ข้อมูลหายทั้งหมด
+   ผู้ใช้จะเห็นหน้าหลักแล้วไม่รู้ว่าเสียอะไรไป
+
+   รับเฉพาะเส้นทางภายในเว็บนี้ — ห้าม scheme ห้ามขึ้นต้นด้วย // ห้ามมี :
+   ไม่งั้นกลายเป็นช่องให้พาไปเว็บอื่นโดยอ้างชื่อเราเป็นทางผ่าน */
+function safeNext() {
+  const raw = new URLSearchParams(location.search).get('next') || '';
+  if (!raw) return '@@BASE@@';
+  let v;
+  try { v = decodeURIComponent(raw); } catch (e) { return '@@BASE@@'; }
+  if (/^[a-z][a-z0-9+.-]*:/i.test(v) || v.startsWith('//') || v.includes('\\')) return '@@BASE@@';
+  return v.startsWith('/') ? v : '@@BASE@@' + v.replace(/^\.?\//, '');
+}
+D0507.initAuth(@@FBCFG@@, u => { if (u) location.href = safeNext(); });
 </script>
 </body></html>
