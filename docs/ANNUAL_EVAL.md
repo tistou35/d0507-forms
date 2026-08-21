@@ -37,16 +37,22 @@ OMA D.2.9 แยกการตรวจสมรรถนะครูออก�
 
 | ด้านใน Annual Eval | ใบที่ออก | หมายเหตุ |
 |---|---|---|
-| Ground Training | `IM-PCR-TKI-302-A` | Tier 1 TKI IPC |
-| Flight Training | `IM-PCR-FI-301-A` | Tier 1 FI IPC |
-| Simulator Training | `IM-PCR-FI-301-A` | ใส่รหัส FTD/FNPT ในช่องทะเบียนอากาศยาน |
-| Recurrent Training | `IM-EFC-303-B` | ครู **เข้ารับ** การอบรม — บันทึกผลอบรม ไม่ใช่ตรวจสมรรถนะ |
-| Progressive / Standard Check | `IM-PCR-FI-301-A` | Tier 1 FI IPC ประจำปี |
-| ประเมินผู้สมัครก่อนจ้าง | `QA-EFM-301-B` | บทบาทเดิมของ EFM ตาม OMA |
+| id ในแอป | ด้าน | ใบที่ออก | `tier` / `ipcType` |
+|---|---|---|---|
+| `ground` | Ground Training | `IM-PCR-TKI-302-A` | ตามเหตุที่ตรวจ |
+| `flight` | Flight Training | `IM-PCR-FI-301-A` | ตามเหตุที่ตรวจ |
+| `simulator` | Simulator Training | `IM-PCR-FI-301-A` | ใส่รหัส FTD/FNPT ใน `acReg` |
+| `recurrent` | Recurrent Training | `IM-PCR-FI-301-A` | `t1postabs` |
+| `progressive` | Progressive / Standard Check | `IM-PCR-FI-301-A` | `t1annual` |
+| — | ประเมินผู้สมัครก่อนจ้าง | `QA-EFM-301-B` | บทบาทเดิมของ EFM ตาม OMA |
 
-⚠️ **Recurrent ground course ไม่ใช่ TKI IPC** — ครูไปนั่งเรียนอบรมทบทวนแล้วออก EFC นั้นถูก
-แต่นั่นคือบันทึก *ผลการอบรม* ไม่ใช่การตรวจ *ความสามารถในการสอน*
-TKI IPC ยังต้องทำแยกและออก `IM-PCR-TKI-302-A` อยู่ดี
+⚠️ **"Recurrent" ในเมนูคือการตรวจสมรรถนะการบินหลังขาด current** ไม่ใช่การไปนั่งเรียน
+ตรงกับ Post-Absence IPC ใน D.2.9 ("Return from absence exceeding 90 days") จึงออก PCR-FI
+
+⚠️ **ครูที่ "เข้ารับ" การอบรมทบทวนเป็นคนละเรื่อง และไม่ได้อยู่ในเมนูนี้**
+OMA D.2.7 บรรทัด 8624–8625 ระบุว่า *"A completed IM-RTR-301-A shall be produced for
+every refresher training event"* — ใบที่ต้องออกคือ **`IM-RTR-301-A`** ไม่ใช่ EFC
+ส่วน EFC เป็นรายงานจบหลักสูตรของผู้เข้ารับการฝึกที่บันทึกใน TrainHub เป็นคนละสาย
 
 ---
 
@@ -103,6 +109,7 @@ const p = btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(o)
 | ครูใหม่ ก่อนปฏิบัติหน้าที่ครั้งแรก | `t1initial` |
 | หลังการอบรมแก้ไขมาตรฐาน D.2.8 | `t1postcor` |
 | Recurrent — กลับจากหยุดเกิน 90 วัน / ขาด current | `t1postabs` |
+| Simulator / Flight — ระบุเหตุตามข้างบน | ตามเหตุ ไม่ใช่ตามด้าน |
 | HT สั่งตรวจ (พบข้อกังวลด้านความปลอดภัย หรือผลตรวจสอบภายใน) | `t1directed` |
 
 ### PCR-TKI — `?c=PCR-TKI`
@@ -120,7 +127,8 @@ const p = btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(o)
 
 ### EFC — `?c=EFC`
 
-ใช้อยู่แล้วกับ TrainHub และ FTMS — บันทึกไว้ย้อนหลังเพื่อให้ตรวจอัตโนมัติได้ทั้งสามใบ
+**ไม่ใช่ปลายทางของเมนู Annual Eval** — ใช้กับ TrainHub และ FTMS สำหรับรายงานจบหลักสูตร
+บันทึกคีย์ไว้ที่นี่เพื่อให้ `check_prefill.py --doc` ตรวจสัญญาได้ครบทั้งสามใบในที่เดียว
 
 | คีย์ | ชนิด | ค่า |
 |---|---|---|

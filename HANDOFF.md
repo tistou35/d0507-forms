@@ -307,9 +307,11 @@ D.2.9.3 เขียนว่าแม้ผล LPC+ ของ CAAT examiner ก
 | ด้านใน Annual Eval | ใบที่ออก |
 |---|---|
 | Ground Training | `D-0507-PCR-TKI-001` |
-| Flight / Simulator / Progressive-Standard | `D-0507-PCR-FI-001` |
-| Recurrent (ครูเข้ารับการอบรม) | `D-0507-EFC-001` |
+| Flight / Simulator / Progressive-Standard / Recurrent | `D-0507-PCR-FI-001` |
 | ประเมินผู้สมัครก่อนจ้าง | `D-0507-EFM-001` |
+
+"Recurrent" ในเมนูคือการตรวจการบินหลังขาด current (= Post-Absence IPC) ไม่ใช่การไปนั่งเรียน
+ครูที่ **เข้ารับ** การอบรมทบทวนออก `IM-RTR-301-A` ตาม OMA D.2.7 บรรทัด 8624 — ไม่ใช่ EFC
 
 **ไม่แก้ `.docx` ของ PCR เลย** — OMA บรรทัด 8892 / 9023 / 9026 อ้าง `IM-PCR-FI-301-A`
 และ `IM-PCR-TKI-302-A` ตรง ๆ การเพิ่มช่องจะเลื่อนรหัสเป็น `-B` แล้วคู่มือจะอ้างเลขที่ไม่มีอยู่จริง

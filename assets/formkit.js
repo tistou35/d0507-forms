@@ -58,13 +58,34 @@
     if (expr.includes('||')) return expr.split('||').some(p => evalCond(p.trim(), ctx));
     if (expr.includes('&&')) return expr.split('&&').every(p => evalCond(p.trim(), ctx));
 
+    /* "countBelow(3) > 2" — ฟังก์ชันเทียบกับตัวเลข
+       OMA D.2.9.5 ไม่ได้ถามแค่ "มีข้อต่ำกว่าเกณฑ์ไหม" แต่ถามว่า "กี่ข้อ"
+       เกรด 2 ในหนึ่งถึงสองข้อคือผ่านแบบมีเงื่อนไข เกินสองข้อคือไม่ผ่าน */
+    const fnCmp = expr.match(/^(\w+)\(([^)]*)\)\s*(>=|<=|==|!=|>|<)\s*(-?[\d.]+|true|false)$/);
+    if (fnCmp) {
+      const a = callFn(ctx, fnCmp[1], fnCmp[2]);
+      if (a === null) return false;
+      /* "anyBelow(2) == false" — ให้เขียนกฎที่ต้อง *ไม่* เข้าเงื่อนไขอื่นได้
+         ตัวประเมินไม่มี ! และไม่ควรมี เพราะกฎที่ต้องอ่านออกด้วยตาคนตรวจเอกสาร
+         การเขียนเทียบกับ false ตรง ๆ อ่านง่ายกว่าเครื่องหมายปฏิเสธหน้าเงื่อนไข */
+      if (fnCmp[4] === 'true' || fnCmp[4] === 'false') {
+        const want = fnCmp[4] === 'true';
+        return fnCmp[3] === '!=' ? !!a !== want : !!a === want;
+      }
+      const b = Number(fnCmp[4]);
+      switch (fnCmp[3]) {
+        case '>=': return Number(a) >= b;
+        case '<=': return Number(a) <= b;
+        case '==': return Number(a) === b;
+        case '!=': return Number(a) !== b;
+        case '>':  return Number(a) >  b;
+        case '<':  return Number(a) <  b;
+      }
+    }
     const fn = expr.match(/^(\w+)\(([^)]*)\)$/);
     if (fn) {
-      const arg = fn[2].trim().replace(/^['"]|['"]$/g, '');
-      if (fn[1] === 'anyStarBelow') return ctx.__anyStarBelow(Number(arg));
-      if (fn[1] === 'anyBelow') return ctx.__anyBelow(Number(arg));
-      if (fn[1] === 'filled') return ctx[arg] !== undefined && ctx[arg] !== '' && ctx[arg] !== null;
-      return false;
+      const r = callFn(ctx, fn[1], fn[2]);
+      return r === null ? false : !!r;
     }
     /* "evType has other" — ใช้กับ multi ที่เก็บเป็น array
        ไม่มีตัวนี้ก็เขียนเงื่อนไข "ติ๊กข้อนี้ไหม" กับช่องเลือกหลายค่าไม่ได้เลย */
@@ -194,6 +215,18 @@
     return out;
   }
 
+  /* คืน null เมื่อไม่รู้จักชื่อฟังก์ชัน เพื่อให้ผู้เรียกแยกได้ระหว่าง
+     "ฟังก์ชันตอบว่าไม่ใช่" กับ "ไม่มีฟังก์ชันนี้" — สองอย่างนี้ต่างกัน */
+  function callFn(ctx, name, rawArg) {
+    const arg = String(rawArg).trim().replace(/^['"]|['"]$/g, '');
+    if (name === 'anyStarBelow') return ctx.__anyStarBelow(Number(arg));
+    if (name === 'anyBelow')     return ctx.__anyBelow(Number(arg));
+    if (name === 'countBelow')   return ctx.__countBelow(Number(arg));
+    if (name === 'filled')
+      return ctx[arg] !== undefined && ctx[arg] !== '' && ctx[arg] !== null;
+    return null;
+  }
+
   FormKit.prototype.ctx = function () {
     const c = Object.assign({}, this.data, this.computed());
     const self = this;
@@ -205,6 +238,16 @@
     });
     c.__anyStarBelow = n => below(n, true);
     c.__anyBelow = n => below(n, false);
+    /* นับเฉพาะข้อที่ "ไม่ใช่" safety-critical
+       ข้อ safety-critical มีกฎเด็ดขาดของตัวเองอยู่แล้ว (ต่ำกว่า 3 = ตกทันที)
+       ถ้านับรวมเข้ามาด้วย ความผิดพลาดด้านความปลอดภัยครั้งเดียวจะไปทบกฎ
+       "เกิน 2 ข้อ" อีกทาง แล้วข้อความที่ผู้ตรวจเห็นจะชี้ผิดเรื่อง */
+    c.__countBelow = n => Object.keys(self.fields).filter(k => {
+      const f = self.fields[k];
+      if (f.type !== 'grade' || f.star) return false;
+      const v = self.data[k];
+      return v !== undefined && v !== '' && Number(v) < n;
+    }).length;
     return c;
   };
 
