@@ -20,8 +20,8 @@
    },
    {
     "k": "T2",
-    "th": "รายวิชา",
-    "en": "Subjects"
+    "th": "รายวิชา / บทเรียน",
+    "en": "Subjects / Lessons"
    },
    {
     "k": "T3",
@@ -275,20 +275,20 @@
    "tab": "T2",
    "party": "ht",
    "title": {
-    "th": "รายวิชา (ระบบการจัดการ / TrainHub) — รายงานรายบุคคล",
-    "en": "Subjects (management system / TrainHub) — individual report"
+    "th": "ผลรายวิชา / บทเรียน",
+    "en": "Subject / lesson results"
    },
    "fields": [
     {
      "k": "reportCourse",
      "type": "select",
      "label": {
-      "th": "หลักสูตรที่รายงานผล (TrainHub)",
-      "en": "Course being reported (TrainHub)"
+      "th": "หลักสูตรที่รายงานผล (ภาคพื้น)",
+      "en": "Course being reported (ground)"
      },
      "hint": {
-      "th": "เลือกแล้วรายวิชาของหลักสูตรนั้นจะขึ้นในตารางด้านล่าง · ถ้ามาจากลิงก์ TrainHub ตารางถูกเติมมาแล้ว ไม่ต้องเลือก",
-      "en": "Choosing a course fills the subject table below. Coming from a TrainHub link, it is already filled."
+      "th": "เลือกแล้วรายวิชาของหลักสูตรนั้นจะขึ้นในตารางด้านล่าง · ถ้ามาจากลิงก์ระบบต้นทาง ตารางถูกเติมมาแล้ว ไม่ต้องเลือก",
+      "en": "Choosing a course fills the table below. Coming from a source-system link, it is already filled."
      },
      "seedInto": "s7",
      "opt": [
@@ -805,14 +805,15 @@
         }
        ]
       }
-     ]
+     ],
+     "showIf": "courseType != 'flight'"
     },
     {
      "k": "courseHead",
      "type": "static",
      "text": {
-      "th": "หลักสูตร: {course}\nรายวิชาและผลด้านล่างเป็นของหลักสูตรนี้",
-      "en": "Course: {course}\nThe subjects and results below belong to this course"
+      "th": "หลักสูตร: {course}\nรายการด้านล่างเป็นของหลักสูตรนี้ — หลักสูตรภาคพื้นเป็นรายวิชา · หลักสูตรภาคอากาศเป็นบทเรียน",
+      "en": "Course: {course}\nThe items below belong to this course — subjects for ground courses, lessons for flight courses"
      }
     },
     {
@@ -822,8 +823,8 @@
      "rows": 4,
      "max": 30,
      "label": {
-      "th": "ผลรายวิชา",
-      "en": "Subject results"
+      "th": "ผลรายวิชา / บทเรียน",
+      "en": "Subject / lesson results"
      },
      "cols": [
       {
@@ -831,17 +832,17 @@
        "type": "text",
        "w": "46%",
        "label": {
-        "th": "วิชา",
-        "en": "Subject"
+        "th": "วิชา / บทเรียน",
+        "en": "Subject / lesson"
        }
       },
       {
        "k": "score",
-       "type": "number",
+       "type": "text",
        "w": "14%",
        "label": {
-        "th": "คะแนน (%)",
-        "en": "Score (%)"
+        "th": "คะแนน / เกรด",
+        "en": "Score / grade"
        }
       },
       {
