@@ -354,6 +354,19 @@ def build(abbr, verbose=False):
         known = {b['tok']: b for b in boxes}
         boxes = [known.get(t, {'tok': t, 'label': ''}) for t in want]
 
+    # token ที่เขียนไว้ในเอกสารแล้วด้วยมือ ไม่ต้องให้ตัววางไปหาที่ให้อีก
+    # เอกสารบางใบวาง token เองทั้งใบ (STR ฉบับแก้ไข) ถ้าไม่กันออก
+    # ตัววางจะไม่เจอที่ว่างให้วาง แล้วโยนทั้งชุดไปกองในบล็อก "ยังไม่ได้วาง" ท้ายเอกสาร
+    all_text = '\n'.join(str(c) for c in cells) + '\n' + \
+               '\n'.join(x if isinstance(x, str) else ' '.join(map(str, x)) for x in lines)
+    already = set(re.findall(r'\{\{[A-Za-z0-9_]+\}\}', all_text))
+    if already:
+        by_label = [b for b in by_label if b['tok'] not in already]
+        by_cell = [b for b in by_cell if b['tok'] not in already]
+        by_line = [b for b in by_line if b['tok'] not in already]
+        boxes = [b for b in boxes if b['tok'] not in already]
+        unmatched = [u for u in unmatched if u['tok'] not in already]
+
     # ลำดับช่องติ๊กต้องตรงกับกระดาษ ไม่ใช่แค่จำนวนเท่ากัน
     # boxesPartial: กระดาษมี ☐ มากกว่าที่ฟอร์มใช้ และ ☐ ที่เหลือไม่มีใครติ๊กแล้ว
     # (EFC — ตารางรายวิชา 84 ช่องย้ายไปเป็นไฟล์แนบ เหลือ 10 ช่องแรกที่ยังใช้)

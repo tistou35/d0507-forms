@@ -2981,248 +2981,48 @@ var TOKEN_MAP = {
     "abbr": "STR",
     "docx": "D-0507-STR-001.docx",
     "orderWarn": [],
-    "byLabel": [
-      {
-        "label": "Instructor Name",
-        "tok": "{{insName}}"
-      },
-      {
-        "label": "Certificate No.",
-        "tok": "{{certNo}}"
-      },
-      {
-        "label": "Instructor Rating(s)",
-        "tok": "{{ratings}}"
-      },
-      {
-        "label": "Date",
-        "tok": "{{sesDate}}"
-      },
-      {
-        "label": "Duration (hrs)",
-        "tok": "{{duration}}"
-      },
-      {
-        "label": "Venue / Location",
-        "tok": "{{venue}}"
-      },
-      {
-        "label": "Conducted by (HT / ISM)",
-        "tok": "{{conductedBy}}"
-      },
-      {
-        "label": "Aircraft Type (if applicable)",
-        "tok": "{{acType}}"
-      },
-      {
-        "label": "Other — specify:",
-        "tok": "{{topicOther}}"
-      },
-      {
-        "label": "Assessment Notes",
-        "tok": "{{notes}}"
-      },
-      {
-        "label": "Follow-up Action Required",
-        "tok": "{{fuAction}}"
-      },
-      {
-        "label": "Due Date for Follow-up",
-        "tok": "{{fuDue}}"
-      },
-      {
-        "label": "Responsible Person",
-        "tok": "{{fuOwner}}"
-      },
-      {
-        "label": "Follow-up Verified by",
-        "tok": "{{fuVerifiedBy}}"
-      },
-      {
-        "label": "Verification Date",
-        "tok": "{{fuVerifiedDate}}"
-      }
-    ],
+    "byLabel": [],
     "byLine": [
+      {
+        "label": "Name (Print)",
+        "und": 30,
+        "tok": "{{assessorName}}"
+      },
       {
         "label": "Date",
         "und": 38,
         "tok": "{{assessorDate}}"
       },
       {
+        "label": "Signature",
+        "und": 33,
+        "tok": "{{sig_assessorSign}}"
+      },
+      {
         "label": "Date",
         "und": 38,
         "tok": "{{insAckDate}}"
+      },
+      {
+        "label": "Signature",
+        "und": 33,
+        "tok": "{{sig_insSign}}"
       }
     ],
     "byCell": [],
-    "boxes": [
-      {
-        "tok": "{{k_category_FI}}",
-        "label": "FI",
-        "ord": "FI"
-      },
-      {
-        "tok": "{{k_category_TKI}}",
-        "label": "TKI",
-        "ord": "TKI"
-      },
-      {
-        "tok": "{{k_category_Both}}",
-        "label": "Both",
-        "ord": "Both"
-      },
-      {
-        "tok": "{{k_trainType_annual}}",
-        "label": "Annual",
-        "ord": "Annual"
-      },
-      {
-        "tok": "{{k_trainType_initial}}",
-        "label": "Initial",
-        "ord": "Initial"
-      },
-      {
-        "tok": "{{k_trainType_triggered}}",
-        "label": "Triggered",
-        "ord": "Triggered"
-      },
-      {
-        "tok": "{{k_trainType_corrective}}",
-        "label": "Corrective",
-        "ord": "Corrective"
-      },
-      {
-        "tok": "{{k_topics_sop}}",
-        "label": "SOPs — flight operations",
-        "ord": "SOPs — flight operations"
-      },
-      {
-        "tok": "{{k_topics_emerg}}",
-        "label": "Emergency procedures",
-        "ord": "Emergency procedures"
-      },
-      {
-        "tok": "{{k_topics_brief}}",
-        "label": "Pre/post-flight briefing",
-        "ord": "Pre/post-flight briefing"
-      },
-      {
-        "tok": "{{k_topics_manoeuvre}}",
-        "label": "Flight manoeuvres / drills",
-        "ord": "Flight manoeuvres / drills"
-      },
-      {
-        "tok": "{{k_topics_checklist}}",
-        "label": "Use of checklists",
-        "ord": "Use of checklists"
-      },
-      {
-        "tok": "{{k_topics_technique}}",
-        "label": "Instructional techniques",
-        "ord": "Instructional techniques"
-      },
-      {
-        "tok": "{{k_topics_feedback}}",
-        "label": "Student feedback methods",
-        "ord": "Student feedback methods"
-      },
-      {
-        "tok": "{{k_topics_classroom}}",
-        "label": "Classroom management",
-        "ord": "Classroom management"
-      },
-      {
-        "tok": "{{k_topics_pedagogy}}",
-        "label": "Teaching methodology",
-        "ord": "Teaching methodology"
-      },
-      {
-        "tok": "{{k_topics_assess}}",
-        "label": "Student assessment methods",
-        "ord": "Student assessment methods"
-      },
-      {
-        "tok": "{{k_topics_compliance}}",
-        "label": "Regulatory compliance",
-        "ord": "Regulatory compliance"
-      },
-      {
-        "tok": "{{k_topics_hpa}}",
-        "label": "High-performance aeroplane (T206H)",
-        "ord": "High-performance aeroplane (T206H)"
-      },
-      {
-        "tok": "{{k_topics_avionics}}",
-        "label": "Advanced avionics / G1000",
-        "ord": "Advanced avionics / G1000"
-      },
-      {
-        "tok": "{{k_topics_docs}}",
-        "label": "Documentation / flight logs",
-        "ord": "Documentation / flight logs"
-      },
-      {
-        "tok": "{{k_topics_other}}",
-        "label": "Other",
-        "ord": "Other"
-      },
-      {
-        "tok": "{{k_method_observation}}",
-        "label": "Observation",
-        "ord": "Observation"
-      },
-      {
-        "tok": "{{k_method_oral}}",
-        "label": "Oral",
-        "ord": "Oral"
-      },
-      {
-        "tok": "{{k_method_practical}}",
-        "label": "Practical",
-        "ord": "Practical"
-      },
-      {
-        "tok": "{{k_outcome_standardised}}",
-        "label": "Standardised",
-        "ord": "Standardised"
-      },
-      {
-        "tok": "{{k_outcome_followup}}",
-        "label": "Requires follow-up",
-        "ord": "Requires follow-up"
-      }
-    ],
+    "boxes": [],
+    "boxesPartial": false,
     "tables": [],
-    "boxesInDocx": 27,
+    "boxesInDocx": 0,
     "approval": [
       {
         "tok": "{{insAckName}}",
-        "label": "Instructor name",
-        "labelTh": "ชื่อครู",
+        "label": "Name",
+        "labelTh": "ชื่อ",
         "sign": false
-      },
-      {
-        "tok": "{{sig_insSign}}",
-        "label": "Instructor signature",
-        "labelTh": "ลายเซ็นครู",
-        "sign": true
       }
     ],
-    "manual": [
-      {
-        "tok": "{{assessorName}}",
-        "label": "Assessor name (HT / ISM)",
-        "labelTh": "ชื่อผู้ประเมิน (HT / ISM)",
-        "sign": false
-      },
-      {
-        "tok": "{{sig_assessorSign}}",
-        "label": "Assessor signature",
-        "labelTh": "ลายเซ็นผู้ประเมิน",
-        "sign": true
-      }
-    ]
+    "manual": []
   },
   "VSR": {
     "abbr": "VSR",
