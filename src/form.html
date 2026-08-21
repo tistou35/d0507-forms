@@ -94,14 +94,20 @@ function paint(){
   ].filter(x => x[1] !== null).map(x =>
     `<div><span>${A.esc(x[0])}</span><b>${A.esc(x[1])}</b></div>`).join('');
 
-  const t = A.target(REG, F);
+  /* เอกสารอ้างอิงไม่ใช่ใบกรอก — ทะเบียนคุมมันเหมือนกันเพราะมันคือเอกสารควบคุม
+     แต่หน้าเว็บต้องไม่บอกว่า "ยังไม่มีฟอร์มออนไลน์" ราวกับรอใครมาทำให้
+     เกณฑ์การให้คะแนนจะไม่มีวันมีช่องกรอก การรอนั้นไม่มีวันจบ */
+  const isRef = F.kind === 'ref';
+  const t = isRef ? null : A.target(REG, F);
+  const openDoc = A.L(isRef ? {th:'เปิดเอกสาร',en:'Open document'}
+                            : {th:'ดูฟอร์มเปล่า',en:'View blank form'});
   document.getElementById('acts').innerHTML =
     (t ? `<a class="big pri" href="${A.esc(t.url)}"${t.ext?' target="_blank" rel="noopener"':''}>${A.esc(t.label)}${t.ext?' ↗':''}</a>` :
-         `<span class="big off">${A.esc(A.t('noOnline'))}</span>`) +
+     isRef ? '' : `<span class="big off">${A.esc(A.t('noOnline'))}</span>`) +
     /* ฟอร์มที่ย้ายไปทำในระบบอื่นแล้ว คนยังต้องเห็นหน้าตาเอกสารได้
        ไม่งั้นต้องไปรื้อไฟล์ .docx เอง ซึ่งคนทั่วไปเปิดไม่ได้ */
-    (F.blank ? `<a class="big sec" href="@@BASE@@${A.esc(F.blank)}" target="_blank" rel="noopener">${
-        A.esc(A.L({th:'ดูฟอร์มเปล่า',en:'View blank form'}))} ↗</a>` : '') +
+    (F.blank ? `<a class="big ${isRef?'pri':'sec'}" href="@@BASE@@${A.esc(F.blank)}" target="_blank" rel="noopener">${
+        A.esc(openDoc)} ↗</a>` : '') +
     `<a class="big sec" href="@@BASE@@all/">${A.esc(A.t('backToAll'))}</a>`;
 
   /* ขอบเขตการประเมิน — ใช้กับฟอร์มที่ตัวเอกสารอยู่ที่นี่เพื่อควบคุม
@@ -128,7 +134,7 @@ function paint(){
   }
 
   const al = [];
-  if (F.hasDef === false && F.sys === 'here' && !F.jot && !F.assignTo)
+  if (F.hasDef === false && F.sys === 'here' && !F.jot && !F.assignTo && !isRef)
     al.push(['warn', A.t('noFields')]);
   if (staff && F.note) al.push([(REG.status[F.st]||{}).lv==='bad'?'stop':'warn', F.note]);
   document.getElementById('alerts').innerHTML = al.map(x =>

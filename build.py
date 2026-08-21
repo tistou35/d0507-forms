@@ -44,7 +44,7 @@ def firebase_config():
 
 PUBLIC_FORBIDDEN = ('code', 'lef', 'st', 'note', 'docx', 'own', 'jotDup')
 PUBLIC_KEEP = ('doc', 'abbr', 't', 'th', 'sys', 'jot', 'assignTo', 'r', 'chain', 'kw',
-               'public', 'iss', 'rev', 'eff', 'hasDef')
+               'public', 'iss', 'rev', 'eff', 'hasDef', 'kind')
 FIELD_TYPES = {'text', 'textarea', 'date', 'time', 'number', 'email', 'tel', 'select',
                'multi', 'check', 'checklist', 'grade', 'scale', 'sign', 'static', 'table', 'file'}
 
@@ -111,6 +111,31 @@ def check_guide(reg):
             if g.get('fa') and g['fa'] not in known:
                 sys.exit('guide ของ %s ชี้ไปฟอร์ม %s ที่ไม่มีในทะเบียน'
                          % (f['abbr'], g['fa']))
+
+
+def check_status(reg, defs):
+    """สถานะในทะเบียนต้องตรงกับของจริง
+
+    'noform' แปลว่ายังไม่มีฟอร์มออนไลน์ ถ้ามีนิยามฟอร์มแล้วก็ไม่จริงอีกต่อไป
+    สถานะที่ค้างอยู่จะทำให้หน้าเว็บบอกผู้ใช้ผิดว่าใบนี้ยังกรอกออนไลน์ไม่ได้
+    เคยเกิดกับ PCR-TKI และ RTR มาแล้วทั้งคู่ — ตรวจให้ดังตั้งแต่ build
+    """
+    for f in reg['forms']:
+        if f.get('kind') == 'ref':
+            if f['abbr'] in defs:
+                sys.exit("%s: เป็นเอกสารอ้างอิงแต่มี formdefs/%s.json — "
+                         "เลือกอย่างใดอย่างหนึ่ง" % (f['doc'], f['abbr']))
+            if not f.get('blank'):
+                sys.exit("%s: เป็นเอกสารอ้างอิงแต่ไม่มี blank: ให้เปิดอ่าน "
+                         "— หน้าเว็บจะไม่มีอะไรให้กดเลย" % f['doc'])
+            continue
+        if f.get('st') == 'noform' and f['abbr'] in defs:
+            sys.exit("%s: สถานะเป็น 'noform' แต่มี formdefs/%s.json แล้ว "
+                     "— แก้สถานะในทะเบียน" % (f['doc'], f['abbr']))
+        if f.get('st') == 'ok' and f.get('sys') == 'here' \
+                and f['abbr'] not in defs and not f.get('jot'):
+            sys.exit("%s: สถานะเป็น 'ok' แต่ไม่มีทั้งนิยามฟอร์มและลิงก์ Jotform "
+                     "— กรอกที่ไหนไม่ได้เลย" % f['doc'])
 
 
 def public_view(reg):
@@ -203,6 +228,7 @@ def main():
     AIRAC = airac_table(10)
 
     check_guide(reg)
+    check_status(reg, defs)
     pub = public_view(reg)
     # ⚠️ ทุกหน้าที่ host แบบสาธารณะฝังได้เฉพาะ pub — ทะเบียนเต็มอยู่ Firestore เท่านั้น
     FB, todo, GAS = firebase_config()
@@ -263,7 +289,7 @@ def main():
         # ต่างจาก note ที่เป็นบันทึกภายใน (มาจาก Firestore ตอน login เท่านั้น)
         fpub = {k: f[k] for k in ('abbr','doc','t','th','sys','chain','public','r','with',
                                   'assignTo','iss','rev','eff','jot','hasDef',
-                                  'guide','blank') if k in f}
+                                  'guide','blank','kind') if k in f}
         sub = {'@@REG@@': jsonjs(mini), '@@FBCFG@@': FB, '@@GASURL@@': GAS, '@@FORM@@': jsonjs(fpub),
                '@@FTITLE@@': (f.get('th') or f.get('t') or f['abbr']).replace('"', "'")}
         total += emit('form.html', os.path.join(HERE, 'f', f['abbr'], 'index.html'),

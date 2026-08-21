@@ -658,9 +658,9 @@
       ],
       "jot": "",
       "docx": "D-0507-RTR-001.docx",
-      "st": "noform",
+      "st": "nolink",
       "chain": "standardisation",
-      "note": "เปิดอัตโนมัติเมื่อ PCR ไม่ผ่าน (OMA D.2.8 Corrective Standardisation)",
+      "note": "เปิดอัตโนมัติเมื่อ PCR ไม่ผ่าน (OMA D.2.8 Corrective Standardisation) · มีฟอร์มออนไลน์และแม่แบบ PDF แล้ว เหลือแค่ LEF ยังไม่ใส่ลิงก์",
       "r": {
         "ins": "บันทึกการอบรมทบทวนของตัวเอง",
         "mgt": "จัดการอบรมทบทวนและรับรองผล"
@@ -680,6 +680,7 @@
       "doc": "D-0507-ECA-001",
       "code": "IM-ECA-301-A",
       "abbr": "ECA",
+      "kind": "ref",
       "t": "Proficiency Check — Evaluation Criteria and Assessment Standards",
       "th": "เกณฑ์การประเมินการตรวจสมรรถนะ",
       "iss": "01",
@@ -691,14 +692,42 @@
       "docx": "D-0507-ECA-001.docx",
       "st": "notinlef",
       "chain": "standardisation",
-      "note": "เป็นเอกสารมาตรฐานอ้างอิง ไม่ใช่ฟอร์ม — พิจารณาใส่ LEP แทน LEF",
+      "note": "เอกสารเกณฑ์การให้คะแนน ไม่มีช่องกรอก จึงไม่มีนิยามฟอร์ม — เปิดอ่านเป็น PDF · 🔴 เนื้อในขัดกับ OMA D.2.9.5 ซึ่งเป็นคู่มือหลัก: ECA ให้ FI 7 หัวข้อโดยมี Emergency handling และ Regulatory compliance ที่ D.2.9.5 ไม่มี · ★ ของ ECA มี 3 หัวข้อ แต่ D.2.9.5 มีหัวข้อเดียว (Airmanship สำหรับ FI · Delivery สำหรับ TKI) · ECA เพิ่มเกณฑ์ \"Overall ≥ 75%\" ที่ D.2.9.5 ไม่มี — ครูที่ได้เกรด 3 ทุกหัวข้อ ผ่านตาม D.2.9.5 แต่ตกตาม ECA (21/35 = 60%) · ใบ PCR ทั้งสองใบทำตาม D.2.9.5 · 🔴 อ้างเลขผิดสองแห่ง: หัวเอกสารเขียน Ref OMA D.2.9.1 แต่เกณฑ์อยู่ D.2.9.5 · PURPOSE อ้าง \"Form D-0507-PCR-001\" ซึ่งไม่มีอยู่จริง ของจริงคือ D-0507-PCR-FI-001 และ D-0507-PCR-TKI-001 · รอการตัดสินใจว่าจะแก้ ECA ให้ตรง OMA หรือไม่ — ยังไม่ได้แก้",
       "r": {
         "ins": "อ่านเกณฑ์การให้เกรดก่อนเข้ารับการตรวจ",
         "mgt": "ใช้เป็นเกณฑ์ให้เกรดใน PCR"
       },
       "with": [],
       "sys": "here",
-      "public": false
+      "public": false,
+      "blank": "blank/ECA.pdf",
+      "guide": {
+        "th": "เอกสารเกณฑ์ ไม่ใช่ใบกรอก — ผู้ตรวจเปิดอ่านระหว่างให้เกรด แล้วบันทึกผลลงใบตรวจสมรรถนะ",
+        "en": "A criteria document, not a form — assessors read it while grading and record the result on the proficiency check record",
+        "items": [
+          {
+            "n": "PART A — Flight Instructor",
+            "by": "HT / CFI / FIE",
+            "w": "7 หัวข้อ พร้อมคำบรรยายเกรด 1–5 ต่อหัวข้อ · ★ 3 หัวข้อ",
+            "f": "D-0507-PCR-FI-001",
+            "fa": "PCR-FI"
+          },
+          {
+            "n": "PART B — Theoretical Knowledge Instructor",
+            "by": "HT / CTKI",
+            "w": "7 หัวข้อ พร้อมคำบรรยายเกรด 1–5 ต่อหัวข้อ · ★ 3 หัวข้อ",
+            "f": "D-0507-PCR-TKI-001",
+            "fa": "PCR-TKI"
+          }
+        ]
+      },
+      "kw": [
+        "eca",
+        "evaluation criteria",
+        "grade descriptor",
+        "เกณฑ์ประเมิน",
+        "เกณฑ์ให้คะแนน"
+      ]
     },
     {
       "doc": "D-0507-FPL-001",
