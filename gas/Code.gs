@@ -639,6 +639,12 @@ function expandRows_(body, data) {
       var key = m[1], arr = data ? data[key] : null;
       if (!Array.isArray(arr) || arr.length < 2) continue;
 
+      /* แม่แบบที่เผื่อแถวไว้แล้ว (มี {{key_2_...}} เขียนไว้ในเอกสาร) ห้ามขยาย
+         ไม่งั้นจะได้แถวสำเนาทับซ้อนกับแถวที่มีอยู่ ข้อมูลชุดเดียวโผล่สองรอบ
+         ของจริงที่ต้องกัน: DRC เผื่อ 8 แถว · MOC เผื่อ 3–5 แถวในสี่ตาราง
+         แม่แบบพวกนั้นใช้วิธีเดิมคือลบแถวว่างทิ้งตอนท้าย ซึ่งยังทำงานได้ปกติ */
+      if (body.getText().indexOf('{{' + key + '_2_') >= 0) continue;
+
       // แทรกจากท้ายมาหน้า ตำแหน่งของแถวต้นแบบจึงไม่ขยับระหว่างทาง
       for (var i = arr.length; i >= 2; i--) {
         var copy = tb.insertTableRow(r + 1, row.copy());
