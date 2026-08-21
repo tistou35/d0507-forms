@@ -30,8 +30,33 @@ def load(abbr):
     d = json.load(open(os.path.join(HERE, 'formdefs', abbr + '.json'), encoding='utf-8'))
     tpl_path = os.path.join(HERE, 'gas', 'Template_%s.gs' % abbr)
     tpl = open(tpl_path, encoding='utf-8').read() if os.path.exists(tpl_path) else None
+    if tpl is None:
+        tpl = from_tokenmap(abbr)
     entry = next((f for f in reg['forms'] if f['abbr'] == abbr), None)
     return d, entry, tpl
+
+
+def from_tokenmap(abbr):
+    """คืน token ทั้งหมดที่ TokenMap.gs วางไว้ในแม่แบบของใบนี้ เป็นข้อความก้อนเดียว
+
+    ใบรุ่นหลังไม่ได้เขียน Template_<ABBR>.gs อีกแล้ว — แปลง .docx เป็น Google Doc
+    ตรง ๆ แล้วหยอด token ตามแผนที่ ตัวตรวจจึงต้องอ่านแผนที่ ไม่ใช่มองหาไฟล์ .gs
+    ที่ไม่มีใครเขียนแล้ว ไม่งั้นจะไล่ให้คนทำสิ่งที่เลิกทำไปนานแล้ว
+    """
+    mp = os.path.join(HERE, 'gas', 'TokenMap.gs')
+    if not os.path.exists(mp):
+        return None
+    m = re.search(r'var TOKEN_MAP = (\{.*\});\s*$', open(mp, encoding='utf-8').read(), re.S)
+    if not m:
+        return None
+    ent = json.loads(m.group(1)).get(abbr)
+    if not ent:
+        return None
+    out = []
+    for part in ('byLabel', 'byLine', 'byCell', 'boxes', 'tables', 'approval', 'manual'):
+        for x in ent.get(part) or []:
+            out.append(x.get('tok', '') if isinstance(x, dict) else str(x))
+    return '\n'.join(out)
 
 
 def check(abbr):
@@ -104,7 +129,8 @@ def check(abbr):
 
     # ── 3. เทียบกับแม่แบบ PDF ──
     if tpl is None:
-        warn.append('ยังไม่มี gas/Template_%s.gs — PDF จะใช้ฉบับสำรองจาก HTML' % abbr)
+        warn.append('ยังไม่มีแม่แบบ PDF — รัน tools/make_tokenmap.py %s แล้ว importTemplate '
+                    'ไม่งั้น PDF จะใช้ฉบับสำรองจาก HTML ซึ่งหน้าตาไม่เหมือนเอกสารควบคุม' % abbr)
     else:
         toks = set(re.findall(r'\{\{([\w-]+)\}\}', tpl))
         # แม่แบบบางใบ (FRAE) สร้าง token ในลูปจากตารางข้อมูลของตัวเอง
@@ -128,6 +154,29 @@ def check(abbr):
                 head, _, tail = base.rpartition('_')
                 if head in fields and any(str(o.get('v')) == tail
                                           for o in fields[head].get('opt', [])):
+                    continue
+                # ช่องให้เกรดไม่มี opt — ค่าที่ติ๊กได้คือ 1 ถึง max
+                # แม่แบบจึงมี {{k_g5_1}}…{{k_g5_5}} หนึ่งช่องต่อหนึ่งเกรด
+                if head in fields and fields[head].get('type') in ('grade', 'scale') \
+                        and tail.isdigit() and 1 <= int(tail) <= int(fields[head].get('max', 5)):
+                    continue
+                # รายการตรวจ — หนึ่งช่องต่อ "หนึ่งรายการ × หนึ่งผล" เช่น {{k_checks_T1_S}}
+                # ชื่อจึงมีสามท่อน ต้องแยกอีกชั้นแล้วตรวจทั้งรหัสรายการและค่าผล
+                h2, _, item = head.rpartition('_') if '_' in head else ('', '', head)
+                owner = h2 if h2 in fields else head
+                fo = fields.get(owner)
+                if fo and fo.get('type') == 'checklist':
+                    ids = {str(i.get('id')) for i in fo.get('items', [])}
+                    vals = {str(o.get('v')) for o in fo.get('opts', [])}
+                    if owner == h2 and item in ids and tail in vals:
+                        continue
+                    if owner == head and tail in ids:      # แม่แบบบางใบไม่แยกผล
+                        continue
+                    err.append('แม่แบบใช้ {{%s}} — %s ไม่มีรายการ %r หรือผล %r'
+                               % (t, owner, item if owner == h2 else tail, tail))
+                    continue
+                # ค่าที่คำนวณได้ เช่น {{k_riskLevel_H}} ติ๊กตามระดับที่เมทริกซ์ให้
+                if head in comp:
                     continue
                 err.append('แม่แบบใช้ {{%s}} ที่ไม่มีฟิลด์หรือค่าตัวเลือกรองรับ' % t)
                 continue
