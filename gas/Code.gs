@@ -295,6 +295,10 @@ function makePdf_(folder, abbr, s) {
     try { var hd = doc.getHeader(); if (hd) parts.push(hd); } catch (e) {}
     try { var ft = doc.getFooter(); if (ft) parts.push(ft); } catch (e) {}
 
+    /* ขยายตารางตามจำนวนข้อมูลก่อนแทนค่า — ตารางใน Word ขยายเองไม่ได้
+       แต่ Apps Script แทรกแถวตอนสร้างเอกสารได้ แม่แบบจึงมีแถวตัวอย่างแค่แถวเดียว */
+    expandRows_(b, data);
+
     parts.forEach(function (part) {
       Object.keys(all).forEach(function (k) {
         part.replaceText('\\{\\{' + k + '\\}\\}', String(all[k]));
@@ -608,4 +612,40 @@ function overflowNote_(body, data) {
       .setAttributes({ FOREGROUND_COLOR: '#B42318', BOLD: true, FONT_SIZE: 9 });
     Logger.log('🔴 %s มี %s แถว เกินที่แม่แบบรองรับ %s', k, v.length, slots);
   });
+}
+
+
+/**
+ * ขยายตารางให้มีแถวเท่าจำนวนข้อมูลจริง — เรียกก่อนแทนค่า token
+ *
+ * ── ทำไมถึงทำแบบนี้ ─────────────────────────────────────────
+ * ตารางใน Word ขยายเองไม่ได้ วิธีเดิมคือเผื่อแถวไว้ในแม่แบบ (EFC เผื่อ 18)
+ * แล้วลบแถวที่ไม่ได้ใช้ทิ้ง ซึ่งมีเพดานตายตัว หลักสูตรที่ยาวกว่านั้นจะขาด
+ *
+ * Apps Script แทรกแถวตอนสร้างเอกสารได้ แม่แบบจึงเก็บแถวตัวอย่างไว้แถวเดียว
+ * ที่เขียน {{key_1_...}} แล้วให้ตัวนี้ทำสำเนาเป็น {{key_2_...}} ไปจนครบจำนวนข้อมูล
+ * ได้ตารางที่ยาวเท่าที่ข้อมูลมีจริง ไม่มีเพดาน ไม่มีแถวว่างเหลือ
+ *
+ * สำเนามาจากแถวเดิม รูปแบบ เส้นขอบ ความกว้างคอลัมน์จึงเหมือนกันทั้งหมด
+ */
+function expandRows_(body, data) {
+  var TOK = /\{\{([A-Za-z0-9]+)_1_([A-Za-z0-9]+)\}\}/;
+  var tables = body.getTables();
+  for (var t = 0; t < tables.length; t++) {
+    var tb = tables[t];
+    for (var r = 0; r < tb.getNumRows(); r++) {
+      var row = tb.getRow(r), txt = row.getText(), m = txt.match(TOK);
+      if (!m) continue;
+      var key = m[1], arr = data ? data[key] : null;
+      if (!Array.isArray(arr) || arr.length < 2) continue;
+
+      // แทรกจากท้ายมาหน้า ตำแหน่งของแถวต้นแบบจึงไม่ขยับระหว่างทาง
+      for (var i = arr.length; i >= 2; i--) {
+        var copy = tb.insertTableRow(r + 1, row.copy());
+        copy.replaceText('\\{\\{' + key + '_1_', '{{' + key + '_' + i + '_');
+      }
+      Logger.log('ขยายตาราง %s เป็น %s แถว', key, arr.length);
+      r += arr.length - 1;            // ข้ามแถวที่เพิ่งสร้าง
+    }
+  }
 }
