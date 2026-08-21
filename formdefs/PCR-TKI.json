@@ -203,8 +203,8 @@
         "en": "Theoretical Knowledge Instructor evaluation"
       },
       "desc": {
-        "th": "เกณฑ์การให้คะแนนตาม IM-ECA-301-A · ★ = การถ่ายทอดเนื้อหาที่เกี่ยวกับความปลอดภัย เกรด 1 หรือ 2 = ไม่ผ่านทันที · เกณฑ์ผ่าน คือเกรด 3 ขึ้นไปทุกข้อ",
-        "en": "Grading per IM-ECA-301-A. ★ = delivery of safety-critical content: grade 1 or 2 is an automatic fail. Pass standard: grade 3+ in ALL areas."
+        "th": "เกณฑ์การให้คะแนนตาม IM-ECA-301-B · ★ = การถ่ายทอดเนื้อหาที่เกี่ยวกับความปลอดภัย เกรด 1 หรือ 2 = ไม่ผ่านทันที · เกณฑ์ผ่าน คือเกรด 3 ขึ้นไปทุกข้อ",
+        "en": "Grading per IM-ECA-301-B. ★ = delivery of safety-critical content: grade 1 or 2 is an automatic fail. Pass standard: grade 3+ in ALL areas."
       },
       "fields": [
         {
