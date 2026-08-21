@@ -2,7 +2,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>บันทึกการมอบอำนาจ — D-0507 Flight Training</title>
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="../../assets/app.css?v=c6b8f030">
+<link rel="stylesheet" href="../../assets/app.css?v=d2fee5ab">
 </head><body>
 <div class="topbar">
   <a class="brand" href="../../" style="text-decoration:none">
@@ -188,12 +188,19 @@ function paint(){
     /* ฟอร์มที่ผู้ประเมินเป็นคนเดียวกันทุกหัวข้อ (เช่น SEF นักเรียนประเมินทั้งใบ)
        ไม่ต้องมีคอลัมน์ผู้ประเมินให้ซ้ำกันทุกแถว — บอกไว้ในหัวข้อพอ */
     const anyBy = F.guide.items.some(g => g.by);
+    /* บางใบครอบคลุมหลายด้าน แต่ละด้านออกใบควบคุมคนละใบ (เช่น Annual Eval)
+       ต้องบอกเลขใบที่ได้ ไม่งั้นคนกรอกจะคิดว่าทุกด้านออกใบเดียวกัน */
+    const anyF = F.guide.items.some(g => g.f);
     const box = document.getElementById('guide');
-    box.className = 'gitems' + (anyBy ? '' : ' nb');
+    box.className = 'gitems' + (anyBy ? '' : ' nb') + (anyF ? ' wf' : '');
     box.innerHTML = F.guide.items.map(g =>
       `<div class="gitem"><b>${A.esc(g.n)}</b>${
         anyBy ? `<span class="by">${A.esc(g.by || '')}</span>` : ''}
-        <span class="w">${A.esc(g.w)}</span></div>`).join('');
+        <span class="w">${A.esc(g.w)}</span>${
+        !anyF ? '' : !g.f ? '<span class="gf">\u2014</span>'
+          : g.fa && g.fa !== F.abbr
+            ? `<a class="gf" href="../../f/${A.esc(g.fa)}/">${A.esc(g.f)}</a>`
+            : `<span class="gf on">${A.esc(g.f)}</span>`}</div>`).join('');
   }
 
   const al = [];

@@ -92,6 +92,27 @@ def load_defs():
     return out, errs
 
 
+CODE_RE = re.compile(r'\b[A-Z]{2}-[A-Z]{2,4}(?:-[A-Z]{2,3})?-\d{3}-[A-Z]\b')
+
+
+def check_guide(reg):
+    """guide ถูกฝังลงหน้าฟอร์มสาธารณะ แต่ code ไม่ใช่ข้อมูลสาธารณะ
+
+    เลขกำกับยังเลื่อนตัวอักษรทุกครั้งที่ ISSUE หรือ REVISION เปลี่ยน
+    เขียนไว้ใน guide จึงเน่าเงียบ ๆ ให้อ้างเลขเอกสารที่คงที่แทน
+    """
+    known = {f['abbr'] for f in reg['forms']}
+    for f in reg['forms']:
+        for g in (f.get('guide') or {}).get('items', []):
+            bad = CODE_RE.findall(' '.join(str(v) for v in g.values()))
+            if bad:
+                sys.exit('guide ของ %s อ้างเลขกำกับ %s — ให้ใช้เลขเอกสารแทน'
+                         % (f['abbr'], bad))
+            if g.get('fa') and g['fa'] not in known:
+                sys.exit('guide ของ %s ชี้ไปฟอร์ม %s ที่ไม่มีในทะเบียน'
+                         % (f['abbr'], g['fa']))
+
+
 def public_view(reg):
     out = []
     for f in reg['forms']:
@@ -181,6 +202,7 @@ def main():
     from airac import table as airac_table
     AIRAC = airac_table(10)
 
+    check_guide(reg)
     pub = public_view(reg)
     # ⚠️ ทุกหน้าที่ host แบบสาธารณะฝังได้เฉพาะ pub — ทะเบียนเต็มอยู่ Firestore เท่านั้น
     FB, todo, GAS = firebase_config()

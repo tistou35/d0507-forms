@@ -591,6 +591,18 @@ footer{text-align:center;color:var(--g-400);font-size:12px;padding:22px}
 @media print{ .gitem{break-inside:avoid} }
 /* ผู้ประเมินคนเดียวกันทั้งใบ — ยุบเหลือสองคอลัมน์ */
 .gitems.nb .gitem{grid-template-columns:minmax(180px,1fr) 2fr}
+/* เลขใบควบคุมที่แต่ละด้านออกให้ — ชิดขวาเพื่อให้กวาดตาอ่านเทียบกันได้เป็นแนว */
+.gitems.wf .gitem{grid-template-columns:minmax(140px,1fr) minmax(110px,.7fr) 1.2fr auto}
+.gitems.wf.nb .gitem{grid-template-columns:minmax(170px,1fr) 1.6fr auto}
+.gitem .gf{font-family:var(--font-mono);font-size:11.5px;white-space:nowrap;
+  padding:3px 8px;border-radius:6px;background:var(--g-50);color:var(--fg-1);
+  border:1px solid var(--border-light);text-decoration:none}
+a.gf:hover{border-color:var(--navy-900);color:var(--navy-900)}
+.gitem .gf.on{background:var(--sky-100);border-color:var(--sky-200);color:var(--sky-600)}
+@media(max-width:760px){
+  .gitems.wf .gitem,.gitems.wf.nb .gitem{grid-template-columns:1fr}
+  .gitem .gf{justify-self:start;margin-top:3px}
+}
 
 /* ── ไฟล์แนบในฟอร์ม ───────────────────────────────────────── */
 .fk-file{display:flex;flex-direction:column;gap:6px}

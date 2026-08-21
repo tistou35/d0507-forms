@@ -2271,6 +2271,7 @@ var TOKEN_MAP = {
         "ord": "No"
       }
     ],
+    "boxesPartial": false,
     "tables": [],
     "boxesInDocx": 50,
     "approval": [
@@ -2547,6 +2548,7 @@ var TOKEN_MAP = {
         "ord": "No"
       }
     ],
+    "boxesPartial": false,
     "tables": [],
     "boxesInDocx": 41,
     "approval": [
