@@ -215,6 +215,10 @@
           "label": {
             "th": "การวางแผนบทเรียน",
             "en": "Lesson planning"
+          },
+          "hint": {
+            "th": "สอดคล้องกับหลักสูตร CAAT · ระบุวัตถุประสงค์การเรียนรู้ · ระยะเวลาเหมาะสม · เตรียมสื่อการสอน",
+            "en": "CAAT syllabus alignment, learning objectives defined, appropriate duration, materials prepared"
           }
         },
         {
@@ -226,6 +230,10 @@
           "label": {
             "th": "การถ่ายทอด (รวมเนื้อหาด้านความปลอดภัย)",
             "en": "Delivery (including safety-critical content)"
+          },
+          "hint": {
+            "th": "โครงสร้าง · ความชัดเจน · เนื้อหาทางเทคนิคถูกต้อง · ใช้สื่อที่ได้รับอนุมัติ · จังหวะเหมาะสม",
+            "en": "Structure, clarity, correct technical content, approved materials, appropriate pace"
           }
         },
         {
@@ -236,6 +244,10 @@
           "label": {
             "th": "การมีส่วนร่วมของนักเรียน",
             "en": "Student engagement"
+          },
+          "hint": {
+            "th": "เทคนิคการตั้งคำถาม · ตรวจสอบความเข้าใจ · ปรับตามการตอบสนองของชั้นเรียน",
+            "en": "Questioning technique, checking understanding, adapting to class response"
           }
         },
         {
@@ -246,6 +258,10 @@
           "label": {
             "th": "การวัดและประเมินผล",
             "en": "Assessment"
+          },
+          "hint": {
+            "th": "ใช้เครื่องมือวัดผลถูกต้อง · ตรวจให้คะแนนสม่ำเสมอ · ให้ข้อติชมเป็นลายลักษณ์อักษร",
+            "en": "Assessment tools applied correctly, consistent marking, written feedback provided"
           }
         },
         {
@@ -256,6 +272,10 @@
           "label": {
             "th": "การบริหารชั้นเรียน",
             "en": "Classroom management"
+          },
+          "hint": {
+            "th": "ขั้นตอนเช็กชื่อ · การบริหารเวลา · การกำกับความประพฤติของนักเรียน",
+            "en": "Attendance procedure, time management, student conduct managed"
           }
         },
         {
@@ -266,6 +286,10 @@
           "label": {
             "th": "การจัดทำเอกสาร",
             "en": "Documentation"
+          },
+          "hint": {
+            "th": "ความถูกต้องของบันทึกการเข้าเรียน · การบันทึกความคืบหน้า · การส่งผลเข้าระบบบันทึกการฝึก",
+            "en": "Accuracy of attendance records, progress entries, submissions to the training records system"
           }
         }
       ]

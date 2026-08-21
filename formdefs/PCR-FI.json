@@ -243,6 +243,10 @@
           "label": {
             "th": "การบรีฟก่อนบิน",
             "en": "Pre-flight briefing"
+          },
+          "hint": {
+            "th": "โครงบทเรียน · ระบุวัตถุประสงค์ · ครอบคลุมสภาพอากาศ · ขั้นตอนฉุกเฉิน · ยืนยันความพร้อมของนักเรียน",
+            "en": "Lesson structure, objectives stated, weather covered, emergency procedures, student preparation confirmed"
           }
         },
         {
@@ -253,6 +257,10 @@
           "label": {
             "th": "การสาธิตและเทคนิค",
             "en": "Demonstration and technique"
+          },
+          "hint": {
+            "th": "ความแม่นยำของท่าบิน · เทคนิคตามมาตรฐาน ATO · การคุมความเร็วและระดับความสูง",
+            "en": "Accuracy of manoeuvre, ATO standard technique, correct airspeed / altitude management"
           }
         },
         {
@@ -263,6 +271,10 @@
           "label": {
             "th": "การบรรยายประกอบการสอน",
             "en": "Instructional patter"
+          },
+          "hint": {
+            "th": "ความชัดเจน · ลำดับถูกต้อง · ถ้อยคำมาตรฐาน · จังหวะเหมาะสม · ไม่มีนิสัยการสอนที่ไม่พึงประสงค์",
+            "en": "Clarity, correct sequence, standard phraseology, appropriate pace, absence of negative habits"
           }
         },
         {
@@ -273,6 +285,10 @@
           "label": {
             "th": "การดูแลนักเรียน",
             "en": "Student management"
+          },
+          "hint": {
+            "th": "การจับข้อผิดพลาด · จังหวะและวิธีเข้าแทรก · วิธีแก้ไข",
+            "en": "Recognition of errors, intervention timing and method, correction technique"
           }
         },
         {
@@ -284,6 +300,10 @@
           "label": {
             "th": "ความปลอดภัยและวินัยการบิน",
             "en": "Safety and airmanship"
+          },
+          "hint": {
+            "th": "การใช้ TEM · การรู้สถานการณ์รอบตัว · การตัดสินใจ · การตัดสินใจ go-around",
+            "en": "TEM application, situational awareness, decision-making, go-around judgment"
           }
         },
         {
@@ -294,6 +314,10 @@
           "label": {
             "th": "การบรีฟหลังบิน",
             "en": "Post-flight debrief"
+          },
+          "hint": {
+            "th": "โครงสร้างการบรีฟ · ข้อติชมที่เจาะจง · ระบุสิ่งที่ต้องปรับปรุง · รักษากำลังใจนักเรียน",
+            "en": "Structure, specific feedback, improvement actions identified, student motivation maintained"
           }
         },
         {
@@ -304,6 +328,10 @@
           "label": {
             "th": "การจัดทำเอกสาร",
             "en": "Documentation"
+          },
+          "hint": {
+            "th": "ความถูกต้องและครบถ้วนของ FRAE, AFM และบันทึกการฝึกของนักเรียน",
+            "en": "Accuracy and completeness of FRAE, AFM, student training records"
           }
         }
       ]
