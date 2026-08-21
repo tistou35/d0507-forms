@@ -232,6 +232,43 @@ IPC ทั้งห้าประเภท ตารางประเภท IP
 ข้อมูลต้นทางสามระดับไม่มีความละเอียดพอจะแยกได้ ผลข้างเคียงคือกฎ "เกรด 1 = ตกทันที"
 จะไม่มีวันถูกกระตุ้นจากส่วนภาคอากาศ ผู้ตรวจต้องเป็นคนตั้งเอง — ตั้งใจให้เป็นแบบนั้น
 
+### จับกลุ่ม — PCR-FI (จากระบบบันทึกการฝึก Part 2)
+
+`Gr.n` = กลุ่มที่ n ใน Part 2 · `T#n` = ข้อที่ n ในกลุ่ม "Flight Teaching Skill & Evaluation"
+
+| หัวข้อ | Elements Assessed (คำในคู่มือ) | แหล่งข้อมูล |
+|---|---|---|
+| `g1` Pre-flight Briefing | Lesson structure, objectives stated, **weather covered**, **emergency procedures**, student preparation confirmed | Gr.1 Planning of Flight (7) · Gr.5 Meteorology (2) · Gr.8 Emergency Equipment & Procedures (2) · T#5 Maneuvering Planning |
+| `g2` Demonstration and Technique | Accuracy of manoeuvre, ATO standard technique, correct airspeed / altitude management | Gr.12 Flying — Smooth Handling, Accuracy (22) · T#2 Demonstration & Guidance |
+| `g3` Instructional Patter | Clarity, correct sequence, standard phraseology, appropriate pace, absence of negative habits | T#1 Instructing / Communication · T#3 Draw the Attention · T#8 Inflight Teaching Atmosphere · T#9 Ghosting Control |
+| `g4` Student Management | Recognition of errors, intervention timing and method, correction technique | T#4 Intervene the Student · T#6 Error Detection · T#7 Distraction Technique · T#10 Immediate Change of Teaching · T#12 Acceptable Envelope of Fault |
+| `g5` ★ Safety and Airmanship | TEM application, situational awareness, **decision-making**, go-around judgment | Gr.14 Airmanship (5) · Gr.10 Judgment & Efficiency (2) |
+| `g6` Post-flight Debrief | Structure, specific feedback, improvement actions identified, student motivation maintained | Gr.13 Debrief (6) · T#11 Inflight 'End of Training' |
+| `g7` Documentation | Accuracy and completeness of FRAE, AFM, student training records | **ไม่มีในระบบต้นทาง** — ปล่อยว่าง |
+
+**กลุ่มที่ไม่ได้ใช้ให้เกรด** — Gr.2 ATC Procedures · Gr.3 Route Procedures · Gr.4 Communications ·
+Gr.6 Technical Questions · Gr.7 Company Regulations · Gr.9 Crew's Cooperation · Gr.11 Aircraft Systems
+
+กลุ่มเหล่านี้วัดความสามารถของ *นักบิน* ไม่ใช่ของ *ครู* คู่มือมีเจ็ดหัวข้อสำหรับครูและไม่มีหัวข้อไหน
+ถามว่าครูรู้ระบบอากาศยานดีแค่ไหน ยัดเข้าไปให้ครบทุกกลุ่มคือการสร้างความละเอียดที่เกณฑ์ไม่ได้เรียกหา
+ให้เป็นข้อมูลประกอบที่ผู้ตรวจอ่าน ไม่ใช่ตัวกำหนดเกรด
+
+### ⚠️ ค่าต่ำสุดกับหัวข้อ safety-critical
+
+`g5` เป็นข้อ ★ ที่ได้ 2 แล้วตกทันที ถ้าดึงค่าต่ำสุดจาก 7 ข้อ (Airmanship 5 + Judgment 2)
+ข้อเดียวที่ Not Satisfied จะทำให้ทั้งใบตก ซึ่ง *เข้มกว่า* ที่คู่มือตั้งใจ — คู่มือให้ผู้ตรวจ
+ตัดสินหัวข้อ Airmanship เป็นภาพรวมหนึ่งเกรด ไม่ได้ให้ไล่หาข้อที่แย่ที่สุดจากรายการย่อย
+
+ยังใช้ค่าต่ำสุดตามเดิม เพราะกฎทั้งชุดใน D.2.9.5 อ่านแบบ "ต่ำสุด" ไม่ใช่ "เฉลี่ย"
+แต่ต้องมีตัวกัน — **ทุกหัวข้อที่ได้ต่ำกว่า 3 ให้ระบุชื่อข้อย่อยที่เป็นเหตุไว้ใน `remarks`**
+
+```
+g5 = 2 จาก "Go-around judgment" (Not Satisfied) — Airmanship ข้ออื่นผ่านทั้งหมด
+```
+
+ไม่งั้นผู้ตรวจจะเห็นแค่ "ไม่ผ่าน — ข้อความปลอดภัย" แล้วไม่รู้ว่ามาจากไหน
+จะเชื่อตามหรือแก้เป็น 3 ก็ตัดสินไม่ได้ทั้งคู่ · เรื่องนี้ใช้กับ `g2` ด้วยที่ดึงจาก 22 ข้อ
+
 ### ต้องเขียนวิธียุบไว้ในใบด้วย
 
 ต่อจากบรรทัด "ที่มา:" ใน `remarks` เพราะผู้ตรวจกำลังจะเซ็นรับรองเกรดเหล่านี้
