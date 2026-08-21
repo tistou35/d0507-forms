@@ -242,8 +242,8 @@ IPC ทั้งห้าประเภท ตารางประเภท IP
 | `g2` Demonstration and Technique | Accuracy of manoeuvre, ATO standard technique, correct airspeed / altitude management | Gr.12 Flying — Smooth Handling, Accuracy (22) · T#2 Demonstration & Guidance |
 | `g3` Instructional Patter | Clarity, correct sequence, standard phraseology, appropriate pace, absence of negative habits | T#1 Instructing / Communication · T#3 Draw the Attention · T#8 Inflight Teaching Atmosphere · T#9 Ghosting Control |
 | `g4` Student Management | Recognition of errors, intervention timing and method, correction technique | T#4 Intervene the Student · T#6 Error Detection · T#7 Distraction Technique · T#10 Immediate Change of Teaching · T#12 Acceptable Envelope of Fault |
-| `g5` ★ Safety and Airmanship | TEM application, situational awareness, **decision-making**, go-around judgment | Gr.14 Airmanship (5) · Gr.10 Judgment & Efficiency (2) |
-| `g6` Post-flight Debrief | Structure, specific feedback, improvement actions identified, student motivation maintained | Gr.13 Debrief (6) · T#11 Inflight 'End of Training' |
+| `g5` ★ Safety and Airmanship | TEM application, situational awareness, **decision-making**, go-around judgment | Gr.14 Airmanship (5): Discipline · Skill & Proficiency · Knowledge · Situational Awareness · Judgment — บวก Gr.10 Judgment & Efficiency (2) |
+| `g6` Post-flight Debrief | Structure, specific feedback, improvement actions identified, student motivation maintained | Gr.13 Debrief (6): Declaration of Result · Reason of Result · Rating & Performance · Guidance for Next Step · Balancing · Pleasant Atmosphere — บวก T#11 Inflight 'End of Training' |
 | `g7` Documentation | Accuracy and completeness of FRAE, AFM, student training records | **ไม่มีในระบบต้นทาง** — ปล่อยว่าง |
 
 **กลุ่มที่ไม่ได้ใช้ให้เกรด** — Gr.2 ATC Procedures · Gr.3 Route Procedures · Gr.4 Communications ·
@@ -252,6 +252,22 @@ Gr.6 Technical Questions · Gr.7 Company Regulations · Gr.9 Crew's Cooperation 
 กลุ่มเหล่านี้วัดความสามารถของ *นักบิน* ไม่ใช่ของ *ครู* คู่มือมีเจ็ดหัวข้อสำหรับครูและไม่มีหัวข้อไหน
 ถามว่าครูรู้ระบบอากาศยานดีแค่ไหน ยัดเข้าไปให้ครบทุกกลุ่มคือการสร้างความละเอียดที่เกณฑ์ไม่ได้เรียกหา
 ให้เป็นข้อมูลประกอบที่ผู้ตรวจอ่าน ไม่ใช่ตัวกำหนดเกรด
+
+### ช่องว่างที่รู้แล้ว — TEM ไม่มีข้อถามตรง ๆ
+
+D.2.9.5 ระบุ `g5` ว่าครอบ *"TEM application, situational awareness, decision-making,
+go-around judgment"* แต่ Gr.14 Airmanship ในระบบต้นทางมีห้าข้อคือ Discipline ·
+Skill & Proficiency · Knowledge · **Situational Awareness** · **Judgment**
+
+สองข้อหลังตรงกับ situational awareness และ decision-making ส่วน **TEM กับ go-around
+judgment ไม่มีข้อถามตรง ๆ** ถูกกลืนอยู่ใน Judgment กับ Situational Awareness
+ถ้าผู้ตรวจสอบภายนอกถามว่า "ประเมิน TEM ตรงไหน" คำตอบตอนนี้คือ "โดยนัย"
+
+ตัวกันที่ทำไว้แล้ว — ฟอร์มแสดงเกณฑ์จากคู่มือใต้ทุกหัวข้อที่ให้เกรด ผู้ตรวจที่กำลังให้
+เกรด `g5` จะเห็นคำว่า TEM และ go-around อยู่ตรงหน้า ไม่ใช่เห็นแค่คำว่า "Airmanship"
+แล้วนึกเอาเอง · ถ้าจะปิดช่องว่างนี้ให้สนิทต้องเพิ่มข้อในระบบต้นทาง
+
+Gr.13 Debrief ครอบครบทั้งสี่ element ของ `g6` ไม่มีช่องว่าง
 
 ### ⚠️ ค่าต่ำสุดกับหัวข้อ safety-critical
 
