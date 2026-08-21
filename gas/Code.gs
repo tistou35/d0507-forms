@@ -526,6 +526,17 @@ function rowMark_(row, data) {
   var sc = row.score;
   var hasScore = sc !== null && sc !== undefined && sc !== '';
 
+  /* สถานะที่ต้นทางบอกว่ายังไม่จบ — ไม่พิมพ์อะไรเลย ต้องเช็กก่อนทุกกรณี
+     รวมถึงกรณีที่มีเกรดติดมาแล้ว แต่ระบบยังถือว่ายังไม่จบ */
+  if (/^(รอสอบ|ยังไม่จบ)$/.test(res)) return '';
+
+  /* เกรดตัวอักษร A–F จากระบบบันทึกการฝึกภาคอากาศ (FTMS)
+     เกณฑ์ผ่านที่เจ้าของงานกำหนด: C ขึ้นไปถือว่าผ่าน
+     ที่นั่นไม่มีช่องผ่าน/ไม่ผ่านแยกต่างหาก เกรดคือผลโดยตรง จึงตัดสินจากเกรดได้
+     ต่างจากฝั่ง TrainHub ที่เป็นเปอร์เซ็นต์และมีช่องผลมาให้ */
+  var L = String(sc == null ? '' : sc).trim().toUpperCase();
+  if (/^[A-F]$/.test(L)) return '[(' + L + '): ' + ('ABC'.indexOf(L) >= 0 ? 'pass' : 'fail') + ']';
+
   if (res === 'ผ่าน')    return hasScore ? '[(' + sc + '): pass]' : '[pass]';
   if (res === 'ไม่ผ่าน')  return hasScore ? '[(' + sc + '): fail]' : '[fail]';
   if (/^completed$/i.test(res)) return '[Completed]';
@@ -538,7 +549,7 @@ function rowMark_(row, data) {
                && String(data.result || '') === 'passed';
     return done ? '[Completed]' : '';
   }
-  return '';                          // รอสอบ · ยังไม่จบ · สถานะที่ยังไม่รู้จัก
+  return '';                          // สถานะที่ยังไม่รู้จัก
 }
 
 

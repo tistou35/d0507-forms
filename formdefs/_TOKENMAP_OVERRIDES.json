@@ -131,6 +131,10 @@
     "skipTables": [
       "s7"
     ],
-    "_whyTables": "กระดาษฉบับแก้ไขรวมชื่อวิชากับผลไว้คอลัมน์เดียว ใช้ {{s7_N_shown}} จึงไม่มีหัวคอลัมน์ Subject/Score/Result/Passed on ให้จับคู่อีกแล้ว"
+    "_whyTables": "กระดาษฉบับแก้ไขรวมชื่อวิชากับผลไว้คอลัมน์เดียว ใช้ {{s7_N_shown}} จึงไม่มีหัวคอลัมน์ Subject/Score/Result/Passed on ให้จับคู่อีกแล้ว",
+    "labels": {
+      "Learning / Flight Hours": "{{learningHours}}"
+    },
+    "_whyLabels": "ป้ายบนกระดาษต้องครอบทั้งสองโหมด (ภาคพื้น = ชั่วโมงเรียน · ภาคอากาศ = ชั่วโมงบิน) จึงเขียนว่า Learning / Flight Hours ซึ่งไม่ตรงกับ label ในนิยามฟอร์ม ตัวจับคู่จึงหาไม่เจอ"
   }
 }

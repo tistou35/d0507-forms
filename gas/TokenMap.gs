@@ -785,10 +785,6 @@ var TOKEN_MAP = {
         "tok": "{{studyTo}}"
       },
       {
-        "label": "Learning Hours",
-        "tok": "{{learningHours}}"
-      },
-      {
         "label": "Completion Date",
         "tok": "{{completeDate}}"
       },
@@ -803,6 +799,10 @@ var TOKEN_MAP = {
       {
         "label": "Total Score",
         "tok": "{{totalScore}}"
+      },
+      {
+        "label": "Learning / Flight Hours",
+        "tok": "{{learningHours}}"
       }
     ],
     "byLine": [],

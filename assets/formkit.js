@@ -376,7 +376,12 @@
     const ro = this.readonly || (this.party && f.__sec.party !== this.party);
     const dis = ro ? ' disabled' : '';
     const id = 'fk_' + f.k;
-    const lab = L(f.label, this.lang);
+    /* ป้ายที่เปลี่ยนตามคำตอบข้ออื่น — ช่องเดียวกันแต่ความหมายต่างตามบริบท
+       EFC ช่องชั่วโมง: หลักสูตรภาคพื้นคือชั่วโมงเรียน ภาคอากาศคือชั่วโมงบิน
+       ถ้าใช้ป้ายเดียวกันทั้งสองแบบ คนอ่านเอกสารจะเข้าใจผิดว่าเป็นชั่วโมงอะไร
+       ใช้ป้ายแรกที่เงื่อนไขเป็นจริง ไม่มีตรงก็ใช้ label ปกติ */
+    const alt = (f.labelIf || []).find(x => evalCond(x.when, this.ctx()));
+    const lab = L(alt ? alt.label : f.label, this.lang);
     const star = f.star ? ' <span class="star" title="safety-critical">★</span>' : '';
     let body = '';
 

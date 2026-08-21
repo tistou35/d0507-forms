@@ -124,9 +124,18 @@
       "en": "Learning hours credited"
      },
      "hint": {
-      "th": "ชั่วโมงที่ระบบบันทึกการฝึกนับให้ ทศนิยม 1 ตำแหน่ง",
-      "en": "Hours credited by the training system, to 1 decimal"
-     }
+      "th": "หลักสูตรภาคพื้นคือชั่วโมงเรียน · หลักสูตรภาคอากาศคือชั่วโมงบิน",
+      "en": "Ground courses: learning hours · Flight courses: flight hours"
+     },
+     "labelIf": [
+      {
+       "when": "courseType == 'flight'",
+       "label": {
+        "th": "ชั่วโมงบินที่นับให้",
+        "en": "Flight hours credited"
+       }
+      }
+     ]
     },
     {
      "k": "completeDate",
