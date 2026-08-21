@@ -1,167 +1,623 @@
 {
-  "code": "STR",
-  "doc": "D-0507-STR-001",
-  "control": "IM-STR-301-A",
-  "issue": "01",
-  "rev": "00",
-  "eff": "06 JUN 2026",
-  "title": { "th": "บันทึกการอบรมมาตรฐานครูการบิน", "en": "Standardisation Training Record" },
-  "retain": "OMA A.10",
-
-  "ui": {
-    "compact": true,
-    "tabs": [
-      { "k": "T1", "th": "ครูและการอบรม", "en": "Instructor & session" },
-      { "k": "T2", "th": "หัวข้อ", "en": "Topics" },
-      { "k": "T3", "th": "ผลและลงนาม", "en": "Assessment & sign" }
-    ]
+ "code": "STR",
+ "doc": "D-0507-STR-001",
+ "control": "IM-STR-301-A",
+ "issue": "01",
+ "rev": "00",
+ "eff": "06 JUN 2026",
+ "title": {
+  "th": "บันทึกการอบรมมาตรฐานครูการบิน",
+  "en": "Standardisation Training Record"
+ },
+ "retain": "OMA A.10",
+ "ui": {
+  "compact": true,
+  "tabs": [
+   {
+    "k": "T1",
+    "th": "ครูและการอบรม",
+    "en": "Instructor & session"
+   },
+   {
+    "k": "T2",
+    "th": "หัวข้อ",
+    "en": "Topics"
+   },
+   {
+    "k": "T3",
+    "th": "ผลและลงนาม",
+    "en": "Assessment & sign"
+   }
+  ]
+ },
+ "parties": [
+  {
+   "k": "ins",
+   "n": {
+    "th": "ครูผู้รับการอบรม",
+    "en": "Instructor"
+   },
+   "auth": "role:ins"
   },
-
-  "parties": [
-    { "k": "ins", "n": { "th": "ครูผู้รับการอบรม", "en": "Instructor" }, "auth": "role:ins" },
-    { "k": "ht",  "n": { "th": "ผู้ประเมิน (HT / ISM)", "en": "Assessor (HT / ISM)" }, "auth": "role:mgt" }
-  ],
-
-  "sections": [
+  {
+   "k": "ht",
+   "n": {
+    "th": "ผู้ประเมิน (HT / ISM)",
+    "en": "Assessor (HT / ISM)"
+   },
+   "auth": "role:mgt"
+  }
+ ],
+ "sections": [
+  {
+   "k": "A",
+   "party": "ht",
+   "title": {
+    "th": "ผู้รับการรับรองมาตรฐาน",
+    "en": "Person being standardised"
+   },
+   "fields": [
     {
-      "k": "A", "tab": "T1", "party": "ht",
-      "title": { "th": "ข้อมูลครู", "en": "Instructor details" },
-      "fields": [
-        { "k": "insName", "type": "text", "req": true, "half": true,
-          "label": { "th": "ชื่อครู", "en": "Instructor name" } },
-        { "k": "certNo", "type": "text", "req": true, "half": true,
-          "label": { "th": "เลขที่ใบรับรอง", "en": "Certificate No." } },
-        { "k": "ratings", "type": "text", "half": true,
-          "label": { "th": "ศักย์การบินที่ถือ", "en": "Instructor rating(s)" } },
-        { "k": "category", "type": "select", "req": true, "half": true,
-          "label": { "th": "ประเภทครู", "en": "Category" },
-          "opt": [
-            { "v": "FI",   "n": { "th": "ครูการบิน (FI)", "en": "FI" } },
-            { "v": "TKI",  "n": { "th": "ครูภาคทฤษฎี (TKI)", "en": "TKI" } },
-            { "v": "Both", "n": { "th": "ทั้งสองประเภท", "en": "Both" } } ] }
-      ]
+     "k": "insName",
+     "type": "text",
+     "req": true,
+     "label": {
+      "th": "ชื่อ-สกุล",
+      "en": "Name"
+     }
     },
     {
-      "k": "B", "tab": "T1", "party": "ht",
-      "title": { "th": "รายละเอียดการอบรม", "en": "Session details" },
-      "fields": [
-        { "k": "sesDate", "type": "date", "req": true, "prefill": "today", "half": true,
-          "label": { "th": "วันที่", "en": "Date" } },
-        { "k": "duration", "type": "number", "req": true, "min": 0, "step": 0.5, "half": true,
-          "label": { "th": "ระยะเวลา (ชม.)", "en": "Duration (hrs)" } },
-        { "k": "venue", "type": "text", "req": true, "half": true,
-          "label": { "th": "สถานที่", "en": "Venue / location" } },
-        { "k": "trainType", "type": "select", "req": true, "half": true,
-          "label": { "th": "ประเภทการอบรม", "en": "Training type" },
-          "opt": [
-            { "v": "annual",     "n": { "th": "ประจำปี", "en": "Annual" } },
-            { "v": "initial",    "n": { "th": "แรกเข้า", "en": "Initial" } },
-            { "v": "triggered",  "n": { "th": "ตามเหตุกระตุ้น", "en": "Triggered" } },
-            { "v": "corrective", "n": { "th": "แก้ไขมาตรฐาน", "en": "Corrective" } } ] },
-        { "k": "conductedBy", "type": "text", "req": true, "half": true,
-          "label": { "th": "ผู้ดำเนินการอบรม (HT / ISM)", "en": "Conducted by (HT / ISM)" } },
-        { "k": "acType", "type": "text", "half": true,
-          "label": { "th": "แบบอากาศยาน (ถ้ามี)", "en": "Aircraft type (if applicable)" } }
-      ]
+     "k": "category",
+     "type": "select",
+     "req": true,
+     "label": {
+      "th": "บทบาท",
+      "en": "Role"
+     },
+     "opt": [
+      {
+       "v": "fi",
+       "n": {
+        "th": "ครูการบิน (FI)",
+        "en": "Flight Instructor"
+       }
+      },
+      {
+       "v": "tki",
+       "n": {
+        "th": "ครูภาคทฤษฎี (TKI)",
+        "en": "Theoretical Knowledge Instructor"
+       }
+      },
+      {
+       "v": "fie",
+       "n": {
+        "th": "ครูผู้ตรวจสอบ (FIE)",
+        "en": "Flight Instructor Examiner"
+       }
+      },
+      {
+       "v": "staff",
+       "n": {
+        "th": "เจ้าหน้าที่ปฏิบัติการ",
+        "en": "Operations staff"
+       }
+      }
+     ]
     },
     {
-      "k": "C", "tab": "T2", "party": "ht",
-      "title": { "th": "หัวข้อที่อบรมมาตรฐาน", "en": "Topics standardised" },
-      "fields": [
-        { "k": "topics", "type": "multi", "req": true,
-          "label": { "th": "เลือกได้หลายข้อ", "en": "Select all that apply" },
-          "opt": [
-            { "v": "sop",       "n": { "th": "SOP — การปฏิบัติการบิน", "en": "SOPs — flight operations" } },
-            { "v": "emerg",     "n": { "th": "ขั้นตอนฉุกเฉิน", "en": "Emergency procedures" } },
-            { "v": "brief",     "n": { "th": "การบรีฟก่อนและหลังบิน", "en": "Pre/post-flight briefing" } },
-            { "v": "manoeuvre", "n": { "th": "ท่าบินและการฝึกปฏิบัติ", "en": "Flight manoeuvres / drills" } },
-            { "v": "checklist", "n": { "th": "การใช้เช็กลิสต์", "en": "Use of checklists" } },
-            { "v": "technique", "n": { "th": "เทคนิคการสอน", "en": "Instructional techniques" } },
-            { "v": "feedback",  "n": { "th": "วิธีให้ผลป้อนกลับแก่นักเรียน", "en": "Student feedback methods" } },
-            { "v": "classroom", "n": { "th": "การบริหารชั้นเรียน", "en": "Classroom management" } },
-            { "v": "pedagogy",  "n": { "th": "ระเบียบวิธีการสอน", "en": "Teaching methodology" } },
-            { "v": "assess",    "n": { "th": "วิธีประเมินนักเรียน", "en": "Student assessment methods" } },
-            { "v": "compliance","n": { "th": "การปฏิบัติตามกฎ", "en": "Regulatory compliance" } },
-            { "v": "hpa",       "n": { "th": "อากาศยานสมรรถนะสูง (T206H)", "en": "High-performance aeroplane (T206H)" } },
-            { "v": "avionics",  "n": { "th": "เอวิโอนิกส์ขั้นสูง / G1000", "en": "Advanced avionics / G1000" } },
-            { "v": "docs",      "n": { "th": "เอกสารและสมุดบันทึกการบิน", "en": "Documentation / flight logs" } },
-            { "v": "other",     "n": { "th": "อื่น ๆ", "en": "Other" } } ] },
-        { "k": "topicOther", "type": "text", "showIf": "topics has 'other'", "reqIf": "topics has 'other'",
-          "label": { "th": "ระบุหัวข้ออื่น", "en": "Other — specify" } }
-      ]
+     "k": "certNo",
+     "type": "text",
+     "half": true,
+     "label": {
+      "th": "เลขที่ใบรับรอง (ถ้ามี)",
+      "en": "Certificate no. (if any)"
+     }
     },
     {
-      "k": "D", "tab": "T3", "party": "ht",
-      "title": { "th": "การประเมิน", "en": "Assessment" },
-      "fields": [
-        { "k": "method", "type": "select", "req": true, "half": true,
-          "label": { "th": "วิธีประเมิน", "en": "Assessment method" },
-          "opt": [
-            { "v": "observation", "n": { "th": "สังเกตการณ์", "en": "Observation" } },
-            { "v": "oral",        "n": { "th": "สอบปากเปล่า", "en": "Oral" } },
-            { "v": "practical",   "n": { "th": "ภาคปฏิบัติ", "en": "Practical" } } ] },
-        { "k": "outcome", "type": "select", "req": true, "half": true,
-          "label": { "th": "ผลการประเมิน", "en": "Outcome" },
-          "opt": [
-            { "v": "standardised", "n": { "th": "ได้มาตรฐาน", "en": "Standardised" } },
-            { "v": "followup",     "n": { "th": "ต้องติดตามผล", "en": "Requires follow-up" } } ] },
-        { "k": "notes", "type": "textarea",
-          "label": { "th": "บันทึกการประเมิน", "en": "Assessment notes" } }
-      ]
-    },
-    {
-      "k": "E", "tab": "T3", "party": "ht", "showIf": "outcome == 'followup'",
-      "title": { "th": "การติดตามผล", "en": "Follow-up action" },
-      "fields": [
-        { "k": "fuAction", "type": "textarea", "reqIf": "outcome == 'followup'",
-          "label": { "th": "การติดตามผลที่ต้องทำ", "en": "Follow-up action required" } },
-        { "k": "fuDue", "type": "date", "reqIf": "outcome == 'followup'", "half": true,
-          "label": { "th": "กำหนดแล้วเสร็จ", "en": "Due date for follow-up" } },
-        { "k": "fuOwner", "type": "text", "reqIf": "outcome == 'followup'", "half": true,
-          "label": { "th": "ผู้รับผิดชอบ", "en": "Responsible person" } },
-        { "k": "fuVerifiedBy", "type": "text", "half": true,
-          "label": { "th": "ผู้ตรวจรับการติดตามผล", "en": "Follow-up verified by" } },
-        { "k": "fuVerifiedDate", "type": "date", "half": true,
-          "label": { "th": "วันที่ตรวจรับ", "en": "Verification date" } }
-      ]
-    },
-    {
-      "k": "F", "tab": "T3", "party": "ht",
-      "title": { "th": "ลงนามผู้ประเมิน", "en": "Assessor signature" },
-      "fields": [
-        { "k": "assessorName", "type": "text", "req": true, "half": true,
-          "label": { "th": "ชื่อผู้ประเมิน (HT / ISM)", "en": "Assessor name (HT / ISM)" } },
-        { "k": "assessorDate", "type": "date", "req": true, "prefill": "today", "half": true,
-          "label": { "th": "วันที่", "en": "Date" } },
-        { "k": "assessorSign", "type": "sign", "req": true,
-          "label": { "th": "ลายเซ็นผู้ประเมิน", "en": "Assessor signature" } }
-      ]
-    },
-    {
-      "k": "G", "tab": "T3", "party": "ins", "hideOthers": true,
-      "title": { "th": "ครูผู้รับการอบรมรับทราบ", "en": "Instructor acknowledgement" },
-      "fields": [
-        { "k": "insAckName", "type": "text", "req": true, "half": true,
-          "label": { "th": "ชื่อครู", "en": "Instructor name" } },
-        { "k": "insAckDate", "type": "date", "req": true, "half": true,
-          "label": { "th": "วันที่", "en": "Date" } },
-        { "k": "insSign", "type": "sign", "req": true,
-          "label": { "th": "ลายเซ็นครู", "en": "Instructor signature" } }
-      ]
+     "k": "ratings",
+     "type": "text",
+     "half": true,
+     "label": {
+      "th": "ศักย์การบินที่ถือ (ถ้ามี)",
+      "en": "Ratings held (if any)"
+     }
     }
-  ],
-
-  "gates": [
-    { "when": "outcome == 'followup'", "level": "warn",
-      "short": { "th": "ต้องติดตามผล", "en": "FOLLOW-UP" },
-      "msg": { "th": "ผลยังไม่ได้มาตรฐาน — ต้องระบุการติดตามผล กำหนดวันแล้วเสร็จ และผู้รับผิดชอบ ก่อนปิดบันทึก",
-               "en": "Not yet standardised — record the follow-up action, due date, and responsible person before closing." } }
-  ],
-
-  "route": [
-    { "step": 1, "party": "ht", "sign": true },
-    { "step": 2, "party": "ins", "sign": true, "assignedBy": "submitter", "slaDays": 7 }
-  ],
-
-  "export": { "docx": "D-0507-STR-001.docx", "lockUntilComplete": true }
+   ]
+  },
+  {
+   "k": "B",
+   "party": "ht",
+   "title": {
+    "th": "ประเภทและเหตุที่ต้องรับรอง",
+    "en": "Type and trigger"
+   },
+   "fields": [
+    {
+     "k": "strNote",
+     "type": "static",
+     "text": {
+      "th": "ห้าประเภทนี้มาจาก OMA D.2.8 — สามประเภทล่างไม่ผูกกับรอบปี เกิดเมื่อมีเหตุ จึงไม่มีใบประเมินประจำปีมารองรับ",
+      "en": "The five types come from OMA D.2.8. The lower three are event-driven, not annual, so no annual evaluation covers them."
+     }
+    },
+    {
+     "k": "strType",
+     "type": "select",
+     "req": true,
+     "label": {
+      "th": "ประเภทการรับรองมาตรฐาน",
+      "en": "Standardisation type"
+     },
+     "opt": [
+      {
+       "v": "initial",
+       "n": {
+        "th": "Initial — ก่อนสอน/ปฏิบัติงานเองครั้งแรก",
+        "en": "Initial"
+       }
+      },
+      {
+       "v": "annual",
+       "n": {
+        "th": "Annual — ประจำปี",
+        "en": "Annual"
+       }
+      },
+      {
+       "v": "type",
+       "n": {
+        "th": "Type-Specific — ก่อนสอนบนอากาศยานแบบใหม่",
+        "en": "Type-specific"
+       }
+      },
+      {
+       "v": "procedure",
+       "n": {
+        "th": "Procedure-Update — ภายใน 30 วันหลัง SOP/เช็กลิสต์เปลี่ยน",
+        "en": "Procedure update"
+       }
+      },
+      {
+       "v": "corrective",
+       "n": {
+        "th": "Corrective — ภายใน 10 วันทำการหลังผลตรวจต่ำกว่ามาตรฐาน",
+        "en": "Corrective"
+       }
+      }
+     ]
+    },
+    {
+     "k": "acType",
+     "type": "text",
+     "showIf": "strType == 'type'",
+     "label": {
+      "th": "อากาศยานแบบใหม่",
+      "en": "New aircraft type"
+     },
+     "ph": "เช่น Cessna T206H"
+    },
+    {
+     "k": "procRef",
+     "type": "text",
+     "showIf": "strType == 'procedure'",
+     "label": {
+      "th": "เอกสาร/ขั้นตอนที่เปลี่ยน",
+      "en": "Document or procedure changed"
+     },
+     "ph": "เลขที่เอกสารและฉบับแก้ไข"
+    },
+    {
+     "k": "findingRef",
+     "type": "text",
+     "showIf": "strType == 'corrective'",
+     "label": {
+      "th": "ผลตรวจที่เป็นเหตุ",
+      "en": "Finding that triggered this"
+     },
+     "ph": "เลขที่ PCR หรือข้อสังเกตจากการตรวจสอบ"
+    },
+    {
+     "k": "dueBy",
+     "type": "date",
+     "half": true,
+     "label": {
+      "th": "กำหนดแล้วเสร็จตามคู่มือ",
+      "en": "Due by (per manual)"
+     },
+     "hint": {
+      "th": "Procedure-Update 30 วัน · Corrective 10 วันทำการ",
+      "en": "Procedure update: 30 days · Corrective: 10 working days"
+     }
+    },
+    {
+     "k": "sesDate",
+     "type": "date",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "วันที่รับรอง",
+      "en": "Date standardised"
+     }
+    }
+   ]
+  },
+  {
+   "k": "C",
+   "party": "ht",
+   "title": {
+    "th": "หลักฐานการประเมินที่ใช้อ้างอิง",
+    "en": "Assessment evidence relied upon"
+   },
+   "fields": [
+    {
+     "k": "evNote",
+     "type": "static",
+     "text": {
+      "th": "ใบนี้ไม่ประเมินซ้ำ — อ้างอิงผลจากใบที่ประเมินไปแล้ว\nOMA D.2.8 ระบุว่าใช้เกณฑ์เดียวกับ D.2.9 คือ D-0507-ECA-001 ผลที่ประเมินไว้แล้วจึงใช้เป็นหลักฐานได้โดยไม่ต้องประเมินใหม่",
+      "en": "This record does not re-assess. It cites the record that already did.\nOMA D.2.8 uses the same criteria as D.2.9 (D-0507-ECA-001), so an existing assessment is valid evidence."
+     }
+    },
+    {
+     "k": "basedOn",
+     "type": "select",
+     "req": true,
+     "label": {
+      "th": "อ้างอิงจาก",
+      "en": "Evidence source"
+     },
+     "opt": [
+      {
+       "v": "efm",
+       "n": {
+        "th": "Annual Evaluation — ความสามารถการบินและการสอน (QA-EFM-301-B)",
+        "en": "Annual Evaluation (EFM)"
+       }
+      },
+      {
+       "v": "efc",
+       "n": {
+        "th": "End of Course / Stage Report — หลักสูตรภาคพื้น (IM-EFC-303-B)",
+        "en": "End of Course report (EFC)"
+       }
+      },
+      {
+       "v": "pcr",
+       "n": {
+        "th": "Proficiency Check Record — D.2.9",
+        "en": "Proficiency Check Record"
+       }
+      },
+      {
+       "v": "adhoc",
+       "n": {
+        "th": "อบรมเฉพาะกิจ — ไม่มีใบประเมินมาก่อน",
+        "en": "Ad-hoc session, no prior record"
+       }
+      }
+     ]
+    },
+    {
+     "k": "refNo",
+     "type": "text",
+     "half": true,
+     "showIf": "basedOn != 'adhoc'",
+     "label": {
+      "th": "เลขที่ใบอ้างอิง",
+      "en": "Reference no."
+     }
+    },
+    {
+     "k": "refDate",
+     "type": "date",
+     "half": true,
+     "showIf": "basedOn != 'adhoc'",
+     "label": {
+      "th": "วันที่ของใบอ้างอิง",
+      "en": "Date of that record"
+     }
+    },
+    {
+     "k": "topics",
+     "type": "multi",
+     "showIf": "basedOn == 'adhoc'",
+     "label": {
+      "th": "หัวข้อที่อบรม (เฉพาะกรณีไม่มีใบอ้างอิง)",
+      "en": "Topics covered (ad-hoc only)"
+     },
+     "opt": [
+      {
+       "v": "sop",
+       "n": {
+        "th": "SOP — การปฏิบัติการบิน",
+        "en": "SOP"
+       }
+      },
+      {
+       "v": "emerg",
+       "n": {
+        "th": "ขั้นตอนฉุกเฉิน",
+        "en": "Emergency procedures"
+       }
+      },
+      {
+       "v": "brief",
+       "n": {
+        "th": "การบรีฟก่อนและหลังบิน",
+        "en": "Briefing and debriefing"
+       }
+      },
+      {
+       "v": "manoeuvre",
+       "n": {
+        "th": "ท่าบินและการฝึกปฏิบัติ",
+        "en": "Manoeuvres"
+       }
+      },
+      {
+       "v": "checklist",
+       "n": {
+        "th": "การใช้เช็กลิสต์",
+        "en": "Checklist use"
+       }
+      },
+      {
+       "v": "technique",
+       "n": {
+        "th": "เทคนิคการสอน",
+        "en": "Instructional technique"
+       }
+      },
+      {
+       "v": "assess",
+       "n": {
+        "th": "วิธีประเมินนักเรียน",
+        "en": "Student assessment"
+       }
+      },
+      {
+       "v": "docs",
+       "n": {
+        "th": "เอกสารและสมุดบันทึกการบิน",
+        "en": "Documentation"
+       }
+      },
+      {
+       "v": "other",
+       "n": {
+        "th": "อื่น ๆ",
+        "en": "Other"
+       }
+      }
+     ]
+    },
+    {
+     "k": "topicOther",
+     "type": "text",
+     "showIf": "topics has 'other'",
+     "label": {
+      "th": "ระบุหัวข้ออื่น",
+      "en": "Specify other"
+     },
+     "reqIf": "topics has 'other'"
+    },
+    {
+     "k": "conductedBy",
+     "type": "text",
+     "req": true,
+     "label": {
+      "th": "ผู้ดำเนินการรับรอง (HT / ISM)",
+      "en": "Conducted by (HT / ISM)"
+     }
+    }
+   ]
+  },
+  {
+   "k": "D",
+   "party": "ht",
+   "title": {
+    "th": "ผลการรับรอง",
+    "en": "Standardisation outcome"
+   },
+   "fields": [
+    {
+     "k": "outcome",
+     "type": "select",
+     "req": true,
+     "label": {
+      "th": "ผล",
+      "en": "Outcome"
+     },
+     "opt": [
+      {
+       "v": "std",
+       "n": {
+        "th": "ได้มาตรฐาน — บันทึก Standardised ในทะเบียน",
+        "en": "Standardised"
+       }
+      },
+      {
+       "v": "notyet",
+       "n": {
+        "th": "ยังไม่ได้มาตรฐาน — ต้องติดตามผล",
+        "en": "Not yet standardised"
+       }
+      }
+     ]
+    },
+    {
+     "k": "notes",
+     "type": "textarea",
+     "label": {
+      "th": "บันทึกเพิ่มเติม",
+      "en": "Notes"
+     }
+    }
+   ]
+  },
+  {
+   "k": "E",
+   "party": "ht",
+   "showIf": "outcome == 'notyet' || strType == 'corrective'",
+   "title": {
+    "th": "การติดตามผล",
+    "en": "Follow-up"
+   },
+   "fields": [
+    {
+     "k": "fuAction",
+     "type": "textarea",
+     "req": true,
+     "label": {
+      "th": "สิ่งที่ต้องทำ",
+      "en": "Action required"
+     }
+    },
+    {
+     "k": "fuDue",
+     "type": "date",
+     "half": true,
+     "label": {
+      "th": "กำหนดแล้วเสร็จ",
+      "en": "Due"
+     }
+    },
+    {
+     "k": "fuOwner",
+     "type": "text",
+     "half": true,
+     "label": {
+      "th": "ผู้รับผิดชอบ",
+      "en": "Owner"
+     }
+    },
+    {
+     "k": "fuVerifiedBy",
+     "type": "text",
+     "half": true,
+     "label": {
+      "th": "ผู้ตรวจรับ",
+      "en": "Verified by"
+     }
+    },
+    {
+     "k": "fuVerifiedDate",
+     "type": "date",
+     "half": true,
+     "label": {
+      "th": "วันที่ตรวจรับ",
+      "en": "Verified on"
+     }
+    }
+   ]
+  },
+  {
+   "k": "F",
+   "party": "ht",
+   "title": {
+    "th": "ลงนามผู้รับรอง",
+    "en": "Certifying signature"
+   },
+   "fields": [
+    {
+     "k": "assessorName",
+     "type": "text",
+     "req": true,
+     "label": {
+      "th": "ชื่อผู้รับรอง (HT / ISM)",
+      "en": "Name (HT / ISM)"
+     }
+    },
+    {
+     "k": "assessorDate",
+     "type": "date",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "วันที่",
+      "en": "Date"
+     }
+    },
+    {
+     "k": "assessorSign",
+     "type": "sign",
+     "req": true,
+     "label": {
+      "th": "ลายเซ็นผู้รับรอง",
+      "en": "Signature"
+     }
+    }
+   ]
+  },
+  {
+   "k": "G",
+   "party": "ins",
+   "title": {
+    "th": "ผู้รับการรับรองรับทราบ",
+    "en": "Acknowledgement"
+   },
+   "fields": [
+    {
+     "k": "insAckName",
+     "type": "text",
+     "req": true,
+     "label": {
+      "th": "ชื่อ",
+      "en": "Name"
+     }
+    },
+    {
+     "k": "insAckDate",
+     "type": "date",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "วันที่",
+      "en": "Date"
+     }
+    },
+    {
+     "k": "insSign",
+     "type": "sign",
+     "req": true,
+     "label": {
+      "th": "ลายเซ็น",
+      "en": "Signature"
+     }
+    }
+   ]
+  }
+ ],
+ "gates": [
+  {
+   "when": "outcome == 'followup'",
+   "level": "warn",
+   "short": {
+    "th": "ต้องติดตามผล",
+    "en": "FOLLOW-UP"
+   },
+   "msg": {
+    "th": "ผลยังไม่ได้มาตรฐาน — ต้องระบุการติดตามผล กำหนดวันแล้วเสร็จ และผู้รับผิดชอบ ก่อนปิดบันทึก",
+    "en": "Not yet standardised — record the follow-up action, due date, and responsible person before closing."
+   }
+  }
+ ],
+ "route": [
+  {
+   "step": 1,
+   "party": "ht",
+   "sign": true
+  },
+  {
+   "step": 2,
+   "party": "ins",
+   "sign": true,
+   "assignedBy": "submitter",
+   "slaDays": 7
+  }
+ ],
+ "export": {
+  "docx": "D-0507-STR-001.docx",
+  "lockUntilComplete": true
+ }
 }
