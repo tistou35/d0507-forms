@@ -10,6 +10,13 @@
     "en": "Passenger Waiver and Release Form"
   },
   "retain": "OMA A.10",
+  "passthrough": [
+    {
+      "k": "ref",
+      "from": "flight-plan-webapp",
+      "note": "กุญแจของระบบวางแผนการบิน (Submission ID 8 ตัว) — ส่งมาทางลิงก์ prefill เก็บไว้ในใบเพื่อให้ฝั่งนั้นถามสถานะกลับได้โดยไม่ต้องส่งชื่อผู้โดยสารมา ไม่แสดงบนหน้าจอและไม่ขึ้น PDF"
+    }
+  ],
   "ui": {
     "compact": true,
     "tabs": [

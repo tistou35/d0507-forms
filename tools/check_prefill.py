@@ -54,10 +54,14 @@ def sendable(d):
 
 
 def check(code, o):
-    d, F = load(code), None
+    d = load(code)
     F = fields(d)
+    # คีย์ที่ฟอร์มรับไว้เฉย ๆ เพื่อส่งต่อ ไม่ใช่ช่องกรอก (เช่น กุญแจของระบบอื่น)
+    thru = {p['k'] if isinstance(p, dict) else p for p in (d.get('passthrough') or [])}
     err, warn = [], []
     for k, v in o.items():
+        if k in thru:
+            continue
         f = F.get(k)
         if not f:
             near = [x for x in F if x.lower().startswith(k[:3].lower())]
