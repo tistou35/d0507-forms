@@ -95,6 +95,35 @@ def load_defs():
 CODE_RE = re.compile(r'\b[A-Z]{2}-[A-Z]{2,4}(?:-[A-Z]{2,3})?-\d{3}-[A-Z]\b')
 
 
+def check_statics(defs):
+    """ข้อความคงที่ที่อ้างเลขกำกับหรือฉบับ ต้องตรงกับหัวของนิยามฟอร์มนั้น
+
+    PWR บอกผู้โดยสารว่า "ข้อความที่ท่านกำลังยอมรับคือฉบับนี้" ก่อนให้กดยอมรับ
+    ถ้าแก้เอกสารแล้วลืมแก้ข้อความนี้ หน้าเว็บจะอ้างฉบับที่ถูกแทนไปแล้ว
+    ซึ่งแย่กว่าไม่บอกเลย เพราะเป็นการยืนยันสิ่งที่ไม่จริงให้คนนอกองค์กรอ่าน
+    """
+    for code, d in defs.items():
+        want = {k: str(d.get(k) or '') for k in ('control', 'issue', 'rev', 'eff')}
+        for sec in d.get('sections', []):
+            for f in sec.get('fields', []):
+                if f.get('type') != 'static':
+                    continue
+                txt = ' '.join(str(v) for v in (f.get('text') or {}).values())
+                if want['control'] and want['control'] not in txt:
+                    if re.search(r'\b[A-Z]{2}[/-][A-Z]{2,4}[/-]\d{3}-?[A-Z]?\b', txt):
+                        sys.exit("%s: ข้อความ %s อ้างเลขกำกับที่ไม่ใช่ %s"
+                                 % (code, f['k'], want['control']))
+                if want['control'] and want['control'] in txt:
+                    for lbl, key in (('Issue', 'issue'), ('Rev', 'rev')):
+                        m = re.search(lbl + r'\s*(\d+)', txt)
+                        if m and m.group(1) != want[key]:
+                            sys.exit("%s: ข้อความ %s เขียน %s %s แต่นิยามฟอร์มเป็น %s"
+                                     % (code, f['k'], lbl, m.group(1), want[key]))
+                    if want['eff'] and want['eff'] not in txt:
+                        sys.exit("%s: ข้อความ %s อ้างเลขกำกับแต่ไม่ได้ระบุวันมีผล %s"
+                                 % (code, f['k'], want['eff']))
+
+
 def check_guide(reg):
     """guide ถูกฝังลงหน้าฟอร์มสาธารณะ แต่ code ไม่ใช่ข้อมูลสาธารณะ
 
@@ -228,6 +257,7 @@ def main():
     AIRAC = airac_table(10)
 
     check_guide(reg)
+    check_statics(defs)
     check_status(reg, defs)
     pub = public_view(reg)
     # ⚠️ ทุกหน้าที่ host แบบสาธารณะฝังได้เฉพาะ pub — ทะเบียนเต็มอยู่ Firestore เท่านั้น

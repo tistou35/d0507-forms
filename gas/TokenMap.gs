@@ -2586,10 +2586,6 @@ var TOKEN_MAP = {
     "orderWarn": [],
     "byLabel": [
       {
-        "label": "Full Name",
-        "tok": "{{paxName}}"
-      },
-      {
         "label": "Date of Birth",
         "tok": "{{paxDob}}"
       },
@@ -2630,23 +2626,24 @@ var TOKEN_MAP = {
         "tok": "{{gId}}"
       }
     ],
-    "byLine": [
-      {
-        "label": "Date Signed",
-        "und": 3,
-        "tok": "{{signDate}}"
-      }
-    ],
+    "byLine": [],
     "byCell": [],
     "boxes": [
       {
         "tok": "{{k_isMinor}}",
-        "label": "Passenger is a minor (under 18). A parent or legal guardian must sign.",
-        "item": "Passenger is a minor (under 18). A parent or legal guardian must sign."
+        "label": "Passenger is under 18 — a parent or legal guardian must complete and sign on their behalf",
+        "item": "Passenger is under 18 — a parent or legal guardian must complete and sign on their behalf"
+      },
+      {
+        "tok": "{{k_gConsent}}",
+        "label": "GUARDIAN CONSENT — I give the consent stated above",
+        "item": "GUARDIAN CONSENT — I give the consent stated above",
+        "ord": "GUARDIAN CONSENT — I am the parent or legal guardian of the passenger named in Section A."
       }
     ],
+    "boxesPartial": false,
     "tables": [],
-    "boxesInDocx": 1,
+    "boxesInDocx": 2,
     "approval": [
       {
         "tok": "{{htName}}",
@@ -2667,14 +2664,7 @@ var TOKEN_MAP = {
         "sign": true
       }
     ],
-    "manual": [
-      {
-        "tok": "{{sig_paxSign}}",
-        "label": "Passenger signature (if minor: parent / legal guardian)",
-        "labelTh": "ลายเซ็นผู้โดยสาร (หากเป็นผู้เยาว์ ให้ผู้ปกครองลงนาม)",
-        "sign": true
-      }
-    ]
+    "manual": []
   },
   "RTR": {
     "abbr": "RTR",

@@ -1,140 +1,147 @@
 {
-  "_README": [
-    "แก้การจับคู่ token ที่เครื่องมือเดาเองไม่ได้ — ใช้เมื่อกระดาษกับนิยามฟอร์มไม่ตรงกัน 1:1",
-    "",
-    "boxes   รายชื่อ token ที่จะแทน ☐ ในเอกสาร เรียงตามลำดับที่ ☐ ปรากฏจริง",
-    "        ใส่เมื่อจำนวนช่องติ๊กในนิยามฟอร์มไม่เท่ากับ ☐ ในเอกสาร",
-    "        (เช่น กระดาษไม่มีช่องติ๊กให้ข้อตกลงที่ระบบทำเป็น checkbox)",
-    "labels  ป้ายในเอกสาร -> token  บังคับจับคู่เอง ทับผลที่เครื่องมือเดา",
-    "skip    token ที่ไม่ต้องขึ้น PDF เลย ไม่ต้องเตือนว่ายังไม่ได้วาง",
-    "",
-    "ตรวจจำนวน ☐ จริงได้ด้วย: python3 tools/make_tokenmap.py <ABBR>",
-    "cells   เซลล์ที่มีป้าย+ตัวยึดตำแหน่งในตัวเอง -> { tok, head } · head คือข้อความที่เก็บไว้หน้า token"
+ "_README": [
+  "แก้การจับคู่ token ที่เครื่องมือเดาเองไม่ได้ — ใช้เมื่อกระดาษกับนิยามฟอร์มไม่ตรงกัน 1:1",
+  "",
+  "boxes   รายชื่อ token ที่จะแทน ☐ ในเอกสาร เรียงตามลำดับที่ ☐ ปรากฏจริง",
+  "        ใส่เมื่อจำนวนช่องติ๊กในนิยามฟอร์มไม่เท่ากับ ☐ ในเอกสาร",
+  "        (เช่น กระดาษไม่มีช่องติ๊กให้ข้อตกลงที่ระบบทำเป็น checkbox)",
+  "labels  ป้ายในเอกสาร -> token  บังคับจับคู่เอง ทับผลที่เครื่องมือเดา",
+  "skip    token ที่ไม่ต้องขึ้น PDF เลย ไม่ต้องเตือนว่ายังไม่ได้วาง",
+  "",
+  "ตรวจจำนวน ☐ จริงได้ด้วย: python3 tools/make_tokenmap.py <ABBR>",
+  "cells   เซลล์ที่มีป้าย+ตัวยึดตำแหน่งในตัวเอง -> { tok, head } · head คือข้อความที่เก็บไว้หน้า token"
+ ],
+ "PWR": {
+  "_why": "กระดาษมี ☐ สองช่อง — ผู้โดยสารเป็นผู้เยาว์ กับความยินยอมของผู้ปกครอง ส่วนข้อตกลง 4 ข้อเป็นความเรียง ไม่มีช่องติ๊ก การลงนามถือเป็นการยอมรับอยู่แล้ว · ป้าย \"Signature:\" และ \"Name (Print):\" มีอยู่สามชุด (ผู้ปกครอง ผู้โดยสาร หัวหน้าครูฝึก) ตัวจับคู่แยกไม่ออกว่าชุดไหนของใคร จึงวาง token ลงในเอกสารเองแทน",
+  "boxes": [
+   "{{k_isMinor}}",
+   {
+    "tok": "{{k_gConsent}}",
+    "ord": "GUARDIAN CONSENT — I am the parent or legal guardian of the passenger named in Section A."
+   }
   ],
-  "PWR": {
-    "_why": "กระดาษมี ☐ ช่องเดียว คือช่องผู้โดยสารเป็นผู้เยาว์ ส่วนข้อตกลง 4 ข้อเป็นความเรียง ไม่มีช่องติ๊ก การลงนามถือเป็นการยอมรับอยู่แล้ว",
-    "boxes": [
-      "{{k_isMinor}}"
-    ],
-    "skip": [
-      "{{k_t1}}",
-      "{{k_t2}}",
-      "{{k_t3}}",
-      "{{k_t4}}"
-    ]
+  "labels": {
+   "ID / Passport No. (Guardian)": "{{gId}}"
   },
-  "ASF": {
-    "_why": "กระดาษวาง Night Hours & Landings ไว้ตำแหน่งที่ 5 ต่อจาก Flight Hours แต่ในนิยามฟอร์มข้อนี้ย้ายไปอยู่กลุ่มบินกลางคืน (เพื่อไม่บังคับติ๊กตอนบินกลางวัน) ลำดับ token จึงเลื่อนจากช่องที่ 5 ลงไปทั้งหมด — ต้องเรียงตามกระดาษเอง",
-    "boxes": [
-      "{{k_soloType_initial}}",
-      "{{k_soloType_localxc}}",
-      "{{k_soloType_night}}",
-      "{{k_preHours_hours_Y}}",
-      "{{k_nightKnow_nightHours_Y}}",
-      "{{k_knowledge_systems_Y}}",
-      "{{k_knowledge_aero_Y}}",
-      "{{k_knowledge_emerg_Y}}",
-      "{{k_knowledge_law_Y}}",
-      "{{k_knowledge_wx_Y}}",
-      "{{k_knowledge_preflight_Y}}",
-      "{{k_knowledge_radio_Y}}",
-      "{{k_nightKnow_vision_Y}}",
-      "{{k_nightKnow_lighting_Y}}",
-      "{{k_nightKnow_disorient_Y}}",
-      "{{k_nightKnow_nav_Y}}"
-    ],
-    "_cellsWhy": "กระดาษพิมพ์ 'Aircraft Reg.:  HS-___' แต่ค่าที่กรอกมี HS- อยู่แล้ว จึงตัด HS- ที่พิมพ์ไว้ออก ไม่งั้นได้ HS-HS-DAB",
-    "cells": {
-      "Aircraft Reg.:  HS-___": {
-        "tok": "{{acReg}}",
-        "head": "Aircraft Reg.:  "
-      }
-    }
-  },
-  "APF": {
-    "_why": "คำรับรองในกระดาษเป็นความเรียง ไม่มีช่องติ๊ก — การลงนามคือการรับรอง ระบบทำเป็น checkbox เพื่อบังคับให้อ่านก่อนส่ง",
-    "skip": [
-      "{{k_declare}}"
-    ]
-  },
-  "DRC": {
-    "_why": "เหตุผลเดียวกับ APF — ข้อความรับรองการรับเอกสารเป็นความเรียง ช่องติ๊กในกระดาษมีแค่ Hard Copy / Digital",
-    "skip": [
-      "{{k_confirm}}"
-    ]
-  },
-  "FTR": {
-    "_why": "กระดาษมีสองคอลัมน์ Satisfactory / Unsatisfactory ต่อหนึ่งรายการ ไม่มีคอลัมน์ N/A — ระบบเพิ่มให้เลือกได้ แต่ในเอกสารไม่มีช่องให้ติ๊ก",
-    "skip": [
-      "{{k_checks_E1_NA}}",
-      "{{k_checks_E2_NA}}",
-      "{{k_checks_T1_NA}}",
-      "{{k_checks_T2_NA}}",
-      "{{k_checks_C1_NA}}",
-      "{{k_checks_C2_NA}}",
-      "{{k_checks_H1_NA}}",
-      "{{k_checks_H2_NA}}",
-      "{{k_checks_A1_NA}}",
-      "{{k_checks_A2_NA}}",
-      "{{k_checks_P1_NA}}",
-      "{{k_checks_P2_NA}}"
-    ]
-  },
-  "HIF": {
-    "_why": "☐ 5 ช่องในกระดาษคือ High/Medium/Low แล้วตามด้วย Yes/No ของ residual risk — ระดับความเสี่ยงมาจากตารางเมทริกซ์ (riskLevel) ไม่ใช่ช่องที่ผู้กรอกเลือก ส่วน lik กับ sev เป็นช่องกรอกตัวเลข กระดาษไม่มีช่องติ๊กให้",
-    "boxes": [
-      "{{k_riskLevel_H}}",
-      "{{k_riskLevel_A}}",
-      "{{k_riskLevel_L}}",
-      "{{k_residualOk_yes}}",
-      "{{k_residualOk_no}}"
-    ],
-    "skip": [
-      "{{k_lik_1}}",
-      "{{k_lik_2}}",
-      "{{k_lik_3}}",
-      "{{k_lik_4}}",
-      "{{k_lik_5}}",
-      "{{k_sev_1}}",
-      "{{k_sev_2}}",
-      "{{k_sev_3}}",
-      "{{k_sev_4}}",
-      "{{k_sev_5}}"
-    ],
-    "_labels_why": "lik/sev เป็น select จึงถูกจัดเป็นช่องติ๊กไปแล้ว ส่วน riskScore/riskLevel เป็นค่าคำนวณ ไม่ใช่ฟิลด์ในนิยามฟอร์ม ทั้งสี่ช่องนี้จึงต้องผูกกับป้ายเอง มิฉะนั้นแถวสรุปความเสี่ยงจะว่างทั้งแถว",
-    "labels": {
-      "Likelihood (1–5):": "{{lik}}",
-      "Severity (1–5):": "{{sev}}",
-      "Risk Score (L×S):": "{{riskScore}}",
-      "Risk Level:": "{{riskLevel}}"
-    }
-  },
-  "EFM": {
-    "_why": "ป้าย \"Signature:\" ในกระดาษสั้นเกินกว่าจะจับคู่อัตโนมัติกับ \"Evaluator signature\" ในนิยามฟอร์ม (คำว่า signature กว้างเกินไป ตัวจับคู่จึงไม่กล้าเดา) ระบุเองให้ชัด",
-    "labels": {
-      "Signature:": "{{sig_evSign}}"
-    }
-  },
-  "EFC": {
-    "_why": "reportCourse เป็นตัวเลือกในหน้าจอ ไม่ใช่ช่องติ๊กบนกระดาษ — กระดาษพิมพ์ชื่อหลักสูตรเป็นข้อความผ่าน {{course}} ที่หัวตารางรายวิชาแทน ถ้าไม่กันออก ตัวสร้างจะนับเป็นช่องติ๊ก 9 ช่องแล้วจำนวนไม่ตรงกับเอกสาร",
-    "skip": [
-      "{{k_reportCourse_f09c1566-9212-48b6-9758-7c13273af7fe}}",
-      "{{k_reportCourse_f758880b-7f2f-4265-a84c-8333cc18210f}}",
-      "{{k_reportCourse_d375de64-fc87-47c5-8c0c-fed83cf2a4c4}}",
-      "{{k_reportCourse_1b0b4749-4848-4f0a-9848-c4e71fbe667d}}",
-      "{{k_reportCourse_0b4e73dd-224f-49cf-9852-9cf935d0553d}}",
-      "{{k_reportCourse_538737cb-c947-48e8-8543-97e0d408ab54}}",
-      "{{k_reportCourse_9205fce4-ea12-41a5-b648-469b9e8794f6}}",
-      "{{k_reportCourse_ae8eb145-dd0d-4924-af29-a0f2168fb2b9}}",
-      "{{k_reportCourse_3a34964c-ca0b-4347-84a3-448ea18c5331}}"
-    ],
-    "skipTables": [
-      "s7"
-    ],
-    "_whyTables": "กระดาษฉบับแก้ไขรวมชื่อวิชากับผลไว้คอลัมน์เดียว ใช้ {{s7_N_shown}} จึงไม่มีหัวคอลัมน์ Subject/Score/Result/Passed on ให้จับคู่อีกแล้ว",
-    "labels": {
-      "Learning / Flight Hours": "{{learningHours}}"
-    },
-    "_whyLabels": "ป้ายบนกระดาษต้องครอบทั้งสองโหมด (ภาคพื้น = ชั่วโมงเรียน · ภาคอากาศ = ชั่วโมงบิน) จึงเขียนว่า Learning / Flight Hours ซึ่งไม่ตรงกับ label ในนิยามฟอร์ม ตัวจับคู่จึงหาไม่เจอ"
+  "skip": [
+   "{{k_t1}}",
+   "{{k_t2}}",
+   "{{k_t3}}",
+   "{{k_t4}}"
+  ]
+ },
+ "ASF": {
+  "_why": "กระดาษวาง Night Hours & Landings ไว้ตำแหน่งที่ 5 ต่อจาก Flight Hours แต่ในนิยามฟอร์มข้อนี้ย้ายไปอยู่กลุ่มบินกลางคืน (เพื่อไม่บังคับติ๊กตอนบินกลางวัน) ลำดับ token จึงเลื่อนจากช่องที่ 5 ลงไปทั้งหมด — ต้องเรียงตามกระดาษเอง",
+  "boxes": [
+   "{{k_soloType_initial}}",
+   "{{k_soloType_localxc}}",
+   "{{k_soloType_night}}",
+   "{{k_preHours_hours_Y}}",
+   "{{k_nightKnow_nightHours_Y}}",
+   "{{k_knowledge_systems_Y}}",
+   "{{k_knowledge_aero_Y}}",
+   "{{k_knowledge_emerg_Y}}",
+   "{{k_knowledge_law_Y}}",
+   "{{k_knowledge_wx_Y}}",
+   "{{k_knowledge_preflight_Y}}",
+   "{{k_knowledge_radio_Y}}",
+   "{{k_nightKnow_vision_Y}}",
+   "{{k_nightKnow_lighting_Y}}",
+   "{{k_nightKnow_disorient_Y}}",
+   "{{k_nightKnow_nav_Y}}"
+  ],
+  "_cellsWhy": "กระดาษพิมพ์ 'Aircraft Reg.:  HS-___' แต่ค่าที่กรอกมี HS- อยู่แล้ว จึงตัด HS- ที่พิมพ์ไว้ออก ไม่งั้นได้ HS-HS-DAB",
+  "cells": {
+   "Aircraft Reg.:  HS-___": {
+    "tok": "{{acReg}}",
+    "head": "Aircraft Reg.:  "
+   }
   }
+ },
+ "APF": {
+  "_why": "คำรับรองในกระดาษเป็นความเรียง ไม่มีช่องติ๊ก — การลงนามคือการรับรอง ระบบทำเป็น checkbox เพื่อบังคับให้อ่านก่อนส่ง",
+  "skip": [
+   "{{k_declare}}"
+  ]
+ },
+ "DRC": {
+  "_why": "เหตุผลเดียวกับ APF — ข้อความรับรองการรับเอกสารเป็นความเรียง ช่องติ๊กในกระดาษมีแค่ Hard Copy / Digital",
+  "skip": [
+   "{{k_confirm}}"
+  ]
+ },
+ "FTR": {
+  "_why": "กระดาษมีสองคอลัมน์ Satisfactory / Unsatisfactory ต่อหนึ่งรายการ ไม่มีคอลัมน์ N/A — ระบบเพิ่มให้เลือกได้ แต่ในเอกสารไม่มีช่องให้ติ๊ก",
+  "skip": [
+   "{{k_checks_E1_NA}}",
+   "{{k_checks_E2_NA}}",
+   "{{k_checks_T1_NA}}",
+   "{{k_checks_T2_NA}}",
+   "{{k_checks_C1_NA}}",
+   "{{k_checks_C2_NA}}",
+   "{{k_checks_H1_NA}}",
+   "{{k_checks_H2_NA}}",
+   "{{k_checks_A1_NA}}",
+   "{{k_checks_A2_NA}}",
+   "{{k_checks_P1_NA}}",
+   "{{k_checks_P2_NA}}"
+  ]
+ },
+ "HIF": {
+  "_why": "☐ 5 ช่องในกระดาษคือ High/Medium/Low แล้วตามด้วย Yes/No ของ residual risk — ระดับความเสี่ยงมาจากตารางเมทริกซ์ (riskLevel) ไม่ใช่ช่องที่ผู้กรอกเลือก ส่วน lik กับ sev เป็นช่องกรอกตัวเลข กระดาษไม่มีช่องติ๊กให้",
+  "boxes": [
+   "{{k_riskLevel_H}}",
+   "{{k_riskLevel_A}}",
+   "{{k_riskLevel_L}}",
+   "{{k_residualOk_yes}}",
+   "{{k_residualOk_no}}"
+  ],
+  "skip": [
+   "{{k_lik_1}}",
+   "{{k_lik_2}}",
+   "{{k_lik_3}}",
+   "{{k_lik_4}}",
+   "{{k_lik_5}}",
+   "{{k_sev_1}}",
+   "{{k_sev_2}}",
+   "{{k_sev_3}}",
+   "{{k_sev_4}}",
+   "{{k_sev_5}}"
+  ],
+  "_labels_why": "lik/sev เป็น select จึงถูกจัดเป็นช่องติ๊กไปแล้ว ส่วน riskScore/riskLevel เป็นค่าคำนวณ ไม่ใช่ฟิลด์ในนิยามฟอร์ม ทั้งสี่ช่องนี้จึงต้องผูกกับป้ายเอง มิฉะนั้นแถวสรุปความเสี่ยงจะว่างทั้งแถว",
+  "labels": {
+   "Likelihood (1–5):": "{{lik}}",
+   "Severity (1–5):": "{{sev}}",
+   "Risk Score (L×S):": "{{riskScore}}",
+   "Risk Level:": "{{riskLevel}}"
+  }
+ },
+ "EFM": {
+  "_why": "ป้าย \"Signature:\" ในกระดาษสั้นเกินกว่าจะจับคู่อัตโนมัติกับ \"Evaluator signature\" ในนิยามฟอร์ม (คำว่า signature กว้างเกินไป ตัวจับคู่จึงไม่กล้าเดา) ระบุเองให้ชัด",
+  "labels": {
+   "Signature:": "{{sig_evSign}}"
+  }
+ },
+ "EFC": {
+  "_why": "reportCourse เป็นตัวเลือกในหน้าจอ ไม่ใช่ช่องติ๊กบนกระดาษ — กระดาษพิมพ์ชื่อหลักสูตรเป็นข้อความผ่าน {{course}} ที่หัวตารางรายวิชาแทน ถ้าไม่กันออก ตัวสร้างจะนับเป็นช่องติ๊ก 9 ช่องแล้วจำนวนไม่ตรงกับเอกสาร",
+  "skip": [
+   "{{k_reportCourse_f09c1566-9212-48b6-9758-7c13273af7fe}}",
+   "{{k_reportCourse_f758880b-7f2f-4265-a84c-8333cc18210f}}",
+   "{{k_reportCourse_d375de64-fc87-47c5-8c0c-fed83cf2a4c4}}",
+   "{{k_reportCourse_1b0b4749-4848-4f0a-9848-c4e71fbe667d}}",
+   "{{k_reportCourse_0b4e73dd-224f-49cf-9852-9cf935d0553d}}",
+   "{{k_reportCourse_538737cb-c947-48e8-8543-97e0d408ab54}}",
+   "{{k_reportCourse_9205fce4-ea12-41a5-b648-469b9e8794f6}}",
+   "{{k_reportCourse_ae8eb145-dd0d-4924-af29-a0f2168fb2b9}}",
+   "{{k_reportCourse_3a34964c-ca0b-4347-84a3-448ea18c5331}}"
+  ],
+  "skipTables": [
+   "s7"
+  ],
+  "_whyTables": "กระดาษฉบับแก้ไขรวมชื่อวิชากับผลไว้คอลัมน์เดียว ใช้ {{s7_N_shown}} จึงไม่มีหัวคอลัมน์ Subject/Score/Result/Passed on ให้จับคู่อีกแล้ว",
+  "labels": {
+   "Learning / Flight Hours": "{{learningHours}}"
+  },
+  "_whyLabels": "ป้ายบนกระดาษต้องครอบทั้งสองโหมด (ภาคพื้น = ชั่วโมงเรียน · ภาคอากาศ = ชั่วโมงบิน) จึงเขียนว่า Learning / Flight Hours ซึ่งไม่ตรงกับ label ในนิยามฟอร์ม ตัวจับคู่จึงหาไม่เจอ"
+ }
 }

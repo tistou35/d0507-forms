@@ -350,9 +350,20 @@ def build(abbr, verbose=False):
         unmatched = [u for u in unmatched if u['tok'] not in skip]
     if ov.get('boxes'):
         # เรียงเองตามที่ ☐ อยู่จริงในกระดาษ — ที่ไม่ได้ระบุถือว่าไม่มีช่องให้ติ๊ก
+        # เขียนเป็น {"tok": "...", "ord": "ข้อความข้าง ☐ ในกระดาษ"} ได้ด้วย
+        # ใช้เมื่อป้ายบนจอสั้นกว่าข้อความในกระดาษมากจนตัวตรวจลำดับจับคู่ไม่ได้
+        # การเขียน ord ไว้คือการยืนยันว่า "ช่องนี้คือข้อความนี้" ถ้ากระดาษถูกแก้
+        # จนข้อความเปลี่ยน ตัวตรวจจะเตือนทันที ไม่ใช่ปิดเสียงเตือนทิ้ง
         want = ov['boxes']
         known = {b['tok']: b for b in boxes}
-        boxes = [known.get(t, {'tok': t, 'label': ''}) for t in want]
+        boxes = []
+        for w in want:
+            tok = w['tok'] if isinstance(w, dict) else w
+            rec = dict(known.get(tok) or {'tok': tok, 'label': ''})
+            rec['tok'] = tok
+            if isinstance(w, dict) and w.get('ord'):
+                rec['ord'] = w['ord']
+            boxes.append(rec)
 
     # token ที่เขียนไว้ในเอกสารแล้วด้วยมือ ไม่ต้องให้ตัววางไปหาที่ให้อีก
     # เอกสารบางใบวาง token เองทั้งใบ (STR ฉบับแก้ไข) ถ้าไม่กันออก
