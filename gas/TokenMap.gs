@@ -11,6 +11,7 @@ var TOKEN_MAP = {
   "APF": {
     "abbr": "APF",
     "docx": "D-0507-APF-001.docx",
+    "control": "AD/APF/301-A",
     "orderWarn": [],
     "byLabel": [
       {
@@ -118,6 +119,7 @@ var TOKEN_MAP = {
         "ord": "Appeal dismissed"
       }
     ],
+    "boxesPartial": false,
     "tables": [],
     "boxesInDocx": 8,
     "approval": [
@@ -152,6 +154,7 @@ var TOKEN_MAP = {
   "ASF": {
     "abbr": "ASF",
     "docx": "D-0507-ASF-001.docx",
+    "control": "IM-ASF-003-A",
     "orderWarn": [],
     "byLabel": [
       {
@@ -298,6 +301,7 @@ var TOKEN_MAP = {
         "item": "Night navigation"
       }
     ],
+    "boxesPartial": false,
     "tables": [],
     "boxesInDocx": 16,
     "approval": [
@@ -331,6 +335,7 @@ var TOKEN_MAP = {
   "DAF": {
     "abbr": "DAF",
     "docx": "D-0507-DAF-001.docx",
+    "control": "AD-DAF-301-A",
     "orderWarn": [],
     "byLabel": [
       {
@@ -483,6 +488,7 @@ var TOKEN_MAP = {
         "ord": "Other"
       }
     ],
+    "boxesPartial": false,
     "tables": [],
     "boxesInDocx": 15,
     "approval": [
@@ -535,6 +541,7 @@ var TOKEN_MAP = {
   "DRC": {
     "abbr": "DRC",
     "docx": "D-0507-DRC-001.docx",
+    "control": "QA-DRF-302-A",
     "orderWarn": [],
     "byLabel": [
       {
@@ -580,6 +587,7 @@ var TOKEN_MAP = {
         "ord": "Digital"
       }
     ],
+    "boxesPartial": false,
     "tables": [
       {
         "k": "docs",
@@ -619,6 +627,7 @@ var TOKEN_MAP = {
   "DRF": {
     "abbr": "DRF",
     "docx": "D-0507-DRF-001.docx",
+    "control": "QA-DRF-301-A",
     "orderWarn": [],
     "byLabel": [
       {
@@ -732,6 +741,7 @@ var TOKEN_MAP = {
         "ord": "CAAT directive"
       }
     ],
+    "boxesPartial": false,
     "tables": [],
     "boxesInDocx": 10,
     "approval": [
@@ -766,15 +776,12 @@ var TOKEN_MAP = {
   "EFC": {
     "abbr": "EFC",
     "docx": "D-0507-EFC-001.docx",
+    "control": "IM-EFC-303-B",
     "orderWarn": [],
     "byLabel": [
       {
         "label": "Student Name",
         "tok": "{{stuName}}"
-      },
-      {
-        "label": "Course Attended",
-        "tok": "{{course}}"
       },
       {
         "label": "Study From",
@@ -893,6 +900,7 @@ var TOKEN_MAP = {
   "FRAE": {
     "abbr": "FRAE",
     "docx": "D-0507-FRAE-001.docx",
+    "control": "IM-DRM-304-A",
     "orderWarn": [],
     "byLabel": [
       {
@@ -1242,6 +1250,7 @@ var TOKEN_MAP = {
         "ord": "NO-GO"
       }
     ],
+    "boxesPartial": false,
     "tables": [],
     "boxesInDocx": 64,
     "approval": [
@@ -1294,6 +1303,7 @@ var TOKEN_MAP = {
   "FTR": {
     "abbr": "FTR",
     "docx": "D-0507-FTR-001.docx",
+    "control": "ME-FTR-301-A",
     "orderWarn": [],
     "byLabel": [
       {
@@ -1528,6 +1538,7 @@ var TOKEN_MAP = {
         "ord": "Unserviceable — defects require rectification first"
       }
     ],
+    "boxesPartial": false,
     "tables": [],
     "boxesInDocx": 31,
     "approval": [
@@ -1586,6 +1597,7 @@ var TOKEN_MAP = {
   "HIF": {
     "abbr": "HIF",
     "docx": "D-0507-HIF-001.docx",
+    "control": "SM-HIF-301-A",
     "orderWarn": [],
     "byLabel": [
       {
@@ -1663,6 +1675,7 @@ var TOKEN_MAP = {
         "ord": "No — requires further action"
       }
     ],
+    "boxesPartial": false,
     "tables": [],
     "boxesInDocx": 5,
     "approval": [
@@ -1703,6 +1716,7 @@ var TOKEN_MAP = {
   "MOC": {
     "abbr": "MOC",
     "docx": "D-0507-MOC-001.docx",
+    "control": "D-0507-MOC-001",
     "orderWarn": [],
     "byLabel": [
       {
@@ -1840,6 +1854,7 @@ var TOKEN_MAP = {
         "ord": "No"
       }
     ],
+    "boxesPartial": false,
     "tables": [
       {
         "k": "hazards",
@@ -1993,6 +2008,7 @@ var TOKEN_MAP = {
   "PCR-FI": {
     "abbr": "PCR-FI",
     "docx": "D-0507-PCR-FI-001.docx",
+    "control": "IM-PCR-FI-301-A",
     "orderWarn": [],
     "byLabel": [
       {
@@ -2306,6 +2322,7 @@ var TOKEN_MAP = {
   "PCR-TKI": {
     "abbr": "PCR-TKI",
     "docx": "D-0507-PCR-TKI-001.docx",
+    "control": "IM-PCR-TKI-302-A",
     "orderWarn": [],
     "byLabel": [
       {
@@ -2583,6 +2600,7 @@ var TOKEN_MAP = {
   "PWR": {
     "abbr": "PWR",
     "docx": "D-0507-PWR-001.docx",
+    "control": "AD/PWR/301-D",
     "orderWarn": [],
     "byLabel": [
       {
@@ -2654,6 +2672,7 @@ var TOKEN_MAP = {
   "RTR": {
     "abbr": "RTR",
     "docx": "D-0507-RTR-001.docx",
+    "control": "IM-RTR-301-A",
     "orderWarn": [],
     "byLabel": [
       {
@@ -2785,6 +2804,7 @@ var TOKEN_MAP = {
         "ord": "Unsatisfactory"
       }
     ],
+    "boxesPartial": false,
     "tables": [],
     "boxesInDocx": 13,
     "approval": [
@@ -2825,6 +2845,7 @@ var TOKEN_MAP = {
   "SDF": {
     "abbr": "SDF",
     "docx": "D-0507-SDF-001.docx",
+    "control": "AD-SDF-301-A",
     "orderWarn": [],
     "byLabel": [
       {
@@ -2911,6 +2932,7 @@ var TOKEN_MAP = {
         "item": "FTL Compliance Confirmation: I confirm the totals above include hours from ALL operators. After today's planned duty with D-0507, my flight hours will not exceed the FTL limits: 7 days ≤ 28 hr / 28 days ≤ 100 hr / 365 days ≤ 1,000 hr. I understand that inaccurate declaration is a regulatory offence under Thai civil aviation law."
       }
     ],
+    "boxesPartial": false,
     "tables": [],
     "boxesInDocx": 7,
     "approval": [
@@ -2957,6 +2979,7 @@ var TOKEN_MAP = {
   "STR": {
     "abbr": "STR",
     "docx": "D-0507-STR-001.docx",
+    "control": "IM-STR-301-B",
     "orderWarn": [],
     "byLabel": [],
     "byLine": [
@@ -3004,6 +3027,7 @@ var TOKEN_MAP = {
   "VSR": {
     "abbr": "VSR",
     "docx": "D-0507-VSR-001.docx",
+    "control": "SM-VSR-303-A",
     "orderWarn": [],
     "byLabel": [
       {
@@ -3072,6 +3096,7 @@ var TOKEN_MAP = {
         "ord": "Other"
       }
     ],
+    "boxesPartial": false,
     "tables": [],
     "boxesInDocx": 5,
     "approval": [

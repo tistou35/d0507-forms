@@ -39,6 +39,7 @@ function importTemplate(abbr) {
 
   var docId = copyAsDoc_(src.getId(), name, folder.getId());
   var doc = DocumentApp.openById(docId);
+  checkEdition_(abbr, doc, map);
   var res = fillTokens_(doc, map);
   doc.saveAndClose();
 
@@ -78,6 +79,30 @@ function copyAsDoc_(fileId, name, parentId) {
 }
 
 /** หาไฟล์ .docx ใน Drive ทั้งบัญชี — ชื่อต้องตรงเป๊ะ */
+/** เอกสารที่หยิบมาต้องเป็นฉบับเดียวกับที่นิยามฟอร์มอ้างถึง
+
+    findDocx_ ตัดสินด้วยวันแก้ไขล่าสุดอย่างเดียว ถ้ามีชื่อซ้ำใน Drive แล้วใครไปเปิด
+    ฉบับเก่าแล้วเซฟ มันจะกลายเป็นตัวที่ใหม่กว่าและถูกหยิบมาทำแม่แบบโดยไม่มีอะไรเตือน
+
+    เกิดขึ้นมาแล้วจริงกับ PWR — แม่แบบถูกสร้างจากฉบับ Rev 02 ทั้งที่เอกสารเป็น Rev 03
+    ไปแล้ว ทุกอย่างดูปกติ ไม่มี error กว่าจะรู้ก็ต่อเมื่อมีคนเปิดแม่แบบดูด้วยตา
+    เลขกำกับเป็นสิ่งเดียวที่แยกฉบับออกจากกันได้ จึงเอามาตรวจตรงนี้ */
+function checkEdition_(abbr, doc, map) {
+  var want = map.control || '';
+  if (!want) return;                       // แผนที่รุ่นเก่ายังไม่มีข้อมูลนี้ อย่าเพิ่งขวาง
+  var txt = doc.getBody().getText();
+  var hdr = doc.getHeader(), ftr = doc.getFooter();
+  if (hdr) txt += '\n' + hdr.getText();
+  if (ftr) txt += '\n' + ftr.getText();
+  if (txt.indexOf(want) < 0) {
+    doc.saveAndClose();
+    DriveApp.getFileById(doc.getId()).setTrashed(true);
+    throw new Error(
+      abbr + ': .docx ที่หยิบมาไม่มีเลขกำกับ ' + want + ' — น่าจะเป็นฉบับเก่า ' +
+      'อัปโหลดฉบับปัจจุบันขึ้น Drive แล้วลบ/เปลี่ยนชื่อฉบับเก่าก่อน (ทิ้งแม่แบบที่สร้างค้างไว้แล้ว)');
+  }
+}
+
 function findDocx_(name) {
   /* ชื่อไฟล์เดียวกันอาจมีหลายฉบับใน Drive — ออกฉบับแก้ไขแล้วอัปโหลดทับชื่อเดิม
      ฉบับเก่ายังอยู่จนกว่าจะลบ ถ้าหยิบตัวแรกที่เจอจะได้ฉบับไหนก็ได้

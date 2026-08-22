@@ -401,6 +401,11 @@ def build(abbr, verbose=False):
     return {
         'abbr': abbr,
         'docx': 'D-0507-%s-001.docx' % abbr,
+        # เลขกำกับที่คาดว่าจะเจอในเอกสาร — ImportTemplate ใช้ตรวจว่าหยิบฉบับถูก
+        # findDocx_ ตัดสินด้วยวันแก้ไขล่าสุดอย่างเดียว ถ้ามีชื่อซ้ำใน Drive
+        # แล้วใครไปเปิดฉบับเก่าแล้วเซฟ มันจะกลายเป็นตัวใหม่กว่าและถูกหยิบไปทำแม่แบบ
+        # โดยไม่มีอะไรเตือน เกิดขึ้นมาแล้วจริงกับ PWR — แม่แบบขึ้น Rev 02 ทั้งที่เอกสารเป็น Rev 03
+        'control': (d.get('control') or ''),
         'orderWarn': order_warn,
         'byLabel': by_label,
         'byLine': by_line,
