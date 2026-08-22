@@ -852,16 +852,14 @@
       "st": "ok",
       "chain": "admin",
       "r": {
-        "stu": "ผู้โดยสาร trial flight ลงนามก่อนขึ้นบิน",
-        "ops": "จัดให้ผู้โดยสารลงนามและเก็บเข้าแฟ้ม"
+        "stu": "ผู้โดยสาร trial flight อ่านเงื่อนไขและลงนามก่อนขึ้นบิน — กรอกเสร็จคือรับทราบแล้ว",
+        "ops": "ดูรายการที่ลงนามแล้วในชีต PWR — Records และเก็บ PDF เข้าแฟ้ม"
       },
       "with": [
-        "PIC",
-        "HT"
+        "PIC"
       ],
       "sys": "here",
       "public": true,
-      "assignTo": "HT",
       "kw": [
         "consent",
         "guardian",

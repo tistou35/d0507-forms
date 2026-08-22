@@ -50,14 +50,6 @@
         "en": "Passenger"
       },
       "auth": "public"
-    },
-    {
-      "k": "ht",
-      "n": {
-        "th": "หัวหน้าครูฝึก",
-        "en": "Head of Training"
-      },
-      "auth": "role:mgt"
     }
   ],
   "sections": [
@@ -390,48 +382,6 @@
           }
         }
       ]
-    },
-    {
-      "k": "E",
-      "tab": "T4",
-      "party": "ht",
-      "hideOthers": true,
-      "title": {
-        "th": "อนุมัติโดยหัวหน้าครูฝึก",
-        "en": "Approved by Head of Training"
-      },
-      "fields": [
-        {
-          "k": "htName",
-          "type": "text",
-          "req": true,
-          "half": true,
-          "label": {
-            "th": "ชื่อหัวหน้าครูฝึก",
-            "en": "Head of Training name"
-          }
-        },
-        {
-          "k": "htDate",
-          "type": "date",
-          "req": true,
-          "prefill": "today",
-          "half": true,
-          "label": {
-            "th": "วันที่อนุมัติ",
-            "en": "Date approved"
-          }
-        },
-        {
-          "k": "htSign",
-          "type": "sign",
-          "req": true,
-          "label": {
-            "th": "ลายเซ็นหัวหน้าครูฝึก",
-            "en": "Head of Training signature"
-          }
-        }
-      ]
     }
   ],
   "gates": [
@@ -477,15 +427,6 @@
       "step": 1,
       "party": "pax",
       "sign": true
-    },
-    {
-      "step": 2,
-      "party": "ht",
-      "sign": true,
-      "assignedBy": "later",
-      "pool": "HT",
-      "canDelegate": true,
-      "slaDays": 1
     }
   ],
   "export": {

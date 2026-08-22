@@ -2648,26 +2648,7 @@ var TOKEN_MAP = {
     "boxesPartial": false,
     "tables": [],
     "boxesInDocx": 2,
-    "approval": [
-      {
-        "tok": "{{htName}}",
-        "label": "Head of Training name",
-        "labelTh": "ชื่อหัวหน้าครูฝึก",
-        "sign": false
-      },
-      {
-        "tok": "{{htDate}}",
-        "label": "Date approved",
-        "labelTh": "วันที่อนุมัติ",
-        "sign": false
-      },
-      {
-        "tok": "{{sig_htSign}}",
-        "label": "Head of Training signature",
-        "labelTh": "ลายเซ็นหัวหน้าครูฝึก",
-        "sign": true
-      }
-    ],
+    "approval": [],
     "manual": []
   },
   "RTR": {
