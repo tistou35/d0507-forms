@@ -143,6 +143,18 @@ function boot(){
    ถ้าผู้ใช้กดเข้าสู่ระบบแล้วกลับมาโดยไม่มี query string ค่าจะหายเงียบ ๆ
    จึงเก็บไว้ตั้งแต่ boot แรก แล้วอ่านคืนเมื่อ URL ไม่มีให้
    ผูกกับรหัสฟอร์มและลบทิ้งหลังใช้ — จะได้ไม่ค้างไปโผล่ในใบอื่น */
+/* หน้านี้อ่าน query param แค่ c กับ p — ที่เหลือถูกทิ้งเงียบ ๆ
+   ระบบภายนอกที่ส่ง ?ref=...&sys=... มาตรง ๆ จะไม่ได้อะไรกลับเลยและไม่รู้ตัว
+   เกิดขึ้นมาแล้วจริง: อีกทีมเขียนตัวเชื่อมไป 280 บรรทัดก่อนจะรู้ว่าค่าไม่เคยถึงฟอร์ม
+   ค่าที่ต้องส่งมาให้ใบเก็บไว้ ต้องอยู่ "ข้างใน" p ที่เข้ารหัสไว้ ไม่ใช่ระดับบนสุด */
+(function warnUnknownParams(){
+  const KNOWN=new Set(['c','p']);
+  const extra=[...new URLSearchParams(location.search).keys()].filter(k=>!KNOWN.has(k));
+  if(extra.length) console.warn(
+    '[fill] ทิ้ง query param ที่ไม่รู้จัก: '+extra.join(', ')+
+    ' — หน้านี้อ่านแค่ c กับ p · ค่าที่ต้องการให้ใบเก็บไว้ ให้ใส่ไว้ข้างใน p');
+})();
+
 const PKEY='d0507.prefill.'+(new URLSearchParams(location.search).get('c')||'');
 (function stashP(){
   const raw=new URLSearchParams(location.search).get('p');
