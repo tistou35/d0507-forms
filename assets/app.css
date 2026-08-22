@@ -630,3 +630,26 @@ a.gf:hover{border-color:var(--navy-900);color:var(--navy-900)}
   font-family:var(--font-mono);font-size:13px}
 .fk-score:focus{outline:2px solid var(--sky-500);outline-offset:1px}
 @media print{ .fk-score{border:0;padding:0} }
+
+
+/* ── ตารางความเสี่ยง ───────────────────────────────────────
+   สีบอกระดับ ไม่ใช่ตัวอักษรอย่างเดียว — ผู้ประเมินต้องเห็นได้ทันทีว่าขยับ
+   หนึ่งช่องแล้วข้ามเขต และเห็นว่าช่องที่เลือกอยู่ตรงไหนของทั้งตาราง */
+.fk-rm{overflow-x:auto;margin-top:4px}
+.fk-rm table{border-collapse:separate;border-spacing:3px}
+.fk-rm th{font-size:11.5px;font-weight:600;color:var(--fg-2);text-align:right;
+  white-space:nowrap;padding-right:6px}
+.fk-rm .rm-x{font-family:var(--font-mono);font-size:11.5px;color:var(--fg-2);text-align:center}
+.fk-rm .rm{width:52px;height:42px;border-radius:7px;cursor:pointer;font-weight:700;
+  font-size:12.5px;border:1px solid var(--border-light);color:var(--fg-1);
+  background:var(--surface);transition:transform .08s var(--ease)}
+.fk-rm .rm:hover:not(:disabled){transform:scale(1.06)}
+.fk-rm .rm:disabled{cursor:default;opacity:.75}
+.fk-rm .rm-l{background:var(--green-100)}
+.fk-rm .rm-a{background:var(--amber-100)}
+.fk-rm .rm-h{background:var(--red-100)}
+.fk-rm .rm.on{outline:3px solid var(--navy-900);outline-offset:1px}
+.rm-ax{font-size:11.5px;color:var(--fg-2);margin:2px 0 0 62px}
+.rm-out{font-size:13.5px;margin-top:8px;padding:9px 12px;border-radius:8px;
+  background:var(--g-50);border:1px solid var(--border-light)}
+@media print{ .fk-rm .rm{transition:none} }

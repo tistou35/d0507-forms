@@ -5,77 +5,257 @@
   "issue": "01",
   "rev": "00",
   "eff": "20 AUG 2020",
-  "title": { "th": "ใบรับเอกสารควบคุม", "en": "Document Receipt" },
+  "title": {
+    "th": "ใบรับเอกสารควบคุม",
+    "en": "Document Receipt"
+  },
   "retain": "OMA A.10",
-
-  "parties": [
-    { "k": "iss", "n": { "th": "ผู้แจกจ่าย", "en": "Issuer" }, "auth": "role:mgt" },
-    { "k": "rcv", "n": { "th": "ผู้รับเอกสาร", "en": "Recipient" }, "auth": "assignee" }
+  "passthrough": [
+    {
+      "k": "ref",
+      "from": "aerofbo",
+      "note": "เลขที่ประกาศจากระบบ AeroFBO — ยังไม่ได้ใช้ตอนนี้ เตรียมที่ไว้ให้ ฝั่งนั้นส่งมาได้เมื่อพร้อม เก็บลงชีตพร้อมข้อมูลอื่นในแถวเดียวกัน"
+    }
   ],
-
+  "parties": [
+    {
+      "k": "iss",
+      "n": {
+        "th": "ผู้แจกจ่าย",
+        "en": "Issuer"
+      },
+      "auth": "role:mgt"
+    },
+    {
+      "k": "rcv",
+      "n": {
+        "th": "ผู้รับเอกสาร",
+        "en": "Recipient"
+      },
+      "auth": "assignee"
+    }
+  ],
   "sections": [
     {
-      "k": "A", "party": "iss",
-      "title": { "th": "การแจกจ่าย", "en": "Distribution" },
+      "k": "A",
+      "party": "iss",
+      "title": {
+        "th": "การแจกจ่าย",
+        "en": "Distribution"
+      },
       "desc": {
         "th": "ผู้รับลงนามรับทราบว่าได้รับเอกสารควบคุมตามรายการด้านล่าง และมีหน้าที่เก็บรักษาให้เป็นฉบับปัจจุบันเสมอ",
-        "en": "The recipient acknowledges receipt of the controlled documents listed below and is responsible for keeping them current and controlled." },
+        "en": "The recipient acknowledges receipt of the controlled documents listed below and is responsible for keeping them current and controlled."
+      },
       "fields": [
-        { "k": "rcvName", "type": "text", "req": true, "half": true,
-          "label": { "th": "แจกจ่ายให้ (ชื่อ)", "en": "Distributed to (name)" } },
-        { "k": "rcvRole", "type": "text", "req": true, "half": true,
-          "label": { "th": "ตำแหน่ง / หน้าที่", "en": "Position / role" } },
-        { "k": "issDate", "type": "date", "req": true, "prefill": "today", "half": true,
-          "label": { "th": "วันที่แจกจ่าย", "en": "Date issued" } },
-        { "k": "issBy", "type": "text", "req": true, "half": true,
-          "label": { "th": "ผู้แจกจ่าย", "en": "Issued by" } },
-        { "k": "copyType", "type": "select", "req": true, "half": true,
-          "label": { "th": "รูปแบบสำเนา", "en": "Copy type" },
+        {
+          "k": "rcvName",
+          "type": "text",
+          "req": true,
+          "half": true,
+          "label": {
+            "th": "แจกจ่ายให้ (ชื่อ)",
+            "en": "Distributed to (name)"
+          }
+        },
+        {
+          "k": "rcvRole",
+          "type": "text",
+          "req": true,
+          "half": true,
+          "label": {
+            "th": "ตำแหน่ง / หน้าที่",
+            "en": "Position / role"
+          }
+        },
+        {
+          "k": "issDate",
+          "type": "date",
+          "req": true,
+          "prefill": "today",
+          "half": true,
+          "label": {
+            "th": "วันที่แจกจ่าย",
+            "en": "Date issued"
+          }
+        },
+        {
+          "k": "issBy",
+          "type": "text",
+          "req": true,
+          "half": true,
+          "label": {
+            "th": "ผู้แจกจ่าย",
+            "en": "Issued by"
+          }
+        },
+        {
+          "k": "copyType",
+          "type": "select",
+          "req": true,
+          "half": true,
+          "label": {
+            "th": "รูปแบบสำเนา",
+            "en": "Copy type"
+          },
           "opt": [
-            { "v": "hard",    "n": { "th": "ฉบับพิมพ์", "en": "Hard copy" } },
-            { "v": "digital", "n": { "th": "ฉบับดิจิทัล", "en": "Digital" } } ] },
-        { "k": "copyNo", "type": "text", "half": true,
-          "label": { "th": "เลขสำเนาควบคุม", "en": "Copy No." } }
+            {
+              "v": "hard",
+              "n": {
+                "th": "ฉบับพิมพ์",
+                "en": "Hard copy"
+              }
+            },
+            {
+              "v": "digital",
+              "n": {
+                "th": "ฉบับดิจิทัล",
+                "en": "Digital"
+              }
+            }
+          ]
+        },
+        {
+          "k": "copyNo",
+          "type": "text",
+          "half": true,
+          "label": {
+            "th": "เลขสำเนาควบคุม",
+            "en": "Copy No."
+          }
+        }
       ]
     },
     {
-      "k": "B", "party": "iss",
-      "title": { "th": "รายการเอกสารที่แจกจ่าย", "en": "Documents received" },
+      "k": "B",
+      "party": "iss",
+      "title": {
+        "th": "รายการเอกสารที่แจกจ่าย",
+        "en": "Documents received"
+      },
       "fields": [
-        { "k": "docs", "type": "table", "req": true, "rows": 8, "max": 20,
-          "label": { "th": "รายการเอกสาร", "en": "Document list" },
+        {
+          "k": "docs",
+          "type": "table",
+          "req": true,
+          "rows": 8,
+          "max": 20,
+          "label": {
+            "th": "รายการเอกสาร",
+            "en": "Document list"
+          },
           "cols": [
-            { "k": "title", "type": "text", "w": "40%",
-              "label": { "th": "ชื่อเอกสาร", "en": "Document title" } },
-            { "k": "code",  "type": "text", "w": "22%",
-              "label": { "th": "รหัสเอกสาร", "en": "Document code" } },
-            { "k": "rev",   "type": "text", "w": "16%",
-              "label": { "th": "Issue / Rev", "en": "Issue / Rev." } },
-            { "k": "eff",   "type": "date", "w": "22%",
-              "label": { "th": "วันที่มีผล", "en": "Eff. date" } } ] }
-      ]
+            {
+              "k": "title",
+              "type": "text",
+              "w": "40%",
+              "label": {
+                "th": "ชื่อเอกสาร",
+                "en": "Document title"
+              }
+            },
+            {
+              "k": "code",
+              "type": "text",
+              "w": "22%",
+              "label": {
+                "th": "รหัสเอกสาร",
+                "en": "Document code"
+              }
+            },
+            {
+              "k": "rev",
+              "type": "text",
+              "w": "16%",
+              "label": {
+                "th": "Issue / Rev",
+                "en": "Issue / Rev."
+              }
+            },
+            {
+              "k": "eff",
+              "type": "date",
+              "w": "22%",
+              "label": {
+                "th": "วันที่มีผล",
+                "en": "Eff. date"
+              }
+            }
+          ]
+        }
+      ],
+      "desc": {
+        "th": "ประกาศที่ส่งจากระบบเอกสาร (AeroFBO) จะเติมชื่อเอกสารมาให้แล้ว ผู้รับตรวจว่าตรงกับที่ได้รับจริงก่อนเซ็น",
+        "en": "Bulletins sent from the document system (AeroFBO) arrive with the title already filled in. The recipient checks it matches what they received before signing."
+      }
     },
     {
-      "k": "C", "party": "rcv", "hideOthers": true,
-      "title": { "th": "การรับรองของผู้รับ", "en": "Recipient confirmation" },
+      "k": "C",
+      "party": "rcv",
+      "hideOthers": true,
+      "title": {
+        "th": "การรับรองของผู้รับ",
+        "en": "Recipient confirmation"
+      },
       "fields": [
-        { "k": "confirm", "type": "check", "req": true,
-          "label": { "th": "ข้าพเจ้าได้รับเอกสารตามรายการข้างต้นในฉบับที่ระบุ และเข้าใจหน้าที่ในการเก็บรักษาให้เป็นฉบับปัจจุบันและอยู่ในระบบควบคุม",
-                     "en": "I confirm that I have received the documents listed above in the editions specified, and that I understand my obligation to maintain them in a current and controlled state." } },
-        { "k": "rcvSignName", "type": "text", "req": true, "half": true,
-          "label": { "th": "ชื่อผู้รับ", "en": "Recipient name" } },
-        { "k": "rcvDate", "type": "date", "req": true, "prefill": "today", "half": true,
-          "label": { "th": "วันที่รับ", "en": "Date" } },
-        { "k": "rcvSign", "type": "sign", "req": true,
-          "label": { "th": "ลายเซ็นผู้รับ", "en": "Recipient signature" } }
+        {
+          "k": "confirm",
+          "type": "check",
+          "req": true,
+          "label": {
+            "th": "ข้าพเจ้าได้รับเอกสารตามรายการข้างต้นในฉบับที่ระบุ และเข้าใจหน้าที่ในการเก็บรักษาให้เป็นฉบับปัจจุบันและอยู่ในระบบควบคุม",
+            "en": "I confirm that I have received the documents listed above in the editions specified, and that I understand my obligation to maintain them in a current and controlled state."
+          }
+        },
+        {
+          "k": "rcvSignName",
+          "type": "text",
+          "req": true,
+          "half": true,
+          "label": {
+            "th": "ชื่อผู้รับ",
+            "en": "Recipient name"
+          }
+        },
+        {
+          "k": "rcvDate",
+          "type": "date",
+          "req": true,
+          "prefill": "today",
+          "half": true,
+          "label": {
+            "th": "วันที่รับ",
+            "en": "Date"
+          }
+        },
+        {
+          "k": "rcvSign",
+          "type": "sign",
+          "req": true,
+          "label": {
+            "th": "ลายเซ็นผู้รับ",
+            "en": "Recipient signature"
+          }
+        }
       ]
     }
   ],
-
   "route": [
-    { "step": 1, "party": "iss", "sign": false },
-    { "step": 2, "party": "rcv", "sign": true, "assignedBy": "submitter", "slaDays": 7 }
+    {
+      "step": 1,
+      "party": "iss",
+      "sign": false
+    },
+    {
+      "step": 2,
+      "party": "rcv",
+      "sign": true,
+      "assignedBy": "submitter",
+      "slaDays": 7
+    }
   ],
-
-  "export": { "docx": "D-0507-DRC-001.docx", "lockUntilComplete": true }
+  "export": {
+    "docx": "D-0507-DRC-001.docx",
+    "lockUntilComplete": true
+  }
 }

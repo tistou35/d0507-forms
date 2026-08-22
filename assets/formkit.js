@@ -464,6 +464,38 @@
          เก็บเฉพาะข้อมูลย่อของไฟล์ (id ชื่อ ขนาด) ตัวไฟล์ขึ้นไปอยู่ Drive ทันทีที่เลือก
          อัปโหลดตอนเลือกไม่ใช่ตอนกดส่ง เพราะถ้าไฟล์ใหญ่หรือเน็ตหลุด
          คนกรอกต้องรู้ตั้งแต่ตอนนั้น ไม่ใช่ตอนกดส่งแล้วเสียงานทั้งใบ */
+      /* ตารางความเสี่ยง — กดช่องเดียวตั้งได้ทั้งโอกาสและความรุนแรง
+         ของเดิมเลือกตัวเลข 1–5 สองช่องแยกกัน คนกรอกจึงไม่เห็นว่าตัวเองอยู่ตรงไหน
+         ของตาราง และไม่เห็นว่าขยับหนึ่งช่องแล้วข้ามจากเหลืองเป็นแดง
+         ICAO Doc 9859 ใช้ตารางสีเป็นภาพหลักของการประเมินความเสี่ยง ไม่ใช่ผลคูณ */
+      case 'riskmatrix': {
+        const rows = f.rows || 5, cols = f.cols || 5;
+        const kx = f.of && f.of[0], ky = f.of && f.of[1];   // [แกนนอน, แกนตั้ง]
+        const vx = this.data[kx], vy = this.data[ky];
+        const lvl = this.computed()[f.level] || '';
+        const cls = { H: 'rm-h', A: 'rm-a', L: 'rm-l' };
+        let g = '<div class="fk-rm"><table><tbody>';
+        for (let y = rows; y >= 1; y--) {
+          g += `<tr><th>${esc(L(f.yLab, this.lang) || '')} ${y}</th>`;
+          for (let x = 1; x <= cols; x++) {
+            const lv = (f.table && f.table[String(y)] || [])[x - 1] || '';
+            const on = String(vx) === String(x) && String(vy) === String(y);
+            g += `<td><button type="button" class="rm ${cls[lv] || ''}${on ? ' on' : ''}"
+              data-rm="${esc(f.k)}" data-x="${x}" data-y="${y}"
+              aria-pressed="${on}"${ro ? ' disabled' : ''}>${esc(lv)}</button></td>`;
+          }
+          g += '</tr>';
+        }
+        g += '<tr><th></th>';
+        for (let x = 1; x <= cols; x++) g += `<td class="rm-x">${x}</td>`;
+        g += '</tr></tbody></table>'
+          + `<p class="rm-ax">${esc(L(f.xLab, this.lang) || '')} →</p></div>`;
+        body = g + (vx && vy
+          ? `<p class="rm-out"><b>${esc(L(f.pick, this.lang) || '')}</b> ${esc(vy)} × ${esc(vx)}
+             = <b>${esc(String(Number(vx) * Number(vy)))}</b> · ${esc(lvl)}</p>` : '');
+        break;
+      }
+
       case 'file': {
         const at = v && v.id ? v : null;
         body = `<div class="fk-file" data-fk="${esc(f.k)}">
@@ -799,6 +831,20 @@
 
     el.querySelectorAll('[data-fx]').forEach(b =>
       b.addEventListener('click', () => { self.set(b.dataset.fx, null); rerender(); }));
+
+    /* ตารางความเสี่ยง — กดหนึ่งช่องตั้งสองค่า กดซ้ำช่องเดิมคือยกเลิก
+       ต้อง rerender เพราะสีของช่องที่เลือกและข้อความสรุปเปลี่ยนพร้อมกัน */
+    el.querySelectorAll('button[data-rm]').forEach(b =>
+      b.addEventListener('click', () => {
+        const f = self.fields[b.dataset.rm] || {};
+        const kx = f.of && f.of[0], ky = f.of && f.of[1];
+        if (!kx || !ky) return;
+        const same = String(self.data[kx]) === b.dataset.x
+                  && String(self.data[ky]) === b.dataset.y;
+        self.set(kx, same ? '' : Number(b.dataset.x));
+        self.set(ky, same ? '' : Number(b.dataset.y));
+        rerender();
+      }));
 
     // ตารางแถวซ้ำ — เขียนค่าลงช่องโดยไม่ rerender ระหว่างพิมพ์ กัน focus หลุดเหมือน mask
     el.querySelectorAll('input[data-tk]').forEach(i =>

@@ -59,6 +59,23 @@ def from_tokenmap(abbr):
     return '\n'.join(out)
 
 
+def virtual_keys(d):
+    """คีย์ที่มีค่าจริงในใบ แต่ไม่ได้ประกาศเป็นช่องกรอก
+
+    ตารางความเสี่ยงตั้งค่าให้สองคีย์ (โอกาส กับ ความรุนแรง) จากการกดช่องเดียว
+    คีย์พวกนั้นไม่ใช่ field แต่มีค่าอยู่ใน data จริงและต้องขึ้น PDF ได้
+    passthrough ก็เช่นกัน — ค่าจากระบบอื่นที่ใบรับไว้เฉย ๆ
+    """
+    out = set()
+    for sec in d.get('sections', []):
+        for f in sec.get('fields', []):
+            if f.get('type') == 'riskmatrix':
+                out |= set(f.get('of') or [])
+    for pt in (d.get('passthrough') or []):
+        out.add(pt['k'] if isinstance(pt, dict) else pt)
+    return out
+
+
 def check(abbr):
     err, warn = [], []
     try:
@@ -179,6 +196,8 @@ def check(abbr):
                 if head in comp:
                     continue
                 err.append('แม่แบบใช้ {{%s}} ที่ไม่มีฟิลด์หรือค่าตัวเลือกรองรับ' % t)
+                continue
+            if t in virtual_keys(d):
                 continue
             err.append('แม่แบบใช้ {{%s}} ที่ไม่มีที่มา' % t)
 

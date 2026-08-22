@@ -5,140 +5,693 @@
   "issue": "01",
   "rev": "00",
   "eff": "24 AUG 2021",
-  "title": { "th": "แบบระบุอันตราย", "en": "Hazard Identification Form" },
+  "title": {
+    "th": "แบบระบุอันตราย",
+    "en": "Hazard Identification Form"
+  },
   "retain": "OMA A.10",
-
   "ui": {
     "compact": true,
     "tabs": [
-      { "k": "T1", "th": "อันตรายที่พบ", "en": "Hazard" },
-      { "k": "T2", "th": "ประเมินความเสี่ยง", "en": "Risk assessment" },
-      { "k": "T3", "th": "ลงนาม", "en": "Sign" }
+      {
+        "k": "T1",
+        "th": "แจ้งอันตราย",
+        "en": "Report hazard"
+      },
+      {
+        "k": "T2",
+        "th": "วิเคราะห์",
+        "en": "Analysis"
+      },
+      {
+        "k": "T3",
+        "th": "ประเมินความเสี่ยง",
+        "en": "Risk assessment"
+      },
+      {
+        "k": "T4",
+        "th": "ลงนาม",
+        "en": "Sign"
+      }
     ],
-    "headline": { "value": "riskScore", "of": 25,
-                  "th": "คะแนนความเสี่ยง (โอกาส × ความรุนแรง)",
-                  "en": "Risk score (likelihood × severity)" }
+    "headline": {
+      "value": "riskScore",
+      "of": 25,
+      "th": "คะแนนความเสี่ยง (โอกาส × ความรุนแรง)",
+      "en": "Risk score (likelihood × severity)"
+    }
   },
-
   "parties": [
-    { "k": "rep", "n": { "th": "ผู้แจ้ง", "en": "Reporter" }, "auth": "public" },
-    { "k": "sm",  "n": { "th": "ผู้จัดการนิรภัย", "en": "Safety Manager" }, "auth": "role:mgt" }
+    {
+      "k": "rep",
+      "n": {
+        "th": "ผู้แจ้ง",
+        "en": "Reporter"
+      },
+      "auth": "public"
+    },
+    {
+      "k": "sm",
+      "n": {
+        "th": "ผู้จัดการนิรภัย",
+        "en": "Safety Manager"
+      },
+      "auth": "role:mgt"
+    }
   ],
-
   "sections": [
     {
-      "k": "A", "tab": "T1", "party": "rep",
-      "title": { "th": "ข้อมูลอันตราย", "en": "Hazard details" },
+      "k": "A",
+      "tab": "T1",
+      "party": "rep",
+      "title": {
+        "th": "ข้อมูลอันตราย",
+        "en": "Hazard details"
+      },
       "fields": [
-        { "k": "title", "type": "text", "req": true,
-          "label": { "th": "หัวข้ออันตราย", "en": "Hazard title" } },
-        { "k": "foundDate", "type": "date", "req": true, "prefill": "today", "half": true,
-          "label": { "th": "วันที่พบ", "en": "Date identified" } },
-        { "k": "refNo", "type": "text", "half": true,
-          "label": { "th": "เลขอ้างอิง", "en": "Ref. No." },
-          "hint": { "th": "ไม่บังคับ — สำนักงานนิรภัยออกให้ภายหลัง",
-                    "en": "Optional — issued by the SMS office" } },
-        { "k": "byName", "type": "text", "req": true, "half": true,
-          "label": { "th": "ผู้ระบุอันตราย", "en": "Identified by" } },
-        { "k": "dept", "type": "text", "half": true,
-          "label": { "th": "ฝ่าย", "en": "Department" } },
-        { "k": "location", "type": "text", "req": true,
-          "label": { "th": "สถานที่", "en": "Location" } },
-        { "k": "descr", "type": "textarea", "req": true,
-          "label": { "th": "อธิบายอันตราย สภาพที่ไม่ปลอดภัย หรือต้นเหตุที่อาจก่อให้เกิดอันตราย",
-                     "en": "Describe the hazard, unsafe condition, or potential source of harm" } }
+        {
+          "k": "title",
+          "type": "text",
+          "req": true,
+          "label": {
+            "th": "หัวข้ออันตราย",
+            "en": "Hazard title"
+          }
+        },
+        {
+          "k": "foundDate",
+          "type": "date",
+          "req": true,
+          "prefill": "today",
+          "half": true,
+          "label": {
+            "th": "วันที่พบ",
+            "en": "Date identified"
+          }
+        },
+        {
+          "k": "refNo",
+          "type": "text",
+          "half": true,
+          "label": {
+            "th": "เลขอ้างอิง",
+            "en": "Ref. No."
+          },
+          "hint": {
+            "th": "ไม่บังคับ — สำนักงานนิรภัยออกให้ภายหลัง",
+            "en": "Optional — issued by the SMS office"
+          }
+        },
+        {
+          "k": "byName",
+          "type": "text",
+          "req": true,
+          "half": true,
+          "label": {
+            "th": "ผู้ระบุอันตราย",
+            "en": "Identified by"
+          }
+        },
+        {
+          "k": "dept",
+          "type": "text",
+          "half": true,
+          "label": {
+            "th": "ฝ่าย",
+            "en": "Department"
+          }
+        },
+        {
+          "k": "location",
+          "type": "text",
+          "req": true,
+          "label": {
+            "th": "สถานที่",
+            "en": "Location"
+          }
+        },
+        {
+          "k": "descr",
+          "type": "textarea",
+          "req": true,
+          "label": {
+            "th": "อธิบายอันตราย สภาพที่ไม่ปลอดภัย หรือต้นเหตุที่อาจก่อให้เกิดอันตราย",
+            "en": "Describe the hazard, unsafe condition, or potential source of harm"
+          }
+        }
+      ],
+      "desc": {
+        "th": "ใครก็แจ้งอันตรายได้ ไม่ต้องประเมินความเสี่ยงเอง · กรอกเท่าที่รู้แล้วส่ง ผู้จัดการความปลอดภัยจะวิเคราะห์และประเมินต่อในแท็บถัดไป",
+        "en": "Anyone may report a hazard — you do not have to assess the risk yourself. Fill in what you know and submit; the Safety Manager analyses and assesses it next."
+      }
+    },
+    {
+      "k": "B",
+      "tab": "T2",
+      "party": "sm",
+      "title": {
+        "th": "เครื่องมือช่วยวิเคราะห์",
+        "en": "Analysis tools"
+      },
+      "desc": {
+        "th": "เลือกอย่างน้อยหนึ่งเครื่องมือ เลือกได้หลายอย่าง · เครื่องมือช่วยไม่ให้หยุดที่อาการ และทำให้การวิเคราะห์ของแต่ละเรื่องเทียบกันได้",
+        "en": "Pick at least one tool; more than one is fine. The tools stop the analysis at the symptom and make separate reports comparable."
+      },
+      "fields": [
+        {
+          "k": "tools",
+          "type": "multi",
+          "req": true,
+          "label": {
+            "th": "เครื่องมือที่ใช้",
+            "en": "Tools used"
+          },
+          "opt": [
+            {
+              "v": "why",
+              "n": {
+                "th": "5 Whys — ไล่หาสาเหตุราก",
+                "en": "5 Whys — root cause"
+              }
+            },
+            {
+              "v": "tem",
+              "n": {
+                "th": "TEM — จัดหมวดภัยคุกคาม",
+                "en": "TEM — threat category"
+              }
+            },
+            {
+              "v": "bow",
+              "n": {
+                "th": "Bow-tie — สาเหตุ เหตุการณ์ ผลที่ตามมา",
+                "en": "Bow-tie — cause, event, consequence"
+              }
+            },
+            {
+              "v": "hist",
+              "n": {
+                "th": "เทียบรายงานเดิม",
+                "en": "Compare with past reports"
+              }
+            }
+          ]
+        },
+        {
+          "k": "whyNote",
+          "type": "static",
+          "showIf": "tools has 'why'",
+          "text": {
+            "th": "<p><b>5 Whys</b> — ถามต่อจากคำตอบก่อนหน้า ไม่ใช่ถามใหม่ทุกชั้น หยุดเมื่อถึงสิ่งที่องค์กรแก้ได้ ไม่ใช่หยุดที่ตัวบุคคล</p>",
+            "en": "<p><b>5 Whys</b> — each question follows on from the previous answer, not a fresh question each time. Stop when you reach something the organisation can change, not when you reach a person.</p>"
+          }
+        },
+        {
+          "k": "why1",
+          "type": "textarea",
+          "showIf": "tools has 'why'",
+          "reqIf": "tools has 'why'",
+          "label": {
+            "th": "ทำไม ครั้งที่ 1",
+            "en": "Why 1"
+          }
+        },
+        {
+          "k": "why2",
+          "type": "textarea",
+          "showIf": "tools has 'why'",
+          "reqIf": "tools has 'why'",
+          "label": {
+            "th": "ทำไม ครั้งที่ 2",
+            "en": "Why 2"
+          }
+        },
+        {
+          "k": "why3",
+          "type": "textarea",
+          "showIf": "tools has 'why'",
+          "reqIf": "tools has 'why'",
+          "label": {
+            "th": "ทำไม ครั้งที่ 3",
+            "en": "Why 3"
+          }
+        },
+        {
+          "k": "why4",
+          "type": "textarea",
+          "showIf": "tools has 'why'",
+          "label": {
+            "th": "ทำไม ครั้งที่ 4",
+            "en": "Why 4"
+          }
+        },
+        {
+          "k": "why5",
+          "type": "textarea",
+          "showIf": "tools has 'why'",
+          "label": {
+            "th": "ทำไม ครั้งที่ 5",
+            "en": "Why 5"
+          }
+        },
+        {
+          "k": "temKind",
+          "type": "multi",
+          "showIf": "tools has 'tem'",
+          "reqIf": "tools has 'tem'",
+          "label": {
+            "th": "ภัยคุกคามมาจากไหน",
+            "en": "Where does the threat come from"
+          },
+          "hint": {
+            "th": "เลือกได้หลายข้อ — ภัยหนึ่งอย่างมักมีต้นทางมากกว่าหนึ่งทาง",
+            "en": "More than one may apply — a single threat often has more than one source."
+          },
+          "opt": [
+            {
+              "v": "env",
+              "n": {
+                "th": "สภาพแวดล้อม — อากาศ ภูมิประเทศ สนามบิน จราจร",
+                "en": "Environmental — weather, terrain, aerodrome, traffic"
+              }
+            },
+            {
+              "v": "org",
+              "n": {
+                "th": "องค์กร — ขั้นตอน ตารางงาน เครื่องมือ การฝึก",
+                "en": "Organisational — procedures, scheduling, equipment, training"
+              }
+            },
+            {
+              "v": "hum",
+              "n": {
+                "th": "คน — ความล้า การสื่อสาร ภาระงาน ความชำนาญ",
+                "en": "Human — fatigue, communication, workload, currency"
+              }
+            }
+          ]
+        },
+        {
+          "k": "temNote",
+          "type": "textarea",
+          "showIf": "tools has 'tem'",
+          "label": {
+            "th": "อธิบายภัยคุกคามที่จัดหมวดไว้",
+            "en": "Describe the threats categorised above"
+          }
+        },
+        {
+          "k": "bowNote",
+          "type": "static",
+          "showIf": "tools has 'bow'",
+          "text": {
+            "th": "<p><b>Bow-tie</b> — เขียนเหตุการณ์ตรงกลางก่อน แล้วค่อยกรอกสองข้าง ซ้ายคือสิ่งที่ทำให้เกิด ขวาคือสิ่งที่ตามมา มาตรการฝั่งซ้ายคือการ<b>ป้องกัน</b> ฝั่งขวาคือการ<b>ลดความเสียหาย</b> ถ้ามีแต่ฝั่งขวาแปลว่ายังไม่ได้กันไม่ให้เกิด</p>",
+            "en": "<p><b>Bow-tie</b> — write the event in the middle first, then fill both sides. Left is what causes it, right is what follows. Left-hand controls <b>prevent</b>; right-hand controls <b>reduce the damage</b>. Only right-hand controls means nothing is stopping it happening.</p>"
+          }
+        },
+        {
+          "k": "bowCause",
+          "type": "textarea",
+          "showIf": "tools has 'bow'",
+          "reqIf": "tools has 'bow'",
+          "label": {
+            "th": "สาเหตุที่ทำให้เกิด",
+            "en": "Causes"
+          }
+        },
+        {
+          "k": "bowEvent",
+          "type": "text",
+          "showIf": "tools has 'bow'",
+          "reqIf": "tools has 'bow'",
+          "label": {
+            "th": "เหตุการณ์ที่ไม่ต้องการ",
+            "en": "Unwanted event"
+          }
+        },
+        {
+          "k": "bowConseq",
+          "type": "textarea",
+          "showIf": "tools has 'bow'",
+          "reqIf": "tools has 'bow'",
+          "label": {
+            "th": "ผลที่ตามมา",
+            "en": "Consequences"
+          }
+        },
+        {
+          "k": "bowPrevent",
+          "type": "textarea",
+          "showIf": "tools has 'bow'",
+          "label": {
+            "th": "มาตรการป้องกัน (ฝั่งสาเหตุ)",
+            "en": "Preventive controls (cause side)"
+          }
+        },
+        {
+          "k": "bowRecover",
+          "type": "textarea",
+          "showIf": "tools has 'bow'",
+          "label": {
+            "th": "มาตรการลดความเสียหาย (ฝั่งผล)",
+            "en": "Recovery controls (consequence side)"
+          }
+        },
+        {
+          "k": "histNote",
+          "type": "static",
+          "showIf": "tools has 'hist'",
+          "text": {
+            "th": "<p><b>เทียบรายงานเดิม</b> — เรื่องที่เคยเกิดซ้ำเปลี่ยนการประเมินโอกาสได้จริง ค้นรายงานเก่าด้วยคำสำคัญ แล้วบันทึกว่าเจอกี่เรื่องและเรื่องอะไร ถ้าเคยเกิดแล้วยังเกิดอีก แปลว่ามาตรการเดิมไม่ได้ผล ต้องเขียนไว้ด้วย</p>",
+            "en": "<p><b>Compare with past reports</b> — a recurrence genuinely changes the likelihood rating. Search earlier reports by keyword, then record how many and which ones. If it has happened before and happened again, the earlier mitigation did not work and that belongs here too.</p>"
+          }
+        },
+        {
+          "k": "histFound",
+          "type": "number",
+          "showIf": "tools has 'hist'",
+          "reqIf": "tools has 'hist'",
+          "min": 0,
+          "half": true,
+          "label": {
+            "th": "จำนวนรายงานเดิมที่คล้ายกัน",
+            "en": "Similar past reports found"
+          }
+        },
+        {
+          "k": "histRefs",
+          "type": "textarea",
+          "showIf": "tools has 'hist'",
+          "label": {
+            "th": "เลขที่รายงานและสิ่งที่เคยทำไป",
+            "en": "Report numbers and what was done then"
+          }
+        }
+      ],
+      "hideOthers": true
+    },
+    {
+      "k": "C",
+      "tab": "T3",
+      "party": "sm",
+      "title": {
+        "th": "ประเมินความเสี่ยง",
+        "en": "Risk assessment"
+      },
+      "desc": {
+        "th": "กดช่องในตารางเพื่อกำหนดโอกาสและความรุนแรงพร้อมกัน · สีบอกระดับตาม ICAO Doc 9859",
+        "en": "Click a cell to set likelihood and severity together. Colours follow the ICAO Doc 9859 scheme."
+      },
+      "fields": [
+        {
+          "k": "matrix",
+          "type": "riskmatrix",
+          "req": true,
+          "of": [
+            "lik",
+            "sev"
+          ],
+          "level": "riskLevel",
+          "table": {
+            "5": [
+              "A",
+              "A",
+              "H",
+              "H",
+              "H"
+            ],
+            "4": [
+              "L",
+              "A",
+              "A",
+              "H",
+              "H"
+            ],
+            "3": [
+              "L",
+              "L",
+              "A",
+              "A",
+              "H"
+            ],
+            "2": [
+              "L",
+              "L",
+              "L",
+              "L",
+              "A"
+            ],
+            "1": [
+              "L",
+              "L",
+              "L",
+              "L",
+              "L"
+            ]
+          },
+          "xLab": {
+            "th": "โอกาสเกิด (1 นาน ๆ ครั้ง → 5 เกิดแน่)",
+            "en": "Likelihood (1 rare → 5 almost certain)"
+          },
+          "yLab": {
+            "th": "ความรุนแรง",
+            "en": "Severity"
+          },
+          "pick": {
+            "th": "เลือกไว้ที่",
+            "en": "Selected"
+          },
+          "label": {
+            "th": "ตารางความเสี่ยง — ความรุนแรง × โอกาสเกิด",
+            "en": "Risk matrix — severity × likelihood"
+          }
+        },
+        {
+          "k": "mitigation",
+          "type": "textarea",
+          "req": true,
+          "label": {
+            "th": "มาตรการลดความเสี่ยงที่เสนอ",
+            "en": "Proposed mitigation"
+          }
+        },
+        {
+          "k": "residualOk",
+          "type": "select",
+          "req": true,
+          "label": {
+            "th": "ความเสี่ยงคงเหลือยอมรับได้หรือไม่",
+            "en": "Residual risk acceptable"
+          },
+          "opt": [
+            {
+              "v": "yes",
+              "n": {
+                "th": "ยอมรับได้",
+                "en": "Yes"
+              }
+            },
+            {
+              "v": "no",
+              "n": {
+                "th": "ยอมรับไม่ได้ — ต้องมีมาตรการเพิ่ม",
+                "en": "No — requires further action"
+              }
+            }
+          ]
+        }
+      ],
+      "hideOthers": true
+    },
+    {
+      "k": "E",
+      "tab": "T4",
+      "party": "rep",
+      "title": {
+        "th": "ผู้แจ้ง",
+        "en": "Reported by"
+      },
+      "fields": [
+        {
+          "k": "prepSign",
+          "type": "sign",
+          "req": true,
+          "label": {
+            "th": "ลายเซ็นผู้จัดทำ",
+            "en": "Prepared by — signature"
+          }
+        }
       ]
     },
     {
-      "k": "B", "tab": "T2", "party": "rep",
-      "title": { "th": "ประเมินความเสี่ยง", "en": "Risk assessment" },
-      "desc": { "th": "ระบบเทียบกับเมทริกซ์ความเสี่ยงในเอกสารให้เอง — ไม่ใช่แค่คูณกัน เพราะความรุนแรงถูกถ่วงน้ำหนักมากกว่า",
-                "en": "Matched against the matrix in the document — not a plain product; severity is weighted more heavily." },
+      "k": "D",
+      "tab": "T4",
+      "party": "sm",
+      "hideOthers": true,
+      "title": {
+        "th": "ผู้จัดการนิรภัยพิจารณา",
+        "en": "Safety Manager review"
+      },
       "fields": [
-        { "k": "lik", "type": "select", "req": true,
-          "label": { "th": "โอกาสเกิด", "en": "Likelihood" },
-          "opt": [
-            { "v": "1", "n": { "th": "1 — แทบไม่เกิด", "en": "1 — Rare" } },
-            { "v": "2", "n": { "th": "2 — ไม่น่าเกิด", "en": "2 — Unlikely" } },
-            { "v": "3", "n": { "th": "3 — เป็นไปได้", "en": "3 — Possible" } },
-            { "v": "4", "n": { "th": "4 — น่าจะเกิด", "en": "4 — Likely" } },
-            { "v": "5", "n": { "th": "5 — เกิดแน่นอน", "en": "5 — Almost certain" } } ] },
-        { "k": "sev", "type": "select", "req": true,
-          "label": { "th": "ความรุนแรง", "en": "Severity" },
-          "opt": [
-            { "v": "1", "n": { "th": "1 — เล็กน้อยมาก", "en": "1 — Negligible" } },
-            { "v": "2", "n": { "th": "2 — เล็กน้อย", "en": "2 — Minor" } },
-            { "v": "3", "n": { "th": "3 — ปานกลาง", "en": "3 — Marginal" } },
-            { "v": "4", "n": { "th": "4 — วิกฤต", "en": "4 — Critical" } },
-            { "v": "5", "n": { "th": "5 — หายนะ", "en": "5 — Catastrophic" } } ] },
-        { "k": "mitigation", "type": "textarea", "req": true,
-          "label": { "th": "มาตรการลดความเสี่ยงที่เสนอ", "en": "Proposed mitigation" } },
-        { "k": "residualOk", "type": "select", "req": true,
-          "label": { "th": "ความเสี่ยงคงเหลือยอมรับได้หรือไม่", "en": "Residual risk acceptable" },
-          "opt": [
-            { "v": "yes", "n": { "th": "ยอมรับได้", "en": "Yes" } },
-            { "v": "no",  "n": { "th": "ยอมรับไม่ได้ — ต้องมีมาตรการเพิ่ม",
-                                 "en": "No — requires further action" } } ] }
-      ]
-    },
-    {
-      "k": "C", "tab": "T3", "party": "rep",
-      "title": { "th": "ลงนามผู้จัดทำ", "en": "Prepared by" },
-      "fields": [
-        { "k": "prepSign", "type": "sign", "req": true,
-          "label": { "th": "ลายเซ็นผู้จัดทำ", "en": "Prepared by — signature" } }
-      ]
-    },
-    {
-      "k": "D", "tab": "T3", "party": "sm", "hideOthers": true,
-      "title": { "th": "ผู้จัดการนิรภัยพิจารณา", "en": "Safety Manager review" },
-      "fields": [
-        { "k": "smName", "type": "text", "req": true, "half": true,
-          "label": { "th": "ชื่อผู้จัดการนิรภัย", "en": "Safety Manager name" } },
-        { "k": "smDate", "type": "date", "req": true, "half": true,
-          "label": { "th": "วันที่พิจารณา", "en": "Date reviewed" } },
-        { "k": "smComment", "type": "textarea",
-          "label": { "th": "ความเห็น", "en": "Comment" } },
-        { "k": "smSign", "type": "sign", "req": true,
-          "label": { "th": "ลายเซ็นผู้จัดการนิรภัย", "en": "Safety Manager signature" } }
+        {
+          "k": "smName",
+          "type": "text",
+          "req": true,
+          "half": true,
+          "label": {
+            "th": "ชื่อผู้จัดการนิรภัย",
+            "en": "Safety Manager name"
+          }
+        },
+        {
+          "k": "smDate",
+          "type": "date",
+          "req": true,
+          "half": true,
+          "label": {
+            "th": "วันที่พิจารณา",
+            "en": "Date reviewed"
+          }
+        },
+        {
+          "k": "smComment",
+          "type": "textarea",
+          "label": {
+            "th": "ความเห็น",
+            "en": "Comment"
+          }
+        },
+        {
+          "k": "smSign",
+          "type": "sign",
+          "req": true,
+          "label": {
+            "th": "ลายเซ็นผู้จัดการนิรภัย",
+            "en": "Safety Manager signature"
+          }
+        }
       ]
     }
   ],
-
   "compute": [
-    { "k": "riskScore", "op": "mul", "of": ["lik", "sev"] },
-    { "k": "riskLevel", "op": "matrix", "of": ["sev", "lik"],
+    {
+      "k": "riskScore",
+      "op": "mul",
+      "of": [
+        "lik",
+        "sev"
+      ]
+    },
+    {
+      "k": "riskLevel",
+      "op": "matrix",
+      "of": [
+        "sev",
+        "lik"
+      ],
       "table": {
-        "5": ["A","A","H","H","H"],
-        "4": ["L","A","A","H","H"],
-        "3": ["L","L","A","A","H"],
-        "2": ["L","L","L","L","A"],
-        "1": ["L","L","L","L","L"]
-      } }
+        "5": [
+          "A",
+          "A",
+          "H",
+          "H",
+          "H"
+        ],
+        "4": [
+          "L",
+          "A",
+          "A",
+          "H",
+          "H"
+        ],
+        "3": [
+          "L",
+          "L",
+          "A",
+          "A",
+          "H"
+        ],
+        "2": [
+          "L",
+          "L",
+          "L",
+          "L",
+          "A"
+        ],
+        "1": [
+          "L",
+          "L",
+          "L",
+          "L",
+          "L"
+        ]
+      }
+    }
   ],
-
   "gates": [
-    { "when": "riskLevel == 'H'", "level": "stop",
-      "short": { "th": "ความเสี่ยงสูง", "en": "HIGH RISK" },
-      "msg": { "th": "ความเสี่ยงสูง — ต้องดำเนินการทันที ห้ามปล่อยไว้ ผู้จัดการนิรภัยต้องพิจารณาโดยเร็วที่สุด",
-               "en": "High risk — immediate action required." } },
-    { "when": "riskLevel == 'A'", "level": "warn",
-      "short": { "th": "ความเสี่ยงปานกลาง", "en": "MEDIUM RISK" },
-      "msg": { "th": "ความเสี่ยงปานกลาง — ต้องมีมาตรการรองรับ",
-               "en": "Medium risk — action required." } },
-    { "when": "riskLevel == 'L'", "level": "info",
-      "short": { "th": "ความเสี่ยงต่ำ", "en": "LOW RISK" },
-      "msg": { "th": "ความเสี่ยงต่ำ — เฝ้าติดตาม", "en": "Low risk — monitor." } },
-    { "when": "residualOk == 'no'", "level": "warn",
-      "msg": { "th": "ความเสี่ยงคงเหลือยอมรับไม่ได้ — ต้องเสนอมาตรการเพิ่มก่อนปิดเรื่อง",
-               "en": "Residual risk not acceptable — further action must be proposed." } }
+    {
+      "when": "riskLevel == 'H'",
+      "level": "stop",
+      "short": {
+        "th": "ความเสี่ยงสูง",
+        "en": "HIGH RISK"
+      },
+      "msg": {
+        "th": "ความเสี่ยงสูง — ต้องดำเนินการทันที ห้ามปล่อยไว้ ผู้จัดการนิรภัยต้องพิจารณาโดยเร็วที่สุด",
+        "en": "High risk — immediate action required."
+      }
+    },
+    {
+      "when": "riskLevel == 'A'",
+      "level": "warn",
+      "short": {
+        "th": "ความเสี่ยงปานกลาง",
+        "en": "MEDIUM RISK"
+      },
+      "msg": {
+        "th": "ความเสี่ยงปานกลาง — ต้องมีมาตรการรองรับ",
+        "en": "Medium risk — action required."
+      }
+    },
+    {
+      "when": "riskLevel == 'L'",
+      "level": "info",
+      "short": {
+        "th": "ความเสี่ยงต่ำ",
+        "en": "LOW RISK"
+      },
+      "msg": {
+        "th": "ความเสี่ยงต่ำ — เฝ้าติดตาม",
+        "en": "Low risk — monitor."
+      }
+    },
+    {
+      "when": "residualOk == 'no'",
+      "level": "warn",
+      "msg": {
+        "th": "ความเสี่ยงคงเหลือยอมรับไม่ได้ — ต้องเสนอมาตรการเพิ่มก่อนปิดเรื่อง",
+        "en": "Residual risk not acceptable — further action must be proposed."
+      }
+    }
   ],
-
   "route": [
-    { "step": 1, "party": "rep", "sign": true },
-    { "step": 2, "party": "sm", "sign": true, "assignedBy": "later", "pool": "SM",
-      "canDelegate": true, "slaDays": 2 }
+    {
+      "step": 1,
+      "party": "rep",
+      "sign": true
+    },
+    {
+      "step": 2,
+      "party": "sm",
+      "sign": true,
+      "assignedBy": "later",
+      "pool": "SM",
+      "canDelegate": true,
+      "slaDays": 2
+    }
   ],
-
-  "export": { "docx": "D-0507-HIF-001.docx", "lockUntilComplete": true }
+  "export": {
+    "docx": "D-0507-HIF-001.docx",
+    "lockUntilComplete": true
+  }
 }

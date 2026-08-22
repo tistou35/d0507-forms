@@ -1629,6 +1629,10 @@ var TOKEN_MAP = {
         "tok": "{{descr}}"
       },
       {
+        "label": "Severity ↓ / Likelihood →",
+        "tok": "{{matrix}}"
+      },
+      {
         "label": "Prepared by:\n___________________________",
         "tok": "{{sig_prepSign}}"
       },
@@ -1680,6 +1684,90 @@ var TOKEN_MAP = {
     "boxesInDocx": 5,
     "approval": [
       {
+        "tok": "{{why1}}",
+        "label": "Why 1",
+        "labelTh": "ทำไม ครั้งที่ 1",
+        "sign": false
+      },
+      {
+        "tok": "{{why2}}",
+        "label": "Why 2",
+        "labelTh": "ทำไม ครั้งที่ 2",
+        "sign": false
+      },
+      {
+        "tok": "{{why3}}",
+        "label": "Why 3",
+        "labelTh": "ทำไม ครั้งที่ 3",
+        "sign": false
+      },
+      {
+        "tok": "{{why4}}",
+        "label": "Why 4",
+        "labelTh": "ทำไม ครั้งที่ 4",
+        "sign": false
+      },
+      {
+        "tok": "{{why5}}",
+        "label": "Why 5",
+        "labelTh": "ทำไม ครั้งที่ 5",
+        "sign": false
+      },
+      {
+        "tok": "{{temNote}}",
+        "label": "Describe the threats categorised above",
+        "labelTh": "อธิบายภัยคุกคามที่จัดหมวดไว้",
+        "sign": false
+      },
+      {
+        "tok": "{{bowCause}}",
+        "label": "Causes",
+        "labelTh": "สาเหตุที่ทำให้เกิด",
+        "sign": false
+      },
+      {
+        "tok": "{{bowEvent}}",
+        "label": "Unwanted event",
+        "labelTh": "เหตุการณ์ที่ไม่ต้องการ",
+        "sign": false
+      },
+      {
+        "tok": "{{bowConseq}}",
+        "label": "Consequences",
+        "labelTh": "ผลที่ตามมา",
+        "sign": false
+      },
+      {
+        "tok": "{{bowPrevent}}",
+        "label": "Preventive controls (cause side)",
+        "labelTh": "มาตรการป้องกัน (ฝั่งสาเหตุ)",
+        "sign": false
+      },
+      {
+        "tok": "{{bowRecover}}",
+        "label": "Recovery controls (consequence side)",
+        "labelTh": "มาตรการลดความเสียหาย (ฝั่งผล)",
+        "sign": false
+      },
+      {
+        "tok": "{{histFound}}",
+        "label": "Similar past reports found",
+        "labelTh": "จำนวนรายงานเดิมที่คล้ายกัน",
+        "sign": false
+      },
+      {
+        "tok": "{{histRefs}}",
+        "label": "Report numbers and what was done then",
+        "labelTh": "เลขที่รายงานและสิ่งที่เคยทำไป",
+        "sign": false
+      },
+      {
+        "tok": "{{mitigation}}",
+        "label": "Proposed mitigation",
+        "labelTh": "มาตรการลดความเสี่ยงที่เสนอ",
+        "sign": false
+      },
+      {
         "tok": "{{smName}}",
         "label": "Safety Manager name",
         "labelTh": "ชื่อผู้จัดการนิรภัย",
@@ -1704,14 +1792,7 @@ var TOKEN_MAP = {
         "sign": true
       }
     ],
-    "manual": [
-      {
-        "tok": "{{mitigation}}",
-        "label": "Proposed mitigation",
-        "labelTh": "มาตรการลดความเสี่ยงที่เสนอ",
-        "sign": false
-      }
-    ]
+    "manual": []
   },
   "MOC": {
     "abbr": "MOC",

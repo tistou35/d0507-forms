@@ -46,7 +46,7 @@ PUBLIC_FORBIDDEN = ('code', 'lef', 'st', 'note', 'docx', 'own', 'jotDup')
 PUBLIC_KEEP = ('doc', 'abbr', 't', 'th', 'sys', 'jot', 'assignTo', 'r', 'chain', 'kw',
                'public', 'iss', 'rev', 'eff', 'hasDef', 'kind')
 FIELD_TYPES = {'text', 'textarea', 'date', 'time', 'number', 'email', 'tel', 'select',
-               'multi', 'check', 'checklist', 'grade', 'scale', 'sign', 'static', 'table', 'file'}
+               'multi', 'check', 'checklist', 'grade', 'scale', 'sign', 'static', 'table', 'file', 'riskmatrix'}
 
 
 def jsonjs(o):
