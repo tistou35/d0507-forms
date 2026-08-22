@@ -43,12 +43,40 @@ def api(url, tk, data=None, ctype=None, method=None):
     return urllib.request.urlopen(req, context=SSLCTX, timeout=300)
 
 
+def blank_docx(path):
+    """คืนไบต์ของ .docx ที่ถอด {{token}} ออกแล้ว
+
+    เอกสารบางใบวาง token ไว้ในตัวเองเมื่อป้ายบนกระดาษซ้ำกันจนจับคู่อัตโนมัติไม่ได้
+    (PWR มี "Signature:" สามชุด) ฟอร์มเปล่าที่ให้คนเปิดดูหรือพิมพ์ไปกรอกด้วยมือ
+    จึงจะมีคำว่า {{sig_paxSign}} โผล่แทนเส้นให้เซ็น ซึ่งอ่านแล้วเหมือนเอกสารเสีย
+    """
+    import re as _re, zipfile as _z, io as _io
+    src = _z.ZipFile(path)
+    buf = _io.BytesIO()
+    with _z.ZipFile(buf, 'w', _z.ZIP_DEFLATED) as out:
+        for it in src.infolist():
+            data = src.read(it.filename)
+            if it.filename.endswith('.xml') and b'{{' in data:
+                t = data.decode('utf-8')
+                # แทนด้วย "เส้นให้เขียน" ไม่ใช่ลบทิ้ง — ฟอร์มเปล่าถูกพิมพ์ไปกรอกด้วยมือ
+                # ลบเฉย ๆ แล้วช่องลายเซ็นจะเหลือแค่คำว่า "Signature:" ไม่มีที่ให้เซ็น
+                def _line(m):
+                    k = m.group(1)
+                    if k.lower().endswith('date'):
+                        return '___ / ___ / ______'
+                    return '_' * (35 if k.startswith('sig_') else 30)
+                t = _re.sub(r'\{\{([A-Za-z0-9_]+)\}\}', _line, t)
+                data = t.encode('utf-8')
+            out.writestr(it, data)
+    return buf.getvalue()
+
+
 def convert(path, tk):
     """.docx -> PDF ผ่าน Drive — คืนไบต์ของ PDF"""
     meta = json.dumps({'name': '_tmp_blank', 'mimeType': GDOC}).encode()
     body = (b'--x\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n' + meta
             + b'\r\n--x\r\nContent-Type: ' + DOCX.encode() + b'\r\n\r\n'
-            + open(path, 'rb').read() + b'\r\n--x--')
+            + blank_docx(path) + b'\r\n--x--')
     fid = json.load(api('https://www.googleapis.com/upload/drive/v3/files'
                         '?uploadType=multipart&fields=id', tk, body,
                         'multipart/related; boundary=x'))['id']

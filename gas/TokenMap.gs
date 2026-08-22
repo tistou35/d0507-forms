@@ -2586,12 +2586,12 @@ var TOKEN_MAP = {
     "orderWarn": [],
     "byLabel": [
       {
-        "label": "Date of Birth",
-        "tok": "{{paxDob}}"
+        "label": "Full Name",
+        "tok": "{{paxName}}"
       },
       {
-        "label": "Age",
-        "tok": "{{paxAge}}"
+        "label": "Date of Birth",
+        "tok": "{{paxDob}}"
       },
       {
         "label": "Phone Number",
@@ -2624,6 +2624,10 @@ var TOKEN_MAP = {
       {
         "label": "ID / Passport No. (Guardian)",
         "tok": "{{gId}}"
+      },
+      {
+        "label": "Age",
+        "tok": "{{paxAge}}"
       }
     ],
     "byLine": [],

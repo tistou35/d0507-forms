@@ -261,6 +261,25 @@
       else if (c.op === 'sum') out[c.k] = (c.of || []).reduce((a, k) => a + (Number(this.data[k]) || 0), 0);
       else if (c.op === 'pct') out[c.k] = c.max ? Math.round((Number(out[c.of] ?? this.data[c.of]) || 0) / c.max * 100) : 0;
       else if (c.op === 'count') out[c.k] = (c.of || []).filter(k => this.data[k]).length;
+      /* ค่าเดียวกันที่ต้องโผล่สองที่ในกระดาษ (ชื่อผู้โดยสารในส่วน ก และใต้ลายเซ็น)
+         token ตัวเดียววางซ้ำสองที่ไม่ได้ — ตัววางแผนที่กันไม่ให้ token ซ้ำ
+         และถ้าฝืนวาง ช่องหนึ่งจะว่างเงียบ ๆ โดยไม่มีใครรู้จนกว่าจะเปิด PDF ดู */
+      else if (c.op === 'copy') out[c.k] = this.data[c.of];
+      /* อายุจากวันเกิด — ผู้กรอกไม่ต้องคิดเอง และคิดผิดไม่ได้
+         ยังไม่กรอกวันเกิดต้องคืน undefined ไม่ใช่ 0 ไม่งั้นเงื่อนไข "อายุ < 18"
+         จะเป็นจริงตั้งแต่ฟอร์มยังว่าง แล้วขึ้นเตือนใส่คนที่ยังไม่ได้เริ่มกรอก */
+      else if (c.op === 'age') {
+        const raw = this.data[c.of];
+        const d = raw ? new Date(raw + 'T00:00:00') : null;
+        if (!d || isNaN(d)) { out[c.k] = undefined; }
+        else {
+          const n = new Date();
+          let y = n.getFullYear() - d.getFullYear();
+          const m = n.getMonth() - d.getMonth();
+          if (m < 0 || (m === 0 && n.getDate() < d.getDate())) y -= 1;
+          out[c.k] = y >= 0 && y < 130 ? y : undefined;
+        }
+      }
       else if (c.op === 'mul')
         out[c.k] = (c.of || []).reduce((a, k) => a * (Number(this.data[k]) || 0), 1);
       /* ตารางเปิดสองแกน — ใช้กับเมทริกซ์ความเสี่ยงที่ไม่ใช่ผลคูณ

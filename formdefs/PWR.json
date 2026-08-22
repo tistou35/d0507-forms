@@ -68,6 +68,14 @@
       },
       "fields": [
         {
+          "k": "readFirst",
+          "type": "static",
+          "text": {
+            "th": "<p><b style=\"color:#c0392b\">โปรดอ่านอย่างละเอียดก่อนลงนาม</b></p><p>การลงนามในหนังสือฉบับนี้เป็นการยืนยันว่าท่านได้อ่าน เข้าใจ และตกลงยอมรับข้อกำหนดทั้งหมดข้างล่างนี้ด้วยความสมัครใจ</p><p>เอกสารนี้เป็น<b>การสละสิทธิ์เรียกร้องตามกฎหมาย</b> ไม่ใช่แบบฟอร์มลงทะเบียนทั่วไป เมื่อลงนามแล้ว ท่านจะไม่สามารถเรียกร้องค่าเสียหายจากบริษัทได้ในกรณีที่ระบุไว้ในข้อ 2 รวมถึงกรณีที่เกิดจากความประมาทเลินเล่อ หากมีข้อใดที่ท่านไม่เข้าใจ <b>โปรดสอบถามเจ้าหน้าที่ก่อนลงนาม</b> อย่าเพิ่งยืนยัน</p><p>หากผู้โดยสารอายุต่ำกว่า 18 ปี บิดามารดาหรือผู้ปกครองตามกฎหมายเป็นผู้อ่าน ยืนยัน และลงนามแทน ผู้เยาว์ลงนามเองไม่มีผลผูกพัน</p>",
+            "en": "<p><b style=\"color:#c0392b\">PLEASE READ CAREFULLY BEFORE SIGNING</b></p><p>By signing this form you confirm that you have read, understood, and voluntarily agree to all the terms set out below.</p><p>This is a <b>legal waiver of claims</b>, not an ordinary registration form. Once signed, you give up the right to claim compensation from the company in the circumstances set out in clause 2, including those arising from negligence. If there is anything you do not understand, <b>ask a member of staff before you sign</b> — do not confirm yet.</p><p>If the passenger is under 18, the parent or legal guardian reads, confirms, and signs on their behalf. A waiver signed by a minor alone is not binding.</p>"
+          }
+        },
+        {
           "k": "docNote",
           "type": "static",
           "text": {
@@ -175,22 +183,18 @@
           "k": "paxDob",
           "type": "date",
           "req": true,
-          "half": true,
           "label": {
             "th": "วันเกิด",
             "en": "Date of birth"
           }
         },
         {
-          "k": "paxAge",
-          "type": "number",
-          "req": true,
-          "min": 0,
-          "max": 120,
-          "half": true,
-          "label": {
-            "th": "อายุ (ปี)",
-            "en": "Age (years)"
+          "k": "ageShown",
+          "type": "static",
+          "showIf": "filled(paxDob)",
+          "text": {
+            "th": "<p>อายุ ณ วันนี้ <b>{paxAge}</b> ปี — คำนวณจากวันเกิดที่กรอก ไม่ต้องกรอกเอง</p>",
+            "en": "<p>Age today: <b>{paxAge}</b> years — calculated from the date of birth entered.</p>"
           }
         },
         {
@@ -437,7 +441,7 @@
       }
     },
     {
-      "when": "paxAge < 18 && isMinor != true",
+      "when": "filled(paxDob) && paxAge < 18 && isMinor != true",
       "level": "stop",
       "short": {
         "th": "อายุกับการติ๊กไม่ตรงกัน",
@@ -449,7 +453,7 @@
       }
     },
     {
-      "when": "paxAge >= 18 && isMinor == true",
+      "when": "filled(paxDob) && paxAge >= 18 && isMinor == true",
       "level": "warn",
       "short": {
         "th": "ติ๊กผู้เยาว์แต่อายุถึงแล้ว",
@@ -480,5 +484,17 @@
   "export": {
     "docx": "D-0507-PWR-001.docx",
     "lockUntilComplete": true
-  }
+  },
+  "compute": [
+    {
+      "k": "paxAge",
+      "op": "age",
+      "of": "paxDob"
+    },
+    {
+      "k": "paxNamePrint",
+      "op": "copy",
+      "of": "paxName"
+    }
+  ]
 }
