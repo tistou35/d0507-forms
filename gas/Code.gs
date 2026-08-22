@@ -83,11 +83,19 @@ function doGet() {
 // ระบบต้นทางที่รู้จัก และ Script Property ที่เก็บค่าของแต่ละราย
 //   flightplan   FLIGHTPLAN_EXEC_URL   /exec ของ D0507 Flight Plan
 //                FLIGHTPLAN_KEY        กุญแจร่วม ต้องตรงกับ PWR_SHARED_KEY ฝั่งโน้น
+//   trainhub     TRAINHUB_EFC_URL      https://www.361vision.org/api/ext/efc
+//                TRAINHUB_KEY          กุญแจร่วม ต้องตรงกับ EFC_BRIDGE_KEY ฝั่งโน้น
+//
+// เพิ่มระบบใหม่ = เพิ่มบรรทัดข้างล่าง + ตั้ง Script Property สองตัว ไม่ต้องแตะฟอร์ม
 //
 // รายชื่อเป็น allowlist ตายตัว ไม่ใช่ URL ที่ส่งมาจากหน้าเว็บ — ไม่งั้นใครก็
 // สั่งให้สคริปต์นี้ยิง POST ไปที่ไหนก็ได้ในนามของบัญชีที่ deploy มันไว้
 var EXT_SYSTEMS = {
   flightplan: { url: 'FLIGHTPLAN_EXEC_URL', key: 'FLIGHTPLAN_KEY', api: 'paxpwr' },
+  // TrainHub ส่งหัวหน้าครูฝึกมาลงนาม EFC พร้อมผลรายวิชาที่เติมมาให้แล้ว
+  // แล้วรอรู้ว่าใบถูกยื่นจริงหรือยัง — เป็น Next.js route ไม่ใช่ Apps Script
+  // แต่พูดภาษาเดียวกัน (query string เดิม) เพราะสะพานควรมีสำเนียงเดียว
+  trainhub: { url: 'TRAINHUB_EFC_URL', key: 'TRAINHUB_KEY', api: '' },
 };
 
 /** สถานะที่ยอมให้ส่งออกไปได้ — กันคำที่ปลายทางไม่รู้จักไม่ให้ออกจากที่นี่ */
@@ -109,15 +117,18 @@ function extNotify_(body) {
   var key = props.getProperty(target.key);
   if (!url || !key) throw new Error('ยังไม่ได้ตั้ง Script Property: ' + target.url + ' / ' + target.key);
 
-  var q = [
-    'api=' + encodeURIComponent(target.api),
+  // ปลายทางที่เป็น Apps Script ต้องมี api= เพื่อเลือก endpoint · ปลายทางที่เป็น
+  // REST route มี path ของตัวเองอยู่แล้ว ส่ง api= เปล่าไปจะกลายเป็นพารามิเตอร์ขยะ
+  var q = [];
+  if (target.api) q.push('api=' + encodeURIComponent(target.api));
+  q = q.concat([
     'op=status',
     'ref=' + encodeURIComponent(ref),
     'status=' + encodeURIComponent(status),
     'tracking=' + encodeURIComponent(String(body.tracking || '')),
     'form=' + encodeURIComponent(String(body.formCode || '')),
     'key=' + encodeURIComponent(key),
-  ].join('&');
+  ]).join('&');
 
   // followRedirects: Apps Script web app ตอบ 302 ไป googleusercontent เสมอ
   // muteHttpExceptions: ปลายทางล่มต้องได้ข้อความจริง ไม่ใช่ exception เปล่า

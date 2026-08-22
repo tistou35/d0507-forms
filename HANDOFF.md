@@ -335,3 +335,15 @@ sessionStorage) เพราะขั้นอนุมัติเกิดท�
 
 **เพิ่มระบบต้นทางรายใหม่** = เพิ่มบรรทัดใน `EXT_SYSTEMS` (`gas/Code.gs`) แล้วตั้ง
 Script Property สองตัวของรายนั้น ไม่ต้องแตะหน้าเว็บ
+
+### ระบบต้นทางที่ต่ออยู่ตอนนี้
+
+| sys | ระบบ | ฟอร์ม | Script Property ที่ต้องตั้ง |
+|---|---|---|---|
+| `flightplan` | ระบบทำแผนการบิน (Apps Script) | PWR | `FLIGHTPLAN_EXEC_URL` · `FLIGHTPLAN_KEY` |
+| `trainhub` | TrainHub (Next.js/Vercel) | EFC | `TRAINHUB_EFC_URL` · `TRAINHUB_KEY` |
+
+ปลายทางที่เป็น Apps Script ต้องมี `api=` เพื่อเลือก endpoint · ปลายทางที่เป็น REST route
+มี path ของตัวเองอยู่แล้ว `EXT_SYSTEMS[x].api = ''` จึงไม่ส่ง `api=` ไปให้เป็นพารามิเตอร์ขยะ
+
+เอกสารฝั่งปลายทาง: `docs/PWR_BRIDGE.md` (flight-plan) · `docs/EFC_BRIDGE.md` (trainhub)
