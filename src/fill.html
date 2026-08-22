@@ -164,9 +164,20 @@ const RKEY='d0507.extref.'+(new URLSearchParams(location.search).get('c')||'');
   if(ref){ try{ sessionStorage.setItem(RKEY,JSON.stringify({ref:ref,sys:q.get('sys')||''})); }catch(e){} }
 })();
 
+/* สายกลับมาได้สองทาง และเรารับทั้งสอง
+     1. ใน `p` ปนมากับค่าที่เติมให้ — ทางที่ระบบทำแผนการบินใช้ตอนนี้
+     2. เป็น query `?ref=&sys=` แยกต่างหาก — ทางที่ TrainHub ใช้
+
+   ไม่เลือกข้างเพราะลิงก์ที่ส่งออกไปแล้วเรียกคืนไม่ได้ ผู้โดยสารที่ถือลิงก์แบบเก่า
+   อยู่ในมือต้องใช้ได้เหมือนกัน การรับทางเดียวแล้วประกาศว่าอีกทางผิด แปลว่า
+   ใบที่ส่งจากลิงก์เก่าจะเงียบหายโดยไม่มีอะไรฟ้อง */
 function extLink(){
   const q=new URLSearchParams(location.search);
   let ref=q.get('ref')||'', sys=q.get('sys')||'';
+  if(!ref){
+    const p=prefillRaw();
+    if(p&&p.ref){ ref=String(p.ref); sys=String(p.sys||''); }
+  }
   if(!ref){
     try{ const o=JSON.parse(sessionStorage.getItem(RKEY)||'null');
          if(o&&o.ref){ ref=o.ref; sys=o.sys||''; } }catch(e){}
@@ -188,6 +199,21 @@ async function notifyExt(link,status,tracking){
     return await A.gas('extNotify',{ ref:link.extRef, sys:link.extSystem,
       status:status, tracking:tracking||'', formCode:code });
   }catch(e){ console.warn('[extNotify] แจ้งกลับระบบต้นทางไม่สำเร็จ',e); return null; }
+}
+
+/* อ่านค่าที่ส่งมาโดยไม่กิน — prefill() ลบ stash ทิ้งหลังใช้ เรียกซ้ำจะได้ค่าว่าง
+   ตัวนี้จึงแยกไว้ให้ extLink() ส่องหา ref ได้โดยไม่ไปแย่งค่าของช่องกรอก */
+function prefillRaw(){
+  let raw=new URLSearchParams(location.search).get('p');
+  if(!raw){ try{ raw=sessionStorage.getItem(PKEY); }catch(e){} }
+  if(!raw) return null;
+  try{
+    const b64=raw.replace(/-/g,'+').replace(/_/g,'/');
+    const bin=atob(b64);
+    const bytes=Uint8Array.from(bin,ch=>ch.charCodeAt(0));
+    const o=JSON.parse(new TextDecoder().decode(bytes));
+    return (o&&typeof o==='object'&&!Array.isArray(o))?o:null;
+  }catch(e){ return null; }
 }
 
 function prefill(){
