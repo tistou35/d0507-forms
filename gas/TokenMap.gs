@@ -3108,7 +3108,7 @@ var TOKEN_MAP = {
   "VSR": {
     "abbr": "VSR",
     "docx": "D-0507-VSR-001.docx",
-    "control": "SM-VSR-303-A",
+    "control": "SM-VSR-303-B",
     "orderWarn": [],
     "byLabel": [
       {
@@ -3142,10 +3142,6 @@ var TOKEN_MAP = {
       {
         "label": "Aircraft (if applicable):",
         "tok": "{{evAircraft}}"
-      },
-      {
-        "label": "Describe what happened, what you observed, or what could have happened if uncorrected:",
-        "tok": "{{descr}}"
       }
     ],
     "byLine": [],
@@ -3212,19 +3208,6 @@ var TOKEN_MAP = {
         "sign": true
       }
     ],
-    "manual": [
-      {
-        "tok": "{{evOther}}",
-        "label": "Other — specify",
-        "labelTh": "ระบุประเภทอื่น",
-        "sign": false
-      },
-      {
-        "tok": "{{suggest}}",
-        "label": "Suggested action (optional)",
-        "labelTh": "ข้อเสนอแนะในการแก้ไข (ถ้ามี)",
-        "sign": false
-      }
-    ]
+    "manual": []
   }
 };

@@ -1,10 +1,10 @@
 {
   "code": "VSR",
   "doc": "D-0507-VSR-001",
-  "control": "SM-VSR-303-A",
+  "control": "SM-VSR-303-B",
   "issue": "01",
-  "rev": "00",
-  "eff": "01 MAR 2020",
+  "rev": "01",
+  "eff": "23 AUG 2026",
   "title": {
     "th": "รายงานนิรภัยโดยสมัครใจ",
     "en": "Voluntary Safety Report"
@@ -210,6 +210,18 @@
           "label": {
             "th": "เล่าว่าเกิดอะไรขึ้น ท่านสังเกตเห็นอะไร หรือถ้าปล่อยไว้อาจเกิดอะไรขึ้น",
             "en": "Describe what happened, what you observed, or what could have happened if uncorrected"
+          }
+        },
+        {
+          "k": "contributing",
+          "type": "textarea",
+          "label": {
+            "th": "ปัจจัยที่คิดว่าเกี่ยวข้อง",
+            "en": "Contributing factors (as you see them)"
+          },
+          "hint": {
+            "th": "สิ่งที่คิดว่าทำให้เกิดหรือทำให้แย่ลง เช่น สภาพอากาศ ความเร่งรีบ อุปกรณ์ ขั้นตอนที่ไม่ชัด · ไม่ต้องแน่ใจ เขียนเท่าที่เห็น",
+            "en": "What you think caused it or made it worse — weather, time pressure, equipment, unclear procedure. You do not have to be certain; write what you saw."
           }
         },
         {
