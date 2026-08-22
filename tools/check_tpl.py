@@ -10,6 +10,10 @@
 #
 # นิยามฟอร์มก็นับด้วย — เพิ่มช่องใหม่แล้วแม่แบบไม่มี token ให้วาง ค่าที่กรอก
 # จะหายไปเงียบ ๆ เหมือนกัน
+#
+# เทียบ "ชุด token จริง" กับตอนสร้างแม่แบบ ไม่ใช่วันแก้ไฟล์ — แก้ gate หรือ
+# ข้อความช่วยไม่กระทบ token สักตัว ถ้าเตือนด้วยวันที่จะไล่ให้สร้างใหม่ทั้งที่
+# ไม่มีอะไรเปลี่ยน แล้วคนจะเลิกเชื่อคำเตือน
 # ============================================================
 import datetime, json, os, sys, urllib.parse, urllib.request
 
@@ -73,9 +77,14 @@ def mtime(path):
 def main():
     reg = json.load(open(os.path.join(HERE, 'forms_register.json'), encoding='utf-8'))
     tpls = drive_templates(token())
-    stale, ok, none, unknown = [], 0, [], []
+    stale, ok, none, unknown, unused = [], 0, [], [], []
     for f in reg['forms']:
         t = tpls.get(f['abbr'])
+        # ใบที่ย้ายไปกรอกในระบบอื่นแล้ว ระบบนี้ไม่ได้ออก PDF ให้ แม่แบบที่ค้างอยู่
+        # จึงไม่มีใครใช้ — เตือนว่าเก่าก็ไม่มีประโยชน์ บอกว่าเป็นของค้างดีกว่า
+        if t and f.get('sys') not in (None, '', 'here'):
+            unused.append('%s (%s)' % (f['abbr'], f['sys']))
+            continue
         if not t:
             if f.get('kind') != 'ref':
                 none.append(f['abbr'])
@@ -113,6 +122,8 @@ def main():
     for a, made, n in unknown:
         print('❔ %-9s แม่แบบสร้าง %s — เก่ากว่าประวัติ TokenMap ใน git เทียบไม่ได้ '
               '(ตอนนี้มี %d token) เปิดดูด้วยตาหรือสร้างใหม่ให้แน่ใจ' % (a, made, n))
+    if unused:
+        print('💤 แม่แบบค้างอยู่แต่ไม่มีใครใช้ (ใบย้ายไประบบอื่นแล้ว): %s' % ' · '.join(sorted(unused)))
     if none:
         print('⚠️  ยังไม่มีแม่แบบ: %s' % ' '.join(sorted(none)))
     print('\nแม่แบบเป็นฉบับปัจจุบัน %d ใบ · ต้องสร้างใหม่ %d ใบ · เทียบไม่ได้ %d ใบ'
