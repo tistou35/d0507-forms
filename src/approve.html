@@ -299,6 +299,21 @@ async function finish(status,action,note){
         chain:undefined, closedAt:undefined,
       }));
     }
+
+    /* ใบที่มาจากระบบอื่น — บอกผลการอนุมัติกลับไปด้วย
+       สายผูกมากับตัวใบตั้งแต่ตอนส่ง (extRef) ไม่ได้อ่านจาก URL ของหน้านี้
+       เพราะผู้อนุมัติเข้ามาทางคิวงาน ไม่ได้เดินตามลิงก์เดิมของผู้กรอก
+
+       'rejected' สำคัญพอกับ 'approved' — ปลายทางที่รู้แค่ว่ายังไม่อนุมัติ
+       จะรอต่อไปเรื่อย ๆ ทั้งที่ใบถูกตีกลับไปแล้ว */
+    if(SUB.extRef){
+      try{
+        await A.gas('extNotify',{ ref:SUB.extRef, sys:SUB.extSystem||'',
+          status: status==='complete'?'approved':'rejected',
+          tracking:SUB.tracking||'', formCode:SUB.formCode||'' });
+      }catch(e){ console.warn('[extNotify] แจ้งกลับระบบต้นทางไม่สำเร็จ',e); }
+    }
+
     foot.innerHTML=box(status==='complete'?'info':'warn',
       `<b>${A.esc(A.t(status==='complete'?'approved':'rejectedDone'))}</b><br>
        ${A.esc(A.t('trackingNo'))}: <span class="mono">${A.esc(SUB.tracking||'')}</span>

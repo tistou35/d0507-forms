@@ -53,6 +53,20 @@ function doPost(e) {
       return json_({ ok: true, result: attach_(body, who) });
     }
 
+    /* ── แจ้งผลกลับระบบต้นทาง ────────────────────────────────
+       ใบบางใบถูกเปิดมาจากระบบอื่นที่รอผลอยู่ (ตอนนี้: ระบบทำแผนการบิน
+       ส่งผู้โดยสารมาลงนาม PWR แล้วรอรู้ว่าลงนามแล้วหรือยัง)
+
+       ทำไมต้องผ่านที่นี่ ไม่ยิงตรงจากเบราว์เซอร์: กุญแจร่วมระหว่างสองระบบ
+       ต้องไม่อยู่ในหน้าเว็บที่ host สาธารณะ ใครเปิด view-source ก็เห็น
+       และถ้าใครถือกุญแจได้ ก็ปลอมสถานะ "ลงนามแล้ว" ให้ผู้โดยสารที่ไม่เคยลงนามได้
+
+       นักเรียน/ผู้โดยสารที่ล็อกอินแบบ anonymous เรียกได้ — ผู้กรอกฟอร์มคือ
+       คนกลุ่มนี้ทั้งหมด สิ่งที่กันไว้คือคนนอกที่ไม่มี token ของโปรเจกต์นี้เลย */
+    if (body.action === 'extNotify') {
+      return json_({ ok: true, result: extNotify_(body) });
+    }
+
     var out = exportSubmission_(body.submission, who);
     return json_({ ok: true, result: out });
   } catch (err) {
@@ -62,6 +76,62 @@ function doPost(e) {
 
 function doGet() {
   return json_({ ok: true, service: 'D-0507 Forms exporter', at: new Date().toISOString() });
+}
+
+// ── สะพานแจ้งผลกลับระบบต้นทาง ───────────────────────────────
+//
+// ระบบต้นทางที่รู้จัก และ Script Property ที่เก็บค่าของแต่ละราย
+//   flightplan   FLIGHTPLAN_EXEC_URL   /exec ของ D0507 Flight Plan
+//                FLIGHTPLAN_KEY        กุญแจร่วม ต้องตรงกับ PWR_SHARED_KEY ฝั่งโน้น
+//
+// รายชื่อเป็น allowlist ตายตัว ไม่ใช่ URL ที่ส่งมาจากหน้าเว็บ — ไม่งั้นใครก็
+// สั่งให้สคริปต์นี้ยิง POST ไปที่ไหนก็ได้ในนามของบัญชีที่ deploy มันไว้
+var EXT_SYSTEMS = {
+  flightplan: { url: 'FLIGHTPLAN_EXEC_URL', key: 'FLIGHTPLAN_KEY', api: 'paxpwr' },
+};
+
+/** สถานะที่ยอมให้ส่งออกไปได้ — กันคำที่ปลายทางไม่รู้จักไม่ให้ออกจากที่นี่ */
+var EXT_STATUSES = { submitted: true, approved: true, rejected: true };
+
+function extNotify_(body) {
+  var sys = String(body.sys || '');
+  var target = EXT_SYSTEMS[sys];
+  if (!target) throw new Error('ไม่รู้จักระบบต้นทาง: ' + sys);
+
+  var status = String(body.status || '');
+  if (!EXT_STATUSES[status]) throw new Error('สถานะไม่ถูกต้อง: ' + status);
+
+  var ref = String(body.ref || '');
+  if (!ref || ref.length > 120) throw new Error('ref ไม่ถูกต้อง');
+
+  var props = PropertiesService.getScriptProperties();
+  var url = props.getProperty(target.url);
+  var key = props.getProperty(target.key);
+  if (!url || !key) throw new Error('ยังไม่ได้ตั้ง Script Property: ' + target.url + ' / ' + target.key);
+
+  var q = [
+    'api=' + encodeURIComponent(target.api),
+    'op=status',
+    'ref=' + encodeURIComponent(ref),
+    'status=' + encodeURIComponent(status),
+    'tracking=' + encodeURIComponent(String(body.tracking || '')),
+    'form=' + encodeURIComponent(String(body.formCode || '')),
+    'key=' + encodeURIComponent(key),
+  ].join('&');
+
+  // followRedirects: Apps Script web app ตอบ 302 ไป googleusercontent เสมอ
+  // muteHttpExceptions: ปลายทางล่มต้องได้ข้อความจริง ไม่ใช่ exception เปล่า
+  var res = UrlFetchApp.fetch(url + (url.indexOf('?') >= 0 ? '&' : '?') + q, {
+    method: 'get', followRedirects: true, muteHttpExceptions: true,
+  });
+  var text = res.getContentText();
+  if (res.getResponseCode() !== 200) {
+    throw new Error('ระบบต้นทางตอบ ' + res.getResponseCode() + ': ' + text.slice(0, 200));
+  }
+  var out;
+  try { out = JSON.parse(text); } catch (e) { throw new Error('ระบบต้นทางตอบไม่ใช่ JSON: ' + text.slice(0, 200)); }
+  if (!out.ok) throw new Error('ระบบต้นทางปฏิเสธ: ' + (out.error || ''));
+  return { system: sys, status: status, remote: out };
 }
 
 function json_(o) {

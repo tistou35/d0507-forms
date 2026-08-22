@@ -73,7 +73,7 @@ dialog .df{padding:14px 22px;border-top:1px solid var(--g-100);display:flex;gap:
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="../assets/app.js?v=c60eea6d"></script>
+<script src="../assets/app.js?v=6bc9a001"></script>
 <script>D0507.GAS_URL='https://script.google.com/macros/s/AKfycby7rFFVxd92wPImX4m8pv8nHqTrK3Iq0O32A34844DAg1rP8N3RfgKEyGvAUkQu-NXd/exec';</script>
 <script src="../assets/formkit.js?v=58850b06"></script>
 <script>
@@ -340,6 +340,21 @@ async function finish(status,action,note){
         chain:undefined, closedAt:undefined,
       }));
     }
+
+    /* ใบที่มาจากระบบอื่น — บอกผลการอนุมัติกลับไปด้วย
+       สายผูกมากับตัวใบตั้งแต่ตอนส่ง (extRef) ไม่ได้อ่านจาก URL ของหน้านี้
+       เพราะผู้อนุมัติเข้ามาทางคิวงาน ไม่ได้เดินตามลิงก์เดิมของผู้กรอก
+
+       'rejected' สำคัญพอกับ 'approved' — ปลายทางที่รู้แค่ว่ายังไม่อนุมัติ
+       จะรอต่อไปเรื่อย ๆ ทั้งที่ใบถูกตีกลับไปแล้ว */
+    if(SUB.extRef){
+      try{
+        await A.gas('extNotify',{ ref:SUB.extRef, sys:SUB.extSystem||'',
+          status: status==='complete'?'approved':'rejected',
+          tracking:SUB.tracking||'', formCode:SUB.formCode||'' });
+      }catch(e){ console.warn('[extNotify] แจ้งกลับระบบต้นทางไม่สำเร็จ',e); }
+    }
+
     foot.innerHTML=box(status==='complete'?'info':'warn',
       `<b>${A.esc(A.t(status==='complete'?'approved':'rejectedDone'))}</b><br>
        ${A.esc(A.t('trackingNo'))}: <span class="mono">${A.esc(SUB.tracking||'')}</span>
