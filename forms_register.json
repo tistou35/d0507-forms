@@ -767,6 +767,7 @@
       "doc": "D-0507-NPC-001",
       "code": "NP-CHK-303-B",
       "abbr": "NPC",
+      "kind": "ref",
       "t": "Normal Procedures Checklist",
       "th": "รายการตรวจขั้นตอนปกติ",
       "iss": "01",
@@ -779,7 +780,7 @@
       ],
       "jot": "",
       "docx": "D-0507-NPC-001.docx",
-      "st": "noform",
+      "st": "notinlef",
       "chain": "ops",
       "note": "LEF ระบุ Online แต่ไม่มี Jotform · ลิงก์ปัจจุบันชี้ Hazard Identification Form",
       "r": {
@@ -794,12 +795,14 @@
         "checklist",
         "normal",
         "npc"
-      ]
+      ],
+      "blank": "blank/NPC.pdf"
     },
     {
       "doc": "D-0507-EPC-001",
       "code": "EP-CHK-303-B",
       "abbr": "EPC",
+      "kind": "ref",
       "t": "Emergency Procedures Checklist",
       "th": "รายการตรวจขั้นตอนฉุกเฉิน",
       "iss": "01",
@@ -812,7 +815,7 @@
       ],
       "jot": "",
       "docx": "D-0507-EPC-001.docx",
-      "st": "pdfonly",
+      "st": "notinlef",
       "chain": "ops",
       "note": "LEF ชี้ไป PDF บน Google Drive · TM มีแถวซ้ำ 2 แถว",
       "r": {
@@ -827,7 +830,8 @@
         "emergency",
         "memory item",
         "epc"
-      ]
+      ],
+      "blank": "blank/EPC.pdf"
     },
     {
       "doc": "D-0507-PWR-001",

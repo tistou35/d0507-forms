@@ -76,11 +76,14 @@
       "src": "inhouse",
       "th": "เช็กลิสต์ปกติ C172M",
       "en": "Normal Checklist C172M",
-      "ed": "",
-      "rev": "",
-      "eff": "",
-      "file": "",
-      "by": "HT"
+      "ed": "01",
+      "rev": "00",
+      "eff": "2024-11-11",
+      "file": "blank/NPC.pdf",
+      "by": "HT",
+      "doc": "D-0507-NPC-001",
+      "code": "NP-CHK-303-B",
+      "note": "เอกสารควบคุมฉบับเดียวครอบ C172 M/N/S — ใช้ประกอบการฝึกเท่านั้น อ้างอิง POH"
     },
     {
       "id": "CL-NORM-C172N",
@@ -89,11 +92,14 @@
       "src": "inhouse",
       "th": "เช็กลิสต์ปกติ C172N",
       "en": "Normal Checklist C172N",
-      "ed": "",
-      "rev": "",
-      "eff": "",
-      "file": "",
-      "by": "HT"
+      "ed": "01",
+      "rev": "00",
+      "eff": "2024-11-11",
+      "file": "blank/NPC.pdf",
+      "by": "HT",
+      "doc": "D-0507-NPC-001",
+      "code": "NP-CHK-303-B",
+      "note": "เอกสารควบคุมฉบับเดียวครอบ C172 M/N/S — ใช้ประกอบการฝึกเท่านั้น อ้างอิง POH"
     },
     {
       "id": "CL-NORM-C172S",
@@ -102,11 +108,14 @@
       "src": "inhouse",
       "th": "เช็กลิสต์ปกติ C172S",
       "en": "Normal Checklist C172S",
-      "ed": "",
-      "rev": "",
-      "eff": "",
-      "file": "",
-      "by": "HT"
+      "ed": "01",
+      "rev": "00",
+      "eff": "2024-11-11",
+      "file": "blank/NPC.pdf",
+      "by": "HT",
+      "doc": "D-0507-NPC-001",
+      "code": "NP-CHK-303-B",
+      "note": "เอกสารควบคุมฉบับเดียวครอบ C172 M/N/S — ใช้ประกอบการฝึกเท่านั้น อ้างอิง POH"
     },
     {
       "id": "CL-NORM-C182T",
@@ -141,11 +150,14 @@
       "src": "inhouse",
       "th": "เช็กลิสต์ฉุกเฉิน C172M",
       "en": "Emergency Checklist C172M",
-      "ed": "",
-      "rev": "",
-      "eff": "",
-      "file": "",
-      "by": "HT"
+      "ed": "01",
+      "rev": "00",
+      "eff": "2024-11-11",
+      "file": "blank/EPC.pdf",
+      "by": "HT",
+      "doc": "D-0507-EPC-001",
+      "code": "EP-CHK-303-B",
+      "note": "เอกสารควบคุมฉบับเดียวครอบ C172 M/N/S — ใช้ประกอบการฝึกเท่านั้น อ้างอิง POH"
     },
     {
       "id": "CL-EMER-C172N",
@@ -154,11 +166,14 @@
       "src": "inhouse",
       "th": "เช็กลิสต์ฉุกเฉิน C172N",
       "en": "Emergency Checklist C172N",
-      "ed": "",
-      "rev": "",
-      "eff": "",
-      "file": "",
-      "by": "HT"
+      "ed": "01",
+      "rev": "00",
+      "eff": "2024-11-11",
+      "file": "blank/EPC.pdf",
+      "by": "HT",
+      "doc": "D-0507-EPC-001",
+      "code": "EP-CHK-303-B",
+      "note": "เอกสารควบคุมฉบับเดียวครอบ C172 M/N/S — ใช้ประกอบการฝึกเท่านั้น อ้างอิง POH"
     },
     {
       "id": "CL-EMER-C172S",
@@ -167,11 +182,14 @@
       "src": "inhouse",
       "th": "เช็กลิสต์ฉุกเฉิน C172S",
       "en": "Emergency Checklist C172S",
-      "ed": "",
-      "rev": "",
-      "eff": "",
-      "file": "",
-      "by": "HT"
+      "ed": "01",
+      "rev": "00",
+      "eff": "2024-11-11",
+      "file": "blank/EPC.pdf",
+      "by": "HT",
+      "doc": "D-0507-EPC-001",
+      "code": "EP-CHK-303-B",
+      "note": "เอกสารควบคุมฉบับเดียวครอบ C172 M/N/S — ใช้ประกอบการฝึกเท่านั้น อ้างอิง POH"
     },
     {
       "id": "CL-EMER-C182T",

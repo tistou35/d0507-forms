@@ -220,8 +220,14 @@ function state(p){
   return { k:'ok', t:{th:'ใช้อยู่',en:'Current'} };
 }
 
+/* file รับได้สามแบบ — URL เต็ม · ไฟล์ในรีโปนี้ · id ของไฟล์ใน Drive
+   เอกสารที่ทำเองแล้วเก็บในรีโปดีกว่าฝาก Drive เพราะเวอร์ชันเดินคู่กับทะเบียน
+   และไม่ต้องพึ่งสิทธิ์การแชร์ของ Drive ซึ่งบัญชีนี้ถูกนโยบายปิดไว้บางส่วน
+   id ของ Drive ไม่มีทั้ง / และ . จึงแยกจากพาธในรีโปได้ด้วยตัวอักษรสองตัวนี้ */
 const fileUrl = f => !f ? '' :
-  (/^https?:/.test(f) ? f : 'https://drive.google.com/file/d/'+f+'/view');
+  /^https?:/.test(f) ? f :
+  /[\/.]/.test(f)    ? '@@BASE@@' + f :
+                       'https://drive.google.com/file/d/' + f + '/view';
 const catsOf = tab => Object.entries(PUB.cats).filter(([,c]) => c.tab === tab).map(([k]) => k);
 const inTab  = (p, tab) => catsOf(tab).includes(p.cat);
 const T = k => A.L({
