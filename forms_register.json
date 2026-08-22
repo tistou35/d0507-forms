@@ -658,9 +658,9 @@
       ],
       "jot": "",
       "docx": "D-0507-RTR-001.docx",
-      "st": "nolink",
+      "st": "ok",
       "chain": "standardisation",
-      "note": "เปิดอัตโนมัติเมื่อ PCR ไม่ผ่าน (OMA D.2.8 Corrective Standardisation) · มีฟอร์มออนไลน์และแม่แบบ PDF แล้ว เหลือแค่ LEF ยังไม่ใส่ลิงก์",
+      "note": "กรอกในระบบบันทึกการฝึก เมนู Annual Eval — เลือก Type of training ให้ตรงกับสิ่งที่ประเมิน · ตัวเอกสารยังเป็นเอกสารควบคุมที่นี่ · นิยามฟอร์มเดิมเก็บไว้ที่ formdefs/_retired/RTR.json",
       "r": {
         "ins": "บันทึกการอบรมทบทวนของตัวเอง",
         "mgt": "จัดการอบรมทบทวนและรับรองผล"
@@ -668,13 +668,34 @@
       "with": [
         "HT"
       ],
-      "sys": "here",
+      "sys": "training",
       "public": false,
       "kw": [
         "อบรมทบทวน",
         "refresher",
         "rtr"
-      ]
+      ],
+      "guide": {
+        "th": "เลือก Type of training ในเมนู Annual Eval ให้ตรงกับสิ่งที่กำลังประเมิน",
+        "en": "Pick the Type of training in Annual Eval that matches what is being assessed",
+        "items": [
+          {
+            "n": "ประเมินครูภาคทฤษฎี (กราวน์)",
+            "by": "HT หรือ CTKI",
+            "w": "เลือก Ground training"
+          },
+          {
+            "n": "ประเมินครูสอนบิน",
+            "by": "HT หรือ CFI",
+            "w": "เลือก Flight training"
+          },
+          {
+            "n": "ประเมินความสามารถในการบิน",
+            "by": "HT, CFI หรือ FI",
+            "w": "เลือก Progressive / Standard check"
+          }
+        ]
+      }
     },
     {
       "doc": "D-0507-ECA-001",
@@ -881,6 +902,7 @@
       "doc": "D-0507-PCK-001",
       "code": "ME-PCK-303-A",
       "abbr": "PCK",
+      "kind": "ref",
       "t": "Pre-Inspection Checklist",
       "th": "รายการตรวจก่อนเริ่มงานซ่อมบำรุง",
       "iss": "01",
@@ -907,7 +929,8 @@
         "ตรวจก่อนงาน",
         "pre-inspection",
         "pck"
-      ]
+      ],
+      "blank": "blank/PCK.pdf"
     },
     {
       "doc": "D-0507-MTC-001",
@@ -925,9 +948,9 @@
         "TM"
       ],
       "docx": "D-0507-MTC-001.docx",
-      "st": "dupsys",
+      "st": "pdfonly",
       "chain": "maint",
-      "note": "ฉบับที่ใช้จริงอยู่ในAeroFBO · LEF ในคู่มือยังชี้ Jotform 230023273391042 ซึ่งเป็นอีกฉบับ — ต้องเลือกให้เหลือฉบับเดียวแล้วแก้ LEF",
+      "note": "สร้างใน AeroFBO — หน้านั้นแสดงแม่แบบให้ดาวน์โหลดหรือพิมพ์ไปเขียนด้วยมือ",
       "r": {
         "mnt": "บันทึกงานซ่อมบำรุงตามใบสั่งงาน"
       },
@@ -1006,7 +1029,7 @@
         "ช่างอากาศยาน",
         "ฝ่ายปฏิบัติการ"
       ],
-      "sys": "here",
+      "sys": "fbo",
       "public": false,
       "kw": [
         "ปูม",
@@ -1014,7 +1037,8 @@
         "การใช้อากาศยาน",
         "log",
         "alr"
-      ]
+      ],
+      "note": "กรอกใน AeroFBO ที่ flight-log-add.php · เที่ยวบินที่มีตารางแล้วกรอกได้จาก preflight-prep.php"
     },
     {
       "doc": "D-0507-APP-001",
@@ -1031,9 +1055,9 @@
         "TM"
       ],
       "docx": "D-0507-APP-001.docx",
-      "st": "dupsys",
+      "st": "ok",
       "chain": "admin",
-      "note": "ฉบับที่ใช้จริงอยู่ในAeroFBO · LEF ในคู่มือยังชี้ Jotform 221220820577045 ซึ่งเป็นอีกฉบับ — ต้องเลือกให้เหลือฉบับเดียวแล้วแก้ LEF",
+      "note": "กรอกใน AeroFBO ที่ recruitment.php",
       "r": {
         "stu": "สมัครเข้าเรียน เปลี่ยนหลักสูตร หรือขอ licence / rating",
         "mgt": "พิจารณารับเข้าเรียนหรือรับเป็นครูการบิน"
@@ -1289,16 +1313,16 @@
       ],
       "jot": "210655063681050",
       "docx": "D-0507-NCHR-001.docx",
-      "st": "linkwrong",
+      "st": "ok",
       "chain": "audit",
-      "note": "LEF ชี้ไปฟอร์ม APPLICATION FORM · ทับซ้อนกับ D-0507-CAR-001 ต้องตัดสินว่าใช้ใบไหน",
+      "note": "ย้ายไปสร้างในระบบตรวจสอบภายใน",
       "r": {
         "mgt": "บันทึกและติดตามข้อไม่สอดคล้องจากการตรวจ"
       },
       "with": [
         "CMM"
       ],
-      "sys": "here",
+      "sys": "audit",
       "public": false,
       "kw": [
         "ข้อไม่สอดคล้อง",
@@ -1432,10 +1456,10 @@
       "lef": [],
       "jot": "",
       "docx": "D-0507-CAR-001.docx",
-      "st": "notinlef",
+      "st": "ok",
       "chain": "audit",
       "app": "audit",
-      "note": "ทำงานอยู่แล้วในประตูงานตรวจสอบ · ต้องเพิ่มเข้า LEF ของ OMM Section 5",
+      "note": "ย้ายไปสร้างในระบบตรวจสอบภายใน",
       "r": {
         "ins": "ตอบกลับ Part 3–5 (Root cause → Corrective → Preventive)",
         "mnt": "ตอบกลับ Part 3–5 เมื่อเป็นผู้รับผิดชอบ",
@@ -1473,7 +1497,7 @@
       "app": "audit",
       "st": "notinlef",
       "chain": "audit",
-      "note": "2,081 รายการ · ใช้งานที่ประตูงานตรวจสอบ",
+      "note": "2,081 รายการ · ใช้งานที่ประตูงานตรวจสอบ · ควรอยู่หมวดเช็กลิสต์ แต่ยังไม่มี .docx ต้นฉบับให้ทำไฟล์เปิดอ่าน",
       "r": {
         "mgt": "ดำเนินการตรวจติดตามภายในตามแผนประจำปี"
       },
@@ -1488,6 +1512,7 @@
       "doc": "D-0507-VAC-001",
       "code": "",
       "abbr": "VAC",
+      "kind": "ref",
       "t": "Vendor / Contracted Services Audit Checklist",
       "th": "รายการตรวจผู้ให้บริการภายนอก",
       "iss": "01",
@@ -1509,12 +1534,14 @@
         "CMM"
       ],
       "sys": "audit",
-      "public": false
+      "public": false,
+      "blank": "blank/VAC.pdf"
     },
     {
       "doc": "D-0507-SAC-001",
       "code": "",
       "abbr": "SAC",
+      "kind": "ref",
       "t": "School Safety Audit Checklist (SMS)",
       "th": "รายการตรวจนิรภัยภาพรวมของโรงเรียน",
       "iss": "01",
@@ -1536,12 +1563,14 @@
         "CMM"
       ],
       "sys": "audit",
-      "public": false
+      "public": false,
+      "blank": "blank/SAC.pdf"
     },
     {
       "doc": "D-0507-SSC-001",
       "code": "",
       "abbr": "SSC",
+      "kind": "ref",
       "t": "Safety Surveillance Checklist (Spot Check)",
       "th": "รายการเฝ้าสังเกตการณ์กิจกรรม",
       "iss": "01",
@@ -1562,7 +1591,8 @@
         "Safety Manager"
       ],
       "sys": "audit",
-      "public": false
+      "public": false,
+      "blank": "blank/SSC.pdf"
     },
     {
       "doc": "D-0507-MER-001",
@@ -1640,236 +1670,6 @@
     {
       "doc": "",
       "code": "",
-      "abbr": "ACPL-TR",
-      "t": "ACPL Training Record",
-      "th": "บันทึกการฝึกหลักสูตร ACPL",
-      "iss": "",
-      "rev": "",
-      "eff": "",
-      "own": "IM",
-      "lef": [],
-      "jot": "221584141965459",
-      "docx": "",
-      "st": "shadow",
-      "chain": "training",
-      "r": {
-        "ins": "บันทึกการฝึกหลักสูตร ACPL",
-        "stu": "ดูความคืบหน้าของตัวเอง"
-      },
-      "with": [],
-      "sys": "here",
-      "public": false
-    },
-    {
-      "doc": "",
-      "code": "",
-      "abbr": "IR-TR",
-      "t": "IR Training Record",
-      "th": "บันทึกการฝึก Instrument Rating",
-      "iss": "",
-      "rev": "",
-      "eff": "",
-      "own": "IM",
-      "lef": [],
-      "jot": "212284129236049",
-      "docx": "",
-      "st": "shadow",
-      "chain": "training",
-      "r": {
-        "ins": "บันทึกการฝึก Instrument Rating",
-        "stu": "ดูความคืบหน้าของตัวเอง"
-      },
-      "with": [],
-      "sys": "here",
-      "public": false
-    },
-    {
-      "doc": "",
-      "code": "",
-      "abbr": "IP-TR",
-      "t": "IP Training Record",
-      "th": "บันทึกการฝึกครูการบิน",
-      "iss": "",
-      "rev": "",
-      "eff": "",
-      "own": "IM",
-      "lef": [],
-      "jot": "212324411781447",
-      "docx": "",
-      "st": "shadow",
-      "chain": "training",
-      "r": {
-        "ins": "บันทึกการฝึกหลักสูตรครูการบิน"
-      },
-      "with": [],
-      "sys": "here",
-      "public": false
-    },
-    {
-      "doc": "",
-      "code": "",
-      "abbr": "IRM-TR",
-      "t": "IRM Training Record",
-      "th": "บันทึกการฝึก IRM",
-      "iss": "",
-      "rev": "",
-      "eff": "",
-      "own": "IM",
-      "lef": [],
-      "jot": "242807814555462",
-      "docx": "",
-      "st": "shadow",
-      "chain": "training",
-      "r": {
-        "ins": "บันทึกการฝึกหลักสูตร IRM"
-      },
-      "with": [],
-      "sys": "here",
-      "public": false
-    },
-    {
-      "doc": "",
-      "code": "",
-      "abbr": "FTD-TR",
-      "t": "FTD Training Record",
-      "th": "บันทึกการฝึกเครื่องฝึกบินจำลอง",
-      "iss": "",
-      "rev": "",
-      "eff": "",
-      "own": "IM",
-      "lef": [],
-      "jot": "212293868959071",
-      "docx": "",
-      "st": "shadow",
-      "chain": "training",
-      "r": {
-        "ins": "บันทึกการฝึกในเครื่องฝึกบินจำลอง (FTD)",
-        "stu": "ดูความคืบหน้าของตัวเอง"
-      },
-      "with": [],
-      "sys": "here",
-      "public": false
-    },
-    {
-      "doc": "",
-      "code": "",
-      "abbr": "REC-TR",
-      "t": "Recurrent Training Record",
-      "th": "บันทึกการฝึกทบทวนประจำปี",
-      "iss": "",
-      "rev": "",
-      "eff": "",
-      "own": "IM",
-      "lef": [],
-      "jot": "212334261940448",
-      "docx": "",
-      "st": "shadow",
-      "chain": "training",
-      "note": "มีฟอร์มซ้ำบน Jotform อีกใบ (221830386692057) ควรเลือกใบเดียว",
-      "r": {
-        "ins": "บันทึกการฝึกทบทวนประจำปี"
-      },
-      "with": [],
-      "sys": "here",
-      "public": false
-    },
-    {
-      "doc": "",
-      "code": "",
-      "abbr": "LSN",
-      "t": "Lesson Plan",
-      "th": "แผนการสอน",
-      "iss": "",
-      "rev": "",
-      "eff": "",
-      "own": "IM",
-      "lef": [],
-      "jot": "211490789942467",
-      "docx": "",
-      "st": "shadow",
-      "chain": "training",
-      "r": {
-        "ins": "จัดทำแผนการสอนรายคาบ"
-      },
-      "with": [],
-      "sys": "here",
-      "public": false
-    },
-    {
-      "doc": "",
-      "code": "",
-      "abbr": "FTM",
-      "t": "Flight Time Record",
-      "th": "บันทึกชั่วโมงบิน",
-      "iss": "",
-      "rev": "",
-      "eff": "",
-      "own": "IM",
-      "lef": [],
-      "jot": "242233803638051",
-      "docx": "",
-      "st": "shadow",
-      "chain": "training",
-      "r": {
-        "ins": "บันทึกชั่วโมงบินของตัวเอง",
-        "ops": "รวบรวมชั่วโมงบินเข้าทะเบียน"
-      },
-      "with": [],
-      "sys": "here",
-      "public": false
-    },
-    {
-      "doc": "",
-      "code": "",
-      "abbr": "AUTH",
-      "t": "Authorization Record",
-      "th": "บันทึกการมอบอำนาจ",
-      "iss": "",
-      "rev": "",
-      "eff": "",
-      "own": "OP",
-      "lef": [],
-      "jot": "221831008515043",
-      "docx": "",
-      "st": "shadow",
-      "chain": "ops",
-      "note": "มีฟอร์มซ้ำบน Jotform อีกใบ (210068540868055) ควรเลือกใบเดียว",
-      "r": {
-        "ops": "บันทึกการมอบอำนาจปฏิบัติหน้าที่",
-        "mgt": "ลงนามมอบอำนาจ"
-      },
-      "with": [],
-      "sys": "here",
-      "public": false
-    },
-    {
-      "doc": "",
-      "code": "",
-      "abbr": "INJ",
-      "t": "Incident / Injury Report",
-      "th": "รายงานอุบัติการณ์และการบาดเจ็บ",
-      "iss": "",
-      "rev": "",
-      "eff": "",
-      "own": "SM",
-      "lef": [],
-      "jot": "222210761720443",
-      "docx": "",
-      "st": "shadow",
-      "chain": "safety",
-      "r": {
-        "ops": "รายงานอุบัติการณ์และการบาดเจ็บ",
-        "mgt": "พิจารณาและส่งต่อ AAIC/CAAT ตามเกณฑ์"
-      },
-      "with": [
-        "Safety Manager"
-      ],
-      "sys": "here",
-      "public": false
-    },
-    {
-      "doc": "",
-      "code": "",
       "abbr": "ACI",
       "t": "Aircraft Inspection Checklist < 5,700 kg",
       "th": "รายการตรวจอากาศยานน้ำหนักน้อยกว่า 5,700 กก.",
@@ -1887,7 +1687,8 @@
       },
       "with": [],
       "sys": "here",
-      "public": false
+      "public": false,
+      "note": "ควรอยู่หมวดเช็กลิสต์ แต่ยังไม่มี .docx ต้นฉบับให้ทำไฟล์เปิดอ่าน"
     },
     {
       "doc": "",
@@ -1933,32 +1734,8 @@
       },
       "with": [],
       "sys": "here",
-      "public": false
-    },
-    {
-      "doc": "",
-      "code": "",
-      "abbr": "ICT",
-      "t": "Instructor Contract",
-      "th": "สัญญาจ้างครูการบิน",
-      "iss": "",
-      "rev": "",
-      "eff": "",
-      "own": "AD",
-      "lef": [],
-      "jot": "241914981807061",
-      "docx": "",
-      "st": "shadow",
-      "chain": "admin",
-      "note": "เป็นเอกสารผูกพันทางกฎหมาย — ต้องให้ @legal ยืนยันการใช้ลายเซ็นอิเล็กทรอนิกส์",
-      "r": {
-        "mgt": "จัดทำและลงนามสัญญาจ้างครูการบิน"
-      },
-      "with": [
-        "ACM"
-      ],
-      "sys": "here",
-      "public": false
+      "public": false,
+      "note": "ใช้บันทึกการได้มาซึ่งเอกสาร สิ่งพิมพ์ หรือหนังสือใหม่ที่จะนำมาใช้ในสถาบัน"
     }
   ],
   "systems": {

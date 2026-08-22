@@ -42,6 +42,20 @@
       "cl": "c",
       "d": "ดาวน์โหลดจาก AIP Thailand — มีอายุตามรอบ AIRAC",
       "tab": "chart"
+    },
+    "maint": {
+      "n": "เช็กลิสต์งานช่าง",
+      "en": "Maintenance checklist",
+      "cl": "a",
+      "d": "ใช้ก่อนและระหว่างการตรวจอากาศยาน",
+      "tab": "ops"
+    },
+    "audit": {
+      "n": "เช็กลิสต์ตรวจสอบ",
+      "en": "Audit checklist",
+      "cl": "c",
+      "d": "ใช้ในการตรวจสอบภายในและการตรวจผู้ให้บริการ · กรอกจริงในระบบตรวจสอบภายใน",
+      "tab": "ops"
     }
   },
   "fleet": [
@@ -396,6 +410,62 @@
       "op": "16q4elje-d18NmAr7P4zFuzUfiIyl1CqC",
       "nap": 1,
       "nop": 4
+    },
+    {
+      "id": "CL-PCK",
+      "cat": "maint",
+      "src": "inhouse",
+      "th": "เช็กลิสต์ก่อนการตรวจ",
+      "en": "Pre-Inspection Checklist",
+      "doc": "D-0507-PCK-001",
+      "code": "ME-PCK-303-A",
+      "ed": "01",
+      "rev": "00",
+      "eff": "",
+      "file": "blank/PCK.pdf",
+      "by": "QA"
+    },
+    {
+      "id": "CL-VAC",
+      "cat": "audit",
+      "src": "inhouse",
+      "th": "เช็กลิสต์ตรวจผู้ให้บริการ",
+      "en": "Vendor / Contracted Services Audit Checklist",
+      "doc": "D-0507-VAC-001",
+      "code": "",
+      "ed": "01",
+      "rev": "00",
+      "eff": "",
+      "file": "blank/VAC.pdf",
+      "by": "QA"
+    },
+    {
+      "id": "CL-SAC",
+      "cat": "audit",
+      "src": "inhouse",
+      "th": "เช็กลิสต์ตรวจความปลอดภัยของสถาบัน",
+      "en": "School Safety Audit Checklist",
+      "doc": "D-0507-SAC-001",
+      "code": "",
+      "ed": "01",
+      "rev": "00",
+      "eff": "",
+      "file": "blank/SAC.pdf",
+      "by": "QA"
+    },
+    {
+      "id": "CL-SSC",
+      "cat": "audit",
+      "src": "inhouse",
+      "th": "เช็กลิสต์เฝ้าระวังความปลอดภัย",
+      "en": "Safety Surveillance Checklist",
+      "doc": "D-0507-SSC-001",
+      "code": "",
+      "ed": "01",
+      "rev": "00",
+      "eff": "",
+      "file": "blank/SSC.pdf",
+      "by": "QA"
     }
   ],
   "tabs": [

@@ -40,7 +40,8 @@
 const REG = @@REG@@;
 const A = D0507;
 let GROUP='all', SYS='all', ST='all', VIEW='card';
-document.querySelectorAll('[data-cnt="forms"]').forEach(e=>e.textContent=REG.forms.length);
+document.querySelectorAll('[data-cnt="forms"]').forEach(
+  e=>e.textContent=REG.forms.filter(f=>f.kind!=='ref').length);
 A.reg = REG;
 A.initAuth(@@FBCFG@@, () => { chips(); paint(); });
 // เปลี่ยนภาษาแล้ววาดใหม่ทั้งหน้า
@@ -67,7 +68,10 @@ function chips(){
   }
 }
 function list(){
-  let L = A.isStaff() ? REG.forms.slice() : REG.forms.filter(f=>f.public);
+  /* เอกสารอ้างอิง (kind:'ref') ไม่ใช่ใบให้กรอก อยู่หมวดเช็กลิสต์และเอกสารเผยแพร่
+     เคยปนอยู่ในรายการนี้แล้วขึ้นว่า "ยังไม่มีฟอร์มออนไลน์" ทั้งที่ไม่มีวันต้องมี */
+  const FORMS = REG.forms.filter(f=>f.kind!=='ref');
+  let L = A.isStaff() ? FORMS.slice() : FORMS.filter(f=>f.public);
   if (GROUP!=='all') L = L.filter(f=>f.r && f.r[GROUP]);
   if (SYS!=='all')   L = L.filter(f=>f.sys===SYS);
   if (A.isStaff()){

@@ -75,7 +75,8 @@
 const REG = @@REG@@;
 const A = D0507;
 document.getElementById('today').textContent = A.today();
-document.querySelectorAll('[data-cnt="forms"]').forEach(e => e.textContent = REG.forms.length);
+document.querySelectorAll('[data-cnt="forms"]').forEach(
+  e => e.textContent = REG.forms.filter(f => f.kind !== 'ref').length);
 
 const CHIPS_PUB = ['พรุ่งนี้จะบินกับครู','จะบินเดี่ยวครั้งแรก','อยากดูผลการฝึกของตัวเอง',
                    'เจอเหตุไม่ปลอดภัย อยากแจ้ง','สมัครเรียน'];
@@ -91,7 +92,8 @@ A.onLang.push(() => paint());
 paint();
 
 function visible() {
-  return A.isStaff() ? REG.forms : REG.forms.filter(f => f.public);
+  const FORMS = REG.forms.filter(f => f.kind !== 'ref');
+  return A.isStaff() ? FORMS : FORMS.filter(f => f.public);
 }
 
 function paint() {
@@ -120,10 +122,10 @@ function paint() {
   let show, head, note;
   if (staff && A.roles.length) {
     const r = A.roles.find(x => REG.roles.some(y => y.k === x)) || 'ins';
-    show = REG.forms.filter(f => f.r && f.r[r]).slice(0, 6);
+    show = REG.forms.filter(f => f.kind !== 'ref' && f.r && f.r[r]).slice(0, 6);
     head = 'ฟอร์มของคุณ'; note = 'ตามบทบาท ' + A.roleNames().join(' · ');
   } else if (staff) {
-    show = REG.forms.filter(f => f.sys === 'here').slice(0, 6);
+    show = REG.forms.filter(f => f.kind !== 'ref' && f.sys === 'here').slice(0, 6);
     head = 'ฟอร์มที่ใช้บ่อย'; note = 'ยังไม่ได้กำหนดบทบาทให้บัญชีนี้';
   } else {
     show = list; head = 'ฟอร์มของนักเรียน'; note = list.length + ' ฟอร์ม · ไม่ต้องเข้าสู่ระบบ';
