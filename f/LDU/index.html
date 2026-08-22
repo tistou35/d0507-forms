@@ -125,7 +125,7 @@
 <script>
 "use strict";
 const REG = {"systems":{"here":{"n":"ระบบฟอร์มออนไลน์","en":"This portal","url":"","lg":"52","cl":"d"},"dispatch":{"n":"ระบบ Dispatch","en":"Flight dispatch","url":"https://d0507.361vision.org/d0507-app/dispatch/?v=final","lg":"DSP","cl":"a"},"training":{"n":"ระบบบันทึกการฝึก","en":"Training records","url":"https://d0507.361vision.org/","lg":"TRN","cl":"b"},"fbo":{"n":"AeroFBO","en":"Operations & maintenance","url":"https://indyzz.com/aerofbo/index.php","lg":"FBO","cl":"c"},"audit":{"n":"Audit Portal","en":"Internal audit","url":"../d0507-audit/","lg":"AUD","cl":"a"}},"roles":[{"k":"stu","n":"นักเรียน","d":"นักศึกษาการบิน · ผู้เข้ารับการฝึก","en":"Students","den":"Student pilots · trainees"},{"k":"ins","n":"ครูการบิน / ครูภาคทฤษฎี","d":"FI · TKI · FIE","en":"Instructors","den":"FI · TKI · FIE"},{"k":"mnt","n":"ช่างอากาศยาน","d":"ฝ่ายซ่อมบำรุง (ME)","en":"Maintenance","den":"Maintenance (ME)"},{"k":"ops","n":"ฝ่ายปฏิบัติการ","d":"Operations · Dispatch · ธุรการเอกสาร","en":"Operations","den":"Operations · Dispatch · document control"},{"k":"mgt","n":"ฝ่ายบริหาร","d":"ACM · HT · CMM · Safety Manager","en":"Management","den":"ACM · HT · CMM · Safety Manager"}],"status":{"ok":{"n":"พร้อมใช้","lv":"ok","en":"Ready"},"linkwrong":{"n":"ลิงก์ใน LEF ผิดใบ","lv":"bad","en":"LEF links to the wrong form"},"nolink":{"n":"LEF ยังไม่ใส่ลิงก์","lv":"warn","en":"No link in LEF"},"noform":{"n":"ยังไม่มีฟอร์มออนไลน์","lv":"warn","en":"No online form yet"},"pdfonly":{"n":"เป็น PDF บน Drive","lv":"warn","en":"PDF on Drive"},"notinlef":{"n":"ยังไม่อยู่ใน LEF","lv":"warn","en":"Not in LEF yet"},"shadow":{"n":"ใช้บน Jotform · ไม่มีในคู่มือ","lv":"bad","en":"In use but not registered"},"dupsys":{"n":"มีสองฉบับ — ระบบภายนอกและ Jotform","lv":"bad","en":"Duplicate across systems"}},"forms":[{"abbr":"DRF","doc":"D-0507-DRF-001","t":"Document Revision Form","th":"แบบขอแก้ไขเอกสารควบคุม","sys":"here","chain":"doccontrol","public":false,"r":{"ops":"ยื่นคำขอแก้ไขเอกสารควบคุม","mgt":"อนุมัติการแก้ไขเอกสารควบคุมและออก revision"},"jot":"193573500355053","hasDef":true},{"abbr":"DRC","doc":"D-0507-DRC-001","t":"Document Receipt","th":"ใบรับเอกสารควบคุม","sys":"here","chain":"doccontrol","public":false,"r":{"ops":"ลงนามรับเอกสารควบคุมและคืนฉบับที่ถูกแทน","mgt":"ติดตามให้ Distribution List ลงนามรับครบ"},"jot":"221830582177053","hasDef":true},{"abbr":"DVL","doc":"","t":"Document Verification Log","th":"บันทึกการทวนสอบเอกสาร","sys":"here","chain":"doccontrol","public":false,"r":{"ops":"บันทึกการทวนสอบเอกสาร","mgt":"ทวนสอบความครบถ้วนของเอกสารควบคุม"},"jot":"250422504322442","hasDef":false}],"lefcount":{"total":43}};
-const F   = {"abbr":"LDU","doc":"D-0507-LDU-001","t":"Licence Holder Document Updated","th":"บันทึกการปรับปรุงเอกสารผู้ถือใบอนุญาต","sys":"here","chain":"doccontrol","public":false,"r":{"ops":"ส่งใบอนุญาต rating และใบตรวจแพทย์ฉบับปรับปรุง","mgt":"ตรวจสอบความครบถ้วนของทะเบียนบุคลากร"},"with":["ธุรการ"],"iss":"01","rev":"00","eff":"04 NOV 2024","jot":"241230138904044","hasDef":false};
+const F   = {"abbr":"LDU","doc":"D-0507-LDU-001","t":"Licence Holder Document Updated","th":"บันทึกการปรับปรุงเอกสารผู้ถือใบอนุญาต","sys":"here","chain":"doccontrol","public":false,"r":{"ops":"ส่งใบอนุญาต rating และใบตรวจแพทย์ฉบับปรับปรุง","mgt":"ตรวจสอบความครบถ้วนของทะเบียนบุคลากร"},"with":["ธุรการ"],"iss":"01","rev":"00","eff":"04 NOV 2024","jot":"241230138904044","hasDef":false,"blank":"blank/LDU.pdf"};
 const A   = D0507;
 const CHAIN_N = {
   preflight:{th:'ก่อนทำการบิน',en:'Pre-flight'}, training:{th:'บันทึกการฝึก',en:'Training records'},
@@ -176,14 +176,23 @@ function paint(){
   const isRef = F.kind === 'ref';
   const t = isRef ? null : A.target(REG, F);
   const openDoc = A.L(isRef ? {th:'เปิดเอกสาร',en:'Open document'}
-                            : {th:'ดูฟอร์มเปล่า',en:'View blank form'});
+                            : {th:'ฟอร์มเปล่า (PDF)',en:'Blank form (PDF)'});
   document.getElementById('acts').innerHTML =
     (t ? `<a class="big pri" href="${A.esc(t.url)}"${t.ext?' target="_blank" rel="noopener"':''}>${A.esc(t.label)}${t.ext?' ↗':''}</a>` :
      isRef ? '' : `<span class="big off">${A.esc(A.t('noOnline'))}</span>`) +
     /* ฟอร์มที่ย้ายไปทำในระบบอื่นแล้ว คนยังต้องเห็นหน้าตาเอกสารได้
-       ไม่งั้นต้องไปรื้อไฟล์ .docx เอง ซึ่งคนทั่วไปเปิดไม่ได้ */
-    (F.blank ? `<a class="big ${isRef?'pri':'sec'}" href="../../${A.esc(F.blank)}" target="_blank" rel="noopener">${
-        A.esc(openDoc)} ↗</a>` : '') +
+       ไม่งั้นต้องไปรื้อไฟล์ .docx เอง ซึ่งคนทั่วไปเปิดไม่ได้
+       download ให้ชื่อไฟล์เป็นเลขเอกสาร ไม่ใช่ตัวย่อ — คนดาวน์โหลดไปเก็บ
+       ต้องรู้ว่าเป็นเอกสารอะไรจากชื่อไฟล์โดยไม่ต้องเปิด */
+    (F.blank ? `<a class="big ${isRef?'pri':'sec'}" href="../../${A.esc(F.blank)}"
+        download="${A.esc((F.doc||F.abbr)+'.pdf')}" target="_blank" rel="noopener">${
+        A.esc(openDoc)} ↓</a>` : '') +
+    /* แม่แบบ Google Doc — ตัวที่ระบบเอาไปเติมคำตอบแล้วออกเป็น PDF
+       เป็นของเจ้าหน้าที่เท่านั้น เปิดได้เฉพาะคนที่มีสิทธิ์ใน Drive อยู่แล้ว
+       คนนอกเห็นลิงก์ไปก็เปิดไม่ได้ แต่ไม่ควรเห็นตั้งแต่แรก */
+    (staff && F.tpl ? `<a class="big sec" href="https://docs.google.com/document/d/${
+        A.esc(F.tpl)}/edit" target="_blank" rel="noopener">${
+        A.esc(A.L({th:'แม่แบบ Google Doc',en:'Google Doc template'}))} ↗</a>` : '') +
     `<a class="big sec" href="../../all/">${A.esc(A.t('backToAll'))}</a>`;
 
   /* ขอบเขตการประเมิน — ใช้กับฟอร์มที่ตัวเอกสารอยู่ที่นี่เพื่อควบคุม

@@ -132,7 +132,9 @@
         "frae",
         "risk",
         "preflight"
-      ]
+      ],
+      "blank": "blank/FRAE.pdf",
+      "tpl": "13Uqc366ffBDGSlyniunFzUZFtTAEbt6SBbWXW14BhiM"
     },
     {
       "doc": "D-0507-SDF-001",
@@ -169,7 +171,9 @@
         "declaration",
         "sdf"
       ],
-      "assignTo": "HT"
+      "assignTo": "HT",
+      "blank": "blank/SDF.pdf",
+      "tpl": "1nW8IplTNObQ9DPKOSCty0FzCXQQY8A2yrCDNPEQGKqU"
     },
     {
       "doc": "D-0507-BCK-001",
@@ -203,7 +207,8 @@
         "ก่อนบิน",
         "รายการตรวจ",
         "bck"
-      ]
+      ],
+      "blank": "blank/BCK.pdf"
     },
     {
       "doc": "D-0507-AFM-001",
@@ -242,7 +247,8 @@
       ],
       "sysOK": "ยืนยันแล้ว 01 AUG 2026",
       "jotDup": "221334919954059",
-      "note": "ฉบับที่ใช้จริงอยู่ในAeroFBO · LEF ในคู่มือยังชี้ Jotform 221334919954059 ซึ่งเป็นอีกฉบับ — ต้องเลือกให้เหลือฉบับเดียวแล้วแก้ LEF"
+      "note": "ฉบับที่ใช้จริงอยู่ในAeroFBO · LEF ในคู่มือยังชี้ Jotform 221334919954059 ซึ่งเป็นอีกฉบับ — ต้องเลือกให้เหลือฉบับเดียวแล้วแก้ LEF",
+      "blank": "blank/AFM.pdf"
     },
     {
       "doc": "D-0507-ASF-001",
@@ -282,7 +288,9 @@
         "นักเรียนบินเดี่ยว",
         "asf"
       ],
-      "assignTo": "FI"
+      "assignTo": "FI",
+      "blank": "blank/ASF.pdf",
+      "tpl": "1uY8DJHLfvBJeTS1FLwa1Dr6gBwJu8L86m_cjjQ-xGAM"
     },
     {
       "doc": "D-0507-GSP-001",
@@ -443,7 +451,8 @@
             "fa": "EFM"
           }
         ]
-      }
+      },
+      "tpl": "1bMu475COdbQAiYx1ISvRZtp9dZwQbOcOOJMSDaCN5SI"
     },
     {
       "doc": "D-0507-EFC-001",
@@ -478,7 +487,9 @@
         "end of course",
         "efc"
       ],
-      "note": "ฉบับแก้ไข 01 (20 AUG 2026) — ถอดตารางหลักสูตรการฝึกบินออกทั้งหมด และ School Standard Subjects ตามที่เจ้าของงานสั่ง · เพิ่มช่วงเวลาเรียน ชั่วโมงเรียน และตารางรายวิชาจาก TrainHub ที่เติมอัตโนมัติผ่านลิงก์ prefill · ผลการฝึกบินจะไปทำในแอปอื่น ไม่ได้บันทึกในใบนี้แล้ว · ต้นฉบับก่อนแก้เก็บไว้ที่ D-0507-EFC-001-rev00-archive.docx"
+      "note": "ฉบับแก้ไข 01 (20 AUG 2026) — ถอดตารางหลักสูตรการฝึกบินออกทั้งหมด และ School Standard Subjects ตามที่เจ้าของงานสั่ง · เพิ่มช่วงเวลาเรียน ชั่วโมงเรียน และตารางรายวิชาจาก TrainHub ที่เติมอัตโนมัติผ่านลิงก์ prefill · ผลการฝึกบินจะไปทำในแอปอื่น ไม่ได้บันทึกในใบนี้แล้ว · ต้นฉบับก่อนแก้เก็บไว้ที่ D-0507-EFC-001-rev00-archive.docx",
+      "blank": "blank/EFC.pdf",
+      "tpl": "1NlzM1wEgRJQG-7tL9lsBzhhQI8Kq-9UopVmsvZvEHOg"
     },
     {
       "doc": "D-0507-SEF-001",
@@ -531,7 +542,8 @@
             "w": "ประเมินการสอนภาคอากาศ"
           }
         ]
-      }
+      },
+      "tpl": "1gBdSF2vQAMNwRNMYpe1XlAXc3vwR_51pfU8VkZsC6eE"
     },
     {
       "doc": "D-0507-STR-001",
@@ -565,7 +577,9 @@
         "มาตรฐานครู",
         "standardisation",
         "str"
-      ]
+      ],
+      "blank": "blank/STR.pdf",
+      "tpl": "11jFuwJ8jbkJz4XnUCtBi_CLomYvVISiOexH8Il2U-dM"
     },
     {
       "doc": "D-0507-PCR-FI-001",
@@ -603,7 +617,9 @@
         "ตรวจสมรรถนะ",
         "ประเมินประจำปี",
         "สมรรถนะครู"
-      ]
+      ],
+      "blank": "blank/PCR-FI.pdf",
+      "tpl": "1G-CvnjcUcSHF5fU7PIi0vokx6WiWUyARRSbZP7O-Je8"
     },
     {
       "doc": "D-0507-PCR-TKI-001",
@@ -641,7 +657,9 @@
         "ตรวจสมรรถนะ",
         "ประเมินประจำปี"
       ],
-      "note": "ให้เกรดตาม D-0507-ECA-001 · รับค่าตั้งต้นจากเมนู Annual Eval ในระบบบันทึกการฝึกผ่านลิงก์ prefill โดยไม่ต้องแก้เอกสาร — ดู docs/ANNUAL_EVAL.md"
+      "note": "ให้เกรดตาม D-0507-ECA-001 · รับค่าตั้งต้นจากเมนู Annual Eval ในระบบบันทึกการฝึกผ่านลิงก์ prefill โดยไม่ต้องแก้เอกสาร — ดู docs/ANNUAL_EVAL.md",
+      "blank": "blank/PCR-TKI.pdf",
+      "tpl": "1ge6sfNn7a133YD7VEC3unYnliVu-3l349RGuBKqRjuc"
     },
     {
       "doc": "D-0507-RTR-001",
@@ -695,7 +713,9 @@
             "w": "เลือก Progressive / Standard check"
           }
         ]
-      }
+      },
+      "blank": "blank/RTR.pdf",
+      "tpl": "1-LWJjU0uxXfVqmVP6Juihv4VTYiLTrTVKZdJmLngyuE"
     },
     {
       "doc": "D-0507-ECA-001",
@@ -782,7 +802,8 @@
       ],
       "sysOK": "ยืนยันแล้ว 01 AUG 2026",
       "jotDup": "93194090184459",
-      "note": "ฉบับที่ใช้จริงอยู่ในระบบ Dispatch · LEF ในคู่มือยังชี้ Jotform 93194090184459 ซึ่งเป็นอีกฉบับ — ต้องเลือกให้เหลือฉบับเดียวแล้วแก้ LEF"
+      "note": "ฉบับที่ใช้จริงอยู่ในระบบ Dispatch · LEF ในคู่มือยังชี้ Jotform 93194090184459 ซึ่งเป็นอีกฉบับ — ต้องเลือกให้เหลือฉบับเดียวแล้วแก้ LEF",
+      "blank": "blank/FPL.pdf"
     },
     {
       "doc": "D-0507-NPC-001",
@@ -896,7 +917,8 @@
         "สละสิทธิ์"
       ],
       "blank": "blank/PWR.pdf",
-      "note": "ฉบับแก้ไข 03 (21 AUG 2026) — เพิ่มความยินยอมและลายเซ็นของผู้ปกครองเป็นของตัวเองใน SECTION B ฉบับเดิมให้ผู้ปกครองกรอกแค่ข้อมูลติดต่อแล้วเซ็นในช่องลายเซ็นผู้โดยสาร อ่านจากใบที่กรอกเสร็จจึงแยกไม่ออกว่าใครเซ็น และไม่มีหลักฐานว่าผู้ปกครองยินยอมให้ผู้เยาว์ขึ้นบิน · หน้ากรอกออนไลน์แสดงข้อความสละสิทธิ์ฉบับเต็มทั้งสี่ข้อก่อนให้ยืนยันทีละข้อ ของเดิมมีแต่บทสรุปในป้ายช่องติ๊ก ผู้โดยสารจึงไม่เคยเห็นข้อความจริงที่ตัวเองผูกพัน · ท้ายกระดาษเดิมค้างที่ Issue 01 Rev 00 / AD/PWR/301-A ขณะที่ตัวเอกสารเป็น Rev 02 / -C — เลขกำกับสองชุดบนใบเดียว แก้แล้ว · เลิกใช้ Jotform 243218657614460 · ต้นฉบับก่อนแก้อยู่ที่ D-0507-PWR-001-rev02-archive.docx"
+      "note": "ฉบับแก้ไข 03 (21 AUG 2026) — เพิ่มความยินยอมและลายเซ็นของผู้ปกครองเป็นของตัวเองใน SECTION B ฉบับเดิมให้ผู้ปกครองกรอกแค่ข้อมูลติดต่อแล้วเซ็นในช่องลายเซ็นผู้โดยสาร อ่านจากใบที่กรอกเสร็จจึงแยกไม่ออกว่าใครเซ็น และไม่มีหลักฐานว่าผู้ปกครองยินยอมให้ผู้เยาว์ขึ้นบิน · หน้ากรอกออนไลน์แสดงข้อความสละสิทธิ์ฉบับเต็มทั้งสี่ข้อก่อนให้ยืนยันทีละข้อ ของเดิมมีแต่บทสรุปในป้ายช่องติ๊ก ผู้โดยสารจึงไม่เคยเห็นข้อความจริงที่ตัวเองผูกพัน · ท้ายกระดาษเดิมค้างที่ Issue 01 Rev 00 / AD/PWR/301-A ขณะที่ตัวเอกสารเป็น Rev 02 / -C — เลขกำกับสองชุดบนใบเดียว แก้แล้ว · เลิกใช้ Jotform 243218657614460 · ต้นฉบับก่อนแก้อยู่ที่ D-0507-PWR-001-rev02-archive.docx",
+      "tpl": "1QObAZ3_hOD_MkE7X1ejlshrCW9v0ymwjZXp9avQKB-I"
     },
     {
       "doc": "D-0507-PCK-001",
@@ -966,7 +988,8 @@
         "mtc"
       ],
       "sysOK": "ยืนยันแล้ว 01 AUG 2026",
-      "jotDup": "230023273391042"
+      "jotDup": "230023273391042",
+      "blank": "blank/MTC.pdf"
     },
     {
       "doc": "D-0507-FTR-001",
@@ -1001,7 +1024,9 @@
         "crs",
         "test flight",
         "ftr"
-      ]
+      ],
+      "blank": "blank/FTR.pdf",
+      "tpl": "1eZIgygRyyyOysXSHkI0HrObwVqxFNPdJR3wj0bMxDgY"
     },
     {
       "doc": "D-0507-ALR-001",
@@ -1038,7 +1063,8 @@
         "log",
         "alr"
       ],
-      "note": "กรอกใน AeroFBO ที่ flight-log-add.php · เที่ยวบินที่มีตารางแล้วกรอกได้จาก preflight-prep.php"
+      "note": "กรอกใน AeroFBO ที่ flight-log-add.php · เที่ยวบินที่มีตารางแล้วกรอกได้จาก preflight-prep.php",
+      "blank": "blank/ALR.pdf"
     },
     {
       "doc": "D-0507-APP-001",
@@ -1075,7 +1101,8 @@
         "app"
       ],
       "sysOK": "ยืนยันแล้ว 01 AUG 2026",
-      "jotDup": "221220820577045"
+      "jotDup": "221220820577045",
+      "blank": "blank/APP.pdf"
     },
     {
       "doc": "D-0507-APF-001",
@@ -1113,7 +1140,9 @@
         "ร้องเรียน",
         "appeal",
         "apf"
-      ]
+      ],
+      "blank": "blank/APF.pdf",
+      "tpl": "1U4HcT5zwQWV32De5WBA5xcUPgAn2x5l-QfjaBRllO9E"
     },
     {
       "doc": "D-0507-DAF-001",
@@ -1148,7 +1177,9 @@
         "ลงโทษ",
         "disciplinary",
         "daf"
-      ]
+      ],
+      "blank": "blank/DAF.pdf",
+      "tpl": "1iEM8zLdNz_88CBzqj-LwgsneWNB5bzeFBXC-al4z_A8"
     },
     {
       "doc": "D-0507-LDU-001",
@@ -1184,7 +1215,8 @@
         "ใบตรวจแพทย์",
         "licence",
         "ldu"
-      ]
+      ],
+      "blank": "blank/LDU.pdf"
     },
     {
       "doc": "D-0507-MRF-001",
@@ -1219,7 +1251,8 @@
         "รายเดือน",
         "reimbursement",
         "mrf"
-      ]
+      ],
+      "blank": "blank/MRF.pdf"
     },
     {
       "doc": "D-0507-DRF-001",
@@ -1259,7 +1292,9 @@
         "คู่มือ",
         "เอกสาร",
         "drf"
-      ]
+      ],
+      "blank": "blank/DRF.pdf",
+      "tpl": "1d4cFwMEsvkHFbWm9z9ZIDfHQicgR05J1aV0ZFbtEZPY"
     },
     {
       "doc": "D-0507-DRC-001",
@@ -1295,7 +1330,9 @@
         "ลงนามรับ",
         "receipt",
         "drc"
-      ]
+      ],
+      "blank": "blank/DRC.pdf",
+      "tpl": "1Wj-gkuRJvVclhwe6s2xRwvta6lBJwpVhg9NEZh-NMuU"
     },
     {
       "doc": "D-0507-NCHR-001",
@@ -1328,7 +1365,8 @@
         "ข้อไม่สอดคล้อง",
         "non-conformance",
         "nchr"
-      ]
+      ],
+      "blank": "blank/NCHR.pdf"
     },
     {
       "doc": "D-0507-VSR-001",
@@ -1372,7 +1410,8 @@
         "เกือบเกิดเหตุ"
       ],
       "assignTo": "SM",
-      "blank": "blank/VSR.pdf"
+      "blank": "blank/VSR.pdf",
+      "tpl": "1AKIqin2Y_yQu59U1W5JL5rLsj8o3XnzxFLBL1NJ_l6g"
     },
     {
       "doc": "D-0507-HIF-001",
@@ -1410,7 +1449,9 @@
         "hif",
         "ความเสี่ยง"
       ],
-      "assignTo": "SM"
+      "assignTo": "SM",
+      "blank": "blank/HIF.pdf",
+      "tpl": "1SN4p7CU2tTvHTMGjVcFgVznuelIn5M0a84ms55mKuqY"
     },
     {
       "doc": "D-0507-MOC-001",
@@ -1442,7 +1483,9 @@
         "moc",
         "change",
         "บริหารการเปลี่ยนแปลง"
-      ]
+      ],
+      "blank": "blank/MOC.pdf",
+      "tpl": "1DmsfV7vnMZEjlrMoPysj48Z-BZmNkR8zPUMU51uNy28"
     },
     {
       "doc": "D-0507-CAR-001",
@@ -1480,7 +1523,8 @@
         "ตอบกลับ",
         "corrective",
         "ข้อบกพร่อง"
-      ]
+      ],
+      "blank": "blank/CAR.pdf"
     },
     {
       "doc": "D-0507-IAC-001",
@@ -1629,7 +1673,8 @@
         "mer",
         "management review",
         "evaluation"
-      ]
+      ],
+      "blank": "blank/MER.pdf"
     },
     {
       "doc": "D-0507-CAP-001",
@@ -1666,7 +1711,8 @@
         "cap",
         "corrective action plan",
         "ป้องกันการเกิดซ้ำ"
-      ]
+      ],
+      "blank": "blank/CAP.pdf"
     },
     {
       "doc": "",

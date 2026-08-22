@@ -124,6 +124,26 @@ def check_statics(defs):
                                  % (code, f['k'], want['eff']))
 
 
+def check_blanks(reg):
+    """ทุกใบต้องมีฟอร์มเปล่าให้ดาวน์โหลด ถ้าไม่มีต้องบอกว่าทำไม
+
+    เงียบไว้แล้วคนเปิดหน้าฟอร์มจะไม่เจอปุ่ม แล้วไม่รู้ว่าเป็นเพราะยังไม่ได้ทำ
+    หรือเพราะใบนี้ไม่มีฟอร์มเปล่า
+    """
+    miss = []
+    for f in reg['forms']:
+        if f.get('blank'):
+            path = os.path.join(HERE, f['blank'])
+            if not os.path.exists(path):
+                sys.exit('%s: ทะเบียนชี้ %s แต่ไม่มีไฟล์ — รัน tools/make_blank.py %s'
+                         % (f['doc'], f['blank'], f['abbr']))
+            continue
+        why = 'ไม่มี .docx ต้นฉบับ' if not f.get('docx') else 'มี .docx แต่ยังไม่ได้ทำ'
+        miss.append('%s (%s)' % (f['abbr'], why))
+    if miss:
+        print('  ⚠️ ยังไม่มีฟอร์มเปล่า %d ใบ: %s' % (len(miss), ' · '.join(miss)))
+
+
 def check_guide(reg):
     """guide ถูกฝังลงหน้าฟอร์มสาธารณะ แต่ code ไม่ใช่ข้อมูลสาธารณะ
 
@@ -257,6 +277,7 @@ def main():
     AIRAC = airac_table(10)
 
     check_guide(reg)
+    check_blanks(reg)
     check_statics(defs)
     check_status(reg, defs)
     pub = public_view(reg)
