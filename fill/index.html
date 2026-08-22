@@ -406,6 +406,15 @@ async function send(){
 
     let ex=null;
     if(done) ex=await A.exportSubmission(Object.assign({},sub,{submittedAt:d.toISOString()}));
+    /* ใบที่พก ref ของระบบอื่นมาและยังไม่จบ — ต้องบอกระบบนั้นว่ากรอกแล้ว
+       ตัวส่งออกถูกเรียกเฉพาะตอนใบจบ ใบที่รอผู้อนุมัติจึงอยู่ใน Firestore ที่เดียว
+       ระบบภายนอกอ่าน Firestore ไม่ได้ ถ้าไม่แจ้งตรงนี้ คนที่กรอกเสร็จแล้วจะถูก
+       รายงานว่า "ยังไม่กรอก" แล้วเจ้าหน้าที่จะไปตามคนที่ทำเสร็จไปแล้ว
+       best-effort — พลาดแล้วใบยังอยู่ใน Firestore ครบ ไม่ขวางการส่ง */
+    else if(FK.data.ref){
+      try{ await A.gas('register',{formCode:F.abbr, ref:FK.data.ref, tracking:trk}); }
+      catch(e){ console.warn('[register] แจ้งสถานะไปยังระบบภายนอกไม่สำเร็จ',e); }
+    }
 
     foot.innerHTML=`<div class="fk-gate info" style="margin-bottom:14px"><span>
         <b>${A.esc(A.t(done?'sentComplete':'sentPending'))}</b><br>

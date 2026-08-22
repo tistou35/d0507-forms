@@ -53,6 +53,12 @@ function doPost(e) {
       return json_({ ok: true, result: attach_(body, who) });
     }
 
+    /* ลงทะเบียนใบที่ยังไม่จบ — ผู้โดยสารเป็น anonymous ก็เรียกได้
+       ไม่เขียน PDF ไม่เขียน Records แตะแค่ดัชนีสถานะ */
+    if (body.action === 'register') {
+      return json_({ ok: true, result: registerPending_(body) });
+    }
+
     var out = exportSubmission_(body.submission, who);
     return json_({ ok: true, result: out });
   } catch (err) {
@@ -60,8 +66,60 @@ function doPost(e) {
   }
 }
 
-function doGet() {
-  return json_({ ok: true, service: 'D-0507 Forms exporter', at: new Date().toISOString() });
+/* ── จุดถามสถานะสำหรับระบบภายนอก ────────────────────────────
+   GET ?api=pwr&ref=A1B2C3D4,B2C3D4E5&key=<ความลับ>
+
+   คืนเฉพาะสถานะกับเวลา ไม่มีชื่อ ไม่มีเลขบัตร ไม่มีอีเมล — ระบบที่ถามมี
+   รายชื่อผู้โดยสารของตัวเองอยู่แล้ว ส่ง PII กลับไปอีกไม่ได้เพิ่มอะไร
+   นอกจากทำให้ข้อมูลอ่อนไหวอยู่สองที่
+
+   key ต้องมาจาก Script Property PWR_STATUS_KEY — ไม่ได้ตั้ง = ปิดสนิท
+   ไม่ใช่เปิดโล่ง ผู้เรียกเป็น backend ของอีกฝั่ง (UrlFetchApp) ความลับจึงเก็บได้จริง
+   ถ้าเรียกจากเบราว์เซอร์ ความลับจะอยู่ใน bundle แล้วไม่มีความหมาย */
+var API_MAX_REF_ = 50;
+
+function doGet(e) {
+  var q = (e && e.parameter) || {};
+  if (!q.api) {
+    return json_({ ok: true, service: 'D-0507 Forms exporter', at: new Date().toISOString() });
+  }
+  try {
+    if (String(q.api).toLowerCase() !== 'pwr') throw new Error('ไม่รู้จัก api นี้');
+    var want = PropertiesService.getScriptProperties().getProperty('PWR_STATUS_KEY');
+    if (!want) throw new Error('ยังไม่ได้เปิดใช้งาน');
+    if (String(q.key || '') !== want) throw new Error('ไม่ได้รับอนุญาต');
+
+    var refs = String(q.ref || '').split(',')
+      .map(function (x) { return x.trim(); })
+      .filter(function (x) { return x.length > 0 && x.length <= 64; });
+    if (!refs.length) throw new Error('ต้องระบุ ref อย่างน้อยหนึ่งตัว');
+    if (refs.length > API_MAX_REF_) {
+      throw new Error('ถามได้ครั้งละไม่เกิน ' + API_MAX_REF_ + ' ref');
+    }
+
+    var sh = indexSheet_('PWR');
+    var rows = sh.getLastRow() > 1
+      ? sh.getRange(2, 1, sh.getLastRow() - 1, IDX_HEAD_.length).getValues() : [];
+    var by = {};
+    rows.forEach(function (r) { by[String(r[0])] = r; });
+
+    var out = {};
+    refs.forEach(function (ref) {
+      var r = by[ref];
+      if (!r) { out[ref] = { ref: ref, status: 'none' }; return; }
+      out[ref] = {
+        ref: ref,
+        tracking: String(r[1] || ''),
+        status: String(r[2] || 'none'),
+        submittedAt: r[3] ? new Date(r[3]).toISOString() : null,
+        signedAt: r[4] ? new Date(r[4]).toISOString() : null,
+        pdfUrl: String(r[5] || '') || null,
+      };
+    });
+    return json_({ ok: true, result: out });
+  } catch (err) {
+    return json_({ ok: false, error: String(err && err.message || err) });
+  }
 }
 
 function json_(o) {
@@ -97,8 +155,8 @@ function subFolder_(abbr) {
   return it.hasNext() ? it.next() : parent.createFolder(abbr);
 }
 
-function recordSheet_(folder, abbr, headers) {
-  var name = abbr + ' — Records';
+/** เปิดหรือสร้างชีตชื่อ name ในโฟลเดอร์ พร้อมหัวคอลัมน์ */
+function recordSheet_(folder, name, headers) {
   var it = folder.getFilesByName(name), ss;
   if (it.hasNext()) {
     ss = SpreadsheetApp.open(it.next());
@@ -132,6 +190,71 @@ function alignHeaders_(sh, headers) {
   return cur;
 }
 
+/* ── ดัชนีสถานะสำหรับระบบภายนอก ──────────────────────────────
+   ระบบวางแผนการบินต้องรู้ว่าผู้โดยสารคนไหนเซ็นแล้ว แต่มันไม่มีทางรู้เลขที่ของเรา
+   (ผู้โดยสารกรอกในเบราว์เซอร์ตัวเอง แอปนั้นไม่เห็นผลลัพธ์) ใบจึงพก ref ของมันเข้ามา
+   แล้วถามกลับด้วย ref
+
+   ทำไมต้องมีชีตนี้แยกจาก "<ABBR> — Records": Records เขียนตอนใบ "จบ" เท่านั้น
+   PWR มีสองขั้น (ผู้โดยสารเซ็น แล้ว HT เซ็น) ช่วงรอ HT ใบอยู่ใน Firestore ที่เดียว
+   ตัวส่งออกมองไม่เห็น ถ้าตอบจาก Records อย่างเดียว คนที่กรอกเสร็จแล้วจะถูกรายงานว่า
+   "ยังไม่กรอก" แล้วเจ้าหน้าที่จะไปตามคนที่ทำเสร็จแล้ว
+
+   ชีตนี้จึงเป็นแหล่งข้อมูลที่สอง ซึ่งมีโอกาสเพี้ยนจาก Firestore ได้
+   ทิศทางที่ยอมให้เพี้ยนคือ "ยังไม่กรอก" เสมอ — รายงานว่าเสร็จทั้งที่ยังไม่เสร็จ
+   อันตรายกว่ามาก เพราะจะมีคนขึ้นเครื่องโดยไม่มีหนังสือสละสิทธิ์ */
+var IDX_HEAD_ = ['ref', 'tracking', 'status', 'submittedAt', 'signedAt', 'pdfUrl'];
+
+function indexSheet_(abbr) {
+  var folder = subFolder_(abbr);
+  var r = recordSheet_(folder, abbr + ' — Index', IDX_HEAD_);   // ชื่อเต็ม ไม่ใช่ตัวย่อ
+  return r.sh;
+}
+
+/** หาแถวของ ref (คืนเลขแถวจริงในชีต หรือ 0 ถ้าไม่มี) */
+function indexRow_(sh, ref) {
+  if (sh.getLastRow() < 2) return 0;
+  var col = sh.getRange(2, 1, sh.getLastRow() - 1, 1).getValues();
+  for (var i = 0; i < col.length; i++) {
+    if (String(col[i][0]) === String(ref)) return i + 2;
+  }
+  return 0;
+}
+
+/** ผู้โดยสารกดส่ง — ยังไม่จบ แต่ต้องให้ระบบภายนอกเห็นว่ากรอกแล้ว */
+function registerPending_(body) {
+  var abbr = String(body.formCode || '').replace(/[^A-Za-z0-9\-]/g, '');
+  var ref = String(body.ref || '').trim();
+  var trk = String(body.tracking || '').trim();
+  if (!abbr || !ref || !trk) throw new Error('register ต้องมี formCode, ref และ tracking');
+  if (ref.length > 64) throw new Error('ref ยาวเกินไป');
+
+  var sh = indexSheet_(abbr);
+  var row = indexRow_(sh, ref);
+  if (row) {
+    // ยิงซ้ำ หรือผู้โดยสารกรอกใหม่ทับของเดิม — เขียนทับเฉพาะที่ยังไม่จบ
+    if (String(sh.getRange(row, 3).getValue()) === 'complete') {
+      return { ref: ref, status: 'complete', note: 'มีใบที่จบแล้วสำหรับ ref นี้ ไม่เขียนทับ' };
+    }
+    sh.getRange(row, 2, 1, 3).setValues([[trk, 'pending', new Date()]]);
+  } else {
+    sh.appendRow([ref, trk, 'pending', new Date(), '', '']);
+  }
+  return { ref: ref, tracking: trk, status: 'pending' };
+}
+
+/** HT เซ็นแล้ว ใบจบ — เลื่อนสถานะในดัชนีให้ตรง */
+function indexComplete_(abbr, ref, trk, pdfUrl) {
+  if (!ref) return;
+  var sh = indexSheet_(abbr);
+  var row = indexRow_(sh, ref);
+  if (!row) { sh.appendRow([ref, trk, 'complete', '', new Date(), pdfUrl || '']); return; }
+  sh.getRange(row, 2).setValue(trk);
+  sh.getRange(row, 3).setValue('complete');
+  sh.getRange(row, 5).setValue(new Date());
+  sh.getRange(row, 6).setValue(pdfUrl || '');
+}
+
 // ── ส่งออกหนึ่งใบ ───────────────────────────────────────────
 function exportSubmission_(s, who) {
   if (!s || !s.formCode) throw new Error('payload ไม่มี formCode');
@@ -146,7 +269,7 @@ function exportSubmission_(s, who) {
   var base = ['เลขที่', 'วันที่บันทึก', 'Doc code', 'Issue/Rev', 'defRev',
               'ผู้ส่ง', 'อีเมลผู้ส่ง', 'สถานะ', 'ผู้ลงนาม', 'PDF'];
   var extra = Object.keys(flat);
-  var r = recordSheet_(folder, abbr, base.concat(extra));
+  var r = recordSheet_(folder, abbr + ' — Records', base.concat(extra));
   var headers = alignHeaders_(r.sh, base.concat(extra));
 
   // ── 2. PDF ──
@@ -179,6 +302,13 @@ function exportSubmission_(s, who) {
   }
 
   r.sh.appendRow(headers.map(function (h) { return byKey[h] === undefined ? '' : byKey[h]; }));
+
+  // ใบที่พก ref ของระบบอื่นมา ต้องบอกระบบนั้นว่าจบแล้ว ไม่งั้นบอร์ดจะค้างเหลืองตลอดไป
+  var ref = (s.data || {}).ref;
+  if (ref) {
+    try { indexComplete_(abbr, ref, s.tracking, pdf ? pdf.getUrl() : ''); }
+    catch (err) { /* ใบจบไปแล้ว ดัชนีพลาดไม่ควรทำให้การส่งออกล้ม */ }
+  }
 
   return { tracking: s.tracking, sheet: r.ss.getUrl(),
            pdf: pdf ? pdf.getUrl() : '', folder: folder.getUrl(),
