@@ -413,7 +413,11 @@ async function send(){
     }
 
     let ex=null;
-    if(done) ex=await A.exportSubmission(Object.assign({},sub,{submittedAt:d.toISOString()}));
+    // render = ใบนี้ในรูปแบบที่พิมพ์ได้ (หัวข้อ ป้ายชื่อ ค่าที่อ่านออก ลายเซ็น)
+    // ส่งไปกับการส่งออกเท่านั้น ไม่เก็บลง Firestore — ประกอบใหม่จากนิยามฟอร์มได้เสมอ
+    // และ rules นับคีย์ของใบไว้ที่ 22
+    if(done) ex=await A.exportSubmission(Object.assign({},sub,{
+      submittedAt:d.toISOString(), render:FK.docSpec()}));
 
     /* แจ้งกลับทันทีที่ลงนามเสร็จ ไม่รอผลอนุมัติ
        ต้นทางถามคำถามเดียวคือ "คนนี้ลงนามหรือยัง" การอนุมัติของหัวหน้าครูฝึก
