@@ -233,6 +233,12 @@
                    en: 'Submission failed — your answers are still on this page' },
     exportFailed:{ th: 'บันทึกลง Drive/Sheet ไม่สำเร็จ (ใบถูกบันทึกในระบบแล้ว):',
                    en: 'Could not write to Drive/Sheet (the record itself was saved):' },
+    /* ใบที่ถูกเปิดมาจากระบบอื่น ระบบนั้นรอผลอยู่ ถ้าแจ้งกลับไม่ถึงต้องบอกผู้กรอก
+       เพราะฝั่งโน้นจะยังเห็นว่า "ยังไม่ได้ลงนาม" ทั้งที่ลงนามไปแล้ว */
+    extNotified: { th: 'แจ้งกลับระบบต้นทางเรียบร้อยแล้ว',
+                   en: 'The system that sent you here has been told' },
+    extNotifyFailed:{ th: 'ใบถูกบันทึกแล้ว แต่แจ้งกลับระบบต้นทางไม่สำเร็จ — โปรดแจ้งเลขที่ใบนี้กับเจ้าหน้าที่',
+                   en: 'Saved, but the system that sent you here was not reached — please quote this record number to staff' },
     tryAgain:    { th: 'ลองส่งอีกครั้ง', en: 'Try again' },
     ticked:      { th: 'ติ๊กไว้', en: 'Ticked' },
 

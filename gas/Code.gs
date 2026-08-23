@@ -53,6 +53,20 @@ function doPost(e) {
       return json_({ ok: true, result: attach_(body, who) });
     }
 
+    /* ── แจ้งผลกลับระบบต้นทาง ────────────────────────────────
+       ใบบางใบถูกเปิดมาจากระบบอื่นที่รอผลอยู่ (ตอนนี้: ระบบทำแผนการบิน
+       ส่งผู้โดยสารมาลงนาม PWR แล้วรอรู้ว่าลงนามแล้วหรือยัง)
+
+       ทำไมต้องผ่านที่นี่ ไม่ยิงตรงจากเบราว์เซอร์: กุญแจร่วมระหว่างสองระบบ
+       ต้องไม่อยู่ในหน้าเว็บที่ host สาธารณะ ใครเปิด view-source ก็เห็น
+       และถ้าใครถือกุญแจได้ ก็ปลอมสถานะ "ลงนามแล้ว" ให้ผู้โดยสารที่ไม่เคยลงนามได้
+
+       นักเรียน/ผู้โดยสารที่ล็อกอินแบบ anonymous เรียกได้ — ผู้กรอกฟอร์มคือ
+       คนกลุ่มนี้ทั้งหมด สิ่งที่กันไว้คือคนนอกที่ไม่มี token ของโปรเจกต์นี้เลย */
+    if (body.action === 'extNotify') {
+      return json_({ ok: true, result: extNotify_(body) });
+    }
+
     var out = exportSubmission_(body.submission, who);
     return json_({ ok: true, result: out });
   } catch (err) {
@@ -64,6 +78,83 @@ function doGet() {
   return json_({ ok: true, service: 'D-0507 Forms exporter', at: new Date().toISOString() });
 }
 
+// ── สะพานแจ้งผลกลับระบบต้นทาง ───────────────────────────────
+//
+// ระบบต้นทางที่รู้จัก และ Script Property ที่เก็บค่าของแต่ละราย
+//   flightplan   FLIGHTPLAN_EXEC_URL   /exec ของ D0507 Flight Plan
+//                FLIGHTPLAN_KEY        กุญแจร่วม ต้องตรงกับ PWR_SHARED_KEY ฝั่งโน้น
+//   trainhub     TRAINHUB_EFC_URL      https://www.361vision.org/api/ext/efc
+//                TRAINHUB_KEY          กุญแจร่วม ต้องตรงกับ EFC_BRIDGE_KEY ฝั่งโน้น
+//
+// เพิ่มระบบใหม่ = เพิ่มบรรทัดข้างล่าง + ตั้ง Script Property สองตัว ไม่ต้องแตะฟอร์ม
+//
+// รายชื่อเป็น allowlist ตายตัว ไม่ใช่ URL ที่ส่งมาจากหน้าเว็บ — ไม่งั้นใครก็
+// สั่งให้สคริปต์นี้ยิง POST ไปที่ไหนก็ได้ในนามของบัญชีที่ deploy มันไว้
+var EXT_SYSTEMS = {
+  flightplan: { url: 'FLIGHTPLAN_EXEC_URL', key: 'FLIGHTPLAN_KEY', api: 'paxpwr' },
+  // TrainHub ส่งหัวหน้าครูฝึกมาลงนาม EFC พร้อมผลรายวิชาที่เติมมาให้แล้ว
+  // แล้วรอรู้ว่าใบถูกยื่นจริงหรือยัง — เป็น Next.js route ไม่ใช่ Apps Script
+  // แต่พูดภาษาเดียวกัน (query string เดิม) เพราะสะพานควรมีสำเนียงเดียว
+  trainhub: { url: 'TRAINHUB_EFC_URL', key: 'TRAINHUB_KEY', api: '' },
+};
+
+/** สถานะที่ยอมให้ส่งออกไปได้ — กันคำที่ปลายทางไม่รู้จักไม่ให้ออกจากที่นี่ */
+var EXT_STATUSES = { submitted: true, approved: true, rejected: true };
+
+function extNotify_(body) {
+  var sys = String(body.sys || '');
+  var target = EXT_SYSTEMS[sys];
+  if (!target) throw new Error('ไม่รู้จักระบบต้นทาง: ' + sys);
+
+  var status = String(body.status || '');
+  if (!EXT_STATUSES[status]) throw new Error('สถานะไม่ถูกต้อง: ' + status);
+
+  var ref = String(body.ref || '');
+  if (!ref || ref.length > 120) throw new Error('ref ไม่ถูกต้อง');
+
+  var props = PropertiesService.getScriptProperties();
+  var url = props.getProperty(target.url);
+  var key = props.getProperty(target.key);
+  if (!url || !key) throw new Error('ยังไม่ได้ตั้ง Script Property: ' + target.url + ' / ' + target.key);
+
+  // ปลายทางที่เป็น Apps Script ต้องมี api= เพื่อเลือก endpoint · ปลายทางที่เป็น
+  // REST route มี path ของตัวเองอยู่แล้ว ส่ง api= เปล่าไปจะกลายเป็นพารามิเตอร์ขยะ
+  var q = [];
+  if (target.api) q.push('api=' + encodeURIComponent(target.api));
+  q = q.concat([
+    'op=status',
+    'ref=' + encodeURIComponent(ref),
+    'status=' + encodeURIComponent(status),
+    'tracking=' + encodeURIComponent(String(body.tracking || '')),
+    'form=' + encodeURIComponent(String(body.formCode || '')),
+    'key=' + encodeURIComponent(key),
+  ]).join('&');
+
+  // followRedirects: Apps Script web app ตอบ 302 ไป googleusercontent เสมอ
+  // muteHttpExceptions: ปลายทางล่มต้องได้ข้อความจริง ไม่ใช่ exception เปล่า
+  var res = UrlFetchApp.fetch(url + (url.indexOf('?') >= 0 ? '&' : '?') + q, {
+    method: 'get', followRedirects: true, muteHttpExceptions: true,
+  });
+  var text = res.getContentText();
+  if (res.getResponseCode() !== 200) {
+    throw new Error('ระบบต้นทางตอบ ' + res.getResponseCode() + ': ' + text.slice(0, 200));
+  }
+  var out;
+  try { out = JSON.parse(text); } catch (e) { throw new Error('ระบบต้นทางตอบไม่ใช่ JSON: ' + text.slice(0, 200)); }
+  if (!out.ok) throw new Error('ระบบต้นทางปฏิเสธ: ' + (out.error || ''));
+  return { system: sys, status: status, remote: out };
+}
+
+function json_(o) {
+  return ContentService.createTextOutput(JSON.stringify(o))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+/**
+ * ตรวจ Firebase ID token ผ่าน Identity Toolkit
+ * ได้ทั้งการยืนยันว่า token ยังไม่หมดอายุ และว่าเป็นของโปรเจกต์นี้จริง
+ * (นักเรียนที่ล็อกอินแบบ anonymous ก็มี token จึงใช้กติกาเดียวกัน)
+ */
 function verifyToken_(idToken) {
   if (!idToken) throw new Error('ไม่มี idToken');
   var res = UrlFetchApp.fetch(
@@ -367,32 +458,107 @@ function signatures_(b, data) {
   });
 }
 
+/**
+ * PDF ของฟอร์มที่ยังไม่มีแม่แบบ Google Doc ของตัวเอง
+ *
+ * 15 จาก 17 ฟอร์มที่มีนิยามแล้วมาทางนี้ และทุกใบมีช่องลายเซ็น เดิมทางนี้พิมพ์
+ * `data` ดิบเป็นตารางคีย์-ค่า ผลคือ PDF ที่หัวข้อเป็นชื่อตัวแปร เรียงตามลำดับ
+ * ที่คนกรอกบังเอิญแตะ และลายเซ็นกลายเป็น base64 ยาวสามหน้ากองอยู่กลางเอกสาร
+ * เอกสารควบคุมที่ใช้เป็นหลักฐานไม่ได้
+ *
+ * ตอนนี้เว็บส่ง `render` มาให้ (FormKit.docSpec) — หัวข้อ ป้ายชื่อ ค่าที่อ่านออก
+ * และลายเซ็นแยกไว้ต่างหาก ที่นี่จึงจัดหน้าให้เป็นเอกสารจริงได้ ไม่ต้องรอใครทำ
+ * แม่แบบครบ 17 ใบก่อน
+ *
+ * ใบเก่าที่ส่งมาก่อนหน้านี้ไม่มี `render` — ยังตกไปทางตารางเดิม แต่ลายเซ็นถูก
+ * แปลงเป็นรูปเสมอ ไม่ปล่อยให้เป็นข้อความ base64 อีก
+ */
 function fallbackHtml_(abbr, s) {
   var esc = function (x) {
     return String(x === undefined || x === null ? '' : x)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   };
-  var flat = flatten_(s.data || {});
-  var rows = Object.keys(flat).map(function (k) {
-    return '<tr><td class="k">' + esc(k) + '</td><td>' + esc(flat[k]) + '</td></tr>';
-  }).join('');
+  // ขึ้นบรรทัดใหม่ในค่า (ตารางติ๊ก / ตารางแถวซ้ำ) ต้องเป็นบรรทัดจริงใน PDF
+  var escML = function (x) { return esc(x).replace(/\n/g, '<br>'); };
+  var isSig = function (v) {
+    return typeof v === 'string' && v.indexOf('data:image') === 0;
+  };
+
+  var body = '', signatures = [];
+
+  if (s.render && s.render.sections) {
+    (s.render.sections || []).forEach(function (sec) {
+      body += '<h2>' + esc(sec.title) + '</h2><table>';
+      (sec.rows || []).forEach(function (row) {
+        body += '<tr><td class="k">' + esc(row.label) + '</td><td>' +
+          (row.value === '' ? '<span class="blank">—</span>' : escML(row.value)) + '</td></tr>';
+      });
+      body += '</table>';
+    });
+    signatures = s.render.signatures || [];
+  } else {
+    // ใบเก่าก่อนมี render — อย่างน้อยอย่าพิมพ์ base64 ออกมาเป็นตัวหนังสือ
+    var flat = flatten_(s.data || {});
+    body += '<table>';
+    Object.keys(flat).forEach(function (k) {
+      if (isSig(flat[k])) { signatures.push({ label: k, image: flat[k] }); return; }
+      body += '<tr><td class="k">' + esc(k) + '</td><td>' + escML(flat[k]) + '</td></tr>';
+    });
+    body += '</table>';
+  }
+
+  var sigHtml = '';
+  if (signatures.length) {
+    sigHtml = '<div class="sigs"><div class="sigsh">ลายมือชื่อ · Signatures</div><div class="sigrow">';
+    signatures.forEach(function (g) {
+      sigHtml += '<div class="sig">' +
+        (g.image
+          ? '<img src="' + esc(g.image) + '">'
+          : '<div class="nosig">ยังไม่ได้ลงนาม<br>not signed</div>') +
+        '<div class="sigline"></div>' +
+        '<div class="sigcap">' + esc(g.label) + '</div></div>';
+    });
+    sigHtml += '</div></div>';
+  }
+
   return '<html><head><meta charset="utf-8"><style>' +
-    'body{font-family:Sarabun,Arial,sans-serif;font-size:11pt;margin:28px}' +
-    'h1{font-size:15pt;margin:0}.sub{color:#555;font-size:9pt}' +
-    '.band{background:#0D1B2A;color:#fff;padding:10px 14px;margin:14px 0 0}' +
-    'table{width:100%;border-collapse:collapse;margin-top:10px}' +
-    'td{border-bottom:1px solid #ddd;padding:6px 8px;vertical-align:top}' +
-    'td.k{width:38%;color:#555}' +
-    '.warn{background:#fef3d8;border-left:4px solid #E8A020;padding:10px 14px;margin-top:16px;font-size:9pt}' +
+    '@page{size:A4;margin:16mm 14mm}' +
+    'body{font-family:Sarabun,"Noto Sans Thai",Arial,sans-serif;font-size:10.5pt;margin:0;color:#12202f}' +
+    '.band{background:#0D1B2A;color:#fff;padding:12px 16px}' +
+    '.band h1{font-size:15pt;margin:0;font-weight:700}' +
+    '.band .sub{color:#cfe0f5;font-size:8.5pt;margin-top:2px}' +
+    '.meta{display:table;width:100%;border-bottom:2px solid #0D1B2A;margin-bottom:12px}' +
+    '.meta div{display:table-cell;padding:6px 10px 7px 0;font-size:8.5pt;color:#4a5b6d}' +
+    '.meta b{display:block;color:#12202f;font-size:10pt;font-weight:600}' +
+    'h2{font-size:10.5pt;margin:15px 0 0;padding:5px 9px;background:#eef3f8;' +
+      'border-left:3px solid #0D1B2A;font-weight:700}' +
+    'table{width:100%;border-collapse:collapse;margin:0}' +
+    'td{border-bottom:1px solid #e2e8ef;padding:5px 9px;vertical-align:top;font-size:10pt}' +
+    'td.k{width:42%;color:#4a5b6d}' +
+    '.blank{color:#9aa8b6}' +
+    // หน้าลายเซ็นห้ามขาดกลาง — ลายเซ็นที่โดนตัดคนละหน้ากับชื่อคือหลักฐานที่โต้แย้งได้
+    '.sigs{margin-top:22px;page-break-inside:avoid}' +
+    '.sigsh{font-size:9pt;color:#4a5b6d;border-bottom:1px solid #0D1B2A;padding-bottom:4px;margin-bottom:10px}' +
+    '.sigrow{display:table;width:100%;table-layout:fixed;border-spacing:14px 0}' +
+    '.sig{display:table-cell;width:1%;text-align:center;vertical-align:bottom}' +
+    '.sig img{max-height:64px;max-width:100%}' +
+    '.nosig{height:64px;color:#9aa8b6;font-size:8.5pt;padding-top:24px;box-sizing:border-box}' +
+    '.sigline{border-bottom:1px solid #12202f;margin:3px 0 5px}' +
+    '.sigcap{font-size:8.5pt;color:#4a5b6d}' +
+    '.foot{margin-top:16px;border-top:1px solid #e2e8ef;padding-top:6px;' +
+      'font-size:7.5pt;color:#7d8b99;text-align:center}' +
     '</style></head><body>' +
     '<div class="band"><h1>' + esc(s.title || abbr) + '</h1>' +
-    '<div class="sub" style="color:#cfe0f5">D-0507 Flight Training Co., Ltd.</div></div>' +
-    '<p class="sub">' + esc(s.doc || abbr) + ' · Issue ' + esc(s.issue) + '/Rev ' + esc(s.rev) +
-    ' · defRev ' + esc(s.defRev) + ' · เลขที่ ' + esc(s.tracking) + '</p>' +
-    '<table>' + rows + '</table>' +
-    '<div class="warn"><b>ยังไม่ได้ติดตั้งแม่แบบของฟอร์มนี้</b><br>' +
-    'อัปโหลด ' + esc(abbr) + '_TEMPLATE (Google Doc) เข้าโฟลเดอร์ ' + esc(abbr) +
-    ' เพื่อให้ PDF มีหน้าตาตรงกับฟอร์มต้นฉบับ</div>' +
+    '<div class="sub">D-0507 Flight Training Co., Ltd. · Controlled Document</div></div>' +
+    '<div class="meta">' +
+      '<div>เลขที่ · Record no.<b>' + esc(s.tracking) + '</b></div>' +
+      '<div>รหัสเอกสาร · Doc<b>' + esc(s.doc || abbr) + '</b></div>' +
+      '<div>ฉบับ/แก้ไข<b>' + esc(s.issue) + ' / ' + esc(s.rev) + '</b></div>' +
+      '<div>วันที่บันทึก<b>' + esc(docStamp_(s.submittedAt)) + '</b></div>' +
+    '</div>' +
+    body + sigHtml +
+    '<div class="foot">' + esc(s.tracking) + ' · ออกโดยระบบฟอร์มออนไลน์ D-0507 · ' +
+      'ผู้ลงนาม: ' + esc((s.signedBy || []).join(', ') || '—') + '</div>' +
     '</body></html>';
 }
 

@@ -296,9 +296,27 @@ async function finish(status,action,note){
         status:'complete', data:FK.data, computed:FK.computed(),
         submittedAt:new Date().toISOString(),
         signedBy:(SUB.signedBy||[]).concat([me]),
+        // ต้องประกอบที่นี่ ไม่ใช่ตอนผู้กรอกส่ง — ลายเซ็นผู้อนุมัติเพิ่งเกิดขึ้น
+        // เดี๋ยวนี้ ใบที่ประกอบไว้ตั้งแต่ขั้นแรกจะมีช่องลายเซ็นคนอนุมัติว่างเปล่า
+        render:FK.docSpec(),
         chain:undefined, closedAt:undefined,
       }));
     }
+
+    /* ใบที่มาจากระบบอื่น — บอกผลการอนุมัติกลับไปด้วย
+       สายผูกมากับตัวใบตั้งแต่ตอนส่ง (extRef) ไม่ได้อ่านจาก URL ของหน้านี้
+       เพราะผู้อนุมัติเข้ามาทางคิวงาน ไม่ได้เดินตามลิงก์เดิมของผู้กรอก
+
+       'rejected' สำคัญพอกับ 'approved' — ปลายทางที่รู้แค่ว่ายังไม่อนุมัติ
+       จะรอต่อไปเรื่อย ๆ ทั้งที่ใบถูกตีกลับไปแล้ว */
+    if(SUB.extRef){
+      try{
+        await A.gas('extNotify',{ ref:SUB.extRef, sys:SUB.extSystem||'',
+          status: status==='complete'?'approved':'rejected',
+          tracking:SUB.tracking||'', formCode:SUB.formCode||'' });
+      }catch(e){ console.warn('[extNotify] แจ้งกลับระบบต้นทางไม่สำเร็จ',e); }
+    }
+
     foot.innerHTML=box(status==='complete'?'info':'warn',
       `<b>${A.esc(A.t(status==='complete'?'approved':'rejectedDone'))}</b><br>
        ${A.esc(A.t('trackingNo'))}: <span class="mono">${A.esc(SUB.tracking||'')}</span>

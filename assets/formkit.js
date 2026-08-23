@@ -315,6 +315,87 @@
   FormKit.prototype.blocked = function () { return this.gates().some(g => g.level === 'stop'); };
 
   /**
+   * ใบนี้ในรูปแบบที่พิมพ์ได้ — หัวข้อ ป้ายชื่อ ค่าที่อ่านออก และลายเซ็น
+   *
+   * ทำไมต้องสร้างที่นี่ ไม่ให้ตัวส่งออกไปประกอบเอง: ฝั่งโน้นได้แต่ `data`
+   * ซึ่งเป็น { คีย์: ค่าดิบ } ไม่มีป้ายชื่อ ไม่มีลำดับ ไม่รู้ว่าช่องไหนถูกเงื่อนไขซ่อน
+   * และไม่รู้ว่า 'S' แปลว่าอะไร PDF ที่ได้จึงเป็นตารางคีย์ดิบเรียงมั่ว
+   * และลายเซ็นกลายเป็น base64 ยาวเหยียดกองอยู่กลางหน้า
+   *
+   * ที่นี่มีนิยามฟอร์ม ภาษาที่ผู้ใช้เลือก และเงื่อนไขครบอยู่แล้ว — เป็นที่เดียว
+   * ที่ตอบได้ว่าใบนี้ "หน้าตาอย่างไร" จึงตอบให้เสร็จแล้วส่งไป
+   *
+   * ลายเซ็นแยกออกมาต่างหาก ไม่ปนกับแถวค่าอื่น เพราะมันคือสิ่งที่ทำให้เอกสารนี้
+   * มีผล ไม่ใช่ค่าอีกช่องหนึ่ง
+   */
+  FormKit.prototype.docSpec = function (lang) {
+    const lg = lang || this.lang;
+    const ctx = this.ctx(), d = this.def;
+    const label = o => L(o, lg);
+
+    const sections = [];
+    const signatures = [];
+
+    (d.sections || []).forEach(sec => {
+      if (!evalCond(sec.showIf, ctx)) return;
+      const rows = [];
+      (sec.fields || []).forEach(f => {
+        if (f.type === 'static') return;
+        if (!evalCond(f.showIf, ctx)) return;
+        const v = this.data[f.k];
+
+        if (f.type === 'sign') {
+          // เก็บไว้ท้ายใบเสมอ แม้ยังไม่ได้เซ็น — ช่องลายเซ็นที่ว่างคือข้อมูล
+          // ไม่ใช่ความว่างเปล่า คนตรวจต้องเห็นว่าใครยังไม่ได้ลงนาม
+          signatures.push({
+            label: label(f.label),
+            image: (typeof v === 'string' && v.indexOf('data:image') === 0) ? v : '',
+          });
+          return;
+        }
+        rows.push({ label: label(f.label), type: f.type, value: this.showValue(f, v, lg) });
+      });
+      if (rows.length) sections.push({ title: label(sec.title), rows });
+    });
+
+    return { sections, signatures };
+  };
+
+  /** ค่าหนึ่งช่องในรูปแบบที่คนอ่านออก ไม่ใช่ค่าที่เครื่องเก็บ */
+  FormKit.prototype.showValue = function (f, v, lang) {
+    const lg = lang || this.lang;
+    const label = o => L(o, lg);
+    // ช่องติ๊กต้องบอกให้ชัดทั้งสองทาง — บนกระดาษ "ไม่ได้ติ๊ก" กับ "ไม่มีข้อมูล"
+    // หน้าตาเหมือนกันหมดถ้าปล่อยว่าง แต่คนละความหมายกันคนละเรื่อง
+    if (f.type === 'check') return v === true ? '☑' : '☐';
+    if (v === undefined || v === null || v === '') return '';
+    if (typeof v === 'boolean') return v ? '☑' : '☐';
+
+    // ตารางติ๊ก — แสดงเฉพาะข้อที่ติ๊ก พร้อมผลของข้อนั้น
+    if (f.type === 'checklist' && v && typeof v === 'object' && !Array.isArray(v)) {
+      const on = (f.items || []).filter(it => v[it.id]).map(it => {
+        const nm = label(it) || it.th || it.id;
+        const opt = (f.opts || []).find(o => String(o.v) === String(v[it.id]));
+        return (f.opts && f.opts.length > 1) ? nm + ' — ' + (opt ? label(opt.n) || opt.v : v[it.id]) : nm;
+      });
+      return on.length ? on.join('\n') + '  (' + on.length + '/' + (f.items || []).length + ')' : '';
+    }
+
+    // ตารางแถวซ้ำ — แถวว่างไม่ต้องพิมพ์ลงเอกสาร
+    if (Array.isArray(v) && v.length && typeof v[0] === 'object') {
+      const cols = f.cols || [];
+      return v.filter(r => r && Object.keys(r).some(k => String(r[k] || '').trim() !== ''))
+        .map((r, i) => (i + 1) + '. ' + cols.map(c => r[c.k])
+          .filter(x => String(x || '').trim() !== '').join('  ·  '))
+        .join('\n');
+    }
+    if (Array.isArray(v)) return v.join('  ·  ');
+    if (f.opt) { const o = f.opt.find(x => String(x.v) === String(v)); if (o) return label(o.n) || o.v; }
+    if (f.type === 'date') return String(v).split('-').reverse().join('/');
+    return String(v);
+  };
+
+  /**
    * ข้อมูลที่จะบันทึกจริง — ตัดค่าของช่องที่เงื่อนไขซ่อนอยู่ออก
    *
    * ผู้กรอกเปลี่ยนใจได้ เช่น ASF เลือก "บินเดี่ยวกลางคืน" ติ๊กครบแล้วเปลี่ยนเป็น

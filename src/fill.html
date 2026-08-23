@@ -143,16 +143,17 @@ function boot(){
    ถ้าผู้ใช้กดเข้าสู่ระบบแล้วกลับมาโดยไม่มี query string ค่าจะหายเงียบ ๆ
    จึงเก็บไว้ตั้งแต่ boot แรก แล้วอ่านคืนเมื่อ URL ไม่มีให้
    ผูกกับรหัสฟอร์มและลบทิ้งหลังใช้ — จะได้ไม่ค้างไปโผล่ในใบอื่น */
-/* หน้านี้อ่าน query param แค่ c กับ p — ที่เหลือถูกทิ้งเงียบ ๆ
-   ระบบภายนอกที่ส่ง ?ref=...&sys=... มาตรง ๆ จะไม่ได้อะไรกลับเลยและไม่รู้ตัว
+/* หน้านี้อ่าน query param สี่ตัวเท่านั้น — c p ref sys
+   ที่เหลือถูกทิ้งเงียบ ๆ ระบบภายนอกที่ส่งชื่ออื่นมาจะไม่ได้อะไรกลับและไม่รู้ตัว
    เกิดขึ้นมาแล้วจริง: อีกทีมเขียนตัวเชื่อมไป 280 บรรทัดก่อนจะรู้ว่าค่าไม่เคยถึงฟอร์ม
-   ค่าที่ต้องส่งมาให้ใบเก็บไว้ ต้องอยู่ "ข้างใน" p ที่เข้ารหัสไว้ ไม่ใช่ระดับบนสุด */
+   ตอนนั้น ref ระดับบนสุดยังถูกทิ้ง ตอนนี้รับแล้วทั้งสองทาง (ดู linkRef ข้างล่าง)
+   ค่าที่เป็นคำตอบของฟอร์มยังต้องอยู่ "ข้างใน" p เหมือนเดิม */
 (function warnUnknownParams(){
-  const KNOWN=new Set(['c','p']);
+  const KNOWN=new Set(['c','p','ref','sys']);
   const extra=[...new URLSearchParams(location.search).keys()].filter(k=>!KNOWN.has(k));
   if(extra.length) console.warn(
     '[fill] ทิ้ง query param ที่ไม่รู้จัก: '+extra.join(', ')+
-    ' — หน้านี้อ่านแค่ c กับ p · ค่าที่ต้องการให้ใบเก็บไว้ ให้ใส่ไว้ข้างใน p');
+    ' — หน้านี้อ่านแค่ c p ref sys · คำตอบของฟอร์มต้องใส่ไว้ข้างใน p');
 })();
 
 const PKEY='d0507.prefill.'+(new URLSearchParams(location.search).get('c')||'');
@@ -160,6 +161,73 @@ const PKEY='d0507.prefill.'+(new URLSearchParams(location.search).get('c')||'');
   const raw=new URLSearchParams(location.search).get('p');
   if(raw){ try{ sessionStorage.setItem(PKEY,raw); }catch(e){} }
 })();
+
+/* ?ref= · ?sys= — ใบนี้ถูกเปิดจากระบบอื่น และระบบนั้นรอผลอยู่
+   ตอนนี้มีที่เดียว: ระบบทำแผนการบินส่งผู้โดยสารมาลงนาม PWR
+
+   เราไม่รู้และไม่ต้องรู้ว่า ref แปลว่าอะไร — เป็นสายที่ต้นทางผูกไว้กับแถวของเขาเอง
+   หน้าที่ของเราคือถือไว้ให้ครบแล้วส่งคืนพร้อมผล ไม่ตีความ ไม่แก้
+
+   เก็บลง sessionStorage ด้วยเหตุผลเดียวกับ ?p= — ถ้าสายขาดตอนผู้กรอกวนไปล็อกอิน
+   ต้นทางจะรอผลที่ไม่มีวันมา ซึ่งมองจากฝั่งโน้นแยกไม่ออกจาก "ยังไม่ได้ลงนาม" */
+const RKEY='d0507.extref.'+(new URLSearchParams(location.search).get('c')||'');
+(function stashRef(){
+  const q=new URLSearchParams(location.search);
+  const ref=q.get('ref');
+  if(ref){ try{ sessionStorage.setItem(RKEY,JSON.stringify({ref:ref,sys:q.get('sys')||''})); }catch(e){} }
+})();
+
+/* สายกลับมาได้สองทาง และเรารับทั้งสอง
+     1. ใน `p` ปนมากับค่าที่เติมให้ — ทางที่ระบบทำแผนการบินใช้ตอนนี้
+     2. เป็น query `?ref=&sys=` แยกต่างหาก — ทางที่ TrainHub ใช้
+
+   ไม่เลือกข้างเพราะลิงก์ที่ส่งออกไปแล้วเรียกคืนไม่ได้ ผู้โดยสารที่ถือลิงก์แบบเก่า
+   อยู่ในมือต้องใช้ได้เหมือนกัน การรับทางเดียวแล้วประกาศว่าอีกทางผิด แปลว่า
+   ใบที่ส่งจากลิงก์เก่าจะเงียบหายโดยไม่มีอะไรฟ้อง */
+function extLink(){
+  const q=new URLSearchParams(location.search);
+  let ref=q.get('ref')||'', sys=q.get('sys')||'';
+  if(!ref){
+    const p=prefillRaw();
+    if(p&&p.ref){ ref=String(p.ref); sys=String(p.sys||''); }
+  }
+  if(!ref){
+    try{ const o=JSON.parse(sessionStorage.getItem(RKEY)||'null');
+         if(o&&o.ref){ ref=o.ref; sys=o.sys||''; } }catch(e){}
+  }
+  // ยาวผิดปกติ = ไม่ใช่สายที่ระบบต้นทางออกให้ ไม่ต้องแบกต่อ
+  if(!ref||ref.length>120) return null;
+  return { extRef:ref, extSystem:String(sys||'').slice(0,40) };
+}
+
+/* บอกระบบต้นทางว่าใบนี้เดินไปถึงไหนแล้ว
+   ยิงผ่าน Apps Script ของเราเอง ไม่ยิงตรงจากเบราว์เซอร์ เพราะกุญแจร่วมระหว่าง
+   สองระบบต้องไม่อยู่ในหน้าเว็บที่ host สาธารณะ
+
+   ล้มได้โดยไม่ทำให้ใบหาย — ใบลง Firestore ไปแล้วก่อนถึงบรรทัดนี้เสมอ
+   สิ่งที่เสียคือปลายทางรู้ช้า ไม่ใช่หลักฐานหาย */
+async function notifyExt(link,status,tracking){
+  if(!link||!link.extRef) return null;
+  try{
+    return await A.gas('extNotify',{ ref:link.extRef, sys:link.extSystem,
+      status:status, tracking:tracking||'', formCode:code });
+  }catch(e){ console.warn('[extNotify] แจ้งกลับระบบต้นทางไม่สำเร็จ',e); return null; }
+}
+
+/* อ่านค่าที่ส่งมาโดยไม่กิน — prefill() ลบ stash ทิ้งหลังใช้ เรียกซ้ำจะได้ค่าว่าง
+   ตัวนี้จึงแยกไว้ให้ extLink() ส่องหา ref ได้โดยไม่ไปแย่งค่าของช่องกรอก */
+function prefillRaw(){
+  let raw=new URLSearchParams(location.search).get('p');
+  if(!raw){ try{ raw=sessionStorage.getItem(PKEY); }catch(e){} }
+  if(!raw) return null;
+  try{
+    const b64=raw.replace(/-/g,'+').replace(/_/g,'/');
+    const bin=atob(b64);
+    const bytes=Uint8Array.from(bin,ch=>ch.charCodeAt(0));
+    const o=JSON.parse(new TextDecoder().decode(bytes));
+    return (o&&typeof o==='object'&&!Array.isArray(o))?o:null;
+  }catch(e){ return null; }
+}
 
 function prefill(){
   let raw=new URLSearchParams(location.search).get('p');
@@ -358,7 +426,15 @@ async function send(){
       computed:FK.computed(),
       data:FK.visibleData(),
     };
+    // สายกลับไปยังระบบที่ส่งคนมา — เก็บไว้ในใบเอง ไม่ใช่แค่ใน sessionStorage
+    // ขั้นอนุมัติเกิดทีหลัง คนละเครื่อง คนละคน ถ้าไม่ติดมากับใบ ตอนหัวหน้าครูฝึก
+    // กดอนุมัติจะไม่มีอะไรบอกได้ว่าต้องแจ้งใครกลับ
+    // (rules นับคีย์ไว้ที่ 22 — ใบนี้ 17 บวกสองยังอยู่ในนั้น)
+    const link=extLink();
+    if(link){ sub.extRef=link.extRef; sub.extSystem=link.extSystem; }
     await ref.set(sub);
+    // ลบสายทิ้งเมื่อผูกกับใบเรียบร้อยแล้ว ไม่งั้นค้างไปโผล่ในใบถัดไปของแท็บเดียวกัน
+    if(link){ try{ sessionStorage.removeItem(RKEY); }catch(e){} }
 
     // งานในคิวของผู้อนุมัติ — ถ้าไม่สร้าง ใบจะค้างเป็น pending โดยไม่มีใครเห็น
     if(!done){
@@ -376,11 +452,22 @@ async function send(){
     }
 
     let ex=null;
-    if(done) ex=await A.exportSubmission(Object.assign({},sub,{submittedAt:d.toISOString()}));
+    // render = ใบนี้ในรูปแบบที่พิมพ์ได้ (หัวข้อ ป้ายชื่อ ค่าที่อ่านออก ลายเซ็น)
+    // ส่งไปกับการส่งออกเท่านั้น ไม่เก็บลง Firestore — ประกอบใหม่จากนิยามฟอร์มได้เสมอ
+    // และ rules นับคีย์ของใบไว้ที่ 22
+    if(done) ex=await A.exportSubmission(Object.assign({},sub,{
+      submittedAt:d.toISOString(), render:FK.docSpec()}));
+
+    /* แจ้งกลับทันทีที่ลงนามเสร็จ ไม่รอผลอนุมัติ
+       ต้นทางถามคำถามเดียวคือ "คนนี้ลงนามหรือยัง" การอนุมัติของหัวหน้าครูฝึก
+       เป็นขั้นตอนของระบบนี้ ปลายทางไม่ควรต้องรอมันก่อนจะทำบัญชีผู้โดยสารต่อ
+       (พออนุมัติแล้วจะมีการแจ้งซ้ำอีกครั้งจากหน้าอนุมัติ) */
+    const notified = await notifyExt(link, done?'approved':'submitted', trk);
 
     foot.innerHTML=`<div class="fk-gate info" style="margin-bottom:14px"><span>
         <b>${A.esc(A.t(done?'sentComplete':'sentPending'))}</b><br>
         ${A.esc(A.t('trackingNo'))}: <span class="mono">${A.esc(trk)}</span>
+        ${link?'<br>'+A.esc(A.t(notified&&notified.ok?'extNotified':'extNotifyFailed')):''}
         ${ex&&ex.ok===false?'<br>'+A.esc(A.t('exportFailed'))+' '+A.esc(ex.error||''):''}
         ${ex&&ex.pdf?`<br><a href="${A.esc(ex.pdf)}" target="_blank" rel="noopener">PDF ↗</a>`:''}
       </span></div>
