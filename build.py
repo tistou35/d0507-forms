@@ -269,7 +269,10 @@ self.addEventListener('fetch', e => {
         const copy = res.clone();
         caches.open(CACHE).then(c => c.put(r, copy));
         return res;
-      }).catch(() => caches.match(r).then(m => m || caches.match(new URL('%sfill/', location).href)))
+      }).catch(() => caches.match(r).then(m => m
+        // ไม่มีตัวตรงกับ query — /fill/?c=FTR ที่ยังไม่เคยเปิดต้องเปิดได้เหมือนกัน
+        // ตัวหน้าเป็นไฟล์เดียวกันทุกใบ อ่าน ?c= จาก location เอง
+        || caches.match(r, { ignoreSearch: true })))
     );
     return;
   }
@@ -278,7 +281,7 @@ self.addEventListener('fetch', e => {
     return res;
   })));
 });
-""" % (stamp, json.dumps(files, ensure_ascii=False, indent=2), base)
+""" % (stamp, json.dumps(files, ensure_ascii=False, indent=2))
     path = os.path.join(HERE, 'sw.js')
     with open(path, 'w', encoding='utf-8') as fh:
         fh.write(js)

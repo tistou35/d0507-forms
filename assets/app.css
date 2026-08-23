@@ -1,13 +1,14 @@
 /* ============================================================
    D-0507 Forms Portal — shell.css
    ยึดตาม D0507 Flight Training Design System (design handoff)
-   @@BASE@@ = path กลับไป root ('' ที่ราก, '../' ในโฟลเดอร์ย่อย)
+   path ของฟอนต์อ้างอิงจากตำแหน่งของไฟล์ .css เอง (assets/) ไม่ใช่จากหน้าที่เรียก
+   — ไฟล์นี้เป็น asset นิ่ง build.py ไม่ได้แทน @@BASE@@ ให้ ใส่ไปก็ได้ 404 ทุกหน้า
    ============================================================ */
 
 /* ── ฟอนต์แบรนด์ · ไม่มีอักษรไทย จึงต้องมีฟอนต์ไทยตามหลังเสมอ ── */
-@font-face{font-family:'Interstate';src:url('@@BASE@@assets/fonts/Interstate-Bold.otf') format('opentype');
+@font-face{font-family:'Interstate';src:url('fonts/Interstate-Bold.otf') format('opentype');
   font-weight:700;font-style:normal;font-display:swap}
-@font-face{font-family:'Ocean Sans Std';src:url('@@BASE@@assets/fonts/Ocean_Sans_Std_Book.ttf') format('truetype');
+@font-face{font-family:'Ocean Sans Std';src:url('fonts/Ocean_Sans_Std_Book.ttf') format('truetype');
   font-weight:400;font-style:normal;font-display:swap}
 
 :root{
@@ -653,3 +654,43 @@ a.gf:hover{border-color:var(--navy-900);color:var(--navy-900)}
 .rm-out{font-size:13.5px;margin-top:8px;padding:9px 12px;border-radius:8px;
   background:var(--g-50);border:1px solid var(--border-light)}
 @media print{ .fk-rm .rm{transition:none} }
+
+
+/* ── แถบสถานะเครือข่ายในหน้ากรอก ────────────────────────────
+   ต้องเห็นตลอดเวลาที่กรอก ไม่ใช่รู้ตอนกดส่งแล้วไม่ผ่าน */
+.netbar{margin:12px 0 0;padding:10px 14px;border-radius:9px;font-size:13px;line-height:1.5;
+  background:var(--sky-100);border:1px solid var(--sky-200);color:var(--fg-1)}
+.netbar.off{background:var(--amber-100);border-color:var(--amber-500)}
+.netbar b{font-weight:700}
+@media print{ .netbar{display:none} }
+
+
+/* ── โหมดแน่น (ui.dense) ─────────────────────────────────────
+   ใบที่กรอกในห้องนักบิน — FTR นักบินทดสอบกรอกไปบินไป ต้องเห็นทั้งรายการ
+   ในหน้าจอเดียว ไม่ใช่เลื่อนสามหน้าจอกว่าจะครบสิบสองข้อ */
+.fk-dense .fk-sec{padding:12px 13px}
+.fk-dense .fk-sec > .desc{margin-bottom:9px}
+.fk-dense .fk-f{margin-bottom:11px}
+.fk-dense .fk-f .hint{margin:2px 0 5px}
+
+/* ช่องที่ตั้ง half ไว้ ยังคงสองคอลัมน์บนจอแคบ — ปกติจะยุบเป็นคอลัมน์เดียวที่ ≤640px
+   แต่ใบที่กรอกในห้องนักบินยอมให้ช่องแคบลง ดีกว่าให้เลื่อนเพิ่มอีกหนึ่งหน้าจอ */
+.fk-dense .fk-2col{grid-template-columns:1fr 1fr;gap:0 10px}
+.fk-dense .fk-f textarea{min-height:66px}
+
+/* รายการตรวจ: ข้อความซ้าย ปุ่มขวา บรรทัดเดียวเสมอ */
+.fk-dense .fk-item{padding:5px 0;gap:8px}
+.fk-dense .fk-item .txt{min-width:0;font-size:13px;line-height:1.35}
+.fk-dense .fk-item .id{display:inline;margin-right:6px}
+.fk-dense .fk-suna button{min-width:44px;min-height:38px;font-size:12px}
+
+/* วิธีตรวจ — ซ่อนไว้ กดปุ่ม ⓘ จึงกาง อ่านตอนไม่แน่ใจ ไม่ใช่กินที่ทุกข้อตลอดเวลา */
+.fk-item .how{display:block;font-size:11.5px;color:var(--g-500);line-height:1.45;margin-top:3px}
+.fk-how{display:none}
+.fk-dense .fk-item .how{display:none}
+.fk-dense .fk-item.how-on .how{display:block}
+.fk-dense .fk-how{display:inline-flex;align-items:center;justify-content:center;
+  width:26px;height:26px;flex:none;border-radius:50%;border:1px solid var(--border-med);
+  background:var(--surface);color:var(--g-500);font-family:var(--font-display);
+  font-size:13px;font-style:italic;cursor:pointer;align-self:center}
+.fk-dense .fk-item.how-on .fk-how{background:var(--sky-100);border-color:var(--sky-500);color:var(--sky-500)}

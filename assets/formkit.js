@@ -646,7 +646,9 @@
         body = (f.items || []).map(it => `
           <div class="fk-item${f.score ? ' has-score' : ''}">
             <span class="txt">${it.id && !f.hideIds ? `<span class="id">${esc(it.id)}</span>` : ''}${esc(L(it, this.lang) || it.th || '')}
-              ${it.how ? `<span class="id" style="color:var(--g-500);margin-top:3px">${esc(it.how)}</span>` : ''}</span>
+              ${it.how ? `<span class="how">${esc(it.how)}</span>` : ''}</span>
+            ${it.how ? `<button type="button" class="fk-how" data-how="${esc(it.id)}"
+                 aria-expanded="false" aria-label="${esc(this.lang === 'en' ? 'How to check' : 'วิธีตรวจ')}">i</button>` : ''}
             ${f.score ? `<input class="fk-score" type="number" inputmode="decimal"
                  data-sc="${esc(f.k)}" data-item="${esc(it.id)}"
                  value="${sc[it.id] == null ? '' : esc(sc[it.id])}"
@@ -841,6 +843,9 @@
     }
 
     el.innerHTML = html;
+    /* dense — ใบที่กรอกบนเครื่องบิน (FTR) ต้องเห็นทั้งหน้าโดยไม่ต้องเลื่อนมาก
+       จัดแถวให้แน่นและซ่อนคำอธิบายวิธีตรวจไว้ใต้ปุ่ม ⓘ แทนที่จะกินบรรทัดของทุกข้อ */
+    el.classList.toggle('fk-dense', !!(this.def.ui && this.def.ui.dense));
     this.bind(el);
   };
 
@@ -1048,6 +1053,15 @@
       e.preventDefault();
       go(strip[(j + strip.length) % strip.length].dataset.tab, true);
     }));
+
+    /* ⓘ วิธีตรวจ — กางเฉพาะข้อที่กด ไม่ rerender เพราะสถานะกางไม่ใช่คำตอบ
+       ถ้าเก็บลง data จะกลายเป็นคีย์ที่ต้องผ่าน rules และไปโผล่ในใบที่ส่งออก */
+    el.querySelectorAll('.fk-how').forEach(b =>
+      b.addEventListener('click', () => {
+        const item = b.closest('.fk-item');
+        const on = item.classList.toggle('how-on');
+        b.setAttribute('aria-expanded', on);
+      }));
 
     el.querySelectorAll('[data-cl]').forEach(b =>
       b.addEventListener('click', () => {

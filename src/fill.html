@@ -53,6 +53,28 @@ const code=new URLSearchParams(location.search).get('c')||'';
 let F=REG.forms.find(f=>f.abbr===code);
 const DEF=DEFS[code];
 let FK=null, DIR=[], PICK='';   // DIR = รายชื่อผู้รับฟอร์ม · PICK = คนที่เลือกไว้
+let DRAFT_AT=0;                // เวลาที่บันทึกร่างไว้ ถ้ามีร่างค้าง
+
+/* แถบบอกสถานะเครือข่าย — ต้องเห็นตลอด ไม่ใช่รู้ตอนกดส่งแล้วไม่ผ่าน
+   คนกรอกบนเครื่องบินต้องรู้ตั้งแต่แรกว่าตอนนี้ไม่มีสัญญาณ แต่กรอกต่อได้ */
+function netBar(){
+  let el=document.getElementById('netbar');
+  if(!el){ el=document.createElement('div'); el.id='netbar';
+    document.getElementById('head').insertAdjacentElement('afterend', el); }
+  const off=!A.online;
+  const dr = DRAFT_AT ? new Date(DRAFT_AT) : null;
+  const when = dr ? dr.toLocaleString(A.lang==='en'?'en-GB':'th-TH',
+                 {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+  el.className = 'netbar' + (off?' off':'');
+  el.innerHTML = off
+    ? `<b>${A.esc(A.L({th:'ไม่มีสัญญาณ',en:'Offline'}))}</b> — ${A.esc(A.L({
+        th:'กรอกต่อได้ ระบบเก็บไว้ในเครื่อง กดส่งแล้วจะส่งเองเมื่อมีสัญญาณ',
+        en:'Keep filling. Answers are held on this device and sent when a signal returns.'}))}`
+    : (DRAFT_AT ? `${A.esc(A.L({th:'มีร่างค้างจาก',en:'Draft restored from'}))} ${A.esc(when)} — ${
+        A.esc(A.L({th:'กรอกต่อได้เลย',en:'continue where you left off'}))}` : '');
+  el.style.display = (off || DRAFT_AT) ? '' : 'none';
+}
+A.onNet.push(netBar);
 
 /* ขั้นอนุมัติถัดไปที่ใช้จริงตามคำตอบปัจจุบัน (undefined = จบที่ผู้กรอก) */
 function nextStep(){
@@ -115,13 +137,21 @@ function boot(){
     return;
   }
   // เก็บคำตอบเดิมไว้เมื่อ boot ซ้ำ (เช่นตอนสลับภาษา หรือ auth เปลี่ยนสถานะ)
-  // boot แรกใช้ค่าที่ส่งมาทาง ?p= ถ้ามี
-  const keep = FK ? FK.data : prefill();
-  FK=new FormKit(DEF,{party:partyOf(),lang:A.lang,data:keep,onChange:()=>renderFoot(),
+  /* boot แรกใช้ค่าที่ส่งมาทาง ?p= ถ้ามี แล้วทับด้วยร่างที่ค้างในเครื่อง
+     นักบินกรอกบนเครื่องแล้วปิดแท็บ ลงมากรอกต่อได้ ค่าที่พิมพ์ไว้ต้องยังอยู่
+     ร่างมาทีหลังเพราะเป็นสิ่งที่คนนี้พิมพ์เอง สำคัญกว่าค่าตั้งต้นจากลิงก์ */
+  let keep = FK ? FK.data : prefill();
+  if (!FK) {
+    const d = A.draftLoad(code);
+    if (d) { keep = Object.assign({}, keep, d.data); DRAFT_AT = d.at; }
+  }
+  FK=new FormKit(DEF,{party:partyOf(),lang:A.lang,data:keep,
+    onChange:()=>{ A.draftSave(code, FK.data); renderFoot(); },
     upload:async f=>{const r=await A.gas('attach',Object.assign({code:DEF.code},f));
       return r.ok?r.result:{error:r.error};}});
   FK.render(document.getElementById('form'));
   renderFoot();
+  netBar();
   loadDir();
 }
 /* หน้านี้เป็นการ "เริ่มใบใหม่" เสมอ — คนที่กดกรอกคือผู้เริ่ม
@@ -451,6 +481,22 @@ async function send(){
       });
     }
 
+    /* ── ยืนยันว่าถึงเซิร์ฟเวอร์จริงหรือยัง ────────────────────
+       Firestore ที่เปิด persistence ไว้จะ resolve ทันทีจากแคชในเครื่อง
+       แม้ไม่มีสัญญาณ — ใบไม่หาย แต่ยังไม่ถึงเซิร์ฟเวอร์
+       บอกว่า "ส่งแล้ว" ตอนนั้นคือคำที่ไม่จริง คนกรอกอาจปิดเครื่องแล้วเดินจากไป
+       ร่างในเครื่องจึงเก็บไว้จนกว่าเซิร์ฟเวอร์จะรับ ไม่ใช่ลบทันทีที่กดส่ง */
+    const queued = await new Promise(res => {
+      let done_=false;
+      const un = ref.onSnapshot({includeMetadataChanges:true}, snap => {
+        if (done_) return;
+        if (!snap.metadata.hasPendingWrites){ done_=true; un(); res(false); }
+      }, () => { if(!done_){ done_=true; res(true); } });
+      // ไม่รอเกินสองวินาที — ถ้ายังไม่ยืนยันถือว่าเข้าคิว หน้าเว็บต้องไม่ค้าง
+      setTimeout(() => { if(!done_){ done_=true; try{un();}catch(e){} res(true); } }, 2000);
+    });
+    if (!queued) A.draftClear(code);
+
     let ex=null;
     // render = ใบนี้ในรูปแบบที่พิมพ์ได้ (หัวข้อ ป้ายชื่อ ค่าที่อ่านออก ลายเซ็น)
     // ส่งไปกับการส่งออกเท่านั้น ไม่เก็บลง Firestore — ประกอบใหม่จากนิยามฟอร์มได้เสมอ
@@ -464,8 +510,13 @@ async function send(){
        (พออนุมัติแล้วจะมีการแจ้งซ้ำอีกครั้งจากหน้าอนุมัติ) */
     const notified = await notifyExt(link, done?'approved':'submitted', trk);
 
-    foot.innerHTML=`<div class="fk-gate info" style="margin-bottom:14px"><span>
-        <b>${A.esc(A.t(done?'sentComplete':'sentPending'))}</b><br>
+    foot.innerHTML=`<div class="fk-gate ${queued?'warn':'info'}" style="margin-bottom:14px"><span>
+        <b>${A.esc(queued ? A.L({th:'เก็บไว้ในเครื่องแล้ว — ยังไม่ถึงเซิร์ฟเวอร์',
+                                 en:'Held on this device — not yet on the server'})
+                          : A.t(done?'sentComplete':'sentPending'))}</b><br>
+        ${queued ? A.esc(A.L({
+            th:'ระบบจะส่งเองเมื่อมีสัญญาณ · อย่าเพิ่งล้างข้อมูลเบราว์เซอร์จนกว่าจะส่งสำเร็จ',
+            en:'It will be sent automatically when a signal returns. Do not clear browser data until then.'}))+'<br>' : ''}
         ${A.esc(A.t('trackingNo'))}: <span class="mono">${A.esc(trk)}</span>
         ${link?'<br>'+A.esc(A.t(notified&&notified.ok?'extNotified':'extNotifyFailed')):''}
         ${ex&&ex.ok===false?'<br>'+A.esc(A.t('exportFailed'))+' '+A.esc(ex.error||''):''}

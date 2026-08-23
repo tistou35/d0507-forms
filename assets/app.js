@@ -28,6 +28,18 @@
     if (!g.firebase) return;
     if (!firebase.apps.length) firebase.initializeApp(cfg);
     A.db = firebase.firestore();
+    /* เขียนตอนไม่มีเน็ตได้ แล้ว Firestore ส่งเองเมื่อสัญญาณกลับมา
+       นักบินกรอกใบทดสอบการบินบนเครื่อง กดส่งตอนยังไม่มีสัญญาณ ใบต้องไม่หาย
+       ล้มเหลวได้สองทางที่ยอมรับได้: เปิดหลายแท็บ (แท็บแรกได้สิทธิ์) หรือ
+       เบราว์เซอร์ไม่รองรับ — ทั้งสองกรณีระบบยังทำงานปกติเมื่อมีเน็ต */
+    if (!A._persist) {
+      A._persist = A.db.enablePersistence({ synchronizeTabs: true })
+        .then(() => { A.offlineReady = true; })
+        .catch(e => {
+          A.offlineReady = false;
+          console.warn('[offline] เก็บข้อมูลในเครื่องไม่ได้ — ต้องมีเน็ตตอนส่ง', e.code || e.message);
+        });
+    }
     firebase.auth().onAuthStateChanged(async u => {
       A.user = (u && !u.isAnonymous) ? u : null;
       A.roles = [];
