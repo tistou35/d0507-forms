@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>เช็กลิสต์ — D-0507 Flight Training</title>
-<link rel="stylesheet" href="../assets/app.css?v=69d40bed">
+<link rel="stylesheet" href="../assets/app.css?v=9dcf3fc0">
 <style>
 .clband{background:var(--navy-900);color:#fff;border-radius:12px;padding:16px 18px}
 .clband h1{font-size:21px;margin:2px 0 4px}
@@ -38,6 +38,14 @@
 
 .clbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:14px 0 4px}
 .clbar .cnt{font-size:13px;color:var(--fg-2);margin-left:auto}
+
+/* หัวข้อในเช็กลิสต์ — แถบทึบ กวาดตาหาหมวดได้โดยไม่ต้องอ่านทีละบรรทัด */
+.clsec{background:var(--navy-900);color:#fff;font-size:12.5px;font-weight:700;
+  letter-spacing:.07em;text-transform:uppercase;text-align:center;padding:5px 10px;
+  border-radius:6px;margin:14px 0 7px;break-inside:avoid}
+.cllist.two .clsec{margin-top:10px}
+.clsec.warn{background:var(--red-600)}
+.clitem .a.none{background:transparent;border-left:0;cursor:default}
 
 /* แผงกรอกข้อมูลของรายงาน */
 .clrep{margin:12px 0 0;padding:14px 16px;border:1px solid var(--border-light);
@@ -217,102 +225,102 @@ async function standaloneHtml(){
 
 function buildPrint(rows, mode, meta){
   const pr = document.getElementById('pr');
-  const two = C.layout === 'two';
-  // ฟอร์ม = แผ่นอ้างอิง ไม่มีช่องติ๊ก · กระดาษเปล่า = มี ☐ ให้กาด้วยปากกา
+  // ฟอร์ม = แผ่นอ้างอิง ไม่มีช่องติ๊ก · กระดาษเปล่า = ☐ ให้กาด้วยปากกา
   // รายงาน = บันทึกที่ทำเสร็จแล้ว ติ๊กตามที่กดไว้บนจอ
   const tick = mode !== 'form';
-  const per  = tick ? 3 : 2;
-  const cols = two ? per * 2 + 1 : per;
+  const box  = r => tick ? `<span class="bx">${mode === 'report' && r.on ? '✓' : '☐'}</span>` : '';
 
-  const cell = r => r
-    ? `<td class="t${r.sub ? ' sub' : ''}">${A.esc(r.t||'')}</td>
-       <td class="a${r.sub ? ' sub' : ''}">${A.esc(r.a||'')}</td>` +
-      (tick ? `<td class="bx">${mode === 'report' && r.on ? '✓' : '☐'}</td>` : '')
-    : '<td class="t e"></td><td class="a e"></td>' + (tick ? '<td class="bx e"></td>' : '');
+  /* แบ่งเป็นหัวข้อ — แถวที่ตั้ง sec ไว้เริ่มหัวข้อใหม่ รายการถัดไปสังกัดหัวข้อนั้น
+     เช็กลิสต์ที่ยังไม่มีหัวข้อ (ใบเก่า) ทุกรายการจะอยู่ในกลุ่มไร้ชื่อกลุ่มเดียว */
+  const groups = [];
+  rows.forEach(r => {
+    if (r.sec) groups.push({ n: r.t, warn: !!r.warn, items: [] });
+    else {
+      if (!groups.length) groups.push({ n: '', warn: false, items: [] });
+      groups[groups.length - 1].items.push(r);
+    }
+  });
 
-  let body = '';
-  if (two) {
-    /* แบ่งเป็นกลุ่ม: ข้อหลักหนึ่งข้อพร้อมข้อย่อยของมัน แล้วค่อยแบ่งลงสองคอลัมน์
-       แบ่งครึ่งตามจำนวนแถวดื้อ ๆ จะพรากข้อย่อยไปอยู่คนละคอลัมน์กับข้อหลัก
-       — คนอ่านเห็น "Radio licence · Present and Valid" ลอยอยู่โดยไม่รู้ว่าของอะไร */
-    const groups = [];
-    rows.forEach(r => {
-      if (r.sub && groups.length) groups[groups.length - 1].push(r);
-      else groups.push([r]);
+  /* หนึ่งตารางต่อหนึ่งรายการ ไม่ใช่ตารางเดียวทั้งหัวข้อ
+     ตารางเดียวทำให้ทุกแถวใช้ความกว้างคอลัมน์เดียวกัน จุดไข่ปลาจึงหยุดตรงขอบ
+     ของคำที่ยาวที่สุดในหัวข้อนั้น แถวที่คำสั้นเลยมีช่องว่างค้างกลางบรรทัด
+     แยกตารางต่อแถวแล้วจุดลากไปจนชนคำของแถวนั้นเอง แบบการ์ดในห้องนักบิน */
+  const line = r => {
+    // รายการที่ไม่มีสิ่งที่ต้องทำคู่กัน — คำสั่งเต็มบรรทัด ไม่ต้องลากจุดไปหาที่ว่าง
+    if (!(r.a || '').trim())
+      return `<p class="full">${A.esc(r.t || '')}</p>`;
+    return `<div class="ln${r.sub ? ' sub' : ''}"><span class="t">${A.esc(r.t || '')}</span>
+      <span class="d"></span><span class="a">${A.esc(r.a)}</span>${box(r)}</div>`;
+  };
+
+  /* ข้อหลักกับข้อย่อยของมันต้องอยู่คอลัมน์เดียวกัน ไม่งั้นคนอ่านเจอ
+     "- Radio licence · Present and Valid" โผล่หัวคอลัมน์ถัดไปโดยไม่รู้ว่าของอะไร */
+  const bundle = items => {
+    const out = [];
+    items.forEach(r => {
+      if (r.sub && out.length) out[out.length - 1].push(r);
+      else out.push([r]);
     });
-    /* ตัดตรงที่ทำให้สองคอลัมน์ยาวใกล้กันที่สุด ไม่ใช่ตรงที่ครบครึ่งพอดี
-       กลุ่มที่มีข้อย่อยห้าข้ออาจทำให้ฝั่งซ้ายยาวสิบแถวและฝั่งขวาเหลือสอง */
-    const half = rows.length / 2;
-    let cut = 0, best = Infinity, n = 0;
-    for (let i = 0; i <= groups.length; i++) {
-      const d = Math.abs(n - half);
-      if (d < best) { best = d; cut = i; }
-      if (i < groups.length) n += groups[i].length;
-    }
-    const L = groups.slice(0, cut).flat(), R = groups.slice(cut).flat();
-    for (let i = 0; i < Math.max(L.length, R.length); i++) {
-      body += `<tr>${cell(L[i])}<td class="gap"></td>${cell(R[i])}</tr>`;
-    }
-  } else {
-    body = rows.map(r => `<tr>${cell(r)}</tr>`).join('');
-  }
+    return out.map(b => `<div class="grp">${b.map(line).join('')}</div>`).join('');
+  };
 
-  /* colgroup ไม่ใช่ของประดับ — table-layout:fixed อ่านความกว้างจากแถวแรกเท่านั้น
-     แถวแรกคือหัวเอกสารที่เป็น colspan เดียว ถ้าไม่บอกความกว้างตรงนี้
-     ทุกคอลัมน์จะกว้างเท่ากันหมด ช่องติ๊กเลยกว้างเท่ากับช่องข้อความ */
-  const one = tick
-    ? '<col style="width:auto"><col style="width:24mm"><col style="width:8mm">'
-    : '<col style="width:auto"><col style="width:26mm">';
-  const cg = '<colgroup>' + (two ? one + '<col style="width:4mm">' + one
-    : one.replace('24mm','34mm').replace('26mm','38mm').replace('8mm','10mm')) + '</colgroup>';
+  const body = groups.map(g => `<div class="sec${g.n ? ' named' : ''}${g.warn ? ' warn' : ''}">
+      ${g.n ? `<div class="cap">${A.esc(g.n)}</div>` : ''}
+      ${bundle(g.items)}</div>`).join('');
 
-  /* ข้อมูลผู้ทำและวันที่ — รายงานพิมพ์ค่าที่กรอก ส่วนกระดาษเปล่ากับแบบฟอร์ม
-     พิมพ์เป็นเส้นว่างให้เขียนด้วยปากกา เพราะแผ่นที่ไม่มีชื่อกับวันที่
-     ใช้เป็นหลักฐานว่าใครตรวจเมื่อไรไม่ได้ */
   const m = meta || {};
-  const line = v => v ? `<i>${A.esc(v)}</i>` : '<i class="bl"></i>';
-  const who = `<table class="prwho"><tr>
-      <td><b>ผู้ทำเช็กลิสต์</b>${line(m.by)}</td>
-      <td><b>ทะเบียนอากาศยาน</b>${line(m.ac)}</td>
-      <td><b>วันที่</b>${line(m.date ? dmy(m.date) : '')}</td>
-      <td class="nw"><b>เวลา</b>${line(m.time)}</td>
-    </tr></table>` + (mode === 'report' && m.note
-      ? `<div class="prnote"><b>หมายเหตุ</b> ${A.esc(m.note)}</div>` : '');
+  const val = v => v ? `<i>${A.esc(v)}</i>` : '<i class="bl"></i>';
+  const who = mode === 'form' ? '' : `<table class="prwho"><tr>
+      <td><b>ผู้ทำ</b>${val(m.by)}</td>
+      <td><b>ทะเบียน</b>${val(m.ac)}</td>
+      <td><b>วันที่</b>${val(m.date ? dmy(m.date) : '')}</td>
+      <td><b>เวลา</b>${val(m.time)}</td>
+      ${mode === 'report' && m.note
+        ? `<td class="nt"><b>หมายเหตุ</b><i style="font-weight:400">${A.esc(m.note)}</i></td>`
+        : '<td class="nt"></td>'}
+    </tr></table>`;
 
   const t = C.title || {};
   const tag = mode === 'report' ? 'รายงาน' : mode === 'form' ? 'แบบฟอร์ม' : 'กระดาษบันทึก';
-  pr.innerHTML = `<table class="prt">${cg}
-    <thead><tr><th colspan="${cols}">
-      <div class="prhd">
-        <p class="org">D-0507 FLIGHT TRAINING CO., LTD.<span class="tag">${A.esc(tag)}</span></p>
-        <p class="ttl">${A.esc((t.th||'').trim() || C.doc || '')}</p>
-        <p class="ten">${A.esc((t.en||'').trim())}</p>
-      </div>
-      <table class="prmeta"><tr>
-        <td><b>รหัสเอกสาร</b><i>${A.esc(C.doc||'—')}</i></td>
-        <td><b>เลขกำกับ</b><i>${A.esc(C.code||'—')}</i></td>
-        <td><b>ฉบับ / แก้ไข</b><i>${A.esc(C.issue||'01')} / ${A.esc(C.rev||'00')}</i></td>
-        <td><b>วันที่มีผล</b><i>${A.esc(dmy(C.eff))}</i></td>
-      </tr></table>
-      ${who}
-    </th></tr></thead>
-    <tbody>${body}</tbody>
-    <tfoot><tr><td colspan="${cols}"><div class="ln">
-      <span class="mono">${A.esc(C.doc||'')} · ${A.esc(C.code||'')} ·
-        ฉบับ ${A.esc(C.issue||'01')} / แก้ไข ${A.esc(C.rev||'00')} ·
+  const cols = C.layout === 'three' ? 'c3' : C.layout === 'two' ? 'c2' : 'c1';
+
+  /* หัวกระดาษบรรทัดเดียวแบบการ์ดในห้องนักบิน — ชื่อเอกสารกับเลขกำกับซ้าย
+     ชื่อเรื่องกลาง ชนิดแผ่นขวา ที่เหลือทั้งแผ่นเป็นของรายการ */
+  pr.innerHTML = `
+    <table class="prtop"><tr>
+      <td class="l">
+        <div class="nm">D-0507 FLIGHT TRAINING CO., LTD.</div>
+        <div class="cd">${A.esc(C.doc || '')} · ${A.esc(C.code || '')}</div>
+      </td>
+      <td class="c">
+        <div class="ttl">${A.esc((t.th || '').trim() || C.doc || '')}</div>
+        <div class="en">${A.esc((t.en || '').trim())}</div>
+      </td>
+      <td class="r">
+        <div class="tag">${A.esc(tag)}</div>
+        <div class="iss">ฉบับ ${A.esc(C.issue || '01')} / แก้ไข ${A.esc(C.rev || '00')}
+          · มีผล ${A.esc(dmy(C.eff))}</div>
+      </td>
+    </tr></table>
+    <hr class="prrule">
+    ${who}
+    <div class="prcols ${cols}">${body}</div>
+    <p class="prfoot">
+      <span class="mono">${A.esc(C.doc || '')} · ${A.esc(C.code || '')} ·
+        ฉบับ ${A.esc(C.issue || '01')} / แก้ไข ${A.esc(C.rev || '00')} ·
         มีผล ${A.esc(dmy(C.eff))}</span>
-      <span>Controlled Copy — Uncontrolled when printed</span>
-    </div></td></tr></tfoot>
-  </table>`;
+      <span class="r">Controlled Copy — Uncontrolled when printed</span>
+    </p>`;
 }
 
 function paint(){
   const rows = [];
   (C.items||[]).forEach((it,i) => {
-    rows.push({ t:it.t, a:it.a, sub:false, k:'i'+i });
+    rows.push({ t:it.t, a:it.a, sub:false, sec:!!it.sec, warn:!!it.warn, k:'i'+i });
     (it.sub||[]).forEach((s,si) => rows.push({ t:s.t, a:s.a, sub:true, k:'i'+i+'s'+si }));
   });
-  const total = rows.filter(r => (r.a||'').trim()).length;
+  // หัวข้อไม่ใช่รายการที่ต้องทำ ไม่นับรวมในตัวเลข "ทำแล้ว x จาก y"
+  const total = rows.filter(r => !r.sec && (r.a||'').trim()).length;
 
   document.getElementById('wrap').innerHTML = `
     <div class="clband">
@@ -353,17 +361,19 @@ function paint(){
       </div>
     </div>
 
-    <div class="cllist ${C.layout==='two'?'two':''}">
-      ${rows.map(r => `<div class="clitem${r.sub?' sub':''}">
+    <div class="cllist ${C.layout==='two'||C.layout==='three'?'two':''}">
+      ${rows.map(r => r.sec
+        ? `<h3 class="clsec${r.warn?' warn':''}">${A.esc(r.t||'')}</h3>`
+        : `<div class="clitem${r.sub?' sub':''}">
         <div class="t">${A.esc(r.t||'')}</div>
-        <div class="a" data-k="${A.esc(r.k)}" role="button" tabindex="0"
-             aria-pressed="false"><span>${A.esc(r.a||'')}</span><span class="tick">✓</span></div>
+        ${(r.a||'').trim()
+          ? `<div class="a" data-k="${A.esc(r.k)}" role="button" tabindex="0"
+             aria-pressed="false"><span>${A.esc(r.a)}</span><span class="tick">✓</span></div>`
+          : '<div class="a none"></div>'}
       </div>`).join('')}
     </div>
 
-    <p class="prfoot">${A.esc(C.doc||'')} · ${A.esc(C.code||'')} ·
-      ฉบับ ${A.esc(C.issue||'01')} / แก้ไข ${A.esc(C.rev||'00')} ·
-      มีผล ${A.esc(dmy(C.eff))} · Controlled Copy — Uncontrolled when printed</p>`;
+`;
 
   /* ติ๊กบนจอแล้วสั่งพิมพ์ ต้องได้กระดาษที่ติ๊กตามนั้น — ประกอบใหม่ก่อนพิมพ์เสมอ
      ยังไม่ได้ติ๊กก็ได้ ☐ ว่างไว้ให้กาด้วยปากกา ซึ่งเป็นวิธีที่ใช้จริงในห้องนักบิน */

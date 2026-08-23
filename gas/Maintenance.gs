@@ -43,7 +43,8 @@ function makeChecklistTemplate() {
   sh.setRowHeight(2, 34);
   sh.getRange('A3:D3').merge()
     .setValue('กรอกหัวเอกสารให้ครบก่อน แล้วจึงพิมพ์รายการที่ต้องทำลงตารางข้างล่าง · '
-            + 'หนึ่งบรรทัดต่อหนึ่งรายการ · ข้อย่อยให้เลือกระดับเป็น "ย่อย" '
+            + 'หนึ่งบรรทัดต่อหนึ่งรายการ · ขึ้นหมวดใหม่ให้เลือกระดับเป็น "หัวข้อ" '
+            + 'แล้วพิมพ์ชื่อหมวดในช่องรายการ · ข้อย่อยให้เลือก "ย่อย" '
             + 'แล้ววางไว้ใต้ข้อหลักที่มันสังกัด')
     .setBackground(GREY).setFontSize(10).setWrap(true).setVerticalAlignment('middle');
   sh.setRowHeight(3, 34);
@@ -57,7 +58,7 @@ function makeChecklistTemplate() {
     ['วันที่มีผล',      '23 AUG 2026',    'รูปแบบ DD MMM YYYY'],
     ['ชื่อ (ไทย)',      '',               'ขึ้นเป็นหัวเรื่องบนกระดาษ'],
     ['ชื่อ (อังกฤษ)',   '',               'บรรทัดรองใต้ชื่อไทย'],
-    ['การจัดหน้า',     'two',            'one = คอลัมน์เดียว · two = สองคอลัมน์'],
+    ['การจัดหน้า',     'three',          'one = คอลัมน์เดียว · two = สองคอลัมน์ · three = สามคอลัมน์'],
   ];
   /* ต้องบังคับเป็นข้อความก่อนเขียน ไม่งั้น Sheets แปลงให้เอง —
      ฉบับ '01' กลายเป็น 1 · แก้ไข '00' กลายเป็น 0 · '23 AUG 2026' กลายเป็นวันที่
@@ -69,7 +70,7 @@ function makeChecklistTemplate() {
   sh.getRange(5, 1, meta.length, 3)
     .setBorder(true, true, true, true, true, true, '#D1D5DB', SpreadsheetApp.BorderStyle.SOLID);
   sh.getRange('B12').setDataValidation(SpreadsheetApp.newDataValidation()
-    .requireValueInList(['one', 'two'], true).setAllowInvalid(false).build());
+    .requireValueInList(['one', 'two', 'three'], true).setAllowInvalid(false).build());
 
   // ── ตารางรายการ ───────────────────────────────────────────
   var HDR = 14;
@@ -79,14 +80,17 @@ function makeChecklistTemplate() {
   sh.setFrozenRows(HDR);
 
   var rows = [
-    ['หลัก', 'Weather information of En Route, Destination, and Alternate', 'CHECK / BRIEFED', 'ตัวอย่าง — ลบออกได้'],
-    ['ย่อย', 'Alternate Airport',  'CONFIRMED',      ''],
-    ['ย่อย', 'Max Crosswind',      'WITHIN LIMITS',  ''],
-    ['หลัก', 'Weight and Balance', 'COMPUTED',       ''],
+    ['หัวข้อ', 'BEFORE START',      '',               'ตัวอย่าง — ลบออกได้'],
+    ['หลัก',  'Pre-flight inspection', 'COMPLETED',   ''],
+    ['หลัก',  'Door',               'CLOSE & LOCK',   ''],
+    ['หัวข้อ', 'DOCUMENT ONBOARD',  '',               ''],
+    ['หลัก',  'Document Onboard',   'ON BOARD',       ''],
+    ['ย่อย',  'C of R & C of A',    'Present and Valid', ''],
+    ['ย่อย',  'Radio licence',      'Present and Valid', ''],
   ];
   sh.getRange(HDR + 1, 1, rows.length, 4).setValues(rows);
   sh.getRange(HDR + 1, 1, 200, 1).setDataValidation(SpreadsheetApp.newDataValidation()
-    .requireValueInList(['หลัก', 'ย่อย'], true).setAllowInvalid(false).build());
+    .requireValueInList(['หัวข้อ', 'หลัก', 'ย่อย'], true).setAllowInvalid(false).build());
   sh.getRange(HDR, 1, 205, 4)
     .setBorder(true, true, true, true, true, true, '#D1D5DB', SpreadsheetApp.BorderStyle.SOLID);
   sh.getRange(HDR + 1, 2, 205, 2).setWrap(true);

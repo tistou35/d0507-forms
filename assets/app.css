@@ -711,68 +711,90 @@ a.gf:hover{border-color:var(--navy-900);color:var(--navy-900)}
 
 
 /* ══ แม่แบบเช็กลิสต์สำหรับพิมพ์ (.prdoc) ══════════════════════
-   ใช้ร่วมกันทุกเช็กลิสต์ ไม่ว่าจะกี่ข้อ กี่คอลัมน์
-   ประกอบเป็น <table> เพราะ <thead>/<tfoot> ของตารางเป็นวิธีเดียว
-   ที่เบราว์เซอร์ซ้ำหัวและท้ายให้ทุกหน้าได้จริง — เช็กลิสต์ที่ยาวเกินหนึ่งหน้า
-   ต้องมีเลขกำกับเอกสารอยู่ทุกแผ่น ไม่งั้นแผ่นที่สองหลุดออกมาแล้วไม่รู้ว่าของใคร */
+   วางแบบการ์ดเช็กลิสต์ในห้องนักบิน — เทียบกับ IM-CHK-402-A (C182T G1000)
+   และ NP-CHK-303-B (Normal Procedure C172)
+
+   หลักที่ยึด
+   · แน่น — ทั้งใบต้องจบในแผ่นเดียว คนถือแผ่นเดียวในมือขณะบิน ไม่ใช่พลิกหา
+   · หัวข้อเป็นแถบทึบ กวาดตาหาหมวดที่ต้องการได้โดยไม่ต้องอ่าน
+   · จุดไข่ปลาลากจากรายการไปหาสิ่งที่ต้องทำ สายตาไม่หลุดแถว
+   · ไม่มีกรอบตาราง เส้นกรอบกินที่และทำให้ตาสะดุดทุกช่อง
+
+   ประกอบเป็น <table> ต่อหนึ่งหัวข้อ ไม่ใช่ flex เพราะตัวแปลง HTML→PDF
+   ของ Apps Script ที่ใช้เก็บสำเนาลง Drive ไม่รู้จัก flex */
 .prdoc{display:none}
 @media print{
   .prdoc{display:block}
-  .clband,.clmeta,.cllist,.clbar,.prfoot{display:none !important}
+  .clband,.clmeta,.cllist,.clbar,.clrep{display:none !important}
+  .prdoc{font-family:var(--font-sans),sans-serif;color:#000;font-size:8.2pt;line-height:1.28}
 
-  .prt{width:100%;border-collapse:collapse;table-layout:fixed;
-    font-family:var(--font-sans),sans-serif;color:#000}
+  /* ── หัวกระดาษ: บรรทัดเดียว ────────────────────────────────
+     ของเดิมเป็นสามบล็อกซ้อนกันสูงเกือบ 40mm กินที่ของรายการไปเปล่า ๆ */
+  .prtop{width:100%;border-collapse:collapse;margin-bottom:4pt}
+  .prtop td{vertical-align:bottom;padding:0 0 3pt}
+  .prtop .l{width:28%}
+  .prtop .c{width:44%;text-align:center}
+  .prtop .r{width:28%;text-align:right}
+  .prtop .nm{font-weight:700;font-size:9.5pt;line-height:1.15}
+  .prtop .en{font-size:7pt;color:#333}
+  .prtop .cd{font-family:var(--font-mono),monospace;font-size:7.5pt;font-weight:700}
+  .prtop .ttl{font-family:var(--font-display),serif;font-size:11pt;font-weight:700;line-height:1.12}
+  .prtop .tag{font-size:9.5pt;font-weight:700;background:none;border:0;padding:0;
+    border-radius:0;color:#000;display:block;letter-spacing:0}
+  .prtop .iss{font-family:var(--font-mono),monospace;font-size:7pt;color:#333}
+  .prrule{border:0;border-top:1.2pt solid #000;margin:0 0 5pt}
 
-  /* หัวเอกสาร — ซ้ำทุกหน้า */
-  .prt thead th{padding:0 0 6px;border:0;text-align:left}
-  .prhd{border:1.2pt solid #000;padding:6pt 8pt}
-  .prhd .org{font-family:var(--font-mono),monospace;font-size:7pt;letter-spacing:.13em}
-  .prhd .ttl{font-family:var(--font-display),serif;font-size:14pt;font-weight:700;line-height:1.2;margin-top:1pt}
-  .prhd .ten{font-size:9pt;color:#333;line-height:1.25}
-  /* เป็น <table> ไม่ใช่ flex — ตัวแปลง HTML→PDF ของ Apps Script ที่ใช้เก็บสำเนา
-     ลง Drive ไม่รู้จัก flex แถวข้อมูลจะกองทับกัน ตารางได้ผลเหมือนกันทั้งสองที่ */
-  .prmeta,.prwho{width:100%;border-collapse:collapse;border:1pt solid #000;border-top:0;
-    table-layout:fixed}
-  .prmeta td{padding:3pt 8pt;border-right:1pt solid #000;font-size:8pt;line-height:1.35}
-  .prmeta td:last-child{border-right:0}
-  .prmeta b{display:block;font-size:6.5pt;letter-spacing:.1em;text-transform:uppercase;
-    font-weight:400;color:#444}
-  .prmeta i{font-style:normal;font-family:var(--font-mono),monospace;font-size:8.5pt}
-  .prhd .tag{float:right;font-family:var(--font-sans),sans-serif;font-size:7pt;
-    letter-spacing:.08em;border:.75pt solid #000;padding:1pt 5pt}
+  /* ── ใครทำ เมื่อไร: บรรทัดเดียวเช่นกัน ─────────────────────
+     แผ่นที่ไม่มีบรรทัดนี้ใช้เป็นหลักฐานว่าใครตรวจเมื่อไรไม่ได้ */
+  .prwho{width:100%;border-collapse:collapse;margin:0 0 5pt;font-size:7.5pt}
+  .prwho td{padding:1pt 0;vertical-align:bottom;white-space:nowrap}
+  .prwho b{font-weight:400;color:#444;letter-spacing:.06em;text-transform:uppercase;font-size:6.5pt}
+  .prwho i{font-style:normal;font-weight:700;font-size:8.5pt;padding:0 6pt 0 3pt}
+  .prwho i.bl{display:inline-block;min-width:26mm;border-bottom:.5pt dotted #555;font-weight:400}
+  .prwho .nt{white-space:normal;width:100%}
 
-  /* ใครทำ เมื่อไร กับอากาศยานลำใด — แผ่นที่ไม่มีบรรทัดนี้ใช้เป็นหลักฐานไม่ได้
-     รายงานพิมพ์ค่าที่กรอกมา กระดาษเปล่ากับแบบฟอร์มพิมพ์เส้นว่างให้เขียนเอง */
-  .prwho td{padding:3pt 8pt;border-right:1pt solid #000;font-size:8pt}
-  .prwho td:last-child{border-right:0}
-  .prwho td.nw{width:24mm}
-  .prwho b{display:block;font-size:6.5pt;letter-spacing:.1em;text-transform:uppercase;
-    font-weight:400;color:#444}
-  .prwho i{font-style:normal;font-size:9pt;display:block;min-height:11pt}
-  .prwho i.bl{border-bottom:.5pt dotted #666;margin-top:2pt}
-  .prnote{border:1pt solid #000;border-top:0;padding:3pt 8pt;font-size:8pt}
-  .prnote b{font-size:6.5pt;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:#444}
+  /* ── คอลัมน์ไหลลงทีละคอลัมน์ ──────────────────────────────
+     อ่านจากบนลงล่างคอลัมน์ซ้ายให้จบก่อนแล้วขึ้นหัวคอลัมน์ถัดไป
+     ตามลำดับที่ทำจริง หัวข้อห้ามถูกฉีกข้ามคอลัมน์ */
+  .prcols{column-gap:5mm;column-fill:balance}
+  .prcols.c2{column-count:2}
+  .prcols.c3{column-count:3}
+  .prcols.c1{column-count:1}
 
-  /* แถวรายการ — ห้ามฉีกกลางแถว และห้ามแยกข้อย่อยไปคนละหน้ากับข้อหลัก */
-  .prt tbody tr{break-inside:avoid}
-  .prt tbody td{border:.75pt solid #000;padding:3.4pt 5pt;font-size:9pt;line-height:1.3;
-    vertical-align:middle}
-  .prt td.t{width:auto}
-  .prt td.a{width:26mm;font-family:var(--font-mono),monospace;font-size:7.5pt;
-    font-weight:700;letter-spacing:.01em;text-transform:uppercase;text-align:center}
-  .prt td.bx{width:7mm;text-align:center;font-size:11pt;line-height:1}
-  .prt td.gap{border:0;width:5mm;padding:0}
-  /* คลาส sub อยู่ที่ช่อง ไม่ใช่ที่แถว — แถวเดียวกันในแบบสองคอลัมน์
-     ฝั่งซ้ายอาจเป็นข้อย่อยขณะที่ฝั่งขวาเป็นข้อหลัก */
-  .prt td.t.sub{padding-left:14pt;font-size:8.2pt}
-  .prt td.t.sub::before{content:"↳ ";color:#555}
-  .prt td.a.sub{font-size:6.8pt;font-weight:400;text-transform:none}
-  .prt td.e{border:0}
-  .prt tr.head td{background:#eee;font-weight:700;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .sec{margin:0 0 4.5pt}
+  /* หัวข้อที่มีชื่อไม่ควรถูกฉีกข้ามคอลัมน์ — คนกวาดตาหาหมวดแล้วเจอครึ่งเดียว
+     เบราว์เซอร์จะย้ายทั้งหัวข้อไปคอลัมน์ถัดไปให้เอง และฉีกเฉพาะตอนที่ยาวเกินหนึ่งคอลัมน์จริง ๆ
+     กลุ่มไร้ชื่อ (เช็กลิสต์เก่าที่ยังไม่มีหัวข้อ) ไม่ห้าม ไม่งั้นทั้งใบกองอยู่คอลัมน์เดียว */
+  .sec.named{break-inside:avoid}
+  .sec .cap{background:#0D1B2A;color:#fff;font-size:8pt;font-weight:700;letter-spacing:.06em;
+    text-transform:uppercase;text-align:center;padding:2pt 4pt;margin-bottom:1.5pt;
+    break-after:avoid;break-inside:avoid;
+    -webkit-print-color-adjust:exact;print-color-adjust:exact}
+  /* หัวข้อที่ทำผิดแล้วอันตราย ให้ต่างจากหัวข้อทั่วไปด้วยสี ไม่ใช่ด้วยตัวอักษรอย่างเดียว */
+  .sec.warn .cap{background:#B42318}
 
-  /* ท้ายเอกสาร — ซ้ำทุกหน้าเช่นกัน */
-  .prt tfoot td{border:0;padding:5pt 0 0;font-size:6.8pt;line-height:1.45;color:#000}
-  .prt tfoot .ln{border-top:.75pt solid #000;padding-top:3pt;display:flex;
-    justify-content:space-between;gap:10pt}
-  .prt tfoot .mono{font-family:var(--font-mono),monospace}
+  .grp{break-inside:avoid}
+  /* แถวเป็น flex ไม่ใช่ตาราง — ต้องได้ทั้งสองอย่างพร้อมกันคือ
+     ข้อความอยู่บรรทัดเดียวเมื่อยังมีที่ และตัดบรรทัดเมื่อยาวเกินคอลัมน์จริง ๆ
+     ตารางทำไม่ได้: nowrap แล้วล้นทะลุไปทับคอลัมน์ข้าง ๆ · ปล่อยให้ตัดคำได้
+     แล้วช่องจุดไข่ปลาจะบีบข้อความเหลือเท่าคำที่ยาวที่สุด
+     ถ้าตัวแปลงปลายทางไม่รู้จัก flex จะได้ข้อความเรียงต่อกันธรรมดา ยังอ่านออก */
+  .ln{display:flex;align-items:baseline;break-inside:avoid;
+    font-size:8.2pt;line-height:1.34}
+  .ln .t{flex:0 1 auto;min-width:0;padding-right:2pt}
+  .ln .d{flex:1 1 auto;min-width:3mm;align-self:flex-end;
+    border-bottom:.5pt dotted #333;margin-bottom:2.2pt}
+  .ln .a{flex:0 0 auto;padding-left:2pt;text-align:right;font-weight:700}
+  .ln .bx{flex:0 0 auto;padding-left:3pt;font-size:9pt}
+  .ln.sub{padding-left:7pt}
+  .ln.sub .t::before{content:"- "}
+  .ln.sub .a{font-weight:400}
+  /* บรรทัดที่ไม่มีสิ่งที่ต้องทำคู่กัน — คำสั่งหรือหมายเหตุที่กินเต็มความกว้าง */
+  .sec .full{font-size:8pt;font-style:italic;color:#222;line-height:1.3;margin:1pt 0 1.5pt}
+
+  .prfoot{border-top:.75pt solid #000;margin-top:5pt;padding-top:2.5pt;
+    font-size:6.5pt;display:table;width:100%}
+  .prfoot span{display:table-cell}
+  .prfoot .r{text-align:right}
+  .prfoot .mono{font-family:var(--font-mono),monospace}
 }

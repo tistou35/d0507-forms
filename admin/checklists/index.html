@@ -2,13 +2,20 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>สร้างเช็กลิสต์ — D-0507 Flight Training</title>
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="../../assets/app.css?v=69d40bed">
+<link rel="stylesheet" href="../../assets/app.css?v=9dcf3fc0">
 <style>
 .clgrid{display:grid;grid-template-columns:1fr 260px;gap:12px;align-items:start}
 .clhead{display:grid;grid-template-columns:1fr 260px 44px;gap:12px;padding:0 2px 6px;
   font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--g-400)}
 .itrow{display:grid;grid-template-columns:1fr 260px 44px;gap:12px;align-items:start;margin-bottom:8px}
 .itrow.sub{grid-template-columns:1fr 260px 44px;margin-left:26px}
+.itrow.sec{grid-template-columns:1fr 260px 44px;margin-top:14px}
+.itrow.sec textarea{background:var(--navy-900);color:#fff;font-weight:700;
+  letter-spacing:.05em;text-transform:uppercase;border-color:var(--navy-900)}
+.itrow.sec textarea::placeholder{color:#9DB2CE}
+.itrow.sec .wn{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--fg-2);
+  padding-top:9px}
+.itrow.sec .wn input{width:16px;height:16px}
 .itrow.sub > :first-child{position:relative}
 .itrow.sub > :first-child::before{content:"↳";position:absolute;left:-20px;top:9px;color:var(--g-400)}
 .itrow input,.itrow textarea{width:100%;min-height:40px;border-radius:8px;padding:9px 11px;
@@ -128,6 +135,7 @@
             <div><label>การจัดหน้า</label><select id="m_layout">
               <option value="rows">เรียงลงมาแถวเดียว</option>
               <option value="two">สองคอลัมน์</option>
+              <option value="three">สามคอลัมน์ (แบบการ์ดในห้องนักบิน)</option>
             </select></div>
           </div>
           <div style="margin-top:12px">
@@ -147,6 +155,7 @@
           <div class="clhead"><span>รายการที่ต้องทำ</span><span>สิ่งที่ต้องปฏิบัติ</span><span></span></div>
           <div id="items"></div>
           <div class="addbar">
+            <button type="button" id="addSec">+ เพิ่มหัวข้อ</button>
             <button type="button" id="addItem">+ เพิ่มรายการ</button>
             <button type="button" id="addSub">+ เพิ่มรายการย่อยใต้อันสุดท้าย</button>
           </div>
@@ -236,7 +245,7 @@ function rows(){
       <div class="nm">${A.esc((c.title&&c.title.th)||c.id)}</div>
       <div class="mt">ฉบับ ${A.esc(c.issue||'01')} / แก้ไข ${A.esc(c.rev||'00')}
         · ${(c.items||[]).length} รายการ
-        · ${c.layout==='two'?'สองคอลัมน์':'แถวเดียว'}</div>
+        · ${c.layout==='three'?'สามคอลัมน์':c.layout==='two'?'สองคอลัมน์':'แถวเดียว'}</div>
     </div>
     <div style="display:flex;gap:8px">
       <a href="../../cl/?id=${encodeURIComponent(c.id)}" target="_blank" rel="noopener">เปิด ↗</a>
@@ -287,8 +296,13 @@ function bumpNote(){
 function items(){
   const el=document.getElementById('items');
   const rowHtml = (it, i, si) => {
-    const cls = si===undefined ? 'itrow' : 'itrow sub';
     const path = si===undefined ? String(i) : i+'.'+si;
+    if (si===undefined && it.sec) return `<div class="itrow sec" data-p="${path}">
+      <textarea data-f="t" rows="1" placeholder="ชื่อหัวข้อ เช่น BEFORE START">${A.esc(it.t||'')}</textarea>
+      <label class="wn"><input type="checkbox" data-f="warn"${it.warn?' checked':''}> แถบแดง (ทำผิดแล้วอันตราย)</label>
+      <button type="button" class="rm" data-x="${path}" title="ลบหัวข้อนี้">✕</button>
+    </div>`;
+    const cls = si===undefined ? 'itrow' : 'itrow sub';
     return `<div class="${cls}" data-p="${path}">
       <textarea data-f="t" rows="1" placeholder="${si===undefined?'รายการที่ต้องทำ':'รายการย่อย'}">${A.esc(it.t||'')}</textarea>
       <textarea data-f="a" rows="1" placeholder="สิ่งที่ต้องปฏิบัติ">${A.esc(it.a||'')}</textarea>
@@ -298,12 +312,13 @@ function items(){
   el.innerHTML = (CUR.items||[]).map((it,i) =>
     rowHtml(it,i) + (it.sub||[]).map((s,si)=>rowHtml(s,i,si)).join('')).join('');
 
-  el.querySelectorAll('[data-f]').forEach(inp => inp.addEventListener('input', () => {
-    const [i,si] = inp.closest('[data-p]').dataset.p.split('.').map(Number);
-    const t = si===undefined || Number.isNaN(si) ? CUR.items[i] : CUR.items[i].sub[si];
-    t[inp.dataset.f] = inp.value;
-    bumpNote();
-  }));
+  el.querySelectorAll('[data-f]').forEach(inp => inp.addEventListener(
+    inp.type === 'checkbox' ? 'change' : 'input', () => {
+      const [i,si] = inp.closest('[data-p]').dataset.p.split('.').map(Number);
+      const t = si===undefined || Number.isNaN(si) ? CUR.items[i] : CUR.items[i].sub[si];
+      t[inp.dataset.f] = inp.type === 'checkbox' ? inp.checked : inp.value;
+      bumpNote();
+    }));
   el.querySelectorAll('[data-x]').forEach(b => b.addEventListener('click', () => {
     const [i,si] = b.dataset.x.split('.').map(Number);
     if (si===undefined || Number.isNaN(si)) CUR.items.splice(i,1);
@@ -319,6 +334,11 @@ document.getElementById('cancel').addEventListener('click', () => {
 });
 document.getElementById('addItem').addEventListener('click', () => {
   CUR.items.push({t:'',a:'',sub:[]}); items(); bumpNote();
+});
+/* หัวข้อคือแถบคั่นหมวด ไม่ใช่รายการที่ต้องทำ จึงไม่มีช่อง "สิ่งที่ต้องปฏิบัติ"
+   และไม่ถูกนับใน "ทำแล้ว x จาก y" */
+document.getElementById('addSec').addEventListener('click', () => {
+  CUR.items.push({t:'',a:'',sec:true,sub:[]}); items(); bumpNote();
 });
 document.getElementById('addSub').addEventListener('click', () => {
   const last = CUR.items[CUR.items.length-1];
@@ -353,9 +373,11 @@ document.getElementById('save').addEventListener('click', async () => {
     eff: CUR.eff || '',
     layout: CUR.layout || 'rows',
     title: { th:(CUR.title&&CUR.title.th)||'', en:(CUR.title&&CUR.title.en)||'' },
-    items: live.map(it => ({ t:(it.t||'').trim(), a:(it.a||'').trim(),
-      sub:(it.sub||[]).filter(s=>(s.t||'').trim()||(s.a||'').trim())
-                      .map(s=>({t:(s.t||'').trim(), a:(s.a||'').trim()})) })),
+    items: live.map(it => Object.assign(
+      { t:(it.t||'').trim(), a: it.sec ? '' : (it.a||'').trim(),
+        sub: it.sec ? [] : (it.sub||[]).filter(s=>(s.t||'').trim()||(s.a||'').trim())
+                        .map(s=>({t:(s.t||'').trim(), a:(s.a||'').trim()})) },
+      it.sec ? { sec:true, warn:!!it.warn } : {})),
     updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
     updatedBy: (A.user && A.user.email) || '',
   };
