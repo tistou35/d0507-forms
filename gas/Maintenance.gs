@@ -64,6 +64,10 @@ function makeChecklistTemplate() {
      ฉบับ '01' กลายเป็น 1 · แก้ไข '00' กลายเป็น 0 · '23 AUG 2026' กลายเป็นวันที่
      ซึ่งผิดรูปแบบเอกสารควบคุมทั้งสามอย่าง และคนที่คัดลอกไปใช้ต่อจะได้ค่าที่ผิด */
   sh.getRange(5, 2, meta.length, 1).setNumberFormat('@');
+  /* ล้างกฎตรวจค่าเดิมก่อนเขียน — รันซ้ำหลังเพิ่มตัวเลือกใหม่ กฎเก่าที่ยังค้างอยู่
+     จะปฏิเสธค่าที่กำลังจะเขียนลงไป ('three' ไม่ผ่านกฎที่มีแค่ one กับ two) */
+  sh.getRange(5, 2, meta.length, 1).clearDataValidations();
+  sh.getRange(15, 1, 205, 1).clearDataValidations();   // แถวรายการเริ่มที่ 15
   sh.getRange(5, 1, meta.length, 3).setValues(meta);
   sh.getRange(5, 1, meta.length, 1).setFontWeight('bold').setBackground(GREY);
   sh.getRange(5, 3, meta.length, 1).setFontSize(9).setFontColor('#6B7280');
@@ -109,7 +113,7 @@ function dropChecklistTestRows() {
   var sh = SpreadsheetApp.open(it.next()).getSheets()[0];
   var v = sh.getDataRange().getValues(), n = 0;
   for (var i = v.length - 1; i >= 1; i--) {
-    if (String(v[i][5]) === 'ทดสอบระบบ (ลบทิ้งได้)') { sh.deleteRow(i + 1); n++; }
+    if (/^ทดสอบ.*\(ลบทิ้งได้\)$/.test(String(v[i][5]))) { sh.deleteRow(i + 1); n++; }
   }
   Logger.log('ลบไป ' + n + ' แถว');
   return n;
