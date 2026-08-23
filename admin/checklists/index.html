@@ -7,15 +7,22 @@
 .clgrid{display:grid;grid-template-columns:1fr 260px;gap:12px;align-items:start}
 .clhead{display:grid;grid-template-columns:1fr 260px 44px;gap:12px;padding:0 2px 6px;
   font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--g-400)}
-.itrow{display:grid;grid-template-columns:1fr 260px 44px;gap:12px;align-items:start;margin-bottom:8px}
-.itrow.sub{grid-template-columns:1fr 260px 44px;margin-left:26px}
-.itrow.sec{grid-template-columns:1fr 260px 44px;margin-top:14px}
+.itrow{display:grid;grid-template-columns:1fr 260px 96px;gap:12px;align-items:start;margin-bottom:8px}
+.itrow.sub{grid-template-columns:1fr 260px 96px;margin-left:26px}
+.itrow.sec{grid-template-columns:1fr 260px 96px;margin-top:14px}
 .itrow.sec textarea{background:var(--navy-900);color:#fff;font-weight:700;
   letter-spacing:.05em;text-transform:uppercase;border-color:var(--navy-900)}
 .itrow.sec textarea::placeholder{color:#9DB2CE}
 .itrow.sec .wn{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--fg-2);
   padding-top:9px}
 .itrow.sec .wn input{width:16px;height:16px}
+/* ปุ่มเลื่อนแถว — เช็กลิสต์แบบ NPC/EPC มีสิบกว่าหัวข้อ ต้องจัดลำดับได้
+   ไม่งั้นวางผิดที่ทีเดียวต้องลบแล้วพิมพ์ใหม่ */
+.mv{display:flex;gap:3px;align-items:start;padding-top:5px}
+.mv button{width:28px;height:30px;border-radius:6px;border:1px solid var(--border-light);
+  background:var(--surface);color:var(--fg-2);font-size:13px;cursor:pointer;line-height:1}
+.mv button:hover{border-color:var(--navy-900);color:var(--navy-900)}
+.mv .rm:hover{border-color:var(--red-600);color:var(--red-600)}
 .itrow.sub > :first-child{position:relative}
 .itrow.sub > :first-child::before{content:"↳";position:absolute;left:-20px;top:9px;color:var(--g-400)}
 .itrow input,.itrow textarea{width:100%;min-height:40px;border-radius:8px;padding:9px 11px;
@@ -234,6 +241,14 @@ async function load(){
     LIST = s.docs.map(d => Object.assign({ id:d.id }, d.data()));
   } catch(e){ log('อ่านรายการไม่ได้: '+(e.code||e.message), 'red-600'); return; }
   rows();
+  /* มาจากหน้าเช็กลิสต์และเอกสารเผยแพร่ พร้อม id ของใบที่จะแก้ — เปิดให้เลย
+     ไม่ต้องให้ไล่หาในรายการอีกรอบ */
+  const want = new URLSearchParams(location.search).get('id');
+  if (want) {
+    const c = LIST.find(x => x.id === want);
+    if (c) { edit(c); document.getElementById('editwrap').scrollIntoView({block:'start'}); }
+    else log('ไม่พบเช็กลิสต์ ' + want, 'red-600');
+  }
 }
 
 function rows(){
@@ -297,16 +312,22 @@ function items(){
   const el=document.getElementById('items');
   const rowHtml = (it, i, si) => {
     const path = si===undefined ? String(i) : i+'.'+si;
+    /* เลื่อนขึ้น/ลงได้ทุกแถว — เช็กลิสต์แบบ NPC/EPC มีสิบกว่าหัวข้อ
+       ถ้าเพิ่มได้แต่ท้ายรายการอย่างเดียว ต้องลบแล้วพิมพ์ใหม่ทุกครั้งที่วางผิดที่ */
+    const mv = `<span class="mv">
+      <button type="button" data-up="${path}" title="เลื่อนขึ้น">↑</button>
+      <button type="button" data-dn="${path}" title="เลื่อนลง">↓</button>
+      <button type="button" class="rm" data-x="${path}" title="ลบแถวนี้">✕</button></span>`;
     if (si===undefined && it.sec) return `<div class="itrow sec" data-p="${path}">
       <textarea data-f="t" rows="1" placeholder="ชื่อหัวข้อ เช่น BEFORE START">${A.esc(it.t||'')}</textarea>
       <label class="wn"><input type="checkbox" data-f="warn"${it.warn?' checked':''}> แถบแดง (ทำผิดแล้วอันตราย)</label>
-      <button type="button" class="rm" data-x="${path}" title="ลบหัวข้อนี้">✕</button>
+      ${mv}
     </div>`;
     const cls = si===undefined ? 'itrow' : 'itrow sub';
     return `<div class="${cls}" data-p="${path}">
       <textarea data-f="t" rows="1" placeholder="${si===undefined?'รายการที่ต้องทำ':'รายการย่อย'}">${A.esc(it.t||'')}</textarea>
       <textarea data-f="a" rows="1" placeholder="สิ่งที่ต้องปฏิบัติ">${A.esc(it.a||'')}</textarea>
-      <button type="button" class="rm" data-x="${path}" title="ลบแถวนี้">✕</button>
+      ${mv}
     </div>`;
   };
   el.innerHTML = (CUR.items||[]).map((it,i) =>
@@ -319,6 +340,22 @@ function items(){
       t[inp.dataset.f] = inp.type === 'checkbox' ? inp.checked : inp.value;
       bumpNote();
     }));
+  /* ข้อย่อยเลื่อนได้ในกลุ่มของตัวเอง ข้อหลักและหัวข้อเลื่อนได้ในรายการหลัก
+     ข้อหลักพาข้อย่อยของมันไปด้วยเสมอ ไม่งั้นเลื่อนทีเดียวข้อย่อยหลุดไปสังกัดข้ออื่น */
+  const move = (path, d) => {
+    const [i,si] = path.split('.').map(Number);
+    const arr = Number.isNaN(si) || si===undefined ? CUR.items : CUR.items[i].sub;
+    const at  = Number.isNaN(si) || si===undefined ? i : si;
+    const to  = at + d;
+    if (to < 0 || to >= arr.length) return;
+    arr.splice(to, 0, arr.splice(at, 1)[0]);
+    items(); bumpNote();
+  };
+  el.querySelectorAll('[data-up]').forEach(b =>
+    b.addEventListener('click', () => move(b.dataset.up, -1)));
+  el.querySelectorAll('[data-dn]').forEach(b =>
+    b.addEventListener('click', () => move(b.dataset.dn, +1)));
+
   el.querySelectorAll('[data-x]').forEach(b => b.addEventListener('click', () => {
     const [i,si] = b.dataset.x.split('.').map(Number);
     if (si===undefined || Number.isNaN(si)) CUR.items.splice(i,1);

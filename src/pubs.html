@@ -83,6 +83,16 @@ span.gof i{background:var(--g-200);color:var(--g-500)}
 .prow .nm b{font-weight:600}
 .prow .nm span{display:block;font-size:11px;color:var(--g-500);font-family:var(--font-mono)}
 .prow .ed{font-family:var(--font-mono);font-size:11.5px;color:var(--fg-2);white-space:nowrap;text-align:right}
+/* เช็กลิสต์ที่สร้างในระบบ — บอกโครงของใบ (กี่หัวข้อ กี่รายการ กี่คอลัมน์)
+   ให้เห็นจากรายการเลย ไม่ต้องเปิดเข้าไปดูทีละใบ */
+.prow > div > b{font-weight:600;font-size:13.5px}
+.prow .cd{display:block;font-size:11px;color:var(--g-500);font-family:var(--font-mono);
+  line-height:1.5;margin-top:2px}
+.prow .ops{display:flex;gap:7px;white-space:nowrap}
+.prow .op{font-size:12.5px;text-decoration:none;color:var(--sky-600);
+  border:1px solid var(--border-light);border-radius:7px;padding:4px 10px}
+.prow .op:hover{border-color:var(--navy-900);color:var(--navy-900)}
+.prow .op.ed2{color:var(--fg-2)}
 
 .badge{font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px;white-space:nowrap}
 .b-ok{background:var(--green-100);color:var(--green-600)}
@@ -245,12 +255,21 @@ function paintMade(){
   box.id = 'madewrap';
   box.innerHTML = '<h3 class="ph">เช็กลิสต์ที่สร้างในระบบ</h3>'
     + '<p class="pd">เปิดอ่านบนเครื่อง แตะช่องขวาเพื่อทำเครื่องหมาย หรือพิมพ์ไปใช้</p>'
-    + MADE.map(c => `<div class="prow">
+    + MADE.map(c => {
+        const secs = (c.items||[]).filter(i => i.sec).length;
+        const items = (c.items||[]).filter(i => !i.sec).length;
+        return `<div class="prow">
         <div><b>${A.esc((c.title&&c.title.th)||c.doc)}</b>
-          <span class="cd">${A.esc(c.doc||'')} · ${A.esc(c.code||'')}</span></div>
+          <span class="cd">${A.esc(c.doc||'')} · ${A.esc(c.code||'')}
+            · ${secs ? secs + ' หัวข้อ · ' : ''}${items} รายการ
+            · ${c.layout==='three'?'สามคอลัมน์':c.layout==='two'?'สองคอลัมน์':'แถวเดียว'}</span></div>
         <span class="ed">${A.esc(c.issue||'01')}/${A.esc(c.rev||'00')}</span>
-        <a class="op" href="@@BASE@@cl/?id=${encodeURIComponent(c.id)}">เปิด ↗</a>
-      </div>`).join('');
+        <span class="ops">
+          <a class="op" href="@@BASE@@cl/?id=${encodeURIComponent(c.id)}">เปิด ↗</a>
+          ${A.isStaff() ? `<a class="op ed2"
+             href="@@BASE@@admin/checklists/?id=${encodeURIComponent(c.id)}">แก้ไข ✎</a>` : ''}
+        </span>
+      </div>`; }).join('');
   host.appendChild(box);
 }
 
