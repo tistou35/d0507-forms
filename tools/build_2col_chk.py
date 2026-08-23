@@ -1,0 +1,193 @@
+#!/usr/bin/env python3
+# ============================================================
+# build_2col_chk.py — จัดเช็กลิสต์ห้องนักบิน (NPC / EPC) ให้เป็นสองคอลัมน์
+#
+#   python3 tools/build_2col_chk.py NPC
+#   python3 tools/build_2col_chk.py NPC EPC
+#
+# ── ทำไม ─────────────────────────────────────────────────────
+# ตารางเดิมเป็นคอลัมน์เดียวยาว 172 แถว (NPC) / 112 แถว (EPC) ออกมา 4 และ 3 หน้า
+# เช็กลิสต์ที่ใช้ในห้องนักบินต้องพลิกให้น้อยที่สุด สองคอลัมน์ลดลงเหลือครึ่งหนึ่ง
+#
+# ── วิธี ─────────────────────────────────────────────────────
+# ไม่ได้พิมพ์เนื้อหาใหม่ — คัดลอก <w:tc> เดิมทั้งก้อนไปวางในตารางใหม่
+# ฟอนต์ เงาพื้น ช่อง ☐ และการจัดย่อหน้าจึงเหมือนเดิมทุกเซลล์
+# เขียนเนื้อหาใหม่เองเมื่อไรคือเปิดโอกาสให้พิมพ์ผิดในเอกสารที่ใช้บนเครื่องบิน
+#
+# แบ่งครึ่งตามกลุ่มหัวข้อ ไม่ใช่ตามจำนวนแถว — หัวข้อกับรายการใต้มันต้องอยู่
+# คอลัมน์เดียวกัน ไม่งั้นอ่านเจอ "☐ Mixture | IDLE CUT-OFF" ลอยอยู่หัวคอลัมน์
+# โดยไม่รู้ว่าเป็นขั้นตอนของเหตุฉุกเฉินอะไร
+#
+# ── เอกสารควบคุม ─────────────────────────────────────────────
+# รูปแบบที่พิมพ์ออกมาเปลี่ยน = ฉบับพิมพ์เปลี่ยน จึงต้องเลื่อนตัวอักษรท้ายเลขกำกับ
+# (-B → -C) ตามกฎใน CLAUDE.md และเก็บฉบับก่อนแก้ไว้ย้อนดู
+# ============================================================
+import copy, os, shutil, sys
+
+import docx
+from docx.oxml.ns import qn
+from docx.oxml import OxmlElement
+
+HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SRC_DIR = os.path.dirname(HERE)                      # โฟลเดอร์ Manual revision
+
+# ความกว้างคอลัมน์ (dxa = 1/20 pt) รวมต้องเท่าของเดิม 10106
+W_ITEM, W_ACT, W_GAP = 3060, 1893, 200
+
+
+def rows_of(tbl):
+    """แยกแถวเป็นกลุ่ม: หัวข้อหนึ่งอันพร้อมรายการใต้มัน"""
+    groups, cur = [], None
+    for tr in tbl.rows:
+        tcs = tr._tr.findall(qn('w:tc'))
+        # แถวหัวข้อคือแถวที่ผสานสองช่องเป็นช่องเดียว
+        is_sec = len(tcs) == 1 or tr.cells[0]._tc is tr.cells[1]._tc
+        if is_sec or cur is None:
+            cur = {'sec': tr if is_sec else None, 'items': []}
+            groups.append(cur)
+            if is_sec:
+                continue
+        cur['items'].append(tr)
+    return groups
+
+
+def split(groups):
+    """ตัดตรงที่ทำให้สองคอลัมน์ยาวใกล้กันที่สุด โดยไม่ฉีกกลุ่ม"""
+    size = [1 + len(g['items']) if g['sec'] is not None else len(g['items']) for g in groups]
+    half, n, cut, best = sum(size) / 2, 0, 0, float('inf')
+    for i in range(len(groups) + 1):
+        if abs(n - half) < best:
+            best, cut = abs(n - half), i
+        if i < len(groups):
+            n += size[i]
+    return groups[:cut], groups[cut:]
+
+
+def flat(groups):
+    """คลี่กลุ่มกลับเป็นลำดับแถว — (tr, เป็นหัวข้อไหม)"""
+    out = []
+    for g in groups:
+        if g['sec'] is not None:
+            out.append((g['sec'], True))
+        out += [(tr, False) for tr in g['items']]
+    return out
+
+
+def blank_tc(w):
+    """ช่องคั่นกลาง ไม่มีเส้นขอบ"""
+    tc = OxmlElement('w:tc')
+    pr = OxmlElement('w:tcPr')
+    tcw = OxmlElement('w:tcW'); tcw.set(qn('w:w'), str(w)); tcw.set(qn('w:type'), 'dxa')
+    pr.append(tcw)
+    bd = OxmlElement('w:tcBorders')
+    for side in ('top', 'left', 'bottom', 'right'):
+        e = OxmlElement('w:' + side); e.set(qn('w:val'), 'nil'); bd.append(e)
+    pr.append(bd)
+    tc.append(pr)
+    tc.append(OxmlElement('w:p'))
+    return tc
+
+
+def cells_from(tr, is_sec, width_item, width_act):
+    """คัดลอกช่องจากแถวเดิม คืนมาเป็นสองช่องเสมอ (หัวข้อ = ผสานสองช่อง)"""
+    tcs = tr._tr.findall(qn('w:tc'))
+    if is_sec:
+        tc = copy.deepcopy(tcs[0])
+        set_w(tc, width_item + width_act)
+        span(tc, 2)
+        return [tc]
+    a = copy.deepcopy(tcs[0]); set_w(a, width_item); span(a, None)
+    b = copy.deepcopy(tcs[1] if len(tcs) > 1 else tcs[0]); set_w(b, width_act); span(b, None)
+    return [a, b]
+
+
+def set_w(tc, w):
+    pr = tc.find(qn('w:tcPr'))
+    if pr is None:
+        pr = OxmlElement('w:tcPr'); tc.insert(0, pr)
+    old = pr.find(qn('w:tcW'))
+    if old is not None:
+        pr.remove(old)
+    e = OxmlElement('w:tcW'); e.set(qn('w:w'), str(w)); e.set(qn('w:type'), 'dxa')
+    pr.insert(0, e)
+
+
+def span(tc, n):
+    pr = tc.find(qn('w:tcPr'))
+    old = pr.find(qn('w:gridSpan'))
+    if old is not None:
+        pr.remove(old)
+    if n:
+        e = OxmlElement('w:gridSpan'); e.set(qn('w:val'), str(n)); pr.append(e)
+
+
+def empty_pair(width_item, width_act):
+    return [blank_tc(width_item), blank_tc(width_act)]
+
+
+def build(abbr):
+    src = os.path.join(SRC_DIR, 'D-0507-%s-001.docx' % abbr)
+    arch = os.path.join(SRC_DIR, 'D-0507-%s-001-1col-archive.docx' % abbr)
+    d = docx.Document(src)
+    tbl = d.tables[-1]
+
+    groups = rows_of(tbl)
+    left, right = split(groups)
+    L, R = flat(left), flat(right)
+    if not L or not R:
+        sys.exit('%s: แบ่งสองคอลัมน์ไม่ได้ — มีกลุ่มเดียว' % abbr)
+
+    # ── ตารางใหม่: item | action | คั่น | item | action ──
+    new = copy.deepcopy(tbl._tbl)
+    for tr in new.findall(qn('w:tr')):
+        new.remove(tr)
+    grid = new.find(qn('w:tblGrid'))
+    for gc in grid.findall(qn('w:gridCol')):
+        grid.remove(gc)
+    for w in (W_ITEM, W_ACT, W_GAP, W_ITEM, W_ACT):
+        gc = OxmlElement('w:gridCol'); gc.set(qn('w:w'), str(w)); grid.append(gc)
+
+    n_rows = max(len(L), len(R))
+    for i in range(n_rows):
+        tr = OxmlElement('w:tr')
+        # ซ้าย
+        if i < len(L):
+            for tc in cells_from(L[i][0], L[i][1], W_ITEM, W_ACT):
+                tr.append(tc)
+        else:
+            for tc in empty_pair(W_ITEM, W_ACT):
+                tr.append(tc)
+        tr.append(blank_tc(W_GAP))
+        if i < len(R):
+            for tc in cells_from(R[i][0], R[i][1], W_ITEM, W_ACT):
+                tr.append(tc)
+        else:
+            for tc in empty_pair(W_ITEM, W_ACT):
+                tr.append(tc)
+        new.append(tr)
+
+    tbl._tbl.addnext(new)
+    tbl._tbl.getparent().remove(tbl._tbl)
+
+    # ── เลื่อนตัวอักษรท้ายเลขกำกับ — ฉบับพิมพ์เปลี่ยน ──
+    bumped = set()
+    for p in d.paragraphs:
+        for r in p.runs:
+            if '-CHK-303-B' in r.text:
+                r.text = r.text.replace('-CHK-303-B', '-CHK-303-C')
+                bumped.add(p.text[:40])
+
+    if os.path.exists(arch):
+        sys.exit('%s: มีไฟล์เก็บฉบับเดิมอยู่แล้ว — ลบหรือเปลี่ยนชื่อก่อน\n  %s' % (abbr, arch))
+    shutil.copy2(src, arch)
+    d.save(src)
+    print('✅ %-4s %d แถว → %d แถว (ซ้าย %d · ขวา %d) · เลื่อนเลขกำกับ %d จุด'
+          % (abbr, len(tbl.rows), n_rows, len(L), len(R), len(bumped)))
+    print('   เก็บฉบับคอลัมน์เดียวไว้ที่ %s' % os.path.basename(arch))
+
+
+if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        sys.exit(__doc__ or 'ใช้: python3 tools/build_2col_chk.py NPC [EPC]')
+    for a in sys.argv[1:]:
+        build(a)

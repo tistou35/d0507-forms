@@ -852,13 +852,13 @@
   },
   {
    "doc": "D-0507-NPC-001",
-   "code": "NP-CHK-303-B",
+   "code": "NP-CHK-303-C",
    "abbr": "NPC",
    "kind": "ref",
    "t": "Normal Procedures Checklist",
    "th": "รายการตรวจขั้นตอนปกติ",
    "iss": "01",
-   "rev": "00",
+   "rev": "01",
    "eff": "11 NOV 2024",
    "own": "OP",
    "lef": [
@@ -887,13 +887,13 @@
   },
   {
    "doc": "D-0507-EPC-001",
-   "code": "EP-CHK-303-B",
+   "code": "EP-CHK-303-C",
    "abbr": "EPC",
    "kind": "ref",
    "t": "Emergency Procedures Checklist",
    "th": "รายการตรวจขั้นตอนฉุกเฉิน",
    "iss": "01",
-   "rev": "00",
+   "rev": "01",
    "eff": "11 NOV 2024",
    "own": "OP",
    "lef": [
