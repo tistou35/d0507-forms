@@ -729,12 +729,29 @@ a.gf:hover{border-color:var(--navy-900);color:var(--navy-900)}
   .prhd .org{font-family:var(--font-mono),monospace;font-size:7pt;letter-spacing:.13em}
   .prhd .ttl{font-family:var(--font-display),serif;font-size:14pt;font-weight:700;line-height:1.2;margin-top:1pt}
   .prhd .ten{font-size:9pt;color:#333;line-height:1.25}
-  .prmeta{display:flex;border:1pt solid #000;border-top:0}
-  .prmeta span{flex:1;padding:3pt 8pt;border-right:1pt solid #000;font-size:8pt;line-height:1.35}
-  .prmeta span:last-child{border-right:0}
+  /* เป็น <table> ไม่ใช่ flex — ตัวแปลง HTML→PDF ของ Apps Script ที่ใช้เก็บสำเนา
+     ลง Drive ไม่รู้จัก flex แถวข้อมูลจะกองทับกัน ตารางได้ผลเหมือนกันทั้งสองที่ */
+  .prmeta,.prwho{width:100%;border-collapse:collapse;border:1pt solid #000;border-top:0;
+    table-layout:fixed}
+  .prmeta td{padding:3pt 8pt;border-right:1pt solid #000;font-size:8pt;line-height:1.35}
+  .prmeta td:last-child{border-right:0}
   .prmeta b{display:block;font-size:6.5pt;letter-spacing:.1em;text-transform:uppercase;
     font-weight:400;color:#444}
   .prmeta i{font-style:normal;font-family:var(--font-mono),monospace;font-size:8.5pt}
+  .prhd .tag{float:right;font-family:var(--font-sans),sans-serif;font-size:7pt;
+    letter-spacing:.08em;border:.75pt solid #000;padding:1pt 5pt}
+
+  /* ใครทำ เมื่อไร กับอากาศยานลำใด — แผ่นที่ไม่มีบรรทัดนี้ใช้เป็นหลักฐานไม่ได้
+     รายงานพิมพ์ค่าที่กรอกมา กระดาษเปล่ากับแบบฟอร์มพิมพ์เส้นว่างให้เขียนเอง */
+  .prwho td{padding:3pt 8pt;border-right:1pt solid #000;font-size:8pt}
+  .prwho td:last-child{border-right:0}
+  .prwho td.nw{width:24mm}
+  .prwho b{display:block;font-size:6.5pt;letter-spacing:.1em;text-transform:uppercase;
+    font-weight:400;color:#444}
+  .prwho i{font-style:normal;font-size:9pt;display:block;min-height:11pt}
+  .prwho i.bl{border-bottom:.5pt dotted #666;margin-top:2pt}
+  .prnote{border:1pt solid #000;border-top:0;padding:3pt 8pt;font-size:8pt}
+  .prnote b{font-size:6.5pt;letter-spacing:.1em;text-transform:uppercase;font-weight:400;color:#444}
 
   /* แถวรายการ — ห้ามฉีกกลางแถว และห้ามแยกข้อย่อยไปคนละหน้ากับข้อหลัก */
   .prt tbody tr{break-inside:avoid}

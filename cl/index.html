@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>เช็กลิสต์ — D-0507 Flight Training</title>
-<link rel="stylesheet" href="../assets/app.css?v=f1644687">
+<link rel="stylesheet" href="../assets/app.css?v=69d40bed">
 <style>
 .clband{background:var(--navy-900);color:#fff;border-radius:12px;padding:16px 18px}
 .clband h1{font-size:21px;margin:2px 0 4px}
@@ -39,8 +39,25 @@
 .clbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:14px 0 4px}
 .clbar .cnt{font-size:13px;color:var(--fg-2);margin-left:auto}
 
+/* แผงกรอกข้อมูลของรายงาน */
+.clrep{margin:12px 0 0;padding:14px 16px;border:1px solid var(--border-light);
+  border-radius:10px;background:var(--surface)}
+.clrep h4{font-size:15px;font-weight:700;font-family:var(--font-display)}
+.clrep .hint{font-size:12.5px;color:var(--g-500);line-height:1.55;margin:3px 0 12px}
+.clrep .g{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px 14px}
+.clrep label{display:block;font-size:13px;font-weight:600}
+.clrep label.wide{margin-top:10px}
+.clrep .rq{color:var(--red-600)}
+.clrep input{width:100%;margin-top:4px;min-height:40px;padding:0 11px;border-radius:8px;
+  border:1px solid var(--border-med);background:var(--surface);font-size:14px;font-family:inherit}
+.clrep input:focus{outline:2px solid var(--sky-500);outline-offset:1px}
+.clrep .a{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px}
+.clrep .msg{font-size:12.5px;color:var(--g-500)}
+.clrep .msg.ok{color:var(--green-600)}
+.clrep .msg.bad{color:var(--red-600)}
+
 /* การพิมพ์ใช้แม่แบบร่วม .prdoc ใน app.css — ที่นี่เหลือเฉพาะการซ่อนของบนจอ */
-@media print{ .clbar{display:none !important} }
+@media print{ .clbar,.clrep{display:none !important} }
 </style>
 </head><body>
 <div class="topbar">
@@ -170,15 +187,47 @@ const dmy = s => {
 
    สองคอลัมน์ = จับครึ่งแรกไว้ซ้าย ครึ่งหลังไว้ขวา ไม่ใช่ column-count
    ซึ่งไหลข้ามหน้าแล้วลำดับข้อสลับกัน — เช็กลิสต์ต้องอ่านตามลำดับที่ทำจริง */
-function buildPrint(rows){
+/* หน้ากระดาษที่พึ่งพาตัวเองได้ — ใช้ส่งไปทำ PDF เก็บใน Drive
+   ดึงกฎ @media print ออกมาจาก stylesheet แล้วถอดกรอบ media ทิ้ง
+   เพราะไฟล์ที่ส่งไปไม่มีทางโหลด stylesheet ของเว็บเราได้ */
+let PRCSS = null;
+async function standaloneHtml(){
+  if (PRCSS === null) {
+    try {
+      const href = [...document.styleSheets].map(x => x.href).find(h => h && h.includes('app.css'));
+      const css = await (await fetch(href)).text();
+      let out = '', i = 0;
+      while ((i = css.indexOf('@media print{', i)) >= 0) {
+        let d = 0; const j = css.indexOf('{', i);
+        for (let k = j; k < css.length; k++) {
+          if (css[k] === '{') d++;
+          else if (css[k] === '}') { d--; if (!d) { out += css.slice(j + 1, k); i = k; break; } }
+        }
+        i++;
+      }
+      PRCSS = out;
+    } catch (e) { PRCSS = ''; }
+  }
+  const pr = document.getElementById('pr');
+  return '<!doctype html><html lang="th"><head><meta charset="utf-8">' +
+    '<style>body{margin:0;font-family:sans-serif}.prdoc{display:block}' + PRCSS +
+    '</style></head><body>' + pr.outerHTML + '</body></html>';
+}
+
+function buildPrint(rows, mode, meta){
   const pr = document.getElementById('pr');
   const two = C.layout === 'two';
+  // ฟอร์ม = แผ่นอ้างอิง ไม่มีช่องติ๊ก · กระดาษเปล่า = มี ☐ ให้กาด้วยปากกา
+  // รายงาน = บันทึกที่ทำเสร็จแล้ว ติ๊กตามที่กดไว้บนจอ
+  const tick = mode !== 'form';
+  const per  = tick ? 3 : 2;
+  const cols = two ? per * 2 + 1 : per;
 
   const cell = r => r
     ? `<td class="t${r.sub ? ' sub' : ''}">${A.esc(r.t||'')}</td>
-       <td class="a${r.sub ? ' sub' : ''}">${A.esc(r.a||'')}</td>
-       <td class="bx">${r.on ? '✓' : '☐'}</td>`
-    : '<td class="t e"></td><td class="a e"></td><td class="bx e"></td>';
+       <td class="a${r.sub ? ' sub' : ''}">${A.esc(r.a||'')}</td>` +
+      (tick ? `<td class="bx">${mode === 'report' && r.on ? '✓' : '☐'}</td>` : '')
+    : '<td class="t e"></td><td class="a e"></td>' + (tick ? '<td class="bx e"></td>' : '');
 
   let body = '';
   if (two) {
@@ -210,26 +259,41 @@ function buildPrint(rows){
   /* colgroup ไม่ใช่ของประดับ — table-layout:fixed อ่านความกว้างจากแถวแรกเท่านั้น
      แถวแรกคือหัวเอกสารที่เป็น colspan เดียว ถ้าไม่บอกความกว้างตรงนี้
      ทุกคอลัมน์จะกว้างเท่ากันหมด ช่องติ๊กเลยกว้างเท่ากับช่องข้อความ */
-  const cg = two
-    ? '<colgroup><col style="width:auto"><col style="width:24mm"><col style="width:8mm">' +
-      '<col style="width:4mm"><col style="width:auto"><col style="width:24mm"><col style="width:8mm"></colgroup>'
-    : '<colgroup><col style="width:auto"><col style="width:34mm"><col style="width:10mm"></colgroup>';
-  const cols = two ? 7 : 3;
+  const one = tick
+    ? '<col style="width:auto"><col style="width:24mm"><col style="width:8mm">'
+    : '<col style="width:auto"><col style="width:26mm">';
+  const cg = '<colgroup>' + (two ? one + '<col style="width:4mm">' + one
+    : one.replace('24mm','34mm').replace('26mm','38mm').replace('8mm','10mm')) + '</colgroup>';
+
+  /* ข้อมูลผู้ทำและวันที่ — รายงานพิมพ์ค่าที่กรอก ส่วนกระดาษเปล่ากับแบบฟอร์ม
+     พิมพ์เป็นเส้นว่างให้เขียนด้วยปากกา เพราะแผ่นที่ไม่มีชื่อกับวันที่
+     ใช้เป็นหลักฐานว่าใครตรวจเมื่อไรไม่ได้ */
+  const m = meta || {};
+  const line = v => v ? `<i>${A.esc(v)}</i>` : '<i class="bl"></i>';
+  const who = `<table class="prwho"><tr>
+      <td><b>ผู้ทำเช็กลิสต์</b>${line(m.by)}</td>
+      <td><b>ทะเบียนอากาศยาน</b>${line(m.ac)}</td>
+      <td><b>วันที่</b>${line(m.date ? dmy(m.date) : '')}</td>
+      <td class="nw"><b>เวลา</b>${line(m.time)}</td>
+    </tr></table>` + (mode === 'report' && m.note
+      ? `<div class="prnote"><b>หมายเหตุ</b> ${A.esc(m.note)}</div>` : '');
 
   const t = C.title || {};
+  const tag = mode === 'report' ? 'รายงาน' : mode === 'form' ? 'แบบฟอร์ม' : 'กระดาษบันทึก';
   pr.innerHTML = `<table class="prt">${cg}
     <thead><tr><th colspan="${cols}">
       <div class="prhd">
-        <p class="org">D-0507 FLIGHT TRAINING CO., LTD.</p>
+        <p class="org">D-0507 FLIGHT TRAINING CO., LTD.<span class="tag">${A.esc(tag)}</span></p>
         <p class="ttl">${A.esc((t.th||'').trim() || C.doc || '')}</p>
         <p class="ten">${A.esc((t.en||'').trim())}</p>
       </div>
-      <div class="prmeta">
-        <span><b>รหัสเอกสาร</b><i>${A.esc(C.doc||'—')}</i></span>
-        <span><b>เลขกำกับ</b><i>${A.esc(C.code||'—')}</i></span>
-        <span><b>ฉบับ / แก้ไข</b><i>${A.esc(C.issue||'01')} / ${A.esc(C.rev||'00')}</i></span>
-        <span><b>วันที่มีผล</b><i>${A.esc(dmy(C.eff))}</i></span>
-      </div>
+      <table class="prmeta"><tr>
+        <td><b>รหัสเอกสาร</b><i>${A.esc(C.doc||'—')}</i></td>
+        <td><b>เลขกำกับ</b><i>${A.esc(C.code||'—')}</i></td>
+        <td><b>ฉบับ / แก้ไข</b><i>${A.esc(C.issue||'01')} / ${A.esc(C.rev||'00')}</i></td>
+        <td><b>วันที่มีผล</b><i>${A.esc(dmy(C.eff))}</i></td>
+      </tr></table>
+      ${who}
     </th></tr></thead>
     <tbody>${body}</tbody>
     <tfoot><tr><td colspan="${cols}"><div class="ln">
@@ -263,9 +327,29 @@ function paint(){
     </div>
 
     <div class="clbar">
-      <button class="obtn" id="print">พิมพ์</button>
+      <button class="obtn" id="prReport">พิมพ์รายงาน</button>
+      <button class="obtn sec" id="prBlank">พิมพ์กระดาษเปล่า</button>
+      <button class="obtn sec" id="prForm">พิมพ์แบบฟอร์ม</button>
       <button class="obtn sec" id="reset">ล้างเครื่องหมาย</button>
       <span class="cnt" id="cnt"></span>
+    </div>
+
+    <div class="clrep" id="rep" hidden>
+      <h4>ข้อมูลของรายงาน</h4>
+      <p class="hint">รายงานเป็นบันทึกว่าใครทำเช็กลิสต์นี้ เมื่อไร กับอากาศยานลำใด —
+        พิมพ์แล้วระบบเก็บสำเนา PDF ลง Drive ให้เอง</p>
+      <div class="g">
+        <label>ผู้ทำเช็กลิสต์ <span class="rq">*</span><input id="rBy" autocomplete="name"></label>
+        <label>ทะเบียนอากาศยาน<input id="rAc" placeholder="HS-" autocomplete="off"></label>
+        <label>วันที่ <span class="rq">*</span><input id="rDate" type="date"></label>
+        <label>เวลา<input id="rTime" type="time"></label>
+      </div>
+      <label class="wide">หมายเหตุ<input id="rNote" autocomplete="off"></label>
+      <div class="a">
+        <button class="obtn" id="rGo">พิมพ์และบันทึกลง Drive</button>
+        <button class="obtn sec" id="rCancel">ยกเลิก</button>
+        <span class="msg" id="rMsg"></span>
+      </div>
     </div>
 
     <div class="cllist ${C.layout==='two'?'two':''}">
@@ -286,8 +370,68 @@ function paint(){
     const el = document.querySelector('.clitem .a[data-k="' + r.k + '"]');
     return Object.assign({}, r, { on: !!el && el.classList.contains('on') });
   });
-  buildPrint(withTicks());
-  addEventListener('beforeprint', () => buildPrint(withTicks()));
+  /* โหมดที่จะพิมพ์ ตั้งไว้ก่อนสั่ง window.print() แล้ว beforeprint ประกอบตามนั้น
+     เก็บไว้ในตัวแปรเพราะกด Ctrl+P เองก็ต้องได้แผ่นที่สมเหตุสมผล ไม่ใช่หน้าว่าง */
+  let MODE = 'blank', META = {};
+  const build = () => buildPrint(withTicks(), MODE, META);
+  build();
+  addEventListener('beforeprint', build);
+
+  const rep = document.getElementById('rep');
+  const msg = document.getElementById('rMsg');
+  const val = id => (document.getElementById(id).value || '').trim();
+
+  const goPrint = (mode, meta) => { MODE = mode; META = meta || {}; build(); window.print(); };
+
+  document.getElementById('prBlank').addEventListener('click', () => goPrint('blank'));
+  document.getElementById('prForm').addEventListener('click',  () => goPrint('form'));
+
+  document.getElementById('prReport').addEventListener('click', () => {
+    rep.hidden = false;
+    if (!val('rBy')) document.getElementById('rBy').value =
+      (A.user && (A.user.name || A.user.displayName)) || '';
+    if (!val('rDate')) document.getElementById('rDate').value = new Date()
+      .toLocaleDateString('en-CA');                    // en-CA ให้ YYYY-MM-DD ตามเขตเวลาเครื่อง
+    if (!val('rTime')) document.getElementById('rTime').value =
+      new Date().toTimeString().slice(0, 5);
+    document.getElementById('rBy').focus();
+    rep.scrollIntoView({ block: 'nearest' });
+  });
+  document.getElementById('rCancel').addEventListener('click', () => { rep.hidden = true; msg.textContent=''; });
+
+  document.getElementById('rGo').addEventListener('click', async () => {
+    if (!val('rBy') || !val('rDate')) {
+      msg.className = 'msg bad'; msg.textContent = 'ต้องมีชื่อผู้ทำและวันที่'; return;
+    }
+    const meta = { by: val('rBy'), ac: val('rAc'), date: val('rDate'),
+                   time: val('rTime'), note: val('rNote') };
+
+    /* พิมพ์ก่อน เก็บทีหลัง — คนกดปุ่มนี้ต้องการกระดาษ ถ้า Drive ล่ม
+       ก็ยังต้องได้แผ่นออกมา และได้รู้ว่าสำเนายังไม่ถูกเก็บ */
+    goPrint('report', meta);
+
+    if (!A.user) { msg.className='msg bad';
+      msg.textContent = 'พิมพ์แล้ว แต่ยังไม่ได้เก็บสำเนา — ต้องเข้าสู่ระบบก่อน'; return; }
+    msg.className = 'msg'; msg.textContent = 'กำลังเก็บสำเนาลง Drive…';
+    const r = await A.gas('checklistReport', {
+      doc: C.doc || ID, code: C.code || '', issue: C.issue || '01', rev: C.rev || '00',
+      eff: C.eff || '', title: C.title || {}, meta: meta,
+      done: withTicks().filter(x => x.on).length,
+      total: rows.filter(x => (x.a||'').trim()).length,
+      // ส่งหน้ากระดาษไปทั้งแผ่น ไม่ใช่ส่งข้อมูลดิบไปให้ประกอบใหม่ฝั่งโน้น
+      // มีแม่แบบเดียว สำเนาใน Drive จึงหน้าตาเหมือนแผ่นที่พิมพ์ออกมาเสมอ
+      html: await standaloneHtml(),
+    });
+    if (r.ok) {
+      msg.className = 'msg ok';
+      msg.innerHTML = 'เก็บสำเนาลง Drive แล้ว · ' +
+        `<a href="${A.esc(r.result.url)}" target="_blank" rel="noopener">เปิดไฟล์ PDF</a>` +
+        (r.result.sheetUrl ? ` · <a href="${A.esc(r.result.sheetUrl)}" target="_blank" rel="noopener">ทะเบียนรายงาน</a>` : '');
+    } else {
+      msg.className = 'msg bad';
+      msg.textContent = 'พิมพ์แล้ว แต่เก็บสำเนาไม่สำเร็จ: ' + (r.error || 'ไม่ทราบสาเหตุ');
+    }
+  });
 
   const cnt = () => {
     const on = document.querySelectorAll('.clitem .a.on').length;
@@ -303,7 +447,6 @@ function paint(){
     el.addEventListener('keydown', e => {
       if (e.key===' '||e.key==='Enter'){ e.preventDefault(); flip(); } });
   });
-  document.getElementById('print').addEventListener('click', () => window.print());
   document.getElementById('reset').addEventListener('click', () => {
     document.querySelectorAll('.clitem .a.on').forEach(el => {
       el.classList.remove('on'); el.setAttribute('aria-pressed','false'); });

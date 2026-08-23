@@ -67,6 +67,12 @@ function doPost(e) {
       return json_({ ok: true, result: extNotify_(body) });
     }
 
+    /* รายงานเช็กลิสต์ — เจ้าหน้าที่ที่ล็อกอินแล้วเท่านั้น (ดู Checklist.gs)
+       เก็บเฉพาะแผ่นที่มีชื่อผู้ทำและวันที่ ไม่เก็บกระดาษเปล่ากับแบบฟอร์ม */
+    if (body.action === 'checklistReport') {
+      return json_({ ok: true, result: checklistReport_(body, who) });
+    }
+
     var out = exportSubmission_(body.submission, who);
     return json_({ ok: true, result: out });
   } catch (err) {
