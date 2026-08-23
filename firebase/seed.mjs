@@ -31,7 +31,7 @@ const DRY = process.argv.includes('--dry');
    ──────────────────────────────────────────────────────────── */
 const PEOPLE = [
   {
-    uid:   'REPLACE_WITH_UID',
+    uid:   'GwQFCbOfxrcWFaZglTgMX6LWz7S2',   // ดึงจาก Firebase Auth 23 AUG 2026
     email: 'tistou35@gmail.com',
     name:  'ธนวัฒน์ ว.',
     cert:  'FI · หัวหน้าฝ่ายปฏิบัติการการบิน',
@@ -107,6 +107,22 @@ async function main() {
       console.warn(`  ⚠ ยังไม่มีใครรับฟอร์มที่ส่งถึง ${need} — ฟอร์มนั้นจะส่งไม่ได้`);
   }
 
+  /* ทะเบียนต้องถูกนับใน --dry ด้วย — ของเดิม return ก่อนถึงบล็อกที่เขียนทะเบียน
+     สรุปจึงบอกแค่จำนวนคน แล้วคนอ่านนึกว่าไม่ได้แตะทะเบียน ทั้งที่การรันจริง
+     เขียนทับ registry/current ทั้งก้อน ซึ่งเป็นสิ่งที่เจ้าหน้าที่ทุกคนเห็น */
+  const regPath = new URL('./registry.json', import.meta.url);
+  const hasReg = existsSync(regPath);
+  const reg = hasReg ? JSON.parse(readFileSync(regPath, 'utf8')) : null;
+  if (hasReg) {
+    const kinds = reg.forms.reduce((a, f) => (a[f.kind || 'form'] = (a[f.kind || 'form'] || 0) + 1, a), {});
+    console.log(`registry/current:      ${reg.forms.length} ฟอร์ม `
+      + `(ใบให้กรอก ${kinds.form || 0} · เอกสารอ้างอิง ${kinds.ref || 0})`);
+    console.log(`  · มีฟอร์มเปล่า ${reg.forms.filter(f => f.blank).length} ใบ`
+      + ` · มีแม่แบบ Google Doc ${reg.forms.filter(f => f.tpl).length} ใบ`);
+  } else {
+    console.warn('  ⚠ ไม่พบ firebase/registry.json — รัน python3 build.py ก่อน');
+  }
+
   if (DRY) { console.log('\n--dry: ไม่ได้เขียนอะไร'); return; }
 
   const batch = db.batch();
@@ -115,14 +131,9 @@ async function main() {
             { list: instructors, updatedAt: FieldValue.serverTimestamp() });
 
   // ทะเบียนฉบับเต็ม — เว็บสาธารณะฝังไม่ได้ จึงอ่านจาก Firestore หลัง login
-  const regPath = new URL('./registry.json', import.meta.url);
-  if (existsSync(regPath)) {
-    const reg = JSON.parse(readFileSync(regPath, 'utf8'));
+  if (hasReg) {
     batch.set(db.doc('registry/current'),
               Object.assign({}, reg, { updatedAt: FieldValue.serverTimestamp() }));
-    console.log(`registry/current:      ${reg.forms.length} ฟอร์ม`);
-  } else {
-    console.warn('  ⚠ ไม่พบ firebase/registry.json — รัน python3 build.py ก่อน');
   }
 
   await batch.commit();
