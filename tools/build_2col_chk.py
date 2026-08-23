@@ -2,8 +2,9 @@
 # ============================================================
 # build_2col_chk.py — จัดเช็กลิสต์ห้องนักบิน (NPC / EPC) ให้เป็นสองคอลัมน์
 #
-#   python3 tools/build_2col_chk.py NPC
+#   python3 tools/build_2col_chk.py NPC          สองคอลัมน์ (ค่าปริยาย)
 #   python3 tools/build_2col_chk.py NPC EPC
+#   python3 tools/build_2col_chk.py --cols 3 NPC EPC
 #
 # ── ทำไม ─────────────────────────────────────────────────────
 # ตารางเดิมเป็นคอลัมน์เดียวยาว 172 แถว (NPC) / 112 แถว (EPC) ออกมา 4 และ 3 หน้า
@@ -31,8 +32,13 @@ from docx.oxml import OxmlElement
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC_DIR = os.path.dirname(HERE)                      # โฟลเดอร์ Manual revision
 
-# ความกว้างคอลัมน์ (dxa = 1/20 pt) รวมต้องเท่าของเดิม 10106
-W_ITEM, W_ACT, W_GAP = 3060, 1893, 200
+# ความกว้างรวมต้องเท่าของเดิม 10106 dxa (1 dxa = 1/20 pt)
+TOTAL, W_GAP = 10106, 170
+# สัดส่วนช่องรายการ : ช่องสิ่งที่ต้องทำ
+# ฉบับเดิมคอลัมน์เดียวใช้ 0.62 แต่พอแบ่งสามคอลัมน์ ช่องขวาจะแคบจนคำอย่าง
+# UNOBSTRUCTED ถูกตัดกลางคำเป็น "UNOBSTRUCT ED" — อ่านผิดได้ในห้องนักบิน
+# ยิ่งคอลัมน์เยอะยิ่งต้องแบ่งให้ช่องขวามากขึ้น
+RATIO = {1: 0.62, 2: 0.615, 3: 0.55}
 
 
 def rows_of(tbl):
@@ -51,16 +57,29 @@ def rows_of(tbl):
     return groups
 
 
-def split(groups):
-    """ตัดตรงที่ทำให้สองคอลัมน์ยาวใกล้กันที่สุด โดยไม่ฉีกกลุ่ม"""
+def split(groups, cols=2):
+    """ตัดให้ทุกคอลัมน์ยาวใกล้กันที่สุด โดยไม่ฉีกกลุ่มหัวข้อ
+
+    ไล่ตัดทีละจุดตามลำดับ ไม่ได้จัดเรียงใหม่ — ลำดับขั้นตอนของเช็กลิสต์
+    ต้องอ่านจากบนลงล่างคอลัมน์ซ้ายให้จบก่อนแล้วขึ้นหัวคอลัมน์ถัดไป
+    """
     size = [1 + len(g['items']) if g['sec'] is not None else len(g['items']) for g in groups]
-    half, n, cut, best = sum(size) / 2, 0, 0, float('inf')
-    for i in range(len(groups) + 1):
-        if abs(n - half) < best:
-            best, cut = abs(n - half), i
-        if i < len(groups):
-            n += size[i]
-    return groups[:cut], groups[cut:]
+    total = sum(size)
+    out, start, done = [], 0, 0
+    for c in range(cols - 1):
+        target = total * (c + 1) / cols
+        n, cut, best = done, start, float('inf')
+        for i in range(start, len(groups) + 1):
+            if abs(n - target) < best:
+                best, cut = abs(n - target), i
+            if i < len(groups):
+                n += size[i]
+        cut = max(cut, start)
+        out.append(groups[start:cut])
+        done += sum(size[start:cut])
+        start = cut
+    out.append(groups[start:])
+    return out
 
 
 def flat(groups):
@@ -125,17 +144,23 @@ def empty_pair(width_item, width_act):
     return [blank_tc(width_item), blank_tc(width_act)]
 
 
-def build(abbr):
+def widths(cols):
+    half = (TOTAL - W_GAP * (cols - 1)) // cols
+    item = int(half * RATIO.get(cols, 0.55))
+    return item, half - item
+
+
+def build(abbr, cols=2):
+    W_ITEM, W_ACT = widths(cols)
     src = os.path.join(SRC_DIR, 'D-0507-%s-001.docx' % abbr)
     arch = os.path.join(SRC_DIR, 'D-0507-%s-001-1col-archive.docx' % abbr)
     d = docx.Document(src)
     tbl = d.tables[-1]
 
     groups = rows_of(tbl)
-    left, right = split(groups)
-    L, R = flat(left), flat(right)
-    if not L or not R:
-        sys.exit('%s: แบ่งสองคอลัมน์ไม่ได้ — มีกลุ่มเดียว' % abbr)
+    parts = [flat(g) for g in split(groups, cols)]
+    if any(not p for p in parts):
+        sys.exit('%s: แบ่ง %d คอลัมน์ไม่ได้ — กลุ่มหัวข้อน้อยเกินไป' % (abbr, cols))
 
     # ── ตารางใหม่: item | action | คั่น | item | action ──
     new = copy.deepcopy(tbl._tbl)
@@ -144,26 +169,24 @@ def build(abbr):
     grid = new.find(qn('w:tblGrid'))
     for gc in grid.findall(qn('w:gridCol')):
         grid.remove(gc)
-    for w in (W_ITEM, W_ACT, W_GAP, W_ITEM, W_ACT):
-        gc = OxmlElement('w:gridCol'); gc.set(qn('w:w'), str(w)); grid.append(gc)
+    for n in range(cols):
+        if n:
+            gc = OxmlElement('w:gridCol'); gc.set(qn('w:w'), str(W_GAP)); grid.append(gc)
+        for w in (W_ITEM, W_ACT):
+            gc = OxmlElement('w:gridCol'); gc.set(qn('w:w'), str(w)); grid.append(gc)
 
-    n_rows = max(len(L), len(R))
+    n_rows = max(len(p) for p in parts)
     for i in range(n_rows):
         tr = OxmlElement('w:tr')
-        # ซ้าย
-        if i < len(L):
-            for tc in cells_from(L[i][0], L[i][1], W_ITEM, W_ACT):
-                tr.append(tc)
-        else:
-            for tc in empty_pair(W_ITEM, W_ACT):
-                tr.append(tc)
-        tr.append(blank_tc(W_GAP))
-        if i < len(R):
-            for tc in cells_from(R[i][0], R[i][1], W_ITEM, W_ACT):
-                tr.append(tc)
-        else:
-            for tc in empty_pair(W_ITEM, W_ACT):
-                tr.append(tc)
+        for n, part in enumerate(parts):
+            if n:
+                tr.append(blank_tc(W_GAP))
+            if i < len(part):
+                for tc in cells_from(part[i][0], part[i][1], W_ITEM, W_ACT):
+                    tr.append(tc)
+            else:
+                for tc in empty_pair(W_ITEM, W_ACT):
+                    tr.append(tc)
         new.append(tr)
 
     tbl._tbl.addnext(new)
@@ -181,13 +204,18 @@ def build(abbr):
         sys.exit('%s: มีไฟล์เก็บฉบับเดิมอยู่แล้ว — ลบหรือเปลี่ยนชื่อก่อน\n  %s' % (abbr, arch))
     shutil.copy2(src, arch)
     d.save(src)
-    print('✅ %-4s %d แถว → %d แถว (ซ้าย %d · ขวา %d) · เลื่อนเลขกำกับ %d จุด'
-          % (abbr, len(tbl.rows), n_rows, len(L), len(R), len(bumped)))
+    print('✅ %-4s %d แถว → %d แถว × %d คอลัมน์ (%s) · เลื่อนเลขกำกับ %d จุด'
+          % (abbr, len(tbl.rows), n_rows, cols,
+             ' · '.join(str(len(p)) for p in parts), len(bumped)))
     print('   เก็บฉบับคอลัมน์เดียวไว้ที่ %s' % os.path.basename(arch))
 
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        sys.exit(__doc__ or 'ใช้: python3 tools/build_2col_chk.py NPC [EPC]')
-    for a in sys.argv[1:]:
-        build(a)
+    args = sys.argv[1:]
+    cols = 2
+    if args and args[0] == '--cols':
+        cols = int(args[1]); args = args[2:]
+    if not args:
+        sys.exit('ใช้: python3 tools/build_2col_chk.py [--cols N] NPC [EPC]')
+    for a in args:
+        build(a, cols)
