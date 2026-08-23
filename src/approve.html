@@ -294,6 +294,8 @@ async function finish(status,action,note){
     if(status==='complete'){
       ex=await A.exportSubmission(Object.assign({},SUB,patch,{
         status:'complete', data:FK.data, computed:FK.computed(),
+        computedLabels:(DEF.compute||[]).reduce((o,c)=>{
+          if(c.label) o[c.k]=FormKit.L(c.label,A.lang); return o; },{}),
         submittedAt:new Date().toISOString(),
         signedBy:(SUB.signedBy||[]).concat([me]),
         // ต้องประกอบที่นี่ ไม่ใช่ตอนผู้กรอกส่ง — ลายเซ็นผู้อนุมัติเพิ่งเกิดขึ้น

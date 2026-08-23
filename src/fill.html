@@ -77,6 +77,15 @@ function netBar(){
 A.onNet.push(netBar);
 
 /* ขั้นอนุมัติถัดไปที่ใช้จริงตามคำตอบปัจจุบัน (undefined = จบที่ผู้กรอก) */
+/* ชื่อของค่าที่คำนวณได้ ใช้เป็นหัวคอลัมน์ในชีตบันทึก
+   ตัวส่งออกไม่มีนิยามฟอร์ม จึงรู้แค่คีย์ ('score') ซึ่งอ่านไม่ออกว่าคืออะไร
+   ส่งไปเฉพาะตอนส่งออก ไม่เก็บลง Firestore */
+function cLabels(){
+  const out = {};
+  (DEF.compute||[]).forEach(c => { if (c.label) out[c.k] = LL(c.label); });
+  return out;
+}
+
 function nextStep(){
   if(!FK) return null;
   const ctx=FK.ctx();
@@ -502,7 +511,7 @@ async function send(){
     // ส่งไปกับการส่งออกเท่านั้น ไม่เก็บลง Firestore — ประกอบใหม่จากนิยามฟอร์มได้เสมอ
     // และ rules นับคีย์ของใบไว้ที่ 22
     if(done) ex=await A.exportSubmission(Object.assign({},sub,{
-      submittedAt:d.toISOString(), render:FK.docSpec()}));
+      submittedAt:d.toISOString(), render:FK.docSpec(), computedLabels:cLabels()}));
 
     /* แจ้งกลับทันทีที่ลงนามเสร็จ ไม่รอผลอนุมัติ
        ต้นทางถามคำถามเดียวคือ "คนนี้ลงนามหรือยัง" การอนุมัติของหัวหน้าครูฝึก

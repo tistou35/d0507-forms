@@ -230,9 +230,21 @@ function exportSubmission_(s, who) {
 
   // ── 1. แถวในชีต ──
   var flat = flatten_(s.data || {});
+
+  /* ค่าที่คำนวณได้ต้องลงชีตด้วย ไม่ใช่ลงแต่ใน PDF
+     FRAE เป็นใบประเมินความเสี่ยง คะแนนรวมคือสาระของทั้งใบ แต่ชีตเดิมเก็บแค่
+     คำตอบดิบกับผลตัดสิน GO/NO-GO — คนตรวจย้อนหลังจึงตอบไม่ได้ว่าคะแนนเท่าไร
+     ถ้าไม่เปิด PDF ทีละใบ
+     ชื่อคอลัมน์เอาจาก computedLabels ที่หน้าเว็บส่งมา ('TOTAL RISK SCORE')
+     ไม่มีชื่อก็ใช้คีย์ไปก่อน ดีกว่าไม่มีคอลัมน์เลย */
+  var comp = s.computed || {}, cLab = s.computedLabels || {};
+  var cKeys = Object.keys(comp).map(function (k) { return cLab[k] || k; });
+
   var base = ['เลขที่', 'วันที่บันทึก', 'Doc code', 'Issue/Rev', 'defRev',
               'ผู้ส่ง', 'อีเมลผู้ส่ง', 'สถานะ', 'ผู้ลงนาม', 'PDF'];
-  var extra = Object.keys(flat);
+  var extra = cKeys.concat(Object.keys(flat).filter(function (k) {
+    return cKeys.indexOf(k) < 0;          // คีย์ซ้ำกับชื่อผลคำนวณ อย่าให้มีสองคอลัมน์
+  }));
   var r = recordSheet_(folder, abbr + ' — Records', base.concat(extra));
   var headers = alignHeaders_(r.sh, base.concat(extra));
 
@@ -252,6 +264,7 @@ function exportSubmission_(s, who) {
     'PDF': pdf ? pdf.getUrl() : '',
   };
   Object.keys(flat).forEach(function (k) { byKey[k] = flat[k]; });
+  Object.keys(comp).forEach(function (k) { byKey[cLab[k] || k] = comp[k]; });
 
   // กันบันทึกซ้ำถ้ายิงมาสองครั้ง
   var trkCol = headers.indexOf('เลขที่') + 1;
