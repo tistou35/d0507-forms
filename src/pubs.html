@@ -76,7 +76,7 @@ span.gof i{background:var(--g-200);color:var(--g-500)}
   background:var(--green-100);color:var(--green-600);vertical-align:2px}
 
 /* แถวทั่วไป (ปฏิบัติการ · แผนภูมิ) */
-.prow{display:grid;grid-template-columns:1fr auto auto auto;gap:12px;align-items:center;
+.prow{display:grid;grid-template-columns:1fr auto auto auto auto;gap:12px;align-items:center;
   padding:10px 14px;border:1px solid var(--border-light);border-radius:8px;
   background:var(--surface);margin-bottom:7px}
 .prow .nm{font-size:13.5px;line-height:1.35}
@@ -93,6 +93,11 @@ span.gof i{background:var(--g-200);color:var(--g-500)}
   border:1px solid var(--border-light);border-radius:7px;padding:4px 10px}
 .prow .op:hover{border-color:var(--navy-900);color:var(--navy-900)}
 .prow .op.ed2{color:var(--fg-2)}
+/* ลิงก์ต้นฉบับที่แก้ไขได้ — เห็นเฉพาะเจ้าหน้าที่ ต่างจากปุ่มเปิดที่ทุกคนเห็น
+   ไฟล์นี้คือตัวที่เอกสารควบคุมงอกมาจาก แก้แล้วต้องเลื่อนเลขกำกับและทำ PDF ใหม่ */
+.prow a.go.ed3{background:var(--surface);color:var(--fg-2);
+  border:1px dashed var(--border-med);white-space:nowrap}
+.prow a.go.ed3:hover{color:var(--navy-900);border-color:var(--navy-900)}
 
 .badge{font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px;white-space:nowrap}
 .b-ok{background:var(--green-100);color:var(--green-600)}
@@ -283,6 +288,7 @@ const T = k => A.L({
   pubs:{th:'เช็กลิสต์และเอกสารเผยแพร่',en:'Checklists & publications'},
   open:{th:'เปิด',en:'Open'},
   nofile:{th:'ยังไม่มีไฟล์',en:'No file'},
+  editSrc:{th:'แก้ต้นฉบับ',en:'Edit source'},
   eff:{th:'มีผล',en:'Eff'},
   until:{th:'ถึง',en:'until'},
   none:{th:'ยังไม่มีรายการในหมวดนี้ — เพิ่มได้ที่ publications.json',
@@ -390,7 +396,11 @@ function listHtml(tab){
         <div class="ed">${ed}</div>
         <span class="badge b-${s.k}">${A.esc(A.L(s.t))}</span>
         ${u ? `<a class="go" href="${A.esc(u)}" target="_blank" rel="noopener">${A.esc(T('open'))} ↗</a>`
-            : `<span class="go">${A.esc(T('nofile'))}</span>`}</div>`;
+            : `<span class="go">${A.esc(T('nofile'))}</span>`}
+        ${p.edit && A.isStaff()
+            ? `<a class="go ed3" href="https://docs.google.com/document/d/${A.esc(p.edit)}/edit"
+                 target="_blank" rel="noopener" title="ต้นฉบับที่แก้ไขได้ — แก้แล้วต้องเลื่อนเลขกำกับและทำ PDF ใหม่"
+                 >${A.esc(T('editSrc'))} ✎</a>` : ''}</div>`;
     }).join('') : `<p class="sub" style="padding:9px 14px;border:1px dashed var(--border-med);border-radius:8px">${A.esc(T('none'))}</p>`);
   }
   return out.join('');
