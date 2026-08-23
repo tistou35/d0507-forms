@@ -1,0 +1,112 @@
+/**
+ * D-0507 Forms — งานตั้งค่าที่สั่งเองจากหน้า Apps Script
+ *
+ * ไฟล์นี้ไม่ได้ต่อกับ doPost — ไม่มีใครเรียกจากเว็บได้
+ * เป็นงานที่ทำครั้งเดียวตอนตั้งระบบ กดรันจากหน้า Apps Script เท่านั้น
+ */
+
+/**
+ * สร้างแม่แบบเช็กลิสต์เป็น Google Sheet ไว้ใน <PARENT>/CHECKLIST/
+ * วางแบบเดียวกับแม่แบบของฟอร์มอื่น — หัวเอกสารอยู่บน ตารางรายการอยู่ล่าง
+ * เอาไว้ร่างเช็กลิสต์ใบใหม่ใน Sheet ก่อนนำเข้าระบบ
+ *
+ * รันซ้ำได้ — ถ้ามีอยู่แล้วจะไม่สร้างซ้ำ แต่คืน URL ของเดิม
+ */
+function makeChecklistTemplate() {
+  var folder = subFolder_('CHECKLIST');
+  var NAME = 'CHECKLIST_TEMPLATE';
+
+  var it = folder.getFilesByName(NAME), ss;
+  if (it.hasNext()) {
+    ss = SpreadsheetApp.open(it.next());       // มีอยู่แล้ว — จัดรูปแบบใหม่ทับของเดิม
+  } else {
+    ss = SpreadsheetApp.create(NAME);
+    var f = DriveApp.getFileById(ss.getId());
+    folder.addFile(f);
+    DriveApp.getRootFolder().removeFile(f);    // create วางไว้ที่ My Drive ต้องย้ายเข้าโฟลเดอร์
+  }
+
+  var sh = ss.getSheets()[0].setName('เช็กลิสต์');
+  sh.setColumnWidth(1, 90).setColumnWidth(2, 420).setColumnWidth(3, 190)
+    .setColumnWidth(4, 300);
+
+  var NAVY = '#0D1B2A', GREY = '#F3F4F6';
+
+  // ── หัวเอกสาร ─────────────────────────────────────────────
+  sh.getRange('A1:D1').merge().setValue('D-0507 FLIGHT TRAINING CO., LTD.')
+    .setBackground(NAVY).setFontColor('#FFFFFF').setFontFamily('Courier New')
+    .setFontSize(10).setVerticalAlignment('middle');
+  sh.setRowHeight(1, 28);
+  sh.getRange('A2:D2').merge().setValue('แม่แบบเช็กลิสต์ · CHECKLIST TEMPLATE')
+    .setBackground(NAVY).setFontColor('#FFFFFF').setFontSize(15).setFontWeight('bold')
+    .setVerticalAlignment('middle');
+  sh.setRowHeight(2, 34);
+  sh.getRange('A3:D3').merge()
+    .setValue('กรอกหัวเอกสารให้ครบก่อน แล้วจึงพิมพ์รายการที่ต้องทำลงตารางข้างล่าง · '
+            + 'หนึ่งบรรทัดต่อหนึ่งรายการ · ข้อย่อยให้เลือกระดับเป็น "ย่อย" '
+            + 'แล้ววางไว้ใต้ข้อหลักที่มันสังกัด')
+    .setBackground(GREY).setFontSize(10).setWrap(true).setVerticalAlignment('middle');
+  sh.setRowHeight(3, 34);
+
+  // ── ข้อมูลเอกสาร ──────────────────────────────────────────
+  var meta = [
+    ['รหัสเอกสาร',    'D-0507-XXX-001', 'รหัสจากทะเบียนเอกสาร'],
+    ['เลขกำกับ',      'OP-CHK-4XX-A',   'ตัวอักษรท้ายเลื่อนหนึ่งตัวทุกครั้งที่ ฉบับ หรือ แก้ไข เปลี่ยน'],
+    ['ฉบับ',          '01',             'ISSUE NO.'],
+    ['แก้ไข',         '00',             'REVISION NO.'],
+    ['วันที่มีผล',      '23 AUG 2026',    'รูปแบบ DD MMM YYYY'],
+    ['ชื่อ (ไทย)',      '',               'ขึ้นเป็นหัวเรื่องบนกระดาษ'],
+    ['ชื่อ (อังกฤษ)',   '',               'บรรทัดรองใต้ชื่อไทย'],
+    ['การจัดหน้า',     'two',            'one = คอลัมน์เดียว · two = สองคอลัมน์'],
+  ];
+  /* ต้องบังคับเป็นข้อความก่อนเขียน ไม่งั้น Sheets แปลงให้เอง —
+     ฉบับ '01' กลายเป็น 1 · แก้ไข '00' กลายเป็น 0 · '23 AUG 2026' กลายเป็นวันที่
+     ซึ่งผิดรูปแบบเอกสารควบคุมทั้งสามอย่าง และคนที่คัดลอกไปใช้ต่อจะได้ค่าที่ผิด */
+  sh.getRange(5, 2, meta.length, 1).setNumberFormat('@');
+  sh.getRange(5, 1, meta.length, 3).setValues(meta);
+  sh.getRange(5, 1, meta.length, 1).setFontWeight('bold').setBackground(GREY);
+  sh.getRange(5, 3, meta.length, 1).setFontSize(9).setFontColor('#6B7280');
+  sh.getRange(5, 1, meta.length, 3)
+    .setBorder(true, true, true, true, true, true, '#D1D5DB', SpreadsheetApp.BorderStyle.SOLID);
+  sh.getRange('B12').setDataValidation(SpreadsheetApp.newDataValidation()
+    .requireValueInList(['one', 'two'], true).setAllowInvalid(false).build());
+
+  // ── ตารางรายการ ───────────────────────────────────────────
+  var HDR = 14;
+  sh.getRange(HDR, 1, 1, 4)
+    .setValues([['ระดับ', 'รายการที่ต้องทำ', 'ACTION', 'หมายเหตุ (ไม่ขึ้นบนกระดาษ)']])
+    .setFontWeight('bold').setBackground(NAVY).setFontColor('#FFFFFF');
+  sh.setFrozenRows(HDR);
+
+  var rows = [
+    ['หลัก', 'Weather information of En Route, Destination, and Alternate', 'CHECK / BRIEFED', 'ตัวอย่าง — ลบออกได้'],
+    ['ย่อย', 'Alternate Airport',  'CONFIRMED',      ''],
+    ['ย่อย', 'Max Crosswind',      'WITHIN LIMITS',  ''],
+    ['หลัก', 'Weight and Balance', 'COMPUTED',       ''],
+  ];
+  sh.getRange(HDR + 1, 1, rows.length, 4).setValues(rows);
+  sh.getRange(HDR + 1, 1, 200, 1).setDataValidation(SpreadsheetApp.newDataValidation()
+    .requireValueInList(['หลัก', 'ย่อย'], true).setAllowInvalid(false).build());
+  sh.getRange(HDR, 1, 205, 4)
+    .setBorder(true, true, true, true, true, true, '#D1D5DB', SpreadsheetApp.BorderStyle.SOLID);
+  sh.getRange(HDR + 1, 2, 205, 2).setWrap(true);
+  sh.getRange(HDR + 1, 3, 205, 1).setFontFamily('Courier New').setFontWeight('bold');
+  sh.getRange(HDR + 1, 4, 205, 1).setFontSize(9).setFontColor('#6B7280');
+
+  Logger.log('สร้างแล้ว: ' + ss.getUrl());
+  return ss.getUrl();
+}
+
+/** ลบแถวทดสอบออกจากทะเบียนรายงานเช็กลิสต์ (ใช้ครั้งเดียวหลังทดสอบระบบ) */
+function dropChecklistTestRows() {
+  var folder = subFolder_('CHECKLIST');
+  var it = folder.getFilesByName('CHECKLIST — Records');
+  if (!it.hasNext()) { Logger.log('ยังไม่มีทะเบียน'); return 0; }
+  var sh = SpreadsheetApp.open(it.next()).getSheets()[0];
+  var v = sh.getDataRange().getValues(), n = 0;
+  for (var i = v.length - 1; i >= 1; i--) {
+    if (String(v[i][5]) === 'ทดสอบระบบ (ลบทิ้งได้)') { sh.deleteRow(i + 1); n++; }
+  }
+  Logger.log('ลบไป ' + n + ' แถว');
+  return n;
+}
