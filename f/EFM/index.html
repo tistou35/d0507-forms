@@ -2,7 +2,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>แบบประเมินความคืบหน้า — D-0507 Flight Training</title>
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="../../assets/app.css?v=9dcf3fc0">
+<link rel="stylesheet" href="../../assets/app.css?v=55a3531d">
 </head><body>
 <div class="topbar">
   <a class="brand" href="../../" style="text-decoration:none">
@@ -96,6 +96,12 @@
       <dl class="kv" id="ctrl"></dl>
     </div>
 
+    <div class="card" id="flowwrap" style="display:none">
+      <h3 data-t="flowTitle">ลำดับการออกใบ</h3>
+      <p class="hint" id="flowdesc" style="margin:3px 0 0"></p>
+      <div class="flowsteps" id="flowsteps"></div>
+    </div>
+
     <div class="card" id="relwrap" style="display:none">
       <h3 data-t="related">ฟอร์มที่เกี่ยวข้องในสายงานเดียวกัน</h3>
       <div class="forms" id="rel" style="margin-top:4px"></div>
@@ -120,12 +126,12 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="../../assets/app.js?v=dceb4ebf"></script>
+<script src="../../assets/app.js?v=80cc6d77"></script>
 <script>D0507.GAS_URL='https://script.google.com/macros/s/AKfycby7rFFVxd92wPImX4m8pv8nHqTrK3Iq0O32A34844DAg1rP8N3RfgKEyGvAUkQu-NXd/exec';</script>
 <script>
 "use strict";
-const REG = {"systems":{"here":{"n":"ระบบฟอร์มออนไลน์","en":"This portal","url":"","lg":"52","cl":"d"},"dispatch":{"n":"ระบบ Dispatch","en":"Flight dispatch","url":"https://d0507.361vision.org/d0507-app/dispatch/?v=final","lg":"DSP","cl":"a"},"training":{"n":"ระบบบันทึกการฝึก","en":"Training records","url":"https://d0507.361vision.org/","lg":"TRN","cl":"b"},"fbo":{"n":"AeroFBO","en":"Operations & maintenance","url":"https://indyzz.com/aerofbo/index.php","lg":"FBO","cl":"c"},"audit":{"n":"Audit Portal","en":"Internal audit","url":"../d0507-audit/","lg":"AUD","cl":"a"}},"roles":[{"k":"stu","n":"นักเรียน","d":"นักศึกษาการบิน · ผู้เข้ารับการฝึก","en":"Students","den":"Student pilots · trainees"},{"k":"ins","n":"ครูการบิน / ครูภาคทฤษฎี","d":"FI · TKI · FIE","en":"Instructors","den":"FI · TKI · FIE"},{"k":"mnt","n":"ช่างอากาศยาน","d":"ฝ่ายซ่อมบำรุง (ME)","en":"Maintenance","den":"Maintenance (ME)"},{"k":"ops","n":"ฝ่ายปฏิบัติการ","d":"Operations · Dispatch · ธุรการเอกสาร","en":"Operations","den":"Operations · Dispatch · document control"},{"k":"mgt","n":"ฝ่ายบริหาร","d":"ACM · HT · CMM · Safety Manager","en":"Management","den":"ACM · HT · CMM · Safety Manager"}],"status":{"ok":{"n":"พร้อมใช้","lv":"ok","en":"Ready"},"linkwrong":{"n":"ลิงก์ใน LEF ผิดใบ","lv":"bad","en":"LEF links to the wrong form"},"nolink":{"n":"LEF ยังไม่ใส่ลิงก์","lv":"warn","en":"No link in LEF"},"noform":{"n":"ยังไม่มีฟอร์มออนไลน์","lv":"warn","en":"No online form yet"},"pdfonly":{"n":"เป็น PDF บน Drive","lv":"warn","en":"PDF on Drive"},"notinlef":{"n":"ยังไม่อยู่ใน LEF","lv":"warn","en":"Not in LEF yet"},"shadow":{"n":"ใช้บน Jotform · ไม่มีในคู่มือ","lv":"bad","en":"In use but not registered"},"dupsys":{"n":"มีสองฉบับ — ระบบภายนอกและ Jotform","lv":"bad","en":"Duplicate across systems"}},"forms":[{"abbr":"GSP","doc":"D-0507-GSP-001","t":"Flight Training Evaluation","th":"บันทึกการฝึกภาคอากาศ","sys":"training","chain":"training","public":true,"r":{"stu":"ดูบันทึกการฝึกและความคืบหน้าของตัวเอง (อ่านเท่านั้น)","ins":"บันทึกผลการฝึกและให้เกรดรายเที่ยวบิน"},"hasDef":false},{"abbr":"EFC","doc":"D-0507-EFC-001","t":"End of Course / Stage Report","th":"รายงานจบหลักสูตรหรือจบขั้นการฝึก","sys":"here","chain":"training","public":false,"r":{"ins":"ปิด Stage หรือปิดหลักสูตร พร้อมผลสอบ","mgt":"รับรองผลการจบหลักสูตร"},"hasDef":true},{"abbr":"SEF","doc":"D-0507-SEF-001","t":"Student Evaluation Form","th":"แบบประเมินครูผู้สอนโดยนักเรียน","sys":"training","chain":"training","public":true,"r":{"stu":"ประเมินครูผู้สอนเมื่อจบแต่ละ Stage (ไม่เปิดเผยชื่อ) — ทำในระบบบันทึกการฝึก"},"jot":"210063447392452","hasDef":false}],"lefcount":{"total":43}};
-const F   = {"abbr":"EFM","doc":"D-0507-EFM-001","t":"Progress and Evaluation Form","th":"แบบประเมินความคืบหน้า","sys":"training","chain":"training","public":true,"r":{"ins":"ถูกประเมินก่อนรับเข้าเป็นครู — ทำในระบบบันทึกการฝึก","mgt":"HT / CFI / CTKI ประเมินผู้สมัคร แล้วเสนอ ACM"},"with":["HT","CFI","CTKI","FI"],"iss":"01","rev":"00","eff":"20 NOV 2024","hasDef":false,"guide":{"th":"เมนู Annual Eval ในระบบบันทึกการฝึกครอบคลุมการประเมิน 5 ด้าน — แต่ละด้านออกใบควบคุมคนละใบตาม OMA D.2.9","en":"Annual Eval in the training records system covers five areas — each produces its own controlled form per OMA D.2.9","items":[{"n":"Ground Training","by":"HT หรือ CTKI","w":"ประเมินการสอนภาคทฤษฎี — Tier 1 TKI IPC","f":"D-0507-PCR-TKI-001","fa":"PCR-TKI"},{"n":"Flight Training","by":"HT หรือ CFI","w":"ประเมินการสอนภาคอากาศ — Tier 1 FI IPC","f":"D-0507-PCR-FI-001","fa":"PCR-FI"},{"n":"Simulator Training","by":"HT หรือ CFI","w":"ประเมินการสอนใน FTD/FNPT — Tier 1 FI IPC","f":"D-0507-PCR-FI-001","fa":"PCR-FI"},{"n":"Recurrent Training","by":"HT, CFI หรือ FI","w":"ตรวจสมรรถนะการบินเมื่อขาด current — Tier 1 FI IPC (Post-absence)","f":"D-0507-PCR-FI-001","fa":"PCR-FI"},{"n":"Progressive / Standard Check","by":"HT, CFI หรือ FI","w":"ตรวจสมรรถนะการบินประจำปี — Tier 1 FI IPC","f":"D-0507-PCR-FI-001","fa":"PCR-FI"},{"n":"ประเมินผู้สมัครก่อนจ้าง","by":"HT, CFI/CTKI, ACM","w":"ประเมินหลัง Practical Introduction และ Standardisation ตาม OMA (ผ่าน = จ้าง)","f":"D-0507-EFM-001","fa":"EFM"}]},"blank":"blank/EFM.pdf"};
+const REG = {"systems":{"here":{"n":"ระบบฟอร์มออนไลน์","en":"This portal","url":"","lg":"52","cl":"d"},"dispatch":{"n":"ระบบ Dispatch","en":"Flight dispatch","url":"https://d0507.361vision.org/d0507-app/dispatch/?v=final","lg":"DSP","cl":"a"},"training":{"n":"ระบบบันทึกการฝึก","en":"Training records","url":"https://d0507.361vision.org/","lg":"TRN","cl":"b"},"fbo":{"n":"AeroFBO","en":"Operations & maintenance","url":"https://indyzz.com/aerofbo/index.php","lg":"FBO","cl":"c"},"audit":{"n":"Audit Portal","en":"Internal audit","url":"../d0507-audit/","lg":"AUD","cl":"a"}},"roles":[{"k":"stu","n":"นักเรียน","d":"นักศึกษาการบิน · ผู้เข้ารับการฝึก","en":"Students","den":"Student pilots · trainees"},{"k":"ins","n":"ครูการบิน / ครูภาคทฤษฎี","d":"FI · TKI · FIE","en":"Instructors","den":"FI · TKI · FIE"},{"k":"mnt","n":"ช่างอากาศยาน","d":"ฝ่ายซ่อมบำรุง (ME)","en":"Maintenance","den":"Maintenance (ME)"},{"k":"ops","n":"ฝ่ายปฏิบัติการ","d":"Operations · Dispatch · ธุรการเอกสาร","en":"Operations","den":"Operations · Dispatch · document control"},{"k":"mgt","n":"ฝ่ายบริหาร","d":"ACM · HT · CMM · Safety Manager","en":"Management","den":"ACM · HT · CMM · Safety Manager"}],"status":{"ok":{"n":"พร้อมใช้","lv":"ok","en":"Ready"},"linkwrong":{"n":"ลิงก์ใน LEF ผิดใบ","lv":"bad","en":"LEF links to the wrong form"},"nolink":{"n":"LEF ยังไม่ใส่ลิงก์","lv":"warn","en":"No link in LEF"},"noform":{"n":"ยังไม่มีฟอร์มออนไลน์","lv":"warn","en":"No online form yet"},"pdfonly":{"n":"เป็น PDF บน Drive","lv":"warn","en":"PDF on Drive"},"notinlef":{"n":"ยังไม่อยู่ใน LEF","lv":"warn","en":"Not in LEF yet"},"shadow":{"n":"ใช้บน Jotform · ไม่มีในคู่มือ","lv":"bad","en":"In use but not registered"},"dupsys":{"n":"มีสองฉบับ — ระบบภายนอกและ Jotform","lv":"bad","en":"Duplicate across systems"}},"forms":[{"abbr":"GSP","doc":"D-0507-GSP-001","t":"Flight Training Evaluation","th":"บันทึกการฝึกภาคอากาศ","sys":"training","chain":"training","public":true,"r":{"stu":"ดูบันทึกการฝึกและความคืบหน้าของตัวเอง (อ่านเท่านั้น)","ins":"บันทึกผลการฝึกและให้เกรดรายเที่ยวบิน"},"hasDef":false},{"abbr":"EFC","doc":"D-0507-EFC-001","t":"End of Course / Stage Report","th":"รายงานจบหลักสูตรหรือจบขั้นการฝึก","sys":"here","chain":"training","public":false,"r":{"ins":"ปิด Stage หรือปิดหลักสูตร พร้อมผลสอบ","mgt":"รับรองผลการจบหลักสูตร"},"hasDef":true},{"abbr":"SEF","doc":"D-0507-SEF-001","t":"Student Evaluation Form","th":"แบบประเมินครูผู้สอนโดยนักเรียน","sys":"training","chain":"training","public":true,"r":{"stu":"ประเมินครูผู้สอนเมื่อจบแต่ละ Stage (ไม่เปิดเผยชื่อ) — ทำในระบบบันทึกการฝึก"},"jot":"210063447392452","hasDef":false},{"abbr":"STR","doc":"D-0507-STR-001","t":"Standardisation Training Record","th":"บันทึกการอบรมมาตรฐานครูการบิน","sys":"here","chain":"standardisation","public":false,"r":{"ins":"บันทึกการอบรมมาตรฐานครูการบิน (OMA D.2.8.2)","mgt":"จัดและรับรองการอบรมมาตรฐาน"},"jot":"261578705156060","hasDef":true,"flow":{"th":"อบรมมาตรฐานครู (D.2.8) — เสร็จแล้วต้องตรวจสมรรถนะครั้งแรกก่อนปฏิบัติหน้าที่","en":"Standardisation training — initial proficiency check follows"}}],"lefcount":{"total":43}};
+const F   = {"abbr":"EFM","doc":"D-0507-EFM-001","t":"Progress and Evaluation Form","th":"แบบประเมินความคืบหน้า","sys":"training","chain":"training","public":true,"r":{"ins":"ถูกประเมินก่อนรับเข้าเป็นครู — ทำในระบบบันทึกการฝึก","mgt":"HT / CFI / CTKI ประเมินผู้สมัคร แล้วเสนอ ACM"},"with":["HT","CFI","CTKI","FI"],"iss":"01","rev":"00","eff":"20 NOV 2024","hasDef":false,"guide":{"th":"เมนู Annual Eval ในระบบบันทึกการฝึกครอบคลุมการประเมิน 5 ด้าน — แต่ละด้านออกใบควบคุมคนละใบตาม OMA D.2.9","en":"Annual Eval in the training records system covers five areas — each produces its own controlled form per OMA D.2.9","items":[{"n":"Ground Training","by":"HT หรือ CTKI","w":"ประเมินการสอนภาคทฤษฎี — Tier 1 TKI IPC","f":"D-0507-PCR-TKI-001","fa":"PCR-TKI"},{"n":"Flight Training","by":"HT หรือ CFI","w":"ประเมินการสอนภาคอากาศ — Tier 1 FI IPC","f":"D-0507-PCR-FI-001","fa":"PCR-FI"},{"n":"Simulator Training","by":"HT หรือ CFI","w":"ประเมินการสอนใน FTD/FNPT — Tier 1 FI IPC","f":"D-0507-PCR-FI-001","fa":"PCR-FI"},{"n":"Recurrent Training","by":"HT, CFI หรือ FI","w":"ตรวจสมรรถนะการบินเมื่อขาด current — Tier 1 FI IPC (Post-absence)","f":"D-0507-PCR-FI-001","fa":"PCR-FI"},{"n":"Progressive / Standard Check","by":"HT, CFI หรือ FI","w":"ตรวจสมรรถนะการบินประจำปี — Tier 1 FI IPC","f":"D-0507-PCR-FI-001","fa":"PCR-FI"},{"n":"ประเมินผู้สมัครก่อนจ้าง","by":"HT, CFI/CTKI, ACM","w":"ประเมินหลัง Practical Introduction และ Standardisation ตาม OMA (ผ่าน = จ้าง)","f":"D-0507-EFM-001","fa":"EFM"}]},"blank":"blank/EFM.pdf","next":["STR"],"flow":{"th":"ประเมินผู้สมัครก่อนตัดสินใจจ้าง — ผ่านแล้วจึงเข้าสายมาตรฐานครู","en":"Applicant assessment before the hiring decision"}};
 const A   = D0507;
 const CHAIN_N = {
   preflight:{th:'ก่อนทำการบิน',en:'Pre-flight'}, training:{th:'บันทึกการฝึก',en:'Training records'},
@@ -247,6 +253,24 @@ function paint(){
       F.jotDup ? [A.t('jotDup'), F.jotDup] : null,
       F.sysOK ? [A.t('sysOK'), F.sysOK] : null,
     ].filter(Boolean).map(r => `<dt>${A.esc(r[0])}</dt><dd>${A.esc(r[1])}</dd>`).join('');
+  }
+
+  /* ลำดับการออกใบ — ใบที่ต้องออกก่อน ใบที่ต้องออกต่อ และเกณฑ์ที่ใบนี้อ้างอิง
+     สายงาน (chain) บอกแค่ว่าอยู่หมวดเดียวกัน ไม่ได้บอกว่าอะไรมาก่อนอะไร
+     ครูหนึ่งคนเดินผ่าน EFM → STR → PCR → RTR → PCR ซึ่งข้ามสายงาน QA กับ IM */
+  const look = a => (REG.forms || []).find(x => x.abbr === a);
+  const step = (t, list) => {
+    const has = (list || []).map(look).filter(Boolean);
+    if (!has.length) return '';
+    return `<div class="fstep"><span class="lb">${A.esc(A.t(t))}</span><div class="fs">`
+      + has.map(x => `<a href="../${A.esc(x.abbr)}/">${A.esc(A.nm(x))}
+           <em>${A.esc(x.abbr)}</em></a>`).join('') + '</div></div>';
+  };
+  const flow = step('flowPrev', F.prev) + step('flowNext', F.next) + step('flowRefs', F.refs);
+  if (flow) {
+    document.getElementById('flowwrap').style.display = '';
+    document.getElementById('flowsteps').innerHTML = flow;
+    document.getElementById('flowdesc').textContent = F.flow ? A.L(F.flow) : '';
   }
 
   const rel = (A.isStaff() ? REG.forms : REG.forms.filter(f=>f.public))

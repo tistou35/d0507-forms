@@ -2,7 +2,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>บันทึกการปรับปรุงเอกสารผู้ถือใบอนุญาต — D-0507 Flight Training</title>
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="../../assets/app.css?v=9dcf3fc0">
+<link rel="stylesheet" href="../../assets/app.css?v=55a3531d">
 </head><body>
 <div class="topbar">
   <a class="brand" href="../../" style="text-decoration:none">
@@ -96,6 +96,12 @@
       <dl class="kv" id="ctrl"></dl>
     </div>
 
+    <div class="card" id="flowwrap" style="display:none">
+      <h3 data-t="flowTitle">ลำดับการออกใบ</h3>
+      <p class="hint" id="flowdesc" style="margin:3px 0 0"></p>
+      <div class="flowsteps" id="flowsteps"></div>
+    </div>
+
     <div class="card" id="relwrap" style="display:none">
       <h3 data-t="related">ฟอร์มที่เกี่ยวข้องในสายงานเดียวกัน</h3>
       <div class="forms" id="rel" style="margin-top:4px"></div>
@@ -120,7 +126,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="../../assets/app.js?v=dceb4ebf"></script>
+<script src="../../assets/app.js?v=80cc6d77"></script>
 <script>D0507.GAS_URL='https://script.google.com/macros/s/AKfycby7rFFVxd92wPImX4m8pv8nHqTrK3Iq0O32A34844DAg1rP8N3RfgKEyGvAUkQu-NXd/exec';</script>
 <script>
 "use strict";
@@ -247,6 +253,24 @@ function paint(){
       F.jotDup ? [A.t('jotDup'), F.jotDup] : null,
       F.sysOK ? [A.t('sysOK'), F.sysOK] : null,
     ].filter(Boolean).map(r => `<dt>${A.esc(r[0])}</dt><dd>${A.esc(r[1])}</dd>`).join('');
+  }
+
+  /* ลำดับการออกใบ — ใบที่ต้องออกก่อน ใบที่ต้องออกต่อ และเกณฑ์ที่ใบนี้อ้างอิง
+     สายงาน (chain) บอกแค่ว่าอยู่หมวดเดียวกัน ไม่ได้บอกว่าอะไรมาก่อนอะไร
+     ครูหนึ่งคนเดินผ่าน EFM → STR → PCR → RTR → PCR ซึ่งข้ามสายงาน QA กับ IM */
+  const look = a => (REG.forms || []).find(x => x.abbr === a);
+  const step = (t, list) => {
+    const has = (list || []).map(look).filter(Boolean);
+    if (!has.length) return '';
+    return `<div class="fstep"><span class="lb">${A.esc(A.t(t))}</span><div class="fs">`
+      + has.map(x => `<a href="../${A.esc(x.abbr)}/">${A.esc(A.nm(x))}
+           <em>${A.esc(x.abbr)}</em></a>`).join('') + '</div></div>';
+  };
+  const flow = step('flowPrev', F.prev) + step('flowNext', F.next) + step('flowRefs', F.refs);
+  if (flow) {
+    document.getElementById('flowwrap').style.display = '';
+    document.getElementById('flowsteps').innerHTML = flow;
+    document.getElementById('flowdesc').textContent = F.flow ? A.L(F.flow) : '';
   }
 
   const rel = (A.isStaff() ? REG.forms : REG.forms.filter(f=>f.public))

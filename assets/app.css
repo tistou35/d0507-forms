@@ -696,6 +696,19 @@ a.gf:hover{border-color:var(--navy-900);color:var(--navy-900)}
 .fk-dense .fk-item.how-on .fk-how{background:var(--sky-100);border-color:var(--sky-500);color:var(--sky-500)}
 
 
+/* ── ลำดับการออกใบในหน้าฟอร์ม ───────────────────────────────
+   บอกว่าใบนี้อยู่ตรงไหนของขั้นตอน ไม่ใช่แค่ว่าอยู่หมวดไหน */
+.flowsteps{margin-top:12px;display:flex;flex-direction:column;gap:9px}
+.fstep{display:grid;grid-template-columns:minmax(120px,150px) 1fr;gap:12px;align-items:baseline}
+.fstep .lb{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--g-500)}
+.fstep .fs{display:flex;flex-wrap:wrap;gap:7px}
+.fstep .fs a{display:inline-flex;align-items:baseline;gap:7px;text-decoration:none;
+  font-size:13.5px;color:var(--fg-1);border:1px solid var(--border-light);
+  background:var(--surface);border-radius:8px;padding:5px 11px}
+.fstep .fs a:hover{border-color:var(--navy-900)}
+.fstep .fs em{font-style:normal;font-family:var(--font-mono);font-size:11px;color:var(--g-500)}
+@media(max-width:640px){ .fstep{grid-template-columns:1fr;gap:4px} }
+
 /* ══ พิมพ์ลงกระดาษ — พื้นฐานที่ทุกหน้าใช้ร่วมกัน ══════════════
    .body เป็นกริด 250px + 1fr สำหรับแถบเมนูซ้าย ซ่อน .rail เฉย ๆ ไม่พอ
    เพราะคอลัมน์ 250px ยังจองที่อยู่ เนื้อหาจึงถูกบีบไปอยู่หนึ่งในสามของหน้า

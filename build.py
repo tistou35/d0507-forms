@@ -44,7 +44,7 @@ def firebase_config():
 
 PUBLIC_FORBIDDEN = ('code', 'lef', 'st', 'note', 'docx', 'own', 'jotDup')
 PUBLIC_KEEP = ('doc', 'abbr', 't', 'th', 'sys', 'jot', 'assignTo', 'r', 'chain', 'kw',
-               'public', 'iss', 'rev', 'eff', 'hasDef', 'kind')
+               'public', 'iss', 'rev', 'eff', 'hasDef', 'kind', 'next', 'refs', 'flow')
 FIELD_TYPES = {'text', 'textarea', 'date', 'time', 'number', 'email', 'tel', 'select',
                'multi', 'check', 'checklist', 'grade', 'scale', 'sign', 'static', 'table', 'file', 'riskmatrix'}
 
@@ -400,10 +400,17 @@ def main():
 
     # หน้าฟอร์มรายใบ — หนึ่งโฟลเดอร์ต่อฟอร์ม ได้ URL สะอาดบน static host
     # ฝังเฉพาะข้อมูลที่หน้านั้นใช้ (ฟอร์มสายงานเดียวกัน) ไม่ยัดทะเบียนเต็มทุกหน้า
-    SLIM = ('abbr', 'doc', 't', 'th', 'sys', 'st', 'chain', 'public', 'r', 'jot', 'assignTo', 'hasDef')
+    SLIM = ('abbr', 'doc', 't', 'th', 'sys', 'st', 'chain', 'public', 'r', 'jot',
+            'assignTo', 'hasDef', 'kind', 'flow')
     for f in reg['forms']:
+        # ใบที่โยงกันตามลำดับการทำงาน อาจอยู่คนละสายงาน — EFM เป็นสาย QA
+        # ส่วน PCR เป็นสาย IM แต่ต่อกันเป็นขั้นตอนเดียวกันของครูหนึ่งคน
+        near = set(f.get('next') or []) | set(f.get('refs') or []) | {
+            x['abbr'] for x in reg['forms'] if f['abbr'] in (x.get('next') or [])}
         rel = [{k: x[k] for k in SLIM if k in x and k not in ('st',)}
-               for x in reg['forms'] if x.get('chain') == f.get('chain') and x['abbr'] != f['abbr']][:6]
+               for x in reg['forms']
+               if x['abbr'] != f['abbr']
+               and (x.get('chain') == f.get('chain') or x['abbr'] in near)][:8]
         mini = {'systems': reg['systems'], 'roles': reg['roles'], 'status': reg['status'],
                 'forms': rel, 'lefcount': {'total': len(reg['forms'])}}
         # ฝังเฉพาะฟิลด์ที่เปิดสาธารณะได้ — code / lef / st / note / docx มาจาก Firestore ตอน login
@@ -411,7 +418,11 @@ def main():
         # ต่างจาก note ที่เป็นบันทึกภายใน (มาจาก Firestore ตอน login เท่านั้น)
         fpub = {k: f[k] for k in ('abbr','doc','t','th','sys','chain','public','r','with',
                                   'assignTo','iss','rev','eff','jot','hasDef',
-                                  'guide','blank','kind') if k in f}
+                                  'guide','blank','kind','next','refs','flow') if k in f}
+        # ใบที่อยู่ก่อนหน้าคำนวณจาก next ของใบอื่น จะได้ไม่ต้องกรอกสองที่ให้ขัดกันเอง
+        fpub['prev'] = [x['abbr'] for x in reg['forms'] if f['abbr'] in (x.get('next') or [])]
+        if not fpub['prev']:
+            del fpub['prev']
         sub = {'@@REG@@': jsonjs(mini), '@@FBCFG@@': FB, '@@GASURL@@': GAS, '@@FORM@@': jsonjs(fpub),
                '@@FTITLE@@': (f.get('th') or f.get('t') or f['abbr']).replace('"', "'")}
         total += emit('form.html', os.path.join(HERE, 'f', f['abbr'], 'index.html'),
