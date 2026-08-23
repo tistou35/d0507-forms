@@ -74,9 +74,34 @@ def mtime(path):
             if os.path.exists(path) else None)
 
 
+def relink(reg, tpls, path):
+    """ผูก tpl ในทะเบียนให้ตรงกับไฟล์ที่มีอยู่จริงใน Drive
+
+    importTemplate ทิ้งแม่แบบเดิมลงถังขยะแล้วสร้างไฟล์ใหม่ id จึงเปลี่ยนทุกครั้ง
+    ทะเบียนที่เก็บ id ไว้ก่อนรันจะชี้ไปไฟล์ในถังขยะ — ลิงก์ยังกดได้แต่ขึ้นว่า
+    "File is in the bin" เกิดมาแล้วกับ 12 ใบพร้อมกัน กว่าจะรู้ก็ตอนมีคนกดเปิด
+    """
+    ch = []
+    for f in reg['forms']:
+        t = tpls.get(f['abbr'])
+        if t and f.get('tpl') != t['id']:
+            ch.append('%s → %s' % (f['abbr'], t['id'][:12]))
+            f['tpl'] = t['id']
+        elif not t and f.get('tpl'):
+            ch.append('%s → ไม่มีแม่แบบแล้ว' % f['abbr'])
+            f.pop('tpl', None)
+    if ch:
+        json.dump(reg, open(path, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
+        print('🔗 ผูก tpl ใหม่ %d ใบ: %s' % (len(ch), ' · '.join(ch)))
+        print('   รัน python3 build.py แล้ว node firebase/seed.mjs ต่อ ไม่งั้นเจ้าหน้าที่ยังเห็นลิงก์เก่า')
+    return len(ch)
+
+
 def main():
-    reg = json.load(open(os.path.join(HERE, 'forms_register.json'), encoding='utf-8'))
+    regp = os.path.join(HERE, 'forms_register.json')
+    reg = json.load(open(regp, encoding='utf-8'))
     tpls = drive_templates(token())
+    relink(reg, tpls, regp)
     stale, ok, none, unknown, unused = [], 0, [], [], []
     for f in reg['forms']:
         t = tpls.get(f['abbr'])

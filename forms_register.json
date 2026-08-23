@@ -134,7 +134,7 @@
         "preflight"
       ],
       "blank": "blank/FRAE.pdf",
-      "tpl": "13Uqc366ffBDGSlyniunFzUZFtTAEbt6SBbWXW14BhiM"
+      "tpl": "1iglI6fZuJjDp1AixRf2OIEokGbRnhT4RZFeIVtn6kCE"
     },
     {
       "doc": "D-0507-SDF-001",
@@ -173,7 +173,7 @@
       ],
       "assignTo": "HT",
       "blank": "blank/SDF.pdf",
-      "tpl": "1nW8IplTNObQ9DPKOSCty0FzCXQQY8A2yrCDNPEQGKqU"
+      "tpl": "1FqiALWv4ZrDYWbWHVLCVE4_XOuUQei1ovP1Kk9Jekic"
     },
     {
       "doc": "D-0507-BCK-001",
@@ -489,7 +489,7 @@
       ],
       "note": "ฉบับแก้ไข 01 (20 AUG 2026) — ถอดตารางหลักสูตรการฝึกบินออกทั้งหมด และ School Standard Subjects ตามที่เจ้าของงานสั่ง · เพิ่มช่วงเวลาเรียน ชั่วโมงเรียน และตารางรายวิชาจาก TrainHub ที่เติมอัตโนมัติผ่านลิงก์ prefill · ผลการฝึกบินจะไปทำในแอปอื่น ไม่ได้บันทึกในใบนี้แล้ว · ต้นฉบับก่อนแก้เก็บไว้ที่ D-0507-EFC-001-rev00-archive.docx",
       "blank": "blank/EFC.pdf",
-      "tpl": "1NlzM1wEgRJQG-7tL9lsBzhhQI8Kq-9UopVmsvZvEHOg"
+      "tpl": "1CdI-PRUriVZcaz78_QeXxYpaWcCCEfc7-gtafCC8RCk"
     },
     {
       "doc": "D-0507-SEF-001",
@@ -659,7 +659,7 @@
       ],
       "note": "ให้เกรดตาม D-0507-ECA-001 · รับค่าตั้งต้นจากเมนู Annual Eval ในระบบบันทึกการฝึกผ่านลิงก์ prefill โดยไม่ต้องแก้เอกสาร — ดู docs/ANNUAL_EVAL.md",
       "blank": "blank/PCR-TKI.pdf",
-      "tpl": "1ge6sfNn7a133YD7VEC3unYnliVu-3l349RGuBKqRjuc"
+      "tpl": "18K74IDTaS91BAe2WI_5u4ZBESqGT9kZgN0PzCxHX6Bk"
     },
     {
       "doc": "D-0507-RTR-001",
@@ -1026,7 +1026,7 @@
         "ftr"
       ],
       "blank": "blank/FTR.pdf",
-      "tpl": "1eZIgygRyyyOysXSHkI0HrObwVqxFNPdJR3wj0bMxDgY"
+      "tpl": "1iDeTikRktXxm59E8_U_1zfpxVcO5OgAS1sxcbgO3ZaY"
     },
     {
       "doc": "D-0507-ALR-001",
@@ -1142,7 +1142,7 @@
         "apf"
       ],
       "blank": "blank/APF.pdf",
-      "tpl": "1U4HcT5zwQWV32De5WBA5xcUPgAn2x5l-QfjaBRllO9E"
+      "tpl": "1dmuq_INKH6zmvG1pVy_wUKCy7zwwUsYf-XninlMCrBA"
     },
     {
       "doc": "D-0507-DAF-001",
@@ -1179,7 +1179,7 @@
         "daf"
       ],
       "blank": "blank/DAF.pdf",
-      "tpl": "1iEM8zLdNz_88CBzqj-LwgsneWNB5bzeFBXC-al4z_A8"
+      "tpl": "1ZneD6k6y7mU692SVZsYpKJuCKTYqE_HkJHhQfcbl6UU"
     },
     {
       "doc": "D-0507-LDU-001",
@@ -1294,7 +1294,7 @@
         "drf"
       ],
       "blank": "blank/DRF.pdf",
-      "tpl": "1d4cFwMEsvkHFbWm9z9ZIDfHQicgR05J1aV0ZFbtEZPY"
+      "tpl": "1LRibEDPwiMmQAjeQmkP3gvgkhsyP5GVbTgZDCJcXA2o"
     },
     {
       "doc": "D-0507-DRC-001",
@@ -1332,7 +1332,7 @@
         "drc"
       ],
       "blank": "blank/DRC.pdf",
-      "tpl": "1Wj-gkuRJvVclhwe6s2xRwvta6lBJwpVhg9NEZh-NMuU"
+      "tpl": "1cP4Kpet0XYWVGhInoi3Ac5LEw53wsO4nJtrWSfNf4Ko"
     },
     {
       "doc": "D-0507-NCHR-001",
@@ -1411,7 +1411,7 @@
       ],
       "assignTo": "SM",
       "blank": "blank/VSR.pdf",
-      "tpl": "1AKIqin2Y_yQu59U1W5JL5rLsj8o3XnzxFLBL1NJ_l6g"
+      "tpl": "1qTfU4JTCxvMJbrA8lKDedngn8MqdthT5zuTkr_Ma2Wo"
     },
     {
       "doc": "D-0507-HIF-001",
@@ -1451,7 +1451,7 @@
       ],
       "assignTo": "SM",
       "blank": "blank/HIF.pdf",
-      "tpl": "1SN4p7CU2tTvHTMGjVcFgVznuelIn5M0a84ms55mKuqY"
+      "tpl": "1jJLzzD-_v9rr1K8Fw6sqQsdH5JqRpCOj2o_EAvfpwF0"
     },
     {
       "doc": "D-0507-MOC-001",
@@ -1485,7 +1485,7 @@
         "บริหารการเปลี่ยนแปลง"
       ],
       "blank": "blank/MOC.pdf",
-      "tpl": "1DmsfV7vnMZEjlrMoPysj48Z-BZmNkR8zPUMU51uNy28"
+      "tpl": "1lj9ie_H1-kct5Z4sA2L1L0RKTu2glwgxYa041OFpvZc"
     },
     {
       "doc": "D-0507-CAR-001",

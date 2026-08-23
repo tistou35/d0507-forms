@@ -324,6 +324,44 @@
     };
   };
 
+  /* ── ทำงานตอนไม่มีเน็ต ─────────────────────────────────────
+     นักบินเปิดใบทดสอบการบินบนเครื่องที่ไม่มีสัญญาณ ถ้าไม่แคชหน้าไว้
+     หน้าจะเปิดไม่ขึ้นเลย ไม่ใช่แค่ส่งไม่ได้ */
+  A.online = navigator.onLine;
+  A.onNet = [];                      // หน้าเว็บลงทะเบียนไว้ให้เรียกเมื่อเน็ตเปลี่ยน
+  function netChanged() {
+    A.online = navigator.onLine;
+    A.onNet.forEach(fn => { try { fn(A.online); } catch (e) { /* หน้าหนึ่งพังต้องไม่ลามหน้าอื่น */ } });
+  }
+  addEventListener('online', netChanged);
+  addEventListener('offline', netChanged);
+
+  if ('serviceWorker' in navigator && location.protocol !== 'file:') {
+    // scope เป็นรากของเว็บ ลงทะเบียนหน้าไหนก็ได้ ครอบทุกหน้า
+    const swUrl = new URL((g.BASE || '') + 'sw.js', location).href;
+    navigator.serviceWorker.register(swUrl, { scope: new URL(g.BASE || '', location).href })
+      .catch(e => console.warn('[sw] ลงทะเบียนไม่สำเร็จ — หน้าจะใช้ได้เฉพาะตอนมีเน็ต', e.message));
+  }
+
+  /* ร่างที่ยังกรอกไม่เสร็จ — เก็บในเครื่อง ไม่ได้ส่งไปไหน
+     ลงจากเครื่องแล้วมากรอกต่อได้ และปิดแท็บไปก็ไม่หาย */
+  A.draftKey = code => 'd0507.draft.' + code;
+  A.draftSave = function (code, data) {
+    try { localStorage.setItem(A.draftKey(code),
+      JSON.stringify({ at: Date.now(), data: data })); } catch (e) { /* เต็มก็ข้ามไป */ }
+  };
+  A.draftLoad = function (code) {
+    try {
+      const raw = localStorage.getItem(A.draftKey(code));
+      if (!raw) return null;
+      const o = JSON.parse(raw);
+      // ร่างเก่าเกิน 30 วันน่าจะเป็นของเที่ยวบินอื่นไปแล้ว อย่าเอามาเติมให้สับสน
+      if (!o || !o.data || Date.now() - (o.at || 0) > 30 * 864e5) return null;
+      return o;
+    } catch (e) { return null; }
+  };
+  A.draftClear = code => { try { localStorage.removeItem(A.draftKey(code)); } catch (e) {} };
+
   A.onLang = [];               // หน้าเว็บลงทะเบียนไว้ให้เรียกเมื่อเปลี่ยนภาษา
 
   A.setLang = function (l) {

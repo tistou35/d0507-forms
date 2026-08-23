@@ -221,6 +221,70 @@ def partials(active, base):
             top.replace('@@BASE@@', base))
 
 
+def write_sw(ver, base):
+    """สร้าง sw.js พร้อมรายชื่อไฟล์ที่ต้องแคช — ต้องสร้างตอน build เท่านั้น
+
+    ชื่อไฟล์ asset ติด ?v=<hash> ทุกตัว รายชื่อจึงเปลี่ยนทุกครั้งที่แก้โค้ด
+    เขียน sw.js ด้วยมือแล้วจะแคชของเก่าค้างไว้โดยไม่มีใครรู้ — ผู้ใช้ที่เคย
+    เปิดหน้าไว้จะได้ตัวเรนเดอร์เก่าคู่กับนิยามฟอร์มใหม่ตลอดไป
+
+    ชื่อแคชผูกกับ hash รวม เปลี่ยนโค้ดเมื่อไรแคชเก่าถูกลบทิ้งทั้งชุด
+    """
+    shell = ['fill/', 'cl/', 'pubs/', 'all/', '']
+    assets = ['app.css', 'app.js', 'formkit.js']
+    files = [base + p for p in shell] + \
+            [base + 'assets/' + a + '?v=' + ver[a] for a in assets if a in ver]
+    stamp = hashlib.sha1(('|'.join(files)).encode()).hexdigest()[:10]
+    js = """/* สร้างโดย build.py — อย่าแก้ไฟล์นี้เอง แก้ที่ write_sw() ใน build.py
+
+   ทำไมต้องมี: นักบินเปิดใบทดสอบการบินตอนอยู่บนเครื่อง ไม่มีเน็ต
+   ถ้าไม่แคชหน้าไว้ เปิดไม่ขึ้นเลย ไม่ใช่แค่ส่งไม่ได้
+
+   หน้า HTML ใช้เครือข่ายก่อนแล้วค่อยตกมาที่แคช — จะได้ไม่ค้างรุ่นเก่าเมื่อออนไลน์
+   asset ใช้แคชก่อนเพราะติด ?v= อยู่แล้ว เปลี่ยนเนื้อไฟล์เมื่อไร URL เปลี่ยนตาม */
+const CACHE = 'd0507-%s';
+const FILES = %s;
+
+self.addEventListener('install', e => {
+  self.skipWaiting();
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES).catch(() => {})));
+});
+
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(ks =>
+    Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))
+  ).then(() => self.clients.claim()));
+});
+
+self.addEventListener('fetch', e => {
+  const r = e.request;
+  if (r.method !== 'GET') return;
+  const url = new URL(r.url);
+  if (url.origin !== location.origin) return;      // firebase/gstatic จัดการเอง
+
+  const isDoc = r.mode === 'navigate' || (r.headers.get('accept') || '').includes('text/html');
+  if (isDoc) {
+    e.respondWith(
+      fetch(r).then(res => {
+        const copy = res.clone();
+        caches.open(CACHE).then(c => c.put(r, copy));
+        return res;
+      }).catch(() => caches.match(r).then(m => m || caches.match(new URL('%sfill/', location).href)))
+    );
+    return;
+  }
+  e.respondWith(caches.match(r).then(m => m || fetch(r).then(res => {
+    if (res.ok) { const copy = res.clone(); caches.open(CACHE).then(c => c.put(r, copy)); }
+    return res;
+  })));
+});
+""" % (stamp, json.dumps(files, ensure_ascii=False, indent=2), base)
+    path = os.path.join(HERE, 'sw.js')
+    with open(path, 'w', encoding='utf-8') as fh:
+        fh.write(js)
+    return len(js)
+
+
 def asset_versions():
     """?v=<hash ของเนื้อไฟล์> ต่อท้าย asset ทุกตัว
 
@@ -321,6 +385,8 @@ def main():
         ('cl.html',          'cl/index.html',                  '../',   'pubs'),
     ]
     VER = asset_versions()
+    # sw.js อยู่ราก path ในนั้นจึงอ้างอิงจากตำแหน่งตัวเอง ไม่ใช่ base ของแต่ละหน้า
+    print('  built: %-30s %7d bytes' % ('sw.js', write_sw(VER, '')))
     for src, out, base, active in pages:
         sub = {'@@REG@@': R, '@@REGPUB@@': P, '@@FBCFG@@': FB, '@@GASURL@@': GAS,
                '@@STATS@@': jsonjs(stats), '@@DEFS@@': jsonjs(defs),
