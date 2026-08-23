@@ -59,6 +59,22 @@ service cloud.firestore {
       allow write: if admin();
     }
 
+    /* เช็กลิสต์ที่สร้างในระบบ — ใครก็เปิดอ่านและพิมพ์ได้ เจ้าหน้าที่เท่านั้นที่แก้
+       ลบไม่ได้: เป็นเอกสารควบคุมที่มีเลขคุม ฉบับที่เลิกใช้ต้องเก็บไว้
+       ไม่ใช่หายไปจากระบบ ให้ปิดการใช้งานด้วย active:false แทน */
+    match /checklists/{clId} {
+      allow read:          if true;
+      allow create, update: if staff();
+      allow delete:        if false;
+
+      // ฉบับที่ถูกแทนที่ — เขียนเพิ่มได้ แก้ของเดิมไม่ได้
+      match /versions/{rev} {
+        allow read:   if true;
+        allow create: if staff();
+        allow update, delete: if false;
+      }
+    }
+
     // ── นิยามฟอร์ม — หน้าสาธารณะต้องใช้จึงอ่านได้ทั้งโลก ────
     // ห้ามใส่ข้อมูลควบคุมภายใน (control code / สถานะ LEF) ลงในนิยามฟอร์ม
     match /formDefs/{formCode} {

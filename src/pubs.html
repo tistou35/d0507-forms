@@ -129,7 +129,10 @@ h2.psec .d{font-family:var(--font-sans);font-size:12.5px;color:var(--fg-2);font-
     <div class="greet noprint">
       <div><p class="eyebrow"><span data-t="pubs">เช็กลิสต์และเอกสาร</span> · <span data-t2="pubs">CHECKLISTS &amp; PUBLICATIONS</span></p>
         <h1 id="hd">—</h1></div>
-      <button class="fb" id="prt">🖨 <span data-t="printList">พิมพ์รายการ</span></button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a class="fb hide" id="build" href="@@BASE@@admin/checklists/">✎ สร้างเช็กลิสต์</a>
+        <button class="fb" id="prt">🖨 <span data-t="printList">พิมพ์รายการ</span></button>
+      </div>
     </div>
 
     <div id="warn"></div>
@@ -224,6 +227,33 @@ function state(p){
    เอกสารที่ทำเองแล้วเก็บในรีโปดีกว่าฝาก Drive เพราะเวอร์ชันเดินคู่กับทะเบียน
    และไม่ต้องพึ่งสิทธิ์การแชร์ของ Drive ซึ่งบัญชีนี้ถูกนโยบายปิดไว้บางส่วน
    id ของ Drive ไม่มีทั้ง / และ . จึงแยกจากพาธในรีโปได้ด้วยตัวอักษรสองตัวนี้ */
+/* เช็กลิสต์ที่สร้างในระบบนี้อยู่ใน Firestore ไม่ใช่ publications.json
+   ผู้ดูแลสร้างเองได้ตลอด ไฟล์ทะเบียนแบบ static จึงตามไม่ทัน */
+let MADE = [];
+async function loadMade(){
+  try {
+    const s = await A.db.collection('checklists').orderBy('doc').get();
+    MADE = s.docs.map(d => Object.assign({ id:d.id }, d.data()));
+  } catch(e){ MADE = []; }
+  if (MADE.length) paintMade();
+  if (A.isStaff()) document.getElementById('build').classList.remove('hide');
+}
+function paintMade(){
+  const host = document.getElementById('out');
+  if (!host || document.getElementById('madewrap')) return;
+  const box = document.createElement('section');
+  box.id = 'madewrap';
+  box.innerHTML = '<h3 class="ph">เช็กลิสต์ที่สร้างในระบบ</h3>'
+    + '<p class="pd">เปิดอ่านบนเครื่อง แตะช่องขวาเพื่อทำเครื่องหมาย หรือพิมพ์ไปใช้</p>'
+    + MADE.map(c => `<div class="prow">
+        <div><b>${A.esc((c.title&&c.title.th)||c.doc)}</b>
+          <span class="cd">${A.esc(c.doc||'')} · ${A.esc(c.code||'')}</span></div>
+        <span class="ed">${A.esc(c.issue||'01')}/${A.esc(c.rev||'00')}</span>
+        <a class="op" href="@@BASE@@cl/?id=${encodeURIComponent(c.id)}">เปิด ↗</a>
+      </div>`).join('');
+  host.appendChild(box);
+}
+
 const fileUrl = f => !f ? '' :
   /^https?:/.test(f) ? f :
   /[\/.]/.test(f)    ? '@@BASE@@' + f :
@@ -444,7 +474,8 @@ document.getElementById('prt').addEventListener('click', () => {
 A.onLang.push(paint);
 
 // เรียกท้ายสุด — paint ใช้ตัวช่วยที่ประกาศด้วย const ข้างบน
-A.initAuth(@@FBCFG@@, hydrate);
+A.initAuth(@@FBCFG@@, () => { hydrate(); loadMade(); });
 paint();
+loadMade();
 </script>
 </body></html>

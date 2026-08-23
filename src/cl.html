@@ -1,0 +1,162 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>เช็กลิสต์ — D-0507 Flight Training</title>
+<link rel="stylesheet" href="@@BASE@@assets/app.css">
+<style>
+.clband{background:var(--navy-900);color:#fff;border-radius:12px;padding:16px 18px}
+.clband h1{font-size:21px;margin:2px 0 4px}
+.clband .o{font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;color:var(--sky-300)}
+.clband .en{font-size:12.5px;color:var(--sky-200)}
+.clmeta{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0;
+  border:1px solid var(--border-light);border-top:0;border-radius:0 0 12px 12px;background:var(--surface)}
+.clmeta > div{padding:9px 14px;border-right:1px solid var(--border-light)}
+.clmeta > div:last-child{border-right:0}
+.clmeta span{display:block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--g-400)}
+.clmeta b{font-family:var(--font-mono);font-size:13px}
+
+/* รายการ — แตะช่องขวาเพื่อทำเครื่องหมายว่าทำแล้ว */
+.cllist{margin-top:16px}
+.cllist.two{column-count:2;column-gap:18px}
+@media(max-width:820px){ .cllist.two{column-count:1} }
+.clitem{break-inside:avoid;display:grid;grid-template-columns:1fr minmax(120px,200px);gap:0;
+  border:1px solid var(--border-light);border-radius:9px;margin-bottom:7px;background:var(--surface);
+  overflow:hidden}
+.clitem.sub{margin-left:20px;border-style:dashed}
+.clitem .t{padding:11px 13px;font-size:14px;line-height:1.4;align-self:center}
+.clitem.sub .t{font-size:13px;color:var(--fg-2)}
+.clitem .t::before{content:""}
+.clitem.sub .t::before{content:"↳ ";color:var(--g-400)}
+.clitem .a{padding:11px 13px;font-family:var(--font-mono);font-size:12.5px;font-weight:700;
+  letter-spacing:.02em;border-left:1px solid var(--border-light);cursor:pointer;user-select:none;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  background:var(--g-50);color:var(--fg-1);transition:background .12s,color .12s}
+.clitem .a:hover{background:var(--sky-100)}
+.clitem .a .tick{opacity:0;font-size:15px}
+.clitem .a.on{background:var(--green-600);color:#fff}
+.clitem .a.on .tick{opacity:1}
+.clitem .a.on:hover{background:var(--green-600)}
+
+.clbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:14px 0 4px}
+.clbar .cnt{font-size:13px;color:var(--fg-2);margin-left:auto}
+
+@media print{
+  .clband{background:#fff;color:#000;border:1px solid #000;border-radius:0;padding:8px 10px}
+  .clband .o,.clband .en{color:#000}
+  .clmeta{border-color:#000;border-radius:0}
+  .clbar,.topbar,.rail,.botnav,.greet .obtn{display:none !important}
+  .clitem{border-color:#000;border-radius:0;margin-bottom:0;border-bottom:0}
+  .cllist .clitem:last-child{border-bottom:1px solid #000}
+  .clitem .a{background:#fff !important;color:#000 !important}
+  .clitem .a .tick{opacity:1}
+  .main{padding:0 !important}
+  .prfoot{display:block !important}
+}
+.prfoot{display:none;margin-top:10px;font-size:10.5px;color:#000;
+  border-top:1px solid #000;padding-top:5px}
+</style>
+</head><body>
+@@TOPBAR@@
+<div class="body">
+@@RAIL@@
+  <main class="main">
+    <div id="wrap"></div>
+  </main>
+</div>
+@@BOTNAV@@
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="@@BASE@@assets/app.js"></script>
+<script>
+"use strict";
+const A = D0507;
+const ID = new URLSearchParams(location.search).get('id') || '';
+let C = null;
+
+A.initAuth(@@FBCFG@@, () => {});
+load();
+
+async function load(){
+  const w = document.getElementById('wrap');
+  if (!ID){ w.innerHTML = '<div class="card"><p>ไม่ได้ระบุเช็กลิสต์</p></div>'; return; }
+  w.innerHTML = '<div class="card"><p class="note">กำลังโหลด…</p></div>';
+  try {
+    const d = await A.db.collection('checklists').doc(ID).get();
+    if (!d.exists){ w.innerHTML = '<div class="card"><p>ไม่พบเช็กลิสต์นี้</p></div>'; return; }
+    C = d.data();
+  } catch(e){
+    w.innerHTML = '<div class="card"><p>เปิดไม่ได้: ' + A.esc(e.code||e.message) + '</p></div>'; return;
+  }
+  paint();
+}
+
+const dmy = s => {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s||''); if (!m) return s||'—';
+  return m[3] + ' ' + ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'][+m[2]-1]
+       + ' ' + m[1];
+};
+
+function paint(){
+  const rows = [];
+  (C.items||[]).forEach((it,i) => {
+    rows.push({ t:it.t, a:it.a, sub:false, k:'i'+i });
+    (it.sub||[]).forEach((s,si) => rows.push({ t:s.t, a:s.a, sub:true, k:'i'+i+'s'+si }));
+  });
+  const total = rows.filter(r => (r.a||'').trim()).length;
+
+  document.getElementById('wrap').innerHTML = `
+    <div class="clband">
+      <p class="o">D-0507 FLIGHT TRAINING CO., LTD.</p>
+      <h1>${A.esc((C.title&&C.title.th) || C.doc || '')}</h1>
+      <p class="en">${A.esc((C.title&&C.title.en) || '')}</p>
+    </div>
+    <div class="clmeta">
+      <div><span>รหัสเอกสาร</span><b>${A.esc(C.doc||'—')}</b></div>
+      <div><span>เลขกำกับ</span><b>${A.esc(C.code||'—')}</b></div>
+      <div><span>ฉบับ / แก้ไข</span><b>${A.esc(C.issue||'01')} / ${A.esc(C.rev||'00')}</b></div>
+      <div><span>วันที่มีผล</span><b>${A.esc(dmy(C.eff))}</b></div>
+    </div>
+
+    <div class="clbar">
+      <button class="obtn" id="print">พิมพ์</button>
+      <button class="obtn sec" id="reset">ล้างเครื่องหมาย</button>
+      <span class="cnt" id="cnt"></span>
+    </div>
+
+    <div class="cllist ${C.layout==='two'?'two':''}">
+      ${rows.map(r => `<div class="clitem${r.sub?' sub':''}">
+        <div class="t">${A.esc(r.t||'')}</div>
+        <div class="a" data-k="${A.esc(r.k)}" role="button" tabindex="0"
+             aria-pressed="false"><span>${A.esc(r.a||'')}</span><span class="tick">✓</span></div>
+      </div>`).join('')}
+    </div>
+
+    <p class="prfoot">${A.esc(C.doc||'')} · ${A.esc(C.code||'')} ·
+      ฉบับ ${A.esc(C.issue||'01')} / แก้ไข ${A.esc(C.rev||'00')} ·
+      มีผล ${A.esc(dmy(C.eff))} · Controlled Copy — Uncontrolled when printed</p>`;
+
+  const cnt = () => {
+    const on = document.querySelectorAll('.clitem .a.on').length;
+    document.getElementById('cnt').textContent = total ? `ทำแล้ว ${on} จาก ${total}` : '';
+  };
+  /* แตะช่องขวาเพื่อทำเครื่องหมาย — ไม่ได้บันทึกที่ไหน เป็นเครื่องช่วยจำระหว่างทำงาน
+     เท่านั้น รีเฟรชหน้าก็หาย ตั้งใจให้เป็นแบบนี้: เช็กลิสต์ใบนี้ไม่ใช่บันทึกที่ต้อง
+     เก็บเป็นหลักฐาน ถ้าจะเก็บผลต้องทำเป็นฟอร์มที่มีคนลงนาม */
+  document.querySelectorAll('.clitem .a').forEach(el => {
+    const flip = () => { el.classList.toggle('on');
+      el.setAttribute('aria-pressed', el.classList.contains('on')); cnt(); };
+    el.addEventListener('click', flip);
+    el.addEventListener('keydown', e => {
+      if (e.key===' '||e.key==='Enter'){ e.preventDefault(); flip(); } });
+  });
+  document.getElementById('print').addEventListener('click', () => window.print());
+  document.getElementById('reset').addEventListener('click', () => {
+    document.querySelectorAll('.clitem .a.on').forEach(el => {
+      el.classList.remove('on'); el.setAttribute('aria-pressed','false'); });
+    cnt();
+  });
+  cnt();
+  document.title = ((C.title&&C.title.th) || C.doc || 'เช็กลิสต์') + ' — D-0507 Flight Training';
+}
+</script>
+</body></html>

@@ -317,6 +317,8 @@ def main():
         ('approve.html',     'approve/index.html',             '../',   'queue'),
         ('approvals.html',   'admin/approvals/index.html',     '../../','aprv'),
         ('pubs.html',        'pubs/index.html',                '../',   'pubs'),
+        ('checklists.html',  'admin/checklists/index.html',    '../../','pubs'),
+        ('cl.html',          'cl/index.html',                  '../',   'pubs'),
     ]
     VER = asset_versions()
     for src, out, base, active in pages:

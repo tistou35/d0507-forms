@@ -1,0 +1,301 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>สร้างเช็กลิสต์ — D-0507 Flight Training</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="@@BASE@@assets/app.css">
+<style>
+.clgrid{display:grid;grid-template-columns:1fr 260px;gap:12px;align-items:start}
+.clhead{display:grid;grid-template-columns:1fr 260px 44px;gap:12px;padding:0 2px 6px;
+  font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--g-400)}
+.itrow{display:grid;grid-template-columns:1fr 260px 44px;gap:12px;align-items:start;margin-bottom:8px}
+.itrow.sub{grid-template-columns:1fr 260px 44px;margin-left:26px}
+.itrow.sub > :first-child{position:relative}
+.itrow.sub > :first-child::before{content:"↳";position:absolute;left:-20px;top:9px;color:var(--g-400)}
+.itrow input,.itrow textarea{width:100%;min-height:40px;border-radius:8px;padding:9px 11px;
+  border:1px solid var(--border-med);background:var(--surface);color:var(--fg-1);font-size:13.5px;
+  font-family:var(--font-sans);resize:vertical}
+.itrow .rm{min-height:40px;border-radius:8px;border:1px solid var(--border-light);cursor:pointer;
+  background:var(--surface);color:var(--red-600);font-size:15px}
+.itrow .rm:hover{border-color:var(--red-500);background:var(--red-100)}
+.addbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.addbar button{min-height:38px;padding:0 14px;border-radius:8px;cursor:pointer;font-size:13px;
+  border:1px dashed var(--border-med);background:var(--surface);color:var(--fg-2)}
+.addbar button:hover{border-color:var(--navy-900);color:var(--fg-1)}
+.metagrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.metagrid label{display:block;font-size:12px;color:var(--fg-2);margin-bottom:4px}
+.metagrid input,.metagrid select{width:100%;min-height:40px;border-radius:8px;padding:0 10px;
+  border:1px solid var(--border-med);background:var(--surface);color:var(--fg-1);font-size:13.5px}
+.clcard{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 14px;
+  border-bottom:1px solid var(--g-100)}
+.clcard:last-child{border-bottom:0}
+.clcard .cd{font-family:var(--font-mono);font-size:11.5px;font-weight:700;color:var(--sky-600)}
+.clcard .nm{font-size:14.5px;font-weight:600}
+.clcard .mt{font-size:12px;color:var(--fg-2)}
+.clcard a,.clcard button{min-height:38px;padding:0 14px;border-radius:8px;font-size:13px;cursor:pointer;
+  border:1px solid var(--border-med);background:var(--surface);color:var(--fg-1);
+  display:inline-flex;align-items:center;text-decoration:none}
+.bump{padding:11px 13px;border-radius:9px;background:var(--amber-100);
+  border:1px solid var(--amber-500);font-size:13px;margin:10px 0}
+</style>
+</head><body>
+@@TOPBAR@@
+<div class="body">
+@@RAIL@@
+  <main class="main">
+    <div class="greet"><div>
+      <p class="eyebrow">ผู้ดูแลระบบ · CHECKLIST BUILDER</p>
+      <h1>สร้างเช็กลิสต์</h1>
+      <p class="sub">รายการที่ต้องทำคู่กับสิ่งที่ต้องปฏิบัติ · เปิดอ่านบนเครื่องหรือพิมพ์ไปใช้ก็ได้</p></div>
+      <button class="obtn" id="new">สร้างใหม่</button>
+    </div>
+
+    <div id="gate"></div>
+
+    <div id="body" class="hide">
+      <section id="listwrap">
+        <div class="sh"><h2>เช็กลิสต์ที่มี</h2><span class="en">Existing checklists</span></div>
+        <div class="card" style="padding:6px 0"><div id="list"></div></div>
+      </section>
+
+      <section id="editwrap" class="hide">
+        <div class="sh"><h2 id="edtitle">แก้ไข</h2><span class="en">Editor</span></div>
+
+        <div class="card">
+          <div class="metagrid">
+            <div><label>เลขเอกสาร</label><input id="m_doc" placeholder="D-0507-XXX-001"></div>
+            <div><label>เลขกำกับ</label><input id="m_code" placeholder="OP-CHK-401-A"></div>
+            <div><label>ฉบับที่</label><input id="m_issue" value="01"></div>
+            <div><label>แก้ไขครั้งที่</label><input id="m_rev" value="00" readonly
+              title="เดินอัตโนมัติทุกครั้งที่บันทึกการแก้ไข"></div>
+            <div><label>วันมีผล</label><input id="m_eff" type="date"></div>
+            <div><label>การจัดหน้า</label><select id="m_layout">
+              <option value="rows">เรียงลงมาแถวเดียว</option>
+              <option value="two">สองคอลัมน์</option>
+            </select></div>
+          </div>
+          <div style="margin-top:12px">
+            <label style="display:block;font-size:12px;color:var(--fg-2);margin-bottom:4px">ชื่อเช็กลิสต์ (ไทย)</label>
+            <input id="m_th" class="w" style="width:100%;min-height:40px;border-radius:8px;padding:0 10px;
+              border:1px solid var(--border-med);background:var(--surface);color:var(--fg-1);font-size:13.5px">
+          </div>
+          <div style="margin-top:10px">
+            <label style="display:block;font-size:12px;color:var(--fg-2);margin-bottom:4px">ชื่อเช็กลิสต์ (อังกฤษ)</label>
+            <input id="m_en" style="width:100%;min-height:40px;border-radius:8px;padding:0 10px;
+              border:1px solid var(--border-med);background:var(--surface);color:var(--fg-1);font-size:13.5px">
+          </div>
+          <div id="bumpnote"></div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <div class="clhead"><span>รายการที่ต้องทำ</span><span>สิ่งที่ต้องปฏิบัติ</span><span></span></div>
+          <div id="items"></div>
+          <div class="addbar">
+            <button type="button" id="addItem">+ เพิ่มรายการ</button>
+            <button type="button" id="addSub">+ เพิ่มรายการย่อยใต้อันสุดท้าย</button>
+          </div>
+        </div>
+
+        <div class="acts" style="margin-top:16px">
+          <button class="big pri" id="save">บันทึก</button>
+          <a class="big sec" id="preview" target="_blank" rel="noopener">เปิดหน้าใช้งาน ↗</a>
+          <button class="big sec" id="cancel">ปิดตัวแก้ไข</button>
+        </div>
+      </section>
+
+      <div id="log" class="note" style="margin-top:14px"></div>
+    </div>
+  </main>
+</div>
+@@BOTNAV@@
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="@@BASE@@assets/app.js"></script>
+<script>
+"use strict";
+const A = D0507;
+let LIST = [], CUR = null, ORIG = '';
+
+function log(m, c){ const el=document.getElementById('log');
+  el.textContent=m; el.style.color=c?`var(--${c})`:''; }
+
+/* เลขกำกับเดินหนึ่งตัวอักษรทุกครั้งที่ ISSUE หรือ REVISION เปลี่ยน — กติกาเดียว
+   กับเอกสารควบคุมใบอื่นในโครงการนี้ ท้ายสุดเป็น Z แล้วต้องตั้งรหัสใหม่ ไม่วนกลับ A */
+function bumpCode(code){
+  const m = String(code||'').match(/^(.*-)([A-Z])$/);
+  if (!m) return code || '';
+  if (m[2] === 'Z') return code;
+  return m[1] + String.fromCharCode(m[2].charCodeAt(0) + 1);
+}
+const pad2 = n => String(Math.max(0, Number(n)||0)).padStart(2,'0');
+
+A.initAuth(@@FBCFG@@, boot);
+boot();
+
+async function boot(){
+  const gate=document.getElementById('gate'), body=document.getElementById('body');
+  if (!A.isStaff()){
+    gate.innerHTML = `<div class="card"><p>หน้านี้สำหรับเจ้าหน้าที่ — <a href="@@BASE@@staff-login/?next=${
+      encodeURIComponent(location.pathname)}">เข้าสู่ระบบ</a></p></div>`;
+    body.classList.add('hide'); return;
+  }
+  gate.innerHTML=''; body.classList.remove('hide');
+  await load();
+}
+
+async function load(){
+  try {
+    const s = await A.db.collection('checklists').orderBy('doc').get();
+    LIST = s.docs.map(d => Object.assign({ id:d.id }, d.data()));
+  } catch(e){ log('อ่านรายการไม่ได้: '+(e.code||e.message), 'red-600'); return; }
+  rows();
+}
+
+function rows(){
+  const el=document.getElementById('list');
+  if (!LIST.length){ el.innerHTML='<p class="note" style="padding:12px 14px">ยังไม่มีเช็กลิสต์ — กด "สร้างใหม่"</p>'; return; }
+  el.innerHTML = LIST.map(c => `<div class="clcard">
+    <div>
+      <span class="cd">${A.esc(c.doc||'')} · ${A.esc(c.code||'')}</span>
+      <div class="nm">${A.esc((c.title&&c.title.th)||c.id)}</div>
+      <div class="mt">ฉบับ ${A.esc(c.issue||'01')} / แก้ไข ${A.esc(c.rev||'00')}
+        · ${(c.items||[]).length} รายการ
+        · ${c.layout==='two'?'สองคอลัมน์':'แถวเดียว'}</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <a href="@@BASE@@cl/?id=${encodeURIComponent(c.id)}" target="_blank" rel="noopener">เปิด ↗</a>
+      <button data-ed="${A.esc(c.id)}">แก้ไข</button>
+    </div>
+  </div>`).join('');
+  el.querySelectorAll('[data-ed]').forEach(b =>
+    b.addEventListener('click', () => edit(LIST.find(x=>x.id===b.dataset.ed))));
+}
+
+function blank(){
+  return { id:'', doc:'', code:'', issue:'01', rev:'00', eff:'',
+           layout:'rows', title:{th:'',en:''}, items:[{t:'',a:'',sub:[]}] };
+}
+
+function edit(c){
+  CUR = JSON.parse(JSON.stringify(c || blank()));
+  ORIG = JSON.stringify({ items:CUR.items, title:CUR.title, layout:CUR.layout });
+  document.getElementById('edtitle').textContent = c ? 'แก้ไข ' + (c.doc||c.id) : 'สร้างใหม่';
+  document.getElementById('editwrap').classList.remove('hide');
+  ['doc','code','issue','rev','eff'].forEach(k =>
+    document.getElementById('m_'+k).value = CUR[k] || '');
+  document.getElementById('m_layout').value = CUR.layout || 'rows';
+  document.getElementById('m_th').value = (CUR.title&&CUR.title.th) || '';
+  document.getElementById('m_en').value = (CUR.title&&CUR.title.en) || '';
+  document.getElementById('preview').href = CUR.id
+    ? '@@BASE@@cl/?id=' + encodeURIComponent(CUR.id) : '#';
+  items(); bumpNote();
+  document.getElementById('editwrap').scrollIntoView({behavior:'smooth'});
+}
+
+function changed(){
+  return CUR && CUR.id &&
+    ORIG !== JSON.stringify({ items:CUR.items, title:CUR.title, layout:CUR.layout });
+}
+
+/* บอกก่อนบันทึกว่าเลขจะเดินไปเท่าไร — เลขคุมเอกสารเปลี่ยนเงียบ ๆ ไม่ได้
+   คนที่ถือฉบับพิมพ์อยู่ต้องรู้ว่าของตัวเองเป็นฉบับที่ถูกแทนแล้ว */
+function bumpNote(){
+  const el=document.getElementById('bumpnote');
+  if (!changed()){ el.innerHTML=''; return; }
+  el.innerHTML = `<div class="bump">แก้เนื้อหาแล้ว — บันทึกครั้งนี้จะเดินเป็น
+    <b>แก้ไขครั้งที่ ${A.esc(pad2(Number(CUR.rev)+1))}</b>
+    · เลขกำกับ <b>${A.esc(bumpCode(CUR.code)||'—')}</b>
+    · ฉบับเดิมถูกเก็บไว้ย้อนดูได้</div>`;
+}
+
+function items(){
+  const el=document.getElementById('items');
+  const rowHtml = (it, i, si) => {
+    const cls = si===undefined ? 'itrow' : 'itrow sub';
+    const path = si===undefined ? String(i) : i+'.'+si;
+    return `<div class="${cls}" data-p="${path}">
+      <textarea data-f="t" rows="1" placeholder="${si===undefined?'รายการที่ต้องทำ':'รายการย่อย'}">${A.esc(it.t||'')}</textarea>
+      <textarea data-f="a" rows="1" placeholder="สิ่งที่ต้องปฏิบัติ">${A.esc(it.a||'')}</textarea>
+      <button type="button" class="rm" data-x="${path}" title="ลบแถวนี้">✕</button>
+    </div>`;
+  };
+  el.innerHTML = (CUR.items||[]).map((it,i) =>
+    rowHtml(it,i) + (it.sub||[]).map((s,si)=>rowHtml(s,i,si)).join('')).join('');
+
+  el.querySelectorAll('[data-f]').forEach(inp => inp.addEventListener('input', () => {
+    const [i,si] = inp.closest('[data-p]').dataset.p.split('.').map(Number);
+    const t = si===undefined || Number.isNaN(si) ? CUR.items[i] : CUR.items[i].sub[si];
+    t[inp.dataset.f] = inp.value;
+    bumpNote();
+  }));
+  el.querySelectorAll('[data-x]').forEach(b => b.addEventListener('click', () => {
+    const [i,si] = b.dataset.x.split('.').map(Number);
+    if (si===undefined || Number.isNaN(si)) CUR.items.splice(i,1);
+    else CUR.items[i].sub.splice(si,1);
+    if (!CUR.items.length) CUR.items=[{t:'',a:'',sub:[]}];
+    items(); bumpNote();
+  }));
+}
+
+document.getElementById('new').addEventListener('click', () => edit(null));
+document.getElementById('cancel').addEventListener('click', () => {
+  document.getElementById('editwrap').classList.add('hide'); CUR=null;
+});
+document.getElementById('addItem').addEventListener('click', () => {
+  CUR.items.push({t:'',a:'',sub:[]}); items(); bumpNote();
+});
+document.getElementById('addSub').addEventListener('click', () => {
+  const last = CUR.items[CUR.items.length-1];
+  (last.sub = last.sub || []).push({t:'',a:''}); items(); bumpNote();
+});
+['doc','code','issue','eff'].forEach(k =>
+  document.getElementById('m_'+k).addEventListener('input', e => { CUR[k]=e.target.value; }));
+document.getElementById('m_layout').addEventListener('change', e => { CUR.layout=e.target.value; bumpNote(); });
+document.getElementById('m_th').addEventListener('input', e => {
+  CUR.title = CUR.title||{}; CUR.title.th=e.target.value; bumpNote(); });
+document.getElementById('m_en').addEventListener('input', e => {
+  CUR.title = CUR.title||{}; CUR.title.en=e.target.value; bumpNote(); });
+
+document.getElementById('save').addEventListener('click', async () => {
+  if (!CUR) return;
+  if (!CUR.doc.trim()){ log('ต้องมีเลขเอกสารก่อน', 'red-600'); return; }
+  const live = (CUR.items||[]).filter(it => (it.t||'').trim() || (it.a||'').trim());
+  if (!live.length){ log('ต้องมีอย่างน้อยหนึ่งรายการ', 'red-600'); return; }
+
+  const isNew = !CUR.id;
+  const willBump = changed();
+  if (willBump && !confirm(
+      'แก้เนื้อหาแล้ว — จะเดินเป็นแก้ไขครั้งที่ ' + pad2(Number(CUR.rev)+1) +
+      ' และเลขกำกับ ' + (bumpCode(CUR.code)||'—') + '\n\nยืนยันบันทึก?')) return;
+
+  const id = CUR.id || CUR.doc.trim().replace(/[^A-Za-z0-9-]/g,'-');
+  const rec = {
+    doc: CUR.doc.trim(),
+    code: willBump ? bumpCode(CUR.code) : (CUR.code||'').trim(),
+    issue: pad2(CUR.issue || 1),
+    rev: willBump ? pad2(Number(CUR.rev)+1) : pad2(CUR.rev || 0),
+    eff: CUR.eff || '',
+    layout: CUR.layout || 'rows',
+    title: { th:(CUR.title&&CUR.title.th)||'', en:(CUR.title&&CUR.title.en)||'' },
+    items: live.map(it => ({ t:(it.t||'').trim(), a:(it.a||'').trim(),
+      sub:(it.sub||[]).filter(s=>(s.t||'').trim()||(s.a||'').trim())
+                      .map(s=>({t:(s.t||'').trim(), a:(s.a||'').trim()})) })),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    updatedBy: (A.user && A.user.email) || '',
+  };
+  try {
+    // เก็บฉบับที่กำลังจะถูกแทนก่อน แล้วค่อยเขียนทับ — ถ้าเขียนสำเนาไม่ผ่าน
+    // จะได้ไม่เสียฉบับเดิมไปโดยไม่มีที่ให้ย้อนดู
+    if (willBump) {
+      const old = LIST.find(x => x.id === CUR.id);
+      if (old) await A.db.collection('checklists').doc(id)
+        .collection('versions').doc(String(old.rev||'00')).set(old);
+    }
+    await A.db.collection('checklists').doc(id).set(rec, { merge:true });
+    log('บันทึกแล้ว — ' + rec.doc + ' ' + rec.code + ' ฉบับ ' + rec.issue + '/' + rec.rev, 'green-600');
+    await load();
+    edit(LIST.find(x => x.id === id));
+  } catch(e){ log('บันทึกไม่สำเร็จ: ' + (e.code||e.message), 'red-600'); }
+});
+</script>
+</body></html>

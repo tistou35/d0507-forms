@@ -1,0 +1,377 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>สร้างเช็กลิสต์ — D-0507 Flight Training</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="../../assets/app.css?v=a79e64f0">
+<style>
+.clgrid{display:grid;grid-template-columns:1fr 260px;gap:12px;align-items:start}
+.clhead{display:grid;grid-template-columns:1fr 260px 44px;gap:12px;padding:0 2px 6px;
+  font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--g-400)}
+.itrow{display:grid;grid-template-columns:1fr 260px 44px;gap:12px;align-items:start;margin-bottom:8px}
+.itrow.sub{grid-template-columns:1fr 260px 44px;margin-left:26px}
+.itrow.sub > :first-child{position:relative}
+.itrow.sub > :first-child::before{content:"↳";position:absolute;left:-20px;top:9px;color:var(--g-400)}
+.itrow input,.itrow textarea{width:100%;min-height:40px;border-radius:8px;padding:9px 11px;
+  border:1px solid var(--border-med);background:var(--surface);color:var(--fg-1);font-size:13.5px;
+  font-family:var(--font-sans);resize:vertical}
+.itrow .rm{min-height:40px;border-radius:8px;border:1px solid var(--border-light);cursor:pointer;
+  background:var(--surface);color:var(--red-600);font-size:15px}
+.itrow .rm:hover{border-color:var(--red-500);background:var(--red-100)}
+.addbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.addbar button{min-height:38px;padding:0 14px;border-radius:8px;cursor:pointer;font-size:13px;
+  border:1px dashed var(--border-med);background:var(--surface);color:var(--fg-2)}
+.addbar button:hover{border-color:var(--navy-900);color:var(--fg-1)}
+.metagrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.metagrid label{display:block;font-size:12px;color:var(--fg-2);margin-bottom:4px}
+.metagrid input,.metagrid select{width:100%;min-height:40px;border-radius:8px;padding:0 10px;
+  border:1px solid var(--border-med);background:var(--surface);color:var(--fg-1);font-size:13.5px}
+.clcard{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;padding:12px 14px;
+  border-bottom:1px solid var(--g-100)}
+.clcard:last-child{border-bottom:0}
+.clcard .cd{font-family:var(--font-mono);font-size:11.5px;font-weight:700;color:var(--sky-600)}
+.clcard .nm{font-size:14.5px;font-weight:600}
+.clcard .mt{font-size:12px;color:var(--fg-2)}
+.clcard a,.clcard button{min-height:38px;padding:0 14px;border-radius:8px;font-size:13px;cursor:pointer;
+  border:1px solid var(--border-med);background:var(--surface);color:var(--fg-1);
+  display:inline-flex;align-items:center;text-decoration:none}
+.bump{padding:11px 13px;border-radius:9px;background:var(--amber-100);
+  border:1px solid var(--amber-500);font-size:13px;margin:10px 0}
+</style>
+</head><body>
+<div class="topbar">
+  <a class="brand" href="../../" style="text-decoration:none">
+    <svg viewBox="0 0 320 72" fill="none" role="img" aria-label="D0507 Flight Training">
+      <g transform="translate(8,12)"><path d="M4 28 L44 20 L52 22 L44 26 L48 36 L40 34 L36 28 Z" fill="#fff"/>
+      <path d="M18 24 L44 20 L40 34 L22 30 Z" fill="#4A90D9"/><path d="M4 28 L14 22 L16 26 L8 30 Z" fill="#4A90D9"/></g>
+      <text x="70" y="36" font-family="'Arial Narrow',Arial,sans-serif" font-size="28" font-weight="800" letter-spacing="-0.5" fill="#fff">D0507</text>
+      <text x="71" y="54" font-family="'Arial Narrow',Arial,sans-serif" font-size="14" font-weight="600" letter-spacing="4" fill="#4A90D9">FLIGHT TRAINING</text>
+    </svg>
+    <span class="div"></span>
+    <span><span class="nm" data-t="brand">ระบบฟอร์มออนไลน์</span><span class="en" data-t2="brand">Forms &amp; Approvals</span></span>
+  </a>
+  <div class="tsearch" onclick="location.href='../../all/'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
+    <span><span data-t="searchPh">ค้นหาฟอร์ม</span> · <span data-t2="searchPh">Search forms</span></span><span class="k">⌘K</span>
+  </div>
+  <div class="tright">
+    <div class="langsw" role="group" aria-label="ภาษา · Language">
+      <button type="button" data-lang="th" aria-pressed="true">ไทย</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+    <div id="authbox" style="display:flex;align-items:center;gap:14px"></div>
+  </div>
+</div>
+<div class="body">
+<nav class="rail">
+  <span class="lab"><span data-t="menu">เมนู</span> · <span data-t2="menu">Menu</span></span>
+  <a class="nav" data-nav="home" href="../../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>
+    <span><span class="t" data-t="navHome">หน้าหลัก</span><span class="en" data-t2="navHome">Home</span></span></a>
+  <a class="nav" data-nav="all" href="../../all/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg>
+    <span><span class="t" data-t="navAll">คลังฟอร์ม</span><span class="en" data-t2="navAll">All forms</span></span><span class="pill gry" data-cnt="forms">—</span></a>
+  <a class="nav staffonly" data-nav="queue" href="../../queue/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l4 4L14 8"/><path d="M10 13l4 4L22 8"/></svg>
+    <span><span class="t" data-t="navQueue">งานของฉัน</span><span class="en" data-t2="navQueue">My queue</span></span><span class="pill amb" data-cnt="queue">0</span></a>
+  <a class="nav" data-nav="pubs" href="../../pubs/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.5h6a2.5 2.5 0 0 1 2.5 2.5v13A2 2 0 0 0 10.5 18H4z"/><path d="M20 4.5h-6A2.5 2.5 0 0 0 11.5 7v13A2 2 0 0 1 13.5 18H20z"/></svg>
+    <span><span class="t" data-t="navPubs">เช็กลิสต์และเอกสาร</span><span class="en" data-t2="navPubs">Checklists · Publications</span></span></a>
+  <a class="nav staffonly adminonly" data-nav="register" href="../../admin/register/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h8.5L19 7v14.5H6z"/><path d="M14 2.5V7h5"/><path d="M9 12h7M9 15.5h7"/></svg>
+    <span><span class="t" data-t="navReg">ทะเบียนเอกสาร</span><span class="en" data-t2="navReg">Register · LEF</span></span></a>
+  <a class="nav staffonly adminonly" data-nav="fadmin" href="../../admin/forms/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 12h16M4 19h9"/><circle cx="18.5" cy="19" r="2.5"/></svg>
+    <span><span class="t" data-t="navForms">จัดการฟอร์ม</span><span class="en" data-t2="navForms">Form management</span></span></a>
+  <a class="nav staffonly adminonly" data-nav="aprv" href="../../admin/approvals/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l2.5 2.5L16 8"/><path d="M20.5 12a8.5 8.5 0 1 1-4.2-7.3"/></svg>
+    <span><span class="t" data-t="navAprv">ผังผู้อนุมัติ</span><span class="en" data-t2="navAprv">Approvals</span></span></a>
+  <a class="nav staffonly adminonly" data-nav="setup" href="../../admin/setup/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>
+    <span><span class="t" data-t="navSetup">ตั้งค่าระบบ</span><span class="en" data-t2="navSetup">Admin setup</span></span></a>
+  <a class="nav staffonly" data-nav="audit" href="../../../d0507-audit/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.4 15.4L21 21"/></svg>
+    <span><span class="t" data-t="navAudit">งานตรวจสอบ</span><span class="en" data-t="auditNote">Audit ↗ login แยก</span></span></a>
+
+  <div class="railfoot">
+    <svg class="q" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9.2"/><path d="M9.4 9.2a2.7 2.7 0 1 1 3.4 2.6c-.6.2-.8.7-.8 1.3v.6"/><circle cx="12" cy="17" r=".9" fill="currentColor" stroke="none"/></svg>
+    <b data-t="helpTitle">ไม่รู้ว่าต้องใช้ฟอร์มไหน?</b>
+    <p data-t="helpBody">พิมพ์สิ่งที่อยากทำในช่องค้นหา ระบบจะหาให้ข้ามทุกระบบ</p>
+  </div>
+</nav>
+  <main class="main">
+    <div class="greet"><div>
+      <p class="eyebrow">ผู้ดูแลระบบ · CHECKLIST BUILDER</p>
+      <h1>สร้างเช็กลิสต์</h1>
+      <p class="sub">รายการที่ต้องทำคู่กับสิ่งที่ต้องปฏิบัติ · เปิดอ่านบนเครื่องหรือพิมพ์ไปใช้ก็ได้</p></div>
+      <button class="obtn" id="new">สร้างใหม่</button>
+    </div>
+
+    <div id="gate"></div>
+
+    <div id="body" class="hide">
+      <section id="listwrap">
+        <div class="sh"><h2>เช็กลิสต์ที่มี</h2><span class="en">Existing checklists</span></div>
+        <div class="card" style="padding:6px 0"><div id="list"></div></div>
+      </section>
+
+      <section id="editwrap" class="hide">
+        <div class="sh"><h2 id="edtitle">แก้ไข</h2><span class="en">Editor</span></div>
+
+        <div class="card">
+          <div class="metagrid">
+            <div><label>เลขเอกสาร</label><input id="m_doc" placeholder="D-0507-XXX-001"></div>
+            <div><label>เลขกำกับ</label><input id="m_code" placeholder="OP-CHK-401-A"></div>
+            <div><label>ฉบับที่</label><input id="m_issue" value="01"></div>
+            <div><label>แก้ไขครั้งที่</label><input id="m_rev" value="00" readonly
+              title="เดินอัตโนมัติทุกครั้งที่บันทึกการแก้ไข"></div>
+            <div><label>วันมีผล</label><input id="m_eff" type="date"></div>
+            <div><label>การจัดหน้า</label><select id="m_layout">
+              <option value="rows">เรียงลงมาแถวเดียว</option>
+              <option value="two">สองคอลัมน์</option>
+            </select></div>
+          </div>
+          <div style="margin-top:12px">
+            <label style="display:block;font-size:12px;color:var(--fg-2);margin-bottom:4px">ชื่อเช็กลิสต์ (ไทย)</label>
+            <input id="m_th" class="w" style="width:100%;min-height:40px;border-radius:8px;padding:0 10px;
+              border:1px solid var(--border-med);background:var(--surface);color:var(--fg-1);font-size:13.5px">
+          </div>
+          <div style="margin-top:10px">
+            <label style="display:block;font-size:12px;color:var(--fg-2);margin-bottom:4px">ชื่อเช็กลิสต์ (อังกฤษ)</label>
+            <input id="m_en" style="width:100%;min-height:40px;border-radius:8px;padding:0 10px;
+              border:1px solid var(--border-med);background:var(--surface);color:var(--fg-1);font-size:13.5px">
+          </div>
+          <div id="bumpnote"></div>
+        </div>
+
+        <div class="card" style="margin-top:16px">
+          <div class="clhead"><span>รายการที่ต้องทำ</span><span>สิ่งที่ต้องปฏิบัติ</span><span></span></div>
+          <div id="items"></div>
+          <div class="addbar">
+            <button type="button" id="addItem">+ เพิ่มรายการ</button>
+            <button type="button" id="addSub">+ เพิ่มรายการย่อยใต้อันสุดท้าย</button>
+          </div>
+        </div>
+
+        <div class="acts" style="margin-top:16px">
+          <button class="big pri" id="save">บันทึก</button>
+          <a class="big sec" id="preview" target="_blank" rel="noopener">เปิดหน้าใช้งาน ↗</a>
+          <button class="big sec" id="cancel">ปิดตัวแก้ไข</button>
+        </div>
+      </section>
+
+      <div id="log" class="note" style="margin-top:14px"></div>
+    </div>
+  </main>
+</div>
+<nav class="botnav">
+  <a data-nav="home" href="../../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg><span data-t="navHome">หน้าหลัก</span></a>
+  <a data-nav="all" href="../../all/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg><span data-t="navAll">คลังฟอร์ม</span></a>
+  <a data-nav="queue" class="staffonly" href="../../queue/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l4 4L14 8"/><path d="M10 13l4 4L22 8"/></svg><span data-t="navQueue">งานของฉัน</span></a>
+  <a class="on" data-nav="pubs" href="../../pubs/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.5h6a2.5 2.5 0 0 1 2.5 2.5v13A2 2 0 0 0 10.5 18H4z"/><path d="M20 4.5h-6A2.5 2.5 0 0 0 11.5 7v13A2 2 0 0 1 13.5 18H20z"/></svg>
+    <span data-t="navPubs">เช็กลิสต์</span></a>
+  <a data-nav="register" class="staffonly adminonly" href="../../admin/register/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h8.5L19 7v14.5H6z"/><path d="M14 2.5V7h5"/><path d="M9 12h7M9 15.5h7"/></svg><span data-t="navRegSh">ทะเบียน</span></a>
+</nav>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="../../assets/app.js?v=e6fe87c3"></script>
+<script>
+"use strict";
+const A = D0507;
+let LIST = [], CUR = null, ORIG = '';
+
+function log(m, c){ const el=document.getElementById('log');
+  el.textContent=m; el.style.color=c?`var(--${c})`:''; }
+
+/* เลขกำกับเดินหนึ่งตัวอักษรทุกครั้งที่ ISSUE หรือ REVISION เปลี่ยน — กติกาเดียว
+   กับเอกสารควบคุมใบอื่นในโครงการนี้ ท้ายสุดเป็น Z แล้วต้องตั้งรหัสใหม่ ไม่วนกลับ A */
+function bumpCode(code){
+  const m = String(code||'').match(/^(.*-)([A-Z])$/);
+  if (!m) return code || '';
+  if (m[2] === 'Z') return code;
+  return m[1] + String.fromCharCode(m[2].charCodeAt(0) + 1);
+}
+const pad2 = n => String(Math.max(0, Number(n)||0)).padStart(2,'0');
+
+A.initAuth({
+  apiKey: "AIzaSyCVR8EiBJDT4Qr3KZ2DRPhmFzUksHTwAjg",
+  authDomain: "d0507-forms.firebaseapp.com",
+  projectId: "d0507-forms",
+  storageBucket: "d0507-forms.firebasestorage.app",
+  messagingSenderId: "38336897307",
+  appId: "1:38336897307:web:0e423f959e635a07faf3be"
+}, boot);
+boot();
+
+async function boot(){
+  const gate=document.getElementById('gate'), body=document.getElementById('body');
+  if (!A.isStaff()){
+    gate.innerHTML = `<div class="card"><p>หน้านี้สำหรับเจ้าหน้าที่ — <a href="../../staff-login/?next=${
+      encodeURIComponent(location.pathname)}">เข้าสู่ระบบ</a></p></div>`;
+    body.classList.add('hide'); return;
+  }
+  gate.innerHTML=''; body.classList.remove('hide');
+  await load();
+}
+
+async function load(){
+  try {
+    const s = await A.db.collection('checklists').orderBy('doc').get();
+    LIST = s.docs.map(d => Object.assign({ id:d.id }, d.data()));
+  } catch(e){ log('อ่านรายการไม่ได้: '+(e.code||e.message), 'red-600'); return; }
+  rows();
+}
+
+function rows(){
+  const el=document.getElementById('list');
+  if (!LIST.length){ el.innerHTML='<p class="note" style="padding:12px 14px">ยังไม่มีเช็กลิสต์ — กด "สร้างใหม่"</p>'; return; }
+  el.innerHTML = LIST.map(c => `<div class="clcard">
+    <div>
+      <span class="cd">${A.esc(c.doc||'')} · ${A.esc(c.code||'')}</span>
+      <div class="nm">${A.esc((c.title&&c.title.th)||c.id)}</div>
+      <div class="mt">ฉบับ ${A.esc(c.issue||'01')} / แก้ไข ${A.esc(c.rev||'00')}
+        · ${(c.items||[]).length} รายการ
+        · ${c.layout==='two'?'สองคอลัมน์':'แถวเดียว'}</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <a href="../../cl/?id=${encodeURIComponent(c.id)}" target="_blank" rel="noopener">เปิด ↗</a>
+      <button data-ed="${A.esc(c.id)}">แก้ไข</button>
+    </div>
+  </div>`).join('');
+  el.querySelectorAll('[data-ed]').forEach(b =>
+    b.addEventListener('click', () => edit(LIST.find(x=>x.id===b.dataset.ed))));
+}
+
+function blank(){
+  return { id:'', doc:'', code:'', issue:'01', rev:'00', eff:'',
+           layout:'rows', title:{th:'',en:''}, items:[{t:'',a:'',sub:[]}] };
+}
+
+function edit(c){
+  CUR = JSON.parse(JSON.stringify(c || blank()));
+  ORIG = JSON.stringify({ items:CUR.items, title:CUR.title, layout:CUR.layout });
+  document.getElementById('edtitle').textContent = c ? 'แก้ไข ' + (c.doc||c.id) : 'สร้างใหม่';
+  document.getElementById('editwrap').classList.remove('hide');
+  ['doc','code','issue','rev','eff'].forEach(k =>
+    document.getElementById('m_'+k).value = CUR[k] || '');
+  document.getElementById('m_layout').value = CUR.layout || 'rows';
+  document.getElementById('m_th').value = (CUR.title&&CUR.title.th) || '';
+  document.getElementById('m_en').value = (CUR.title&&CUR.title.en) || '';
+  document.getElementById('preview').href = CUR.id
+    ? '../../cl/?id=' + encodeURIComponent(CUR.id) : '#';
+  items(); bumpNote();
+  document.getElementById('editwrap').scrollIntoView({behavior:'smooth'});
+}
+
+function changed(){
+  return CUR && CUR.id &&
+    ORIG !== JSON.stringify({ items:CUR.items, title:CUR.title, layout:CUR.layout });
+}
+
+/* บอกก่อนบันทึกว่าเลขจะเดินไปเท่าไร — เลขคุมเอกสารเปลี่ยนเงียบ ๆ ไม่ได้
+   คนที่ถือฉบับพิมพ์อยู่ต้องรู้ว่าของตัวเองเป็นฉบับที่ถูกแทนแล้ว */
+function bumpNote(){
+  const el=document.getElementById('bumpnote');
+  if (!changed()){ el.innerHTML=''; return; }
+  el.innerHTML = `<div class="bump">แก้เนื้อหาแล้ว — บันทึกครั้งนี้จะเดินเป็น
+    <b>แก้ไขครั้งที่ ${A.esc(pad2(Number(CUR.rev)+1))}</b>
+    · เลขกำกับ <b>${A.esc(bumpCode(CUR.code)||'—')}</b>
+    · ฉบับเดิมถูกเก็บไว้ย้อนดูได้</div>`;
+}
+
+function items(){
+  const el=document.getElementById('items');
+  const rowHtml = (it, i, si) => {
+    const cls = si===undefined ? 'itrow' : 'itrow sub';
+    const path = si===undefined ? String(i) : i+'.'+si;
+    return `<div class="${cls}" data-p="${path}">
+      <textarea data-f="t" rows="1" placeholder="${si===undefined?'รายการที่ต้องทำ':'รายการย่อย'}">${A.esc(it.t||'')}</textarea>
+      <textarea data-f="a" rows="1" placeholder="สิ่งที่ต้องปฏิบัติ">${A.esc(it.a||'')}</textarea>
+      <button type="button" class="rm" data-x="${path}" title="ลบแถวนี้">✕</button>
+    </div>`;
+  };
+  el.innerHTML = (CUR.items||[]).map((it,i) =>
+    rowHtml(it,i) + (it.sub||[]).map((s,si)=>rowHtml(s,i,si)).join('')).join('');
+
+  el.querySelectorAll('[data-f]').forEach(inp => inp.addEventListener('input', () => {
+    const [i,si] = inp.closest('[data-p]').dataset.p.split('.').map(Number);
+    const t = si===undefined || Number.isNaN(si) ? CUR.items[i] : CUR.items[i].sub[si];
+    t[inp.dataset.f] = inp.value;
+    bumpNote();
+  }));
+  el.querySelectorAll('[data-x]').forEach(b => b.addEventListener('click', () => {
+    const [i,si] = b.dataset.x.split('.').map(Number);
+    if (si===undefined || Number.isNaN(si)) CUR.items.splice(i,1);
+    else CUR.items[i].sub.splice(si,1);
+    if (!CUR.items.length) CUR.items=[{t:'',a:'',sub:[]}];
+    items(); bumpNote();
+  }));
+}
+
+document.getElementById('new').addEventListener('click', () => edit(null));
+document.getElementById('cancel').addEventListener('click', () => {
+  document.getElementById('editwrap').classList.add('hide'); CUR=null;
+});
+document.getElementById('addItem').addEventListener('click', () => {
+  CUR.items.push({t:'',a:'',sub:[]}); items(); bumpNote();
+});
+document.getElementById('addSub').addEventListener('click', () => {
+  const last = CUR.items[CUR.items.length-1];
+  (last.sub = last.sub || []).push({t:'',a:''}); items(); bumpNote();
+});
+['doc','code','issue','eff'].forEach(k =>
+  document.getElementById('m_'+k).addEventListener('input', e => { CUR[k]=e.target.value; }));
+document.getElementById('m_layout').addEventListener('change', e => { CUR.layout=e.target.value; bumpNote(); });
+document.getElementById('m_th').addEventListener('input', e => {
+  CUR.title = CUR.title||{}; CUR.title.th=e.target.value; bumpNote(); });
+document.getElementById('m_en').addEventListener('input', e => {
+  CUR.title = CUR.title||{}; CUR.title.en=e.target.value; bumpNote(); });
+
+document.getElementById('save').addEventListener('click', async () => {
+  if (!CUR) return;
+  if (!CUR.doc.trim()){ log('ต้องมีเลขเอกสารก่อน', 'red-600'); return; }
+  const live = (CUR.items||[]).filter(it => (it.t||'').trim() || (it.a||'').trim());
+  if (!live.length){ log('ต้องมีอย่างน้อยหนึ่งรายการ', 'red-600'); return; }
+
+  const isNew = !CUR.id;
+  const willBump = changed();
+  if (willBump && !confirm(
+      'แก้เนื้อหาแล้ว — จะเดินเป็นแก้ไขครั้งที่ ' + pad2(Number(CUR.rev)+1) +
+      ' และเลขกำกับ ' + (bumpCode(CUR.code)||'—') + '\n\nยืนยันบันทึก?')) return;
+
+  const id = CUR.id || CUR.doc.trim().replace(/[^A-Za-z0-9-]/g,'-');
+  const rec = {
+    doc: CUR.doc.trim(),
+    code: willBump ? bumpCode(CUR.code) : (CUR.code||'').trim(),
+    issue: pad2(CUR.issue || 1),
+    rev: willBump ? pad2(Number(CUR.rev)+1) : pad2(CUR.rev || 0),
+    eff: CUR.eff || '',
+    layout: CUR.layout || 'rows',
+    title: { th:(CUR.title&&CUR.title.th)||'', en:(CUR.title&&CUR.title.en)||'' },
+    items: live.map(it => ({ t:(it.t||'').trim(), a:(it.a||'').trim(),
+      sub:(it.sub||[]).filter(s=>(s.t||'').trim()||(s.a||'').trim())
+                      .map(s=>({t:(s.t||'').trim(), a:(s.a||'').trim()})) })),
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+    updatedBy: (A.user && A.user.email) || '',
+  };
+  try {
+    // เก็บฉบับที่กำลังจะถูกแทนก่อน แล้วค่อยเขียนทับ — ถ้าเขียนสำเนาไม่ผ่าน
+    // จะได้ไม่เสียฉบับเดิมไปโดยไม่มีที่ให้ย้อนดู
+    if (willBump) {
+      const old = LIST.find(x => x.id === CUR.id);
+      if (old) await A.db.collection('checklists').doc(id)
+        .collection('versions').doc(String(old.rev||'00')).set(old);
+    }
+    await A.db.collection('checklists').doc(id).set(rec, { merge:true });
+    log('บันทึกแล้ว — ' + rec.doc + ' ' + rec.code + ' ฉบับ ' + rec.issue + '/' + rec.rev, 'green-600');
+    await load();
+    edit(LIST.find(x => x.id === id));
+  } catch(e){ log('บันทึกไม่สำเร็จ: ' + (e.code||e.message), 'red-600'); }
+});
+</script>
+</body></html>

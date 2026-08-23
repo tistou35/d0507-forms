@@ -317,6 +317,9 @@
     return {
       mode: step.assignedBy === 'submitter' ? 'pick' : 'pool',
       position: step.pool || (regEntry && regEntry.assignTo) || '',
+      // ค่าตั้งต้นไม่มอบต่อ — ผู้ดูแลตั้งเองในหน้า Admin
+      // เดาแทนไม่ได้ งานอนุมัติที่ไปถึงคนผิดตำแหน่งแย่กว่างานที่ค้างอยู่
+      delegateTo: '',
       escalateDays: 2, rejectDays: 7,
     };
   };
