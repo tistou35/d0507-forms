@@ -694,3 +694,68 @@ a.gf:hover{border-color:var(--navy-900);color:var(--navy-900)}
   background:var(--surface);color:var(--g-500);font-family:var(--font-display);
   font-size:13px;font-style:italic;cursor:pointer;align-self:center}
 .fk-dense .fk-item.how-on .fk-how{background:var(--sky-100);border-color:var(--sky-500);color:var(--sky-500)}
+
+
+/* ══ พิมพ์ลงกระดาษ — พื้นฐานที่ทุกหน้าใช้ร่วมกัน ══════════════
+   .body เป็นกริด 250px + 1fr สำหรับแถบเมนูซ้าย ซ่อน .rail เฉย ๆ ไม่พอ
+   เพราะคอลัมน์ 250px ยังจองที่อยู่ เนื้อหาจึงถูกบีบไปอยู่หนึ่งในสามของหน้า
+   — นี่คือเหตุที่เช็กลิสต์พิมพ์ออกมาแล้วไม่เต็ม A4 */
+@page{ size:A4 portrait; margin:12mm 12mm 14mm }
+@media print{
+  html,body{background:#fff;color:#000}
+  .body{display:block}
+  .main{max-width:none;width:auto;padding:0 !important;margin:0}
+  .topbar,.rail,.botnav,.greet .obtn,.helpcard{display:none !important}
+  a[href]{color:#000;text-decoration:none}
+}
+
+
+/* ══ แม่แบบเช็กลิสต์สำหรับพิมพ์ (.prdoc) ══════════════════════
+   ใช้ร่วมกันทุกเช็กลิสต์ ไม่ว่าจะกี่ข้อ กี่คอลัมน์
+   ประกอบเป็น <table> เพราะ <thead>/<tfoot> ของตารางเป็นวิธีเดียว
+   ที่เบราว์เซอร์ซ้ำหัวและท้ายให้ทุกหน้าได้จริง — เช็กลิสต์ที่ยาวเกินหนึ่งหน้า
+   ต้องมีเลขกำกับเอกสารอยู่ทุกแผ่น ไม่งั้นแผ่นที่สองหลุดออกมาแล้วไม่รู้ว่าของใคร */
+.prdoc{display:none}
+@media print{
+  .prdoc{display:block}
+  .clband,.clmeta,.cllist,.clbar,.prfoot{display:none !important}
+
+  .prt{width:100%;border-collapse:collapse;table-layout:fixed;
+    font-family:var(--font-sans),sans-serif;color:#000}
+
+  /* หัวเอกสาร — ซ้ำทุกหน้า */
+  .prt thead th{padding:0 0 6px;border:0;text-align:left}
+  .prhd{border:1.2pt solid #000;padding:6pt 8pt}
+  .prhd .org{font-family:var(--font-mono),monospace;font-size:7pt;letter-spacing:.13em}
+  .prhd .ttl{font-family:var(--font-display),serif;font-size:14pt;font-weight:700;line-height:1.2;margin-top:1pt}
+  .prhd .ten{font-size:9pt;color:#333;line-height:1.25}
+  .prmeta{display:flex;border:1pt solid #000;border-top:0}
+  .prmeta span{flex:1;padding:3pt 8pt;border-right:1pt solid #000;font-size:8pt;line-height:1.35}
+  .prmeta span:last-child{border-right:0}
+  .prmeta b{display:block;font-size:6.5pt;letter-spacing:.1em;text-transform:uppercase;
+    font-weight:400;color:#444}
+  .prmeta i{font-style:normal;font-family:var(--font-mono),monospace;font-size:8.5pt}
+
+  /* แถวรายการ — ห้ามฉีกกลางแถว และห้ามแยกข้อย่อยไปคนละหน้ากับข้อหลัก */
+  .prt tbody tr{break-inside:avoid}
+  .prt tbody td{border:.75pt solid #000;padding:3.4pt 5pt;font-size:9pt;line-height:1.3;
+    vertical-align:middle}
+  .prt td.t{width:auto}
+  .prt td.a{width:26mm;font-family:var(--font-mono),monospace;font-size:7.5pt;
+    font-weight:700;letter-spacing:.01em;text-transform:uppercase;text-align:center}
+  .prt td.bx{width:7mm;text-align:center;font-size:11pt;line-height:1}
+  .prt td.gap{border:0;width:5mm;padding:0}
+  /* คลาส sub อยู่ที่ช่อง ไม่ใช่ที่แถว — แถวเดียวกันในแบบสองคอลัมน์
+     ฝั่งซ้ายอาจเป็นข้อย่อยขณะที่ฝั่งขวาเป็นข้อหลัก */
+  .prt td.t.sub{padding-left:14pt;font-size:8.2pt}
+  .prt td.t.sub::before{content:"↳ ";color:#555}
+  .prt td.a.sub{font-size:6.8pt;font-weight:400;text-transform:none}
+  .prt td.e{border:0}
+  .prt tr.head td{background:#eee;font-weight:700;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+
+  /* ท้ายเอกสาร — ซ้ำทุกหน้าเช่นกัน */
+  .prt tfoot td{border:0;padding:5pt 0 0;font-size:6.8pt;line-height:1.45;color:#000}
+  .prt tfoot .ln{border-top:.75pt solid #000;padding-top:3pt;display:flex;
+    justify-content:space-between;gap:10pt}
+  .prt tfoot .mono{font-family:var(--font-mono),monospace}
+}
