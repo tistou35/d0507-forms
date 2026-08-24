@@ -69,6 +69,13 @@ function doPost(e) {
 
     /* รายงานเช็กลิสต์ — เจ้าหน้าที่ที่ล็อกอินแล้วเท่านั้น (ดู Checklist.gs)
        เก็บเฉพาะแผ่นที่มีชื่อผู้ทำและวันที่ ไม่เก็บกระดาษเปล่ากับแบบฟอร์ม */
+    /* ฟอร์มเปล่าจากแม่แบบ — เจ้าหน้าที่ที่ล็อกอินแล้วเท่านั้น (ดู BlankForm.gs)
+       คืน PDF เป็น base64 ให้เครื่องที่สั่งเอาไปเก็บลงรีโป ไม่ได้เขียนลง Drive */
+    if (body.action === 'blankForm') {
+      if (!who || !who.email) throw new Error('ต้องเข้าสู่ระบบก่อน');
+      return json_({ ok: true, result: blankForm_(body.abbr) });
+    }
+
     if (body.action === 'checklistReport') {
       return json_({ ok: true, result: checklistReport_(body, who) });
     }

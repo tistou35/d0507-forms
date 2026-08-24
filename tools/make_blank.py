@@ -112,7 +112,10 @@ def main(argv):
         sys.exit(__doc__ or 'ใช้: make_blank.py <ABBR> [ABBR ...] | --all')
     reg = json.load(open(REG, encoding='utf-8'))
     by = {f['abbr']: f for f in reg['forms']}
-    want = ([f['abbr'] for f in reg['forms'] if f.get('blank')]
+    # ใบที่ตั้ง blankFrom: 'tpl' ทำจากแม่แบบใน Drive ไม่ใช่ .docx กระดาษ
+    # ใช้ tools/make_blank_tpl.mjs แทน — ที่นี่ต้องไม่เขียนทับ
+    want = ([f['abbr'] for f in reg['forms']
+             if f.get('blank') and f.get('blankFrom') != 'tpl']
             if argv[0] == '--all' else argv)
 
     os.makedirs(OUT, exist_ok=True)
@@ -122,6 +125,9 @@ def main(argv):
         f = by.get(a)
         if not f:
             print('🔴 %s ไม่มีในทะเบียน' % a); bad += 1; continue
+        if f.get('blankFrom') == 'tpl':
+            print('⏭  %s ทำจากแม่แบบ — ใช้ tools/make_blank_tpl.mjs %s' % (a, a))
+            continue
         src = os.path.join(DOCX_DIR, f.get('docx') or '')
         if not f.get('docx') or not os.path.exists(src):
             print('🔴 %s ไม่มีไฟล์ต้นฉบับ %s' % (a, f.get('docx') or '(ไม่ระบุ)')); bad += 1; continue

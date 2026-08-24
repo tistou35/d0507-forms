@@ -1223,7 +1223,8 @@
     "ftr"
    ],
    "blank": "blank/FTR.pdf",
-   "tpl": "1iDeTikRktXxm59E8_U_1zfpxVcO5OgAS1sxcbgO3ZaY"
+   "tpl": "1iDeTikRktXxm59E8_U_1zfpxVcO5OgAS1sxcbgO3ZaY",
+   "blankFrom": "tpl"
   },
   {
    "doc": "D-0507-ALR-001",
