@@ -1306,13 +1306,13 @@
   },
   {
    "doc": "D-0507-APP-001",
-   "code": "AD-APP-302-B",
+   "code": "AD-APP-302-C",
    "abbr": "APP",
    "t": "Application Form",
    "th": "ใบสมัคร",
    "iss": "01",
-   "rev": "00",
-   "eff": "13 JAN 2022",
+   "rev": "01",
+   "eff": "24 AUG 2026",
    "own": "AD",
    "lef": [
     "OMM",
@@ -1321,7 +1321,7 @@
    "docx": "D-0507-APP-001.docx",
    "st": "ok",
    "chain": "admin",
-   "note": "กรอกใน AeroFBO ที่ recruitment.php",
+   "note": "กรอกจริงใน AeroFBO ที่ recruitment.php — ใบสมัครงาน ถามตำแหน่งที่สมัคร ประวัติการศึกษา และใบรับรองที่ถืออยู่ · ฉบับกระดาษปรับให้ตรงกับหน้าเว็บเมื่อ 24 AUG 2026",
    "r": {
     "stu": "สมัครเข้าเรียน เปลี่ยนหลักสูตร หรือขอ licence / rating",
     "mgt": "พิจารณารับเข้าเรียนหรือรับเป็นครูการบิน"
@@ -1340,7 +1340,8 @@
    ],
    "sysOK": "ยืนยันแล้ว 01 AUG 2026",
    "jotDup": "221220820577045",
-   "blank": "blank/APP.pdf"
+   "blank": "blank/APP.pdf",
+   "tpl": "136d01uNGHI-w2naJfY9rsL0IAOVZ1z9qqmEHwcDroig"
   },
   {
    "doc": "D-0507-APF-001",
