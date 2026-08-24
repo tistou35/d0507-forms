@@ -101,7 +101,7 @@
         <label>ผู้รับ (ชื่อ) <span class="rq">*</span><input id="rcvName" autocomplete="off"></label>
         <label>ตำแหน่ง / หน้าที่ <span class="rq">*</span><input id="rcvRole" autocomplete="off"></label>
         <label>อีเมลผู้รับ<input id="rcvEmail" type="email" autocomplete="off"></label>
-        <label>ฉบับที่รับ / เลขสำเนา<input id="copyNo" placeholder="เช่น ACM 01" autocomplete="off"></label>
+        <label>ฉบับที่รับ / เลขสำเนา<select id="copyNo"><option value="">— ไม่ระบุ —</option></select></label>
         <label>รูปแบบสำเนา <span class="rq">*</span><select id="copyType">
           <option value="digital">ฉบับดิจิทัล</option>
           <option value="hard">ฉบับพิมพ์</option></select></label>
@@ -238,6 +238,14 @@ const MANUALS = [
   ['SMS', 'Safety Management System Manual'],
   ['ERP', 'Emergency Response Plan'],
 ];
+
+(function fillCopyNo(){
+  const sel = document.getElementById('copyNo');
+  for (let n = 1; n <= 99; n++) {
+    const v = String(n).padStart(2, '0');
+    sel.add(new Option(v, v));
+  }
+})();
 
 function fillPick(){
   const sel = document.getElementById('pick');
@@ -389,9 +397,9 @@ function paintReg(subs){
           g.eff ? ' · มีผล ' + A.esc(dmy(g.eff)) : ''} · รับแล้ว ${g.rows.length} ราย</span>
       </th></tr>
       <tr>
-        <th style="width:76px">เลขสำเนา</th><th>ผู้รับ</th><th>ตำแหน่ง</th>
+        <th style="width:62px">เลขสำเนา</th><th>ผู้รับ</th><th>ตำแหน่ง</th>
         <th style="width:62px">รูปแบบ</th><th style="width:88px">วันที่รับ</th>
-        <th style="width:126px">ลายเซ็น</th><th style="width:118px">เลขที่ใบรับ</th>
+        <th style="width:118px">ลายเซ็น</th><th style="width:112px">เลขที่ใบรับ</th>
       </tr></thead><tbody>${g.rows.map(r => `<tr>
         <td class="mono">${A.esc(r.copy || '—')}</td>
         <td>${A.esc(r.name || '—')}${r.email ? '<br><span class="none">'+A.esc(r.email)+'</span>' : ''}</td>

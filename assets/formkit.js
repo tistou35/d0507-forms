@@ -18,6 +18,7 @@
   /* ข้อความของตัวเรนเดอร์เอง — ที่ไม่ได้มาจากนิยามฟอร์ม */
   const UI = {
     yes:        { th: 'ใช่', en: 'Yes' },
+    choose:     { th: '— เลือก —', en: '— Choose —' },
     readonly:   { th: 'อ่านอย่างเดียว', en: 'read only' },
     blind:      { th: 'ส่วนนี้ถูกซ่อนไว้จนกว่าคุณจะส่งส่วนของตัวเอง — ตามข้อกำหนดที่ให้แต่ละฝ่ายประเมินอย่างอิสระ',
                   en: 'Hidden until you submit your own part — each party assesses independently.' },
@@ -602,6 +603,20 @@
         body = `<textarea id="${id}" data-k="${esc(f.k)}"${dis}>${esc(v || '')}</textarea>`; break;
 
       case 'select':
+        /* menu:true = เรนเดอร์เป็นเมนูดึงลงแทนแถวปุ่ม
+           แถวปุ่มอ่านง่ายเมื่อมีไม่กี่ตัวเลือก แต่พังเมื่อมีเป็นสิบเป็นร้อย
+           (เลขสำเนาควบคุมของ DRC มี 99 ตัวเลือก) — ตั้งเองในนิยามฟอร์ม
+           ไม่ใช่ตัดสินจากจำนวนตัวเลือก ฟอร์มที่ทำไว้แล้วจะได้ไม่เปลี่ยนหน้าตาเอง */
+        if (f.menu) {
+          body = `<select id="${id}" data-k="${esc(f.k)}"${dis}>`
+            + `<option value=""${v == null || v === '' ? ' selected' : ''}>${
+                 esc(f.req ? T('choose', this.lang) : '—')}</option>`
+            + (f.opt || []).map(o =>
+                `<option value="${esc(o.v)}"${v == o.v ? ' selected' : ''}>${
+                  esc(L(o.n, this.lang) || o.v)}</option>`).join('')
+            + `</select>`;
+          break;
+        }
         body = `<div class="fk-opts">` + (f.opt || []).map(o =>
           `<button type="button" class="fk-opt" data-k="${esc(f.k)}" data-v="${esc(o.v)}"
              aria-pressed="${v == o.v}"${dis}>${esc(L(o.n, this.lang) || o.v)}</button>`).join('') + `</div>`;
@@ -876,6 +891,13 @@
         rerender();
       });
     });
+
+    // select ที่ตั้ง menu:true — เก็บค่าจากเมนูดึงลง ('' = ยังไม่เลือก)
+    el.querySelectorAll('select[data-k]').forEach(sel =>
+      sel.addEventListener('change', () => {
+        self.set(sel.dataset.k, sel.value);
+        rerender();
+      }));
 
     /* ไฟล์แนบ — ส่งขึ้น Drive ผ่านตัวส่งออก แล้วเก็บแค่ข้อมูลย่อไว้ในใบ
        ตัวอัปโหลดรับมาจากหน้าที่เรียก (opts.upload) formkit จึงไม่ผูกกับ Firebase เอง */
