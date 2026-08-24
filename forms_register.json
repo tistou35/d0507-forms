@@ -851,14 +851,14 @@
    "blank": "blank/FPL.pdf"
   },
   {
-   "doc": "D-0507-NPC-001",
-   "code": "NP-CHK-303-C",
-   "abbr": "NPC",
+   "doc": "D-0507-NPC-M-001",
+   "code": "NP-CHK-303-A",
+   "abbr": "NPC-M",
    "kind": "ref",
-   "t": "Normal Procedures Checklist",
-   "th": "รายการตรวจขั้นตอนปกติ",
+   "t": "Normal Procedures Checklist — C172M",
+   "th": "รายการตรวจขั้นตอนปกติ — C172M",
    "iss": "01",
-   "rev": "01",
+   "rev": "00",
    "eff": "11 NOV 2024",
    "own": "OP",
    "lef": [
@@ -866,10 +866,10 @@
     "TM"
    ],
    "jot": "",
-   "docx": "D-0507-NPC-001.docx",
+   "docx": "D-0507-NPC-M-001.docx",
    "st": "ok",
    "chain": "ops",
-   "note": "LEF ระบุ Online แต่ไม่มี Jotform · ลิงก์ปัจจุบันชี้ Hazard Identification Form",
+   "note": "แยกจากฉบับรวม D-0507-NPC-001 ที่ครอบ C172 M/N/S เมื่อ 24 AUG 2026 — เนื้อหายังเหมือนกันทุกฉบับ",
    "r": {
     "ops": "Cessna 172 Series — ใช้ประกอบการฝึก",
     "ins": "ใช้สอนขั้นตอนปกติกับนักเรียน"
@@ -881,19 +881,21 @@
     "ขั้นตอนปกติ",
     "checklist",
     "normal",
-    "npc"
+    "npc",
+    "c172m",
+    "C172M"
    ],
-   "blank": "blank/NPC.pdf"
+   "blank": "blank/NPC-M.pdf"
   },
   {
-   "doc": "D-0507-EPC-001",
-   "code": "EP-CHK-303-C",
-   "abbr": "EPC",
+   "doc": "D-0507-NPC-N-001",
+   "code": "NP-CHK-304-A",
+   "abbr": "NPC-N",
    "kind": "ref",
-   "t": "Emergency Procedures Checklist",
-   "th": "รายการตรวจขั้นตอนฉุกเฉิน",
+   "t": "Normal Procedures Checklist — C172N",
+   "th": "รายการตรวจขั้นตอนปกติ — C172N",
    "iss": "01",
-   "rev": "01",
+   "rev": "00",
    "eff": "11 NOV 2024",
    "own": "OP",
    "lef": [
@@ -901,10 +903,84 @@
     "TM"
    ],
    "jot": "",
-   "docx": "D-0507-EPC-001.docx",
+   "docx": "D-0507-NPC-N-001.docx",
    "st": "ok",
    "chain": "ops",
-   "note": "LEF ชี้ไป PDF บน Google Drive · TM มีแถวซ้ำ 2 แถว",
+   "note": "แยกจากฉบับรวม D-0507-NPC-001 ที่ครอบ C172 M/N/S เมื่อ 24 AUG 2026 — เนื้อหายังเหมือนกันทุกฉบับ",
+   "r": {
+    "ops": "Cessna 172 Series — ใช้ประกอบการฝึก",
+    "ins": "ใช้สอนขั้นตอนปกติกับนักเรียน"
+   },
+   "with": [],
+   "sys": "here",
+   "public": false,
+   "kw": [
+    "ขั้นตอนปกติ",
+    "checklist",
+    "normal",
+    "npc",
+    "c172n",
+    "C172N"
+   ],
+   "blank": "blank/NPC-N.pdf"
+  },
+  {
+   "doc": "D-0507-NPC-S-001",
+   "code": "NP-CHK-305-A",
+   "abbr": "NPC-S",
+   "kind": "ref",
+   "t": "Normal Procedures Checklist — C172S",
+   "th": "รายการตรวจขั้นตอนปกติ — C172S",
+   "iss": "01",
+   "rev": "00",
+   "eff": "11 NOV 2024",
+   "own": "OP",
+   "lef": [
+    "OMA",
+    "TM"
+   ],
+   "jot": "",
+   "docx": "D-0507-NPC-S-001.docx",
+   "st": "ok",
+   "chain": "ops",
+   "note": "แยกจากฉบับรวม D-0507-NPC-001 ที่ครอบ C172 M/N/S เมื่อ 24 AUG 2026 — เนื้อหายังเหมือนกันทุกฉบับ",
+   "r": {
+    "ops": "Cessna 172 Series — ใช้ประกอบการฝึก",
+    "ins": "ใช้สอนขั้นตอนปกติกับนักเรียน"
+   },
+   "with": [],
+   "sys": "here",
+   "public": false,
+   "kw": [
+    "ขั้นตอนปกติ",
+    "checklist",
+    "normal",
+    "npc",
+    "c172s",
+    "C172S"
+   ],
+   "blank": "blank/NPC-S.pdf"
+  },
+  {
+   "doc": "D-0507-EPC-M-001",
+   "code": "EP-CHK-303-A",
+   "abbr": "EPC-M",
+   "kind": "ref",
+   "t": "Emergency Procedures Checklist — C172M",
+   "th": "รายการตรวจขั้นตอนฉุกเฉิน — C172M",
+   "iss": "01",
+   "rev": "00",
+   "eff": "11 NOV 2024",
+   "own": "OP",
+   "lef": [
+    "OMA",
+    "TM"
+   ],
+   "jot": "",
+   "docx": "D-0507-EPC-M-001.docx",
+   "st": "ok",
+   "chain": "ops",
+   "note": "แยกจากฉบับรวม D-0507-EPC-001 ที่ครอบ C172 M/N/S เมื่อ 24 AUG 2026 — เนื้อหายังเหมือนกันทุกฉบับ",
    "r": {
     "ops": "Cessna 172 Series — memory items",
     "ins": "ใช้สอนขั้นตอนฉุกเฉินกับนักเรียน"
@@ -916,9 +992,85 @@
     "ฉุกเฉิน",
     "emergency",
     "memory item",
-    "epc"
+    "epc",
+    "c172m",
+    "C172M"
    ],
-   "blank": "blank/EPC.pdf"
+   "blank": "blank/EPC-M.pdf"
+  },
+  {
+   "doc": "D-0507-EPC-N-001",
+   "code": "EP-CHK-304-A",
+   "abbr": "EPC-N",
+   "kind": "ref",
+   "t": "Emergency Procedures Checklist — C172N",
+   "th": "รายการตรวจขั้นตอนฉุกเฉิน — C172N",
+   "iss": "01",
+   "rev": "00",
+   "eff": "11 NOV 2024",
+   "own": "OP",
+   "lef": [
+    "OMA",
+    "TM"
+   ],
+   "jot": "",
+   "docx": "D-0507-EPC-N-001.docx",
+   "st": "ok",
+   "chain": "ops",
+   "note": "แยกจากฉบับรวม D-0507-EPC-001 ที่ครอบ C172 M/N/S เมื่อ 24 AUG 2026 — เนื้อหายังเหมือนกันทุกฉบับ",
+   "r": {
+    "ops": "Cessna 172 Series — memory items",
+    "ins": "ใช้สอนขั้นตอนฉุกเฉินกับนักเรียน"
+   },
+   "with": [],
+   "sys": "here",
+   "public": false,
+   "kw": [
+    "ฉุกเฉิน",
+    "emergency",
+    "memory item",
+    "epc",
+    "c172n",
+    "C172N"
+   ],
+   "blank": "blank/EPC-N.pdf"
+  },
+  {
+   "doc": "D-0507-EPC-S-001",
+   "code": "EP-CHK-305-A",
+   "abbr": "EPC-S",
+   "kind": "ref",
+   "t": "Emergency Procedures Checklist — C172S",
+   "th": "รายการตรวจขั้นตอนฉุกเฉิน — C172S",
+   "iss": "01",
+   "rev": "00",
+   "eff": "11 NOV 2024",
+   "own": "OP",
+   "lef": [
+    "OMA",
+    "TM"
+   ],
+   "jot": "",
+   "docx": "D-0507-EPC-S-001.docx",
+   "st": "ok",
+   "chain": "ops",
+   "note": "แยกจากฉบับรวม D-0507-EPC-001 ที่ครอบ C172 M/N/S เมื่อ 24 AUG 2026 — เนื้อหายังเหมือนกันทุกฉบับ",
+   "r": {
+    "ops": "Cessna 172 Series — memory items",
+    "ins": "ใช้สอนขั้นตอนฉุกเฉินกับนักเรียน"
+   },
+   "with": [],
+   "sys": "here",
+   "public": false,
+   "kw": [
+    "ฉุกเฉิน",
+    "emergency",
+    "memory item",
+    "epc",
+    "c172s",
+    "C172S"
+   ],
+   "blank": "blank/EPC-S.pdf"
   },
   {
    "doc": "D-0507-PWR-001",
