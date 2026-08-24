@@ -140,7 +140,10 @@ def check(abbr):
     # ส่วนของฝ่ายที่ไม่ใช่ขั้นแรก ควรซ่อนจากคนกรอก
     first = steps[0]['party'] if steps else None
     for s in d.get('sections', []):
-        if first and s.get('party') and s['party'] != first and not s.get('hideOthers'):
+        # showLocked = ตั้งใจให้เห็นแต่แก้ไม่ได้ เช่น DRC ที่ผู้รับต้องเห็นว่ากำลัง
+        # เซ็นรับเอกสารอะไรบ้าง ซ่อนไปคือให้เซ็นโดยไม่เห็นของ
+        if (first and s.get('party') and s['party'] != first
+                and not s.get('hideOthers') and not s.get('showLocked')):
             warn.append("section %s เป็นของฝ่าย '%s' แต่ไม่ได้ตั้ง hideOthers — "
                         "คนกรอกจะเห็นช่องที่ตัวเองแตะไม่ได้" % (s['k'], s['party']))
 

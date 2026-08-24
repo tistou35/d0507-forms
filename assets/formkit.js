@@ -170,9 +170,11 @@
   }
   /* แถวของ field ชนิด table — เติมให้ครบ rows ขั้นต่ำเสมอ
      กระดาษพิมพ์แถวว่างไว้ให้เขียน หน้าจอจึงควรมีแถวว่างรออยู่เท่ากัน ไม่ใช่เริ่มจากศูนย์ */
-  function tableRows(f, v) {
+  function tableRows(f, v, ro) {
     const arr = Array.isArray(v) ? v.slice() : [];
-    const min = f.rows || 1;
+    /* แถวว่างมีไว้ให้คนเขียน — ตารางที่แก้ไม่ได้ไม่มีคนเขียน เติมไปก็เป็นช่องว่าง
+       ที่ชวนให้เข้าใจว่ายังเติมรายการได้อีก ซึ่งบนใบรับเอกสารคือความหมายผิด */
+    const min = ro ? Math.min(1, f.rows || 1) : (f.rows || 1);
     while (arr.length < min) arr.push({});
     return arr;
   }
@@ -671,7 +673,7 @@
          แถวว่างทั้งแถวไม่นับเป็นข้อมูล ตอนส่งออกจึงไม่กินบรรทัดในเอกสาร */
       case 'table': {
         const cols = f.cols || [];
-        const rows = tableRows(f, v);
+        const rows = tableRows(f, v, ro);
         const head = cols.map(c =>
           `<th${c.w ? ` style="width:${esc(c.w)}"` : ''}>${esc(L(c.label, this.lang))}</th>`).join('');
         const body_ = rows.map((row, ri) => `<tr>${cols.map(c => {

@@ -211,9 +211,10 @@ def partials(active, base):
         return m.group(1).strip()
     rail, bot, top = block('RAIL'), block('BOTNAV'), block('TOPBAR')
     def mark(h):
-        return re.sub(r'(<a[^>]*data-nav="%s"[^>]*class="([^"]*)")' % re.escape(active),
-                      lambda m: m.group(1).replace('class="%s"' % m.group(2),
-                                                   'class="%s on"' % m.group(2)), h)
+        # rail เขียน class ไว้ก่อน data-nav เสมอ — รูปแบบเดิมมองหา class ที่ตามหลัง
+        # จึงไม่เคยเข้าคู่กับอะไรเลย เมนูฝั่งซ้ายเลยไม่เคยไฮไลต์หน้าที่เปิดอยู่
+        return re.sub(r'<a class="([^"]*)" data-nav="%s"' % re.escape(active),
+                      lambda m: '<a class="%s on" data-nav="%s"' % (m.group(1), active), h)
     def mark2(h):  # botnav มี class ตามหลัง data-nav
         return re.sub(r'<a data-nav="%s"' % re.escape(active), '<a class="on" data-nav="%s"' % active, h)
     return (mark(rail).replace('@@BASE@@', base),
@@ -386,6 +387,7 @@ def main():
         ('pubs.html',        'pubs/index.html',                '../',   'pubs'),
         ('checklists.html',  'admin/checklists/index.html',    '../../','pubs'),
         ('cl.html',          'cl/index.html',                  '../',   'pubs'),
+        ('drc.html',         'admin/drc/index.html',           '../../','drc'),
     ]
     VER = asset_versions()
     # sw.js อยู่ราก path ในนั้นจึงอ้างอิงจากตำแหน่งตัวเอง ไม่ใช่ base ของแต่ละหน้า

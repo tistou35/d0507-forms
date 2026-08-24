@@ -1553,7 +1553,7 @@
    "docx": "D-0507-DRC-001.docx",
    "st": "ok",
    "chain": "doccontrol",
-   "note": "LEF ของ OMM และ TM ชี้ไปฟอร์ม Maintenance Task Card",
+   "note": "ผู้แจกจ่ายเตรียมรายการเอกสารแล้วสร้างลิงก์จากหน้า \"สร้างลิงก์ใบรับเอกสาร\" เอาลิงก์ไปวางในประกาศของ AeroFBO › Bulletin · ผู้รับกดลิงก์แล้วยืนยันและลงนามได้เลย ไม่ต้องล็อกอิน ส่วนของการแจกจ่ายล็อกไว้แก้ไม่ได้",
    "r": {
     "ops": "ลงนามรับเอกสารควบคุมและคืนฉบับที่ถูกแทน",
     "mgt": "ติดตามให้ Distribution List ลงนามรับครบ"
@@ -1563,7 +1563,7 @@
     "ผู้รับ"
    ],
    "sys": "here",
-   "public": false,
+   "public": true,
    "kw": [
     "รับเอกสาร",
     "ลงนามรับ",
@@ -1571,7 +1571,14 @@
     "drc"
    ],
    "blank": "blank/DRC.pdf",
-   "tpl": "1cP4Kpet0XYWVGhInoi3Ac5LEw53wsO4nJtrWSfNf4Ko"
+   "tpl": "1cP4Kpet0XYWVGhInoi3Ac5LEw53wsO4nJtrWSfNf4Ko",
+   "admin": {
+    "url": "admin/drc/",
+    "n": {
+     "th": "เตรียมลิงก์แจกจ่าย",
+     "en": "Prepare distribution link"
+    }
+   }
   },
   {
    "doc": "D-0507-NCHR-001",

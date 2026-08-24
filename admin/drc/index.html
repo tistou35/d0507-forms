@@ -1,0 +1,495 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ใบรับเอกสารควบคุม — D-0507 Flight Training</title>
+<link rel="stylesheet" href="../../assets/app.css?v=55a3531d">
+<style>
+.dtabs{display:flex;gap:8px;margin:14px 0 4px;flex-wrap:wrap}
+.dtabs button{padding:8px 15px;border-radius:9px;border:1px solid var(--border-light);
+  background:var(--surface);font-size:13.5px;cursor:pointer;color:var(--fg-2)}
+.dtabs button[aria-selected="true"]{background:var(--navy-900);color:#fff;border-color:var(--navy-900)}
+
+/* ── สร้างลิงก์ ── */
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px 14px}
+.g label,.wide label{display:block;font-size:13px;font-weight:600}
+.wide{margin-top:10px}
+.g input,.g select,.wide input{width:100%;margin-top:4px;min-height:40px;padding:0 11px;
+  border-radius:8px;border:1px solid var(--border-med);background:var(--surface);
+  font-size:14px;font-family:inherit}
+.g input:focus,.wide input:focus,.g select:focus{outline:2px solid var(--sky-500);outline-offset:1px}
+.rq{color:var(--red-600)}
+
+.drow{display:grid;grid-template-columns:1fr 150px 96px 138px 40px;gap:8px;margin-bottom:7px}
+.drow input{min-height:38px;padding:0 10px;border-radius:8px;border:1px solid var(--border-med);
+  background:var(--surface);font-size:13.5px;font-family:inherit}
+.drow .x{border:1px solid var(--border-light);background:var(--surface);border-radius:8px;
+  cursor:pointer;color:var(--g-500)}
+.drow .x:hover{border-color:var(--red-600);color:var(--red-600)}
+.dhead{display:grid;grid-template-columns:1fr 150px 96px 138px 40px;gap:8px;
+  font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--g-500);margin-bottom:5px}
+@media(max-width:760px){ .drow,.dhead{grid-template-columns:1fr} .dhead{display:none} }
+
+.out{margin-top:14px;padding:13px 15px;border-radius:10px;background:var(--g-50);
+  border:1px solid var(--border-light)}
+.out code{display:block;font-family:var(--font-mono);font-size:12px;line-height:1.6;
+  word-break:break-all;color:var(--fg-1);margin-top:6px;max-height:120px;overflow:auto}
+.msg{font-size:12.5px;color:var(--g-500)}
+.msg.bad{color:var(--red-600)}
+.msg.ok{color:var(--green-600)}
+
+/* ── ทะเบียนลายเซ็น ── */
+.sigreg{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
+.sigreg th{text-align:left;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;
+  white-space:nowrap;
+  color:var(--g-500);font-weight:600;padding:7px 9px;border-bottom:1.5px solid var(--border-med)}
+.sigreg td{padding:8px 9px;border-bottom:1px solid var(--border-light);vertical-align:middle}
+.sigreg tr:last-child td{border-bottom:0}
+.sigreg .mono{font-family:var(--font-mono);font-size:11.5px;white-space:nowrap}
+/* ตำแหน่งงานยาวกว่าช่องที่เหลือเสมอ ปล่อยให้ตัดบรรทัดได้แต่ไม่กลางคำ */
+.sigreg td:nth-child(2),.sigreg td:nth-child(3){line-height:1.35}
+.sigreg img{height:32px;max-width:126px;object-fit:contain;display:block}
+.sigreg .none{color:var(--g-400);font-size:11.5px}
+.sgrp{margin-top:20px}
+/* หัวกลุ่มอยู่ใน <thead> ไม่ใช่ <h3> เหนือตาราง — เบราว์เซอร์ซ้ำ thead ให้ทุกหน้า
+   ตารางที่ยาวข้ามหน้าจึงพาชื่อคู่มือไปด้วย ถ้าปล่อยไว้ข้างนอก หน้าที่สองจะเป็น
+   รายชื่อคนเซ็นลอย ๆ ที่ไม่บอกว่าเซ็นรับคู่มือเล่มไหน ซึ่งใช้เป็นหลักฐานไม่ได้ */
+.sigreg .gh th{border-bottom:2px solid var(--navy-900);padding:0 0 5px;
+  text-transform:none;letter-spacing:0;color:var(--fg-1)}
+.sigreg .gh .t{display:block;font-size:14.5px;font-weight:700;font-family:var(--font-display)}
+.sigreg .gh .s{display:block;font-size:11.5px;color:var(--g-500);
+  font-family:var(--font-mono);font-weight:400;margin-top:2px}
+
+@media print{
+  /* .greet คือหัวเรื่องของหน้าจอ — บนกระดาษมี .prhead ทำหน้าที่นั้นแล้ว
+     ปล่อยทั้งคู่ไว้จะได้หัวเรื่องซ้อนกันสองชั้นบนหน้าแรก */
+  .dtabs,.topbar,.rail,.botnav,.obtn,.gen,.out,.greet,#gate{display:none !important}
+  #preg{border:0;box-shadow:none;padding:0;margin:0}
+  .sigreg img{height:28px;max-width:124px}
+  .sgrp{break-inside:auto}
+  .sigreg tr{break-inside:avoid}
+  .sigreg .gh th{padding-top:0}
+  .sigreg thead{display:table-header-group}
+  .prhead{display:block !important}
+}
+.prhead{display:none;border-bottom:1.2pt solid #000;padding-bottom:5pt;margin-bottom:9pt}
+.prhead .o{font-family:var(--font-mono);font-size:7.5pt;letter-spacing:.12em}
+.prhead h2{font-size:13pt;font-weight:700;font-family:var(--font-display)}
+.prhead .m{font-size:8pt;color:#333}
+</style>
+</head><body>
+<div class="topbar">
+  <a class="brand" href="../../" style="text-decoration:none">
+    <svg viewBox="0 0 320 72" fill="none" role="img" aria-label="D0507 Flight Training">
+      <g transform="translate(8,12)"><path d="M4 28 L44 20 L52 22 L44 26 L48 36 L40 34 L36 28 Z" fill="#fff"/>
+      <path d="M18 24 L44 20 L40 34 L22 30 Z" fill="#4A90D9"/><path d="M4 28 L14 22 L16 26 L8 30 Z" fill="#4A90D9"/></g>
+      <text x="70" y="36" font-family="'Arial Narrow',Arial,sans-serif" font-size="28" font-weight="800" letter-spacing="-0.5" fill="#fff">D0507</text>
+      <text x="71" y="54" font-family="'Arial Narrow',Arial,sans-serif" font-size="14" font-weight="600" letter-spacing="4" fill="#4A90D9">FLIGHT TRAINING</text>
+    </svg>
+    <span class="div"></span>
+    <span><span class="nm" data-t="brand">ระบบฟอร์มออนไลน์</span><span class="en" data-t2="brand">Forms &amp; Approvals</span></span>
+  </a>
+  <div class="tsearch" onclick="location.href='../../all/'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
+    <span><span data-t="searchPh">ค้นหาฟอร์ม</span> · <span data-t2="searchPh">Search forms</span></span><span class="k">⌘K</span>
+  </div>
+  <div class="tright">
+    <div class="langsw" role="group" aria-label="ภาษา · Language">
+      <button type="button" data-lang="th" aria-pressed="true">ไทย</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+    <div id="authbox" style="display:flex;align-items:center;gap:14px"></div>
+  </div>
+</div>
+<div class="body">
+<nav class="rail">
+  <span class="lab"><span data-t="menu">เมนู</span> · <span data-t2="menu">Menu</span></span>
+  <a class="nav" data-nav="home" href="../../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>
+    <span><span class="t" data-t="navHome">หน้าหลัก</span><span class="en" data-t2="navHome">Home</span></span></a>
+  <a class="nav" data-nav="all" href="../../all/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg>
+    <span><span class="t" data-t="navAll">คลังฟอร์ม</span><span class="en" data-t2="navAll">All forms</span></span><span class="pill gry" data-cnt="forms">—</span></a>
+  <a class="nav staffonly" data-nav="queue" href="../../queue/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l4 4L14 8"/><path d="M10 13l4 4L22 8"/></svg>
+    <span><span class="t" data-t="navQueue">งานของฉัน</span><span class="en" data-t2="navQueue">My queue</span></span><span class="pill amb" data-cnt="queue">0</span></a>
+  <a class="nav" data-nav="pubs" href="../../pubs/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.5h6a2.5 2.5 0 0 1 2.5 2.5v13A2 2 0 0 0 10.5 18H4z"/><path d="M20 4.5h-6A2.5 2.5 0 0 0 11.5 7v13A2 2 0 0 1 13.5 18H20z"/></svg>
+    <span><span class="t" data-t="navPubs">เช็กลิสต์และเอกสาร</span><span class="en" data-t2="navPubs">Checklists · Publications</span></span></a>
+  <a class="nav staffonly adminonly" data-nav="register" href="../../admin/register/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h8.5L19 7v14.5H6z"/><path d="M14 2.5V7h5"/><path d="M9 12h7M9 15.5h7"/></svg>
+    <span><span class="t" data-t="navReg">ทะเบียนเอกสาร</span><span class="en" data-t2="navReg">Register · LEF</span></span></a>
+  <a class="nav staffonly adminonly" data-nav="fadmin" href="../../admin/forms/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 12h16M4 19h9"/><circle cx="18.5" cy="19" r="2.5"/></svg>
+    <span><span class="t" data-t="navForms">จัดการฟอร์ม</span><span class="en" data-t2="navForms">Form management</span></span></a>
+  <a class="nav staffonly adminonly" data-nav="aprv" href="../../admin/approvals/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l2.5 2.5L16 8"/><path d="M20.5 12a8.5 8.5 0 1 1-4.2-7.3"/></svg>
+    <span><span class="t" data-t="navAprv">ผังผู้อนุมัติ</span><span class="en" data-t2="navAprv">Approvals</span></span></a>
+  <a class="nav staffonly adminonly" data-nav="setup" href="../../admin/setup/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3.2"/><path d="M19.4 15a1.6 1.6 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.6 1.6 0 0 0-1.8-.3 1.6 1.6 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.6 1.6 0 0 0-1-1.5 1.6 1.6 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.6 1.6 0 0 0 .3-1.8 1.6 1.6 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.6 1.6 0 0 0 1.5-1 1.6 1.6 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.6 1.6 0 0 0 1.8.3H9a1.6 1.6 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.6 1.6 0 0 0 1 1.5 1.6 1.6 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.6 1.6 0 0 0-.3 1.8V9a1.6 1.6 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.6 1.6 0 0 0-1.5 1z"/></svg>
+    <span><span class="t" data-t="navSetup">ตั้งค่าระบบ</span><span class="en" data-t2="navSetup">Admin setup</span></span></a>
+  <a class="nav staffonly on" data-nav="drc" href="../../admin/drc/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3.5h9L19 8v12.5H5z"/><path d="M14 3.5V8h5"/><path d="M8.5 16.5c1.4-2.4 2.4-3.6 3-3.6.9 0 .3 3 1.2 3 .6 0 1-.7 2.8-1.4"/></svg>
+    <span><span class="t" data-t="navDrc">แจกจ่ายเอกสาร</span><span class="en" data-t2="navDrc">Distribution · DRC</span></span></a>
+  <a class="nav staffonly" data-nav="audit" href="../../../d0507-audit/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.4 15.4L21 21"/></svg>
+    <span><span class="t" data-t="navAudit">งานตรวจสอบ</span><span class="en" data-t="auditNote">Audit ↗ login แยก</span></span></a>
+
+  <div class="railfoot">
+    <svg class="q" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9.2"/><path d="M9.4 9.2a2.7 2.7 0 1 1 3.4 2.6c-.6.2-.8.7-.8 1.3v.6"/><circle cx="12" cy="17" r=".9" fill="currentColor" stroke="none"/></svg>
+    <b data-t="helpTitle">ไม่รู้ว่าต้องใช้ฟอร์มไหน?</b>
+    <p data-t="helpBody">พิมพ์สิ่งที่อยากทำในช่องค้นหา ระบบจะหาให้ข้ามทุกระบบ</p>
+  </div>
+</nav>
+  <main class="main">
+    <div class="greet">
+      <div><p class="eyebrow"><span>ใบรับเอกสารควบคุม</span> · <span>DOCUMENT RECEIPT · DRC</span></p>
+        <h1>D-0507-DRC-001</h1>
+        <p class="sub">เตรียมรายการเอกสารแล้วสร้างลิงก์ให้ผู้รับกดเซ็น · และดูทะเบียนว่าใครรับฉบับไหนไปแล้ว</p></div>
+    </div>
+
+    <div class="dtabs" role="tablist">
+      <button role="tab" data-tab="gen" aria-selected="true">สร้างลิงก์ใบรับ</button>
+      <button role="tab" data-tab="reg" aria-selected="false">ทะเบียนลายเซ็น</button>
+    </div>
+
+    <div id="gate"></div>
+
+    <!-- ── สร้างลิงก์ ────────────────────────────────────── -->
+    <section id="pgen" class="card gen hide">
+      <h3>1 · การแจกจ่าย</h3>
+      <p class="note" style="margin:3px 0 12px">ส่วนนี้จะถูกล็อกไว้บนใบของผู้รับ — เขาเห็นได้แต่แก้ไม่ได้</p>
+      <div class="g">
+        <label>ผู้รับ (ชื่อ) <span class="rq">*</span><input id="rcvName" autocomplete="off"></label>
+        <label>ตำแหน่ง / หน้าที่ <span class="rq">*</span><input id="rcvRole" autocomplete="off"></label>
+        <label>อีเมลผู้รับ<input id="rcvEmail" type="email" autocomplete="off"></label>
+        <label>ฉบับที่รับ / เลขสำเนา<input id="copyNo" placeholder="เช่น ACM 01" autocomplete="off"></label>
+        <label>รูปแบบสำเนา <span class="rq">*</span><select id="copyType">
+          <option value="digital">ฉบับดิจิทัล</option>
+          <option value="hard">ฉบับพิมพ์</option></select></label>
+        <label>วันที่แจกจ่าย <span class="rq">*</span><input id="issDate" type="date"></label>
+        <label>ผู้แจกจ่าย <span class="rq">*</span><input id="issBy" autocomplete="off"></label>
+        <label>เลขที่ประกาศ (ถ้ามี)<input id="ref" placeholder="BUL-2026-…" autocomplete="off"></label>
+      </div>
+
+      <h3 style="margin-top:18px">2 · รายการเอกสารที่แจกจ่าย</h3>
+      <p class="note" style="margin:3px 0 10px">ใส่ได้หลายฉบับ — ผู้รับลงนามครั้งเดียวครอบทุกรายการในใบนี้</p>
+      <div class="dhead"><span>ชื่อเอกสาร</span><span>รหัสเอกสาร</span><span>ฉบับ/แก้ไข</span>
+        <span>วันที่มีผล</span><span></span></div>
+      <div id="docs"></div>
+      <div style="display:flex;gap:8px;margin-top:9px;flex-wrap:wrap;align-items:center">
+        <button class="obtn sec" id="addDoc">+ เพิ่มรายการ</button>
+        <select id="pick" style="min-height:40px;padding:0 11px;border-radius:8px;
+          border:1px solid var(--border-med);background:var(--surface);font-size:13.5px;
+          font-family:inherit;max-width:100%"><option value="">— หยิบจากทะเบียน —</option></select>
+      </div>
+
+      <div style="display:flex;gap:8px;align-items:center;margin-top:16px;flex-wrap:wrap">
+        <button class="obtn" id="make">สร้างลิงก์</button>
+        <span class="msg" id="gmsg"></span>
+      </div>
+
+      <div class="out hide" id="out">
+        <b style="font-size:13.5px">ลิงก์สำหรับวางในประกาศของ AeroFBO › Bulletin</b>
+        <code id="url"></code>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <button class="obtn sec" id="copy">คัดลอกลิงก์</button>
+          <a class="obtn sec" id="open" target="_blank" rel="noopener">เปิดดูใบที่ผู้รับจะเห็น ↗</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── ทะเบียนลายเซ็น ───────────────────────────────── -->
+    <section id="preg" class="card hide">
+      <div class="prhead">
+        <p class="o">D-0507 FLIGHT TRAINING CO., LTD.</p>
+        <h2>ทะเบียนการรับเอกสารควบคุม · CONTROLLED DOCUMENT RECEIPT REGISTER</h2>
+        <p class="m" id="prm"></p>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <button class="obtn sec" id="print">พิมพ์ทะเบียน</button>
+        <button class="obtn sec" id="reload">โหลดใหม่</button>
+        <span class="msg" id="rmsg"></span>
+      </div>
+      <div id="regout"></div>
+    </section>
+  </main>
+</div>
+<nav class="botnav">
+  <a data-nav="home" href="../../">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg><span data-t="navHome">หน้าหลัก</span></a>
+  <a data-nav="all" href="../../all/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg><span data-t="navAll">คลังฟอร์ม</span></a>
+  <a data-nav="queue" class="staffonly" href="../../queue/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l4 4L14 8"/><path d="M10 13l4 4L22 8"/></svg><span data-t="navQueue">งานของฉัน</span></a>
+  <a data-nav="pubs" href="../../pubs/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.5h6a2.5 2.5 0 0 1 2.5 2.5v13A2 2 0 0 0 10.5 18H4z"/><path d="M20 4.5h-6A2.5 2.5 0 0 0 11.5 7v13A2 2 0 0 1 13.5 18H20z"/></svg>
+    <span data-t="navPubs">เช็กลิสต์</span></a>
+  <a data-nav="register" class="staffonly adminonly" href="../../admin/register/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2.5h8.5L19 7v14.5H6z"/><path d="M14 2.5V7h5"/><path d="M9 12h7M9 15.5h7"/></svg><span data-t="navRegSh">ทะเบียน</span></a>
+</nav>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="../../assets/app.js?v=a75d5a4a"></script>
+<script>
+"use strict";
+const A = D0507, REG = {"systems":{"here":{"n":"ระบบฟอร์มออนไลน์","en":"This portal","url":"","lg":"52","cl":"d"},"dispatch":{"n":"ระบบ Dispatch","en":"Flight dispatch","url":"https://d0507.361vision.org/d0507-app/dispatch/?v=final","lg":"DSP","cl":"a"},"training":{"n":"ระบบบันทึกการฝึก","en":"Training records","url":"https://d0507.361vision.org/","lg":"TRN","cl":"b"},"fbo":{"n":"AeroFBO","en":"Operations & maintenance","url":"https://indyzz.com/aerofbo/index.php","lg":"FBO","cl":"c"},"audit":{"n":"Audit Portal","en":"Internal audit","url":"../d0507-audit/","lg":"AUD","cl":"a"}},"forms":[{"doc":"D-0507-FRAE-001","abbr":"FRAE","t":"Flight Risk Assessment and Evaluation","th":"การประเมินความเสี่ยงก่อนทำการบิน","sys":"here","jot":"210071253532038","assignTo":"FI","r":{"stu":"กรอกฝั่งนักเรียนก่อนบินทุกเที่ยว"},"chain":"preflight","kw":["บิน","จะบิน","ก่อนบิน","พรุ่งนี้","ความเสี่ยง","เสี่ยง","ประเมิน","ครู","fit to fly","frae","risk","preflight"],"public":true,"iss":"01","rev":"00","eff":"07 JUL 2022","hasDef":true},{"doc":"D-0507-SDF-001","abbr":"SDF","t":"Self Declaration Form","th":"แบบแจ้งข้อมูลด้วยตนเอง","sys":"here","jot":"210394186308456","assignTo":"HT","r":{"stu":"แจ้งเมื่อหยุดบินเกิน 2 สัปดาห์ หรือมีการบินอื่นนอกหลักสูตร"},"chain":"preflight","kw":["แจ้ง","หยุด","หยุดบิน","ไม่ได้บิน","บินที่อื่น","ประกาศตน","declaration","sdf"],"public":true,"iss":"01","rev":"01","eff":"22 JUN 2026","hasDef":true},{"doc":"D-0507-GSP-001","abbr":"GSP","t":"Flight Training Evaluation","th":"บันทึกการฝึกภาคอากาศ","sys":"training","r":{"stu":"ดูบันทึกการฝึกและความคืบหน้าของตัวเอง (อ่านเท่านั้น)"},"chain":"training","kw":["ผลการฝึก","ความคืบหน้า","บันทึกการฝึก","gradeslip","training record","ppl","gsp"],"public":true,"iss":"01","rev":"00","eff":"07 JUL 2022","hasDef":false},{"doc":"D-0507-EFM-001","abbr":"EFM","t":"Progress and Evaluation Form","th":"แบบประเมินความคืบหน้า","sys":"training","r":{"stu":""},"chain":"training","kw":["ผลการฝึก","ดูผล","เกรด","gradeslip","ความคืบหน้า","ประเมินความคืบหน้า","efm"],"public":true,"iss":"01","rev":"00","eff":"20 NOV 2024","hasDef":false,"next":["STR"],"flow":{"th":"ประเมินผู้สมัครก่อนตัดสินใจจ้าง — ผ่านแล้วจึงเข้าสายมาตรฐานครู","en":"Applicant assessment before the hiring decision"}},{"doc":"D-0507-SEF-001","abbr":"SEF","t":"Student Evaluation Form","th":"แบบประเมินครูผู้สอนโดยนักเรียน","sys":"training","jot":"210063447392452","r":{"stu":"ประเมินครูผู้สอนเมื่อจบแต่ละ Stage (ไม่เปิดเผยชื่อ) — ทำในระบบบันทึกการฝึก"},"chain":"training","kw":["ประเมินครู","ครูผู้สอน","ให้คะแนนครู","ความเห็น","feedback","sef"],"public":true,"iss":"01","rev":"00","eff":"20 AUG 2020","hasDef":false},{"doc":"D-0507-PWR-001","abbr":"PWR","t":"Passenger Waiver and Release Form","th":"หนังสือสละสิทธิ์เรียกร้องของผู้โดยสาร","sys":"here","jot":"","r":{"stu":"ผู้โดยสาร trial flight อ่านเงื่อนไขและลงนามก่อนขึ้นบิน — กรอกเสร็จคือรับทราบแล้ว"},"chain":"admin","kw":["consent","guardian","minor","pwr","trial flight","waiver","ผู้ปกครอง","ผู้เยาว์","ผู้โดยสาร","พาคนขึ้น","ยินยอม","สละสิทธิ์"],"public":true,"iss":"01","rev":"03","eff":"21 AUG 2026","hasDef":true},{"doc":"D-0507-APP-001","abbr":"APP","t":"Application Form","th":"ใบสมัคร","sys":"fbo","r":{"stu":"สมัครเข้าเรียน เปลี่ยนหลักสูตร หรือขอ licence / rating"},"chain":"admin","kw":["สมัคร","สมัครเรียน","เข้าเรียน","ใบสมัคร","โปรไฟล์","application","app"],"public":true,"iss":"01","rev":"01","eff":"24 AUG 2026","hasDef":false},{"doc":"D-0507-APF-001","abbr":"APF","t":"Appeal Form","th":"แบบอุทธรณ์","sys":"here","jot":"243218287458465","assignTo":"ACM","r":{"stu":"ยื่นอุทธรณ์คำวินิจฉัยของ ATO ภายใน 14 วัน"},"chain":"admin","kw":["อุทธรณ์","ไม่เป็นธรรม","ร้องเรียน","appeal","apf"],"public":true,"iss":"01","rev":"00","eff":"14 SEP 2022","hasDef":true},{"doc":"D-0507-DRC-001","abbr":"DRC","t":"Document Receipt","th":"ใบรับเอกสารควบคุม","sys":"here","jot":"221830582177053","r":{"stu":""},"chain":"doccontrol","kw":["รับเอกสาร","ลงนามรับ","receipt","drc"],"public":true,"iss":"01","rev":"00","eff":"20 AUG 2020","hasDef":true},{"doc":"D-0507-VSR-001","abbr":"VSR","t":"Voluntary Safety Report","th":"รายงานนิรภัยโดยสมัครใจ","sys":"here","jot":"221482584465058","assignTo":"SM","r":{"stu":"แจ้งเหตุหรือความเสี่ยงด้านนิรภัย (ไม่ระบุชื่อได้)"},"chain":"safety","kw":["ไม่ปลอดภัย","อันตราย","เหตุ","แจ้งเหตุ","นิรภัย","รายงาน","safety","vsr","เกือบเกิดเหตุ"],"public":true,"iss":"01","rev":"01","eff":"23 AUG 2026","hasDef":true}],"roles":[{"k":"stu","n":"นักเรียน","d":"นักศึกษาการบิน · ผู้เข้ารับการฝึก","en":"Students","den":"Student pilots · trainees"},{"k":"ins","n":"ครูการบิน / ครูภาคทฤษฎี","d":"FI · TKI · FIE","en":"Instructors","den":"FI · TKI · FIE"},{"k":"mnt","n":"ช่างอากาศยาน","d":"ฝ่ายซ่อมบำรุง (ME)","en":"Maintenance","den":"Maintenance (ME)"},{"k":"ops","n":"ฝ่ายปฏิบัติการ","d":"Operations · Dispatch · ธุรการเอกสาร","en":"Operations","den":"Operations · Dispatch · document control"},{"k":"mgt","n":"ฝ่ายบริหาร","d":"ACM · HT · CMM · Safety Manager","en":"Management","den":"ACM · HT · CMM · Safety Manager"}],"status":{"ok":{"n":"พร้อมใช้","lv":"ok","en":"Ready"},"linkwrong":{"n":"ลิงก์ใน LEF ผิดใบ","lv":"bad","en":"LEF links to the wrong form"},"nolink":{"n":"LEF ยังไม่ใส่ลิงก์","lv":"warn","en":"No link in LEF"},"noform":{"n":"ยังไม่มีฟอร์มออนไลน์","lv":"warn","en":"No online form yet"},"pdfonly":{"n":"เป็น PDF บน Drive","lv":"warn","en":"PDF on Drive"},"notinlef":{"n":"ยังไม่อยู่ใน LEF","lv":"warn","en":"Not in LEF yet"},"shadow":{"n":"ใช้บน Jotform · ไม่มีในคู่มือ","lv":"bad","en":"In use but not registered"},"dupsys":{"n":"มีสองฉบับ — ระบบภายนอกและ Jotform","lv":"bad","en":"Duplicate across systems"}},"lefcount":{"total":48}};
+/* ไฟล์ที่ host เอาไว้มีแต่ทะเบียนชุดสาธารณะ 10 ใบ ทะเบียนเต็มอยู่ใน Firestore
+   และ A.hydrate() จะเทลงใน A.reg ตัวนี้เองหลังล็อกอิน — ตัวเลือกในรายการ
+   จึงต้องสร้างหลัง boot() ไม่ใช่ตอนโหลดหน้า ไม่งั้นได้แค่สิบใบ */
+A.reg = REG;
+let ROWS = [{}];
+
+A.initAuth({
+  apiKey: "AIzaSyCVR8EiBJDT4Qr3KZ2DRPhmFzUksHTwAjg",
+  authDomain: "d0507-forms.firebaseapp.com",
+  projectId: "d0507-forms",
+  storageBucket: "d0507-forms.firebasestorage.app",
+  messagingSenderId: "38336897307",
+  appId: "1:38336897307:web:0e423f959e635a07faf3be"
+}, boot);
+boot();
+
+function boot(){
+  const gate = document.getElementById('gate');
+  if (!A.isStaff()){
+    gate.innerHTML = `<div class="card"><p>หน้านี้สำหรับเจ้าหน้าที่ —
+      <a href="../../staff-login/?next=${encodeURIComponent(location.pathname)}">เข้าสู่ระบบ</a></p></div>`;
+    document.getElementById('pgen').classList.add('hide');
+    document.getElementById('preg').classList.add('hide');
+    return;
+  }
+  gate.innerHTML = '';
+  show(new URLSearchParams(location.search).get('t') === 'reg' ? 'reg' : 'gen');
+  rows();
+  fillPick();
+  const iss = document.getElementById('issBy');
+  if (!document.getElementById('issDate').value)
+    document.getElementById('issDate').value = new Date().toLocaleDateString('en-CA');
+  if (!iss.value) iss.value = (A.user && (A.user.displayName || A.user.email)) || '';
+}
+
+function show(t){
+  document.querySelectorAll('.dtabs button').forEach(b =>
+    b.setAttribute('aria-selected', b.dataset.tab === t));
+  document.getElementById('pgen').classList.toggle('hide', t !== 'gen');
+  document.getElementById('preg').classList.toggle('hide', t !== 'reg');
+  if (t === 'reg') loadReg();
+}
+document.querySelectorAll('.dtabs button').forEach(b =>
+  b.addEventListener('click', () => show(b.dataset.tab)));
+
+/* ── รายการเอกสาร ─────────────────────────────────────── */
+function rows(){
+  const el = document.getElementById('docs');
+  el.innerHTML = ROWS.map((r,i) => `<div class="drow" data-i="${i}">
+    <input data-f="title" placeholder="ชื่อเอกสาร" value="${A.esc(r.title||'')}">
+    <input data-f="code"  placeholder="รหัสเอกสาร" value="${A.esc(r.code||'')}">
+    <input data-f="rev"   placeholder="01 / 00"    value="${A.esc(r.rev||'')}">
+    <input data-f="eff"   type="date"              value="${A.esc(r.eff||'')}">
+    <button type="button" class="x" data-x="${i}" title="ลบแถวนี้">✕</button>
+  </div>`).join('');
+  el.querySelectorAll('[data-f]').forEach(inp => inp.addEventListener('input', () => {
+    ROWS[+inp.closest('[data-i]').dataset.i][inp.dataset.f] = inp.value;
+  }));
+  el.querySelectorAll('[data-x]').forEach(b => b.addEventListener('click', () => {
+    ROWS.splice(+b.dataset.x, 1);
+    if (!ROWS.length) ROWS = [{}];
+    rows();
+  }));
+}
+document.getElementById('addDoc').addEventListener('click', () => { ROWS.push({}); rows(); });
+
+/* หยิบจากทะเบียนแทนการพิมพ์เอง — ชื่อ รหัส ฉบับ และวันมีผลจะตรงกับทะเบียนเสมอ
+   พิมพ์เองเมื่อไรก็มีโอกาสพิมพ์เลขฉบับผิด ซึ่งเป็นสิ่งที่ใบรับนี้มีไว้พิสูจน์
+
+   คู่มือไม่ได้อยู่ในทะเบียนฟอร์ม จึงใส่ไว้เป็นรายชื่อแยก — และตั้งใจเว้นเลขฉบับ
+   กับวันมีผลให้ว่าง ผู้แจกจ่ายกรอกจากเล่มที่ถืออยู่จริง ถ้าฝังเลขฉบับไว้ในเครื่องมือ
+   วันหนึ่งคู่มือขึ้นฉบับใหม่แล้วลืมแก้ที่นี่ ใบรับทุกใบจะอ้างฉบับผิดพร้อมกันหมด */
+const MANUALS = [
+  ['OMA', 'Operations Manual Part A — General / Basic'],
+  ['OMB', 'Operations Manual Part B — Aircraft Operating Matters'],
+  ['OMC', 'Operations Manual Part C — Route and Aerodrome'],
+  ['OMD', 'Operations Manual Part D — Training'],
+  ['OMM', 'Operations Manual Part M — Management System'],
+  ['TM',  'Training Manual'],
+  ['QM',  'Quality Manual'],
+  ['MCM', 'Maintenance Control Manual'],
+  ['SMS', 'Safety Management System Manual'],
+  ['ERP', 'Emergency Response Plan'],
+];
+
+function fillPick(){
+  const sel = document.getElementById('pick');
+  sel.length = 1;
+  const gM = document.createElement('optgroup'); gM.label = 'คู่มือ';
+  MANUALS.forEach(([c, t]) => {
+    const o = document.createElement('option');
+    o.value = 'm:' + c; o.textContent = c + ' — ' + t;
+    gM.appendChild(o);
+  });
+  const gF = document.createElement('optgroup'); gF.label = 'ฟอร์มในทะเบียน';
+  (REG.forms || []).filter(f => f.doc)
+    .sort((a, b) => a.doc.localeCompare(b.doc))
+    .forEach(f => {
+      const o = document.createElement('option');
+      o.value = 'f:' + f.abbr;
+      o.textContent = f.doc + ' — ' + (f.th || f.t || f.abbr);
+      gF.appendChild(o);
+    });
+  sel.append(gM, gF);
+  if (sel.dataset.wired) return;
+  sel.dataset.wired = '1';
+  sel.addEventListener('change', () => {
+    const v = sel.value; sel.value = '';
+    if (!v) return;
+    const [kind, key] = [v.slice(0, 1), v.slice(2)];
+    let row;
+    if (kind === 'm') {
+      const m = MANUALS.find(x => x[0] === key);
+      row = { title: m[1], code: key, rev: '', eff: '' };
+    } else {
+      const f = (REG.forms || []).find(x => x.abbr === key);
+      if (!f) return;
+      row = { title: f.th || f.t || f.abbr, code: f.doc || '',
+              rev: (f.iss || '') + ' / ' + (f.rev || ''), eff: isoDate(f.eff) };
+    }
+    if (ROWS.length === 1 && !ROWS[0].title && !ROWS[0].code) ROWS.length = 0;
+    ROWS.push(row);
+    rows();
+    msg('gmsg', 'เพิ่ม ' + row.code + (row.rev ? '' : ' — กรอกฉบับ/แก้ไข และวันที่มีผลเอง'),
+        row.rev ? 'ok' : '');
+  });
+}
+
+// ทะเบียนเก็บวันที่แบบ "24 AUG 2026" แต่ช่อง date ต้องการ YYYY-MM-DD
+const M = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+function isoDate(s){
+  const m = /^(\d{1,2})\s+([A-Z]{3})\s+(\d{4})$/.exec(String(s||'').trim().toUpperCase());
+  if (!m) return '';
+  const i = M.indexOf(m[2]);
+  return i < 0 ? '' : `${m[3]}-${String(i+1).padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+}
+const msg = (id, t, cls) => {
+  const e = document.getElementById(id);
+  e.className = 'msg' + (cls ? ' ' + cls : ''); e.textContent = t;
+};
+
+/* ── สร้างลิงก์ ───────────────────────────────────────── */
+document.getElementById('make').addEventListener('click', () => {
+  const v = id => (document.getElementById(id).value || '').trim();
+  const need = [['rcvName','ชื่อผู้รับ'], ['rcvRole','ตำแหน่ง'],
+                ['issDate','วันที่แจกจ่าย'], ['issBy','ผู้แจกจ่าย']];
+  for (const [k, n] of need)
+    if (!v(k)) { msg('gmsg', 'ยังไม่ได้กรอก' + n, 'bad'); document.getElementById(k).focus(); return; }
+
+  const docs = ROWS.filter(r => (r.title||'').trim() || (r.code||'').trim());
+  if (!docs.length) { msg('gmsg', 'ยังไม่มีรายการเอกสาร', 'bad'); return; }
+
+  /* ช่องที่บังคับกรอกอยู่ในส่วนที่ผู้รับแก้ไม่ได้ — ถ้าลิงก์ไม่ได้ส่งมา
+     ผู้รับจะติดค้างส่งใบไม่ได้และแก้เองก็ไม่ได้ จึงต้องครบตั้งแต่ตอนสร้างลิงก์ */
+  const o = { rcvName: v('rcvName'), rcvRole: v('rcvRole'), issDate: v('issDate'),
+              issBy: v('issBy'), copyType: v('copyType'), docs: docs };
+  if (v('rcvEmail')) o.rcvEmail = v('rcvEmail');
+  if (v('copyNo'))   o.copyNo   = v('copyNo');
+  if (v('ref'))    { o.ref = v('ref'); o.sys = 'aerofbo'; }
+
+  const p = btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(o))))
+              .replace(/\+/g,'-').replace(/\//g,'_');
+  const abs = new URL('../../fill/?c=DRC&p=' + p, location.href).href;
+  document.getElementById('url').textContent = abs;
+  document.getElementById('open').href = abs;
+  document.getElementById('out').classList.remove('hide');
+  msg('gmsg', 'สร้างแล้ว · ' + docs.length + ' รายการ · ลิงก์ยาว ' + abs.length + ' ตัวอักษร', 'ok');
+});
+
+document.getElementById('copy').addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText(document.getElementById('url').textContent);
+        msg('gmsg', 'คัดลอกแล้ว', 'ok'); }
+  catch(e){ msg('gmsg', 'คัดลอกไม่ได้ — เลือกข้อความแล้วคัดลอกเอง', 'bad'); }
+});
+
+/* ── ทะเบียนลายเซ็น ───────────────────────────────────── */
+let LOADED = false;
+async function loadReg(force){
+  if (LOADED && !force) return;
+  const host = document.getElementById('regout');
+  host.innerHTML = '<p class="note" style="padding:12px 0">กำลังโหลด…</p>';
+  let subs = [];
+  try {
+    const s = await A.db.collection('submissions').where('formCode','==','DRC').get();
+    subs = s.docs.map(d => Object.assign({ id:d.id }, d.data()))
+                 .filter(x => x.status === 'complete');
+  } catch(e){
+    host.innerHTML = '<p class="note">อ่านไม่ได้: ' + A.esc(e.code||e.message) + '</p>'; return;
+  }
+  LOADED = true;
+  paintReg(subs);
+}
+document.getElementById('reload').addEventListener('click', () => loadReg(true));
+document.getElementById('print').addEventListener('click', () => window.print());
+
+function paintReg(subs){
+  const host = document.getElementById('regout');
+  if (!subs.length){ host.innerHTML = '<p class="note" style="padding:12px 0">ยังไม่มีใบรับที่ลงนามแล้ว</p>'; return; }
+
+  /* จัดกลุ่มตามเอกสาร ไม่ใช่ตามใบรับ — คำถามที่ทะเบียนนี้ต้องตอบคือ
+     "คู่มือฉบับนี้ ใครรับไปแล้วบ้าง" ไม่ใช่ "ใบรับใบนี้มีอะไร"
+     ใบเดียวที่แจกหลายเล่มจึงต้องแตกออกไปอยู่ใต้ทุกเล่มที่มันครอบ */
+  const by = new Map();
+  subs.forEach(s => {
+    const d = s.data || {};
+    (d.docs || []).forEach(doc => {
+      const key = (doc.code || doc.title || '—') + '||' + (doc.rev || '');
+      if (!by.has(key)) by.set(key, { code: doc.code || '', title: doc.title || '',
+                                      rev: doc.rev || '', eff: doc.eff || '', rows: [] });
+      by.get(key).rows.push({
+        name: d.rcvSignName || d.rcvName || '', role: d.rcvRole || '',
+        email: d.rcvEmail || '', copy: d.copyNo || '', type: d.copyType || '',
+        date: d.rcvDate || '', sign: d.rcvSign || '', trk: s.tracking || '',
+      });
+    });
+  });
+
+  const keys = [...by.keys()].sort((a,b) => a.localeCompare(b));
+  const dmy = s => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s||''); if (!m) return s||'—';
+    return m[3] + ' ' + M[+m[2]-1] + ' ' + m[1];
+  };
+  const CT = { hard:'พิมพ์', digital:'ดิจิทัล' };
+
+  host.innerHTML = keys.map(k => {
+    const g = by.get(k);
+    g.rows.sort((a,b) => (a.copy||'').localeCompare(b.copy||'') || (a.name||'').localeCompare(b.name||''));
+    return `<div class="sgrp">
+      <table class="sigreg"><thead>
+      <tr class="gh"><th colspan="7">
+        <span class="t">${A.esc(g.title || g.code)}</span>
+        <span class="s">${A.esc(g.code)}${g.rev ? ' · ฉบับ/แก้ไข ' + A.esc(g.rev) : ''}${
+          g.eff ? ' · มีผล ' + A.esc(dmy(g.eff)) : ''} · รับแล้ว ${g.rows.length} ราย</span>
+      </th></tr>
+      <tr>
+        <th style="width:76px">เลขสำเนา</th><th>ผู้รับ</th><th>ตำแหน่ง</th>
+        <th style="width:62px">รูปแบบ</th><th style="width:88px">วันที่รับ</th>
+        <th style="width:126px">ลายเซ็น</th><th style="width:118px">เลขที่ใบรับ</th>
+      </tr></thead><tbody>${g.rows.map(r => `<tr>
+        <td class="mono">${A.esc(r.copy || '—')}</td>
+        <td>${A.esc(r.name || '—')}${r.email ? '<br><span class="none">'+A.esc(r.email)+'</span>' : ''}</td>
+        <td>${A.esc(r.role || '—')}</td>
+        <td style="white-space:nowrap">${A.esc(CT[r.type] || r.type || '—')}</td>
+        <td class="mono">${A.esc(dmy(r.date))}</td>
+        <td>${r.sign && String(r.sign).indexOf('data:image') === 0
+              ? `<img src="${A.esc(r.sign)}" alt="ลายเซ็น ${A.esc(r.name)}">`
+              : '<span class="none">ไม่มีรูปลายเซ็น</span>'}</td>
+        <td class="mono">${A.esc(r.trk || '—')}</td>
+      </tr>`).join('')}</tbody></table>
+    </div>`;
+  }).join('');
+
+  const total = keys.reduce((n,k) => n + by.get(k).rows.length, 0);
+  msg('rmsg', 'เอกสาร ' + keys.length + ' ฉบับ · ลงนามรับแล้ว ' + total + ' ราย');
+  document.getElementById('prm').textContent =
+    'พิมพ์เมื่อ ' + dmy(new Date().toLocaleDateString('en-CA'))
+    + ' · เอกสาร ' + keys.length + ' ฉบับ · ลงนามรับแล้ว ' + total + ' ราย';
+}
+</script>
+</body></html>

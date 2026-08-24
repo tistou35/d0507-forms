@@ -1,0 +1,416 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ใบรับเอกสารควบคุม — D-0507 Flight Training</title>
+<link rel="stylesheet" href="@@BASE@@assets/app.css">
+<style>
+.dtabs{display:flex;gap:8px;margin:14px 0 4px;flex-wrap:wrap}
+.dtabs button{padding:8px 15px;border-radius:9px;border:1px solid var(--border-light);
+  background:var(--surface);font-size:13.5px;cursor:pointer;color:var(--fg-2)}
+.dtabs button[aria-selected="true"]{background:var(--navy-900);color:#fff;border-color:var(--navy-900)}
+
+/* ── สร้างลิงก์ ── */
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px 14px}
+.g label,.wide label{display:block;font-size:13px;font-weight:600}
+.wide{margin-top:10px}
+.g input,.g select,.wide input{width:100%;margin-top:4px;min-height:40px;padding:0 11px;
+  border-radius:8px;border:1px solid var(--border-med);background:var(--surface);
+  font-size:14px;font-family:inherit}
+.g input:focus,.wide input:focus,.g select:focus{outline:2px solid var(--sky-500);outline-offset:1px}
+.rq{color:var(--red-600)}
+
+.drow{display:grid;grid-template-columns:1fr 150px 96px 138px 40px;gap:8px;margin-bottom:7px}
+.drow input{min-height:38px;padding:0 10px;border-radius:8px;border:1px solid var(--border-med);
+  background:var(--surface);font-size:13.5px;font-family:inherit}
+.drow .x{border:1px solid var(--border-light);background:var(--surface);border-radius:8px;
+  cursor:pointer;color:var(--g-500)}
+.drow .x:hover{border-color:var(--red-600);color:var(--red-600)}
+.dhead{display:grid;grid-template-columns:1fr 150px 96px 138px 40px;gap:8px;
+  font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--g-500);margin-bottom:5px}
+@media(max-width:760px){ .drow,.dhead{grid-template-columns:1fr} .dhead{display:none} }
+
+.out{margin-top:14px;padding:13px 15px;border-radius:10px;background:var(--g-50);
+  border:1px solid var(--border-light)}
+.out code{display:block;font-family:var(--font-mono);font-size:12px;line-height:1.6;
+  word-break:break-all;color:var(--fg-1);margin-top:6px;max-height:120px;overflow:auto}
+.msg{font-size:12.5px;color:var(--g-500)}
+.msg.bad{color:var(--red-600)}
+.msg.ok{color:var(--green-600)}
+
+/* ── ทะเบียนลายเซ็น ── */
+.sigreg{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
+.sigreg th{text-align:left;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;
+  white-space:nowrap;
+  color:var(--g-500);font-weight:600;padding:7px 9px;border-bottom:1.5px solid var(--border-med)}
+.sigreg td{padding:8px 9px;border-bottom:1px solid var(--border-light);vertical-align:middle}
+.sigreg tr:last-child td{border-bottom:0}
+.sigreg .mono{font-family:var(--font-mono);font-size:11.5px;white-space:nowrap}
+/* ตำแหน่งงานยาวกว่าช่องที่เหลือเสมอ ปล่อยให้ตัดบรรทัดได้แต่ไม่กลางคำ */
+.sigreg td:nth-child(2),.sigreg td:nth-child(3){line-height:1.35}
+.sigreg img{height:32px;max-width:126px;object-fit:contain;display:block}
+.sigreg .none{color:var(--g-400);font-size:11.5px}
+.sgrp{margin-top:20px}
+/* หัวกลุ่มอยู่ใน <thead> ไม่ใช่ <h3> เหนือตาราง — เบราว์เซอร์ซ้ำ thead ให้ทุกหน้า
+   ตารางที่ยาวข้ามหน้าจึงพาชื่อคู่มือไปด้วย ถ้าปล่อยไว้ข้างนอก หน้าที่สองจะเป็น
+   รายชื่อคนเซ็นลอย ๆ ที่ไม่บอกว่าเซ็นรับคู่มือเล่มไหน ซึ่งใช้เป็นหลักฐานไม่ได้ */
+.sigreg .gh th{border-bottom:2px solid var(--navy-900);padding:0 0 5px;
+  text-transform:none;letter-spacing:0;color:var(--fg-1)}
+.sigreg .gh .t{display:block;font-size:14.5px;font-weight:700;font-family:var(--font-display)}
+.sigreg .gh .s{display:block;font-size:11.5px;color:var(--g-500);
+  font-family:var(--font-mono);font-weight:400;margin-top:2px}
+
+@media print{
+  /* .greet คือหัวเรื่องของหน้าจอ — บนกระดาษมี .prhead ทำหน้าที่นั้นแล้ว
+     ปล่อยทั้งคู่ไว้จะได้หัวเรื่องซ้อนกันสองชั้นบนหน้าแรก */
+  .dtabs,.topbar,.rail,.botnav,.obtn,.gen,.out,.greet,#gate{display:none !important}
+  #preg{border:0;box-shadow:none;padding:0;margin:0}
+  .sigreg img{height:28px;max-width:124px}
+  .sgrp{break-inside:auto}
+  .sigreg tr{break-inside:avoid}
+  .sigreg .gh th{padding-top:0}
+  .sigreg thead{display:table-header-group}
+  .prhead{display:block !important}
+}
+.prhead{display:none;border-bottom:1.2pt solid #000;padding-bottom:5pt;margin-bottom:9pt}
+.prhead .o{font-family:var(--font-mono);font-size:7.5pt;letter-spacing:.12em}
+.prhead h2{font-size:13pt;font-weight:700;font-family:var(--font-display)}
+.prhead .m{font-size:8pt;color:#333}
+</style>
+</head><body>
+@@TOPBAR@@
+<div class="body">
+@@RAIL@@
+  <main class="main">
+    <div class="greet">
+      <div><p class="eyebrow"><span>ใบรับเอกสารควบคุม</span> · <span>DOCUMENT RECEIPT · DRC</span></p>
+        <h1>D-0507-DRC-001</h1>
+        <p class="sub">เตรียมรายการเอกสารแล้วสร้างลิงก์ให้ผู้รับกดเซ็น · และดูทะเบียนว่าใครรับฉบับไหนไปแล้ว</p></div>
+    </div>
+
+    <div class="dtabs" role="tablist">
+      <button role="tab" data-tab="gen" aria-selected="true">สร้างลิงก์ใบรับ</button>
+      <button role="tab" data-tab="reg" aria-selected="false">ทะเบียนลายเซ็น</button>
+    </div>
+
+    <div id="gate"></div>
+
+    <!-- ── สร้างลิงก์ ────────────────────────────────────── -->
+    <section id="pgen" class="card gen hide">
+      <h3>1 · การแจกจ่าย</h3>
+      <p class="note" style="margin:3px 0 12px">ส่วนนี้จะถูกล็อกไว้บนใบของผู้รับ — เขาเห็นได้แต่แก้ไม่ได้</p>
+      <div class="g">
+        <label>ผู้รับ (ชื่อ) <span class="rq">*</span><input id="rcvName" autocomplete="off"></label>
+        <label>ตำแหน่ง / หน้าที่ <span class="rq">*</span><input id="rcvRole" autocomplete="off"></label>
+        <label>อีเมลผู้รับ<input id="rcvEmail" type="email" autocomplete="off"></label>
+        <label>ฉบับที่รับ / เลขสำเนา<input id="copyNo" placeholder="เช่น ACM 01" autocomplete="off"></label>
+        <label>รูปแบบสำเนา <span class="rq">*</span><select id="copyType">
+          <option value="digital">ฉบับดิจิทัล</option>
+          <option value="hard">ฉบับพิมพ์</option></select></label>
+        <label>วันที่แจกจ่าย <span class="rq">*</span><input id="issDate" type="date"></label>
+        <label>ผู้แจกจ่าย <span class="rq">*</span><input id="issBy" autocomplete="off"></label>
+        <label>เลขที่ประกาศ (ถ้ามี)<input id="ref" placeholder="BUL-2026-…" autocomplete="off"></label>
+      </div>
+
+      <h3 style="margin-top:18px">2 · รายการเอกสารที่แจกจ่าย</h3>
+      <p class="note" style="margin:3px 0 10px">ใส่ได้หลายฉบับ — ผู้รับลงนามครั้งเดียวครอบทุกรายการในใบนี้</p>
+      <div class="dhead"><span>ชื่อเอกสาร</span><span>รหัสเอกสาร</span><span>ฉบับ/แก้ไข</span>
+        <span>วันที่มีผล</span><span></span></div>
+      <div id="docs"></div>
+      <div style="display:flex;gap:8px;margin-top:9px;flex-wrap:wrap;align-items:center">
+        <button class="obtn sec" id="addDoc">+ เพิ่มรายการ</button>
+        <select id="pick" style="min-height:40px;padding:0 11px;border-radius:8px;
+          border:1px solid var(--border-med);background:var(--surface);font-size:13.5px;
+          font-family:inherit;max-width:100%"><option value="">— หยิบจากทะเบียน —</option></select>
+      </div>
+
+      <div style="display:flex;gap:8px;align-items:center;margin-top:16px;flex-wrap:wrap">
+        <button class="obtn" id="make">สร้างลิงก์</button>
+        <span class="msg" id="gmsg"></span>
+      </div>
+
+      <div class="out hide" id="out">
+        <b style="font-size:13.5px">ลิงก์สำหรับวางในประกาศของ AeroFBO › Bulletin</b>
+        <code id="url"></code>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <button class="obtn sec" id="copy">คัดลอกลิงก์</button>
+          <a class="obtn sec" id="open" target="_blank" rel="noopener">เปิดดูใบที่ผู้รับจะเห็น ↗</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── ทะเบียนลายเซ็น ───────────────────────────────── -->
+    <section id="preg" class="card hide">
+      <div class="prhead">
+        <p class="o">D-0507 FLIGHT TRAINING CO., LTD.</p>
+        <h2>ทะเบียนการรับเอกสารควบคุม · CONTROLLED DOCUMENT RECEIPT REGISTER</h2>
+        <p class="m" id="prm"></p>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <button class="obtn sec" id="print">พิมพ์ทะเบียน</button>
+        <button class="obtn sec" id="reload">โหลดใหม่</button>
+        <span class="msg" id="rmsg"></span>
+      </div>
+      <div id="regout"></div>
+    </section>
+  </main>
+</div>
+@@BOTNAV@@
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="@@BASE@@assets/app.js"></script>
+<script>
+"use strict";
+const A = D0507, REG = @@REG@@;
+/* ไฟล์ที่ host เอาไว้มีแต่ทะเบียนชุดสาธารณะ 10 ใบ ทะเบียนเต็มอยู่ใน Firestore
+   และ A.hydrate() จะเทลงใน A.reg ตัวนี้เองหลังล็อกอิน — ตัวเลือกในรายการ
+   จึงต้องสร้างหลัง boot() ไม่ใช่ตอนโหลดหน้า ไม่งั้นได้แค่สิบใบ */
+A.reg = REG;
+let ROWS = [{}];
+
+A.initAuth(@@FBCFG@@, boot);
+boot();
+
+function boot(){
+  const gate = document.getElementById('gate');
+  if (!A.isStaff()){
+    gate.innerHTML = `<div class="card"><p>หน้านี้สำหรับเจ้าหน้าที่ —
+      <a href="@@BASE@@staff-login/?next=${encodeURIComponent(location.pathname)}">เข้าสู่ระบบ</a></p></div>`;
+    document.getElementById('pgen').classList.add('hide');
+    document.getElementById('preg').classList.add('hide');
+    return;
+  }
+  gate.innerHTML = '';
+  show(new URLSearchParams(location.search).get('t') === 'reg' ? 'reg' : 'gen');
+  rows();
+  fillPick();
+  const iss = document.getElementById('issBy');
+  if (!document.getElementById('issDate').value)
+    document.getElementById('issDate').value = new Date().toLocaleDateString('en-CA');
+  if (!iss.value) iss.value = (A.user && (A.user.displayName || A.user.email)) || '';
+}
+
+function show(t){
+  document.querySelectorAll('.dtabs button').forEach(b =>
+    b.setAttribute('aria-selected', b.dataset.tab === t));
+  document.getElementById('pgen').classList.toggle('hide', t !== 'gen');
+  document.getElementById('preg').classList.toggle('hide', t !== 'reg');
+  if (t === 'reg') loadReg();
+}
+document.querySelectorAll('.dtabs button').forEach(b =>
+  b.addEventListener('click', () => show(b.dataset.tab)));
+
+/* ── รายการเอกสาร ─────────────────────────────────────── */
+function rows(){
+  const el = document.getElementById('docs');
+  el.innerHTML = ROWS.map((r,i) => `<div class="drow" data-i="${i}">
+    <input data-f="title" placeholder="ชื่อเอกสาร" value="${A.esc(r.title||'')}">
+    <input data-f="code"  placeholder="รหัสเอกสาร" value="${A.esc(r.code||'')}">
+    <input data-f="rev"   placeholder="01 / 00"    value="${A.esc(r.rev||'')}">
+    <input data-f="eff"   type="date"              value="${A.esc(r.eff||'')}">
+    <button type="button" class="x" data-x="${i}" title="ลบแถวนี้">✕</button>
+  </div>`).join('');
+  el.querySelectorAll('[data-f]').forEach(inp => inp.addEventListener('input', () => {
+    ROWS[+inp.closest('[data-i]').dataset.i][inp.dataset.f] = inp.value;
+  }));
+  el.querySelectorAll('[data-x]').forEach(b => b.addEventListener('click', () => {
+    ROWS.splice(+b.dataset.x, 1);
+    if (!ROWS.length) ROWS = [{}];
+    rows();
+  }));
+}
+document.getElementById('addDoc').addEventListener('click', () => { ROWS.push({}); rows(); });
+
+/* หยิบจากทะเบียนแทนการพิมพ์เอง — ชื่อ รหัส ฉบับ และวันมีผลจะตรงกับทะเบียนเสมอ
+   พิมพ์เองเมื่อไรก็มีโอกาสพิมพ์เลขฉบับผิด ซึ่งเป็นสิ่งที่ใบรับนี้มีไว้พิสูจน์
+
+   คู่มือไม่ได้อยู่ในทะเบียนฟอร์ม จึงใส่ไว้เป็นรายชื่อแยก — และตั้งใจเว้นเลขฉบับ
+   กับวันมีผลให้ว่าง ผู้แจกจ่ายกรอกจากเล่มที่ถืออยู่จริง ถ้าฝังเลขฉบับไว้ในเครื่องมือ
+   วันหนึ่งคู่มือขึ้นฉบับใหม่แล้วลืมแก้ที่นี่ ใบรับทุกใบจะอ้างฉบับผิดพร้อมกันหมด */
+const MANUALS = [
+  ['OMA', 'Operations Manual Part A — General / Basic'],
+  ['OMB', 'Operations Manual Part B — Aircraft Operating Matters'],
+  ['OMC', 'Operations Manual Part C — Route and Aerodrome'],
+  ['OMD', 'Operations Manual Part D — Training'],
+  ['OMM', 'Operations Manual Part M — Management System'],
+  ['TM',  'Training Manual'],
+  ['QM',  'Quality Manual'],
+  ['MCM', 'Maintenance Control Manual'],
+  ['SMS', 'Safety Management System Manual'],
+  ['ERP', 'Emergency Response Plan'],
+];
+
+function fillPick(){
+  const sel = document.getElementById('pick');
+  sel.length = 1;
+  const gM = document.createElement('optgroup'); gM.label = 'คู่มือ';
+  MANUALS.forEach(([c, t]) => {
+    const o = document.createElement('option');
+    o.value = 'm:' + c; o.textContent = c + ' — ' + t;
+    gM.appendChild(o);
+  });
+  const gF = document.createElement('optgroup'); gF.label = 'ฟอร์มในทะเบียน';
+  (REG.forms || []).filter(f => f.doc)
+    .sort((a, b) => a.doc.localeCompare(b.doc))
+    .forEach(f => {
+      const o = document.createElement('option');
+      o.value = 'f:' + f.abbr;
+      o.textContent = f.doc + ' — ' + (f.th || f.t || f.abbr);
+      gF.appendChild(o);
+    });
+  sel.append(gM, gF);
+  if (sel.dataset.wired) return;
+  sel.dataset.wired = '1';
+  sel.addEventListener('change', () => {
+    const v = sel.value; sel.value = '';
+    if (!v) return;
+    const [kind, key] = [v.slice(0, 1), v.slice(2)];
+    let row;
+    if (kind === 'm') {
+      const m = MANUALS.find(x => x[0] === key);
+      row = { title: m[1], code: key, rev: '', eff: '' };
+    } else {
+      const f = (REG.forms || []).find(x => x.abbr === key);
+      if (!f) return;
+      row = { title: f.th || f.t || f.abbr, code: f.doc || '',
+              rev: (f.iss || '') + ' / ' + (f.rev || ''), eff: isoDate(f.eff) };
+    }
+    if (ROWS.length === 1 && !ROWS[0].title && !ROWS[0].code) ROWS.length = 0;
+    ROWS.push(row);
+    rows();
+    msg('gmsg', 'เพิ่ม ' + row.code + (row.rev ? '' : ' — กรอกฉบับ/แก้ไข และวันที่มีผลเอง'),
+        row.rev ? 'ok' : '');
+  });
+}
+
+// ทะเบียนเก็บวันที่แบบ "24 AUG 2026" แต่ช่อง date ต้องการ YYYY-MM-DD
+const M = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+function isoDate(s){
+  const m = /^(\d{1,2})\s+([A-Z]{3})\s+(\d{4})$/.exec(String(s||'').trim().toUpperCase());
+  if (!m) return '';
+  const i = M.indexOf(m[2]);
+  return i < 0 ? '' : `${m[3]}-${String(i+1).padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+}
+const msg = (id, t, cls) => {
+  const e = document.getElementById(id);
+  e.className = 'msg' + (cls ? ' ' + cls : ''); e.textContent = t;
+};
+
+/* ── สร้างลิงก์ ───────────────────────────────────────── */
+document.getElementById('make').addEventListener('click', () => {
+  const v = id => (document.getElementById(id).value || '').trim();
+  const need = [['rcvName','ชื่อผู้รับ'], ['rcvRole','ตำแหน่ง'],
+                ['issDate','วันที่แจกจ่าย'], ['issBy','ผู้แจกจ่าย']];
+  for (const [k, n] of need)
+    if (!v(k)) { msg('gmsg', 'ยังไม่ได้กรอก' + n, 'bad'); document.getElementById(k).focus(); return; }
+
+  const docs = ROWS.filter(r => (r.title||'').trim() || (r.code||'').trim());
+  if (!docs.length) { msg('gmsg', 'ยังไม่มีรายการเอกสาร', 'bad'); return; }
+
+  /* ช่องที่บังคับกรอกอยู่ในส่วนที่ผู้รับแก้ไม่ได้ — ถ้าลิงก์ไม่ได้ส่งมา
+     ผู้รับจะติดค้างส่งใบไม่ได้และแก้เองก็ไม่ได้ จึงต้องครบตั้งแต่ตอนสร้างลิงก์ */
+  const o = { rcvName: v('rcvName'), rcvRole: v('rcvRole'), issDate: v('issDate'),
+              issBy: v('issBy'), copyType: v('copyType'), docs: docs };
+  if (v('rcvEmail')) o.rcvEmail = v('rcvEmail');
+  if (v('copyNo'))   o.copyNo   = v('copyNo');
+  if (v('ref'))    { o.ref = v('ref'); o.sys = 'aerofbo'; }
+
+  const p = btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(o))))
+              .replace(/\+/g,'-').replace(/\//g,'_');
+  const abs = new URL('@@BASE@@fill/?c=DRC&p=' + p, location.href).href;
+  document.getElementById('url').textContent = abs;
+  document.getElementById('open').href = abs;
+  document.getElementById('out').classList.remove('hide');
+  msg('gmsg', 'สร้างแล้ว · ' + docs.length + ' รายการ · ลิงก์ยาว ' + abs.length + ' ตัวอักษร', 'ok');
+});
+
+document.getElementById('copy').addEventListener('click', async () => {
+  try { await navigator.clipboard.writeText(document.getElementById('url').textContent);
+        msg('gmsg', 'คัดลอกแล้ว', 'ok'); }
+  catch(e){ msg('gmsg', 'คัดลอกไม่ได้ — เลือกข้อความแล้วคัดลอกเอง', 'bad'); }
+});
+
+/* ── ทะเบียนลายเซ็น ───────────────────────────────────── */
+let LOADED = false;
+async function loadReg(force){
+  if (LOADED && !force) return;
+  const host = document.getElementById('regout');
+  host.innerHTML = '<p class="note" style="padding:12px 0">กำลังโหลด…</p>';
+  let subs = [];
+  try {
+    const s = await A.db.collection('submissions').where('formCode','==','DRC').get();
+    subs = s.docs.map(d => Object.assign({ id:d.id }, d.data()))
+                 .filter(x => x.status === 'complete');
+  } catch(e){
+    host.innerHTML = '<p class="note">อ่านไม่ได้: ' + A.esc(e.code||e.message) + '</p>'; return;
+  }
+  LOADED = true;
+  paintReg(subs);
+}
+document.getElementById('reload').addEventListener('click', () => loadReg(true));
+document.getElementById('print').addEventListener('click', () => window.print());
+
+function paintReg(subs){
+  const host = document.getElementById('regout');
+  if (!subs.length){ host.innerHTML = '<p class="note" style="padding:12px 0">ยังไม่มีใบรับที่ลงนามแล้ว</p>'; return; }
+
+  /* จัดกลุ่มตามเอกสาร ไม่ใช่ตามใบรับ — คำถามที่ทะเบียนนี้ต้องตอบคือ
+     "คู่มือฉบับนี้ ใครรับไปแล้วบ้าง" ไม่ใช่ "ใบรับใบนี้มีอะไร"
+     ใบเดียวที่แจกหลายเล่มจึงต้องแตกออกไปอยู่ใต้ทุกเล่มที่มันครอบ */
+  const by = new Map();
+  subs.forEach(s => {
+    const d = s.data || {};
+    (d.docs || []).forEach(doc => {
+      const key = (doc.code || doc.title || '—') + '||' + (doc.rev || '');
+      if (!by.has(key)) by.set(key, { code: doc.code || '', title: doc.title || '',
+                                      rev: doc.rev || '', eff: doc.eff || '', rows: [] });
+      by.get(key).rows.push({
+        name: d.rcvSignName || d.rcvName || '', role: d.rcvRole || '',
+        email: d.rcvEmail || '', copy: d.copyNo || '', type: d.copyType || '',
+        date: d.rcvDate || '', sign: d.rcvSign || '', trk: s.tracking || '',
+      });
+    });
+  });
+
+  const keys = [...by.keys()].sort((a,b) => a.localeCompare(b));
+  const dmy = s => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s||''); if (!m) return s||'—';
+    return m[3] + ' ' + M[+m[2]-1] + ' ' + m[1];
+  };
+  const CT = { hard:'พิมพ์', digital:'ดิจิทัล' };
+
+  host.innerHTML = keys.map(k => {
+    const g = by.get(k);
+    g.rows.sort((a,b) => (a.copy||'').localeCompare(b.copy||'') || (a.name||'').localeCompare(b.name||''));
+    return `<div class="sgrp">
+      <table class="sigreg"><thead>
+      <tr class="gh"><th colspan="7">
+        <span class="t">${A.esc(g.title || g.code)}</span>
+        <span class="s">${A.esc(g.code)}${g.rev ? ' · ฉบับ/แก้ไข ' + A.esc(g.rev) : ''}${
+          g.eff ? ' · มีผล ' + A.esc(dmy(g.eff)) : ''} · รับแล้ว ${g.rows.length} ราย</span>
+      </th></tr>
+      <tr>
+        <th style="width:76px">เลขสำเนา</th><th>ผู้รับ</th><th>ตำแหน่ง</th>
+        <th style="width:62px">รูปแบบ</th><th style="width:88px">วันที่รับ</th>
+        <th style="width:126px">ลายเซ็น</th><th style="width:118px">เลขที่ใบรับ</th>
+      </tr></thead><tbody>${g.rows.map(r => `<tr>
+        <td class="mono">${A.esc(r.copy || '—')}</td>
+        <td>${A.esc(r.name || '—')}${r.email ? '<br><span class="none">'+A.esc(r.email)+'</span>' : ''}</td>
+        <td>${A.esc(r.role || '—')}</td>
+        <td style="white-space:nowrap">${A.esc(CT[r.type] || r.type || '—')}</td>
+        <td class="mono">${A.esc(dmy(r.date))}</td>
+        <td>${r.sign && String(r.sign).indexOf('data:image') === 0
+              ? `<img src="${A.esc(r.sign)}" alt="ลายเซ็น ${A.esc(r.name)}">`
+              : '<span class="none">ไม่มีรูปลายเซ็น</span>'}</td>
+        <td class="mono">${A.esc(r.trk || '—')}</td>
+      </tr>`).join('')}</tbody></table>
+    </div>`;
+  }).join('');
+
+  const total = keys.reduce((n,k) => n + by.get(k).rows.length, 0);
+  msg('rmsg', 'เอกสาร ' + keys.length + ' ฉบับ · ลงนามรับแล้ว ' + total + ' ราย');
+  document.getElementById('prm').textContent =
+    'พิมพ์เมื่อ ' + dmy(new Date().toLocaleDateString('en-CA'))
+    + ' · เอกสาร ' + keys.length + ' ฉบับ · ลงนามรับแล้ว ' + total + ' ราย';
+}
+</script>
+</body></html>

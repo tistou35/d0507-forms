@@ -32,7 +32,7 @@
     "th": "ผู้รับเอกสาร",
     "en": "Recipient"
    },
-   "auth": "assignee"
+   "auth": "public"
   }
  ],
  "sections": [
@@ -141,7 +141,8 @@
       "en": "From the manual distribution list, e.g. ACM 01 · CMM 02 — the bulletin link fills this in"
      }
     }
-   ]
+   ],
+   "showLocked": true
   },
   {
    "k": "B",
@@ -204,7 +205,8 @@
    "desc": {
     "th": "ประกาศที่ส่งจากระบบเอกสาร (AeroFBO) จะเติมชื่อเอกสารมาให้แล้ว ผู้รับตรวจว่าตรงกับที่ได้รับจริงก่อนเซ็น",
     "en": "Bulletins sent from the document system (AeroFBO) arrive with the title already filled in. The recipient checks it matches what they received before signing."
-   }
+   },
+   "showLocked": true
   },
   {
    "k": "C",
@@ -260,15 +262,8 @@
  "route": [
   {
    "step": 1,
-   "party": "iss",
-   "sign": false
-  },
-  {
-   "step": 2,
    "party": "rcv",
-   "sign": true,
-   "assignedBy": "submitter",
-   "slaDays": 7
+   "sign": true
   }
  ],
  "export": {

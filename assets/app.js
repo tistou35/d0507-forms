@@ -175,6 +175,7 @@
     navSetup:   { th: 'ตั้งค่าระบบ', en: 'Admin setup' },
     navAprv:    { th: 'ผังผู้อนุมัติ', en: 'Approvals' },
     navAudit:   { th: 'งานตรวจสอบ', en: 'Audit' },
+    navDrc:     { th: 'แจกจ่ายเอกสาร', en: 'Distribution · DRC' },
     auditNote:  { th: 'Audit ↗ login แยก', en: 'งานตรวจสอบ ↗ แยก login' },
     searchPh:   { th: 'ค้นหาฟอร์ม', en: 'Search forms' },
     thisSystem: { th: 'ระบบนี้', en: 'This system' },

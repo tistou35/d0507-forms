@@ -123,6 +123,11 @@ function paint(){
     (staff && F.tpl ? `<a class="big sec" href="https://docs.google.com/document/d/${
         A.esc(F.tpl)}/edit" target="_blank" rel="noopener">${
         A.esc(A.L({th:'แม่แบบ Google Doc',en:'Google Doc template'}))} ↗</a>` : '') +
+    /* ใบที่มีหน้าจัดการของตัวเอง (ตอนนี้มี DRC — เตรียมรายการแล้วสร้างลิงก์ให้ผู้รับ)
+       ที่อยู่มาจากทะเบียน ไม่ได้ฝังตัวย่อไว้ในหน้านี้ ใบต่อไปที่ต้องมีหน้าจัดการ
+       จึงเพิ่มได้ที่ทะเบียนอย่างเดียว */
+    (staff && F.admin ? `<a class="big sec" href="@@BASE@@${A.esc(F.admin.url)}">${
+        A.esc(A.L(F.admin.n))}</a>` : '') +
     `<a class="big sec" href="@@BASE@@all/">${A.esc(A.t('backToAll'))}</a>`;
 
   /* ขอบเขตการประเมิน — ใช้กับฟอร์มที่ตัวเอกสารอยู่ที่นี่เพื่อควบคุม
