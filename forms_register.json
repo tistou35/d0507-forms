@@ -1302,7 +1302,7 @@
    "note": "รายงานสรุปการใช้อากาศยานและน้ำมันตามวันหรือช่วงที่ระบุ — ไม่ใช่บันทึกรายวัน ออกเมื่อต้องรายงานหน่วยงานภายนอกหรือใช้อ้างอิงคำนวณค่าใช้จ่าย · ฝ่ายซ่อมบำรุงจัดทำ หัวหน้าช่างตรวจ · แยกจาก D-0507-ALR-001 เมื่อ 24 AUG 2026",
    "blank": "blank/AUR.pdf",
    "blankFrom": "gdoc",
-   "tpl": "1wmJ-LFTZVyxhK44kufOuuz9_cZ--2mFgn6fcxJ_Yz_w"
+   "edit": "1wmJ-LFTZVyxhK44kufOuuz9_cZ--2mFgn6fcxJ_Yz_w"
   },
   {
    "doc": "D-0507-APP-001",
@@ -1341,7 +1341,7 @@
    "sysOK": "ยืนยันแล้ว 01 AUG 2026",
    "jotDup": "221220820577045",
    "blank": "blank/APP.pdf",
-   "tpl": "136d01uNGHI-w2naJfY9rsL0IAOVZ1z9qqmEHwcDroig"
+   "edit": "136d01uNGHI-w2naJfY9rsL0IAOVZ1z9qqmEHwcDroig"
   },
   {
    "doc": "D-0507-APF-001",
@@ -1381,7 +1381,7 @@
     "apf"
    ],
    "blank": "blank/APF.pdf",
-   "tpl": "1dmuq_INKH6zmvG1pVy_wUKCy7zwwUsYf-XninlMCrBA"
+   "tpl": "1rn_faqzQtkjsCqy9EpfGiustEfcuBnF9umGHybcvWRA"
   },
   {
    "doc": "D-0507-DAF-001",
