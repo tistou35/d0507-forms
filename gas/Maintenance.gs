@@ -118,3 +118,56 @@ function dropChecklistTestRows() {
   Logger.log('ลบไป ' + n + ' แถว');
   return n;
 }
+
+
+/**
+ * ตั้งเอกสารรายงานการใช้อากาศยาน (AUR) ให้เป็นเอกสารควบคุม
+ *
+ * เอกสารนี้เดิมไม่มีเลขกำกับและวันมีผลพิมพ์อยู่เลย จึงยังเป็นเอกสารควบคุมไม่ได้
+ * และชื่อ "AIRCRAFT LOG REPORT FORM" ไปชนกับชื่ออังกฤษที่ทะเบียนใช้เรียก
+ * สมุดปกบิน (ALR) อยู่ ทำให้สองใบเรียกชื่อเดียวกัน
+ *
+ * รันครั้งเดียวจากหน้า Apps Script
+ */
+function setupAurReport() {
+  var ID = '1wmJ-LFTZVyxhK44kufOuuz9_cZ--2mFgn6fcxJ_Yz_w';
+  var CODE = 'ME-AUR-301-A', EFF = '24 AUG 2026';
+  var TITLE = 'AIRCRAFT UTILISATION REPORT';
+  var SUB = 'Utilisation and fuel report for a specified period '
+          + '— for external reporting and cost reference';
+
+  var doc = DocumentApp.openById(ID);
+  var body = doc.getBody();
+
+  var n = 0;
+  n += body.replaceText('AIRCRAFT LOG REPORT FORM', TITLE) ? 1 : 0;
+
+  /* หัวกระดาษอยู่ในส่วน header ไม่ใช่ body — replaceText ที่ body ไม่โดน
+     ปล่อยไว้แผ่นเดียวจะอ้างสองรหัส (หัว ME-ALR-301-A · ท้าย ME-AUR-301-A) */
+  var hdr = doc.getHeader();
+  if (hdr) {
+    n += hdr.replaceText('ME-ALR-301-[A-Z]', CODE) ? 1 : 0;
+    n += hdr.replaceText('EFF: \\d{1,2} [A-Z]{3} \\d{4}', 'EFF: ' + EFF) ? 1 : 0;
+  }
+  // คำโปรยเดิมบอกว่าเป็นบันทึกรายวัน ซึ่งขัดกับการใช้งานจริง
+  n += body.replaceText(
+    'Daily record of aircraft utilisation, defects, and fuel/oil consumption', SUB) ? 1 : 0;
+
+  /* เลขกำกับกับวันมีผลต้องอยู่บนกระดาษ ไม่ใช่อยู่แต่ในทะเบียน
+     ไม่งั้นแผ่นที่พิมพ์ออกไปแล้วไม่มีอะไรบอกว่าเป็นฉบับไหน */
+  var ftr = doc.getFooter() || doc.addFooter();
+  ftr.clear();
+  ftr.appendParagraph('D-0507 Flight Training Co., Ltd.  |  ' + TITLE + '  |  '
+      + CODE + '  EFF: ' + EFF + '  |  Controlled Copy — Uncontrolled when printed')
+     .setAttributes({ FONT_SIZE: 7.5, FOREGROUND_COLOR: '#3A4652',
+                      HORIZONTAL_ALIGNMENT: DocumentApp.HorizontalAlignment.CENTER });
+  doc.saveAndClose();
+
+  // ชื่อไฟล์ใน Drive ยังเป็นของเอกสารเดิม คนเปิดจากโฟลเดอร์จะหยิบผิดใบ
+  DriveApp.getFileById(ID).setName('D-0507-AUR-001');
+
+  var out = 'AUR: แก้ข้อความ ' + n + ' จุด · หัวและท้ายกระดาษเป็น ' + CODE
+          + ' EFF ' + EFF + ' · เปลี่ยนชื่อไฟล์เป็น D-0507-AUR-001';
+  Logger.log(out);
+  return out;
+}
