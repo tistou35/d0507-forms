@@ -1228,12 +1228,12 @@
   },
   {
    "doc": "D-0507-ALR-001",
-   "code": "ME-ALR-301-A",
+   "code": "ME-ALR-301-B",
    "abbr": "ALR",
    "t": "Aircraft Log Report Form",
    "th": "บันทึกการใช้อากาศยานรายวัน",
    "iss": "01",
-   "rev": "00",
+   "rev": "01",
    "eff": "26 FEB 2021",
    "own": "ME",
    "lef": [
