@@ -42,13 +42,26 @@ service cloud.firestore {
 // ── นิยามฟอร์ม — หน้าสาธารณะต้องใช้จึงอ่านได้ทั้งโลก ────
 // ห้ามใส่ข้อมูลควบคุมภายใน (control code / สถานะ LEF) ลงในนิยามฟอร์ม
   match /formDefs/{formCode} { allow read: if true; allow write: if admin(); match /versions/{defRev} { allow read: if true; allow create: if staff(); allow update, delete: if false; } match /events/{eventId} { allow read: if staff(); allow create: if staff(); allow update, delete: if false; } }
+  /* ── การแจกจ่ายเอกสารควบคุม (DRC) ────────────────────
+  ผู้ดูแล/CCM บันทึกไว้ก่อนว่าประกาศรอบนี้แจกเอกสารอะไรบ้าง แล้วได้ลิงก์
+  ลิงก์เดียวส่งให้ทุกคนผ่านประกาศใน AeroFBO — ผู้รับแต่ละคนกดเข้ามา
+  กรอกชื่อตัวเองแล้วเซ็น จึงต้องอ่านได้โดยไม่ต้องล็อกอิน
+  ในเอกสารนี้มีแต่ชื่อเอกสารที่แจกและชื่อผู้แจกจ่าย ไม่มีชื่อหรืออีเมล
+  ของผู้รับ — รายชื่อผู้รับเกิดจากใบที่แต่ละคนส่งเข้ามาเอง
+  ลบไม่ได้: ใบรับที่ลงนามแล้วอ้างถึงเอกสารนี้เป็นหลักฐานว่าแจกอะไรไป */
+  match /distributions/{distId} { allow read: if true; allow create, update: if staff(); allow delete: if false; }
 // ── ฟอร์มที่ถูกส่ง ──────────────────────────────────────
 // หลักการ: ผู้ที่ไม่ได้ล็อกอิน (นักเรียน) สร้างได้เฉพาะใบที่ "ต้องมีคนอื่นอนุมัติ"
 //   · status ต้องเป็น pending เท่านั้น — ปิดใบเองไม่ได้
 //   · ต้องระบุผู้รับที่มีตัวตนจริง ใบจึงมีคนรับผิดชอบเสมอ
 // ใบที่จบทันทีที่ส่ง (ไม่มีขั้นอนุมัติ) ต้องล็อกอินเป็นเจ้าหน้าที่ก่อน
   function newSubmissionOk() { let d = request.resource.data; return d.keys().hasAll(['formCode', 'tracking', 'status', 'assigneeUid', 'submittedAt']) && d.status == 'pending' && d.assigneeUid is string && (d.assigneeUid.size() > 0 || (d.assignTo is string && d.assignTo.size() > 0)) && d.formCode is string && d.formCode.size() <= 40 && d.tracking is string && d.tracking.size() <= 60 && d.submittedAt == request.time && d.keys().size() <= 22; }
-  match /submissions/{subId} { allow create: if staff() || (anon() && newSubmissionOk()); allow read: if staff(); allow update: if staff(); allow delete: if false; match /events/{eventId} { allow create: if signedIn(); allow read: if staff(); allow update, delete: if false; } }
+  /* ใบรับเอกสารควบคุม — จบในขั้นเดียวตอนผู้รับเซ็น ไม่มีใครต้องอนุมัติต่อ
+  จึงเข้าเงื่อนไข newSubmissionOk() ไม่ได้ (นั่นบังคับ status 'pending')
+  สิ่งที่ใช้แทนคือต้องอ้าง distributions ที่มีอยู่จริง — เขียนใบได้เฉพาะ
+  คนที่ถือลิงก์จากประกาศ ไม่ใช่ใครก็ยิงใบเข้ามาได้ */
+  function newReceiptOk() { let d = request.resource.data; return d.formCode == 'DRC' && d.status == 'complete' && d.distId is string && d.distId.size() > 0 && exists(/databases/$(database)/documents/distributions/$(d.distId)) && d.tracking is string && d.tracking.size() <= 60 && d.submittedAt == request.time && d.keys().size() <= 22; }
+  match /submissions/{subId} { allow create: if staff() || (anon() && (newSubmissionOk() || newReceiptOk())); allow read: if staff(); allow update: if staff(); allow delete: if false; match /events/{eventId} { allow create: if signedIn(); allow read: if staff(); allow update, delete: if false; } }
 // ── คิวงาน — เฉพาะงานของระบบฟอร์มนี้ ────────────────────
 // งาน CAR อยู่คนละโปรเจกต์ จึงรวมมาที่นี่ไม่ได้
 // ── รายชื่อเจ้าหน้าที่ฉบับเต็ม — มี LINE ID และอีเมล ─────

@@ -563,18 +563,21 @@ var TOKEN_MAP = {
       {
         "label": "Copy No.:",
         "tok": "{{copyNo}}"
-      },
-      {
-        "label": "Recipient Name:\n___________________________",
-        "tok": "{{rcvSignName}}"
-      },
-      {
-        "label": "Date:\n___________________________",
-        "tok": "{{rcvDate}}"
       }
     ],
     "byLine": [],
-    "byCell": [],
+    "byCell": [
+      {
+        "cell": "Recipient Name:\n___________________________",
+        "head": "Recipient Name:\n",
+        "tok": "{{rcvSignName}}"
+      },
+      {
+        "cell": "Date:\n___________________________",
+        "head": "Date:\n",
+        "tok": "{{rcvDate}}"
+      }
+    ],
     "boxes": [
       {
         "tok": "{{k_copyType_hard}}",

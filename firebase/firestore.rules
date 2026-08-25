@@ -97,6 +97,20 @@ service cloud.firestore {
       }
     }
 
+    /* ── การแจกจ่ายเอกสารควบคุม (DRC) ────────────────────
+       ผู้ดูแล/CCM บันทึกไว้ก่อนว่าประกาศรอบนี้แจกเอกสารอะไรบ้าง แล้วได้ลิงก์
+       ลิงก์เดียวส่งให้ทุกคนผ่านประกาศใน AeroFBO — ผู้รับแต่ละคนกดเข้ามา
+       กรอกชื่อตัวเองแล้วเซ็น จึงต้องอ่านได้โดยไม่ต้องล็อกอิน
+
+       ในเอกสารนี้มีแต่ชื่อเอกสารที่แจกและชื่อผู้แจกจ่าย ไม่มีชื่อหรืออีเมล
+       ของผู้รับ — รายชื่อผู้รับเกิดจากใบที่แต่ละคนส่งเข้ามาเอง
+       ลบไม่ได้: ใบรับที่ลงนามแล้วอ้างถึงเอกสารนี้เป็นหลักฐานว่าแจกอะไรไป */
+    match /distributions/{distId} {
+      allow read:           if true;
+      allow create, update: if staff();
+      allow delete:         if false;
+    }
+
     // ── ฟอร์มที่ถูกส่ง ──────────────────────────────────────
     // หลักการ: ผู้ที่ไม่ได้ล็อกอิน (นักเรียน) สร้างได้เฉพาะใบที่ "ต้องมีคนอื่นอนุมัติ"
     //   · status ต้องเป็น pending เท่านั้น — ปิดใบเองไม่ได้
@@ -117,9 +131,24 @@ service cloud.firestore {
           && d.keys().size() <= 22;
     }
 
+    /* ใบรับเอกสารควบคุม — จบในขั้นเดียวตอนผู้รับเซ็น ไม่มีใครต้องอนุมัติต่อ
+       จึงเข้าเงื่อนไข newSubmissionOk() ไม่ได้ (นั่นบังคับ status 'pending')
+       สิ่งที่ใช้แทนคือต้องอ้าง distributions ที่มีอยู่จริง — เขียนใบได้เฉพาะ
+       คนที่ถือลิงก์จากประกาศ ไม่ใช่ใครก็ยิงใบเข้ามาได้ */
+    function newReceiptOk() {
+      let d = request.resource.data;
+      return d.formCode == 'DRC'
+          && d.status == 'complete'
+          && d.distId is string && d.distId.size() > 0
+          && exists(/databases/$(database)/documents/distributions/$(d.distId))
+          && d.tracking is string && d.tracking.size() <= 60
+          && d.submittedAt == request.time
+          && d.keys().size() <= 22;
+    }
+
     match /submissions/{subId} {
       // ฝั่งนักเรียนเขียนได้อย่างเดียว อ่านของใครไม่ได้เลย รวมทั้งของตัวเอง
-      allow create: if staff() || (anon() && newSubmissionOk());
+      allow create: if staff() || (anon() && (newSubmissionOk() || newReceiptOk()));
       allow read:   if staff();
       allow update: if staff();
       allow delete: if false;

@@ -156,18 +156,13 @@
     <!-- ── สร้างลิงก์ ────────────────────────────────────── -->
     <section id="pgen" class="card gen hide">
       <h3>1 · การแจกจ่าย</h3>
-      <p class="note" style="margin:3px 0 12px">ส่วนนี้จะถูกล็อกไว้บนใบของผู้รับ — เขาเห็นได้แต่แก้ไม่ได้</p>
+      <p class="note" style="margin:3px 0 12px">ส่วนนี้จะถูกล็อกไว้บนใบของผู้รับ — เขาเห็นได้แต่แก้ไม่ได้ ·
+        ชื่อ ตำแหน่ง อีเมล เลขสำเนา และรูปแบบสำเนา ผู้รับแต่ละคนกรอกเองในใบของตัวเอง</p>
       <div class="g">
-        <label>ผู้รับ (ชื่อ) <span class="rq">*</span><input id="rcvName" autocomplete="off"></label>
-        <label>ตำแหน่ง / หน้าที่ <span class="rq">*</span><input id="rcvRole" autocomplete="off"></label>
-        <label>อีเมลผู้รับ<input id="rcvEmail" type="email" autocomplete="off"></label>
-        <label>ฉบับที่รับ / เลขสำเนา<select id="copyNo"><option value="">— ไม่ระบุ —</option></select></label>
-        <label>รูปแบบสำเนา <span class="rq">*</span><select id="copyType">
-          <option value="digital">ฉบับดิจิทัล</option>
-          <option value="hard">ฉบับพิมพ์</option></select></label>
         <label>วันที่แจกจ่าย <span class="rq">*</span><input id="issDate" type="date"></label>
         <label>ผู้แจกจ่าย <span class="rq">*</span><input id="issBy" autocomplete="off"></label>
         <label>เลขที่ประกาศ (ถ้ามี)<input id="ref" placeholder="BUL-2026-…" autocomplete="off"></label>
+        <label>ชื่อเรียกรอบนี้ (ถ้ามี)<input id="title" placeholder="เช่น ประกาศ OMA ฉบับ 05" autocomplete="off"></label>
       </div>
 
       <h3 style="margin-top:18px">2 · รายการเอกสารที่แจกจ่าย</h3>
@@ -183,18 +178,21 @@
       </div>
 
       <div style="display:flex;gap:8px;align-items:center;margin-top:16px;flex-wrap:wrap">
-        <button class="obtn" id="make">สร้างลิงก์</button>
+        <button class="obtn" id="make">บันทึกและสร้างลิงก์</button>
         <span class="msg" id="gmsg"></span>
       </div>
 
       <div class="out hide" id="out">
         <b style="font-size:13.5px">ลิงก์สำหรับวางในประกาศของ AeroFBO › Bulletin</b>
+        <p class="msg" style="margin-top:3px">ลิงก์เดียวใช้กับผู้รับทุกคน — แต่ละคนกดเข้ามากรอกชื่อตัวเองแล้วเซ็น</p>
         <code id="url"></code>
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
           <button class="obtn sec" id="copy">คัดลอกลิงก์</button>
           <a class="obtn sec" id="open" target="_blank" rel="noopener">เปิดดูใบที่ผู้รับจะเห็น ↗</a>
         </div>
       </div>
+      <h3 style="margin-top:22px">ประกาศที่บันทึกไว้แล้ว</h3>
+      <div id="dlist"><p class="note" style="margin-top:6px">—</p></div>
     </section>
 
     <!-- ── ทะเบียนลายเซ็น ───────────────────────────────── -->
@@ -232,7 +230,7 @@
 <script src="../../assets/app.js?v=a75d5a4a"></script>
 <script>
 "use strict";
-const A = D0507, REG = {"systems":{"here":{"n":"ระบบฟอร์มออนไลน์","en":"This portal","url":"","lg":"52","cl":"d"},"dispatch":{"n":"ระบบ Dispatch","en":"Flight dispatch","url":"https://d0507.361vision.org/d0507-app/dispatch/?v=final","lg":"DSP","cl":"a"},"training":{"n":"ระบบบันทึกการฝึก","en":"Training records","url":"https://d0507.361vision.org/","lg":"TRN","cl":"b"},"fbo":{"n":"AeroFBO","en":"Operations & maintenance","url":"https://indyzz.com/aerofbo/index.php","lg":"FBO","cl":"c"},"audit":{"n":"Audit Portal","en":"Internal audit","url":"../d0507-audit/","lg":"AUD","cl":"a"}},"forms":[{"doc":"D-0507-FRAE-001","abbr":"FRAE","t":"Flight Risk Assessment and Evaluation","th":"การประเมินความเสี่ยงก่อนทำการบิน","sys":"here","jot":"210071253532038","assignTo":"FI","r":{"stu":"กรอกฝั่งนักเรียนก่อนบินทุกเที่ยว"},"chain":"preflight","kw":["บิน","จะบิน","ก่อนบิน","พรุ่งนี้","ความเสี่ยง","เสี่ยง","ประเมิน","ครู","fit to fly","frae","risk","preflight"],"public":true,"iss":"01","rev":"00","eff":"07 JUL 2022","hasDef":true},{"doc":"D-0507-SDF-001","abbr":"SDF","t":"Self Declaration Form","th":"แบบแจ้งข้อมูลด้วยตนเอง","sys":"here","jot":"210394186308456","assignTo":"HT","r":{"stu":"แจ้งเมื่อหยุดบินเกิน 2 สัปดาห์ หรือมีการบินอื่นนอกหลักสูตร"},"chain":"preflight","kw":["แจ้ง","หยุด","หยุดบิน","ไม่ได้บิน","บินที่อื่น","ประกาศตน","declaration","sdf"],"public":true,"iss":"01","rev":"01","eff":"22 JUN 2026","hasDef":true},{"doc":"D-0507-GSP-001","abbr":"GSP","t":"Flight Training Evaluation","th":"บันทึกการฝึกภาคอากาศ","sys":"training","r":{"stu":"ดูบันทึกการฝึกและความคืบหน้าของตัวเอง (อ่านเท่านั้น)"},"chain":"training","kw":["ผลการฝึก","ความคืบหน้า","บันทึกการฝึก","gradeslip","training record","ppl","gsp"],"public":true,"iss":"01","rev":"00","eff":"07 JUL 2022","hasDef":false},{"doc":"D-0507-EFM-001","abbr":"EFM","t":"Progress and Evaluation Form","th":"แบบประเมินความคืบหน้า","sys":"training","r":{"stu":""},"chain":"training","kw":["ผลการฝึก","ดูผล","เกรด","gradeslip","ความคืบหน้า","ประเมินความคืบหน้า","efm"],"public":true,"iss":"01","rev":"00","eff":"20 NOV 2024","hasDef":false,"next":["STR"],"flow":{"th":"ประเมินผู้สมัครก่อนตัดสินใจจ้าง — ผ่านแล้วจึงเข้าสายมาตรฐานครู","en":"Applicant assessment before the hiring decision"}},{"doc":"D-0507-SEF-001","abbr":"SEF","t":"Student Evaluation Form","th":"แบบประเมินครูผู้สอนโดยนักเรียน","sys":"training","jot":"210063447392452","r":{"stu":"ประเมินครูผู้สอนเมื่อจบแต่ละ Stage (ไม่เปิดเผยชื่อ) — ทำในระบบบันทึกการฝึก"},"chain":"training","kw":["ประเมินครู","ครูผู้สอน","ให้คะแนนครู","ความเห็น","feedback","sef"],"public":true,"iss":"01","rev":"00","eff":"20 AUG 2020","hasDef":false},{"doc":"D-0507-PWR-001","abbr":"PWR","t":"Passenger Waiver and Release Form","th":"หนังสือสละสิทธิ์เรียกร้องของผู้โดยสาร","sys":"here","jot":"","r":{"stu":"ผู้โดยสาร trial flight อ่านเงื่อนไขและลงนามก่อนขึ้นบิน — กรอกเสร็จคือรับทราบแล้ว"},"chain":"admin","kw":["consent","guardian","minor","pwr","trial flight","waiver","ผู้ปกครอง","ผู้เยาว์","ผู้โดยสาร","พาคนขึ้น","ยินยอม","สละสิทธิ์"],"public":true,"iss":"01","rev":"03","eff":"21 AUG 2026","hasDef":true},{"doc":"D-0507-APP-001","abbr":"APP","t":"Application Form","th":"ใบสมัคร","sys":"fbo","r":{"stu":"สมัครเข้าเรียน เปลี่ยนหลักสูตร หรือขอ licence / rating"},"chain":"admin","kw":["สมัคร","สมัครเรียน","เข้าเรียน","ใบสมัคร","โปรไฟล์","application","app"],"public":true,"iss":"01","rev":"01","eff":"24 AUG 2026","hasDef":false},{"doc":"D-0507-APF-001","abbr":"APF","t":"Appeal Form","th":"แบบอุทธรณ์","sys":"here","jot":"243218287458465","assignTo":"ACM","r":{"stu":"ยื่นอุทธรณ์คำวินิจฉัยของ ATO ภายใน 14 วัน"},"chain":"admin","kw":["อุทธรณ์","ไม่เป็นธรรม","ร้องเรียน","appeal","apf"],"public":true,"iss":"01","rev":"00","eff":"14 SEP 2022","hasDef":true},{"doc":"D-0507-DRC-001","abbr":"DRC","t":"Document Receipt","th":"ใบรับเอกสารควบคุม","sys":"here","jot":"221830582177053","r":{"stu":""},"chain":"doccontrol","kw":["รับเอกสาร","ลงนามรับ","receipt","drc"],"public":true,"iss":"01","rev":"00","eff":"20 AUG 2020","hasDef":true},{"doc":"D-0507-VSR-001","abbr":"VSR","t":"Voluntary Safety Report","th":"รายงานนิรภัยโดยสมัครใจ","sys":"here","jot":"221482584465058","assignTo":"SM","r":{"stu":"แจ้งเหตุหรือความเสี่ยงด้านนิรภัย (ไม่ระบุชื่อได้)"},"chain":"safety","kw":["ไม่ปลอดภัย","อันตราย","เหตุ","แจ้งเหตุ","นิรภัย","รายงาน","safety","vsr","เกือบเกิดเหตุ"],"public":true,"iss":"01","rev":"01","eff":"23 AUG 2026","hasDef":true}],"roles":[{"k":"stu","n":"นักเรียน","d":"นักศึกษาการบิน · ผู้เข้ารับการฝึก","en":"Students","den":"Student pilots · trainees"},{"k":"ins","n":"ครูการบิน / ครูภาคทฤษฎี","d":"FI · TKI · FIE","en":"Instructors","den":"FI · TKI · FIE"},{"k":"mnt","n":"ช่างอากาศยาน","d":"ฝ่ายซ่อมบำรุง (ME)","en":"Maintenance","den":"Maintenance (ME)"},{"k":"ops","n":"ฝ่ายปฏิบัติการ","d":"Operations · Dispatch · ธุรการเอกสาร","en":"Operations","den":"Operations · Dispatch · document control"},{"k":"mgt","n":"ฝ่ายบริหาร","d":"ACM · HT · CMM · Safety Manager","en":"Management","den":"ACM · HT · CMM · Safety Manager"}],"status":{"ok":{"n":"พร้อมใช้","lv":"ok","en":"Ready"},"linkwrong":{"n":"ลิงก์ใน LEF ผิดใบ","lv":"bad","en":"LEF links to the wrong form"},"nolink":{"n":"LEF ยังไม่ใส่ลิงก์","lv":"warn","en":"No link in LEF"},"noform":{"n":"ยังไม่มีฟอร์มออนไลน์","lv":"warn","en":"No online form yet"},"pdfonly":{"n":"เป็น PDF บน Drive","lv":"warn","en":"PDF on Drive"},"notinlef":{"n":"ยังไม่อยู่ใน LEF","lv":"warn","en":"Not in LEF yet"},"shadow":{"n":"ใช้บน Jotform · ไม่มีในคู่มือ","lv":"bad","en":"In use but not registered"},"dupsys":{"n":"มีสองฉบับ — ระบบภายนอกและ Jotform","lv":"bad","en":"Duplicate across systems"}},"lefcount":{"total":48}};
+const A = D0507, REG = {"systems":{"here":{"n":"ระบบฟอร์มออนไลน์","en":"This portal","url":"","lg":"52","cl":"d"},"dispatch":{"n":"ระบบ Dispatch","en":"Flight dispatch","url":"https://d0507.361vision.org/d0507-app/dispatch/?v=final","lg":"DSP","cl":"a"},"training":{"n":"ระบบบันทึกการฝึก","en":"Training records","url":"https://d0507.361vision.org/","lg":"TRN","cl":"b"},"fbo":{"n":"AeroFBO","en":"Operations & maintenance","url":"https://indyzz.com/aerofbo/index.php","lg":"FBO","cl":"c"},"audit":{"n":"Audit Portal","en":"Internal audit","url":"../d0507-audit/","lg":"AUD","cl":"a"}},"forms":[{"doc":"D-0507-FRAE-001","abbr":"FRAE","t":"Flight Risk Assessment and Evaluation","th":"การประเมินความเสี่ยงก่อนทำการบิน","sys":"here","jot":"210071253532038","assignTo":"FI","r":{"stu":"กรอกฝั่งนักเรียนก่อนบินทุกเที่ยว"},"chain":"preflight","kw":["บิน","จะบิน","ก่อนบิน","พรุ่งนี้","ความเสี่ยง","เสี่ยง","ประเมิน","ครู","fit to fly","frae","risk","preflight"],"public":true,"iss":"01","rev":"00","eff":"07 JUL 2022","hasDef":true},{"doc":"D-0507-SDF-001","abbr":"SDF","t":"Self Declaration Form","th":"แบบแจ้งข้อมูลด้วยตนเอง","sys":"here","jot":"210394186308456","assignTo":"HT","r":{"stu":"แจ้งเมื่อหยุดบินเกิน 2 สัปดาห์ หรือมีการบินอื่นนอกหลักสูตร"},"chain":"preflight","kw":["แจ้ง","หยุด","หยุดบิน","ไม่ได้บิน","บินที่อื่น","ประกาศตน","declaration","sdf"],"public":true,"iss":"01","rev":"01","eff":"22 JUN 2026","hasDef":true},{"doc":"D-0507-GSP-001","abbr":"GSP","t":"Flight Training Evaluation","th":"บันทึกการฝึกภาคอากาศ","sys":"training","r":{"stu":"ดูบันทึกการฝึกและความคืบหน้าของตัวเอง (อ่านเท่านั้น)"},"chain":"training","kw":["ผลการฝึก","ความคืบหน้า","บันทึกการฝึก","gradeslip","training record","ppl","gsp"],"public":true,"iss":"01","rev":"00","eff":"07 JUL 2022","hasDef":false},{"doc":"D-0507-EFM-001","abbr":"EFM","t":"Progress and Evaluation Form","th":"แบบประเมินความคืบหน้า","sys":"training","r":{"stu":""},"chain":"training","kw":["ผลการฝึก","ดูผล","เกรด","gradeslip","ความคืบหน้า","ประเมินความคืบหน้า","efm"],"public":true,"iss":"01","rev":"00","eff":"20 NOV 2024","hasDef":false,"next":["STR"],"flow":{"th":"ประเมินผู้สมัครก่อนตัดสินใจจ้าง — ผ่านแล้วจึงเข้าสายมาตรฐานครู","en":"Applicant assessment before the hiring decision"}},{"doc":"D-0507-SEF-001","abbr":"SEF","t":"Student Evaluation Form","th":"แบบประเมินครูผู้สอนโดยนักเรียน","sys":"training","jot":"210063447392452","r":{"stu":"ประเมินครูผู้สอนเมื่อจบแต่ละ Stage (ไม่เปิดเผยชื่อ) — ทำในระบบบันทึกการฝึก"},"chain":"training","kw":["ประเมินครู","ครูผู้สอน","ให้คะแนนครู","ความเห็น","feedback","sef"],"public":true,"iss":"01","rev":"00","eff":"20 AUG 2020","hasDef":false},{"doc":"D-0507-PWR-001","abbr":"PWR","t":"Passenger Waiver and Release Form","th":"หนังสือสละสิทธิ์เรียกร้องของผู้โดยสาร","sys":"here","jot":"","r":{"stu":"ผู้โดยสาร trial flight อ่านเงื่อนไขและลงนามก่อนขึ้นบิน — กรอกเสร็จคือรับทราบแล้ว"},"chain":"admin","kw":["consent","guardian","minor","pwr","trial flight","waiver","ผู้ปกครอง","ผู้เยาว์","ผู้โดยสาร","พาคนขึ้น","ยินยอม","สละสิทธิ์"],"public":true,"iss":"01","rev":"03","eff":"21 AUG 2026","hasDef":true},{"doc":"D-0507-APP-001","abbr":"APP","t":"Application Form","th":"ใบสมัคร","sys":"fbo","r":{"stu":"สมัครเข้าเรียน เปลี่ยนหลักสูตร หรือขอ licence / rating"},"chain":"admin","kw":["สมัคร","สมัครเรียน","เข้าเรียน","ใบสมัคร","โปรไฟล์","application","app"],"public":true,"iss":"01","rev":"01","eff":"24 AUG 2026","hasDef":false},{"doc":"D-0507-APF-001","abbr":"APF","t":"Appeal Form","th":"แบบอุทธรณ์","sys":"here","jot":"243218287458465","assignTo":"ACM","r":{"stu":"ยื่นอุทธรณ์คำวินิจฉัยของ ATO ภายใน 14 วัน"},"chain":"admin","kw":["อุทธรณ์","ไม่เป็นธรรม","ร้องเรียน","appeal","apf"],"public":true,"iss":"01","rev":"00","eff":"14 SEP 2022","hasDef":true},{"doc":"D-0507-DRC-001","abbr":"DRC","t":"Document Receipt","th":"ใบรับเอกสารควบคุม","sys":"here","jot":"221830582177053","r":{"stu":""},"chain":"doccontrol","kw":["รับเอกสาร","ลงนามรับ","receipt","drc"],"public":true,"iss":"01","rev":"00","eff":"20 AUG 2020","hasDef":true},{"doc":"D-0507-VSR-001","abbr":"VSR","t":"Voluntary Safety Report","th":"รายงานนิรภัยโดยสมัครใจ","sys":"here","jot":"221482584465058","assignTo":"SM","r":{"stu":"แจ้งเหตุหรือความเสี่ยงด้านนิรภัย (ไม่ระบุชื่อได้)"},"chain":"safety","kw":["ไม่ปลอดภัย","อันตราย","เหตุ","แจ้งเหตุ","นิรภัย","รายงาน","safety","vsr","เกือบเกิดเหตุ"],"public":true,"iss":"01","rev":"01","eff":"23 AUG 2026","hasDef":true}],"roles":[{"k":"stu","n":"นักเรียน","d":"นักศึกษาการบิน · ผู้เข้ารับการฝึก","en":"Students","den":"Student pilots · trainees"},{"k":"ins","n":"ครูการบิน / ครูภาคทฤษฎี","d":"FI · TKI · FIE","en":"Instructors","den":"FI · TKI · FIE"},{"k":"mnt","n":"ช่างอากาศยาน","d":"ฝ่ายซ่อมบำรุง (ME)","en":"Maintenance","den":"Maintenance (ME)"},{"k":"ops","n":"ฝ่ายปฏิบัติการ","d":"Operations · Dispatch · ธุรการเอกสาร","en":"Operations","den":"Operations · Dispatch · document control"},{"k":"mgt","n":"ฝ่ายบริหาร","d":"ACM · HT · CMM · Safety Manager","en":"Management","den":"ACM · HT · CMM · Safety Manager"}],"status":{"ok":{"n":"พร้อมใช้","lv":"ok","en":"Ready"},"linkwrong":{"n":"ลิงก์ใน LEF ผิดใบ","lv":"bad","en":"LEF links to the wrong form"},"nolink":{"n":"LEF ยังไม่ใส่ลิงก์","lv":"warn","en":"No link in LEF"},"noform":{"n":"ยังไม่มีฟอร์มออนไลน์","lv":"warn","en":"No online form yet"},"pdfonly":{"n":"เป็น PDF บน Drive","lv":"warn","en":"PDF on Drive"},"notinlef":{"n":"ยังไม่อยู่ใน LEF","lv":"warn","en":"Not in LEF yet"},"shadow":{"n":"ใช้บน Jotform · ไม่มีในคู่มือ","lv":"bad","en":"In use but not registered"},"dupsys":{"n":"มีสองฉบับ — ระบบภายนอกและ Jotform","lv":"bad","en":"Duplicate across systems"}},"lefcount":{"total":47}};
 /* ไฟล์ที่ host เอาไว้มีแต่ทะเบียนชุดสาธารณะ 10 ใบ ทะเบียนเต็มอยู่ใน Firestore
    และ A.hydrate() จะเทลงใน A.reg ตัวนี้เองหลังล็อกอิน — ตัวเลือกในรายการ
    จึงต้องสร้างหลัง boot() ไม่ใช่ตอนโหลดหน้า ไม่งั้นได้แค่สิบใบ */
@@ -262,6 +260,7 @@ function boot(){
   show(new URLSearchParams(location.search).get('t') === 'reg' ? 'reg' : 'gen');
   rows();
   fillPick();
+  loadDists();
   const iss = document.getElementById('issBy');
   if (!document.getElementById('issDate').value)
     document.getElementById('issDate').value = new Date().toLocaleDateString('en-CA');
@@ -318,14 +317,6 @@ const MANUALS = [
   ['ERP', 'Emergency Response Plan'],
 ];
 
-(function fillCopyNo(){
-  const sel = document.getElementById('copyNo');
-  for (let n = 1; n <= 99; n++) {
-    const v = String(n).padStart(2, '0');
-    sel.add(new Option(v, v));
-  }
-})();
-
 function fillPick(){
   const sel = document.getElementById('pick');
   sel.length = 1;
@@ -377,44 +368,108 @@ function isoDate(s){
   const i = M.indexOf(m[2]);
   return i < 0 ? '' : `${m[3]}-${String(i+1).padStart(2,'0')}-${m[1].padStart(2,'0')}`;
 }
+// ISO → 25 AUG 2026 ตามรูปแบบวันที่ของเอกสารควบคุม
+const dmy = v => {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v||''); if (!m) return v||'—';
+  return m[3] + ' ' + M[+m[2]-1] + ' ' + m[1];
+};
 const msg = (id, t, cls) => {
   const e = document.getElementById(id);
   e.className = 'msg' + (cls ? ' ' + cls : ''); e.textContent = t;
 };
 
-/* ── สร้างลิงก์ ───────────────────────────────────────── */
-document.getElementById('make').addEventListener('click', () => {
-  const v = id => (document.getElementById(id).value || '').trim();
-  const need = [['rcvName','ชื่อผู้รับ'], ['rcvRole','ตำแหน่ง'],
-                ['issDate','วันที่แจกจ่าย'], ['issBy','ผู้แจกจ่าย']];
-  for (const [k, n] of need)
-    if (!v(k)) { msg('gmsg', 'ยังไม่ได้กรอก' + n, 'bad'); document.getElementById(k).focus(); return; }
+/* ── บันทึกประกาศ แล้วได้ลิงก์ ─────────────────────────
+   เก็บไว้ในระบบ ไม่ใช่ยัดใส่ลิงก์ ด้วยเหตุผลสามข้อ
+     1. ลิงก์เดียวส่งให้ทุกคน ผู้รับแต่ละคนกรอกชื่อตัวเองในใบของตัวเอง
+        ถ้าฝังชื่อผู้รับไว้ในลิงก์ ต้องออกลิงก์ทีละคน ใช้กับการประกาศไม่ได้
+     2. พิมพ์ชื่อเอกสารผิดหลังประกาศไปแล้ว แก้ที่นี่ที่เดียว ลิงก์ที่แจกไปยังใช้ได้
+        ส่วนลิงก์ที่พกข้อมูลไปเองนั้นเรียกคืนไม่ได้
+     3. เป็นหลักฐานว่าประกาศรอบนี้แจกอะไรบ้าง ต่อให้ยังไม่มีใครเซ็นสักคน */
+const dv = id => (document.getElementById(id).value || '').trim();
 
-  const docs = ROWS.filter(r => (r.title||'').trim() || (r.code||'').trim());
+document.getElementById('make').addEventListener('click', async () => {
+  const btn = document.getElementById('make');
+  for (const [k, n] of [['issDate','วันที่แจกจ่าย'], ['issBy','ผู้แจกจ่าย']])
+    if (!dv(k)) { msg('gmsg', 'ยังไม่ได้กรอก' + n, 'bad'); document.getElementById(k).focus(); return; }
+
+  const docs = ROWS.filter(r => (r.title||'').trim() || (r.code||'').trim())
+                   .map(r => ({ title:(r.title||'').trim(), code:(r.code||'').trim(),
+                                rev:(r.rev||'').trim(), eff:(r.eff||'').trim() }));
   if (!docs.length) { msg('gmsg', 'ยังไม่มีรายการเอกสาร', 'bad'); return; }
 
-  /* ช่องที่บังคับกรอกอยู่ในส่วนที่ผู้รับแก้ไม่ได้ — ถ้าลิงก์ไม่ได้ส่งมา
-     ผู้รับจะติดค้างส่งใบไม่ได้และแก้เองก็ไม่ได้ จึงต้องครบตั้งแต่ตอนสร้างลิงก์ */
-  const o = { rcvName: v('rcvName'), rcvRole: v('rcvRole'), issDate: v('issDate'),
-              issBy: v('issBy'), copyType: v('copyType'), docs: docs };
-  if (v('rcvEmail')) o.rcvEmail = v('rcvEmail');
-  if (v('copyNo'))   o.copyNo   = v('copyNo');
-  if (v('ref'))    { o.ref = v('ref'); o.sys = 'aerofbo'; }
+  const rec = { issDate: dv('issDate'), issBy: dv('issBy'), docs: docs,
+                title: dv('title') || docs[0].title,
+                issUid: (A.user && A.user.uid) || '', issEmail: (A.user && A.user.email) || '',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp() };
+  if (dv('ref')) rec.ref = dv('ref');
 
-  const p = btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(o))))
-              .replace(/\+/g,'-').replace(/\//g,'_');
-  const abs = new URL('../../fill/?c=DRC&p=' + p, location.href).href;
+  btn.disabled = true;
+  msg('gmsg', 'กำลังบันทึก…');
+  let id;
+  try {
+    const ref = await A.db.collection('distributions').add(rec);
+    id = ref.id;
+  } catch(e) {
+    btn.disabled = false;
+    msg('gmsg', 'บันทึกไม่ได้: ' + (e.code || e.message), 'bad');
+    return;
+  }
+  btn.disabled = false;
+  showLink(id, docs.length);
+  loadDists(true);
+});
+
+function showLink(id, n){
+  const abs = new URL('../../fill/?c=DRC&d=' + encodeURIComponent(id), location.href).href;
   document.getElementById('url').textContent = abs;
   document.getElementById('open').href = abs;
   document.getElementById('out').classList.remove('hide');
-  msg('gmsg', 'สร้างแล้ว · ' + docs.length + ' รายการ · ลิงก์ยาว ' + abs.length + ' ตัวอักษร', 'ok');
-});
+  document.getElementById('out').scrollIntoView({ block:'nearest' });
+  if (n) msg('gmsg', 'บันทึกแล้ว · ' + n + ' รายการ · ลิงก์เดียวใช้กับผู้รับทุกคน', 'ok');
+}
 
 document.getElementById('copy').addEventListener('click', async () => {
   try { await navigator.clipboard.writeText(document.getElementById('url').textContent);
         msg('gmsg', 'คัดลอกแล้ว', 'ok'); }
   catch(e){ msg('gmsg', 'คัดลอกไม่ได้ — เลือกข้อความแล้วคัดลอกเอง', 'bad'); }
 });
+
+/* ── ประกาศที่บันทึกไว้แล้ว ─────────────────────────────
+   ลิงก์ที่แจกออกไปแล้วต้องหยิบกลับมาได้ ไม่งั้นคนที่ทำประกาศหายไปหนึ่งวัน
+   แล้วมีคนถามว่า "ลิงก์อันไหน" จะไม่มีใครตอบได้นอกจากสร้างใหม่ ซึ่งจะได้
+   ประกาศสองรอบที่แจกของชุดเดียวกัน */
+let DISTS = [];
+async function loadDists(force){
+  if (DISTS.length && !force) return;
+  const host = document.getElementById('dlist');
+  try {
+    const s = await A.db.collection('distributions').orderBy('createdAt','desc').limit(25).get();
+    DISTS = s.docs.map(d => Object.assign({ id:d.id }, d.data()));
+  } catch(e) {
+    host.innerHTML = '<p class="note" style="margin-top:6px">อ่านไม่ได้: ' + A.esc(e.code||e.message) + '</p>';
+    return;
+  }
+  if (!DISTS.length) {
+    host.innerHTML = '<p class="note" style="margin-top:6px">ยังไม่มี — บันทึกรอบแรกได้เลย</p>';
+    return;
+  }
+  host.innerHTML = '<table class="sigreg"><thead><tr>'
+    + '<th style="width:104px">วันที่แจกจ่าย</th><th>ประกาศ</th>'
+    + '<th style="width:64px">เอกสาร</th><th style="width:130px">ผู้แจกจ่าย</th>'
+    + '<th style="width:96px"></th></tr></thead><tbody>'
+    + DISTS.map(d => `<tr>
+        <td class="mono">${A.esc(dmy(d.issDate))}</td>
+        <td>${A.esc(d.title || '—')}${d.ref ? ' <span class="none">' + A.esc(d.ref) + '</span>' : ''}</td>
+        <td class="mono">${(d.docs||[]).length}</td>
+        <td>${A.esc(d.issBy || '—')}</td>
+        <td><button type="button" class="obtn sec" data-link="${A.esc(d.id)}"
+              style="padding:5px 11px;font-size:12.5px">เอาลิงก์</button></td>
+      </tr>`).join('') + '</tbody></table>';
+  host.querySelectorAll('[data-link]').forEach(b => b.addEventListener('click', () => {
+    const d = DISTS.find(x => x.id === b.dataset.link);
+    showLink(b.dataset.link, (d && (d.docs||[]).length) || 0);
+  }));
+}
 
 /* ── ทะเบียนลายเซ็น ───────────────────────────────────── */
 let LOADED = false;
@@ -446,7 +501,15 @@ function paintReg(subs){
   const by = new Map();
   subs.forEach(s => {
     const d = s.data || {};
-    (d.docs || []).forEach(doc => {
+    /* ใบที่ส่งก่อนจะมีระบบประกาศ ไม่มีรายการเอกสารติดมา — ถ้าวนตาม docs เฉย ๆ
+       ใบพวกนี้จะหายไปเงียบ ๆ แล้วทะเบียนจะบอกว่ายังไม่มีใครเซ็น ทั้งที่มี
+       จัดไว้เป็นกลุ่มของมันเอง ให้เห็นว่ามีอยู่และรู้ว่าต้องตามหาเอกสารเอง */
+    /* ใบเก่ามีแถวว่างติดมาด้วย (ตอนนั้นตารางที่แก้ไม่ได้ยังเติมแถวเปล่าให้ครบแปด)
+       ถ้าไม่กรองทิ้ง ทะเบียนจะขึ้นกลุ่มเปล่าเจ็ดกลุ่มต่อใบหนึ่งใบ */
+    const real = (d.docs || []).filter(x => (x.code||'').trim() || (x.title||'').trim());
+    const list = real.length ? real
+      : [{ code: '—', title: 'ไม่ได้ระบุรายการเอกสาร (ใบก่อนใช้ระบบประกาศ)', rev: '', eff: '' }];
+    list.forEach(doc => {
       const key = (doc.code || doc.title || '—') + '||' + (doc.rev || '');
       if (!by.has(key)) by.set(key, { code: doc.code || '', title: doc.title || '',
                                       rev: doc.rev || '', eff: doc.eff || '', rows: [] });
@@ -459,10 +522,6 @@ function paintReg(subs){
   });
 
   const keys = [...by.keys()].sort((a,b) => a.localeCompare(b));
-  const dmy = s => {
-    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s||''); if (!m) return s||'—';
-    return m[3] + ' ' + M[+m[2]-1] + ' ' + m[1];
-  };
   const CT = { hard:'พิมพ์', digital:'ดิจิทัล' };
 
   host.innerHTML = keys.map(k => {

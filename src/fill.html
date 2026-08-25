@@ -117,7 +117,42 @@ async function findInFull(){
   if(!F){ await A.hydrate(); F = A.reg.forms.find(f=>f.abbr===code) || null; }
   looked=true;
 }
-A.initAuth(@@FBCFG@@, async ()=>{ await findInFull(); boot(); });
+/* ?d=<id ของ distributions> — ประกาศแจกจ่ายรอบนี้แจกเอกสารอะไรบ้าง
+   ต่างจาก ?p= ตรงที่ค่าไม่ได้อยู่ในลิงก์ แต่อยู่ในระบบ ลิงก์เดียวจึงส่งให้ทุกคนได้
+   และถ้าผู้แจกจ่ายพบว่าพิมพ์ชื่อเอกสารผิดหลังประกาศไปแล้ว แก้ที่เดียวจบ
+   ไม่ต้องเรียกลิงก์คืนซึ่งเรียกไม่ได้
+
+   เก็บลง sessionStorage ด้วยเหตุผลเดียวกับ ?p= — ผู้รับที่วนไปล็อกอินแล้วกลับมา
+   ต้องไม่เจอใบเปล่าที่ไม่รู้ว่ากำลังเซ็นรับอะไร */
+const DKEY='d0507.dist.'+(new URLSearchParams(location.search).get('c')||'');
+const DIST_ID=(function(){
+  const q=new URLSearchParams(location.search).get('d');
+  if(q){ try{ sessionStorage.setItem(DKEY,q); }catch(e){} return q; }
+  try{ return sessionStorage.getItem(DKEY)||''; }catch(e){ return ''; }
+})();
+let DIST=null, DIST_TRIED=false;
+async function loadDist(){
+  if(!DIST_ID||DIST_TRIED) return;
+  DIST_TRIED=true;
+  try{
+    const s=await A.db.collection('distributions').doc(DIST_ID).get();
+    if(s.exists) DIST=s.data();
+    else console.warn('[fill] ไม่พบใบแจกจ่าย '+DIST_ID);
+  }catch(e){ console.warn('[fill] อ่านใบแจกจ่ายไม่ได้',e); }
+}
+/* ค่าตั้งต้นจากใบแจกจ่าย — เฉพาะช่องของผู้แจกจ่าย ไม่มีอะไรที่เป็นของผู้รับ
+   ต่อให้ใบแจกจ่ายมีคีย์อื่นปนมา ก็ไม่ถูกหยิบ */
+function distSeed(){
+  if(!DIST) return {};
+  const o={};
+  if(DIST.issDate) o.issDate=DIST.issDate;
+  if(DIST.issBy)   o.issBy=DIST.issBy;
+  if(Array.isArray(DIST.docs)) o.docs=DIST.docs;
+  return o;
+}
+
+A.initAuth(@@FBCFG@@, async ()=>{ await findInFull(); await loadDist(); boot(); });
+loadDist().then(boot);
 boot();
 // เปลี่ยนภาษาแล้ว render ใหม่ทั้งใบ — ข้อมูลที่กรอกไว้อยู่ใน FK.data ไม่หาย
 A.onLang.push(()=>{ if(FK) FK.lang=A.lang; boot(); });
@@ -149,7 +184,11 @@ function boot(){
   /* boot แรกใช้ค่าที่ส่งมาทาง ?p= ถ้ามี แล้วทับด้วยร่างที่ค้างในเครื่อง
      นักบินกรอกบนเครื่องแล้วปิดแท็บ ลงมากรอกต่อได้ ค่าที่พิมพ์ไว้ต้องยังอยู่
      ร่างมาทีหลังเพราะเป็นสิ่งที่คนนี้พิมพ์เอง สำคัญกว่าค่าตั้งต้นจากลิงก์ */
-  let keep = FK ? FK.data : prefill();
+  let keep = FK ? FK.data : Object.assign(distSeed(), prefill());
+  /* boot รอบแรกวิ่งก่อนใบแจกจ่ายมาถึงเสมอ (อ่านจาก Firestore ซึ่งเป็น async)
+     พอมาถึงแล้ว boot รอบสองจะเข้าทาง FK.data ซึ่งไม่มีค่าพวกนี้ — ต้องเทใส่ตรงนี้
+     ทับได้เลย เพราะเป็นช่องของผู้แจกจ่าย ผู้รับแก้ไม่ได้อยู่แล้ว */
+  if (FK) Object.assign(keep, distSeed());
   if (!FK) {
     const d = A.draftLoad(code);
     if (d) { keep = Object.assign({}, keep, d.data); DRAFT_AT = d.at; }
@@ -182,17 +221,17 @@ function boot(){
    ถ้าผู้ใช้กดเข้าสู่ระบบแล้วกลับมาโดยไม่มี query string ค่าจะหายเงียบ ๆ
    จึงเก็บไว้ตั้งแต่ boot แรก แล้วอ่านคืนเมื่อ URL ไม่มีให้
    ผูกกับรหัสฟอร์มและลบทิ้งหลังใช้ — จะได้ไม่ค้างไปโผล่ในใบอื่น */
-/* หน้านี้อ่าน query param สี่ตัวเท่านั้น — c p ref sys
+/* หน้านี้อ่าน query param ห้าตัวเท่านั้น — c p ref sys d
    ที่เหลือถูกทิ้งเงียบ ๆ ระบบภายนอกที่ส่งชื่ออื่นมาจะไม่ได้อะไรกลับและไม่รู้ตัว
    เกิดขึ้นมาแล้วจริง: อีกทีมเขียนตัวเชื่อมไป 280 บรรทัดก่อนจะรู้ว่าค่าไม่เคยถึงฟอร์ม
    ตอนนั้น ref ระดับบนสุดยังถูกทิ้ง ตอนนี้รับแล้วทั้งสองทาง (ดู linkRef ข้างล่าง)
    ค่าที่เป็นคำตอบของฟอร์มยังต้องอยู่ "ข้างใน" p เหมือนเดิม */
 (function warnUnknownParams(){
-  const KNOWN=new Set(['c','p','ref','sys']);
+  const KNOWN=new Set(['c','p','ref','sys','d']);
   const extra=[...new URLSearchParams(location.search).keys()].filter(k=>!KNOWN.has(k));
   if(extra.length) console.warn(
     '[fill] ทิ้ง query param ที่ไม่รู้จัก: '+extra.join(', ')+
-    ' — หน้านี้อ่านแค่ c p ref sys · คำตอบของฟอร์มต้องใส่ไว้ข้างใน p');
+    ' — หน้านี้อ่านแค่ c p ref sys d · คำตอบของฟอร์มต้องใส่ไว้ข้างใน p');
 })();
 
 const PKEY='d0507.prefill.'+(new URLSearchParams(location.search).get('c')||'');
@@ -471,6 +510,7 @@ async function send(){
     // (rules นับคีย์ไว้ที่ 22 — ใบนี้ 17 บวกสองยังอยู่ในนั้น)
     const link=extLink();
     if(link){ sub.extRef=link.extRef; sub.extSystem=link.extSystem; }
+    if(DIST_ID) sub.distId=DIST_ID;
     await ref.set(sub);
     // ลบสายทิ้งเมื่อผูกกับใบเรียบร้อยแล้ว ไม่งั้นค้างไปโผล่ในใบถัดไปของแท็บเดียวกัน
     if(link){ try{ sessionStorage.removeItem(RKEY); }catch(e){} }

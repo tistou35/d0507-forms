@@ -49,39 +49,6 @@
    },
    "fields": [
     {
-     "k": "rcvName",
-     "type": "text",
-     "req": true,
-     "half": true,
-     "label": {
-      "th": "แจกจ่ายให้ (ชื่อ)",
-      "en": "Distributed to (name)"
-     }
-    },
-    {
-     "k": "rcvRole",
-     "type": "text",
-     "req": true,
-     "half": true,
-     "label": {
-      "th": "ตำแหน่ง / หน้าที่",
-      "en": "Position / role"
-     }
-    },
-    {
-     "k": "rcvEmail",
-     "type": "email",
-     "half": true,
-     "label": {
-      "th": "อีเมลผู้รับ",
-      "en": "Recipient email"
-     },
-     "hint": {
-      "th": "ใช้ส่งสำเนาใบรับกลับให้ผู้รับ และใช้ยืนยันตัวตนเวลาตรวจย้อนหลัง",
-      "en": "Used to send the receipt back and to identify the holder in later audits"
-     }
-    },
-    {
      "k": "issDate",
      "type": "date",
      "req": true,
@@ -100,6 +67,122 @@
      "label": {
       "th": "ผู้แจกจ่าย",
       "en": "Issued by"
+     }
+    }
+   ],
+   "showLocked": true,
+   "note": {
+    "th": "บันทึกไว้ตอนออกลิงก์จากประกาศ — ผู้รับเห็นได้แต่แก้ไม่ได้",
+    "en": "Recorded when the bulletin link was issued — visible but not editable"
+   }
+  },
+  {
+   "k": "B",
+   "party": "iss",
+   "title": {
+    "th": "รายการเอกสารที่แจกจ่าย",
+    "en": "Documents received"
+   },
+   "fields": [
+    {
+     "k": "docs",
+     "type": "table",
+     "req": true,
+     "rows": 8,
+     "max": 20,
+     "label": {
+      "th": "รายการเอกสาร",
+      "en": "Document list"
+     },
+     "cols": [
+      {
+       "k": "title",
+       "type": "text",
+       "w": "40%",
+       "label": {
+        "th": "ชื่อเอกสาร",
+        "en": "Document title"
+       }
+      },
+      {
+       "k": "code",
+       "type": "text",
+       "w": "22%",
+       "label": {
+        "th": "รหัสเอกสาร",
+        "en": "Document code"
+       }
+      },
+      {
+       "k": "rev",
+       "type": "text",
+       "w": "16%",
+       "label": {
+        "th": "Issue / Rev",
+        "en": "Issue / Rev."
+       }
+      },
+      {
+       "k": "eff",
+       "type": "date",
+       "w": "22%",
+       "label": {
+        "th": "วันที่มีผล",
+        "en": "Eff. date"
+       }
+      }
+     ]
+    }
+   ],
+   "desc": {
+    "th": "ประกาศที่ส่งจากระบบเอกสาร (AeroFBO) จะเติมชื่อเอกสารมาให้แล้ว ผู้รับตรวจว่าตรงกับที่ได้รับจริงก่อนเซ็น",
+    "en": "Bulletins sent from the document system (AeroFBO) arrive with the title already filled in. The recipient checks it matches what they received before signing."
+   },
+   "showLocked": true
+  },
+  {
+   "k": "R",
+   "party": "rcv",
+   "title": {
+    "th": "ผู้รับเอกสาร",
+    "en": "Recipient"
+   },
+   "note": {
+    "th": "กรอกข้อมูลของตัวคุณเอง — ผู้รับแต่ละคนกรอกใบของตัวเองจากลิงก์เดียวกัน",
+    "en": "Fill in your own details — each recipient files their own receipt from the same link"
+   },
+   "fields": [
+    {
+     "k": "rcvName",
+     "type": "text",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "ชื่อ-สกุลผู้รับ",
+      "en": "Recipient name"
+     }
+    },
+    {
+     "k": "rcvRole",
+     "type": "text",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "ตำแหน่ง / หน้าที่",
+      "en": "Position / function"
+     }
+    },
+    {
+     "k": "rcvEmail",
+     "type": "email",
+     "half": true,
+     "label": {
+      "th": "อีเมลผู้รับ",
+      "en": "Recipient email"
+     },
+     "hint": {
+      "th": "ใช้ส่งสำเนาใบรับกลับให้คุณ และใช้ยืนยันตัวตนเวลาตรวจย้อนหลัง",
+      "en": "Used to send you a copy of the receipt and to identify you on later audit"
      }
     },
     {
@@ -835,74 +918,10 @@
        }
       }
      ],
-     "menu": true
+     "menu": true,
+     "req": true
     }
-   ],
-   "showLocked": true
-  },
-  {
-   "k": "B",
-   "party": "iss",
-   "title": {
-    "th": "รายการเอกสารที่แจกจ่าย",
-    "en": "Documents received"
-   },
-   "fields": [
-    {
-     "k": "docs",
-     "type": "table",
-     "req": true,
-     "rows": 8,
-     "max": 20,
-     "label": {
-      "th": "รายการเอกสาร",
-      "en": "Document list"
-     },
-     "cols": [
-      {
-       "k": "title",
-       "type": "text",
-       "w": "40%",
-       "label": {
-        "th": "ชื่อเอกสาร",
-        "en": "Document title"
-       }
-      },
-      {
-       "k": "code",
-       "type": "text",
-       "w": "22%",
-       "label": {
-        "th": "รหัสเอกสาร",
-        "en": "Document code"
-       }
-      },
-      {
-       "k": "rev",
-       "type": "text",
-       "w": "16%",
-       "label": {
-        "th": "Issue / Rev",
-        "en": "Issue / Rev."
-       }
-      },
-      {
-       "k": "eff",
-       "type": "date",
-       "w": "22%",
-       "label": {
-        "th": "วันที่มีผล",
-        "en": "Eff. date"
-       }
-      }
-     ]
-    }
-   ],
-   "desc": {
-    "th": "ประกาศที่ส่งจากระบบเอกสาร (AeroFBO) จะเติมชื่อเอกสารมาให้แล้ว ผู้รับตรวจว่าตรงกับที่ได้รับจริงก่อนเซ็น",
-    "en": "Bulletins sent from the document system (AeroFBO) arrive with the title already filled in. The recipient checks it matches what they received before signing."
-   },
-   "showLocked": true
+   ]
   },
   {
    "k": "C",
@@ -920,16 +939,6 @@
      "label": {
       "th": "ข้าพเจ้าได้รับเอกสารตามรายการข้างต้นในฉบับที่ระบุ และเข้าใจหน้าที่ในการเก็บรักษาให้เป็นฉบับปัจจุบันและอยู่ในระบบควบคุม",
       "en": "I confirm that I have received the documents listed above in the editions specified, and that I understand my obligation to maintain them in a current and controlled state."
-     }
-    },
-    {
-     "k": "rcvSignName",
-     "type": "text",
-     "req": true,
-     "half": true,
-     "label": {
-      "th": "ชื่อผู้รับ",
-      "en": "Recipient name"
      }
     },
     {
@@ -965,5 +974,12 @@
  "export": {
   "docx": "D-0507-DRC-001.docx",
   "lockUntilComplete": true
- }
+ },
+ "compute": [
+  {
+   "k": "rcvSignName",
+   "op": "copy",
+   "of": "rcvName"
+  }
+ ]
 }

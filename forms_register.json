@@ -1421,43 +1421,6 @@
    "tpl": "1ZneD6k6y7mU692SVZsYpKJuCKTYqE_HkJHhQfcbl6UU"
   },
   {
-   "doc": "D-0507-LDU-001",
-   "code": "AD-LDU-301-B",
-   "abbr": "LDU",
-   "t": "Licence Holder Document Updated",
-   "th": "บันทึกการปรับปรุงเอกสารผู้ถือใบอนุญาต",
-   "iss": "01",
-   "rev": "00",
-   "eff": "04 NOV 2024",
-   "own": "AD",
-   "lef": [
-    "OMM",
-    "TM"
-   ],
-   "jot": "241230138904044",
-   "docx": "D-0507-LDU-001.docx",
-   "st": "ok",
-   "chain": "doccontrol",
-   "r": {
-    "ops": "ส่งใบอนุญาต rating และใบตรวจแพทย์ฉบับปรับปรุง",
-    "mgt": "ตรวจสอบความครบถ้วนของทะเบียนบุคลากร"
-   },
-   "with": [
-    "ธุรการ"
-   ],
-   "sys": "here",
-   "public": false,
-   "kw": [
-    "ใบอนุญาต",
-    "ต่ออายุ",
-    "medical",
-    "ใบตรวจแพทย์",
-    "licence",
-    "ldu"
-   ],
-   "blank": "blank/LDU.pdf"
-  },
-  {
    "doc": "D-0507-MRF-001",
    "code": "",
    "abbr": "MRF",
