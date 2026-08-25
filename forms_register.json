@@ -89,128 +89,6 @@
  },
  "forms": [
   {
-   "doc": "D-0507-FRAE-001",
-   "code": "IM-DRM-304-A",
-   "abbr": "FRAE",
-   "t": "Flight Risk Assessment and Evaluation",
-   "th": "การประเมินความเสี่ยงก่อนทำการบิน",
-   "iss": "01",
-   "rev": "00",
-   "eff": "07 JUL 2022",
-   "own": "IM",
-   "lef": [
-    "OMA",
-    "TM"
-   ],
-   "jot": "210071253532038",
-   "docx": "D-0507-FRAE-001.docx",
-   "st": "ok",
-   "chain": "preflight",
-   "r": {
-    "stu": "กรอกฝั่งนักเรียนก่อนบินทุกเที่ยว",
-    "ins": "กรอกฝั่งครู แล้วยืนยัน fit to fly ร่วมกับนักเรียน",
-    "mgt": "อนุมัติเมื่อคะแนนความเสี่ยงอยู่ระดับเหลืองหรือแดง"
-   },
-   "with": [
-    "นักเรียน",
-    "ครูการบิน",
-    "HT"
-   ],
-   "sys": "here",
-   "public": true,
-   "assignTo": "FI",
-   "kw": [
-    "บิน",
-    "จะบิน",
-    "ก่อนบิน",
-    "พรุ่งนี้",
-    "ความเสี่ยง",
-    "เสี่ยง",
-    "ประเมิน",
-    "ครู",
-    "fit to fly",
-    "frae",
-    "risk",
-    "preflight"
-   ],
-   "blank": "blank/FRAE.pdf",
-   "tpl": "1iglI6fZuJjDp1AixRf2OIEokGbRnhT4RZFeIVtn6kCE"
-  },
-  {
-   "doc": "D-0507-SDF-001",
-   "code": "AD-SDF-301-A",
-   "abbr": "SDF",
-   "t": "Self Declaration Form",
-   "th": "แบบแจ้งข้อมูลด้วยตนเอง",
-   "iss": "01",
-   "rev": "01",
-   "eff": "22 JUN 2026",
-   "own": "AD",
-   "lef": [
-    "OMA",
-    "TM"
-   ],
-   "jot": "210394186308456",
-   "docx": "D-0507-SDF-001.docx",
-   "st": "ok",
-   "chain": "preflight",
-   "r": {
-    "stu": "แจ้งเมื่อหยุดบินเกิน 2 สัปดาห์ หรือมีการบินอื่นนอกหลักสูตร",
-    "ins": "แจ้งเมื่อหยุดปฏิบัติหน้าที่เกิน 2 สัปดาห์ หรือมีหน้าที่บินอื่น"
-   },
-   "with": [],
-   "sys": "here",
-   "public": true,
-   "kw": [
-    "แจ้ง",
-    "หยุด",
-    "หยุดบิน",
-    "ไม่ได้บิน",
-    "บินที่อื่น",
-    "ประกาศตน",
-    "declaration",
-    "sdf"
-   ],
-   "assignTo": "HT",
-   "blank": "blank/SDF.pdf",
-   "tpl": "1FqiALWv4ZrDYWbWHVLCVE4_XOuUQei1ovP1Kk9Jekic"
-  },
-  {
-   "doc": "D-0507-BCK-001",
-   "code": "IM-BCK-303-A",
-   "abbr": "BCK",
-   "t": "Briefing Checklist",
-   "th": "รายการตรวจการบรรยายก่อนบิน",
-   "iss": "01",
-   "rev": "00",
-   "eff": "18 JUL 2024",
-   "own": "IM",
-   "lef": [
-    "OMA",
-    "TM"
-   ],
-   "jot": "242818896187071",
-   "docx": "D-0507-BCK-001.docx",
-   "st": "ok",
-   "chain": "preflight",
-   "r": {
-    "ins": "ยืนยันหัวข้อ briefing กับนักเรียนก่อนบินทุกเที่ยว"
-   },
-   "with": [
-    "นักเรียน"
-   ],
-   "sys": "here",
-   "public": false,
-   "kw": [
-    "briefing",
-    "บรีฟ",
-    "ก่อนบิน",
-    "รายการตรวจ",
-    "bck"
-   ],
-   "blank": "blank/BCK.pdf"
-  },
-  {
    "doc": "D-0507-AFM-001",
    "code": "OP-AFM-301-B",
    "abbr": "AFM",
@@ -249,6 +127,124 @@
    "jotDup": "221334919954059",
    "note": "ฉบับที่ใช้จริงอยู่ในAeroFBO",
    "blank": "blank/AFM.pdf"
+  },
+  {
+   "doc": "D-0507-ALR-001",
+   "code": "ME-ALR-301-B",
+   "abbr": "ALR",
+   "t": "Aircraft Technical & Journey Log",
+   "th": "สมุดปกบินและบันทึกทางเทคนิคประจำอากาศยาน",
+   "iss": "01",
+   "rev": "01",
+   "eff": "24 AUG 2026",
+   "own": "ME",
+   "lef": [
+    "OMM",
+    "TM"
+   ],
+   "jot": "221733809707460",
+   "docx": "D-0507-ALR-001.docx",
+   "st": "ok",
+   "chain": "maint",
+   "r": {
+    "mnt": "บันทึกการใช้อากาศยาน ข้อบกพร่อง และการใช้น้ำมันรายวัน",
+    "ops": "ปิดบันทึกการใช้อากาศยานรายวัน"
+   },
+   "with": [
+    "ช่างอากาศยาน",
+    "ฝ่ายปฏิบัติการ"
+   ],
+   "sys": "fbo",
+   "public": false,
+   "kw": [
+    "สมุดปกบิน",
+    "ปกบิน",
+    "journey log",
+    "technical log",
+    "บันทึกรายเที่ยวบิน",
+    "alr"
+   ],
+   "note": "สมุดที่ติดไปกับอากาศยาน บันทึกรายเที่ยวบิน นักบินลงนามทุกเที่ยว และผูกกับงานซ่อมบำรุง · กรอกใน AeroFBO ที่ flight-log-add.php · เที่ยวบินที่มีตารางแล้วกรอกได้จาก preflight-prep.php",
+   "blank": "blank/ALR.pdf"
+  },
+  {
+   "doc": "D-0507-APF-001",
+   "code": "AD/APF/301-A",
+   "abbr": "APF",
+   "t": "Appeal Form",
+   "th": "แบบอุทธรณ์",
+   "iss": "01",
+   "rev": "00",
+   "eff": "14 SEP 2022",
+   "own": "AD",
+   "lef": [
+    "OMM",
+    "TM"
+   ],
+   "jot": "243218287458465",
+   "docx": "D-0507-APF-001.docx",
+   "st": "ok",
+   "chain": "admin",
+   "note": "SLA: ยื่นภายใน 14 วัน · แจ้งผลภายใน 21 วัน · แก้ eff ตามหัวกระดาษใน .docx (ทะเบียนเดิมคลาดเคลื่อน)",
+   "r": {
+    "stu": "ยื่นอุทธรณ์คำวินิจฉัยของ ATO ภายใน 14 วัน",
+    "mgt": "พิจารณาอุทธรณ์โดยคณะกรรมการอิสระจากผู้ตัดสินเดิม"
+   },
+   "with": [
+    "คณะกรรมการอุทธรณ์",
+    "ACM"
+   ],
+   "sys": "here",
+   "public": true,
+   "assignTo": "ACM",
+   "kw": [
+    "อุทธรณ์",
+    "ไม่เป็นธรรม",
+    "ร้องเรียน",
+    "appeal",
+    "apf"
+   ],
+   "blank": "blank/APF.pdf",
+   "tpl": "1rn_faqzQtkjsCqy9EpfGiustEfcuBnF9umGHybcvWRA"
+  },
+  {
+   "doc": "D-0507-APP-001",
+   "code": "AD-APP-302-C",
+   "abbr": "APP",
+   "t": "Application Form",
+   "th": "ใบสมัคร",
+   "iss": "01",
+   "rev": "01",
+   "eff": "24 AUG 2026",
+   "own": "AD",
+   "lef": [
+    "OMM",
+    "TM"
+   ],
+   "docx": "D-0507-APP-001.docx",
+   "st": "ok",
+   "chain": "admin",
+   "note": "กรอกจริงใน AeroFBO ที่ recruitment.php — ใบสมัครงาน ถามตำแหน่งที่สมัคร ประวัติการศึกษา และใบรับรองที่ถืออยู่ · ฉบับกระดาษปรับให้ตรงกับหน้าเว็บเมื่อ 24 AUG 2026",
+   "r": {
+    "stu": "สมัครเข้าเรียน เปลี่ยนหลักสูตร หรือขอ licence / rating",
+    "mgt": "พิจารณารับเข้าเรียนหรือรับเป็นครูการบิน"
+   },
+   "with": [],
+   "sys": "fbo",
+   "public": true,
+   "kw": [
+    "สมัคร",
+    "สมัครเรียน",
+    "เข้าเรียน",
+    "ใบสมัคร",
+    "โปรไฟล์",
+    "application",
+    "app"
+   ],
+   "sysOK": "ยืนยันแล้ว 01 AUG 2026",
+   "jotDup": "221220820577045",
+   "blank": "blank/APP.pdf",
+   "edit": "136d01uNGHI-w2naJfY9rsL0IAOVZ1z9qqmEHwcDroig"
   },
   {
    "doc": "D-0507-ASF-001",
@@ -292,75 +288,373 @@
    "tpl": "1uY8DJHLfvBJeTS1FLwa1Dr6gBwJu8L86m_cjjQ-xGAM"
   },
   {
-   "doc": "D-0507-GSP-001",
-   "code": "IM-GSP-301-B",
-   "abbr": "GSP",
-   "t": "Flight Training Evaluation",
-   "th": "บันทึกการฝึกภาคอากาศ",
+   "doc": "D-0507-AUR-001",
+   "code": "ME-AUR-301-A",
+   "abbr": "AUR",
+   "t": "Aircraft Utilisation Report",
+   "th": "รายงานการใช้อากาศยานและน้ำมันตามช่วงที่ระบุ",
    "iss": "01",
    "rev": "00",
-   "eff": "07 JUL 2022",
+   "eff": "24 AUG 2026",
+   "own": "ME",
+   "lef": [
+    "OMM",
+    "TM"
+   ],
+   "jot": "221733809707460",
+   "st": "ok",
+   "chain": "maint",
+   "r": {
+    "mnt": "จัดทำรายงานการใช้อากาศยานและน้ำมันตามช่วงที่ขอ",
+    "mgt": "ตรวจและลงนามก่อนส่งออกนอกหน่วยงาน"
+   },
+   "with": [
+    "ช่างอากาศยาน",
+    "ฝ่ายปฏิบัติการ"
+   ],
+   "sys": "fbo",
+   "public": false,
+   "kw": [
+    "รายงานการใช้อากาศยาน",
+    "รายงานน้ำมัน",
+    "utilisation report",
+    "fuel report",
+    "aur"
+   ],
+   "note": "รายงานสรุปการใช้อากาศยานและน้ำมันตามวันหรือช่วงที่ระบุ — ไม่ใช่บันทึกรายวัน ออกเมื่อต้องรายงานหน่วยงานภายนอกหรือใช้อ้างอิงคำนวณค่าใช้จ่าย · ฝ่ายซ่อมบำรุงจัดทำ หัวหน้าช่างตรวจ · แยกจาก D-0507-ALR-001 เมื่อ 24 AUG 2026",
+   "blank": "blank/AUR.pdf",
+   "blankFrom": "gdoc",
+   "edit": "1wmJ-LFTZVyxhK44kufOuuz9_cZ--2mFgn6fcxJ_Yz_w"
+  },
+  {
+   "doc": "D-0507-BCK-001",
+   "code": "IM-BCK-303-A",
+   "abbr": "BCK",
+   "t": "Briefing Checklist",
+   "th": "รายการตรวจการบรรยายก่อนบิน",
+   "iss": "01",
+   "rev": "00",
+   "eff": "18 JUL 2024",
    "own": "IM",
    "lef": [
     "OMA",
     "TM"
    ],
-   "docx": "D-0507-GSP-001.docx",
+   "jot": "242818896187071",
+   "docx": "D-0507-BCK-001.docx",
+   "st": "ok",
+   "chain": "preflight",
+   "r": {
+    "ins": "ยืนยันหัวข้อ briefing กับนักเรียนก่อนบินทุกเที่ยว"
+   },
+   "with": [
+    "นักเรียน"
+   ],
+   "sys": "here",
+   "public": false,
+   "kw": [
+    "briefing",
+    "บรีฟ",
+    "ก่อนบิน",
+    "รายการตรวจ",
+    "bck"
+   ],
+   "blank": "blank/BCK.pdf"
+  },
+  {
+   "doc": "D-0507-CAP-001",
+   "code": "",
+   "abbr": "CAP",
+   "t": "Corrective Action Plan",
+   "th": "แผนการดำเนินการแก้ไข",
+   "iss": "01",
+   "rev": "00",
+   "eff": "",
+   "own": "QA",
+   "lef": [],
+   "jot": "",
+   "docx": "D-0507-CAP-001.docx",
+   "st": "ok",
+   "chain": "audit",
+   "app": "audit",
+   "note": "OMM 5.2.3 / 5.4 · ใช้คู่กับ CAR และ MER · ยังไม่มีวันมีผล รออนุมัติจาก Accountable Manager",
+   "r": {
+    "ins": "จัดทำแผนแก้ไขเมื่อเป็นผู้รับผิดชอบ",
+    "mnt": "จัดทำแผนแก้ไขเมื่อเป็นผู้รับผิดชอบ",
+    "ops": "จัดทำแผนแก้ไขเมื่อเป็นผู้รับผิดชอบ",
+    "mgt": "ตรวจรับแผนและติดตามความคืบหน้าในบทบาท CMM"
+   },
+   "with": [
+    "ผู้รับผิดชอบ",
+    "CMM"
+   ],
+   "sys": "audit",
+   "public": false,
+   "kw": [
+    "แผนแก้ไข",
+    "แก้ไข",
+    "cap",
+    "corrective action plan",
+    "ป้องกันการเกิดซ้ำ"
+   ],
+   "blank": "blank/CAP.pdf"
+  },
+  {
+   "doc": "D-0507-CAR-001",
+   "code": "",
+   "abbr": "CAR",
+   "t": "Corrective Action Request",
+   "th": "คำขอให้ดำเนินการแก้ไขข้อบกพร่อง",
+   "iss": "01",
+   "rev": "00",
+   "eff": "23 JUL 2026",
+   "own": "QA",
+   "lef": [],
+   "jot": "",
+   "docx": "D-0507-CAR-001.docx",
+   "st": "ok",
+   "chain": "audit",
+   "app": "audit",
+   "note": "ย้ายไปสร้างในระบบตรวจสอบภายใน",
+   "r": {
+    "ins": "ตอบกลับ Part 3–5 (Root cause → Corrective → Preventive)",
+    "mnt": "ตอบกลับ Part 3–5 เมื่อเป็นผู้รับผิดชอบ",
+    "ops": "ตอบกลับ Part 3–5 เมื่อเป็นผู้รับผิดชอบ",
+    "mgt": "ตรวจรับหลักฐานและปิด CAR ในบทบาท CMM"
+   },
+   "with": [
+    "Auditor",
+    "ผู้รับผิดชอบ",
+    "CMM"
+   ],
+   "sys": "audit",
+   "public": false,
+   "kw": [
+    "แก้ไขข้อบกพร่อง",
+    "car",
+    "ตอบกลับ",
+    "corrective",
+    "ข้อบกพร่อง"
+   ],
+   "blank": "blank/CAR.pdf"
+  },
+  {
+   "doc": "D-0507-DAF-001",
+   "code": "AD-DAF-301-A",
+   "abbr": "DAF",
+   "t": "Disciplinary Action Form",
+   "th": "แบบบันทึกการดำเนินการทางวินัย",
+   "iss": "01",
+   "rev": "00",
+   "eff": "14 SEP 2022",
+   "own": "AD",
+   "lef": [
+    "OMM",
+    "TM"
+   ],
+   "jot": "213368613135049",
+   "docx": "D-0507-DAF-001.docx",
+   "st": "ok",
+   "chain": "admin",
+   "note": "LEF ชี้ไปฟอร์ม Safety Report · เอกสารลับ จำกัดสิทธิ์เข้าถึง · แก้ eff ตามหัวกระดาษใน .docx (ทะเบียนเดิมคลาดเคลื่อน)",
+   "r": {
+    "mgt": "บันทึกการดำเนินการทางวินัย (จำกัดสิทธิ์เข้าถึง)"
+   },
+   "with": [
+    "HR",
+    "ACM"
+   ],
+   "sys": "here",
+   "public": false,
+   "kw": [
+    "วินัย",
+    "ลงโทษ",
+    "disciplinary",
+    "daf"
+   ],
+   "blank": "blank/DAF.pdf",
+   "tpl": "1ZneD6k6y7mU692SVZsYpKJuCKTYqE_HkJHhQfcbl6UU"
+  },
+  {
+   "doc": "D-0507-DRC-001",
+   "code": "QA-DRF-302-A",
+   "abbr": "DRC",
+   "t": "Document Receipt",
+   "th": "ใบรับเอกสารควบคุม",
+   "iss": "01",
+   "rev": "00",
+   "eff": "20 AUG 2020",
+   "own": "QA",
+   "lef": [
+    "OMM",
+    "TM"
+   ],
+   "jot": "221830582177053",
+   "docx": "D-0507-DRC-001.docx",
+   "st": "ok",
+   "chain": "doccontrol",
+   "note": "ผู้แจกจ่ายเตรียมรายการเอกสารแล้วสร้างลิงก์จากหน้า \"สร้างลิงก์ใบรับเอกสาร\" เอาลิงก์ไปวางในประกาศของ AeroFBO › Bulletin · ผู้รับกดลิงก์แล้วยืนยันและลงนามได้เลย ไม่ต้องล็อกอิน ส่วนของการแจกจ่ายล็อกไว้แก้ไม่ได้",
+   "r": {
+    "ops": "ลงนามรับเอกสารควบคุมและคืนฉบับที่ถูกแทน",
+    "mgt": "ติดตามให้ Distribution List ลงนามรับครบ"
+   },
+   "with": [
+    "ผู้แจกจ่าย",
+    "ผู้รับ"
+   ],
+   "sys": "here",
+   "public": true,
+   "kw": [
+    "รับเอกสาร",
+    "ลงนามรับ",
+    "receipt",
+    "drc"
+   ],
+   "blank": "blank/DRC.pdf",
+   "tpl": "1cP4Kpet0XYWVGhInoi3Ac5LEw53wsO4nJtrWSfNf4Ko",
+   "admin": {
+    "url": "admin/drc/",
+    "n": {
+     "th": "เตรียมลิงก์แจกจ่าย",
+     "en": "Prepare distribution link"
+    }
+   }
+  },
+  {
+   "doc": "D-0507-DRF-001",
+   "code": "QA-DRF-301-A",
+   "abbr": "DRF",
+   "t": "Document Revision Form",
+   "th": "แบบขอแก้ไขเอกสารควบคุม",
+   "iss": "01",
+   "rev": "00",
+   "eff": "20 AUG 2020",
+   "own": "QA",
+   "lef": [
+    "OMM",
+    "TM"
+   ],
+   "jot": "193573500355053",
+   "docx": "D-0507-DRF-001.docx",
+   "st": "ok",
+   "chain": "doccontrol",
+   "r": {
+    "ops": "ยื่นคำขอแก้ไขเอกสารควบคุม",
+    "mgt": "อนุมัติการแก้ไขเอกสารควบคุมและออก revision"
+   },
+   "with": [
+    "@reviewer",
+    "@legal",
+    "CMM",
+    "ACM"
+   ],
+   "sys": "here",
+   "public": false,
+   "kw": [
+    "แก้คู่มือ",
+    "แก้ไขเอกสาร",
+    "ขอแก้",
+    "revision",
+    "คู่มือ",
+    "เอกสาร",
+    "drf"
+   ],
+   "blank": "blank/DRF.pdf",
+   "tpl": "1LRibEDPwiMmQAjeQmkP3gvgkhsyP5GVbTgZDCJcXA2o"
+  },
+  {
+   "doc": "D-0507-ECA-001",
+   "code": "IM-ECA-301-B",
+   "abbr": "ECA",
+   "kind": "ref",
+   "t": "Proficiency Check — Evaluation Criteria and Assessment Standards",
+   "th": "เกณฑ์การประเมินการตรวจสมรรถนะ",
+   "iss": "01",
+   "rev": "01",
+   "eff": "21 AUG 2026",
+   "own": "IM",
+   "lef": [],
+   "jot": "",
+   "docx": "D-0507-ECA-001.docx",
+   "st": "ok",
+   "chain": "standardisation",
+   "note": "เอกสารเกณฑ์การให้คะแนน ไม่มีช่องกรอก จึงไม่มีนิยามฟอร์ม — เปิดอ่านเป็น PDF · ฉบับแก้ไข 01 (21 AUG 2026) เขียนหัวข้อและกฎเกณฑ์ใหม่ให้ตรงกับ OMA D.2.9.5 ทุกตัวอักษร (ตรวจเทียบอัตโนมัติ 13 หัวข้อ) — ของเดิมให้ FI 7 หัวข้อคนละชุด มี ★ 3 หัวข้อ และมีเกณฑ์ \"Overall ≥ 75%\" ที่คู่มือไม่มี ซึ่งทำให้ครูที่ได้เกรด 3 ทุกหัวข้อผ่านตามคู่มือแต่ตกตามใบนี้ · แก้เลขที่อ้างผิดสองแห่ง: Ref D.2.9.1 → D.2.9.5 · Form D-0507-PCR-001 (ไม่มีอยู่จริง) → D-0507-PCR-FI-001 และ D-0507-PCR-TKI-001 · เพิ่มเลขกำกับลงหัวและท้ายเอกสาร ซึ่งฉบับเดิมไม่มีเลย มีแต่ในทะเบียน · ฉบับก่อนแก้เก็บไว้เป็น D-0507-ECA-001-rev00-archive.pdf (ตัว .docx สูญหายระหว่างทำ ฉบับ PDF ครบทั้ง 4 หน้า) · ⚠️ คอลัมน์ Documentation ของภาค B ยังเขียนว่า \"JotForm submissions\" เพราะคัดจากคู่มือตรงตัว ทั้งที่ Jotform กำลังเลิกใช้ — เป็นข้อบกพร่องใน OMA D.2.9.5 เอง ต้องแก้ตอนแก้ LEF",
+   "r": {
+    "ins": "อ่านเกณฑ์การให้เกรดก่อนเข้ารับการตรวจ",
+    "mgt": "ใช้เป็นเกณฑ์ให้เกรดใน PCR"
+   },
+   "with": [],
+   "sys": "here",
+   "public": false,
+   "blank": "blank/ECA.pdf",
+   "guide": {
+    "th": "เอกสารเกณฑ์ ไม่ใช่ใบกรอก — ผู้ตรวจเปิดอ่านระหว่างให้เกรด แล้วบันทึกผลลงใบตรวจสมรรถนะ",
+    "en": "A criteria document, not a form — assessors read it while grading and record the result on the proficiency check record",
+    "items": [
+     {
+      "n": "PART A — Flight Instructor",
+      "by": "HT / CFI / FIE",
+      "w": "7 หัวข้อตาม D.2.9.5 · ★ Safety and Airmanship",
+      "f": "D-0507-PCR-FI-001",
+      "fa": "PCR-FI"
+     },
+     {
+      "n": "PART B — Theoretical Knowledge Instructor",
+      "by": "HT / CTKI",
+      "w": "6 หัวข้อตาม D.2.9.5 · ★ Delivery",
+      "f": "D-0507-PCR-TKI-001",
+      "fa": "PCR-TKI"
+     }
+    ]
+   },
+   "kw": [
+    "eca",
+    "evaluation criteria",
+    "grade descriptor",
+    "เกณฑ์ประเมิน",
+    "เกณฑ์ให้คะแนน"
+   ],
+   "flow": {
+    "th": "เกณฑ์ให้เกรดที่ PCR ทั้งสองใบอ้างอิง — ไม่ใช่ใบกรอก",
+    "en": "Grading criteria cited by both PCR forms — reference, not a form"
+   }
+  },
+  {
+   "doc": "D-0507-EFC-001",
+   "code": "IM-EFC-303-B",
+   "abbr": "EFC",
+   "t": "End of Course / Stage Report",
+   "th": "รายงานจบหลักสูตรหรือจบขั้นการฝึก",
+   "iss": "01",
+   "rev": "01",
+   "eff": "20 AUG 2026",
+   "own": "IM",
+   "lef": [
+    "OMA",
+    "TM"
+   ],
+   "docx": "D-0507-EFC-001.docx",
    "st": "ok",
    "chain": "training",
    "r": {
-    "stu": "ดูบันทึกการฝึกและความคืบหน้าของตัวเอง (อ่านเท่านั้น)",
-    "ins": "บันทึกผลการฝึกและให้เกรดรายเที่ยวบิน"
+    "ins": "ปิด Stage หรือปิดหลักสูตร พร้อมผลสอบ",
+    "mgt": "รับรองผลการจบหลักสูตร"
    },
    "with": [
-    "นักเรียน",
-    "ครูการบิน",
     "HT"
    ],
-   "sys": "training",
-   "public": true,
+   "sys": "here",
+   "public": false,
    "kw": [
-    "ผลการฝึก",
-    "ความคืบหน้า",
-    "บันทึกการฝึก",
-    "gradeslip",
-    "training record",
-    "ppl",
-    "gsp"
+    "จบหลักสูตร",
+    "จบ stage",
+    "ปิดหลักสูตร",
+    "end of course",
+    "efc"
    ],
-   "sysOK": "ยืนยันแล้ว 01 AUG 2026",
-   "note": "ใช้ฉบับในระบบบันทึกการฝึก (d0507.361vision.org) เลิกใช้ Jotform แล้ว · LEF ในคู่มือยังชี้ Jotform 212454638036455 ที่เลิกใช้ ต้องแก้ LEF · เปลี่ยนชื่อเหลือเฉพาะภาคอากาศตามที่ตกลง 16 AUG 2026 แต่ .docx ยังใช้ชื่อ PPL Ground & Flight Training Record และยังมีส่วนภาคพื้นอยู่ — ต้องแก้เอกสารแล้วออก Revision ใหม่",
-   "blank": "blank/GSP.pdf",
-   "guide": {
-    "th": "GSP บันทึกผลรายเที่ยวบิน ครูการบินให้เกรด 6 หมวด เลือกบทเรียนจาก L-01 ถึง L-21 ทำในระบบบันทึกการฝึก",
-    "en": "GSP records each flight; the instructor grades six areas, with the lesson selected from L-01 to L-21, in the training records system",
-    "items": [
-     {
-      "n": "Preflight & Aircraft Handling",
-      "w": "การเตรียมบินและการบังคับอากาศยาน"
-     },
-     {
-      "n": "Takeoff & Departure",
-      "w": "การวิ่งขึ้นและออกเดินทาง"
-     },
-     {
-      "n": "Manoeuvres",
-      "w": "ท่าทางการบิน"
-     },
-     {
-      "n": "Navigation",
-      "w": "การเดินอากาศ"
-     },
-     {
-      "n": "Descent & Landing",
-      "w": "การลดระดับและร่อนลง"
-     },
-     {
-      "n": "Emergency Procedures",
-      "w": "ขั้นตอนฉุกเฉิน รวมการเรียก MAYDAY"
-     }
-    ]
-   }
+   "note": "ฉบับแก้ไข 01 (20 AUG 2026) — ถอดตารางหลักสูตรการฝึกบินออกทั้งหมด และ School Standard Subjects ตามที่เจ้าของงานสั่ง · เพิ่มช่วงเวลาเรียน ชั่วโมงเรียน และตารางรายวิชาจาก TrainHub ที่เติมอัตโนมัติผ่านลิงก์ prefill · ผลการฝึกบินจะไปทำในแอปอื่น ไม่ได้บันทึกในใบนี้แล้ว · ต้นฉบับก่อนแก้เก็บไว้ที่ D-0507-EFC-001-rev00-archive.docx",
+   "blank": "blank/EFC.pdf",
+   "tpl": "1CdI-PRUriVZcaz78_QeXxYpaWcCCEfc7-gtafCC8RCk"
   },
   {
    "doc": "D-0507-EFM-001",
@@ -458,508 +752,6 @@
     "th": "ประเมินผู้สมัครก่อนตัดสินใจจ้าง — ผ่านแล้วจึงเข้าสายมาตรฐานครู",
     "en": "Applicant assessment before the hiring decision"
    }
-  },
-  {
-   "doc": "D-0507-EFC-001",
-   "code": "IM-EFC-303-B",
-   "abbr": "EFC",
-   "t": "End of Course / Stage Report",
-   "th": "รายงานจบหลักสูตรหรือจบขั้นการฝึก",
-   "iss": "01",
-   "rev": "01",
-   "eff": "20 AUG 2026",
-   "own": "IM",
-   "lef": [
-    "OMA",
-    "TM"
-   ],
-   "docx": "D-0507-EFC-001.docx",
-   "st": "ok",
-   "chain": "training",
-   "r": {
-    "ins": "ปิด Stage หรือปิดหลักสูตร พร้อมผลสอบ",
-    "mgt": "รับรองผลการจบหลักสูตร"
-   },
-   "with": [
-    "HT"
-   ],
-   "sys": "here",
-   "public": false,
-   "kw": [
-    "จบหลักสูตร",
-    "จบ stage",
-    "ปิดหลักสูตร",
-    "end of course",
-    "efc"
-   ],
-   "note": "ฉบับแก้ไข 01 (20 AUG 2026) — ถอดตารางหลักสูตรการฝึกบินออกทั้งหมด และ School Standard Subjects ตามที่เจ้าของงานสั่ง · เพิ่มช่วงเวลาเรียน ชั่วโมงเรียน และตารางรายวิชาจาก TrainHub ที่เติมอัตโนมัติผ่านลิงก์ prefill · ผลการฝึกบินจะไปทำในแอปอื่น ไม่ได้บันทึกในใบนี้แล้ว · ต้นฉบับก่อนแก้เก็บไว้ที่ D-0507-EFC-001-rev00-archive.docx",
-   "blank": "blank/EFC.pdf",
-   "tpl": "1CdI-PRUriVZcaz78_QeXxYpaWcCCEfc7-gtafCC8RCk"
-  },
-  {
-   "doc": "D-0507-SEF-001",
-   "code": "IM-SEF-301-A",
-   "abbr": "SEF",
-   "t": "Student Evaluation Form",
-   "th": "แบบประเมินครูผู้สอนโดยนักเรียน",
-   "iss": "01",
-   "rev": "00",
-   "eff": "20 AUG 2020",
-   "own": "IM",
-   "lef": [
-    "OMA",
-    "TM"
-   ],
-   "jot": "210063447392452",
-   "docx": "D-0507-SEF-001.docx",
-   "st": "ok",
-   "chain": "training",
-   "r": {
-    "stu": "ประเมินครูผู้สอนเมื่อจบแต่ละ Stage (ไม่เปิดเผยชื่อ) — ทำในระบบบันทึกการฝึก"
-   },
-   "with": [],
-   "sys": "training",
-   "public": true,
-   "kw": [
-    "ประเมินครู",
-    "ครูผู้สอน",
-    "ให้คะแนนครู",
-    "ความเห็น",
-    "feedback",
-    "sef"
-   ],
-   "note": "แบบประเมินครูผู้สอนทำผ่านระบบบันทึกการฝึก (d0507.361vision.org) ส่งตรงถึงศิษย์การบิน ไม่ต้องกรอกในระบบฟอร์มนี้ — ที่นี่เก็บไว้เพื่อควบคุมเอกสารเท่านั้น (เลขที่เอกสาร Issue/Rev วันมีผล LEF)",
-   "blank": "blank/SEF.pdf",
-   "guide": {
-    "th": "SEF ให้นักเรียนประเมินครูผู้สอน 3 ส่วน ทำในระบบบันทึกการฝึก ส่งตรงถึงศิษย์การบิน (ไม่เปิดเผยชื่อ)",
-    "en": "SEF has the student evaluate the instructor in three parts, sent directly to trainees in the training records system (anonymous)",
-    "items": [
-     {
-      "n": "Part A — Self-Study Content",
-      "w": "ประเมินเนื้อหาที่ศึกษาด้วยตนเอง"
-     },
-     {
-      "n": "Part B — Ground Training",
-      "w": "ประเมินการสอนภาคพื้น"
-     },
-     {
-      "n": "Part C — Flight Training",
-      "w": "ประเมินการสอนภาคอากาศ"
-     }
-    ]
-   },
-   "tpl": "1gBdSF2vQAMNwRNMYpe1XlAXc3vwR_51pfU8VkZsC6eE"
-  },
-  {
-   "doc": "D-0507-STR-001",
-   "code": "IM-STR-301-B",
-   "abbr": "STR",
-   "t": "Standardisation Training Record",
-   "th": "บันทึกการอบรมมาตรฐานครูการบิน",
-   "iss": "01",
-   "rev": "01",
-   "eff": "21 AUG 2026",
-   "own": "IM",
-   "lef": [
-    "OMA"
-   ],
-   "jot": "261578705156060",
-   "docx": "D-0507-STR-001.docx",
-   "st": "ok",
-   "chain": "standardisation",
-   "note": "ฉบับแก้ไข 01 — เปลี่ยนจากใบบันทึกการอบรมเป็นใบรับรองที่ออกต่อจากใบอื่น ไม่ประเมินซ้ำ อ้างอิงผลจาก Annual Evaluation / EFC / PCR ตามที่ OMA D.2.8 ระบุว่าใช้เกณฑ์เดียวกับ D.2.9 · เพิ่มขอบเขตที่ปล่อยให้ปฏิบัติหน้าที่และข้อจำกัด · ใช้กับครูเท่านั้น (FI/TKI/FIE) · ต้นฉบับก่อนแก้อยู่ที่ D-0507-STR-001-rev00-archive.docx",
-   "r": {
-    "ins": "บันทึกการอบรมมาตรฐานครูการบิน (OMA D.2.8.2)",
-    "mgt": "จัดและรับรองการอบรมมาตรฐาน"
-   },
-   "with": [
-    "HT"
-   ],
-   "sys": "here",
-   "public": false,
-   "kw": [
-    "อบรมมาตรฐาน",
-    "มาตรฐานครู",
-    "standardisation",
-    "str"
-   ],
-   "blank": "blank/STR.pdf",
-   "tpl": "11jFuwJ8jbkJz4XnUCtBi_CLomYvVISiOexH8Il2U-dM",
-   "next": [
-    "PCR-FI",
-    "PCR-TKI"
-   ],
-   "flow": {
-    "th": "อบรมมาตรฐานครู (D.2.8) — เสร็จแล้วต้องตรวจสมรรถนะครั้งแรกก่อนปฏิบัติหน้าที่",
-    "en": "Standardisation training — initial proficiency check follows"
-   }
-  },
-  {
-   "doc": "D-0507-PCR-FI-001",
-   "code": "IM-PCR-FI-301-A",
-   "abbr": "PCR-FI",
-   "t": "In-House Proficiency Check Record — Flight Instructor",
-   "th": "บันทึกการตรวจสมรรถนะครูการบิน",
-   "iss": "01",
-   "rev": "01",
-   "eff": "06 JUN 2026",
-   "own": "IM",
-   "lef": [
-    "OMA"
-   ],
-   "jot": "261580093591056",
-   "docx": "D-0507-PCR-FI-001.docx",
-   "st": "ok",
-   "chain": "standardisation",
-   "note": "มี Jotform แล้ว (261580093591056) แต่ LEF ยังไม่ใส่ลิงก์ · ให้เกรดตาม D-0507-ECA-001 · รับค่าตั้งต้นจากเมนู Annual Eval ในระบบบันทึกการฝึกผ่านลิงก์ prefill โดยไม่ต้องแก้เอกสาร — ดู docs/ANNUAL_EVAL.md",
-   "r": {
-    "ins": "รับทราบและลงนามผลการตรวจสมรรถนะของตัวเอง",
-    "mgt": "ประเมินสมรรถนะครูในบทบาท HT / FIE"
-   },
-   "with": [
-    "HT",
-    "FIE"
-   ],
-   "sys": "here",
-   "public": false,
-   "kw": [
-    "annual eval",
-    "ipc",
-    "pcr",
-    "proficiency",
-    "ตรวจสมรรถนะ",
-    "ประเมินประจำปี",
-    "สมรรถนะครู"
-   ],
-   "blank": "blank/PCR-FI.pdf",
-   "tpl": "1G-CvnjcUcSHF5fU7PIi0vokx6WiWUyARRSbZP7O-Je8",
-   "next": [
-    "RTR"
-   ],
-   "refs": [
-    "ECA"
-   ],
-   "flow": {
-    "th": "ตรวจสมรรถนะครูการบิน (D.2.9) — ไม่ผ่านจึงเปิดการอบรมแก้ไข",
-    "en": "Flight instructor proficiency check — failure opens corrective training"
-   }
-  },
-  {
-   "doc": "D-0507-PCR-TKI-001",
-   "code": "IM-PCR-TKI-302-A",
-   "abbr": "PCR-TKI",
-   "t": "In-House Proficiency Check Record — Theoretical Knowledge Instructor",
-   "th": "บันทึกการตรวจสมรรถนะครูภาคทฤษฎี",
-   "iss": "01",
-   "rev": "01",
-   "eff": "06 JUN 2026",
-   "own": "IM",
-   "lef": [
-    "OMA"
-   ],
-   "jot": "",
-   "docx": "D-0507-PCR-TKI-001.docx",
-   "st": "ok",
-   "chain": "standardisation",
-   "r": {
-    "ins": "รับทราบและลงนามผลการตรวจสมรรถนะของตัวเอง",
-    "mgt": "ประเมินสมรรถนะครูภาคทฤษฎี"
-   },
-   "with": [
-    "HT",
-    "FIE"
-   ],
-   "sys": "here",
-   "public": false,
-   "kw": [
-    "annual eval",
-    "ipc",
-    "proficiency",
-    "tki",
-    "ครูภาคทฤษฎี",
-    "ตรวจสมรรถนะ",
-    "ประเมินประจำปี"
-   ],
-   "note": "ให้เกรดตาม D-0507-ECA-001 · รับค่าตั้งต้นจากเมนู Annual Eval ในระบบบันทึกการฝึกผ่านลิงก์ prefill โดยไม่ต้องแก้เอกสาร — ดู docs/ANNUAL_EVAL.md",
-   "blank": "blank/PCR-TKI.pdf",
-   "tpl": "18K74IDTaS91BAe2WI_5u4ZBESqGT9kZgN0PzCxHX6Bk",
-   "next": [
-    "RTR"
-   ],
-   "refs": [
-    "ECA"
-   ],
-   "flow": {
-    "th": "ตรวจสมรรถนะครูภาคทฤษฎี (D.2.9) — ไม่ผ่านจึงเปิดการอบรมแก้ไข",
-    "en": "Theoretical knowledge instructor proficiency check"
-   }
-  },
-  {
-   "doc": "D-0507-RTR-001",
-   "code": "IM-RTR-301-A",
-   "abbr": "RTR",
-   "t": "Refresher Training Record",
-   "th": "บันทึกการอบรมทบทวน",
-   "iss": "01",
-   "rev": "00",
-   "eff": "06 JUN 2026",
-   "own": "IM",
-   "lef": [
-    "OMA"
-   ],
-   "jot": "",
-   "docx": "D-0507-RTR-001.docx",
-   "st": "ok",
-   "chain": "standardisation",
-   "note": "กรอกในระบบบันทึกการฝึก เมนู Annual Eval — เลือก Type of training ให้ตรงกับสิ่งที่ประเมิน · ตัวเอกสารยังเป็นเอกสารควบคุมที่นี่ · นิยามฟอร์มเดิมเก็บไว้ที่ formdefs/_retired/RTR.json",
-   "r": {
-    "ins": "บันทึกการอบรมทบทวนของตัวเอง",
-    "mgt": "จัดการอบรมทบทวนและรับรองผล"
-   },
-   "with": [
-    "HT"
-   ],
-   "sys": "training",
-   "public": false,
-   "kw": [
-    "อบรมทบทวน",
-    "refresher",
-    "rtr"
-   ],
-   "guide": {
-    "th": "เลือก Type of training ในเมนู Annual Eval ให้ตรงกับสิ่งที่กำลังประเมิน",
-    "en": "Pick the Type of training in Annual Eval that matches what is being assessed",
-    "items": [
-     {
-      "n": "ประเมินครูภาคทฤษฎี (กราวน์)",
-      "by": "HT หรือ CTKI",
-      "w": "เลือก Ground training"
-     },
-     {
-      "n": "ประเมินครูสอนบิน",
-      "by": "HT หรือ CFI",
-      "w": "เลือก Flight training"
-     },
-     {
-      "n": "ประเมินความสามารถในการบิน",
-      "by": "HT, CFI หรือ FI",
-      "w": "เลือก Progressive / Standard check"
-     }
-    ]
-   },
-   "blank": "blank/RTR.pdf",
-   "tpl": "1-LWJjU0uxXfVqmVP6Juihv4VTYiLTrTVKZdJmLngyuE",
-   "next": [
-    "PCR-FI",
-    "PCR-TKI"
-   ],
-   "flow": {
-    "th": "อบรมทบทวน / แก้ไขมาตรฐาน (D.2.7, D.2.8) — เสร็จแล้วตรวจซ้ำเสมอ",
-    "en": "Refresher or corrective training — always followed by a re-check"
-   }
-  },
-  {
-   "doc": "D-0507-ECA-001",
-   "code": "IM-ECA-301-B",
-   "abbr": "ECA",
-   "kind": "ref",
-   "t": "Proficiency Check — Evaluation Criteria and Assessment Standards",
-   "th": "เกณฑ์การประเมินการตรวจสมรรถนะ",
-   "iss": "01",
-   "rev": "01",
-   "eff": "21 AUG 2026",
-   "own": "IM",
-   "lef": [],
-   "jot": "",
-   "docx": "D-0507-ECA-001.docx",
-   "st": "ok",
-   "chain": "standardisation",
-   "note": "เอกสารเกณฑ์การให้คะแนน ไม่มีช่องกรอก จึงไม่มีนิยามฟอร์ม — เปิดอ่านเป็น PDF · ฉบับแก้ไข 01 (21 AUG 2026) เขียนหัวข้อและกฎเกณฑ์ใหม่ให้ตรงกับ OMA D.2.9.5 ทุกตัวอักษร (ตรวจเทียบอัตโนมัติ 13 หัวข้อ) — ของเดิมให้ FI 7 หัวข้อคนละชุด มี ★ 3 หัวข้อ และมีเกณฑ์ \"Overall ≥ 75%\" ที่คู่มือไม่มี ซึ่งทำให้ครูที่ได้เกรด 3 ทุกหัวข้อผ่านตามคู่มือแต่ตกตามใบนี้ · แก้เลขที่อ้างผิดสองแห่ง: Ref D.2.9.1 → D.2.9.5 · Form D-0507-PCR-001 (ไม่มีอยู่จริง) → D-0507-PCR-FI-001 และ D-0507-PCR-TKI-001 · เพิ่มเลขกำกับลงหัวและท้ายเอกสาร ซึ่งฉบับเดิมไม่มีเลย มีแต่ในทะเบียน · ฉบับก่อนแก้เก็บไว้เป็น D-0507-ECA-001-rev00-archive.pdf (ตัว .docx สูญหายระหว่างทำ ฉบับ PDF ครบทั้ง 4 หน้า) · ⚠️ คอลัมน์ Documentation ของภาค B ยังเขียนว่า \"JotForm submissions\" เพราะคัดจากคู่มือตรงตัว ทั้งที่ Jotform กำลังเลิกใช้ — เป็นข้อบกพร่องใน OMA D.2.9.5 เอง ต้องแก้ตอนแก้ LEF",
-   "r": {
-    "ins": "อ่านเกณฑ์การให้เกรดก่อนเข้ารับการตรวจ",
-    "mgt": "ใช้เป็นเกณฑ์ให้เกรดใน PCR"
-   },
-   "with": [],
-   "sys": "here",
-   "public": false,
-   "blank": "blank/ECA.pdf",
-   "guide": {
-    "th": "เอกสารเกณฑ์ ไม่ใช่ใบกรอก — ผู้ตรวจเปิดอ่านระหว่างให้เกรด แล้วบันทึกผลลงใบตรวจสมรรถนะ",
-    "en": "A criteria document, not a form — assessors read it while grading and record the result on the proficiency check record",
-    "items": [
-     {
-      "n": "PART A — Flight Instructor",
-      "by": "HT / CFI / FIE",
-      "w": "7 หัวข้อตาม D.2.9.5 · ★ Safety and Airmanship",
-      "f": "D-0507-PCR-FI-001",
-      "fa": "PCR-FI"
-     },
-     {
-      "n": "PART B — Theoretical Knowledge Instructor",
-      "by": "HT / CTKI",
-      "w": "6 หัวข้อตาม D.2.9.5 · ★ Delivery",
-      "f": "D-0507-PCR-TKI-001",
-      "fa": "PCR-TKI"
-     }
-    ]
-   },
-   "kw": [
-    "eca",
-    "evaluation criteria",
-    "grade descriptor",
-    "เกณฑ์ประเมิน",
-    "เกณฑ์ให้คะแนน"
-   ],
-   "flow": {
-    "th": "เกณฑ์ให้เกรดที่ PCR ทั้งสองใบอ้างอิง — ไม่ใช่ใบกรอก",
-    "en": "Grading criteria cited by both PCR forms — reference, not a form"
-   }
-  },
-  {
-   "doc": "D-0507-FPL-001",
-   "code": "OP-FPL-301-3",
-   "abbr": "FPL",
-   "t": "Flight Plan",
-   "th": "แผนการบิน",
-   "iss": "01",
-   "rev": "00",
-   "eff": "18 JUL 2024",
-   "own": "OP",
-   "lef": [
-    "OMA",
-    "TM"
-   ],
-   "docx": "D-0507-FPL-001.docx",
-   "st": "dupsys",
-   "chain": "ops",
-   "r": {
-    "ops": "ยื่นแผนการบินตามแบบ ICAO"
-   },
-   "with": [],
-   "sys": "dispatch",
-   "public": false,
-   "kw": [
-    "แผนการบิน",
-    "ยื่นแผน",
-    "flight plan",
-    "fpl",
-    "ยื่นบิน"
-   ],
-   "sysOK": "ยืนยันแล้ว 01 AUG 2026",
-   "jotDup": "93194090184459",
-   "note": "ฉบับที่ใช้จริงอยู่ในระบบ Dispatch · ฟอร์มเปล่าที่นี่คือแบบ ICAO แผ่นเดียวกับที่ Dispatch พิมพ์ทับเวลาออกแผนจริง ดึงมาจากตัวแอปโดยตรง · Dispatch มีหน้า FORMS ที่กดพิมพ์/ดาวน์โหลด ฟอร์มเปล่าได้ทั้งชุด (แผนการบิน · General Declaration · บัญชีผู้โดยสาร · W&B รายลำ) ที่ d0507.361vision.org/d0507-app/next/#forms",
-   "blank": "blank/FPL.pdf"
-  },
-  {
-   "doc": "D-0507-NPC-M-001",
-   "code": "NP-CHK-303-A",
-   "abbr": "NPC-M",
-   "kind": "ref",
-   "t": "Normal Procedures Checklist — C172M",
-   "th": "รายการตรวจขั้นตอนปกติ — C172M",
-   "iss": "01",
-   "rev": "00",
-   "eff": "11 NOV 2024",
-   "own": "OP",
-   "lef": [
-    "OMA",
-    "TM"
-   ],
-   "jot": "",
-   "docx": "D-0507-NPC-M-001.docx",
-   "st": "ok",
-   "chain": "ops",
-   "note": "แยกจากฉบับรวม D-0507-NPC-001 ที่ครอบ C172 M/N/S เมื่อ 24 AUG 2026 — เนื้อหายังเหมือนกันทุกฉบับ",
-   "r": {
-    "ops": "Cessna 172 Series — ใช้ประกอบการฝึก",
-    "ins": "ใช้สอนขั้นตอนปกติกับนักเรียน"
-   },
-   "with": [],
-   "sys": "here",
-   "public": false,
-   "kw": [
-    "ขั้นตอนปกติ",
-    "checklist",
-    "normal",
-    "npc",
-    "c172m",
-    "C172M"
-   ],
-   "blank": "blank/NPC-M.pdf"
-  },
-  {
-   "doc": "D-0507-NPC-N-001",
-   "code": "NP-CHK-304-A",
-   "abbr": "NPC-N",
-   "kind": "ref",
-   "t": "Normal Procedures Checklist — C172N",
-   "th": "รายการตรวจขั้นตอนปกติ — C172N",
-   "iss": "01",
-   "rev": "00",
-   "eff": "11 NOV 2024",
-   "own": "OP",
-   "lef": [
-    "OMA",
-    "TM"
-   ],
-   "jot": "",
-   "docx": "D-0507-NPC-N-001.docx",
-   "st": "ok",
-   "chain": "ops",
-   "note": "แยกจากฉบับรวม D-0507-NPC-001 ที่ครอบ C172 M/N/S เมื่อ 24 AUG 2026 — เนื้อหายังเหมือนกันทุกฉบับ",
-   "r": {
-    "ops": "Cessna 172 Series — ใช้ประกอบการฝึก",
-    "ins": "ใช้สอนขั้นตอนปกติกับนักเรียน"
-   },
-   "with": [],
-   "sys": "here",
-   "public": false,
-   "kw": [
-    "ขั้นตอนปกติ",
-    "checklist",
-    "normal",
-    "npc",
-    "c172n",
-    "C172N"
-   ],
-   "blank": "blank/NPC-N.pdf"
-  },
-  {
-   "doc": "D-0507-NPC-S-001",
-   "code": "NP-CHK-305-A",
-   "abbr": "NPC-S",
-   "kind": "ref",
-   "t": "Normal Procedures Checklist — C172S",
-   "th": "รายการตรวจขั้นตอนปกติ — C172S",
-   "iss": "01",
-   "rev": "00",
-   "eff": "11 NOV 2024",
-   "own": "OP",
-   "lef": [
-    "OMA",
-    "TM"
-   ],
-   "jot": "",
-   "docx": "D-0507-NPC-S-001.docx",
-   "st": "ok",
-   "chain": "ops",
-   "note": "แยกจากฉบับรวม D-0507-NPC-001 ที่ครอบ C172 M/N/S เมื่อ 24 AUG 2026 — เนื้อหายังเหมือนกันทุกฉบับ",
-   "r": {
-    "ops": "Cessna 172 Series — ใช้ประกอบการฝึก",
-    "ins": "ใช้สอนขั้นตอนปกติกับนักเรียน"
-   },
-   "with": [],
-   "sys": "here",
-   "public": false,
-   "kw": [
-    "ขั้นตอนปกติ",
-    "checklist",
-    "normal",
-    "npc",
-    "c172s",
-    "C172S"
-   ],
-   "blank": "blank/NPC-S.pdf"
   },
   {
    "doc": "D-0507-EPC-M-001",
@@ -1073,6 +865,744 @@
    "blank": "blank/EPC-S.pdf"
   },
   {
+   "sys": "here",
+   "kind": "ref",
+   "chain": "ops",
+   "own": "OP",
+   "doc": "D-0507-EPC-T206H-001",
+   "code": "EP-CHK-306-A",
+   "abbr": "EPC-T206H",
+   "iss": "01",
+   "rev": "00",
+   "eff": "25 AUG 2026",
+   "t": "Emergency Procedures Checklist — Cessna T206H",
+   "th": "เช็กลิสต์ขั้นตอนฉุกเฉิน — Cessna T206H",
+   "lef": [],
+   "st": "notinlef",
+   "public": false,
+   "docx": "D-0507-EPC-T206H-001.docx",
+   "blank": "blank/EPC-T206H.pdf",
+   "kw": [
+    "checklist",
+    "เช็กลิสต์",
+    "T206H",
+    "C206",
+    "Stationair",
+    "ฉุกเฉิน"
+   ],
+   "note": "ฉบับร่าง — ถอดจาก Cessna Pilot's Checklist T206H (Rev 4 · 13 May 2002) ภาพถ่ายต้นฉบับถูกตัดท้ายหน้า ยังขาดรายการที่ทำแถบแดงไว้ ต้องเติมจาก POH และให้หัวหน้าครูการบินรับรองก่อนใช้บิน"
+  },
+  {
+   "doc": "D-0507-FPL-001",
+   "code": "OP-FPL-301-3",
+   "abbr": "FPL",
+   "t": "Flight Plan",
+   "th": "แผนการบิน",
+   "iss": "01",
+   "rev": "00",
+   "eff": "18 JUL 2024",
+   "own": "OP",
+   "lef": [
+    "OMA",
+    "TM"
+   ],
+   "docx": "D-0507-FPL-001.docx",
+   "st": "dupsys",
+   "chain": "ops",
+   "r": {
+    "ops": "ยื่นแผนการบินตามแบบ ICAO"
+   },
+   "with": [],
+   "sys": "dispatch",
+   "public": false,
+   "kw": [
+    "แผนการบิน",
+    "ยื่นแผน",
+    "flight plan",
+    "fpl",
+    "ยื่นบิน"
+   ],
+   "sysOK": "ยืนยันแล้ว 01 AUG 2026",
+   "jotDup": "93194090184459",
+   "note": "ฉบับที่ใช้จริงอยู่ในระบบ Dispatch · ฟอร์มเปล่าที่นี่คือแบบ ICAO แผ่นเดียวกับที่ Dispatch พิมพ์ทับเวลาออกแผนจริง ดึงมาจากตัวแอปโดยตรง · Dispatch มีหน้า FORMS ที่กดพิมพ์/ดาวน์โหลด ฟอร์มเปล่าได้ทั้งชุด (แผนการบิน · General Declaration · บัญชีผู้โดยสาร · W&B รายลำ) ที่ d0507.361vision.org/d0507-app/next/#forms",
+   "blank": "blank/FPL.pdf"
+  },
+  {
+   "doc": "D-0507-FRAE-001",
+   "code": "IM-DRM-304-A",
+   "abbr": "FRAE",
+   "t": "Flight Risk Assessment and Evaluation",
+   "th": "การประเมินความเสี่ยงก่อนทำการบิน",
+   "iss": "01",
+   "rev": "00",
+   "eff": "07 JUL 2022",
+   "own": "IM",
+   "lef": [
+    "OMA",
+    "TM"
+   ],
+   "jot": "210071253532038",
+   "docx": "D-0507-FRAE-001.docx",
+   "st": "ok",
+   "chain": "preflight",
+   "r": {
+    "stu": "กรอกฝั่งนักเรียนก่อนบินทุกเที่ยว",
+    "ins": "กรอกฝั่งครู แล้วยืนยัน fit to fly ร่วมกับนักเรียน",
+    "mgt": "อนุมัติเมื่อคะแนนความเสี่ยงอยู่ระดับเหลืองหรือแดง"
+   },
+   "with": [
+    "นักเรียน",
+    "ครูการบิน",
+    "HT"
+   ],
+   "sys": "here",
+   "public": true,
+   "assignTo": "FI",
+   "kw": [
+    "บิน",
+    "จะบิน",
+    "ก่อนบิน",
+    "พรุ่งนี้",
+    "ความเสี่ยง",
+    "เสี่ยง",
+    "ประเมิน",
+    "ครู",
+    "fit to fly",
+    "frae",
+    "risk",
+    "preflight"
+   ],
+   "blank": "blank/FRAE.pdf",
+   "tpl": "1iglI6fZuJjDp1AixRf2OIEokGbRnhT4RZFeIVtn6kCE"
+  },
+  {
+   "doc": "D-0507-FTR-001",
+   "code": "ME-FTR-301-A",
+   "abbr": "FTR",
+   "t": "Flight Test Report",
+   "th": "รายงานการบินทดสอบ",
+   "iss": "01",
+   "rev": "00",
+   "eff": "27 JAN 2021",
+   "own": "ME",
+   "lef": [
+    "OMM",
+    "TM"
+   ],
+   "jot": "210242903261039",
+   "docx": "D-0507-FTR-001.docx",
+   "st": "ok",
+   "chain": "maint",
+   "r": {
+    "mnt": "บันทึกการบินทดสอบหลังซ่อม แล้วออก CRS",
+    "ops": "จัดเที่ยวบินทดสอบและนักบินทดสอบ"
+   },
+   "with": [
+    "นักบินทดสอบ"
+   ],
+   "sys": "here",
+   "public": false,
+   "kw": [
+    "บินทดสอบ",
+    "หลังซ่อม",
+    "crs",
+    "test flight",
+    "ftr"
+   ],
+   "blank": "blank/FTR.pdf",
+   "tpl": "1iDeTikRktXxm59E8_U_1zfpxVcO5OgAS1sxcbgO3ZaY",
+   "blankFrom": "tpl"
+  },
+  {
+   "doc": "D-0507-GSP-001",
+   "code": "IM-GSP-301-B",
+   "abbr": "GSP",
+   "t": "Flight Training Evaluation",
+   "th": "บันทึกการฝึกภาคอากาศ",
+   "iss": "01",
+   "rev": "00",
+   "eff": "07 JUL 2022",
+   "own": "IM",
+   "lef": [
+    "OMA",
+    "TM"
+   ],
+   "docx": "D-0507-GSP-001.docx",
+   "st": "ok",
+   "chain": "training",
+   "r": {
+    "stu": "ดูบันทึกการฝึกและความคืบหน้าของตัวเอง (อ่านเท่านั้น)",
+    "ins": "บันทึกผลการฝึกและให้เกรดรายเที่ยวบิน"
+   },
+   "with": [
+    "นักเรียน",
+    "ครูการบิน",
+    "HT"
+   ],
+   "sys": "training",
+   "public": true,
+   "kw": [
+    "ผลการฝึก",
+    "ความคืบหน้า",
+    "บันทึกการฝึก",
+    "gradeslip",
+    "training record",
+    "ppl",
+    "gsp"
+   ],
+   "sysOK": "ยืนยันแล้ว 01 AUG 2026",
+   "note": "ใช้ฉบับในระบบบันทึกการฝึก (d0507.361vision.org) เลิกใช้ Jotform แล้ว · LEF ในคู่มือยังชี้ Jotform 212454638036455 ที่เลิกใช้ ต้องแก้ LEF · เปลี่ยนชื่อเหลือเฉพาะภาคอากาศตามที่ตกลง 16 AUG 2026 แต่ .docx ยังใช้ชื่อ PPL Ground & Flight Training Record และยังมีส่วนภาคพื้นอยู่ — ต้องแก้เอกสารแล้วออก Revision ใหม่",
+   "blank": "blank/GSP.pdf",
+   "guide": {
+    "th": "GSP บันทึกผลรายเที่ยวบิน ครูการบินให้เกรด 6 หมวด เลือกบทเรียนจาก L-01 ถึง L-21 ทำในระบบบันทึกการฝึก",
+    "en": "GSP records each flight; the instructor grades six areas, with the lesson selected from L-01 to L-21, in the training records system",
+    "items": [
+     {
+      "n": "Preflight & Aircraft Handling",
+      "w": "การเตรียมบินและการบังคับอากาศยาน"
+     },
+     {
+      "n": "Takeoff & Departure",
+      "w": "การวิ่งขึ้นและออกเดินทาง"
+     },
+     {
+      "n": "Manoeuvres",
+      "w": "ท่าทางการบิน"
+     },
+     {
+      "n": "Navigation",
+      "w": "การเดินอากาศ"
+     },
+     {
+      "n": "Descent & Landing",
+      "w": "การลดระดับและร่อนลง"
+     },
+     {
+      "n": "Emergency Procedures",
+      "w": "ขั้นตอนฉุกเฉิน รวมการเรียก MAYDAY"
+     }
+    ]
+   }
+  },
+  {
+   "doc": "D-0507-HIF-001",
+   "code": "SM-HIF-301-A",
+   "abbr": "HIF",
+   "t": "Hazard Identification Form",
+   "th": "แบบชี้บ่งอันตราย",
+   "iss": "01",
+   "rev": "00",
+   "eff": "24 AUG 2021",
+   "own": "SM",
+   "lef": [
+    "OMM",
+    "TM"
+   ],
+   "jot": "210431245943449",
+   "docx": "D-0507-HIF-001.docx",
+   "st": "ok",
+   "chain": "safety",
+   "note": "LEF ชี้ไปฟอร์ม Disciplinary Action Form",
+   "r": {
+    "ins": "แจ้งอันตรายที่พบและเสนอมาตรการลดความเสี่ยง",
+    "mnt": "แจ้งอันตรายที่พบในพื้นที่ซ่อมบำรุง",
+    "ops": "แจ้งอันตรายที่พบในพื้นที่ปฏิบัติการ"
+   },
+   "with": [
+    "Safety Manager"
+   ],
+   "sys": "here",
+   "public": false,
+   "kw": [
+    "อันตราย",
+    "ชี้บ่งอันตราย",
+    "hazard",
+    "hif",
+    "ความเสี่ยง"
+   ],
+   "assignTo": "SM",
+   "blank": "blank/HIF.pdf",
+   "tpl": "1jJLzzD-_v9rr1K8Fw6sqQsdH5JqRpCOj2o_EAvfpwF0"
+  },
+  {
+   "doc": "D-0507-IAC-001",
+   "code": "",
+   "abbr": "IAC",
+   "t": "Internal Audit Checklist — GAP Analysis (TCAR-ORA)",
+   "th": "รายการตรวจติดตามภายใน",
+   "iss": "01",
+   "rev": "00",
+   "eff": "23 JUL 2026",
+   "own": "QA",
+   "lef": [],
+   "jot": "",
+   "docx": "",
+   "app": "audit",
+   "st": "ok",
+   "chain": "audit",
+   "note": "2,081 รายการ · ใช้งานที่ประตูงานตรวจสอบ · ควรอยู่หมวดเช็กลิสต์ แต่ยังไม่มี .docx ต้นฉบับให้ทำไฟล์เปิดอ่าน",
+   "r": {
+    "mgt": "ดำเนินการตรวจติดตามภายในตามแผนประจำปี"
+   },
+   "with": [
+    "Auditor",
+    "CMM"
+   ],
+   "sys": "audit",
+   "public": false
+  },
+  {
+   "doc": "D-0507-MER-001",
+   "code": "",
+   "abbr": "MER",
+   "t": "Management Evaluation Report",
+   "th": "รายงานผลการทบทวนของฝ่ายบริหาร",
+   "iss": "01",
+   "rev": "00",
+   "eff": "",
+   "own": "QA",
+   "lef": [],
+   "jot": "",
+   "docx": "D-0507-MER-001.docx",
+   "st": "ok",
+   "chain": "audit",
+   "app": "audit",
+   "note": "OMM 5.2.3 อ้างถึงแบบฟอร์มนี้ · ยังไม่มีวันมีผล รออนุมัติจาก Accountable Manager",
+   "r": {
+    "mgt": "บันทึกผลการประชุมทบทวนของฝ่ายบริหารตามรอบ"
+   },
+   "with": [
+    "Accountable Manager",
+    "CMM",
+    "หัวหน้าฝ่าย"
+   ],
+   "sys": "audit",
+   "public": false,
+   "kw": [
+    "ทบทวน",
+    "ฝ่ายบริหาร",
+    "ประชุม",
+    "mer",
+    "management review",
+    "evaluation"
+   ],
+   "blank": "blank/MER.pdf"
+  },
+  {
+   "doc": "D-0507-MOC-001",
+   "code": "",
+   "abbr": "MOC",
+   "t": "Management of Change (MoC) Form",
+   "th": "แบบบริหารการเปลี่ยนแปลง",
+   "iss": "01",
+   "rev": "00",
+   "eff": "",
+   "own": "SM",
+   "lef": [],
+   "jot": "",
+   "docx": "D-0507-MOC-001.docx",
+   "st": "ok",
+   "chain": "safety",
+   "r": {
+    "mgt": "พิจารณาและอนุมัติการเปลี่ยนแปลงตามกระบวนการ SMS"
+   },
+   "with": [
+    "Safety Manager",
+    "HT",
+    "ACM"
+   ],
+   "sys": "here",
+   "public": false,
+   "kw": [
+    "เปลี่ยนแปลง",
+    "moc",
+    "change",
+    "บริหารการเปลี่ยนแปลง"
+   ],
+   "blank": "blank/MOC.pdf",
+   "tpl": "1lj9ie_H1-kct5Z4sA2L1L0RKTu2glwgxYa041OFpvZc"
+  },
+  {
+   "doc": "D-0507-MRF-001",
+   "code": "",
+   "abbr": "MRF",
+   "t": "Monthly Reimbursement Form",
+   "th": "แบบเบิกค่าใช้จ่ายรายเดือน",
+   "iss": "01",
+   "rev": "00",
+   "eff": "",
+   "own": "AD",
+   "lef": [],
+   "jot": "210050755822448",
+   "docx": "D-0507-MRF-001.docx",
+   "st": "ok",
+   "chain": "admin",
+   "r": {
+    "ins": "ยื่นเบิกค่าใช้จ่ายและ timesheet รายเดือน",
+    "mgt": "อนุมัติการเบิกจ่ายรายเดือนของพนักงาน"
+   },
+   "with": [
+    "หัวหน้างาน",
+    "Finance",
+    "ACM"
+   ],
+   "sys": "here",
+   "public": false,
+   "kw": [
+    "เบิก",
+    "เบิกเงิน",
+    "ค่าใช้จ่าย",
+    "รายเดือน",
+    "reimbursement",
+    "mrf"
+   ],
+   "blank": "blank/MRF.pdf"
+  },
+  {
+   "doc": "D-0507-MTC-001",
+   "code": "ME-MTC-306-B",
+   "abbr": "MTC",
+   "t": "Maintenance Task Card",
+   "th": "ใบสั่งงานซ่อมบำรุง",
+   "iss": "01",
+   "rev": "01",
+   "eff": "05 JAN 2026",
+   "own": "ME",
+   "lef": [
+    "OMA",
+    "OMM",
+    "TM"
+   ],
+   "docx": "D-0507-MTC-001.docx",
+   "st": "pdfonly",
+   "chain": "maint",
+   "note": "กรอกจริงใน AeroFBO — ที่นี่เก็บฉบับควบคุมไว้ให้ดาวน์โหลดหรือพิมพ์ไปเขียนด้วยมือ",
+   "r": {
+    "mnt": "บันทึกงานซ่อมบำรุงตามใบสั่งงาน"
+   },
+   "with": [],
+   "sys": "fbo",
+   "public": false,
+   "kw": [
+    "ซ่อม",
+    "ซ่อมบำรุง",
+    "ใบสั่งงาน",
+    "task card",
+    "maintenance",
+    "mtc"
+   ],
+   "sysOK": "ยืนยันแล้ว 01 AUG 2026",
+   "jotDup": "230023273391042",
+   "blank": "blank/MTC.pdf"
+  },
+  {
+   "doc": "D-0507-NCHR-001",
+   "code": "QA-NCHR-301-A",
+   "abbr": "NCHR",
+   "t": "Non-Conformance / Corrective Action Record",
+   "th": "บันทึกข้อไม่สอดคล้องและการแก้ไข",
+   "iss": "01",
+   "rev": "00",
+   "eff": "07 JUL 2022",
+   "own": "QA",
+   "lef": [
+    "OMM",
+    "TM"
+   ],
+   "jot": "210655063681050",
+   "docx": "D-0507-NCHR-001.docx",
+   "st": "ok",
+   "chain": "audit",
+   "note": "ย้ายไปสร้างในระบบตรวจสอบภายใน",
+   "r": {
+    "mgt": "บันทึกและติดตามข้อไม่สอดคล้องจากการตรวจ"
+   },
+   "with": [
+    "CMM"
+   ],
+   "sys": "audit",
+   "public": false,
+   "kw": [
+    "ข้อไม่สอดคล้อง",
+    "non-conformance",
+    "nchr"
+   ],
+   "blank": "blank/NCHR.pdf"
+  },
+  {
+   "doc": "D-0507-NPC-M-001",
+   "code": "NP-CHK-303-A",
+   "abbr": "NPC-M",
+   "kind": "ref",
+   "t": "Normal Procedures Checklist — C172M",
+   "th": "รายการตรวจขั้นตอนปกติ — C172M",
+   "iss": "01",
+   "rev": "00",
+   "eff": "11 NOV 2024",
+   "own": "OP",
+   "lef": [
+    "OMA",
+    "TM"
+   ],
+   "jot": "",
+   "docx": "D-0507-NPC-M-001.docx",
+   "st": "ok",
+   "chain": "ops",
+   "note": "แยกจากฉบับรวม D-0507-NPC-001 ที่ครอบ C172 M/N/S เมื่อ 24 AUG 2026 — เนื้อหายังเหมือนกันทุกฉบับ",
+   "r": {
+    "ops": "Cessna 172 Series — ใช้ประกอบการฝึก",
+    "ins": "ใช้สอนขั้นตอนปกติกับนักเรียน"
+   },
+   "with": [],
+   "sys": "here",
+   "public": false,
+   "kw": [
+    "ขั้นตอนปกติ",
+    "checklist",
+    "normal",
+    "npc",
+    "c172m",
+    "C172M"
+   ],
+   "blank": "blank/NPC-M.pdf"
+  },
+  {
+   "doc": "D-0507-NPC-N-001",
+   "code": "NP-CHK-304-A",
+   "abbr": "NPC-N",
+   "kind": "ref",
+   "t": "Normal Procedures Checklist — C172N",
+   "th": "รายการตรวจขั้นตอนปกติ — C172N",
+   "iss": "01",
+   "rev": "00",
+   "eff": "11 NOV 2024",
+   "own": "OP",
+   "lef": [
+    "OMA",
+    "TM"
+   ],
+   "jot": "",
+   "docx": "D-0507-NPC-N-001.docx",
+   "st": "ok",
+   "chain": "ops",
+   "note": "แยกจากฉบับรวม D-0507-NPC-001 ที่ครอบ C172 M/N/S เมื่อ 24 AUG 2026 — เนื้อหายังเหมือนกันทุกฉบับ",
+   "r": {
+    "ops": "Cessna 172 Series — ใช้ประกอบการฝึก",
+    "ins": "ใช้สอนขั้นตอนปกติกับนักเรียน"
+   },
+   "with": [],
+   "sys": "here",
+   "public": false,
+   "kw": [
+    "ขั้นตอนปกติ",
+    "checklist",
+    "normal",
+    "npc",
+    "c172n",
+    "C172N"
+   ],
+   "blank": "blank/NPC-N.pdf"
+  },
+  {
+   "doc": "D-0507-NPC-S-001",
+   "code": "NP-CHK-305-A",
+   "abbr": "NPC-S",
+   "kind": "ref",
+   "t": "Normal Procedures Checklist — C172S",
+   "th": "รายการตรวจขั้นตอนปกติ — C172S",
+   "iss": "01",
+   "rev": "00",
+   "eff": "11 NOV 2024",
+   "own": "OP",
+   "lef": [
+    "OMA",
+    "TM"
+   ],
+   "jot": "",
+   "docx": "D-0507-NPC-S-001.docx",
+   "st": "ok",
+   "chain": "ops",
+   "note": "แยกจากฉบับรวม D-0507-NPC-001 ที่ครอบ C172 M/N/S เมื่อ 24 AUG 2026 — เนื้อหายังเหมือนกันทุกฉบับ",
+   "r": {
+    "ops": "Cessna 172 Series — ใช้ประกอบการฝึก",
+    "ins": "ใช้สอนขั้นตอนปกติกับนักเรียน"
+   },
+   "with": [],
+   "sys": "here",
+   "public": false,
+   "kw": [
+    "ขั้นตอนปกติ",
+    "checklist",
+    "normal",
+    "npc",
+    "c172s",
+    "C172S"
+   ],
+   "blank": "blank/NPC-S.pdf"
+  },
+  {
+   "sys": "here",
+   "kind": "ref",
+   "chain": "ops",
+   "own": "OP",
+   "doc": "D-0507-NPC-T206H-001",
+   "code": "NP-CHK-306-A",
+   "abbr": "NPC-T206H",
+   "iss": "01",
+   "rev": "00",
+   "eff": "25 AUG 2026",
+   "t": "Normal Procedures Checklist — Cessna T206H",
+   "th": "เช็กลิสต์ขั้นตอนปกติ — Cessna T206H",
+   "lef": [],
+   "st": "notinlef",
+   "public": false,
+   "docx": "D-0507-NPC-T206H-001.docx",
+   "blank": "blank/NPC-T206H.pdf",
+   "kw": [
+    "checklist",
+    "เช็กลิสต์",
+    "T206H",
+    "C206",
+    "Stationair",
+    "ปกติ"
+   ],
+   "note": "ฉบับร่าง — ถอดจาก Cessna Pilot's Checklist T206H (Rev 4 · 13 May 2002) ภาพถ่ายต้นฉบับถูกตัดท้ายหน้า ยังขาดรายการที่ทำแถบแดงไว้ ต้องเติมจาก POH และให้หัวหน้าครูการบินรับรองก่อนใช้บิน"
+  },
+  {
+   "doc": "D-0507-PCK-001",
+   "code": "ME-PCK-303-A",
+   "abbr": "PCK",
+   "kind": "ref",
+   "t": "Pre-Inspection Checklist",
+   "th": "รายการตรวจก่อนเริ่มงานซ่อมบำรุง",
+   "iss": "01",
+   "rev": "00",
+   "eff": "18 JUL 2024",
+   "own": "ME",
+   "lef": [
+    "OMM",
+    "TM"
+   ],
+   "jot": "242401486833456",
+   "docx": "D-0507-PCK-001.docx",
+   "st": "ok",
+   "chain": "maint",
+   "note": "LEF ของ OMM และ TM ชี้ไปฟอร์ม Flight Plan Confirmation",
+   "r": {
+    "mnt": "เช็คก่อนเริ่มงานซ่อมบำรุงทุกครั้ง"
+   },
+   "with": [],
+   "sys": "here",
+   "public": false,
+   "kw": [
+    "ก่อนซ่อม",
+    "ตรวจก่อนงาน",
+    "pre-inspection",
+    "pck"
+   ],
+   "blank": "blank/PCK.pdf"
+  },
+  {
+   "doc": "D-0507-PCR-FI-001",
+   "code": "IM-PCR-FI-301-A",
+   "abbr": "PCR-FI",
+   "t": "In-House Proficiency Check Record — Flight Instructor",
+   "th": "บันทึกการตรวจสมรรถนะครูการบิน",
+   "iss": "01",
+   "rev": "01",
+   "eff": "06 JUN 2026",
+   "own": "IM",
+   "lef": [
+    "OMA"
+   ],
+   "jot": "261580093591056",
+   "docx": "D-0507-PCR-FI-001.docx",
+   "st": "ok",
+   "chain": "standardisation",
+   "note": "มี Jotform แล้ว (261580093591056) แต่ LEF ยังไม่ใส่ลิงก์ · ให้เกรดตาม D-0507-ECA-001 · รับค่าตั้งต้นจากเมนู Annual Eval ในระบบบันทึกการฝึกผ่านลิงก์ prefill โดยไม่ต้องแก้เอกสาร — ดู docs/ANNUAL_EVAL.md",
+   "r": {
+    "ins": "รับทราบและลงนามผลการตรวจสมรรถนะของตัวเอง",
+    "mgt": "ประเมินสมรรถนะครูในบทบาท HT / FIE"
+   },
+   "with": [
+    "HT",
+    "FIE"
+   ],
+   "sys": "here",
+   "public": false,
+   "kw": [
+    "annual eval",
+    "ipc",
+    "pcr",
+    "proficiency",
+    "ตรวจสมรรถนะ",
+    "ประเมินประจำปี",
+    "สมรรถนะครู"
+   ],
+   "blank": "blank/PCR-FI.pdf",
+   "tpl": "1G-CvnjcUcSHF5fU7PIi0vokx6WiWUyARRSbZP7O-Je8",
+   "next": [
+    "RTR"
+   ],
+   "refs": [
+    "ECA"
+   ],
+   "flow": {
+    "th": "ตรวจสมรรถนะครูการบิน (D.2.9) — ไม่ผ่านจึงเปิดการอบรมแก้ไข",
+    "en": "Flight instructor proficiency check — failure opens corrective training"
+   }
+  },
+  {
+   "doc": "D-0507-PCR-TKI-001",
+   "code": "IM-PCR-TKI-302-A",
+   "abbr": "PCR-TKI",
+   "t": "In-House Proficiency Check Record — Theoretical Knowledge Instructor",
+   "th": "บันทึกการตรวจสมรรถนะครูภาคทฤษฎี",
+   "iss": "01",
+   "rev": "01",
+   "eff": "06 JUN 2026",
+   "own": "IM",
+   "lef": [
+    "OMA"
+   ],
+   "jot": "",
+   "docx": "D-0507-PCR-TKI-001.docx",
+   "st": "ok",
+   "chain": "standardisation",
+   "r": {
+    "ins": "รับทราบและลงนามผลการตรวจสมรรถนะของตัวเอง",
+    "mgt": "ประเมินสมรรถนะครูภาคทฤษฎี"
+   },
+   "with": [
+    "HT",
+    "FIE"
+   ],
+   "sys": "here",
+   "public": false,
+   "kw": [
+    "annual eval",
+    "ipc",
+    "proficiency",
+    "tki",
+    "ครูภาคทฤษฎี",
+    "ตรวจสมรรถนะ",
+    "ประเมินประจำปี"
+   ],
+   "note": "ให้เกรดตาม D-0507-ECA-001 · รับค่าตั้งต้นจากเมนู Annual Eval ในระบบบันทึกการฝึกผ่านลิงก์ prefill โดยไม่ต้องแก้เอกสาร — ดู docs/ANNUAL_EVAL.md",
+   "blank": "blank/PCR-TKI.pdf",
+   "tpl": "18K74IDTaS91BAe2WI_5u4ZBESqGT9kZgN0PzCxHX6Bk",
+   "next": [
+    "RTR"
+   ],
+   "refs": [
+    "ECA"
+   ],
+   "flow": {
+    "th": "ตรวจสมรรถนะครูภาคทฤษฎี (D.2.9) — ไม่ผ่านจึงเปิดการอบรมแก้ไข",
+    "en": "Theoretical knowledge instructor proficiency check"
+   }
+  },
+  {
    "doc": "D-0507-PWR-001",
    "code": "AD/PWR/301-D",
    "abbr": "PWR",
@@ -1118,464 +1648,291 @@
    "tpl": "1QObAZ3_hOD_MkE7X1ejlshrCW9v0ymwjZXp9avQKB-I"
   },
   {
-   "doc": "D-0507-PCK-001",
-   "code": "ME-PCK-303-A",
-   "abbr": "PCK",
-   "kind": "ref",
-   "t": "Pre-Inspection Checklist",
-   "th": "รายการตรวจก่อนเริ่มงานซ่อมบำรุง",
+   "doc": "D-0507-RTR-001",
+   "code": "IM-RTR-301-A",
+   "abbr": "RTR",
+   "t": "Refresher Training Record",
+   "th": "บันทึกการอบรมทบทวน",
    "iss": "01",
    "rev": "00",
-   "eff": "18 JUL 2024",
-   "own": "ME",
+   "eff": "06 JUN 2026",
+   "own": "IM",
    "lef": [
-    "OMM",
-    "TM"
+    "OMA"
    ],
-   "jot": "242401486833456",
-   "docx": "D-0507-PCK-001.docx",
+   "jot": "",
+   "docx": "D-0507-RTR-001.docx",
    "st": "ok",
-   "chain": "maint",
-   "note": "LEF ของ OMM และ TM ชี้ไปฟอร์ม Flight Plan Confirmation",
+   "chain": "standardisation",
+   "note": "กรอกในระบบบันทึกการฝึก เมนู Annual Eval — เลือก Type of training ให้ตรงกับสิ่งที่ประเมิน · ตัวเอกสารยังเป็นเอกสารควบคุมที่นี่ · นิยามฟอร์มเดิมเก็บไว้ที่ formdefs/_retired/RTR.json",
    "r": {
-    "mnt": "เช็คก่อนเริ่มงานซ่อมบำรุงทุกครั้ง"
-   },
-   "with": [],
-   "sys": "here",
-   "public": false,
-   "kw": [
-    "ก่อนซ่อม",
-    "ตรวจก่อนงาน",
-    "pre-inspection",
-    "pck"
-   ],
-   "blank": "blank/PCK.pdf"
-  },
-  {
-   "doc": "D-0507-MTC-001",
-   "code": "ME-MTC-306-B",
-   "abbr": "MTC",
-   "t": "Maintenance Task Card",
-   "th": "ใบสั่งงานซ่อมบำรุง",
-   "iss": "01",
-   "rev": "01",
-   "eff": "05 JAN 2026",
-   "own": "ME",
-   "lef": [
-    "OMA",
-    "OMM",
-    "TM"
-   ],
-   "docx": "D-0507-MTC-001.docx",
-   "st": "pdfonly",
-   "chain": "maint",
-   "note": "กรอกจริงใน AeroFBO — ที่นี่เก็บฉบับควบคุมไว้ให้ดาวน์โหลดหรือพิมพ์ไปเขียนด้วยมือ",
-   "r": {
-    "mnt": "บันทึกงานซ่อมบำรุงตามใบสั่งงาน"
-   },
-   "with": [],
-   "sys": "fbo",
-   "public": false,
-   "kw": [
-    "ซ่อม",
-    "ซ่อมบำรุง",
-    "ใบสั่งงาน",
-    "task card",
-    "maintenance",
-    "mtc"
-   ],
-   "sysOK": "ยืนยันแล้ว 01 AUG 2026",
-   "jotDup": "230023273391042",
-   "blank": "blank/MTC.pdf"
-  },
-  {
-   "doc": "D-0507-FTR-001",
-   "code": "ME-FTR-301-A",
-   "abbr": "FTR",
-   "t": "Flight Test Report",
-   "th": "รายงานการบินทดสอบ",
-   "iss": "01",
-   "rev": "00",
-   "eff": "27 JAN 2021",
-   "own": "ME",
-   "lef": [
-    "OMM",
-    "TM"
-   ],
-   "jot": "210242903261039",
-   "docx": "D-0507-FTR-001.docx",
-   "st": "ok",
-   "chain": "maint",
-   "r": {
-    "mnt": "บันทึกการบินทดสอบหลังซ่อม แล้วออก CRS",
-    "ops": "จัดเที่ยวบินทดสอบและนักบินทดสอบ"
+    "ins": "บันทึกการอบรมทบทวนของตัวเอง",
+    "mgt": "จัดการอบรมทบทวนและรับรองผล"
    },
    "with": [
-    "นักบินทดสอบ"
+    "HT"
    ],
-   "sys": "here",
+   "sys": "training",
    "public": false,
    "kw": [
-    "บินทดสอบ",
-    "หลังซ่อม",
-    "crs",
-    "test flight",
-    "ftr"
+    "อบรมทบทวน",
+    "refresher",
+    "rtr"
    ],
-   "blank": "blank/FTR.pdf",
-   "tpl": "1iDeTikRktXxm59E8_U_1zfpxVcO5OgAS1sxcbgO3ZaY",
-   "blankFrom": "tpl"
-  },
-  {
-   "doc": "D-0507-ALR-001",
-   "code": "ME-ALR-301-B",
-   "abbr": "ALR",
-   "t": "Aircraft Technical & Journey Log",
-   "th": "สมุดปกบินและบันทึกทางเทคนิคประจำอากาศยาน",
-   "iss": "01",
-   "rev": "01",
-   "eff": "24 AUG 2026",
-   "own": "ME",
-   "lef": [
-    "OMM",
-    "TM"
-   ],
-   "jot": "221733809707460",
-   "docx": "D-0507-ALR-001.docx",
-   "st": "ok",
-   "chain": "maint",
-   "r": {
-    "mnt": "บันทึกการใช้อากาศยาน ข้อบกพร่อง และการใช้น้ำมันรายวัน",
-    "ops": "ปิดบันทึกการใช้อากาศยานรายวัน"
+   "guide": {
+    "th": "เลือก Type of training ในเมนู Annual Eval ให้ตรงกับสิ่งที่กำลังประเมิน",
+    "en": "Pick the Type of training in Annual Eval that matches what is being assessed",
+    "items": [
+     {
+      "n": "ประเมินครูภาคทฤษฎี (กราวน์)",
+      "by": "HT หรือ CTKI",
+      "w": "เลือก Ground training"
+     },
+     {
+      "n": "ประเมินครูสอนบิน",
+      "by": "HT หรือ CFI",
+      "w": "เลือก Flight training"
+     },
+     {
+      "n": "ประเมินความสามารถในการบิน",
+      "by": "HT, CFI หรือ FI",
+      "w": "เลือก Progressive / Standard check"
+     }
+    ]
    },
-   "with": [
-    "ช่างอากาศยาน",
-    "ฝ่ายปฏิบัติการ"
+   "blank": "blank/RTR.pdf",
+   "tpl": "1-LWJjU0uxXfVqmVP6Juihv4VTYiLTrTVKZdJmLngyuE",
+   "next": [
+    "PCR-FI",
+    "PCR-TKI"
    ],
-   "sys": "fbo",
-   "public": false,
-   "kw": [
-    "สมุดปกบิน",
-    "ปกบิน",
-    "journey log",
-    "technical log",
-    "บันทึกรายเที่ยวบิน",
-    "alr"
-   ],
-   "note": "สมุดที่ติดไปกับอากาศยาน บันทึกรายเที่ยวบิน นักบินลงนามทุกเที่ยว และผูกกับงานซ่อมบำรุง · กรอกใน AeroFBO ที่ flight-log-add.php · เที่ยวบินที่มีตารางแล้วกรอกได้จาก preflight-prep.php",
-   "blank": "blank/ALR.pdf"
-  },
-  {
-   "doc": "D-0507-AUR-001",
-   "code": "ME-AUR-301-A",
-   "abbr": "AUR",
-   "t": "Aircraft Utilisation Report",
-   "th": "รายงานการใช้อากาศยานและน้ำมันตามช่วงที่ระบุ",
-   "iss": "01",
-   "rev": "00",
-   "eff": "24 AUG 2026",
-   "own": "ME",
-   "lef": [
-    "OMM",
-    "TM"
-   ],
-   "jot": "221733809707460",
-   "st": "ok",
-   "chain": "maint",
-   "r": {
-    "mnt": "จัดทำรายงานการใช้อากาศยานและน้ำมันตามช่วงที่ขอ",
-    "mgt": "ตรวจและลงนามก่อนส่งออกนอกหน่วยงาน"
-   },
-   "with": [
-    "ช่างอากาศยาน",
-    "ฝ่ายปฏิบัติการ"
-   ],
-   "sys": "fbo",
-   "public": false,
-   "kw": [
-    "รายงานการใช้อากาศยาน",
-    "รายงานน้ำมัน",
-    "utilisation report",
-    "fuel report",
-    "aur"
-   ],
-   "note": "รายงานสรุปการใช้อากาศยานและน้ำมันตามวันหรือช่วงที่ระบุ — ไม่ใช่บันทึกรายวัน ออกเมื่อต้องรายงานหน่วยงานภายนอกหรือใช้อ้างอิงคำนวณค่าใช้จ่าย · ฝ่ายซ่อมบำรุงจัดทำ หัวหน้าช่างตรวจ · แยกจาก D-0507-ALR-001 เมื่อ 24 AUG 2026",
-   "blank": "blank/AUR.pdf",
-   "blankFrom": "gdoc",
-   "edit": "1wmJ-LFTZVyxhK44kufOuuz9_cZ--2mFgn6fcxJ_Yz_w"
-  },
-  {
-   "doc": "D-0507-APP-001",
-   "code": "AD-APP-302-C",
-   "abbr": "APP",
-   "t": "Application Form",
-   "th": "ใบสมัคร",
-   "iss": "01",
-   "rev": "01",
-   "eff": "24 AUG 2026",
-   "own": "AD",
-   "lef": [
-    "OMM",
-    "TM"
-   ],
-   "docx": "D-0507-APP-001.docx",
-   "st": "ok",
-   "chain": "admin",
-   "note": "กรอกจริงใน AeroFBO ที่ recruitment.php — ใบสมัครงาน ถามตำแหน่งที่สมัคร ประวัติการศึกษา และใบรับรองที่ถืออยู่ · ฉบับกระดาษปรับให้ตรงกับหน้าเว็บเมื่อ 24 AUG 2026",
-   "r": {
-    "stu": "สมัครเข้าเรียน เปลี่ยนหลักสูตร หรือขอ licence / rating",
-    "mgt": "พิจารณารับเข้าเรียนหรือรับเป็นครูการบิน"
-   },
-   "with": [],
-   "sys": "fbo",
-   "public": true,
-   "kw": [
-    "สมัคร",
-    "สมัครเรียน",
-    "เข้าเรียน",
-    "ใบสมัคร",
-    "โปรไฟล์",
-    "application",
-    "app"
-   ],
-   "sysOK": "ยืนยันแล้ว 01 AUG 2026",
-   "jotDup": "221220820577045",
-   "blank": "blank/APP.pdf",
-   "edit": "136d01uNGHI-w2naJfY9rsL0IAOVZ1z9qqmEHwcDroig"
-  },
-  {
-   "doc": "D-0507-APF-001",
-   "code": "AD/APF/301-A",
-   "abbr": "APF",
-   "t": "Appeal Form",
-   "th": "แบบอุทธรณ์",
-   "iss": "01",
-   "rev": "00",
-   "eff": "14 SEP 2022",
-   "own": "AD",
-   "lef": [
-    "OMM",
-    "TM"
-   ],
-   "jot": "243218287458465",
-   "docx": "D-0507-APF-001.docx",
-   "st": "ok",
-   "chain": "admin",
-   "note": "SLA: ยื่นภายใน 14 วัน · แจ้งผลภายใน 21 วัน · แก้ eff ตามหัวกระดาษใน .docx (ทะเบียนเดิมคลาดเคลื่อน)",
-   "r": {
-    "stu": "ยื่นอุทธรณ์คำวินิจฉัยของ ATO ภายใน 14 วัน",
-    "mgt": "พิจารณาอุทธรณ์โดยคณะกรรมการอิสระจากผู้ตัดสินเดิม"
-   },
-   "with": [
-    "คณะกรรมการอุทธรณ์",
-    "ACM"
-   ],
-   "sys": "here",
-   "public": true,
-   "assignTo": "ACM",
-   "kw": [
-    "อุทธรณ์",
-    "ไม่เป็นธรรม",
-    "ร้องเรียน",
-    "appeal",
-    "apf"
-   ],
-   "blank": "blank/APF.pdf",
-   "tpl": "1rn_faqzQtkjsCqy9EpfGiustEfcuBnF9umGHybcvWRA"
-  },
-  {
-   "doc": "D-0507-DAF-001",
-   "code": "AD-DAF-301-A",
-   "abbr": "DAF",
-   "t": "Disciplinary Action Form",
-   "th": "แบบบันทึกการดำเนินการทางวินัย",
-   "iss": "01",
-   "rev": "00",
-   "eff": "14 SEP 2022",
-   "own": "AD",
-   "lef": [
-    "OMM",
-    "TM"
-   ],
-   "jot": "213368613135049",
-   "docx": "D-0507-DAF-001.docx",
-   "st": "ok",
-   "chain": "admin",
-   "note": "LEF ชี้ไปฟอร์ม Safety Report · เอกสารลับ จำกัดสิทธิ์เข้าถึง · แก้ eff ตามหัวกระดาษใน .docx (ทะเบียนเดิมคลาดเคลื่อน)",
-   "r": {
-    "mgt": "บันทึกการดำเนินการทางวินัย (จำกัดสิทธิ์เข้าถึง)"
-   },
-   "with": [
-    "HR",
-    "ACM"
-   ],
-   "sys": "here",
-   "public": false,
-   "kw": [
-    "วินัย",
-    "ลงโทษ",
-    "disciplinary",
-    "daf"
-   ],
-   "blank": "blank/DAF.pdf",
-   "tpl": "1ZneD6k6y7mU692SVZsYpKJuCKTYqE_HkJHhQfcbl6UU"
-  },
-  {
-   "doc": "D-0507-MRF-001",
-   "code": "",
-   "abbr": "MRF",
-   "t": "Monthly Reimbursement Form",
-   "th": "แบบเบิกค่าใช้จ่ายรายเดือน",
-   "iss": "01",
-   "rev": "00",
-   "eff": "",
-   "own": "AD",
-   "lef": [],
-   "jot": "210050755822448",
-   "docx": "D-0507-MRF-001.docx",
-   "st": "ok",
-   "chain": "admin",
-   "r": {
-    "ins": "ยื่นเบิกค่าใช้จ่ายและ timesheet รายเดือน",
-    "mgt": "อนุมัติการเบิกจ่ายรายเดือนของพนักงาน"
-   },
-   "with": [
-    "หัวหน้างาน",
-    "Finance",
-    "ACM"
-   ],
-   "sys": "here",
-   "public": false,
-   "kw": [
-    "เบิก",
-    "เบิกเงิน",
-    "ค่าใช้จ่าย",
-    "รายเดือน",
-    "reimbursement",
-    "mrf"
-   ],
-   "blank": "blank/MRF.pdf"
-  },
-  {
-   "doc": "D-0507-DRF-001",
-   "code": "QA-DRF-301-A",
-   "abbr": "DRF",
-   "t": "Document Revision Form",
-   "th": "แบบขอแก้ไขเอกสารควบคุม",
-   "iss": "01",
-   "rev": "00",
-   "eff": "20 AUG 2020",
-   "own": "QA",
-   "lef": [
-    "OMM",
-    "TM"
-   ],
-   "jot": "193573500355053",
-   "docx": "D-0507-DRF-001.docx",
-   "st": "ok",
-   "chain": "doccontrol",
-   "r": {
-    "ops": "ยื่นคำขอแก้ไขเอกสารควบคุม",
-    "mgt": "อนุมัติการแก้ไขเอกสารควบคุมและออก revision"
-   },
-   "with": [
-    "@reviewer",
-    "@legal",
-    "CMM",
-    "ACM"
-   ],
-   "sys": "here",
-   "public": false,
-   "kw": [
-    "แก้คู่มือ",
-    "แก้ไขเอกสาร",
-    "ขอแก้",
-    "revision",
-    "คู่มือ",
-    "เอกสาร",
-    "drf"
-   ],
-   "blank": "blank/DRF.pdf",
-   "tpl": "1LRibEDPwiMmQAjeQmkP3gvgkhsyP5GVbTgZDCJcXA2o"
-  },
-  {
-   "doc": "D-0507-DRC-001",
-   "code": "QA-DRF-302-A",
-   "abbr": "DRC",
-   "t": "Document Receipt",
-   "th": "ใบรับเอกสารควบคุม",
-   "iss": "01",
-   "rev": "00",
-   "eff": "20 AUG 2020",
-   "own": "QA",
-   "lef": [
-    "OMM",
-    "TM"
-   ],
-   "jot": "221830582177053",
-   "docx": "D-0507-DRC-001.docx",
-   "st": "ok",
-   "chain": "doccontrol",
-   "note": "ผู้แจกจ่ายเตรียมรายการเอกสารแล้วสร้างลิงก์จากหน้า \"สร้างลิงก์ใบรับเอกสาร\" เอาลิงก์ไปวางในประกาศของ AeroFBO › Bulletin · ผู้รับกดลิงก์แล้วยืนยันและลงนามได้เลย ไม่ต้องล็อกอิน ส่วนของการแจกจ่ายล็อกไว้แก้ไม่ได้",
-   "r": {
-    "ops": "ลงนามรับเอกสารควบคุมและคืนฉบับที่ถูกแทน",
-    "mgt": "ติดตามให้ Distribution List ลงนามรับครบ"
-   },
-   "with": [
-    "ผู้แจกจ่าย",
-    "ผู้รับ"
-   ],
-   "sys": "here",
-   "public": true,
-   "kw": [
-    "รับเอกสาร",
-    "ลงนามรับ",
-    "receipt",
-    "drc"
-   ],
-   "blank": "blank/DRC.pdf",
-   "tpl": "1cP4Kpet0XYWVGhInoi3Ac5LEw53wsO4nJtrWSfNf4Ko",
-   "admin": {
-    "url": "admin/drc/",
-    "n": {
-     "th": "เตรียมลิงก์แจกจ่าย",
-     "en": "Prepare distribution link"
-    }
+   "flow": {
+    "th": "อบรมทบทวน / แก้ไขมาตรฐาน (D.2.7, D.2.8) — เสร็จแล้วตรวจซ้ำเสมอ",
+    "en": "Refresher or corrective training — always followed by a re-check"
    }
   },
   {
-   "doc": "D-0507-NCHR-001",
-   "code": "QA-NCHR-301-A",
-   "abbr": "NCHR",
-   "t": "Non-Conformance / Corrective Action Record",
-   "th": "บันทึกข้อไม่สอดคล้องและการแก้ไข",
+   "doc": "D-0507-SAC-001",
+   "code": "",
+   "abbr": "SAC",
+   "kind": "ref",
+   "t": "School Safety Audit Checklist (SMS)",
+   "th": "รายการตรวจนิรภัยภาพรวมของโรงเรียน",
    "iss": "01",
    "rev": "00",
-   "eff": "07 JUL 2022",
-   "own": "QA",
-   "lef": [
-    "OMM",
-    "TM"
-   ],
-   "jot": "210655063681050",
-   "docx": "D-0507-NCHR-001.docx",
+   "eff": "24 JUL 2026",
+   "own": "SM",
+   "lef": [],
+   "jot": "250488767178474",
+   "docx": "D-0507-SAC-001.docx",
+   "app": "audit",
    "st": "ok",
    "chain": "audit",
-   "note": "ย้ายไปสร้างในระบบตรวจสอบภายใน",
+   "note": "26 รายการ 2 มิติ Doc / Impl",
    "r": {
-    "mgt": "บันทึกและติดตามข้อไม่สอดคล้องจากการตรวจ"
+    "mgt": "ตรวจนิรภัยภาพรวมของโรงเรียนตามแผน"
    },
    "with": [
+    "Safety Manager",
     "CMM"
    ],
    "sys": "audit",
    "public": false,
-   "kw": [
-    "ข้อไม่สอดคล้อง",
-    "non-conformance",
-    "nchr"
+   "blank": "blank/SAC.pdf"
+  },
+  {
+   "doc": "D-0507-SDF-001",
+   "code": "AD-SDF-301-A",
+   "abbr": "SDF",
+   "t": "Self Declaration Form",
+   "th": "แบบแจ้งข้อมูลด้วยตนเอง",
+   "iss": "01",
+   "rev": "01",
+   "eff": "22 JUN 2026",
+   "own": "AD",
+   "lef": [
+    "OMA",
+    "TM"
    ],
-   "blank": "blank/NCHR.pdf"
+   "jot": "210394186308456",
+   "docx": "D-0507-SDF-001.docx",
+   "st": "ok",
+   "chain": "preflight",
+   "r": {
+    "stu": "แจ้งเมื่อหยุดบินเกิน 2 สัปดาห์ หรือมีการบินอื่นนอกหลักสูตร",
+    "ins": "แจ้งเมื่อหยุดปฏิบัติหน้าที่เกิน 2 สัปดาห์ หรือมีหน้าที่บินอื่น"
+   },
+   "with": [],
+   "sys": "here",
+   "public": true,
+   "kw": [
+    "แจ้ง",
+    "หยุด",
+    "หยุดบิน",
+    "ไม่ได้บิน",
+    "บินที่อื่น",
+    "ประกาศตน",
+    "declaration",
+    "sdf"
+   ],
+   "assignTo": "HT",
+   "blank": "blank/SDF.pdf",
+   "tpl": "1FqiALWv4ZrDYWbWHVLCVE4_XOuUQei1ovP1Kk9Jekic"
+  },
+  {
+   "doc": "D-0507-SEF-001",
+   "code": "IM-SEF-301-A",
+   "abbr": "SEF",
+   "t": "Student Evaluation Form",
+   "th": "แบบประเมินครูผู้สอนโดยนักเรียน",
+   "iss": "01",
+   "rev": "00",
+   "eff": "20 AUG 2020",
+   "own": "IM",
+   "lef": [
+    "OMA",
+    "TM"
+   ],
+   "jot": "210063447392452",
+   "docx": "D-0507-SEF-001.docx",
+   "st": "ok",
+   "chain": "training",
+   "r": {
+    "stu": "ประเมินครูผู้สอนเมื่อจบแต่ละ Stage (ไม่เปิดเผยชื่อ) — ทำในระบบบันทึกการฝึก"
+   },
+   "with": [],
+   "sys": "training",
+   "public": true,
+   "kw": [
+    "ประเมินครู",
+    "ครูผู้สอน",
+    "ให้คะแนนครู",
+    "ความเห็น",
+    "feedback",
+    "sef"
+   ],
+   "note": "แบบประเมินครูผู้สอนทำผ่านระบบบันทึกการฝึก (d0507.361vision.org) ส่งตรงถึงศิษย์การบิน ไม่ต้องกรอกในระบบฟอร์มนี้ — ที่นี่เก็บไว้เพื่อควบคุมเอกสารเท่านั้น (เลขที่เอกสาร Issue/Rev วันมีผล LEF)",
+   "blank": "blank/SEF.pdf",
+   "guide": {
+    "th": "SEF ให้นักเรียนประเมินครูผู้สอน 3 ส่วน ทำในระบบบันทึกการฝึก ส่งตรงถึงศิษย์การบิน (ไม่เปิดเผยชื่อ)",
+    "en": "SEF has the student evaluate the instructor in three parts, sent directly to trainees in the training records system (anonymous)",
+    "items": [
+     {
+      "n": "Part A — Self-Study Content",
+      "w": "ประเมินเนื้อหาที่ศึกษาด้วยตนเอง"
+     },
+     {
+      "n": "Part B — Ground Training",
+      "w": "ประเมินการสอนภาคพื้น"
+     },
+     {
+      "n": "Part C — Flight Training",
+      "w": "ประเมินการสอนภาคอากาศ"
+     }
+    ]
+   },
+   "tpl": "1gBdSF2vQAMNwRNMYpe1XlAXc3vwR_51pfU8VkZsC6eE"
+  },
+  {
+   "doc": "D-0507-SSC-001",
+   "code": "",
+   "abbr": "SSC",
+   "kind": "ref",
+   "t": "Safety Surveillance Checklist (Spot Check)",
+   "th": "รายการเฝ้าสังเกตการณ์กิจกรรม",
+   "iss": "01",
+   "rev": "00",
+   "eff": "24 JUL 2026",
+   "own": "SM",
+   "lef": [],
+   "jot": "",
+   "docx": "D-0507-SSC-001.docx",
+   "app": "audit",
+   "st": "ok",
+   "chain": "audit",
+   "note": "29 รายการ · อ้างอิง FSOP 2024 · MMSOP 2024",
+   "r": {
+    "mgt": "เฝ้าสังเกตการณ์กิจกรรมแบบ spot check"
+   },
+   "with": [
+    "Safety Manager"
+   ],
+   "sys": "audit",
+   "public": false,
+   "blank": "blank/SSC.pdf"
+  },
+  {
+   "doc": "D-0507-STR-001",
+   "code": "IM-STR-301-B",
+   "abbr": "STR",
+   "t": "Standardisation Training Record",
+   "th": "บันทึกการอบรมมาตรฐานครูการบิน",
+   "iss": "01",
+   "rev": "01",
+   "eff": "21 AUG 2026",
+   "own": "IM",
+   "lef": [
+    "OMA"
+   ],
+   "jot": "261578705156060",
+   "docx": "D-0507-STR-001.docx",
+   "st": "ok",
+   "chain": "standardisation",
+   "note": "ฉบับแก้ไข 01 — เปลี่ยนจากใบบันทึกการอบรมเป็นใบรับรองที่ออกต่อจากใบอื่น ไม่ประเมินซ้ำ อ้างอิงผลจาก Annual Evaluation / EFC / PCR ตามที่ OMA D.2.8 ระบุว่าใช้เกณฑ์เดียวกับ D.2.9 · เพิ่มขอบเขตที่ปล่อยให้ปฏิบัติหน้าที่และข้อจำกัด · ใช้กับครูเท่านั้น (FI/TKI/FIE) · ต้นฉบับก่อนแก้อยู่ที่ D-0507-STR-001-rev00-archive.docx",
+   "r": {
+    "ins": "บันทึกการอบรมมาตรฐานครูการบิน (OMA D.2.8.2)",
+    "mgt": "จัดและรับรองการอบรมมาตรฐาน"
+   },
+   "with": [
+    "HT"
+   ],
+   "sys": "here",
+   "public": false,
+   "kw": [
+    "อบรมมาตรฐาน",
+    "มาตรฐานครู",
+    "standardisation",
+    "str"
+   ],
+   "blank": "blank/STR.pdf",
+   "tpl": "11jFuwJ8jbkJz4XnUCtBi_CLomYvVISiOexH8Il2U-dM",
+   "next": [
+    "PCR-FI",
+    "PCR-TKI"
+   ],
+   "flow": {
+    "th": "อบรมมาตรฐานครู (D.2.8) — เสร็จแล้วต้องตรวจสมรรถนะครั้งแรกก่อนปฏิบัติหน้าที่",
+    "en": "Standardisation training — initial proficiency check follows"
+   }
+  },
+  {
+   "doc": "D-0507-VAC-001",
+   "code": "",
+   "abbr": "VAC",
+   "kind": "ref",
+   "t": "Vendor / Contracted Services Audit Checklist",
+   "th": "รายการตรวจผู้ให้บริการภายนอก",
+   "iss": "01",
+   "rev": "00",
+   "eff": "24 JUL 2026",
+   "own": "QA",
+   "lef": [],
+   "jot": "250133574068455",
+   "docx": "D-0507-VAC-001.docx",
+   "app": "audit",
+   "st": "ok",
+   "chain": "audit",
+   "note": "อ้างอิง ORA.GEN.205 · 25 รายการ",
+   "r": {
+    "mgt": "ตรวจผู้ให้บริการภายนอกตามแผน"
+   },
+   "with": [
+    "Auditor",
+    "CMM"
+   ],
+   "sys": "audit",
+   "public": false,
+   "blank": "blank/VAC.pdf"
   },
   {
    "doc": "D-0507-VSR-001",
@@ -1621,307 +1978,6 @@
    "assignTo": "SM",
    "blank": "blank/VSR.pdf",
    "tpl": "1qTfU4JTCxvMJbrA8lKDedngn8MqdthT5zuTkr_Ma2Wo"
-  },
-  {
-   "doc": "D-0507-HIF-001",
-   "code": "SM-HIF-301-A",
-   "abbr": "HIF",
-   "t": "Hazard Identification Form",
-   "th": "แบบชี้บ่งอันตราย",
-   "iss": "01",
-   "rev": "00",
-   "eff": "24 AUG 2021",
-   "own": "SM",
-   "lef": [
-    "OMM",
-    "TM"
-   ],
-   "jot": "210431245943449",
-   "docx": "D-0507-HIF-001.docx",
-   "st": "ok",
-   "chain": "safety",
-   "note": "LEF ชี้ไปฟอร์ม Disciplinary Action Form",
-   "r": {
-    "ins": "แจ้งอันตรายที่พบและเสนอมาตรการลดความเสี่ยง",
-    "mnt": "แจ้งอันตรายที่พบในพื้นที่ซ่อมบำรุง",
-    "ops": "แจ้งอันตรายที่พบในพื้นที่ปฏิบัติการ"
-   },
-   "with": [
-    "Safety Manager"
-   ],
-   "sys": "here",
-   "public": false,
-   "kw": [
-    "อันตราย",
-    "ชี้บ่งอันตราย",
-    "hazard",
-    "hif",
-    "ความเสี่ยง"
-   ],
-   "assignTo": "SM",
-   "blank": "blank/HIF.pdf",
-   "tpl": "1jJLzzD-_v9rr1K8Fw6sqQsdH5JqRpCOj2o_EAvfpwF0"
-  },
-  {
-   "doc": "D-0507-MOC-001",
-   "code": "",
-   "abbr": "MOC",
-   "t": "Management of Change (MoC) Form",
-   "th": "แบบบริหารการเปลี่ยนแปลง",
-   "iss": "01",
-   "rev": "00",
-   "eff": "",
-   "own": "SM",
-   "lef": [],
-   "jot": "",
-   "docx": "D-0507-MOC-001.docx",
-   "st": "ok",
-   "chain": "safety",
-   "r": {
-    "mgt": "พิจารณาและอนุมัติการเปลี่ยนแปลงตามกระบวนการ SMS"
-   },
-   "with": [
-    "Safety Manager",
-    "HT",
-    "ACM"
-   ],
-   "sys": "here",
-   "public": false,
-   "kw": [
-    "เปลี่ยนแปลง",
-    "moc",
-    "change",
-    "บริหารการเปลี่ยนแปลง"
-   ],
-   "blank": "blank/MOC.pdf",
-   "tpl": "1lj9ie_H1-kct5Z4sA2L1L0RKTu2glwgxYa041OFpvZc"
-  },
-  {
-   "doc": "D-0507-CAR-001",
-   "code": "",
-   "abbr": "CAR",
-   "t": "Corrective Action Request",
-   "th": "คำขอให้ดำเนินการแก้ไขข้อบกพร่อง",
-   "iss": "01",
-   "rev": "00",
-   "eff": "23 JUL 2026",
-   "own": "QA",
-   "lef": [],
-   "jot": "",
-   "docx": "D-0507-CAR-001.docx",
-   "st": "ok",
-   "chain": "audit",
-   "app": "audit",
-   "note": "ย้ายไปสร้างในระบบตรวจสอบภายใน",
-   "r": {
-    "ins": "ตอบกลับ Part 3–5 (Root cause → Corrective → Preventive)",
-    "mnt": "ตอบกลับ Part 3–5 เมื่อเป็นผู้รับผิดชอบ",
-    "ops": "ตอบกลับ Part 3–5 เมื่อเป็นผู้รับผิดชอบ",
-    "mgt": "ตรวจรับหลักฐานและปิด CAR ในบทบาท CMM"
-   },
-   "with": [
-    "Auditor",
-    "ผู้รับผิดชอบ",
-    "CMM"
-   ],
-   "sys": "audit",
-   "public": false,
-   "kw": [
-    "แก้ไขข้อบกพร่อง",
-    "car",
-    "ตอบกลับ",
-    "corrective",
-    "ข้อบกพร่อง"
-   ],
-   "blank": "blank/CAR.pdf"
-  },
-  {
-   "doc": "D-0507-IAC-001",
-   "code": "",
-   "abbr": "IAC",
-   "t": "Internal Audit Checklist — GAP Analysis (TCAR-ORA)",
-   "th": "รายการตรวจติดตามภายใน",
-   "iss": "01",
-   "rev": "00",
-   "eff": "23 JUL 2026",
-   "own": "QA",
-   "lef": [],
-   "jot": "",
-   "docx": "",
-   "app": "audit",
-   "st": "ok",
-   "chain": "audit",
-   "note": "2,081 รายการ · ใช้งานที่ประตูงานตรวจสอบ · ควรอยู่หมวดเช็กลิสต์ แต่ยังไม่มี .docx ต้นฉบับให้ทำไฟล์เปิดอ่าน",
-   "r": {
-    "mgt": "ดำเนินการตรวจติดตามภายในตามแผนประจำปี"
-   },
-   "with": [
-    "Auditor",
-    "CMM"
-   ],
-   "sys": "audit",
-   "public": false
-  },
-  {
-   "doc": "D-0507-VAC-001",
-   "code": "",
-   "abbr": "VAC",
-   "kind": "ref",
-   "t": "Vendor / Contracted Services Audit Checklist",
-   "th": "รายการตรวจผู้ให้บริการภายนอก",
-   "iss": "01",
-   "rev": "00",
-   "eff": "24 JUL 2026",
-   "own": "QA",
-   "lef": [],
-   "jot": "250133574068455",
-   "docx": "D-0507-VAC-001.docx",
-   "app": "audit",
-   "st": "ok",
-   "chain": "audit",
-   "note": "อ้างอิง ORA.GEN.205 · 25 รายการ",
-   "r": {
-    "mgt": "ตรวจผู้ให้บริการภายนอกตามแผน"
-   },
-   "with": [
-    "Auditor",
-    "CMM"
-   ],
-   "sys": "audit",
-   "public": false,
-   "blank": "blank/VAC.pdf"
-  },
-  {
-   "doc": "D-0507-SAC-001",
-   "code": "",
-   "abbr": "SAC",
-   "kind": "ref",
-   "t": "School Safety Audit Checklist (SMS)",
-   "th": "รายการตรวจนิรภัยภาพรวมของโรงเรียน",
-   "iss": "01",
-   "rev": "00",
-   "eff": "24 JUL 2026",
-   "own": "SM",
-   "lef": [],
-   "jot": "250488767178474",
-   "docx": "D-0507-SAC-001.docx",
-   "app": "audit",
-   "st": "ok",
-   "chain": "audit",
-   "note": "26 รายการ 2 มิติ Doc / Impl",
-   "r": {
-    "mgt": "ตรวจนิรภัยภาพรวมของโรงเรียนตามแผน"
-   },
-   "with": [
-    "Safety Manager",
-    "CMM"
-   ],
-   "sys": "audit",
-   "public": false,
-   "blank": "blank/SAC.pdf"
-  },
-  {
-   "doc": "D-0507-SSC-001",
-   "code": "",
-   "abbr": "SSC",
-   "kind": "ref",
-   "t": "Safety Surveillance Checklist (Spot Check)",
-   "th": "รายการเฝ้าสังเกตการณ์กิจกรรม",
-   "iss": "01",
-   "rev": "00",
-   "eff": "24 JUL 2026",
-   "own": "SM",
-   "lef": [],
-   "jot": "",
-   "docx": "D-0507-SSC-001.docx",
-   "app": "audit",
-   "st": "ok",
-   "chain": "audit",
-   "note": "29 รายการ · อ้างอิง FSOP 2024 · MMSOP 2024",
-   "r": {
-    "mgt": "เฝ้าสังเกตการณ์กิจกรรมแบบ spot check"
-   },
-   "with": [
-    "Safety Manager"
-   ],
-   "sys": "audit",
-   "public": false,
-   "blank": "blank/SSC.pdf"
-  },
-  {
-   "doc": "D-0507-MER-001",
-   "code": "",
-   "abbr": "MER",
-   "t": "Management Evaluation Report",
-   "th": "รายงานผลการทบทวนของฝ่ายบริหาร",
-   "iss": "01",
-   "rev": "00",
-   "eff": "",
-   "own": "QA",
-   "lef": [],
-   "jot": "",
-   "docx": "D-0507-MER-001.docx",
-   "st": "ok",
-   "chain": "audit",
-   "app": "audit",
-   "note": "OMM 5.2.3 อ้างถึงแบบฟอร์มนี้ · ยังไม่มีวันมีผล รออนุมัติจาก Accountable Manager",
-   "r": {
-    "mgt": "บันทึกผลการประชุมทบทวนของฝ่ายบริหารตามรอบ"
-   },
-   "with": [
-    "Accountable Manager",
-    "CMM",
-    "หัวหน้าฝ่าย"
-   ],
-   "sys": "audit",
-   "public": false,
-   "kw": [
-    "ทบทวน",
-    "ฝ่ายบริหาร",
-    "ประชุม",
-    "mer",
-    "management review",
-    "evaluation"
-   ],
-   "blank": "blank/MER.pdf"
-  },
-  {
-   "doc": "D-0507-CAP-001",
-   "code": "",
-   "abbr": "CAP",
-   "t": "Corrective Action Plan",
-   "th": "แผนการดำเนินการแก้ไข",
-   "iss": "01",
-   "rev": "00",
-   "eff": "",
-   "own": "QA",
-   "lef": [],
-   "jot": "",
-   "docx": "D-0507-CAP-001.docx",
-   "st": "ok",
-   "chain": "audit",
-   "app": "audit",
-   "note": "OMM 5.2.3 / 5.4 · ใช้คู่กับ CAR และ MER · ยังไม่มีวันมีผล รออนุมัติจาก Accountable Manager",
-   "r": {
-    "ins": "จัดทำแผนแก้ไขเมื่อเป็นผู้รับผิดชอบ",
-    "mnt": "จัดทำแผนแก้ไขเมื่อเป็นผู้รับผิดชอบ",
-    "ops": "จัดทำแผนแก้ไขเมื่อเป็นผู้รับผิดชอบ",
-    "mgt": "ตรวจรับแผนและติดตามความคืบหน้าในบทบาท CMM"
-   },
-   "with": [
-    "ผู้รับผิดชอบ",
-    "CMM"
-   ],
-   "sys": "audit",
-   "public": false,
-   "kw": [
-    "แผนแก้ไข",
-    "แก้ไข",
-    "cap",
-    "corrective action plan",
-    "ป้องกันการเกิดซ้ำ"
-   ],
-   "blank": "blank/CAP.pdf"
   },
   {
    "doc": "",

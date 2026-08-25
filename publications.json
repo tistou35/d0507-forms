@@ -76,9 +76,9 @@
    "regs": []
   },
   {
-   "model": "C206H",
+   "model": "T206H",
    "regs": [],
-   "note": "OMA D.2.8 เรียกแบบนี้ว่า T206H (เทอร์โบ) — ต้องเลือกให้ตรงกันก่อนออกฉบับจริง"
+   "note": "เทอร์โบ TIO-540 — คนละเครื่องกับ 206H ธรรมดา เช็กลิสต์ที่ใช้ถอดจาก Cessna Pilot's Checklist T206H Rev 4"
   }
  ],
  "_fleetNote": "ยังไม่ได้ผูกทะเบียนกับแบบเครื่อง — ระบบมี HS-VVD VVB CCM VST POP BTM แต่ยังไม่รู้ว่าลำไหนแบบไหน ใส่ใน regs แล้วหน้าเว็บจะจับคู่ให้เอง",
@@ -91,13 +91,13 @@
    "th": "เช็กลิสต์ปกติ C172M",
    "en": "Normal Checklist C172M",
    "ed": "01",
-   "rev": "00",
-   "eff": "2024-11-11",
+   "rev": "01",
+   "eff": "2026-08-25",
    "file": "blank/NPC-M.pdf",
    "by": "HT",
    "doc": "D-0507-NPC-M-001",
-   "code": "NP-CHK-303-A",
-   "note": "แยกจากฉบับรวมที่ครอบ C172 M/N/S เมื่อ 24 AUG 2026 — เนื้อหายังเหมือนกันทุกรุ่น แก้แยกกันได้แล้ว",
+   "code": "NP-CHK-303-B",
+   "note": "ตัดรายการปั๊มน้ำมันไฟฟ้าที่ C172M ไม่มีติดตั้ง · runup 1,700 RPM · เปลี่ยนชื่อหมวดเป็น RUNUP [Completed Before Takeoff] · ทุกค่าต้องทวนกับ POH ของเครื่องแต่ละลำก่อนอนุมัติ",
    "edit": "1UGmFHS6eoWXKHTH53e30hZhM2YEO1BSndnU-iZthW1Q"
   },
   {
@@ -108,13 +108,13 @@
    "th": "เช็กลิสต์ปกติ C172N",
    "en": "Normal Checklist C172N",
    "ed": "01",
-   "rev": "00",
-   "eff": "2024-11-11",
+   "rev": "01",
+   "eff": "2026-08-25",
    "file": "blank/NPC-N.pdf",
    "by": "HT",
    "doc": "D-0507-NPC-N-001",
-   "code": "NP-CHK-304-A",
-   "note": "แยกจากฉบับรวมที่ครอบ C172 M/N/S เมื่อ 24 AUG 2026 — เนื้อหายังเหมือนกันทุกรุ่น แก้แยกกันได้แล้ว",
+   "code": "NP-CHK-304-B",
+   "note": "ตัดรายการปั๊มน้ำมันไฟฟ้าที่ C172N ไม่มีติดตั้ง · runup 1,700 RPM · เปลี่ยนชื่อหมวดเป็น RUNUP [Completed Before Takeoff] · ทุกค่าต้องทวนกับ POH ของเครื่องแต่ละลำก่อนอนุมัติ",
    "edit": "1jkfLxaY-4xZfKUSpcRh0K6jFZYLkRSMnHpWOz9jKrmI"
   },
   {
@@ -125,13 +125,13 @@
    "th": "เช็กลิสต์ปกติ C172S",
    "en": "Normal Checklist C172S",
    "ed": "01",
-   "rev": "00",
-   "eff": "2024-11-11",
+   "rev": "01",
+   "eff": "2026-08-25",
    "file": "blank/NPC-S.pdf",
    "by": "HT",
    "doc": "D-0507-NPC-S-001",
-   "code": "NP-CHK-305-A",
-   "note": "แยกจากฉบับรวมที่ครอบ C172 M/N/S เมื่อ 24 AUG 2026 — เนื้อหายังเหมือนกันทุกรุ่น แก้แยกกันได้แล้ว",
+   "code": "NP-CHK-305-B",
+   "note": "ตัด carb heat และ primer ที่เครื่องหัวฉีดไม่มี · mag drop 150 RPM · แฟลป 30° · เปลี่ยนชื่อหมวดเป็น RUNUP [Completed Before Takeoff] · ทุกค่าต้องทวนกับ POH ของเครื่องแต่ละลำก่อนอนุมัติ",
    "edit": "1Iet-verf2FrprTgwBwPx87Hd80MvrWKxREn3Co9IzJU"
   },
   {
@@ -148,17 +148,21 @@
    "by": "HT"
   },
   {
-   "id": "CL-NORM-C206H",
+   "id": "CL-NORM-T206H",
    "cat": "normal",
-   "model": "C206H",
+   "model": "T206H",
    "src": "inhouse",
-   "th": "เช็กลิสต์ปกติ C206H",
-   "en": "Normal Checklist C206H",
-   "ed": "",
-   "rev": "",
-   "eff": "",
-   "file": "",
-   "by": "HT"
+   "th": "เช็กลิสต์ปกติ T206H",
+   "en": "Normal Checklist T206H",
+   "ed": "01",
+   "rev": "00",
+   "eff": "2026-08-25",
+   "file": "blank/NPC-T206H.pdf",
+   "by": "HT",
+   "doc": "D-0507-NPC-T206H-001",
+   "code": "NP-CHK-306-A",
+   "note": "ฉบับร่าง — ถอดจาก Cessna Pilot's Checklist T206H (Rev 4 · 13 May 2002) ภาพถ่ายต้นฉบับถูกตัดท้ายหน้า ยังขาดรายการที่ทำแถบแดงไว้ในตัวเอกสาร ต้องเติมจาก POH และให้หัวหน้าครูการบินรับรองก่อนใช้บิน",
+   "edit": "1JoaOojLYXNfB8nXvY9U8r6sPLVJEKZP1-76kaHgPjpU"
   },
   {
    "id": "CL-EMER-C172M",
@@ -168,13 +172,13 @@
    "th": "เช็กลิสต์ฉุกเฉิน C172M",
    "en": "Emergency Checklist C172M",
    "ed": "01",
-   "rev": "00",
-   "eff": "2024-11-11",
+   "rev": "01",
+   "eff": "2026-08-25",
    "file": "blank/EPC-M.pdf",
    "by": "HT",
    "doc": "D-0507-EPC-M-001",
-   "code": "EP-CHK-303-A",
-   "note": "แยกจากฉบับรวมที่ครอบ C172 M/N/S เมื่อ 24 AUG 2026 — เนื้อหายังเหมือนกันทุกรุ่น แก้แยกกันได้แล้ว",
+   "code": "EP-CHK-303-B",
+   "note": "ตัดรายการปั๊มน้ำมันไฟฟ้าที่ C172M ไม่มีติดตั้ง · ทุกค่าต้องทวนกับ POH ของเครื่องแต่ละลำก่อนอนุมัติ",
    "edit": "175T-SN9nKxPmoqDQ9EIzDe0_cJufrp4ZVq5Vty6GsUE"
   },
   {
@@ -185,13 +189,13 @@
    "th": "เช็กลิสต์ฉุกเฉิน C172N",
    "en": "Emergency Checklist C172N",
    "ed": "01",
-   "rev": "00",
-   "eff": "2024-11-11",
+   "rev": "01",
+   "eff": "2026-08-25",
    "file": "blank/EPC-N.pdf",
    "by": "HT",
    "doc": "D-0507-EPC-N-001",
-   "code": "EP-CHK-304-A",
-   "note": "แยกจากฉบับรวมที่ครอบ C172 M/N/S เมื่อ 24 AUG 2026 — เนื้อหายังเหมือนกันทุกรุ่น แก้แยกกันได้แล้ว",
+   "code": "EP-CHK-304-B",
+   "note": "ตัดรายการปั๊มน้ำมันไฟฟ้าที่ C172N ไม่มีติดตั้ง · ทุกค่าต้องทวนกับ POH ของเครื่องแต่ละลำก่อนอนุมัติ",
    "edit": "1LdZCvqdULFMUjymNHOzD1GaPD8I1Dok3yuMqTwJFu4k"
   },
   {
@@ -202,13 +206,13 @@
    "th": "เช็กลิสต์ฉุกเฉิน C172S",
    "en": "Emergency Checklist C172S",
    "ed": "01",
-   "rev": "00",
-   "eff": "2024-11-11",
+   "rev": "01",
+   "eff": "2026-08-25",
    "file": "blank/EPC-S.pdf",
    "by": "HT",
    "doc": "D-0507-EPC-S-001",
-   "code": "EP-CHK-305-A",
-   "note": "แยกจากฉบับรวมที่ครอบ C172 M/N/S เมื่อ 24 AUG 2026 — เนื้อหายังเหมือนกันทุกรุ่น แก้แยกกันได้แล้ว",
+   "code": "EP-CHK-305-B",
+   "note": "ตัด carb heat และ primer ที่เครื่องหัวฉีดไม่มี · best glide 68 KIAS · ทุกค่าต้องทวนกับ POH ของเครื่องแต่ละลำก่อนอนุมัติ",
    "edit": "1lavso8k7P4LsiJt0uMxJmngMOjN7yMKn70O5hyrfeLE"
   },
   {
@@ -225,17 +229,21 @@
    "by": "HT"
   },
   {
-   "id": "CL-EMER-C206H",
+   "id": "CL-EMER-T206H",
    "cat": "emerg",
-   "model": "C206H",
+   "model": "T206H",
    "src": "inhouse",
-   "th": "เช็กลิสต์ฉุกเฉิน C206H",
-   "en": "Emergency Checklist C206H",
-   "ed": "",
-   "rev": "",
-   "eff": "",
-   "file": "",
-   "by": "HT"
+   "th": "เช็กลิสต์ฉุกเฉิน T206H",
+   "en": "Emergency Checklist T206H",
+   "ed": "01",
+   "rev": "00",
+   "eff": "2026-08-25",
+   "file": "blank/EPC-T206H.pdf",
+   "by": "HT",
+   "doc": "D-0507-EPC-T206H-001",
+   "code": "EP-CHK-306-A",
+   "note": "ฉบับร่าง — ถอดจาก Cessna Pilot's Checklist T206H (Rev 4 · 13 May 2002) ภาพถ่ายต้นฉบับถูกตัดท้ายหน้า ยังขาดรายการที่ทำแถบแดงไว้ในตัวเอกสาร ต้องเติมจาก POH และให้หัวหน้าครูการบินรับรองก่อนใช้บิน",
+   "edit": "1Q_lj8731p3ScIIEqRmuFYfuUruJfpKEspU0rEiRX7fw"
   },
   {
    "id": "CL-BRIEF",
@@ -429,7 +437,8 @@
    "rev": "00",
    "eff": "",
    "file": "blank/PCK.pdf",
-   "by": "QA"
+   "by": "QA",
+   "edit": "1IXGvvxpApxJSwWI-bp5QUI2zW_jDm8L9SLHvgOCn6MY"
   },
   {
    "id": "CL-VAC",
@@ -443,7 +452,8 @@
    "rev": "00",
    "eff": "",
    "file": "blank/VAC.pdf",
-   "by": "QA"
+   "by": "QA",
+   "edit": "1SJ7taMEE_b7OP-hRjOeTSsi-gAZAeGAoWwrleZCYHhE"
   },
   {
    "id": "CL-SAC",
@@ -457,7 +467,8 @@
    "rev": "00",
    "eff": "",
    "file": "blank/SAC.pdf",
-   "by": "QA"
+   "by": "QA",
+   "edit": "1VfqJGjMSqG-lPMCMwhl4wpJwCUoskAmDQfxt8Ht9Ums"
   },
   {
    "id": "CL-SSC",
@@ -471,7 +482,8 @@
    "rev": "00",
    "eff": "",
    "file": "blank/SSC.pdf",
-   "by": "QA"
+   "by": "QA",
+   "edit": "1cAQdDH5JfXpWqwxhwE4h7fnux9i6r4slJOzZyXAyljE"
   }
  ],
  "tabs": [
