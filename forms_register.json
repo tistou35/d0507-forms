@@ -89,6 +89,29 @@
  },
  "forms": [
   {
+   "doc": "",
+   "code": "",
+   "abbr": "ACI",
+   "t": "Aircraft Inspection Checklist < 5,700 kg",
+   "th": "รายการตรวจอากาศยานน้ำหนักน้อยกว่า 5,700 กก.",
+   "iss": "",
+   "rev": "",
+   "eff": "",
+   "own": "ME",
+   "lef": [],
+   "jot": "250272192919056",
+   "docx": "",
+   "st": "shadow",
+   "chain": "maint",
+   "r": {
+    "mnt": "ตรวจอากาศยานตามรายการ"
+   },
+   "with": [],
+   "sys": "here",
+   "public": false,
+   "note": "ควรอยู่หมวดเช็กลิสต์ แต่ยังไม่มี .docx ต้นฉบับให้ทำไฟล์เปิดอ่าน"
+  },
+  {
    "doc": "D-0507-AFM-001",
    "code": "OP-AFM-301-B",
    "abbr": "AFM",
@@ -286,6 +309,29 @@
    "assignTo": "FI",
    "blank": "blank/ASF.pdf",
    "tpl": "1uY8DJHLfvBJeTS1FLwa1Dr6gBwJu8L86m_cjjQ-xGAM"
+  },
+  {
+   "doc": "",
+   "code": "",
+   "abbr": "ATJ",
+   "t": "Aircraft Technical and Journey Log",
+   "th": "สมุดปูมเทคนิคและการเดินทางของอากาศยาน",
+   "iss": "",
+   "rev": "",
+   "eff": "",
+   "own": "ME",
+   "lef": [],
+   "jot": "240054562363047",
+   "docx": "",
+   "st": "shadow",
+   "chain": "maint",
+   "r": {
+    "mnt": "บันทึกสมุดปูมเทคนิค",
+    "ops": "บันทึกการเดินทางของอากาศยาน"
+   },
+   "with": [],
+   "sys": "here",
+   "public": false
   },
   {
    "doc": "D-0507-AUR-001",
@@ -561,6 +607,30 @@
    ],
    "blank": "blank/DRF.pdf",
    "tpl": "1LRibEDPwiMmQAjeQmkP3gvgkhsyP5GVbTgZDCJcXA2o"
+  },
+  {
+   "doc": "",
+   "code": "",
+   "abbr": "DVL",
+   "t": "Document Verification Log",
+   "th": "บันทึกการทวนสอบเอกสาร",
+   "iss": "",
+   "rev": "",
+   "eff": "",
+   "own": "QA",
+   "lef": [],
+   "jot": "250422504322442",
+   "docx": "",
+   "st": "shadow",
+   "chain": "doccontrol",
+   "r": {
+    "ops": "บันทึกการทวนสอบเอกสาร",
+    "mgt": "ทวนสอบความครบถ้วนของเอกสารควบคุม"
+   },
+   "with": [],
+   "sys": "here",
+   "public": false,
+   "note": "ใช้บันทึกการได้มาซึ่งเอกสาร สิ่งพิมพ์ หรือหนังสือใหม่ที่จะนำมาใช้ในสถาบัน"
   },
   {
    "doc": "D-0507-ECA-001",
@@ -1012,6 +1082,37 @@
    "blank": "blank/FTR.pdf",
    "tpl": "1iDeTikRktXxm59E8_U_1zfpxVcO5OgAS1sxcbgO3ZaY",
    "blankFrom": "tpl"
+  },
+  {
+   "doc": "D-0507-GDC-001",
+   "code": "OP-GDC-302-A",
+   "abbr": "GDC",
+   "t": "General Declaration",
+   "th": "ใบแจ้งทั่วไป (General Declaration)",
+   "iss": "01",
+   "rev": "00",
+   "eff": "25 AUG 2026",
+   "own": "OP",
+   "lef": [],
+   "docx": null,
+   "st": "notinlef",
+   "chain": "ops",
+   "r": {
+    "ops": "ออกใบแจ้งทั่วไปสำหรับเที่ยวบินที่ต้องยื่นต่อเจ้าหน้าที่ตาม ICAO Annex 9"
+   },
+   "with": [],
+   "sys": "dispatch",
+   "public": false,
+   "kw": [
+    "general declaration",
+    "gendec",
+    "ใบแจ้งทั่วไป",
+    "แจ้งทั่วไป",
+    "annex 9",
+    "ลูกเรือ"
+   ],
+   "note": "กรอกจริงในระบบ Dispatch (แท็บ GENDEC) · ฟอร์มเปล่าที่นี่ออกจากตัวสร้างเดียวกับใบจริง จึงหน้าตาตรงกันทุกช่อง · ชุดเปล่าทั้งหมดกดพิมพ์ได้ที่ d0507.361vision.org/d0507-app/next/#forms · ยังไม่ได้ขึ้นบัญชีใน LEF ของ OMA — ต้องแก้คู่มือก่อนจึงจะเป็นเอกสารควบคุมเต็มตัว",
+   "blank": "blank/GDC.pdf"
   },
   {
    "doc": "D-0507-GSP-001",
@@ -1648,6 +1749,36 @@
    "tpl": "1QObAZ3_hOD_MkE7X1ejlshrCW9v0ymwjZXp9avQKB-I"
   },
   {
+   "doc": "D-0507-PXM-001",
+   "code": "OP-PXM-303-A",
+   "abbr": "PXM",
+   "t": "Passenger Manifest",
+   "th": "บัญชีผู้โดยสาร",
+   "iss": "01",
+   "rev": "00",
+   "eff": "25 AUG 2026",
+   "own": "OP",
+   "lef": [],
+   "docx": null,
+   "st": "notinlef",
+   "chain": "ops",
+   "r": {
+    "ops": "ทำบัญชีผู้โดยสารประจำเที่ยวบิน ใช้กับการประกันภัยและการควบคุมการขึ้นเครื่อง"
+   },
+   "with": [],
+   "sys": "dispatch",
+   "public": false,
+   "kw": [
+    "passenger manifest",
+    "manifest",
+    "บัญชีผู้โดยสาร",
+    "รายชื่อผู้โดยสาร",
+    "pax"
+   ],
+   "note": "กรอกจริงในระบบ Dispatch (แท็บ GENDEC ส่วนบัญชีผู้โดยสาร) · ฟอร์มเปล่าที่นี่ออกจากตัวสร้างเดียวกับใบจริง แนวนอน 18 บรรทัด · ชุดเปล่าทั้งหมดที่ d0507.361vision.org/d0507-app/next/#forms · ยังไม่ได้ขึ้นบัญชีใน LEF ของ OMA — ต้องแก้คู่มือก่อนจึงจะเป็นเอกสารควบคุมเต็มตัว",
+   "blank": "blank/PXM.pdf"
+  },
+  {
    "doc": "D-0507-RTR-001",
    "code": "IM-RTR-301-A",
    "abbr": "RTR",
@@ -1978,76 +2109,6 @@
    "assignTo": "SM",
    "blank": "blank/VSR.pdf",
    "tpl": "1qTfU4JTCxvMJbrA8lKDedngn8MqdthT5zuTkr_Ma2Wo"
-  },
-  {
-   "doc": "",
-   "code": "",
-   "abbr": "ACI",
-   "t": "Aircraft Inspection Checklist < 5,700 kg",
-   "th": "รายการตรวจอากาศยานน้ำหนักน้อยกว่า 5,700 กก.",
-   "iss": "",
-   "rev": "",
-   "eff": "",
-   "own": "ME",
-   "lef": [],
-   "jot": "250272192919056",
-   "docx": "",
-   "st": "shadow",
-   "chain": "maint",
-   "r": {
-    "mnt": "ตรวจอากาศยานตามรายการ"
-   },
-   "with": [],
-   "sys": "here",
-   "public": false,
-   "note": "ควรอยู่หมวดเช็กลิสต์ แต่ยังไม่มี .docx ต้นฉบับให้ทำไฟล์เปิดอ่าน"
-  },
-  {
-   "doc": "",
-   "code": "",
-   "abbr": "ATJ",
-   "t": "Aircraft Technical and Journey Log",
-   "th": "สมุดปูมเทคนิคและการเดินทางของอากาศยาน",
-   "iss": "",
-   "rev": "",
-   "eff": "",
-   "own": "ME",
-   "lef": [],
-   "jot": "240054562363047",
-   "docx": "",
-   "st": "shadow",
-   "chain": "maint",
-   "r": {
-    "mnt": "บันทึกสมุดปูมเทคนิค",
-    "ops": "บันทึกการเดินทางของอากาศยาน"
-   },
-   "with": [],
-   "sys": "here",
-   "public": false
-  },
-  {
-   "doc": "",
-   "code": "",
-   "abbr": "DVL",
-   "t": "Document Verification Log",
-   "th": "บันทึกการทวนสอบเอกสาร",
-   "iss": "",
-   "rev": "",
-   "eff": "",
-   "own": "QA",
-   "lef": [],
-   "jot": "250422504322442",
-   "docx": "",
-   "st": "shadow",
-   "chain": "doccontrol",
-   "r": {
-    "ops": "บันทึกการทวนสอบเอกสาร",
-    "mgt": "ทวนสอบความครบถ้วนของเอกสารควบคุม"
-   },
-   "with": [],
-   "sys": "here",
-   "public": false,
-   "note": "ใช้บันทึกการได้มาซึ่งเอกสาร สิ่งพิมพ์ หรือหนังสือใหม่ที่จะนำมาใช้ในสถาบัน"
   }
  ],
  "systems": {
