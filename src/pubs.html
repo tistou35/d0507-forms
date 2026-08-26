@@ -119,6 +119,7 @@ h2.psec .d{font-family:var(--font-sans);font-size:12.5px;color:var(--fg-2);font-
 .printhead{display:none}
 
 /* พิมพ์ = ได้สารบัญฉบับปัจจุบันครบทุกแท็บในใบเดียว ใช้เป็นเอกสารควบคุมได้ */
+.go.cl2{background:var(--navy-900);color:#fff;border-color:var(--navy-900)}
 @media print{
   .topbar,.rail,.botnav,footer,.noprint{display:none !important}
   .body{display:block}.main{padding:0;max-width:none}
@@ -256,11 +257,14 @@ async function loadMade(){
 function paintMade(){
   const host = document.getElementById('out');
   if (!host || document.getElementById('madewrap')) return;
+  if (!MADE.filter(c => !PUBS.some(p => p.cl === c.id)).length) return;
   const box = document.createElement('section');
   box.id = 'madewrap';
   box.innerHTML = '<h3 class="ph">เช็กลิสต์ที่สร้างในระบบ</h3>'
     + '<p class="pd">เปิดอ่านบนเครื่อง แตะช่องขวาเพื่อทำเครื่องหมาย หรือพิมพ์ไปใช้</p>'
-    + MADE.map(c => {
+    /* ใบที่มีแถวของตัวเองอยู่แล้วในหมวดข้างบน (ผูกด้วยช่อง cl) ไม่ต้องขึ้นซ้ำ
+       — คนอ่านจะนึกว่าเป็นคนละใบกัน */
+    + MADE.filter(c => !PUBS.some(p => p.cl === c.id)).map(c => {
         const secs = (c.items||[]).filter(i => i.sec).length;
         const items = (c.items||[]).filter(i => !i.sec).length;
         return `<div class="prow">
@@ -302,6 +306,8 @@ const T = k => A.L({
   open:{th:'เปิด',en:'Open'},
   nofile:{th:'ยังไม่มีไฟล์',en:'No file'},
   editSrc:{th:'แก้ต้นฉบับ',en:'Edit source'},
+  tick:{th:'กรอกในระบบ',en:'Fill in app'},
+  blank:{th:'ฟอร์มเปล่า',en:'Blank form'},
   eff:{th:'มีผล',en:'Eff'},
   until:{th:'ถึง',en:'until'},
   none:{th:'ยังไม่มีรายการในหมวดนี้ — เพิ่มได้ที่ publications.json',
@@ -413,8 +419,12 @@ function listHtml(tab){
         <div class="nm"><b>${A.esc(LL(p))}</b><span>${A.esc(p.id)}</span></div>
         <div class="ed">${ed}</div>
         <span class="badge b-${s.k}">${A.esc(A.L(s.t))}</span>
+        ${p.cl ? `<a class="go cl2" href="@@BASE@@cl/?id=${encodeURIComponent(p.cl)}"
+             title="เปิดเป็นเช็กลิสต์ที่กดติ๊กได้ในเครื่อง">${A.esc(T('tick'))} ☑</a>` : ''}
         ${u ? `<a class="go" href="${A.esc(u)}" target="_blank" rel="noopener">${A.esc(T('open'))} ↗</a>`
             : `<span class="go">${A.esc(T('nofile'))}</span>`}
+        ${p.file ? `<a class="go" href="@@BASE@@${A.esc(p.file)}" target="_blank" rel="noopener"
+             download="${A.esc((p.doc||p.id)+'.pdf')}">${A.esc(T('blank'))} ↓</a>` : ''}
         ${p.edit && A.isAdmin()
             ? `<a class="go ed3" href="https://docs.google.com/document/d/${A.esc(p.edit)}/edit"
                  target="_blank" rel="noopener" title="ต้นฉบับที่แก้ไขได้ — แก้แล้วต้องเลื่อนเลขกำกับและทำ PDF ใหม่"

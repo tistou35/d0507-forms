@@ -251,11 +251,14 @@
    "src": "inhouse",
    "th": "เช็กลิสต์การบรีฟก่อนและหลังบิน",
    "en": "Pre/Post-Flight Briefing Checklist",
-   "ed": "",
-   "rev": "",
+   "ed": "01",
+   "rev": "00",
    "eff": "",
-   "file": "",
-   "by": "HT"
+   "file": "blank/BCK.pdf",
+   "by": "HT",
+   "cl": "D-0507-BCK-001",
+   "doc": "D-0507-BCK-001",
+   "code": "IM-BCK-303-A"
   },
   {
    "id": "AD-VTBD",
@@ -438,7 +441,8 @@
    "eff": "",
    "file": "blank/PCK.pdf",
    "by": "QA",
-   "edit": "1IXGvvxpApxJSwWI-bp5QUI2zW_jDm8L9SLHvgOCn6MY"
+   "edit": "1IXGvvxpApxJSwWI-bp5QUI2zW_jDm8L9SLHvgOCn6MY",
+   "cl": "D-0507-PCK-001"
   },
   {
    "id": "CL-VAC",
