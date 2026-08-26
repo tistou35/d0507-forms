@@ -40,8 +40,12 @@
             <div class="fk-f"><label for="nEmail">อีเมล <span style="color:var(--red-500)">*</span></label>
               <input id="nEmail" type="email" autocomplete="off" placeholder="name@d0507.co.th"></div>
             <div class="fk-f"><label for="nPass">รหัสผ่านตั้งต้น <span style="color:var(--red-500)">*</span></label>
-              <p class="hint">อย่างน้อย 8 ตัวอักษร · บอกเจ้าตัวแล้วให้เปลี่ยนเอง</p>
-              <input id="nPass" type="text" autocomplete="off" placeholder="อย่างน้อย 8 ตัวอักษร"></div>
+              <p class="hint">ตัวอักษรและตัวเลขล้วน อย่างน้อย 6 ตัว · บอกเจ้าตัวแล้วให้เปลี่ยนเอง</p>
+              <div style="display:flex;gap:8px">
+                <input id="nPass" type="text" autocomplete="off" spellcheck="false"
+                  placeholder="เช่น K7m2Qp" style="flex:1;min-width:0">
+                <button type="button" class="fb" id="nGen" title="สุ่มรหัส 6 ตัว">สุ่ม</button>
+              </div></div>
             <div class="fk-f"><label for="nCert">ตำแหน่ง (ข้อความที่แสดง)</label>
               <p class="hint">แสดงในตัวเลือกผู้รับ — <b>ห้ามใส่อีเมลหรือเบอร์โทร</b></p>
               <input id="nCert" type="text" placeholder="เช่น FI · ครูการบิน"></div>
@@ -166,6 +170,16 @@ A.initAuth(@@FBCFG@@, boot);
 
 document.getElementById('nAdd').addEventListener('click', addStaff);
 
+/* สุ่มรหัสตั้งต้น 6 ตัว — ตัดตัวที่อ่านสับสนออก (0/O · 1/l/I)
+   รหัสนี้ถูกบอกกันด้วยปากหรือเขียนใส่กระดาษ ตัวที่อ่านผิดได้จะกลายเป็น
+   "เข้าไม่ได้" แล้วต้องตั้งใหม่ทั้งรอบ */
+document.getElementById('nGen').addEventListener('click', () => {
+  const AB = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+  const r = crypto.getRandomValues(new Uint32Array(6));
+  document.getElementById('nPass').value =
+    [...r].map(x => AB[x % AB.length]).join('');
+});
+
 function log(s, cls){
   const el = document.getElementById('out');
   if (el.textContent === '—') el.textContent = '';
@@ -186,7 +200,9 @@ async function addStaff(){
   const btn = document.getElementById('nAdd');
   for (const [k, n] of [['nName','ชื่อ'], ['nEmail','อีเมล'], ['nPass','รหัสผ่าน']])
     if (!v(k)) { msg('ยังไม่ได้กรอก' + n, 'bad'); document.getElementById(k).focus(); return; }
-  if (v('nPass').length < 8) { msg('รหัสผ่านต้องยาวอย่างน้อย 8 ตัวอักษร', 'bad'); return; }
+  if (!/^[A-Za-z0-9]{6,}$/.test(v('nPass'))) {
+    msg('รหัสผ่านตั้งต้นต้องเป็นตัวอักษรและตัวเลขล้วน อย่างน้อย 6 ตัว', 'bad');
+    document.getElementById('nPass').focus(); return; }
   if (!NROLES.size) { msg('เลือกบทบาทอย่างน้อยหนึ่งอย่าง — ไม่งั้นเข้ามาแล้วไม่เห็นฟอร์มอะไรเลย', 'bad'); return; }
 
   btn.disabled = true; msg('กำลังสร้างบัญชี…');

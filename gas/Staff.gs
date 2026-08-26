@@ -21,7 +21,11 @@
 function createStaff_(email, password) {
   email = String(email || '').trim().toLowerCase();
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) throw new Error('อีเมลไม่ถูกต้อง');
-  if (String(password || '').length < 8) throw new Error('รหัสผ่านต้องยาวอย่างน้อย 8 ตัวอักษร');
+  /* 6 ตัวอักษรคือขั้นต่ำที่ Firebase ยอมรับ และเป็นรหัสตั้งต้นที่ต้องบอกกันด้วยปาก
+     หรือพิมพ์ใส่กระดาษส่งให้ จึงจำกัดเป็นตัวอักษรกับตัวเลขล้วน — เครื่องหมาย
+     พิเศษทำให้อ่านผิดและพิมพ์ผิดตอนส่งต่อ เจ้าตัวเปลี่ยนเป็นอะไรก็ได้ทีหลัง */
+  if (!/^[A-Za-z0-9]{6,}$/.test(String(password || '')))
+    throw new Error('รหัสผ่านตั้งต้นต้องเป็นตัวอักษรและตัวเลขล้วน อย่างน้อย 6 ตัว');
 
   var key = cfg_('FIREBASE_API_KEY');
   var res = UrlFetchApp.fetch(
