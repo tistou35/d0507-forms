@@ -308,7 +308,8 @@
    ],
    "assignTo": "FI",
    "blank": "blank/ASF.pdf",
-   "tpl": "1uY8DJHLfvBJeTS1FLwa1Dr6gBwJu8L86m_cjjQ-xGAM"
+   "tpl": "1uY8DJHLfvBJeTS1FLwa1Dr6gBwJu8L86m_cjjQ-xGAM",
+   "unlisted": true
   },
   {
    "doc": "",
@@ -564,7 +565,8 @@
      "th": "เตรียมลิงก์แจกจ่าย",
      "en": "Prepare distribution link"
     }
-   }
+   },
+   "unlisted": true
   },
   {
    "doc": "D-0507-DRF-001",
@@ -606,7 +608,8 @@
     "drf"
    ],
    "blank": "blank/DRF.pdf",
-   "tpl": "1LRibEDPwiMmQAjeQmkP3gvgkhsyP5GVbTgZDCJcXA2o"
+   "tpl": "1LRibEDPwiMmQAjeQmkP3gvgkhsyP5GVbTgZDCJcXA2o",
+   "unlisted": true
   },
   {
    "doc": "",
@@ -1224,7 +1227,8 @@
    ],
    "assignTo": "SM",
    "blank": "blank/HIF.pdf",
-   "tpl": "1jJLzzD-_v9rr1K8Fw6sqQsdH5JqRpCOj2o_EAvfpwF0"
+   "tpl": "1jJLzzD-_v9rr1K8Fw6sqQsdH5JqRpCOj2o_EAvfpwF0",
+   "unlisted": true
   },
   {
    "doc": "D-0507-IAC-001",
@@ -1322,7 +1326,8 @@
     "บริหารการเปลี่ยนแปลง"
    ],
    "blank": "blank/MOC.pdf",
-   "tpl": "1lj9ie_H1-kct5Z4sA2L1L0RKTu2glwgxYa041OFpvZc"
+   "tpl": "1lj9ie_H1-kct5Z4sA2L1L0RKTu2glwgxYa041OFpvZc",
+   "unlisted": true
   },
   {
    "doc": "D-0507-MRF-001",

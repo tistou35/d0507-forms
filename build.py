@@ -44,7 +44,7 @@ def firebase_config():
 
 PUBLIC_FORBIDDEN = ('code', 'lef', 'st', 'note', 'docx', 'own', 'jotDup')
 PUBLIC_KEEP = ('doc', 'abbr', 't', 'th', 'sys', 'jot', 'assignTo', 'r', 'chain', 'kw',
-               'public', 'iss', 'rev', 'eff', 'hasDef', 'kind', 'next', 'refs', 'flow')
+               'public', 'unlisted', 'iss', 'rev', 'eff', 'hasDef', 'kind', 'next', 'refs', 'flow')
 FIELD_TYPES = {'text', 'textarea', 'date', 'time', 'number', 'email', 'tel', 'select',
                'multi', 'check', 'checklist', 'grade', 'scale', 'sign', 'static', 'table', 'file', 'riskmatrix'}
 
@@ -186,6 +186,24 @@ def check_status(reg, defs):
             sys.exit("%s: สถานะเป็น 'ok' แต่ไม่มีทั้งนิยามฟอร์มและลิงก์ Jotform "
                      "— กรอกที่ไหนไม่ได้เลย" % f['doc'])
 
+        # ── ใบที่คนไม่ล็อกอินต้องกรอกได้ ต้องอยู่ในชุดสาธารณะ ──────────
+        # หน้ากรอกอ่านนิยามฟอร์มจากชุดที่ฝังมากับหน้าเว็บ ใบที่ route ขั้นแรก
+        # เป็นของฝ่าย auth: public แต่ทะเบียนไม่ได้ตั้ง public/unlisted
+        # จะขึ้น "ไม่พบฟอร์มนี้" ให้ทุกคนที่กดลิงก์เข้ามา — เคยเกิดกับ DRC
+        # มาแล้วครั้งหนึ่ง หลังจากปิด public เพื่อไม่ให้ขึ้นเป็นการ์ด
+        d = defs.get(f['abbr'])
+        if d:
+            first = (d.get('route') or [{}])[0].get('party')
+            party = next((p for p in d.get('parties', []) if p.get('k') == first), {})
+            if party.get('auth') == 'public' and not (f.get('public') or f.get('unlisted')):
+                sys.exit(
+                    "%s: นิยามฟอร์มให้ขั้นแรกเป็นของฝ่าย '%s' (auth: public) "
+                    "แต่ทะเบียนไม่ได้ตั้ง public หรือ unlisted — คนที่กดลิงก์เข้ามา"
+                    "โดยไม่ล็อกอินจะเจอ 'ไม่พบฟอร์มนี้'\n"
+                    "     ตั้ง public: true ถ้าอยากให้ขึ้นเป็นการ์ดในคลังฟอร์มด้วย\n"
+                    "     ตั้ง unlisted: true ถ้ามาจากลิงก์อย่างเดียว ไม่ต้องขึ้นการ์ด"
+                    % (f['doc'], first))
+
 
 # บทบาทที่ "อยู่นอกองค์กร ณ ตอนที่กรอก" — นักเรียน ผู้โดยสาร ผู้สมัครเป็นครู
 # หน้าที่ของ ops/mgt ไม่เคยออกหน้าสาธารณะ เพราะเขียนถึงสายอนุมัติภายใน
@@ -193,9 +211,18 @@ PUBLIC_ROLES = ('stu', 'ins')
 
 
 def public_view(reg):
+    """ชุดทะเบียนที่ฝังไปกับหน้าเว็บ — คนไม่ล็อกอินเห็นได้แค่นี้
+
+    มีสองอย่างที่ต่างกันและเคยใช้ธงเดียวกันจนพัง
+      public   = ขึ้นเป็นการ์ดในคลังฟอร์มให้คนนอกเห็น
+      unlisted = ไม่ขึ้นเป็นการ์ด แต่ต้องอยู่ในชุดนี้ เพราะหน้ากรอกอ่านนิยามฟอร์ม
+                 จากชุดนี้ ถ้าไม่มี คนที่กดลิงก์เข้ามาจะเจอ "ไม่พบฟอร์มนี้"
+    ใบรับเอกสารควบคุม (DRC) เป็นแบบหลัง — ผู้รับมาจากลิงก์ในประกาศ ไม่ได้มา
+    จากคลังฟอร์ม แต่ก็ไม่ได้ล็อกอิน
+    """
     out = []
     for f in reg['forms']:
-        if not f.get('public'):
+        if not (f.get('public') or f.get('unlisted')):
             continue
         g = {k: f[k] for k in PUBLIC_KEEP if k in f}
         if 'r' in g:
@@ -203,12 +230,12 @@ def public_view(reg):
             # (DRC · EFM) จึงได้สตริงว่าง แล้วไปโผล่เป็นการ์ดที่ไม่บอกว่าคนนอก
             # จะกดไปทำอะไร
             who = next((r for r in PUBLIC_ROLES if str(g['r'].get(r, '')).strip()), None)
-            if not who:
+            if not who and not f.get('unlisted'):
                 sys.exit(
                     "%s: public: true แต่ไม่มีหน้าที่ของ %s สักบทบาท — คนนอกจะเห็น"
                     "การ์ดเปล่า ๆ ใส่หน้าที่ให้บทบาทใดบทบาทหนึ่ง หรือตั้ง public: false"
                     % (f.get('doc') or f.get('abbr'), ' / '.join(PUBLIC_ROLES)))
-            g['r'] = {who: g['r'][who]}
+            g['r'] = {who: g['r'][who]} if who else {}
         leak = [k for k in PUBLIC_FORBIDDEN if k in g]
         if leak:
             sys.exit('ข้อมูลภายในหลุดไปหน้าสาธารณะ: %s -> %s' % (f.get('doc'), leak))
