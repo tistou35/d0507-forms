@@ -22,40 +22,40 @@
     </div>
 
     <section class="intent">
-      <div class="hd"><h2>บอกเราว่าคุณต้องการทำอะไร</h2>
-        <span class="en">ค้นข้ามทุกระบบ — searches every connected system</span></div>
+      <div class="hd"><h2 data-t="intentHd">บอกเราว่าคุณต้องการทำอะไร</h2>
+        <span class="en" data-t2="intentSub">ค้นข้ามทุกระบบ</span></div>
       <div class="srow">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>
         <input id="q" type="search" placeholder="เช่น ‘พรุ่งนี้จะบินกับครู’ หรือ ‘ต้องยื่นแผนการบิน’">
-        <button onclick="document.getElementById('q').focus()">ค้นหา</button>
+        <button data-t="searchPh" onclick="document.getElementById('q').focus()">ค้นหา</button>
       </div>
       <div id="res"></div>
       <div class="chips" id="chips"></div>
     </section>
 
     <section class="staffonly hide" id="queuesec">
-      <div class="sh"><h2>งานที่รอคุณ</h2><span class="en">Waiting on you</span>
-        <span class="rt"><a href="@@BASE@@queue/">ดูทั้งหมด →</a></span></div>
+      <div class="sh"><h2 data-t="waitHd">งานที่รอคุณ</h2><span class="en" data-t2="waitHd">Waiting on you</span>
+        <span class="rt"><a href="@@BASE@@queue/" data-t="seeAll">ดูทั้งหมด →</a></span></div>
       <div class="stats" id="queue"></div>
     </section>
 
     <section>
-      <div class="sh"><h2 id="fhead">ฟอร์มที่ใช้บ่อย</h2><span class="en">Frequently used</span>
+      <div class="sh"><h2 id="fhead">ฟอร์มที่ใช้บ่อย</h2><span class="en" id="fhead2">Frequently used</span>
         <span class="rt" id="fnote"></span></div>
       <div class="forms" id="fgrid"></div>
     </section>
 
     <section id="how">
-      <div class="sh"><h2>ขั้นตอนก่อนออกบิน</h2><span class="en">Before every flight</span></div>
+      <div class="sh"><h2 data-t="beforeHd">ขั้นตอนก่อนออกบิน</h2><span class="en" data-t2="beforeHd">Before every flight</span></div>
       <div class="steps">
-        <div class="stp"><span class="k">ขั้นที่ 1</span><span class="v">นักเรียนกรอกประเมินความเสี่ยง</span>
-          <span class="m">ต่างคนต่างกรอก ไม่เห็นคำตอบของอีกฝ่าย</span></div>
-        <div class="stp"><span class="k">ขั้นที่ 2</span><span class="v">ครูกรอกฝั่งครู</span>
-          <span class="m">ระบบรวมคะแนนความเสี่ยงให้อัตโนมัติ</span></div>
-        <div class="stp"><span class="k">ขั้นที่ 3</span><span class="v">ครูลงนามยืนยัน</span>
-          <span class="m">จุดที่เอกสารกลายเป็นบันทึกควบคุม</span></div>
-        <div class="stp"><span class="k">ขั้นที่ 4</span><span class="v">ฝ่ายปฏิบัติการออกใบอนุญาต</span>
-          <span class="m">ต้องมีผลประเมินที่ผ่านแล้วแนบเสมอ</span></div>
+        <div class="stp"><span class="k" data-t="step1">ขั้นที่ 1</span><span class="v" data-t="step1v">นักเรียนกรอกประเมินความเสี่ยง</span>
+          <span class="m" data-t="step1m">ต่างคนต่างกรอก ไม่เห็นคำตอบของอีกฝ่าย</span></div>
+        <div class="stp"><span class="k" data-t="step2">ขั้นที่ 2</span><span class="v" data-t="step2v">ครูกรอกฝั่งครู</span>
+          <span class="m" data-t="step2m">ระบบรวมคะแนนความเสี่ยงให้อัตโนมัติ</span></div>
+        <div class="stp"><span class="k" data-t="step3">ขั้นที่ 3</span><span class="v" data-t="step3v">ครูลงนามยืนยัน</span>
+          <span class="m" data-t="step3m">จุดที่เอกสารกลายเป็นบันทึกควบคุม</span></div>
+        <div class="stp"><span class="k" data-t="step4">ขั้นที่ 4</span><span class="v" data-t="step4v">ฝ่ายปฏิบัติการออกใบอนุญาต</span>
+          <span class="m" data-t="step4m">ต้องมีผลประเมินที่ผ่านแล้วแนบเสมอ</span></div>
       </div>
     </section>
 
@@ -78,10 +78,16 @@ document.getElementById('today').textContent = A.today();
 document.querySelectorAll('[data-cnt="forms"]').forEach(
   e => e.textContent = REG.forms.filter(f => f.kind !== 'ref').length);
 
-const CHIPS_PUB = ['พรุ่งนี้จะบินกับครู','จะบินเดี่ยวครั้งแรก','อยากดูผลการฝึกของตัวเอง',
-                   'เจอเหตุไม่ปลอดภัย อยากแจ้ง','สมัครเรียน'];
-const CHIPS_STF = ['ต้องยื่นแผนการบิน','นักเรียนจะบินเดี่ยว','เจอเหตุไม่ปลอดภัย อยากรายงาน',
-                   'ขอแก้ข้อความในคู่มือ','เบิกค่าใช้จ่ายรายเดือน'];
+/* ตัวอย่างคำค้น — ต้องมีทั้งสองภาษา ไม่งั้นกดปุ่ม EN แล้วยังเป็นไทยอยู่
+   และคำค้นภาษาอังกฤษต้องตรงกับ kw ในทะเบียน ไม่งั้นกดแล้วไม่เจออะไรเลย */
+const CHIPS_PUB = { th: ['พรุ่งนี้จะบินกับครู','จะบินเดี่ยวครั้งแรก','อยากดูผลการฝึกของตัวเอง',
+                         'เจอเหตุไม่ปลอดภัย อยากแจ้ง','สมัครเรียน'],
+                    en: ['flying with an instructor','first solo','my training record',
+                         'report something unsafe','apply to the school'] };
+const CHIPS_STF = { th: ['ต้องยื่นแผนการบิน','นักเรียนจะบินเดี่ยว','เจอเหตุไม่ปลอดภัย อยากรายงาน',
+                         'ขอแก้ข้อความในคู่มือ','เบิกค่าใช้จ่ายรายเดือน'],
+                    en: ['file a flight plan','student solo','report something unsafe',
+                         'change the manual','monthly expense claim'] };
 
 /* หน้าเดียว ปรับตามสถานะ login — ไม่ต้องมีประตูให้เลือกเอง */
 A.reg = REG;
@@ -101,40 +107,46 @@ function paint() {
   const list = visible();
 
   document.getElementById('hello').textContent = staff && A.user
-    ? 'สวัสดี ' + (A.user.displayName ? A.user.displayName.split(' ')[0] : (A.user.email || '').split('@')[0]) + ' — วันนี้ต้องทำอะไร?'
-    : 'จะทำอะไรวันนี้?';
-  document.getElementById('sub').textContent = staff
-    ? 'ค้นหาฟอร์ม เปิดงานที่รออยู่ หรือดูทะเบียนเอกสาร'
-    : 'เลือกฟอร์มที่ต้องการได้เลย — ไม่ต้องเข้าสู่ระบบ';
-  document.getElementById('allBtn').textContent = 'ดูฟอร์มทั้งหมด ' + list.length + ' ฟอร์ม';
-  document.getElementById('q').placeholder = staff
-    ? 'เช่น ‘ต้องยื่นแผนการบิน’ · ชื่อฟอร์ม หรือรหัสเอกสาร'
-    : 'เช่น ‘พรุ่งนี้จะบินกับครู’ หรือ ‘อยากดูผลการฝึกของตัวเอง’';
+    ? A.L(A.T.hiName)(A.user.displayName ? A.user.displayName.split(' ')[0]
+                                         : (A.user.email || '').split('@')[0])
+    : A.t('hiAnon');
+  document.getElementById('sub').textContent = A.t(staff ? 'subStaff' : 'subAnon');
+  document.getElementById('allBtn').textContent = A.L(A.T.allBtnN)(list.length);
+  document.getElementById('q').placeholder = A.t(staff ? 'qPhStaff' : 'qPhAnon');
 
-  const chips = staff ? CHIPS_STF : CHIPS_PUB;
+  const chips = (staff ? CHIPS_STF : CHIPS_PUB)[A.lang] || [];
   document.getElementById('chips').innerHTML = chips.map(t =>
     `<button class="chip" data-q="${A.esc(t)}"><span class="ar">→</span> ${A.esc(t)}</button>`).join('');
   document.querySelectorAll('#chips .chip').forEach(b => b.addEventListener('click', () => {
     document.getElementById('q').value = b.dataset.q; search();
   }));
 
-  /* ฟอร์มที่ใช้บ่อย — ของเจ้าหน้าที่คัดตามบทบาท ของนักเรียนคือฟอร์มสาธารณะ */
-  let show, head, note;
-  if (staff && A.roles.length) {
-    const r = A.roles.find(x => REG.roles.some(y => y.k === x)) || 'ins';
-    show = REG.forms.filter(f => f.kind !== 'ref' && f.r && f.r[r]).slice(0, 6);
-    head = 'ฟอร์มของคุณ'; note = 'ตามบทบาท ' + A.roleNames().join(' · ');
+  /* ฟอร์มของฉัน — เอาทุกตำแหน่งที่ถืออยู่มารวมกัน ไม่ใช่แค่ตำแหน่งแรก
+     บัญชีที่ roles มีแต่คีย์ที่ระบบไม่รู้จัก ให้ตกไปกรณี "ยังไม่ได้กำหนดบทบาท"
+     ไม่ใช่กลายเป็นครูเงียบ ๆ แบบเดิม */
+  const mine = staff ? A.myRoles() : [];
+  const CAP = 6;
+  let show, head, headEn, note, total;
+  if (mine.length) {
+    const all = REG.forms.filter(f => f.kind !== 'ref' && f.r && mine.some(r => f.r[r]));
+    total = all.length; show = all.slice(0, CAP);
+    head = A.t('yourForms'); headEn = A.t('yourForms', A.other());
+    note = A.L(A.T.byRoles)(A.roleNames().join(' · '));
   } else if (staff) {
-    show = REG.forms.filter(f => f.kind !== 'ref' && f.sys === 'here').slice(0, 6);
-    head = 'ฟอร์มที่ใช้บ่อย'; note = 'ยังไม่ได้กำหนดบทบาทให้บัญชีนี้';
+    const all = REG.forms.filter(f => f.kind !== 'ref' && f.sys === 'here');
+    total = all.length; show = all.slice(0, CAP);
+    head = A.t('commonHd'); headEn = A.t('commonHd', A.other()); note = A.t('noRoleNote');
   } else {
-    show = list; head = 'ฟอร์มของนักเรียน'; note = list.length + ' ฟอร์ม · ไม่ต้องเข้าสู่ระบบ';
+    total = list.length; show = list;
+    head = A.t('openHd'); headEn = A.t('openHd', A.other()); note = A.L(A.T.openNote)(list.length);
   }
   document.getElementById('fhead').textContent = head;
-  document.getElementById('fnote').textContent = note;
-  const role = staff && A.roles.length ? A.roles[0] : 'stu';
+  document.getElementById('fhead2').textContent = headEn;
+  /* เดิมตัดที่ 6 ใบเงียบ ๆ — คนที่มีงาน 27 ใบเห็น 6 ใบแล้วนึกว่ามีแค่นั้น */
+  document.getElementById('fnote').innerHTML = A.esc(note) + (total > show.length
+    ? ` · <a href="@@BASE@@all/">${A.esc(A.L(A.T.moreN)(total - show.length))}</a>` : '');
   document.getElementById('fgrid').innerHTML =
-    show.map(f => A.card(REG, f, f.r && f.r[role])).join('');
+    show.map(f => A.card(REG, f, A.dutyFor(f, mine))).join('');
 
   if (staff) loadQueue();
   search();
@@ -146,15 +158,15 @@ function search() {
   if (!q.trim()) { box.innerHTML = ''; return; }
   const hits = A.search(visible(), q, 6);
   if (!hits.length) {
-    box.innerHTML = `<div class="res"><p class="rh">ไม่พบฟอร์มที่ตรงกับคำค้น —
-      <a href="@@BASE@@all/" style="color:var(--sky-300)">ดูฟอร์มทั้งหมด</a></p></div>`;
+    box.innerHTML = `<div class="res"><p class="rh">${A.esc(A.t('noHits'))} —
+      <a href="@@BASE@@all/" style="color:var(--sky-300)">${A.esc(A.t('seeAllForms'))}</a></p></div>`;
     return;
   }
   const nsys = new Set(hits.map(h => h.sys)).size;
-  box.innerHTML = `<div class="res"><p class="rh">ตรงกับคำค้น · ${hits.length} รายการ ข้าม ${nsys} ระบบ</p>` +
+  box.innerHTML = `<div class="res"><p class="rh">${A.esc(A.L(A.T.hitsN)(hits.length, nsys))}</p>` +
     hits.map(f => {
       const s = A.sysOf(REG, f);
-      const wh = f.sys === 'here' ? `<span class="wh here">ฟอร์มในระบบนี้</span>`
+      const wh = f.sys === 'here' ? `<span class="wh here">${A.esc(A.t('hereForm'))}</span>`
         : `<span class="wh">${A.esc(f.sys === 'audit' ? A.t('goAudit') : A.t('openIn') + ' ' + A.n2(s))}</span>`;
       return `<a class="rr" href="${A.formUrl(f)}"><span><span class="nm">${A.esc(A.nm(f))}</span>
         <span class="cd">${A.esc(f.doc || f.abbr)}</span></span>${wh}</a>`;
@@ -175,15 +187,15 @@ async function loadQueue() {
           return `<a class="stat amb lk" href="@@BASE@@queue/"><div class="top">
             <span><span class="ti">${A.esc(t.title || t.formCode)}</span>
             <span class="en">${A.esc(t.tracking || '')}</span></span></div>
-            <p class="cta">เปิดงาน <span>→</span></p></a>`; }).join('')
-      : `<div class="stat grn"><div class="top"><span class="ti">ไม่มีงานค้าง</span><span class="n">0</span></div>
-         <p class="note">งานที่ถูกส่งถึงคุณจะมาโผล่ที่นี่</p></div>`;
+            <p class="cta">${A.esc(A.t('openTask'))} <span>→</span></p></a>`; }).join('')
+      : `<div class="stat grn"><div class="top"><span class="ti">${A.esc(A.t('noTasks'))}</span><span class="n">0</span></div>
+         <p class="note">${A.esc(A.t('noTasksSub'))}</p></div>`;
   } catch (e) {
     sec.classList.remove('hide');
     document.getElementById('queue').innerHTML =
-      `<div class="stat"><div class="top"><span class="ti">คิวงานยังไม่พร้อมใช้</span></div>
+      `<div class="stat"><div class="top"><span class="ti">${A.esc(A.t('queueDown'))}</span></div>
        <p class="note">${A.esc(e.code === 'permission-denied'
-         ? 'ยังไม่ได้วาง Security Rules ชุดใหม่ — ดู firebase/README.md'
+         ? A.t('queueRules')
          : e.message)}</p></div>`;
   }
 }

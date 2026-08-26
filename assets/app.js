@@ -110,6 +110,29 @@
   };
   A.roleNames = () => A.roles.map(r => A.L(A.ROLE_N[r]) || r);
 
+  /* คนหนึ่งคนถือได้หลายตำแหน่ง — ครูที่เป็นผู้จัดการฝ่ายมาตรฐานด้วย, ช่างที่ทำ
+     dispatch ด้วย users/{uid}.roles จึงเป็น array มาแต่แรก แต่หน้าหลักเดิม
+     หยิบแค่ roles[0] ทั้งที่ป้ายบอกว่า "ตามบทบาท A · B" — เห็นแค่ครึ่งเดียว
+     ของงานตัวเอง สองตัวนี้คือจุดเดียวที่ทั้งระบบใช้ตัดสินว่า "ของฉัน" คืออะไร */
+  A.myRoles = () => A.roles.filter(r => A.ROLE_N[r]);
+
+  /* หน้าที่ของ f สำหรับคนคนนี้ ถ้าถือหลายตำแหน่งและมีหน้าที่ต่างกันในใบเดียวกัน
+     ให้ขึ้นชื่อตำแหน่งกำกับ จะได้รู้ว่ากำลังกรอกในฐานะอะไร
+     roles ที่ส่งเข้ามาว่าง = ยังไม่ login ให้ใช้มุมนักเรียน */
+  A.dutyFor = function (f, roles) {
+    if (!f || !f.r) return '';
+    /* ยังไม่ login = ชุดสาธารณะ ซึ่ง build.py เหลือหน้าที่ไว้บทบาทเดียวอยู่แล้ว
+       ใช้บทบาทที่ติดมากับใบนั้น ไม่ใช่เดาว่าเป็น stu เสมอ — PWR เป็นของผู้โดยสาร
+       EFM เป็นของผู้สมัครเป็นครู ไม่ใช่ของนักเรียนทั้งคู่ */
+    const rr = (roles && roles.length ? roles : Object.keys(f.r)).filter(r => f.r[r]);
+    if (!rr.length) return '';
+    if (rr.length === 1) return f.r[rr[0]];
+    const seen = [];
+    rr.forEach(r => { if (seen.indexOf(f.r[r]) < 0) seen.push(f.r[r]); });
+    if (seen.length === 1) return seen[0];
+    return rr.map(r => (A.L(A.ROLE_N[r]) || r) + ': ' + f.r[r]).join(' · ');
+  };
+
   /* ── ภาษา ──────────────────────────────────────────────
      เอกสารควบคุมของ CAAT เป็นภาษาอังกฤษ แต่คนกรอกอ่านไทย
      จึงต้องสลับได้ โดยที่ทะเบียนและนิยามฟอร์มเก็บทั้งสองภาษาไว้ในไฟล์เดียว
@@ -203,6 +226,63 @@
     colStatus:  { th: 'สถานะ', en: 'Status' },
     openIn:     { th: 'เปิดใน', en: 'Open in' },
     goAudit:    { th: 'ไปงานตรวจสอบ', en: 'Go to Audit' },
+
+    /* หน้าหลัก — เดิมเขียนเป็นข้อความไทยตรง ๆ ใน home.html ปุ่มสลับภาษา
+       จึงเปลี่ยนได้แต่เมนู เนื้อหากลางหน้ายังเป็นไทยหมด */
+    hiName:     { th: n => 'สวัสดี ' + n + ' — วันนี้ต้องทำอะไร?',
+                  en: n => 'Hello ' + n + ' — what do you need today?' },
+    hiAnon:     { th: 'จะทำอะไรวันนี้?', en: 'What do you need today?' },
+    subStaff:   { th: 'ค้นหาฟอร์ม เปิดงานที่รออยู่ หรือดูทะเบียนเอกสาร',
+                  en: 'Search forms, open what is waiting on you, or read the register.' },
+    subAnon:    { th: 'เลือกฟอร์มที่ต้องการได้เลย — ไม่ต้องเข้าสู่ระบบ',
+                  en: 'Pick the form you need — no sign-in required.' },
+    allBtnN:    { th: n => 'ดูฟอร์มทั้งหมด ' + n + ' ฟอร์ม', en: n => 'See all ' + n + ' forms' },
+    qPhStaff:   { th: 'เช่น ‘ต้องยื่นแผนการบิน’ · ชื่อฟอร์ม หรือรหัสเอกสาร',
+                  en: 'e.g. “file a flight plan” · form name or doc code' },
+    qPhAnon:    { th: 'เช่น ‘พรุ่งนี้จะบินกับครู’ หรือ ‘อยากดูผลการฝึกของตัวเอง’',
+                  en: 'e.g. “flying with an instructor tomorrow” or “see my training record”' },
+    intentHd:   { th: 'บอกเราว่าคุณต้องการทำอะไร', en: 'Tell us what you need to do' },
+    intentSub:  { th: 'ค้นข้ามทุกระบบ', en: 'Searches every connected system' },
+    waitHd:     { th: 'งานที่รอคุณ', en: 'Waiting on you' },
+    seeAll:     { th: 'ดูทั้งหมด →', en: 'See all →' },
+    beforeHd:   { th: 'ขั้นตอนก่อนออกบิน', en: 'Before every flight' },
+    yourForms:  { th: 'ฟอร์มของคุณ', en: 'Your forms' },
+    byRoles:    { th: r => 'ตามบทบาท ' + r, en: r => 'By role · ' + r },
+    commonHd:   { th: 'ฟอร์มที่ใช้บ่อย', en: 'Frequently used' },
+    noRoleNote: { th: 'ยังไม่ได้กำหนดบทบาทให้บัญชีนี้ — แสดงฟอร์มที่กรอกในระบบนี้',
+                  en: 'No role set on this account — showing forms hosted here' },
+    /* ชุดสาธารณะไม่ใช่ "ฟอร์มของนักเรียน" ล้วน — มีใบของผู้โดยสาร (PWR)
+       และใบรับเอกสารที่ใครก็ลงนามได้ (DRC) รวมอยู่ด้วย */
+    openHd:     { th: 'ฟอร์มที่เปิดให้ทุกคน', en: 'Open to everyone' },
+    openNote:   { th: n => n + ' ฟอร์ม · นักเรียน ผู้โดยสาร และผู้มาติดต่อ ใช้ได้โดยไม่ต้องเข้าสู่ระบบ',
+                  en: n => n + ' forms · students, passengers and visitors — no sign-in required' },
+    moreN:      { th: n => 'อีก ' + n + ' ฟอร์ม →', en: n => n + ' more →' },
+    hitsN:      { th: (h, s) => 'ตรงกับคำค้น · ' + h + ' รายการ ข้าม ' + s + ' ระบบ',
+                  en: (h, s) => h + ' match' + (h === 1 ? '' : 'es') + ' across ' + s + ' system' + (s === 1 ? '' : 's') },
+    noHits:     { th: 'ไม่พบฟอร์มที่ตรงกับคำค้น', en: 'Nothing matched that search' },
+    seeAllForms:{ th: 'ดูฟอร์มทั้งหมด', en: 'See all forms' },
+    hereForm:   { th: 'ฟอร์มในระบบนี้', en: 'Form in this system' },
+    openTask:   { th: 'เปิดงาน', en: 'Open' },
+    noTasks:    { th: 'ไม่มีงานค้าง', en: 'Nothing waiting' },
+    noTasksSub: { th: 'งานที่ถูกส่งถึงคุณจะมาโผล่ที่นี่', en: 'Anything routed to you shows up here' },
+    queueDown:  { th: 'คิวงานยังไม่พร้อมใช้', en: 'Queue unavailable' },
+    queueRules: { th: 'ยังไม่ได้วาง Security Rules ชุดใหม่ — ดู firebase/README.md',
+                  en: 'Security rules not deployed yet — see firebase/README.md' },
+    step1:      { th: 'ขั้นที่ 1', en: 'Step 1' },
+    step1v:     { th: 'นักเรียนกรอกประเมินความเสี่ยง', en: 'The student fills in the risk assessment' },
+    step1m:     { th: 'ต่างคนต่างกรอก ไม่เห็นคำตอบของอีกฝ่าย',
+                  en: 'Each side answers alone — neither sees the other’s answers' },
+    step2:      { th: 'ขั้นที่ 2', en: 'Step 2' },
+    step2v:     { th: 'ครูกรอกฝั่งครู', en: 'The instructor fills in the instructor side' },
+    step2m:     { th: 'ระบบรวมคะแนนความเสี่ยงให้อัตโนมัติ', en: 'The system totals the risk score' },
+    step3:      { th: 'ขั้นที่ 3', en: 'Step 3' },
+    step3v:     { th: 'ครูลงนามยืนยัน', en: 'The instructor signs' },
+    step3m:     { th: 'จุดที่เอกสารกลายเป็นบันทึกควบคุม',
+                  en: 'The point where the sheet becomes a controlled record' },
+    step4:      { th: 'ขั้นที่ 4', en: 'Step 4' },
+    step4v:     { th: 'ฝ่ายปฏิบัติการออกใบอนุญาต', en: 'Operations issues the release' },
+    step4m:     { th: 'ต้องมีผลประเมินที่ผ่านแล้วแนบเสมอ',
+                  en: 'A passed assessment must always be attached' },
     inSystem:   { th: 'อยู่ในระบบ', en: 'Hosted in' },
     confirmed:  { th: 'ยืนยันแล้ว', en: 'Confirmed' },
     whenWho:    { th: 'ฟอร์มนี้ใช้เมื่อไร · ใครเกี่ยวข้อง', en: 'When to use it · who is involved' },

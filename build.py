@@ -187,6 +187,11 @@ def check_status(reg, defs):
                      "— กรอกที่ไหนไม่ได้เลย" % f['doc'])
 
 
+# บทบาทที่ "อยู่นอกองค์กร ณ ตอนที่กรอก" — นักเรียน ผู้โดยสาร ผู้สมัครเป็นครู
+# หน้าที่ของ ops/mgt ไม่เคยออกหน้าสาธารณะ เพราะเขียนถึงสายอนุมัติภายใน
+PUBLIC_ROLES = ('stu', 'ins')
+
+
 def public_view(reg):
     out = []
     for f in reg['forms']:
@@ -194,7 +199,16 @@ def public_view(reg):
             continue
         g = {k: f[k] for k in PUBLIC_KEEP if k in f}
         if 'r' in g:
-            g['r'] = {'stu': g['r'].get('stu', '')}
+            # เดิมบังคับเป็น {'stu': r.get('stu','')} ใบที่ไม่มีหน้าที่ฝั่งนักเรียน
+            # (DRC · EFM) จึงได้สตริงว่าง แล้วไปโผล่เป็นการ์ดที่ไม่บอกว่าคนนอก
+            # จะกดไปทำอะไร
+            who = next((r for r in PUBLIC_ROLES if str(g['r'].get(r, '')).strip()), None)
+            if not who:
+                sys.exit(
+                    "%s: public: true แต่ไม่มีหน้าที่ของ %s สักบทบาท — คนนอกจะเห็น"
+                    "การ์ดเปล่า ๆ ใส่หน้าที่ให้บทบาทใดบทบาทหนึ่ง หรือตั้ง public: false"
+                    % (f.get('doc') or f.get('abbr'), ' / '.join(PUBLIC_ROLES)))
+            g['r'] = {who: g['r'][who]}
         leak = [k for k in PUBLIC_FORBIDDEN if k in g]
         if leak:
             sys.exit('ข้อมูลภายในหลุดไปหน้าสาธารณะ: %s -> %s' % (f.get('doc'), leak))
