@@ -381,6 +381,11 @@ def main():
     pubs_path = os.path.join(HERE, 'publications.json')
     PUBS = json.load(open(pubs_path, encoding='utf-8')) if os.path.exists(pubs_path) else {'pubs': []}
     PUBS = {k: v for k, v in PUBS.items() if not k.startswith('_')}
+    # ผังงานของแต่ละฟอร์ม — ใครทำอะไร กี่วัน ไม่ผ่านไปไหน
+    wf_path = os.path.join(HERE, 'workflows.json')
+    WF = json.load(open(wf_path, encoding='utf-8')) if os.path.exists(wf_path) else {}
+    WF = {k: v for k, v in WF.items() if not k.startswith('_')}
+
     sys.path.insert(0, os.path.join(HERE, 'tools'))
     from airac import table as airac_table
     AIRAC = airac_table(10)
@@ -428,6 +433,7 @@ def main():
         ('pubs.html',        'pubs/index.html',                '../',   'pubs'),
         ('checklists.html',  'admin/checklists/index.html',    '../../','pubs'),
         ('cl.html',          'cl/index.html',                  '../',   'pubs'),
+        ('flow.html',        'flow/index.html',                '../',   'all'),
         ('drc.html',         'admin/drc/index.html',           '../../','drc'),
     ]
     VER = asset_versions()
@@ -436,7 +442,8 @@ def main():
     for src, out, base, active in pages:
         sub = {'@@REG@@': R, '@@REGPUB@@': P, '@@FBCFG@@': FB, '@@GASURL@@': GAS,
                '@@STATS@@': jsonjs(stats), '@@DEFS@@': jsonjs(defs),
-               '@@PUBS@@': jsonjs(PUBS), '@@AIRAC@@': jsonjs(AIRAC)}
+               '@@PUBS@@': jsonjs(PUBS), '@@AIRAC@@': jsonjs(AIRAC),
+               '@@WF@@': jsonjs(WF)}
         n = emit(src, os.path.join(HERE, out), base, active, sub, VER)
         total += n
         print('  built: %-30s %7d bytes' % (out, n))

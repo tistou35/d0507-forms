@@ -1,0 +1,217 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ผังงานของฟอร์ม — D-0507 Flight Training</title>
+<link rel="stylesheet" href="@@BASE@@assets/app.css">
+<style>
+.wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:start}
+@media(max-width:900px){ .wrap{grid-template-columns:1fr} }
+.chart{background:var(--surface);border:1px solid var(--border-light);border-radius:10px;
+  padding:18px;overflow-x:auto}
+.stab{width:100%;border-collapse:collapse;font-size:13px}
+.stab th{text-align:left;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--g-500);font-weight:600;padding:7px 9px;border-bottom:1.5px solid var(--border-med)}
+.stab td{padding:9px;border-bottom:1px solid var(--border-light);vertical-align:top}
+.stab tr:last-child td{border-bottom:0}
+.stab .n{font-family:var(--font-mono);font-weight:700;color:var(--navy-900);width:26px}
+.stab .by{font-weight:600}
+.stab .d{font-family:var(--font-mono);white-space:nowrap;font-size:12px}
+.stab .rj{font-size:12px;color:var(--red-600)}
+.draft{background:#fff7e6;border:1px solid rgba(214,158,46,.4);color:#7a5312;
+  border-radius:8px;padding:11px 14px;font-size:13px;line-height:1.6;margin-bottom:14px}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 14px}
+.desc{font-size:14px;line-height:1.75;color:var(--fg-2)}
+@media print{
+  .topbar,.rail,.botnav,.obtn,.greet .obtn,#gate{display:none !important}
+  .wrap{grid-template-columns:1fr}
+  .chart{border:0;padding:0;break-inside:avoid}
+  .stab tr{break-inside:avoid}
+}
+</style>
+</head><body>
+@@TOPBAR@@
+<div class="body">
+@@RAIL@@
+  <main class="main">
+    <div class="greet"><div>
+      <p class="eyebrow" id="eyebrow">ผังงานของฟอร์ม · FORM WORKFLOW</p>
+      <h1 id="title">—</h1>
+      <p class="sub" id="sub"></p></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="obtn sec" id="print">พิมพ์ผังงาน</button>
+        <button class="obtn" id="pkg">ดาวน์โหลดชุดเอกสาร</button>
+      </div>
+    </div>
+    <div id="gate"></div>
+    <div id="body"></div>
+    <p class="note" id="pmsg" style="margin-top:10px"></p>
+  </main>
+</div>
+@@BOTNAV@@
+<footer>D-0507 Flight Training Co., Ltd. · Controlled Document System</footer>
+<script>window.BASE='@@BASE@@';</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="@@BASE@@assets/app.js"></script>
+<script src="@@BASE@@assets/flow.js"></script>
+<script src="@@BASE@@assets/zip.js"></script>
+<script>
+"use strict";
+const REG = @@REG@@, DEFS = @@DEFS@@, WF = @@WF@@, A = D0507;
+const code = new URLSearchParams(location.search).get('c') || '';
+let F = REG.forms.find(f => f.abbr === code) || null;
+
+A.reg = REG;
+A.initAuth(@@FBCFG@@, async () => {
+  if (!F) { await A.hydrate(); F = A.reg.forms.find(f => f.abbr === code) || null; }
+  paint();
+});
+paint();
+A.onLang.push(paint);
+
+function paint(){
+  const host = document.getElementById('body');
+  if (!F) {
+    document.getElementById('title').textContent = code || '—';
+    host.innerHTML = '<div class="warn"><b>ไม่พบฟอร์มนี้ในทะเบียน</b></div>';
+    return;
+  }
+  const flow = Flow.resolve(F, DEFS[F.abbr], WF, A.lang);
+  document.getElementById('title').textContent = A.nm(F);
+  document.getElementById('eyebrow').textContent =
+    F.abbr + ' · ' + (F.doc || '') + ' · ผังงาน';
+  document.getElementById('sub').textContent =
+    A.lang === 'en' ? (F.th || '') : (F.t || '');
+
+  if (!flow.steps.length) {
+    host.innerHTML = `<div class="warn"><b>ยังไม่ได้กำหนดผังงานของใบนี้</b><br>
+      สายงาน "${A.esc(F.chain || '—')}" ยังไม่มีขั้นตอนตั้งต้นใน workflows.json</div>`;
+    return;
+  }
+
+  const badge = flow.src === 'route'
+    ? '<span class="tag ok">ตรงกับที่ระบบเดินจริง</span>'
+    : '<span class="tag warn">ค่าตั้งต้นตามสายงาน</span>';
+  const conf = flow.confirmed
+    ? '<span class="tag ok">ยืนยันแล้ว</span>'
+    : '<span class="tag amb">ยังไม่มีใครยืนยัน</span>';
+
+  host.innerHTML = `
+    ${flow.confirmed ? '' : `<div class="draft"><b>ผังนี้เป็นค่าที่ตั้งให้ก่อน</b> —
+      กำหนดจากสายงาน "${A.esc(F.chain || '')}" เพื่อให้มีอะไรให้อ่านและแก้ต่อ
+      ยังไม่ได้ผ่านการยืนยันจากผู้รับผิดชอบ · แก้ที่ <span class="mono">workflows.json</span>
+      แล้วตั้ง <span class="mono">confirmed: true</span></div>`}
+    <div class="meta">${badge} ${conf}
+      <span class="tag dep">${A.esc(A.deptName(F.own))}</span>
+      ${(F.lef||[]).map(m=>`<span class="tag">${A.esc(m)}</span>`).join('')}
+      <span class="tag">รวม ${flow.total || '—'} วันทำการ</span></div>
+    ${flow.desc ? `<p class="desc">${A.esc(flow.desc)}</p>` : ''}
+    <div class="wrap" style="margin-top:18px">
+      <div class="chart">${Flow.svg(flow)}</div>
+      <div>
+        <table class="stab"><thead><tr>
+          <th>#</th><th>ผู้รับผิดชอบ</th><th>ทำอะไร</th><th>ภายใน</th><th>ถ้าไม่ผ่าน</th>
+        </tr></thead><tbody>${flow.steps.map(s => `<tr>
+          <td class="n">${s.n}</td>
+          <td class="by">${A.esc(Flow.posName(s.by))}
+            ${s.onlyIf ? `<div style="font-size:11px;color:var(--g-500)">เมื่อ ${A.esc(s.onlyIf)}</div>` : ''}</td>
+          <td>${A.esc(s.act)}${s.sign ? '<div style="font-size:11px;color:var(--g-500)">ต้องลงนาม</div>' : ''}</td>
+          <td class="d">${s.days ? s.days + ' วัน' : '—'}</td>
+          <td class="rj">${A.esc(Flow.rejectText(s.reject, A.lang))}</td>
+        </tr>`).join('')}</tbody></table>
+      </div>
+    </div>`;
+}
+
+document.getElementById('print').addEventListener('click', () => window.print());
+
+/* ── ชุดเอกสาร ────────────────────────────────────────────
+   [ฟอร์มเปล่า · ผังงาน · คำอธิบายขั้นตอน] รวมเป็นไฟล์ ZIP เดียว
+   ผังงานเก็บเป็น HTML ที่เปิดได้เองโดยไม่ต้องมีอินเทอร์เน็ต — SVG ฝังอยู่ในไฟล์
+   ไม่ได้ทำเป็น PDF เพราะรวม PDF หลายไฟล์ในเบราว์เซอร์ต้องพึ่งไลบรารีใหญ่
+   ส่วนคนที่ต้องการ PDF กดพิมพ์จากไฟล์ HTML นั้นได้เลย */
+document.getElementById('pkg').addEventListener('click', async () => {
+  const msg = t => document.getElementById('pmsg').textContent = t;
+  if (!F) return;
+  const flow = Flow.resolve(F, DEFS[F.abbr], WF, A.lang);
+  msg('กำลังรวมไฟล์…');
+  const files = [];
+
+  if (F.blank) {
+    try {
+      const r = await fetch('@@BASE@@' + F.blank);
+      if (r.ok) files.push({ name: (F.doc || F.abbr) + '.pdf',
+                             data: new Uint8Array(await r.arrayBuffer()) });
+    } catch (e) { /* ไม่มีฟอร์มเปล่าก็ยังส่งชุดที่เหลือได้ */ }
+  }
+  files.push({ name: (F.doc || F.abbr) + '-workflow.html', text: standalone(flow) });
+  files.push({ name: (F.doc || F.abbr) + '-process.txt', text: processText(flow) });
+
+  const blob = Zip.make(files);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (F.doc || F.abbr) + '-doc-package.zip';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+  msg('ดาวน์โหลดแล้ว · ' + files.length + ' ไฟล์: ' + files.map(f => f.name).join(' · ')
+      + (F.blank ? '' : ' (ใบนี้ยังไม่มีฟอร์มเปล่า)'));
+});
+
+function standalone(flow){
+  return `<!DOCTYPE html><html lang="th"><head><meta charset="utf-8">
+<title>${A.esc(F.doc || F.abbr)} — ผังงาน</title>
+<style>
+ body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#0d1b2a;margin:28px;line-height:1.6}
+ h1{font-size:21px;margin:0 0 2px} .s{color:#567;font-size:13px;margin:0 0 18px}
+ table{width:100%;border-collapse:collapse;font-size:13px;margin-top:18px}
+ th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#678;
+    border-bottom:1.5px solid #ccd;padding:7px 9px}
+ td{padding:9px;border-bottom:1px solid #e6e9ee;vertical-align:top}
+ .rj{color:#b23} .d{font-family:ui-monospace,monospace;white-space:nowrap}
+ .w{background:#fff7e6;border:1px solid #e4c26a;color:#7a5312;padding:10px 13px;
+    border-radius:8px;font-size:13px;margin-bottom:16px}
+ footer{margin-top:26px;padding-top:10px;border-top:1px solid #dde;color:#789;font-size:11px}
+ @page{size:A4 portrait;margin:14mm}
+</style></head><body>
+<h1>${A.esc(A.nm(F))}</h1>
+<p class="s">${A.esc(F.abbr)} · ${A.esc(F.doc || '')}${F.code ? ' · ' + A.esc(F.code) : ''}
+  · ฉบับ ${A.esc(F.iss || '—')}/${A.esc(F.rev || '—')} · มีผล ${A.esc(F.eff || '—')}</p>
+${flow.confirmed ? '' : '<div class="w"><b>ผังนี้เป็นค่าที่ตั้งให้ก่อน</b> — ยังไม่ได้ผ่านการยืนยันจากผู้รับผิดชอบ</div>'}
+${flow.desc ? '<p>' + A.esc(flow.desc) + '</p>' : ''}
+${Flow.svg(flow)}
+<table><thead><tr><th>#</th><th>ผู้รับผิดชอบ</th><th>ทำอะไร</th><th>ภายใน</th><th>ถ้าไม่ผ่าน</th></tr></thead>
+<tbody>${flow.steps.map(s => `<tr><td>${s.n}</td><td>${A.esc(Flow.posName(s.by))}</td>
+  <td>${A.esc(s.act)}${s.sign ? ' (ต้องลงนาม)' : ''}</td>
+  <td class="d">${s.days ? s.days + ' วัน' : '—'}</td>
+  <td class="rj">${A.esc(Flow.rejectText(s.reject, 'th'))}</td></tr>`).join('')}</tbody></table>
+<footer>D-0507 Flight Training Co., Ltd. · เอกสารควบคุม · พิมพ์จากระบบฟอร์มออนไลน์</footer>
+</body></html>`;
+}
+
+function processText(flow){
+  const L = [];
+  L.push(A.nm(F));
+  L.push(F.abbr + ' · ' + (F.doc || '') + (F.code ? ' · ' + F.code : ''));
+  L.push('ฉบับ ' + (F.iss || '—') + '/' + (F.rev || '—') + ' · มีผล ' + (F.eff || '—'));
+  L.push('แผนก ' + A.deptName(F.own) + ' · คู่มือ ' + ((F.lef || []).join(' · ') || 'ยังไม่อยู่ใน LEF'));
+  L.push('');
+  L.push(flow.confirmed ? 'สถานะผังงาน: ยืนยันแล้ว'
+                        : 'สถานะผังงาน: ค่าตั้งต้น — ยังไม่ได้ผ่านการยืนยันจากผู้รับผิดชอบ');
+  L.push(flow.src === 'route' ? 'ที่มา: route ในนิยามฟอร์ม (ตรงกับที่ระบบเดินจริง)'
+                              : 'ที่มา: ค่าตั้งต้นตามสายงาน ' + (F.chain || ''));
+  L.push('');
+  if (flow.desc) { L.push('คำอธิบาย'); L.push('  ' + flow.desc); L.push(''); }
+  L.push('ขั้นตอน');
+  flow.steps.forEach(s => {
+    L.push('  ' + s.n + '. ' + Flow.posName(s.by));
+    L.push('     ทำอะไร   : ' + s.act + (s.sign ? ' (ต้องลงนาม)' : ''));
+    L.push('     ภายใน    : ' + (s.days ? s.days + ' วันทำการ' : 'ไม่ได้กำหนด'));
+    L.push('     ถ้าไม่ผ่าน: ' + Flow.rejectText(s.reject, 'th'));
+    if (s.onlyIf) L.push('     เงื่อนไข  : ' + s.onlyIf);
+  });
+  L.push('');
+  L.push('รวมเวลาทั้งกระบวนการ: ' + (flow.total || '—') + ' วันทำการ');
+  return L.join('\n');
+}
+</script>
+</body></html>

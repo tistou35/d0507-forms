@@ -3,6 +3,11 @@
 <title>ตั้งค่าระบบ — D-0507 Flight Training</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="../../assets/app.css?v=55a3531d">
+<style>
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0 18px}
+.msg{font-size:12.5px;color:var(--g-500)}
+.msg.bad{color:var(--red-600)} .msg.ok{color:var(--green-600)}
+</style>
 </head><body>
 <div class="topbar">
   <a class="brand" href="../../" style="text-decoration:none">
@@ -81,6 +86,36 @@
         <div class="sh"><h2>สถานะข้อมูลตั้งต้น</h2><span class="en">Setup status</span>
           <span class="rt"><button class="fb" id="recheck">ตรวจใหม่</button></span></div>
         <div class="stats" id="status"></div>
+      </section>
+
+      <section>
+        <div class="sh"><h2>เพิ่มเจ้าหน้าที่</h2><span class="en">Add staff account</span></div>
+        <div class="card">
+          <p class="note" style="margin-bottom:14px">เปิดบัญชีให้เพื่อนร่วมงานด้วยอีเมลและรหัสผ่านตั้งต้น
+            แล้วกำหนดบทบาทกับตำแหน่งให้ในขั้นตอนเดียว — เจ้าตัวเปลี่ยนรหัสผ่านเองได้ทีหลังที่หน้าเข้าสู่ระบบ ·
+            ถ้ามีบัญชีอยู่แล้ว ระบบจะไม่สร้างใหม่ แต่จะตั้งบทบาทให้บัญชีเดิม</p>
+          <div class="g2">
+            <div class="fk-f"><label for="nName">ชื่อที่จะแสดง <span style="color:var(--red-500)">*</span></label>
+              <input id="nName" type="text" placeholder="เช่น สมชาย ใจดี"></div>
+            <div class="fk-f"><label for="nEmail">อีเมล <span style="color:var(--red-500)">*</span></label>
+              <input id="nEmail" type="email" autocomplete="off" placeholder="name@d0507.co.th"></div>
+            <div class="fk-f"><label for="nPass">รหัสผ่านตั้งต้น <span style="color:var(--red-500)">*</span></label>
+              <p class="hint">อย่างน้อย 8 ตัวอักษร · บอกเจ้าตัวแล้วให้เปลี่ยนเอง</p>
+              <input id="nPass" type="text" autocomplete="off" placeholder="อย่างน้อย 8 ตัวอักษร"></div>
+            <div class="fk-f"><label for="nCert">ตำแหน่ง (ข้อความที่แสดง)</label>
+              <p class="hint">แสดงในตัวเลือกผู้รับ — <b>ห้ามใส่อีเมลหรือเบอร์โทร</b></p>
+              <input id="nCert" type="text" placeholder="เช่น FI · ครูการบิน"></div>
+          </div>
+          <div class="fk-f"><label>บทบาท — กำหนดว่าเห็นฟอร์มกลุ่มไหน</label>
+            <div class="fk-opts" id="nRoles"></div></div>
+          <div class="fk-f"><label>ตำแหน่งในองค์กร — กำหนดว่าอนุมัติฟอร์มไหนได้</label>
+            <p class="hint">ไม่เลือกเลย = ไม่ปรากฏในตัวเลือกผู้รับและไม่ได้รับงานอนุมัติ</p>
+            <div class="fk-opts" id="nPos"></div></div>
+          <div style="display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap">
+            <button class="obtn" id="nAdd">สร้างบัญชีและกำหนดสิทธิ์</button>
+            <span class="msg" id="nMsg"></span>
+          </div>
+        </div>
       </section>
 
       <section>
@@ -196,6 +231,7 @@ const POS_N = {
   TKI:'Theoretical Knowledge Instructor', ME:'Maintenance Engineer',
   OPS:'Operations / Dispatch', AD:'Administration' };
 let ROLES = new Set(), POS = new Set(), NEWREG = null;
+let NROLES = new Set(), NPOS = new Set();
 
 A.reg = REG;
 A.initAuth({
@@ -207,10 +243,71 @@ A.initAuth({
   appId: "1:38336897307:web:0e423f959e635a07faf3be"
 }, boot);
 
+document.getElementById('nAdd').addEventListener('click', addStaff);
+
 function log(s, cls){
   const el = document.getElementById('out');
   if (el.textContent === '—') el.textContent = '';
   el.innerHTML += (cls ? `<span style="color:var(--${cls})">${A.esc(s)}</span>` : A.esc(s)) + '\n';
+}
+
+/* ── เพิ่มเจ้าหน้าที่ ──────────────────────────────────────
+   บัญชีสร้างที่ฝั่งตัวส่งออก ไม่ใช่ในเบราว์เซอร์ —
+   createUserWithEmailAndPassword() จะสลับผู้ใช้ที่ล็อกอินอยู่ไปเป็นบัญชีใหม่
+   ผู้ดูแลที่กดเพิ่มคนจะหลุดจากบัญชีตัวเองทันที แล้วเขียนโปรไฟล์ต่อไม่ได้
+
+   ได้ uid มาแล้วค่อยเขียน users/{uid} กับ staffDirectory จากเบราว์เซอร์
+   ด้วยสิทธิ์ของผู้ดูแลตาม firestore.rules — ให้มีทางเขียนทางเดียว */
+async function addStaff(){
+  const v = id => (document.getElementById(id).value || '').trim();
+  const msg = (t, c) => { const e = document.getElementById('nMsg');
+    e.className = 'msg' + (c ? ' ' + c : ''); e.textContent = t; };
+  const btn = document.getElementById('nAdd');
+  for (const [k, n] of [['nName','ชื่อ'], ['nEmail','อีเมล'], ['nPass','รหัสผ่าน']])
+    if (!v(k)) { msg('ยังไม่ได้กรอก' + n, 'bad'); document.getElementById(k).focus(); return; }
+  if (v('nPass').length < 8) { msg('รหัสผ่านต้องยาวอย่างน้อย 8 ตัวอักษร', 'bad'); return; }
+  if (!NROLES.size) { msg('เลือกบทบาทอย่างน้อยหนึ่งอย่าง — ไม่งั้นเข้ามาแล้วไม่เห็นฟอร์มอะไรเลย', 'bad'); return; }
+
+  btn.disabled = true; msg('กำลังสร้างบัญชี…');
+  const r = await A.gas('createStaff', { email: v('nEmail'), password: v('nPass') });
+  if (!r.ok) { btn.disabled = false; msg(r.error, 'bad'); return; }
+  const { uid, email, created } = r.result;
+
+  try {
+    await A.db.collection('users').doc(uid).set({
+      email, name: v('nName'), cert: v('nCert'), roles: [...NROLES],
+      positions: [...NPOS], active: true,
+    }, { merge: true });
+
+    /* รายชื่อเจ้าหน้าที่สองชุด — ชุดเต็มมีอีเมล ชุดสาธารณะมีแค่ชื่อกับตำแหน่ง
+       ต้องเขียนทั้งคู่ ไม่งั้นคนใหม่ไม่โผล่ในตัวเลือกผู้รับฝั่งนักเรียน */
+    const sref = A.db.collection('staffDirectory').doc('current');
+    const sdoc = await sref.get();
+    const slist = ((sdoc.exists && sdoc.data().list) || []).filter(x => x.id !== uid);
+    slist.push({ id: uid, name: v('nName'), position: v('nCert'),
+                 positions: [...NPOS], email, active: true });
+    await sref.set({ list: slist }, { merge: true });
+
+    const pref = A.db.collection('publicDirectory').doc('instructors');
+    const pdoc = await pref.get();
+    const plist = ((pdoc.exists && pdoc.data().list) || []).filter(x => x.id !== uid);
+    if (NPOS.size) plist.push({ id: uid, name: v('nName'), position: v('nCert'), recv: [...NPOS] });
+    await pref.set({ list: plist }, { merge: true });
+  } catch (e) {
+    btn.disabled = false;
+    msg('สร้างบัญชีแล้วแต่บันทึกโปรไฟล์ไม่สำเร็จ: ' + (e.code || e.message), 'bad');
+    return;
+  }
+
+  btn.disabled = false;
+  msg((created ? 'สร้างบัญชีแล้ว' : 'บัญชีนี้มีอยู่แล้ว — ตั้งบทบาทให้เรียบร้อย')
+      + ' · ' + email + ' · บทบาท ' + [...NROLES].join(', ')
+      + (NPOS.size ? ' · ตำแหน่ง ' + [...NPOS].join(', ') : ''), 'ok');
+  log('users/' + uid + ' — ' + email + ' · ' + [...NROLES].join(', '), 'green-600');
+  ['nName','nEmail','nPass','nCert'].forEach(k => document.getElementById(k).value = '');
+  NROLES.clear(); NPOS.clear();
+  chips(document.getElementById('nRoles'), ROLE_KEYS, NROLES, k => A.L(A.ROLE_N[k]) || k);
+  chips(document.getElementById('nPos'), POS_KEYS, NPOS, k => k + ' · ' + POS_N[k]);
 }
 
 function chips(el, keys, set, label){
@@ -279,6 +376,8 @@ async function boot(){
   admins();
   chips(document.getElementById('roles'), ROLE_KEYS, ROLES, k => A.L(A.ROLE_N[k]) || k);
   chips(document.getElementById('pos'), POS_KEYS, POS, k => k + ' · ' + POS_N[k]);
+  chips(document.getElementById('nRoles'), ROLE_KEYS, NROLES, k => A.L(A.ROLE_N[k]) || k);
+  chips(document.getElementById('nPos'), POS_KEYS, NPOS, k => k + ' · ' + POS_N[k]);
   check(); dir();
 }
 

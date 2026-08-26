@@ -71,6 +71,13 @@ function doPost(e) {
        เก็บเฉพาะแผ่นที่มีชื่อผู้ทำและวันที่ ไม่เก็บกระดาษเปล่ากับแบบฟอร์ม */
     /* ฟอร์มเปล่าจากแม่แบบ — เจ้าหน้าที่ที่ล็อกอินแล้วเท่านั้น (ดู BlankForm.gs)
        คืน PDF เป็น base64 ให้เครื่องที่สั่งเอาไปเก็บลงรีโป ไม่ได้เขียนลง Drive */
+    /* เปิดบัญชีเจ้าหน้าที่ใหม่ — เจ้าหน้าที่ที่ล็อกอินแล้วเท่านั้น
+       ทำที่นี่เพราะถ้าสร้างจากเบราว์เซอร์ ผู้ดูแลจะถูกสลับไปเป็นบัญชีใหม่ทันที */
+    if (body.action === 'createStaff') {
+      if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบเจ้าหน้าที่ก่อน');
+      return json_({ ok: true, result: createStaff_(body.email, body.password) });
+    }
+
     if (body.action === 'blankForm') {
       if (!who || !who.email) throw new Error('ต้องเข้าสู่ระบบก่อน');
       return json_({ ok: true, result: blankForm_(body.abbr) });
