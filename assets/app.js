@@ -15,6 +15,26 @@
   A.roles = [];
   A.reg = null;        // ตั้งค่าโดยหน้าเว็บ — เริ่มจากชุดสาธารณะ
   A.full = false;      // true เมื่อโหลดทะเบียนเต็มจาก Firestore สำเร็จ
+  /* ── แผนกเจ้าของเอกสาร และคู่มือที่เอกสารสังกัด ─────────
+     ทะเบียนเก็บไว้เป็นรหัสสองตัว (own) กับรายชื่อคู่มือ (lef) ซึ่งตรงกับ
+     ตัวนำหน้าเลขกำกับบนกระดาษ เช่น IM-ECA-301-B เป็นของฝ่ายมาตรฐานการบิน
+     เก็บชื่อไว้ที่เดียวตรงนี้ ทุกหน้าจะได้เรียกชื่อแผนกเหมือนกัน */
+  A.DEPT = {
+    OP: { th: 'ปฏิบัติการการบิน',  en: 'Flight Operations',  d: 'Ops · Dispatch' },
+    IM: { th: 'มาตรฐานการบิน',     en: 'Instruction & Standards', d: 'HT · CFI · FIE' },
+    ME: { th: 'ซ่อมบำรุง',         en: 'Maintenance',        d: 'CAMO · ช่างอากาศยาน' },
+    QA: { th: 'ประกันคุณภาพ',      en: 'Quality Assurance',  d: 'CMM · ควบคุมเอกสาร' },
+    SM: { th: 'นิรภัยการบิน',       en: 'Safety Management',  d: 'SM · SMS' },
+    AD: { th: 'ธุรการและบุคคล',    en: 'Administration',     d: 'HR · ธุรการ' },
+  };
+  A.MANUAL = {
+    OMA: { th: 'คู่มือปฏิบัติการ ภาค A', en: 'Operations Manual Part A' },
+    OMM: { th: 'คู่มือปฏิบัติการ ภาค M', en: 'Operations Manual Part M' },
+    TM:  { th: 'คู่มือการฝึกอบรม',       en: 'Training Manual' },
+  };
+  A.deptName   = k => A.L(A.DEPT[k]) || k || '—';
+  A.manualName = k => A.L(A.MANUAL[k]) || k;
+
   A.isStaff = () => !!A.user && !A.user.isAnonymous;
   /* admin = แก้ทะเบียน นิยามฟอร์ม ผังผู้อนุมัติ ตั้งค่าระบบได้
      รายชื่ออยู่ที่ config/admins — ยังไม่มีเอกสารนั้น = เจ้าหน้าที่ทุกคนเป็น admin ชั่วคราว

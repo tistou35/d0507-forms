@@ -3,6 +3,17 @@
 <title>ทะเบียนเอกสาร — D-0507 Flight Training</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="@@BASE@@assets/app.css">
+<style>
+.filters select{min-height:40px;padding:0 11px;border-radius:8px;border:1px solid var(--border-med);
+  background:var(--surface);font-size:13.5px;font-family:inherit;color:var(--fg-1)}
+.filters .cnt{font-size:12.5px;color:var(--g-500);margin-left:auto}
+/* กล่องสถานะกดได้ — กดแล้วกรองตารางด้านล่างตามสถานะนั้น */
+.stat.click{cursor:pointer;transition:box-shadow .12s,transform .12s}
+.stat.click:hover{box-shadow:var(--sh-md);transform:translateY(-1px)}
+.stat.click[aria-pressed="true"]{outline:2px solid var(--navy-900);outline-offset:1px}
+table.reg td.ab{font-family:var(--font-mono);font-weight:700;color:var(--navy-900);white-space:nowrap}
+table.reg a.bl{font-family:var(--font-mono);font-size:11px;color:var(--sky-600);white-space:nowrap}
+</style>
 </head><body>
 @@TOPBAR@@
 <div class="body">
@@ -22,11 +33,14 @@
           <button class="fb" data-f="issue" aria-pressed="false">เฉพาะที่มีปัญหา</button>
           <button class="fb" data-f="inlef" aria-pressed="false">อยู่ใน LEF</button>
           <button class="fb" data-f="notlef" aria-pressed="false">ยังไม่อยู่ใน LEF</button>
-          <input id="q" type="search" placeholder="ค้นหาในทะเบียน">
+          <select id="fdep"><option value="">ทุกแผนก</option></select>
+          <select id="fman"><option value="">ทุกคู่มือ</option></select>
+          <input id="q" type="search" placeholder="ค้นหาด้วยตัวย่อ · เลขเอกสาร · ชื่อ">
+          <span class="cnt" id="cnt"></span>
         </div>
         <div class="twrap"><table class="reg"><thead><tr>
-          <th>Doc code</th><th>Control code</th><th>ชื่อฟอร์ม</th><th>Issue/Rev</th>
-          <th>Effective</th><th>อยู่ใน</th><th>ระบบ</th><th>สถานะ</th>
+          <th>ตัวย่อ</th><th>Doc code</th><th>Control code</th><th>ชื่อฟอร์ม</th><th>Issue/Rev</th>
+          <th>Effective</th><th>แผนก</th><th>อยู่ใน</th><th>ระบบ</th><th>ฟอร์มเปล่า</th><th>สถานะ</th>
         </tr></thead><tbody id="tb"></tbody></table></div>
       </section>
     </div>
@@ -42,7 +56,21 @@
 <script>D0507.GAS_URL='@@GASURL@@';</script>
 <script>
 "use strict";
-const REG=@@REG@@, A=D0507; let FILTER='all';
+const REG=@@REG@@, A=D0507; let FILTER='all', BOXSEL=null, BOXST=null;
+
+/* ตัวเลือกแผนก/คู่มือสร้างหลัง hydrate — ชุดที่ฝังมากับหน้าไม่มี own และ lef */
+function fillPickers(){
+  const dep=document.getElementById('fdep'), man=document.getElementById('fman');
+  dep.length=1; man.length=1;
+  [...new Set(REG.forms.map(f=>f.own).filter(Boolean))].sort()
+    .forEach(k=>dep.add(new Option(k+' · '+A.deptName(k),k)));
+  [...new Set(REG.forms.flatMap(f=>f.lef||[]))].sort()
+    .forEach(k=>man.add(new Option(k+' · '+A.manualName(k),k)));
+  man.add(new Option('ยังไม่อยู่ใน LEF','__none__'));
+  if(dep.dataset.wired) return;
+  dep.dataset.wired='1';
+  [dep,man].forEach(el=>el.addEventListener('change',rows));
+}
 document.querySelectorAll('[data-cnt="forms"]').forEach(e=>e.textContent=REG.forms.length);
 A.reg = REG;
 A.initAuth(@@FBCFG@@, paint); paint();
@@ -64,40 +92,77 @@ function paint(){
     return;
   }
   const F=REG.forms, c=k=>F.filter(f=>f.st===k).length;
-  document.getElementById('stats').innerHTML=[
-    ['grn',c('ok'),'พร้อมใช้ ครบทั้งสามช่องทาง'],
-    ['red',c('linkwrong'),'ลิงก์ใน LEF ชี้ฟอร์มผิดใบ'],
-    ['red',c('dupsys'),'มีสองฉบับ — ระบบภายนอกและ Jotform'],
-    ['red',c('shadow'),'ใช้บน Jotform แต่ไม่มีในคู่มือ'],
-    ['amb',c('notinlef'),'มีเอกสารแต่ยังไม่อยู่ใน LEF'],
-    ['amb',c('noform')+c('pdfonly')+c('nolink'),'LEF กับฟอร์มยังไม่ตรงกัน']
-  ].map(b=>`<div class="stat ${b[0]}"><div class="top"><span class="ti">${A.esc(b[2])}</span>
-     <span class="n">${b[1]}</span></div></div>`).join('');
+  /* กล่องสรุปกดได้ — เห็นตัวเลขแล้วอยากรู้ทันทีว่าเป็นใบไหนบ้าง
+     กดแล้วกรองตารางข้างล่างตามสถานะนั้น กดซ้ำเพื่อเลิกกรอง
+     st: ['ok'] ฯลฯ คือสถานะที่กล่องนั้นนับ ใช้เป็นตัวกรองตรง ๆ */
+  const BOX=[
+    ['grn',['ok'],'พร้อมใช้ ครบทั้งสามช่องทาง'],
+    ['red',['linkwrong'],'ลิงก์ใน LEF ชี้ฟอร์มผิดใบ'],
+    ['red',['dupsys'],'มีสองฉบับ — ระบบภายนอกและ Jotform'],
+    ['red',['shadow'],'ใช้บน Jotform แต่ไม่มีในคู่มือ'],
+    ['amb',['notinlef'],'มีเอกสารแต่ยังไม่อยู่ใน LEF'],
+    ['amb',['noform','pdfonly','nolink'],'LEF กับฟอร์มยังไม่ตรงกัน']];
+  document.getElementById('stats').innerHTML=BOX.map((b,i)=>{
+    const n=b[1].reduce((t,k)=>t+c(k),0);
+    return `<div class="stat ${b[0]} click" role="button" tabindex="0" data-box="${i}"
+       aria-pressed="${BOXSEL===i}" title="กดเพื่อดูเฉพาะใบในกลุ่มนี้">
+       <div class="top"><span class="ti">${A.esc(b[2])}</span><span class="n">${n}</span></div></div>`;
+  }).join('');
+  document.querySelectorAll('[data-box]').forEach(el=>{
+    const go=()=>{ const i=+el.dataset.box;
+      BOXSEL = (BOXSEL===i) ? null : i;
+      BOXST  = BOXSEL===null ? null : BOX[BOXSEL][1];
+      if(BOXSEL!==null){ FILTER='all';
+        document.querySelectorAll('.fb[data-f]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.f==='all')); }
+      paint(); };
+    el.addEventListener('click',go);
+    el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();go();} });
+  });
+  fillPickers();
   rows();
 }
 function rows(){
   const q=(document.getElementById('q').value||'').trim().toLowerCase();
+  const dep=document.getElementById('fdep').value, man=document.getElementById('fman').value;
   let L=REG.forms.slice();
+  if(BOXST)             L=L.filter(f=>BOXST.includes(f.st));
   if(FILTER==='issue')  L=L.filter(f=>f.st!=='ok');
   if(FILTER==='inlef')  L=L.filter(f=>f.lef&&f.lef.length);
   if(FILTER==='notlef') L=L.filter(f=>!f.lef||!f.lef.length);
+  if(dep)               L=L.filter(f=>f.own===dep);
+  if(man==='__none__')  L=L.filter(f=>!(f.lef||[]).length);
+  else if(man)          L=L.filter(f=>(f.lef||[]).includes(man));
   if(q) L=L.filter(f=>[f.doc,f.code,f.t,f.th,f.abbr].join(' ').toLowerCase().includes(q));
+  document.getElementById('cnt').textContent =
+    L.length===REG.forms.length ? REG.forms.length+' ใบ' : L.length+' จาก '+REG.forms.length+' ใบ';
   document.getElementById('tb').innerHTML = L.map(f=>{
     const st=REG.status[f.st]||{}, s=A.sysOf(REG,f);
+    /* ฟอร์มเปล่าเปิดตรงจากทะเบียนได้ ไม่ต้องเข้าไปหน้าเอกสารก่อน
+       stopPropagation ไม่งั้นคลิกโดนแถวแล้วเด้งไปหน้าเอกสารแทน */
+    const bl = f.blank
+      ? `<a class="bl" href="@@BASE@@${A.esc(f.blank)}" target="_blank" rel="noopener"
+           download="${A.esc((f.doc||f.abbr)+'.pdf')}"
+           onclick="event.stopPropagation()">PDF ↓</a>`
+      : '<span style="color:var(--g-400);font-size:11px">—</span>';
     return `<tr onclick="location.href='${A.formUrl(f)}'" style="cursor:pointer">
+      <td class="ab">${A.esc(f.abbr)}</td>
       <td class="c">${A.esc(f.doc||'—')}</td><td class="c">${A.esc(f.code||'—')}</td>
       <td class="nm">${A.esc(f.t)}<span class="th">${A.esc(f.th||'')}</span></td>
       <td class="c">${f.iss?A.esc(f.iss)+' / '+A.esc(f.rev):'—'}</td>
       <td class="c">${A.esc(f.eff||'—')}</td>
+      <td class="c">${A.esc(f.own||'—')}</td>
       <td class="c">${f.lef&&f.lef.length?A.esc(f.lef.join(' · ')):'—'}</td>
       <td class="c">${A.esc(A.n2(s))}${f.sysOK?` <span class="tag ok">${A.esc(A.t('confirmed'))}</span>`:''}</td>
+      <td>${bl}</td>
       <td><span class="tag ${st.lv||''}">${A.esc(A.n2(st)||'')}</span>
         ${f.note?`<div style="color:var(--g-400);font-size:11px;margin-top:3px">${A.esc(f.note)}</div>`:''}</td>
-    </tr>`;}).join('') || '<tr><td colspan="8" style="padding:16px;color:var(--g-400)">ไม่พบรายการ</td></tr>';
+    </tr>`;}).join('') || '<tr><td colspan="11" style="padding:16px;color:var(--g-400)">ไม่พบรายการ</td></tr>';
 }
 document.querySelectorAll('.fb[data-f]').forEach(b=>b.addEventListener('click',()=>{
   FILTER=b.dataset.f;
+  BOXSEL=null; BOXST=null;              // ปุ่มแถวบนกับกล่องสถานะเป็นตัวกรองคนละชุด
   document.querySelectorAll('.fb[data-f]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.f===FILTER));
+  document.querySelectorAll('[data-box]').forEach(x=>x.setAttribute('aria-pressed','false'));
   rows();
 }));
 document.getElementById('q').addEventListener('input',rows);

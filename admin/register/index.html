@@ -3,6 +3,17 @@
 <title>ทะเบียนเอกสาร — D-0507 Flight Training</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="../../assets/app.css?v=55a3531d">
+<style>
+.filters select{min-height:40px;padding:0 11px;border-radius:8px;border:1px solid var(--border-med);
+  background:var(--surface);font-size:13.5px;font-family:inherit;color:var(--fg-1)}
+.filters .cnt{font-size:12.5px;color:var(--g-500);margin-left:auto}
+/* กล่องสถานะกดได้ — กดแล้วกรองตารางด้านล่างตามสถานะนั้น */
+.stat.click{cursor:pointer;transition:box-shadow .12s,transform .12s}
+.stat.click:hover{box-shadow:var(--sh-md);transform:translateY(-1px)}
+.stat.click[aria-pressed="true"]{outline:2px solid var(--navy-900);outline-offset:1px}
+table.reg td.ab{font-family:var(--font-mono);font-weight:700;color:var(--navy-900);white-space:nowrap}
+table.reg a.bl{font-family:var(--font-mono);font-size:11px;color:var(--sky-600);white-space:nowrap}
+</style>
 </head><body>
 <div class="topbar">
   <a class="brand" href="../../" style="text-decoration:none">
@@ -82,11 +93,14 @@
           <button class="fb" data-f="issue" aria-pressed="false">เฉพาะที่มีปัญหา</button>
           <button class="fb" data-f="inlef" aria-pressed="false">อยู่ใน LEF</button>
           <button class="fb" data-f="notlef" aria-pressed="false">ยังไม่อยู่ใน LEF</button>
-          <input id="q" type="search" placeholder="ค้นหาในทะเบียน">
+          <select id="fdep"><option value="">ทุกแผนก</option></select>
+          <select id="fman"><option value="">ทุกคู่มือ</option></select>
+          <input id="q" type="search" placeholder="ค้นหาด้วยตัวย่อ · เลขเอกสาร · ชื่อ">
+          <span class="cnt" id="cnt"></span>
         </div>
         <div class="twrap"><table class="reg"><thead><tr>
-          <th>Doc code</th><th>Control code</th><th>ชื่อฟอร์ม</th><th>Issue/Rev</th>
-          <th>Effective</th><th>อยู่ใน</th><th>ระบบ</th><th>สถานะ</th>
+          <th>ตัวย่อ</th><th>Doc code</th><th>Control code</th><th>ชื่อฟอร์ม</th><th>Issue/Rev</th>
+          <th>Effective</th><th>แผนก</th><th>อยู่ใน</th><th>ระบบ</th><th>ฟอร์มเปล่า</th><th>สถานะ</th>
         </tr></thead><tbody id="tb"></tbody></table></div>
       </section>
     </div>
@@ -110,11 +124,25 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="../../assets/app.js?v=314a31cd"></script>
+<script src="../../assets/app.js?v=7eda98d1"></script>
 <script>D0507.GAS_URL='https://script.google.com/macros/s/AKfycby7rFFVxd92wPImX4m8pv8nHqTrK3Iq0O32A34844DAg1rP8N3RfgKEyGvAUkQu-NXd/exec';</script>
 <script>
 "use strict";
-const REG={"systems":{"here":{"n":"ระบบฟอร์มออนไลน์","en":"This portal","url":"","lg":"52","cl":"d"},"dispatch":{"n":"ระบบ Dispatch","en":"Flight dispatch","url":"https://d0507.361vision.org/d0507-app/dispatch/?v=final","lg":"DSP","cl":"a"},"training":{"n":"ระบบบันทึกการฝึก","en":"Training records","url":"https://d0507.361vision.org/","lg":"TRN","cl":"b"},"fbo":{"n":"AeroFBO","en":"Operations & maintenance","url":"https://indyzz.com/aerofbo/index.php","lg":"FBO","cl":"c"},"audit":{"n":"Audit Portal","en":"Internal audit","url":"../d0507-audit/","lg":"AUD","cl":"a"}},"forms":[{"doc":"D-0507-APF-001","abbr":"APF","t":"Appeal Form","th":"แบบอุทธรณ์","sys":"here","jot":"243218287458465","assignTo":"ACM","r":{"stu":"ยื่นอุทธรณ์คำวินิจฉัยของ ATO ภายใน 14 วัน"},"chain":"admin","kw":["อุทธรณ์","ไม่เป็นธรรม","ร้องเรียน","appeal","apf"],"public":true,"iss":"01","rev":"00","eff":"14 SEP 2022","hasDef":true},{"doc":"D-0507-APP-001","abbr":"APP","t":"Application Form","th":"ใบสมัคร","sys":"fbo","r":{"stu":"สมัครเข้าเรียน เปลี่ยนหลักสูตร หรือขอ licence / rating"},"chain":"admin","kw":["สมัคร","สมัครเรียน","เข้าเรียน","ใบสมัคร","โปรไฟล์","application","app"],"public":true,"iss":"01","rev":"01","eff":"24 AUG 2026","hasDef":false},{"doc":"D-0507-ASF-001","abbr":"ASF","t":"Authorize Solo Flight Form","th":"ใบอนุญาตบินเดี่ยว","sys":"here","jot":"241828892999078","assignTo":"FI","r":{"stu":"รับทราบเงื่อนไขก่อนออกบินเดี่ยว"},"chain":"preflight","kw":["บินเดี่ยว","solo","เดี่ยวครั้งแรก","นักเรียนบินเดี่ยว","asf"],"public":false,"unlisted":true,"iss":"01","rev":"00","eff":"07 JUL 2022","hasDef":true},{"doc":"D-0507-DRC-001","abbr":"DRC","t":"Document Receipt","th":"ใบรับเอกสารควบคุม","sys":"here","jot":"221830582177053","r":{},"chain":"doccontrol","kw":["รับเอกสาร","ลงนามรับ","receipt","drc"],"public":false,"unlisted":true,"iss":"01","rev":"00","eff":"20 AUG 2020","hasDef":true},{"doc":"D-0507-DRF-001","abbr":"DRF","t":"Document Revision Form","th":"แบบขอแก้ไขเอกสารควบคุม","sys":"here","jot":"193573500355053","r":{},"chain":"doccontrol","kw":["แก้คู่มือ","แก้ไขเอกสาร","ขอแก้","revision","คู่มือ","เอกสาร","drf"],"public":false,"unlisted":true,"iss":"01","rev":"00","eff":"20 AUG 2020","hasDef":true},{"doc":"D-0507-EFM-001","abbr":"EFM","t":"Progress and Evaluation Form","th":"แบบประเมินความคืบหน้า","sys":"training","r":{"ins":"ถูกประเมินก่อนรับเข้าเป็นครู — ทำในระบบบันทึกการฝึก"},"chain":"training","kw":["ผลการฝึก","ดูผล","เกรด","gradeslip","ความคืบหน้า","ประเมินความคืบหน้า","efm"],"public":true,"iss":"01","rev":"00","eff":"20 NOV 2024","hasDef":false,"next":["STR"],"flow":{"th":"ประเมินผู้สมัครก่อนตัดสินใจจ้าง — ผ่านแล้วจึงเข้าสายมาตรฐานครู","en":"Applicant assessment before the hiring decision"}},{"doc":"D-0507-FRAE-001","abbr":"FRAE","t":"Flight Risk Assessment and Evaluation","th":"การประเมินความเสี่ยงก่อนทำการบิน","sys":"here","jot":"210071253532038","assignTo":"FI","r":{"stu":"กรอกฝั่งนักเรียนก่อนบินทุกเที่ยว"},"chain":"preflight","kw":["บิน","จะบิน","ก่อนบิน","พรุ่งนี้","ความเสี่ยง","เสี่ยง","ประเมิน","ครู","fit to fly","frae","risk","preflight"],"public":true,"iss":"01","rev":"00","eff":"07 JUL 2022","hasDef":true},{"doc":"D-0507-GSP-001","abbr":"GSP","t":"Flight Training Evaluation","th":"บันทึกการฝึกภาคอากาศ","sys":"training","r":{"stu":"ดูบันทึกการฝึกและความคืบหน้าของตัวเอง (อ่านเท่านั้น)"},"chain":"training","kw":["ผลการฝึก","ความคืบหน้า","บันทึกการฝึก","gradeslip","training record","ppl","gsp"],"public":true,"iss":"01","rev":"00","eff":"07 JUL 2022","hasDef":false},{"doc":"D-0507-HIF-001","abbr":"HIF","t":"Hazard Identification Form","th":"แบบชี้บ่งอันตราย","sys":"here","jot":"210431245943449","assignTo":"SM","r":{"ins":"แจ้งอันตรายที่พบและเสนอมาตรการลดความเสี่ยง"},"chain":"safety","kw":["อันตราย","ชี้บ่งอันตราย","hazard","hif","ความเสี่ยง"],"public":false,"unlisted":true,"iss":"01","rev":"00","eff":"24 AUG 2021","hasDef":true},{"doc":"D-0507-MOC-001","abbr":"MOC","t":"Management of Change (MoC) Form","th":"แบบบริหารการเปลี่ยนแปลง","sys":"here","jot":"","r":{},"chain":"safety","kw":["เปลี่ยนแปลง","moc","change","บริหารการเปลี่ยนแปลง"],"public":false,"unlisted":true,"iss":"01","rev":"00","eff":"","hasDef":true},{"doc":"D-0507-PWR-001","abbr":"PWR","t":"Passenger Waiver and Release Form","th":"หนังสือสละสิทธิ์เรียกร้องของผู้โดยสาร","sys":"here","jot":"","r":{"stu":"ผู้โดยสาร trial flight อ่านเงื่อนไขและลงนามก่อนขึ้นบิน — กรอกเสร็จคือรับทราบแล้ว"},"chain":"admin","kw":["consent","guardian","minor","pwr","trial flight","waiver","ผู้ปกครอง","ผู้เยาว์","ผู้โดยสาร","พาคนขึ้น","ยินยอม","สละสิทธิ์"],"public":true,"iss":"01","rev":"03","eff":"21 AUG 2026","hasDef":true},{"doc":"D-0507-SDF-001","abbr":"SDF","t":"Self Declaration Form","th":"แบบแจ้งข้อมูลด้วยตนเอง","sys":"here","jot":"210394186308456","assignTo":"HT","r":{"stu":"แจ้งเมื่อหยุดบินเกิน 2 สัปดาห์ หรือมีการบินอื่นนอกหลักสูตร"},"chain":"preflight","kw":["แจ้ง","หยุด","หยุดบิน","ไม่ได้บิน","บินที่อื่น","ประกาศตน","declaration","sdf"],"public":true,"iss":"01","rev":"01","eff":"22 JUN 2026","hasDef":true},{"doc":"D-0507-SEF-001","abbr":"SEF","t":"Student Evaluation Form","th":"แบบประเมินครูผู้สอนโดยนักเรียน","sys":"training","jot":"210063447392452","r":{"stu":"ประเมินครูผู้สอนเมื่อจบแต่ละ Stage (ไม่เปิดเผยชื่อ) — ทำในระบบบันทึกการฝึก"},"chain":"training","kw":["ประเมินครู","ครูผู้สอน","ให้คะแนนครู","ความเห็น","feedback","sef"],"public":true,"iss":"01","rev":"00","eff":"20 AUG 2020","hasDef":false},{"doc":"D-0507-VSR-001","abbr":"VSR","t":"Voluntary Safety Report","th":"รายงานนิรภัยโดยสมัครใจ","sys":"here","jot":"221482584465058","assignTo":"SM","r":{"stu":"แจ้งเหตุหรือความเสี่ยงด้านนิรภัย (ไม่ระบุชื่อได้)"},"chain":"safety","kw":["ไม่ปลอดภัย","อันตราย","เหตุ","แจ้งเหตุ","นิรภัย","รายงาน","safety","vsr","เกือบเกิดเหตุ"],"public":true,"iss":"01","rev":"01","eff":"23 AUG 2026","hasDef":true}],"roles":[{"k":"stu","n":"นักเรียน","d":"นักศึกษาการบิน · ผู้เข้ารับการฝึก","en":"Students","den":"Student pilots · trainees"},{"k":"ins","n":"ครูการบิน / ครูภาคทฤษฎี","d":"FI · TKI · FIE","en":"Instructors","den":"FI · TKI · FIE"},{"k":"mnt","n":"ช่างอากาศยาน","d":"ฝ่ายซ่อมบำรุง (ME)","en":"Maintenance","den":"Maintenance (ME)"},{"k":"ops","n":"ฝ่ายปฏิบัติการ","d":"Operations · Dispatch · ธุรการเอกสาร","en":"Operations","den":"Operations · Dispatch · document control"},{"k":"mgt","n":"ฝ่ายบริหาร","d":"ACM · HT · CMM · Safety Manager","en":"Management","den":"ACM · HT · CMM · Safety Manager"}],"status":{"ok":{"n":"พร้อมใช้","lv":"ok","en":"Ready"},"linkwrong":{"n":"ลิงก์ใน LEF ผิดใบ","lv":"bad","en":"LEF links to the wrong form"},"nolink":{"n":"LEF ยังไม่ใส่ลิงก์","lv":"warn","en":"No link in LEF"},"noform":{"n":"ยังไม่มีฟอร์มออนไลน์","lv":"warn","en":"No online form yet"},"pdfonly":{"n":"เป็น PDF บน Drive","lv":"warn","en":"PDF on Drive"},"notinlef":{"n":"ยังไม่อยู่ใน LEF","lv":"warn","en":"Not in LEF yet"},"shadow":{"n":"ใช้บน Jotform · ไม่มีในคู่มือ","lv":"bad","en":"In use but not registered"},"dupsys":{"n":"มีสองฉบับ — ระบบภายนอกและ Jotform","lv":"bad","en":"Duplicate across systems"}},"lefcount":{"total":51}}, A=D0507; let FILTER='all';
+const REG={"systems":{"here":{"n":"ระบบฟอร์มออนไลน์","en":"This portal","url":"","lg":"52","cl":"d"},"dispatch":{"n":"ระบบ Dispatch","en":"Flight dispatch","url":"https://d0507.361vision.org/d0507-app/dispatch/?v=final","lg":"DSP","cl":"a"},"training":{"n":"ระบบบันทึกการฝึก","en":"Training records","url":"https://d0507.361vision.org/","lg":"TRN","cl":"b"},"fbo":{"n":"AeroFBO","en":"Operations & maintenance","url":"https://indyzz.com/aerofbo/index.php","lg":"FBO","cl":"c"},"audit":{"n":"Audit Portal","en":"Internal audit","url":"../d0507-audit/","lg":"AUD","cl":"a"}},"forms":[{"doc":"D-0507-APF-001","abbr":"APF","t":"Appeal Form","th":"แบบอุทธรณ์","sys":"here","jot":"243218287458465","assignTo":"ACM","r":{"stu":"ยื่นอุทธรณ์คำวินิจฉัยของ ATO ภายใน 14 วัน"},"chain":"admin","kw":["อุทธรณ์","ไม่เป็นธรรม","ร้องเรียน","appeal","apf"],"public":true,"iss":"01","rev":"00","eff":"14 SEP 2022","hasDef":true},{"doc":"D-0507-APP-001","abbr":"APP","t":"Application Form","th":"ใบสมัคร","sys":"fbo","r":{"stu":"สมัครเข้าเรียน เปลี่ยนหลักสูตร หรือขอ licence / rating"},"chain":"admin","kw":["สมัคร","สมัครเรียน","เข้าเรียน","ใบสมัคร","โปรไฟล์","application","app"],"public":true,"iss":"01","rev":"01","eff":"24 AUG 2026","hasDef":false},{"doc":"D-0507-ASF-001","abbr":"ASF","t":"Authorize Solo Flight Form","th":"ใบอนุญาตบินเดี่ยว","sys":"here","jot":"241828892999078","assignTo":"FI","r":{"stu":"รับทราบเงื่อนไขก่อนออกบินเดี่ยว"},"chain":"preflight","kw":["บินเดี่ยว","solo","เดี่ยวครั้งแรก","นักเรียนบินเดี่ยว","asf"],"public":false,"unlisted":true,"iss":"01","rev":"00","eff":"07 JUL 2022","hasDef":true},{"doc":"D-0507-DRC-001","abbr":"DRC","t":"Document Receipt","th":"ใบรับเอกสารควบคุม","sys":"here","jot":"221830582177053","r":{},"chain":"doccontrol","kw":["รับเอกสาร","ลงนามรับ","receipt","drc"],"public":false,"unlisted":true,"iss":"01","rev":"00","eff":"20 AUG 2020","hasDef":true},{"doc":"D-0507-DRF-001","abbr":"DRF","t":"Document Revision Form","th":"แบบขอแก้ไขเอกสารควบคุม","sys":"here","jot":"193573500355053","r":{},"chain":"doccontrol","kw":["แก้คู่มือ","แก้ไขเอกสาร","ขอแก้","revision","คู่มือ","เอกสาร","drf"],"public":false,"unlisted":true,"iss":"01","rev":"00","eff":"20 AUG 2020","hasDef":true},{"doc":"D-0507-EFM-001","abbr":"EFM","t":"Progress and Evaluation Form","th":"แบบประเมินความคืบหน้า","sys":"training","r":{"ins":"ถูกประเมินก่อนรับเข้าเป็นครู — ทำในระบบบันทึกการฝึก"},"chain":"training","kw":["ผลการฝึก","ดูผล","เกรด","gradeslip","ความคืบหน้า","ประเมินความคืบหน้า","efm"],"public":true,"iss":"01","rev":"00","eff":"20 NOV 2024","hasDef":false,"next":["STR"],"flow":{"th":"ประเมินผู้สมัครก่อนตัดสินใจจ้าง — ผ่านแล้วจึงเข้าสายมาตรฐานครู","en":"Applicant assessment before the hiring decision"}},{"doc":"D-0507-FRAE-001","abbr":"FRAE","t":"Flight Risk Assessment and Evaluation","th":"การประเมินความเสี่ยงก่อนทำการบิน","sys":"here","jot":"210071253532038","assignTo":"FI","r":{"stu":"กรอกฝั่งนักเรียนก่อนบินทุกเที่ยว"},"chain":"preflight","kw":["บิน","จะบิน","ก่อนบิน","พรุ่งนี้","ความเสี่ยง","เสี่ยง","ประเมิน","ครู","fit to fly","frae","risk","preflight"],"public":true,"iss":"01","rev":"00","eff":"07 JUL 2022","hasDef":true},{"doc":"D-0507-GSP-001","abbr":"GSP","t":"Flight Training Evaluation","th":"บันทึกการฝึกภาคอากาศ","sys":"training","r":{"stu":"ดูบันทึกการฝึกและความคืบหน้าของตัวเอง (อ่านเท่านั้น)"},"chain":"training","kw":["ผลการฝึก","ความคืบหน้า","บันทึกการฝึก","gradeslip","training record","ppl","gsp"],"public":true,"iss":"01","rev":"00","eff":"07 JUL 2022","hasDef":false},{"doc":"D-0507-HIF-001","abbr":"HIF","t":"Hazard Identification Form","th":"แบบชี้บ่งอันตราย","sys":"here","jot":"210431245943449","assignTo":"SM","r":{"ins":"แจ้งอันตรายที่พบและเสนอมาตรการลดความเสี่ยง"},"chain":"safety","kw":["อันตราย","ชี้บ่งอันตราย","hazard","hif","ความเสี่ยง"],"public":false,"unlisted":true,"iss":"01","rev":"00","eff":"24 AUG 2021","hasDef":true},{"doc":"D-0507-MOC-001","abbr":"MOC","t":"Management of Change (MoC) Form","th":"แบบบริหารการเปลี่ยนแปลง","sys":"here","jot":"","r":{},"chain":"safety","kw":["เปลี่ยนแปลง","moc","change","บริหารการเปลี่ยนแปลง"],"public":false,"unlisted":true,"iss":"01","rev":"00","eff":"","hasDef":true},{"doc":"D-0507-PWR-001","abbr":"PWR","t":"Passenger Waiver and Release Form","th":"หนังสือสละสิทธิ์เรียกร้องของผู้โดยสาร","sys":"here","jot":"","r":{"stu":"ผู้โดยสาร trial flight อ่านเงื่อนไขและลงนามก่อนขึ้นบิน — กรอกเสร็จคือรับทราบแล้ว"},"chain":"admin","kw":["consent","guardian","minor","pwr","trial flight","waiver","ผู้ปกครอง","ผู้เยาว์","ผู้โดยสาร","พาคนขึ้น","ยินยอม","สละสิทธิ์"],"public":true,"iss":"01","rev":"03","eff":"21 AUG 2026","hasDef":true},{"doc":"D-0507-SDF-001","abbr":"SDF","t":"Self Declaration Form","th":"แบบแจ้งข้อมูลด้วยตนเอง","sys":"here","jot":"210394186308456","assignTo":"HT","r":{"stu":"แจ้งเมื่อหยุดบินเกิน 2 สัปดาห์ หรือมีการบินอื่นนอกหลักสูตร"},"chain":"preflight","kw":["แจ้ง","หยุด","หยุดบิน","ไม่ได้บิน","บินที่อื่น","ประกาศตน","declaration","sdf"],"public":true,"iss":"01","rev":"01","eff":"22 JUN 2026","hasDef":true},{"doc":"D-0507-SEF-001","abbr":"SEF","t":"Student Evaluation Form","th":"แบบประเมินครูผู้สอนโดยนักเรียน","sys":"training","jot":"210063447392452","r":{"stu":"ประเมินครูผู้สอนเมื่อจบแต่ละ Stage (ไม่เปิดเผยชื่อ) — ทำในระบบบันทึกการฝึก"},"chain":"training","kw":["ประเมินครู","ครูผู้สอน","ให้คะแนนครู","ความเห็น","feedback","sef"],"public":true,"iss":"01","rev":"00","eff":"20 AUG 2020","hasDef":false},{"doc":"D-0507-VSR-001","abbr":"VSR","t":"Voluntary Safety Report","th":"รายงานนิรภัยโดยสมัครใจ","sys":"here","jot":"221482584465058","assignTo":"SM","r":{"stu":"แจ้งเหตุหรือความเสี่ยงด้านนิรภัย (ไม่ระบุชื่อได้)"},"chain":"safety","kw":["ไม่ปลอดภัย","อันตราย","เหตุ","แจ้งเหตุ","นิรภัย","รายงาน","safety","vsr","เกือบเกิดเหตุ"],"public":true,"iss":"01","rev":"01","eff":"23 AUG 2026","hasDef":true}],"roles":[{"k":"stu","n":"นักเรียน","d":"นักศึกษาการบิน · ผู้เข้ารับการฝึก","en":"Students","den":"Student pilots · trainees"},{"k":"ins","n":"ครูการบิน / ครูภาคทฤษฎี","d":"FI · TKI · FIE","en":"Instructors","den":"FI · TKI · FIE"},{"k":"mnt","n":"ช่างอากาศยาน","d":"ฝ่ายซ่อมบำรุง (ME)","en":"Maintenance","den":"Maintenance (ME)"},{"k":"ops","n":"ฝ่ายปฏิบัติการ","d":"Operations · Dispatch · ธุรการเอกสาร","en":"Operations","den":"Operations · Dispatch · document control"},{"k":"mgt","n":"ฝ่ายบริหาร","d":"ACM · HT · CMM · Safety Manager","en":"Management","den":"ACM · HT · CMM · Safety Manager"}],"status":{"ok":{"n":"พร้อมใช้","lv":"ok","en":"Ready"},"linkwrong":{"n":"ลิงก์ใน LEF ผิดใบ","lv":"bad","en":"LEF links to the wrong form"},"nolink":{"n":"LEF ยังไม่ใส่ลิงก์","lv":"warn","en":"No link in LEF"},"noform":{"n":"ยังไม่มีฟอร์มออนไลน์","lv":"warn","en":"No online form yet"},"pdfonly":{"n":"เป็น PDF บน Drive","lv":"warn","en":"PDF on Drive"},"notinlef":{"n":"ยังไม่อยู่ใน LEF","lv":"warn","en":"Not in LEF yet"},"shadow":{"n":"ใช้บน Jotform · ไม่มีในคู่มือ","lv":"bad","en":"In use but not registered"},"dupsys":{"n":"มีสองฉบับ — ระบบภายนอกและ Jotform","lv":"bad","en":"Duplicate across systems"}},"lefcount":{"total":51}}, A=D0507; let FILTER='all', BOXSEL=null, BOXST=null;
+
+/* ตัวเลือกแผนก/คู่มือสร้างหลัง hydrate — ชุดที่ฝังมากับหน้าไม่มี own และ lef */
+function fillPickers(){
+  const dep=document.getElementById('fdep'), man=document.getElementById('fman');
+  dep.length=1; man.length=1;
+  [...new Set(REG.forms.map(f=>f.own).filter(Boolean))].sort()
+    .forEach(k=>dep.add(new Option(k+' · '+A.deptName(k),k)));
+  [...new Set(REG.forms.flatMap(f=>f.lef||[]))].sort()
+    .forEach(k=>man.add(new Option(k+' · '+A.manualName(k),k)));
+  man.add(new Option('ยังไม่อยู่ใน LEF','__none__'));
+  if(dep.dataset.wired) return;
+  dep.dataset.wired='1';
+  [dep,man].forEach(el=>el.addEventListener('change',rows));
+}
 document.querySelectorAll('[data-cnt="forms"]').forEach(e=>e.textContent=REG.forms.length);
 A.reg = REG;
 A.initAuth({
@@ -143,40 +171,77 @@ function paint(){
     return;
   }
   const F=REG.forms, c=k=>F.filter(f=>f.st===k).length;
-  document.getElementById('stats').innerHTML=[
-    ['grn',c('ok'),'พร้อมใช้ ครบทั้งสามช่องทาง'],
-    ['red',c('linkwrong'),'ลิงก์ใน LEF ชี้ฟอร์มผิดใบ'],
-    ['red',c('dupsys'),'มีสองฉบับ — ระบบภายนอกและ Jotform'],
-    ['red',c('shadow'),'ใช้บน Jotform แต่ไม่มีในคู่มือ'],
-    ['amb',c('notinlef'),'มีเอกสารแต่ยังไม่อยู่ใน LEF'],
-    ['amb',c('noform')+c('pdfonly')+c('nolink'),'LEF กับฟอร์มยังไม่ตรงกัน']
-  ].map(b=>`<div class="stat ${b[0]}"><div class="top"><span class="ti">${A.esc(b[2])}</span>
-     <span class="n">${b[1]}</span></div></div>`).join('');
+  /* กล่องสรุปกดได้ — เห็นตัวเลขแล้วอยากรู้ทันทีว่าเป็นใบไหนบ้าง
+     กดแล้วกรองตารางข้างล่างตามสถานะนั้น กดซ้ำเพื่อเลิกกรอง
+     st: ['ok'] ฯลฯ คือสถานะที่กล่องนั้นนับ ใช้เป็นตัวกรองตรง ๆ */
+  const BOX=[
+    ['grn',['ok'],'พร้อมใช้ ครบทั้งสามช่องทาง'],
+    ['red',['linkwrong'],'ลิงก์ใน LEF ชี้ฟอร์มผิดใบ'],
+    ['red',['dupsys'],'มีสองฉบับ — ระบบภายนอกและ Jotform'],
+    ['red',['shadow'],'ใช้บน Jotform แต่ไม่มีในคู่มือ'],
+    ['amb',['notinlef'],'มีเอกสารแต่ยังไม่อยู่ใน LEF'],
+    ['amb',['noform','pdfonly','nolink'],'LEF กับฟอร์มยังไม่ตรงกัน']];
+  document.getElementById('stats').innerHTML=BOX.map((b,i)=>{
+    const n=b[1].reduce((t,k)=>t+c(k),0);
+    return `<div class="stat ${b[0]} click" role="button" tabindex="0" data-box="${i}"
+       aria-pressed="${BOXSEL===i}" title="กดเพื่อดูเฉพาะใบในกลุ่มนี้">
+       <div class="top"><span class="ti">${A.esc(b[2])}</span><span class="n">${n}</span></div></div>`;
+  }).join('');
+  document.querySelectorAll('[data-box]').forEach(el=>{
+    const go=()=>{ const i=+el.dataset.box;
+      BOXSEL = (BOXSEL===i) ? null : i;
+      BOXST  = BOXSEL===null ? null : BOX[BOXSEL][1];
+      if(BOXSEL!==null){ FILTER='all';
+        document.querySelectorAll('.fb[data-f]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.f==='all')); }
+      paint(); };
+    el.addEventListener('click',go);
+    el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();go();} });
+  });
+  fillPickers();
   rows();
 }
 function rows(){
   const q=(document.getElementById('q').value||'').trim().toLowerCase();
+  const dep=document.getElementById('fdep').value, man=document.getElementById('fman').value;
   let L=REG.forms.slice();
+  if(BOXST)             L=L.filter(f=>BOXST.includes(f.st));
   if(FILTER==='issue')  L=L.filter(f=>f.st!=='ok');
   if(FILTER==='inlef')  L=L.filter(f=>f.lef&&f.lef.length);
   if(FILTER==='notlef') L=L.filter(f=>!f.lef||!f.lef.length);
+  if(dep)               L=L.filter(f=>f.own===dep);
+  if(man==='__none__')  L=L.filter(f=>!(f.lef||[]).length);
+  else if(man)          L=L.filter(f=>(f.lef||[]).includes(man));
   if(q) L=L.filter(f=>[f.doc,f.code,f.t,f.th,f.abbr].join(' ').toLowerCase().includes(q));
+  document.getElementById('cnt').textContent =
+    L.length===REG.forms.length ? REG.forms.length+' ใบ' : L.length+' จาก '+REG.forms.length+' ใบ';
   document.getElementById('tb').innerHTML = L.map(f=>{
     const st=REG.status[f.st]||{}, s=A.sysOf(REG,f);
+    /* ฟอร์มเปล่าเปิดตรงจากทะเบียนได้ ไม่ต้องเข้าไปหน้าเอกสารก่อน
+       stopPropagation ไม่งั้นคลิกโดนแถวแล้วเด้งไปหน้าเอกสารแทน */
+    const bl = f.blank
+      ? `<a class="bl" href="../../${A.esc(f.blank)}" target="_blank" rel="noopener"
+           download="${A.esc((f.doc||f.abbr)+'.pdf')}"
+           onclick="event.stopPropagation()">PDF ↓</a>`
+      : '<span style="color:var(--g-400);font-size:11px">—</span>';
     return `<tr onclick="location.href='${A.formUrl(f)}'" style="cursor:pointer">
+      <td class="ab">${A.esc(f.abbr)}</td>
       <td class="c">${A.esc(f.doc||'—')}</td><td class="c">${A.esc(f.code||'—')}</td>
       <td class="nm">${A.esc(f.t)}<span class="th">${A.esc(f.th||'')}</span></td>
       <td class="c">${f.iss?A.esc(f.iss)+' / '+A.esc(f.rev):'—'}</td>
       <td class="c">${A.esc(f.eff||'—')}</td>
+      <td class="c">${A.esc(f.own||'—')}</td>
       <td class="c">${f.lef&&f.lef.length?A.esc(f.lef.join(' · ')):'—'}</td>
       <td class="c">${A.esc(A.n2(s))}${f.sysOK?` <span class="tag ok">${A.esc(A.t('confirmed'))}</span>`:''}</td>
+      <td>${bl}</td>
       <td><span class="tag ${st.lv||''}">${A.esc(A.n2(st)||'')}</span>
         ${f.note?`<div style="color:var(--g-400);font-size:11px;margin-top:3px">${A.esc(f.note)}</div>`:''}</td>
-    </tr>`;}).join('') || '<tr><td colspan="8" style="padding:16px;color:var(--g-400)">ไม่พบรายการ</td></tr>';
+    </tr>`;}).join('') || '<tr><td colspan="11" style="padding:16px;color:var(--g-400)">ไม่พบรายการ</td></tr>';
 }
 document.querySelectorAll('.fb[data-f]').forEach(b=>b.addEventListener('click',()=>{
   FILTER=b.dataset.f;
+  BOXSEL=null; BOXST=null;              // ปุ่มแถวบนกับกล่องสถานะเป็นตัวกรองคนละชุด
   document.querySelectorAll('.fb[data-f]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.f===FILTER));
+  document.querySelectorAll('[data-box]').forEach(x=>x.setAttribute('aria-pressed','false'));
   rows();
 }));
 document.getElementById('q').addEventListener('input',rows);

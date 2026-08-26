@@ -7,11 +7,23 @@
 .fmrow{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;
   background:var(--surface);border:1px solid var(--border-light);border-radius:8px;
   padding:14px 18px;margin-bottom:10px}
+.fmrow .hd{display:flex;gap:9px;align-items:baseline;flex-wrap:wrap}
+.fmrow .ab{font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--navy-900);
+  background:var(--g-100);border-radius:5px;padding:1px 7px;letter-spacing:.02em}
 .fmrow .cd{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--sky-600)}
+.fmrow .rc{font-family:var(--font-mono);font-size:11px;color:var(--g-500)}
+.fmrow .mt{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.fmrow .vr{font-size:12px;color:var(--g-500)}
+.tag.dep{background:var(--sky-50,#eaf2fb);color:var(--sky-600);border:1px solid rgba(42,111,190,.25)}
+.tag.man{background:var(--g-50);color:var(--fg-2);border:1px solid var(--border-light);
+  font-family:var(--font-mono);font-size:10.5px}
 .fmrow .nm{font-size:15px;font-weight:600;font-family:var(--font-sans);line-height:1.3}
 .fmrow .mt{font-size:12.5px;color:var(--g-500);margin-top:3px}
 .fmrow .act{display:flex;gap:8px;flex-wrap:wrap}
 .fb.sm{min-height:36px;font-size:12.5px;padding:0 12px}
+.filters select{min-height:40px;padding:0 11px;border-radius:8px;border:1px solid var(--border-med);
+  background:var(--surface);font-size:13.5px;font-family:inherit;color:var(--fg-1)}
+.filters .cnt{font-size:12.5px;color:var(--g-500);margin-left:auto}
 dialog{border:0;border-radius:12px;padding:0;max-width:640px;width:calc(100% - 32px);
   box-shadow:var(--sh-lg);background:var(--surface);color:var(--fg-1)}
 dialog::backdrop{background:rgba(13,27,42,.5)}
@@ -61,6 +73,12 @@ dialog .df{padding:14px 22px;border-top:1px solid var(--g-100);display:flex;gap:
           <button class="fb" data-f="disabled" aria-pressed="false">ปิดใช้งาน</button>
           <button class="fb" data-f="none" aria-pressed="false">ยังไม่มีนิยาม</button>
         </div>
+        <div class="filters">
+          <select id="fdep"><option value="">ทุกแผนก</option></select>
+          <select id="fman"><option value="">ทุกคู่มือ</option></select>
+          <input id="q" type="search" placeholder="ค้นหาด้วยตัวย่อ · เลขเอกสาร · ชื่อ">
+          <span class="cnt" id="cnt"></span>
+        </div>
         <div id="list"></div>
       </section>
     </div>
@@ -87,6 +105,26 @@ dialog .df{padding:14px 22px;border-top:1px solid var(--g-100);display:flex;gap:
 const REG = @@REG@@;
 const A = D0507, M = FormMgr;
 let DEFS = {}, FILTER = 'all';
+
+/* ตัวเลือกแผนกและคู่มือสร้างจากทะเบียนจริง ไม่ได้พิมพ์ทิ้งไว้
+   วันหนึ่งมีแผนกใหม่ในทะเบียน ตัวกรองจะมีให้เองโดยไม่ต้องแก้หน้านี้
+
+   ต้องสร้างหลัง A.hydrate() — ชุดที่ฝังมากับหน้าเว็บไม่มี own และ lef
+   (เป็นข้อมูลภายใน) สร้างตอนโหลดหน้าจะได้รายการว่าง แล้วตัวกรองจะเงียบ
+   คือเลือกแล้วไม่กรองอะไรเลย ซึ่งแย่กว่าไม่มีตัวกรอง */
+function fillPickers(){
+  const dep = document.getElementById('fdep'), man = document.getElementById('fman');
+  dep.length = 1; man.length = 1;
+  [...new Set(REG.forms.map(f => f.own).filter(Boolean))].sort().forEach(k =>
+    dep.add(new Option(k + ' · ' + A.deptName(k), k)));
+  [...new Set(REG.forms.flatMap(f => f.lef || []))].sort().forEach(k =>
+    man.add(new Option(k + ' · ' + A.manualName(k), k)));
+  man.add(new Option('ยังไม่อยู่ใน LEF', '__none__'));
+  if (dep.dataset.wired) return;
+  dep.dataset.wired = '1';
+  [dep, man].forEach(el => el.addEventListener('change', render));
+  document.getElementById('q').addEventListener('input', render);
+}
 
 A.reg = REG;
 A.initAuth(@@FBCFG@@, boot);
@@ -138,14 +176,24 @@ async function refresh(){
     ['amb', all - Object.keys(DEFS).length, 'ยังไม่มีนิยามฟอร์ม'],
   ].map(b => `<div class="stat ${b[0]}"><div class="top"><span class="ti">${A.esc(b[2])}</span>
       <span class="n">${b[1]}</span></div></div>`).join('');
+  fillPickers();
   render();
 }
 
 function render(){
+  const dep = document.getElementById('fdep').value;
+  const man = document.getElementById('fman').value;
+  const q = (document.getElementById('q').value || '').trim().toLowerCase();
+  let shown = 0;
   const rows = REG.forms.map(f => {
     const d = DEFS[f.abbr];
     const st = d ? d.status : 'none';
     if (FILTER !== 'all' && FILTER !== st) return '';
+    if (dep && f.own !== dep) return '';
+    if (man === '__none__' && (f.lef || []).length) return '';
+    if (man && man !== '__none__' && !(f.lef || []).includes(man)) return '';
+    if (q && ![f.abbr, f.doc, f.code, f.t, f.th].join(' ').toLowerCase().includes(q)) return '';
+    shown++;
     const lv = { published:'ok', draft:'sh2', disabled:'', none:'warn' }[st];
     const label = d ? M.STATUS[st] : 'ยังไม่มีนิยาม';
     const ver = d && d.defRev ? `Issue ${d.issue}/Rev ${d.rev} · defRev ${d.defRev}` :
@@ -159,14 +207,27 @@ function render(){
     } else {
       act.push(`<button class="fb sm" data-new="${A.esc(f.abbr)}">เพิ่มนิยาม</button>`);
     }
+    /* ตัวย่อมาก่อนชื่อไทย — คนที่ทำงานกับเอกสารพวกนี้จำ ADF · NPC · FRAE
+       ได้ก่อนชื่อเต็มเสมอ เห็นชื่อไทยอย่างเดียวแล้วนึกไม่ออกว่าใบไหน */
     return `<div class="fmrow">
-      <div><span class="cd">${A.esc(f.doc || f.abbr)}</span>
+      <div>
+        <div class="hd"><span class="ab">${A.esc(f.abbr)}</span>
+          <span class="cd">${A.esc(f.doc || '—')}</span>
+          ${f.code ? `<span class="rc" title="เลขกำกับบนกระดาษ">${A.esc(f.code)}</span>` : ''}</div>
         <div class="nm">${A.esc(f.th || f.t)}</div>
-        <div class="mt"><span class="tag ${lv}">${A.esc(label)}</span> ${A.esc(ver)}</div></div>
+        <div class="mt">
+          <span class="tag ${lv}">${A.esc(label)}</span>
+          <span class="tag dep" title="แผนกเจ้าของเอกสาร">${A.esc(A.deptName(f.own))}</span>
+          ${(f.lef || []).map(m => `<span class="tag man" title="${A.esc(A.manualName(m))}">${A.esc(m)}</span>`).join('')}
+          ${!(f.lef || []).length ? '<span class="tag warn">ยังไม่อยู่ใน LEF</span>' : ''}
+          <span class="vr">${A.esc(ver)}</span></div></div>
       <div class="act">${act.join('')}</div></div>`;
   }).join('');
   document.getElementById('list').innerHTML = rows ||
     '<p class="note">ไม่มีฟอร์มที่ตรงเงื่อนไข</p>';
+  document.getElementById('cnt').textContent =
+    shown === REG.forms.length ? REG.forms.length + ' ใบ'
+                               : shown + ' จาก ' + REG.forms.length + ' ใบ';
 
   document.querySelectorAll('[data-hist]').forEach(b => b.onclick = () => history(b.dataset.hist));
   document.querySelectorAll('[data-pub]').forEach(b => b.onclick = () => publishDlg(b.dataset.pub));
