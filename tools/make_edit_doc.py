@@ -6,6 +6,7 @@
 #   python3 tools/make_edit_doc.py PCK VAC SAC SSC
 #   python3 tools/make_edit_doc.py --ops        ทุกใบในแท็บที่ไม่ใช่เครื่องบิน
 #   python3 tools/make_edit_doc.py --check      ดูว่าใบไหนยังไม่มีต้นฉบับ
+#   python3 tools/make_edit_doc.py --form ECA   เอกสารในทะเบียนฟอร์ม (ไม่ใช่เช็กลิสต์)
 #
 # ── ทำไม ─────────────────────────────────────────────────────
 # เช็กลิสต์ของเครื่องบิน (NPC / EPC) มีปุ่ม "แก้ต้นฉบับ ✎" ให้เจ้าหน้าที่กดเข้าไป
@@ -90,8 +91,38 @@ def docx_of(pub, reg):
     return abbr, (p if os.path.exists(p) else None)
 
 
+def forms(abbrs):
+    """ทำต้นฉบับให้เอกสารในทะเบียนฟอร์ม — คนละที่กับ publications.json
+
+    ใช้กับเอกสารอ้างอิงที่ไม่มีช่องกรอก (เช่น ECA เกณฑ์การให้เกรด) ซึ่งไม่มี
+    แม่แบบ tpl เพราะไม่มี token ให้เติม แต่ยังต้องแก้ไขได้เหมือนเอกสารอื่น
+    """
+    reg = json.load(open(REG, encoding='utf-8'))
+    tk = token()
+    parent = folder_id(tk)
+    done = 0
+    for abbr in abbrs:
+        row = next((x for x in reg['forms'] if x['abbr'] == abbr), None)
+        if not row:
+            print('   %-9s ไม่มีในทะเบียน — ข้าม' % abbr); continue
+        if row.get('edit'):
+            print('   %-9s มีต้นฉบับอยู่แล้ว %s' % (abbr, row['edit'])); continue
+        path = os.path.join(SRC_DIR, row.get('docx') or '')
+        if not row.get('docx') or not os.path.exists(path):
+            print('   %-9s ไม่มีไฟล์ .docx ต้นฉบับ — ข้าม' % abbr); continue
+        fid = upload(path, '%s — %s' % (row['doc'], row.get('t') or ''), parent, tk)
+        row['edit'] = fid
+        done += 1
+        print('   ✅ %-9s %s' % (abbr, fid))
+    if done:
+        json.dump(reg, open(REG, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+        print('\nเขียน forms_register.json แล้ว %d รายการ — รัน python3 build.py ต่อ' % done)
+
+
 def main():
     args = sys.argv[1:]
+    if '--form' in args:
+        return forms([a.upper() for a in args if a != '--form'])
     pubs = json.load(open(PUBS, encoding='utf-8'))
     reg = json.load(open(REG, encoding='utf-8'))
     ac_cats = {k for k, c in pubs['cats'].items() if c.get('tab') == 'ac'}
