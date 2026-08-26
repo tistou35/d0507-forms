@@ -128,7 +128,7 @@ function paint(){
        edit = ตัวเอกสารเองบน Google Docs สำหรับแก้เนื้อหา
        เอกสารอ้างอิงอย่าง ECA ไม่มี tpl เพราะไม่มีช่องให้เติม แต่ยังต้องแก้ได้
        ปุ่มนี้ใช้ชื่อและความหมายเดียวกับในหน้าเช็กลิสต์ จะได้ไม่ต้องเรียนรู้ใหม่ */
-    (staff && F.edit ? `<a class="big sec" href="https://docs.google.com/document/d/${
+    (A.isAdmin() && F.edit ? `<a class="big sec" href="https://docs.google.com/document/d/${
         A.esc(F.edit)}/edit" target="_blank" rel="noopener"
         title="ต้นฉบับที่แก้ไขได้ — แก้แล้วต้องเลื่อนเลขกำกับ ดาวน์โหลดกลับมาทับ .docx และทำ PDF ใหม่"
         >${A.esc(A.L({th:'แก้ต้นฉบับ',en:'Edit source'}))} ✎</a>` : '') +

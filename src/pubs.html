@@ -306,7 +306,7 @@ function cell(p, label){
     <span class="badge b-${s.k}">${A.esc(A.L(s.t))}</span>
     ${u ? `<a class="go" href="${A.esc(u)}" target="_blank" rel="noopener">${A.esc(T('open'))} ↗</a>`
         : `<span class="go">${A.esc(T('nofile'))}</span>`}
-    ${p && p.edit && A.isStaff()
+    ${p && p.edit && A.isAdmin()
         ? `<a class="go ed3" href="https://docs.google.com/document/d/${A.esc(p.edit)}/edit"
              target="_blank" rel="noopener"
              title="ต้นฉบับที่แก้ไขได้ — แก้แล้วต้องเลื่อนเลขกำกับและทำ PDF ใหม่"
@@ -402,7 +402,7 @@ function listHtml(tab){
         <span class="badge b-${s.k}">${A.esc(A.L(s.t))}</span>
         ${u ? `<a class="go" href="${A.esc(u)}" target="_blank" rel="noopener">${A.esc(T('open'))} ↗</a>`
             : `<span class="go">${A.esc(T('nofile'))}</span>`}
-        ${p.edit && A.isStaff()
+        ${p.edit && A.isAdmin()
             ? `<a class="go ed3" href="https://docs.google.com/document/d/${A.esc(p.edit)}/edit"
                  target="_blank" rel="noopener" title="ต้นฉบับที่แก้ไขได้ — แก้แล้วต้องเลื่อนเลขกำกับและทำ PDF ใหม่"
                  >${A.esc(T('editSrc'))} ✎</a>` : ''}</div>`;
