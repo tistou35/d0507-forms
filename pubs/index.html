@@ -354,6 +354,19 @@ const fileUrl = f => !f ? '' :
   /^https?:/.test(f) ? f :
   /[\/.]/.test(f)    ? '../' + f :
                        'https://drive.google.com/file/d/' + f + '/view';
+
+/* ที่อยู่ของปุ่ม "เปิด" — ต้นฉบับมาก่อน PDF เสมอ
+
+   ต้นฉบับบน Google Docs เป็นแฟ้มเดียวกับที่ปุ่ม "แก้ต้นฉบับ" พาไป เปิดด้วย
+   /preview จึงเป็นหน้าอ่านอย่างเดียว ไม่มีเครื่องมือแก้ไข แก้ที่ต้นฉบับแล้ว
+   สิ่งที่คนเปิดอ่านเปลี่ยนตามทันที ไม่ต้องทำ PDF ใหม่ให้ตรงกันอีกฉบับ
+
+   ⚠️ ต้นฉบับเป็นเอกสารเป็น ๆ ไม่ใช่ฉบับแช่แข็งตามเลขแก้ไข ถ้าวันหนึ่งต้อง
+   เก็บหลักฐานว่า "ฉบับแก้ไข 01 หน้าตาอย่างไร" ยังต้องทำ PDF เก็บไว้อยู่ดี
+   ตอนนี้ PDF ใน blank/ ทำหน้าที่นั้น และยังเป็นตัวสำรองเมื่อไม่มีต้นฉบับ */
+const openUrl = p => !p ? '' :
+  p.edit ? 'https://docs.google.com/document/d/' + p.edit + '/preview'
+         : fileUrl(p.file);
 const catsOf = tab => Object.entries(PUB.cats).filter(([,c]) => c.tab === tab).map(([k]) => k);
 const inTab  = (p, tab) => catsOf(tab).includes(p.cat);
 const T = k => A.L({
@@ -369,7 +382,7 @@ const T = k => A.L({
 
 /* หนึ่งช่อง = หนึ่งฉบับ ใช้ในแถวเครื่องบิน */
 function cell(p, label){
-  const s = state(p), u = p ? fileUrl(p.file) : '';
+  const s = state(p), u = openUrl(p);
   const ed = !p ? '—' : p.cat==='chart'
     ? 'AIRAC ' + A.esc(p.airac||'—')
     : (p.ed ? A.esc(p.ed+'/'+(p.rev||'00')) : '—');
@@ -464,7 +477,7 @@ function listHtml(tab){
     const c = PUB.cats[ck], list = PUBS.filter(p => p.cat === ck);
     out.push(`<h2 class="psec">${A.esc(LL(c))}<span class="d">${A.esc(c.d||'')}</span></h2>`);
     out.push(list.length ? list.map(p => {
-      const s = state(p), u = fileUrl(p.file);
+      const s = state(p), u = openUrl(p);
       const ed = p.cat==='chart'
         ? `<b>AIRAC ${A.esc(p.airac||'—')}</b>${s.sub?' '+A.esc(T('until')+' '+dmy(s.sub)):''}`
         : `<b>${A.esc(p.ed?p.ed+'/'+(p.rev||'00'):'—')}</b>${p.eff?' '+A.esc(T('eff')+' '+dmy(p.eff)):''}`;

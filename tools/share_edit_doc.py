@@ -12,19 +12,31 @@
 # คนที่เปิดอ่านไม่ได้ล็อกอิน Google ของบริษัท แฟ้มจึงต้องเปิดให้ลิงก์อ่านได้
 #
 # ── สิ่งที่ตรวจเจอตอนทำ ──────────────────────────────────────
-# ต้นฉบับของ C172M/N/S ถูกตั้งไว้ที่ anyone = writer มาก่อนแล้ว
-# แปลว่าใครก็ตามที่ได้ลิงก์ไป "แก้เช็กลิสต์ห้องนักบินได้" โดยไม่ต้องล็อกอิน
-# ตัวนี้ลดลงมาเป็น reader — แก้ได้เฉพาะคนที่ถูกเพิ่มชื่อไว้เท่านั้น
+# ต้นฉบับของ C172M/N/S เดิมอยู่ใต้ _Quality Assurance (QA)/D0507/Forms
+# ซึ่งตั้งไว้ที่ anyone = writer แปลว่าใครก็ตามที่ได้ลิงก์ไป
+# "แก้เช็กลิสต์ห้องนักบินได้" โดยไม่ต้องล็อกอิน
+#
+# ลดสิทธิ์ที่ตัวไฟล์ไม่ได้ — Drive ห้ามตั้งต่ำกว่าที่สืบทอดจากโฟลเดอร์แม่
+# และลดที่โฟลเดอร์ Forms ก็ไม่ได้ เพราะ token ของเรามีสโคป drive.file
+# แตะได้เฉพาะไฟล์ที่แอปนี้สร้างเอง ส่วนโฟลเดอร์นั้นคนอื่นสร้างไว้
+#
+# ทางออกคือ "ย้ายออกมา" — ต้นฉบับทุกฉบับย้ายมาไว้ในโฟลเดอร์ของเราเอง
+# (D-0507 Checklist sources) ซึ่งไม่ได้แชร์ แล้วตั้งสิทธิ์ทีละไฟล์เป็น reader
+# ⚠️ โฟลเดอร์ Forms ยังเป็น anyone = writer อยู่ ใบฟอร์มและแผ่นบันทึกที่
+#    ระบบออกไปเก็บไว้ในนั้นยังแก้ได้ด้วยลิงก์ — ต้องแก้เองในหน้าเว็บ Drive
 # ============================================================
 import json
+import urllib.parse
 import os
 import sys
+import urllib.error
 import urllib.request
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(HERE, 'tools'))
 from gas_push import token, SSLCTX  # noqa: E402
 
+FOLDER_NAME = 'D-0507 Checklist sources'
 PUBS = os.path.join(HERE, 'publications.json')
 REG = os.path.join(HERE, 'forms_register.json')
 
@@ -89,61 +101,57 @@ def name_of(fid, tk):
                          % fid, tk))['name']
 
 
-def main():
-    """ตั้งสิทธิ์ที่ "โฟลเดอร์" ไม่ใช่ที่ไฟล์
+def dest_folder(tk):
+    """โฟลเดอร์ของเราเอง — ไม่ได้แชร์ จึงไม่มีสิทธิ์สืบทอดมากดทับ"""
+    q = ("mimeType='application/vnd.google-apps.folder' and trashed=false and name='%s'"
+         % FOLDER_NAME)
+    r = json.load(api('https://www.googleapis.com/drive/v3/files?q=%s&fields=files(id)'
+                      % urllib.parse.quote(q), tk))
+    if not r['files']:
+        sys.exit('ไม่พบโฟลเดอร์ %s' % FOLDER_NAME)
+    return r['files'][0]['id']
 
-    Drive ไม่ยอมให้ตั้งสิทธิ์ของไฟล์ต่ำกว่าที่สืบทอดมาจากโฟลเดอร์แม่
-    (403 Cannot modify a permission ... less than the inherited access)
-    ต้นฉบับของ C172 ทุกใบอยู่ในโฟลเดอร์ของตัวเองที่ตั้งไว้ที่ anyone = writer
-    จึงต้องลดที่โฟลเดอร์ ซึ่งแต่ละโฟลเดอร์มีไฟล์เดียวคือเอกสารนั้นเอง
-    """
+
+def move_in(fid, dest, tk):
+    """ย้ายเข้าโฟลเดอร์ของเรา คืน True ถ้าย้ายจริง (อยู่แล้วคืน False)"""
+    pars = parents_of(fid, tk)
+    if pars == [dest]:
+        return False
+    api('https://www.googleapis.com/drive/v3/files/%s?addParents=%s&removeParents=%s'
+        % (fid, dest, ','.join(pars)), tk, b'{}', 'PATCH')
+    return True
+
+
+def main():
     tk = token()
     check = '--check' in sys.argv
-    # รากของไดรฟ์ต้องไม่ถูกแตะเด็ดขาด — เปิดลิงก์ที่รากคือเปิดทั้งไดรฟ์ 976 แฟ้ม
-    root = json.load(api('https://www.googleapis.com/drive/v3/files/root?fields=id', tk))['id']
-    folders, loose = {}, []
+    dest = dest_folder(tk)
+    moved = fixed = already = 0
     for name, fid in sources():
-        pars = parents_of(fid, tk) or [None]
-        # วางไว้ที่รากไดรฟ์ = ไม่มีโฟลเดอร์ให้ลด ตั้งที่ตัวไฟล์เองได้เลย
-        # (ตั้งที่รากไม่ได้เด็ดขาด นั่นคือเปิดทั้งไดรฟ์)
-        if pars == [root] or pars == [None]:
-            loose.append((name, fid))
-            continue
-        for par in pars:
-            if par != root:
-                folders.setdefault(par, []).append(name)
-
-    fixed = already = 0
-    for par, names in sorted(folders.items(), key=lambda x: str(x[0])):
-        if par is None:
-            print('   ⚠️ %s — ไม่มีโฟลเดอร์แม่ ข้าม' % ', '.join(names))
-            continue
-
-        fname = name_of(par, tk)
-        cur = link_perm(perms(par, tk))
-        now = cur['role'] if cur else 'ไม่มีลิงก์สาธารณะ'
-        if cur and cur['role'] == 'reader':
+        cur = link_perm(perms(fid, tk))
+        where = parents_of(fid, tk)
+        outside = where != [dest]
+        if cur and cur['role'] == 'reader' and not outside:
             already += 1
-            print('   %-30s %-22s ถูกต้องแล้ว (%d ฉบับ)' % (fname[:30], now, len(names)))
+            print('   %-32s reader · อยู่ในโฟลเดอร์ต้นฉบับแล้ว' % name[:32])
             continue
         if check:
-            print('   %-30s %-22s → ควรเป็น reader (%d ฉบับ)' % (fname[:30], now, len(names)))
+            print('   %-32s %-10s %s' % (
+                name[:32], (cur['role'] if cur else 'ส่วนตัว'),
+                'ต้องย้ายออกจากโฟลเดอร์ที่แชร์ไว้' if outside else 'ตั้ง reader ได้เลย'))
             continue
-        was, ok = set_reader(par, tk)
-        print('   %s %-30s %-14s → reader (%d ฉบับ)'
-              % ('✅' if ok else '❌', fname[:30], was, len(names)))
+        try:
+            if outside and move_in(fid, dest, tk):
+                moved += 1
+            was, ok = set_reader(fid, tk)
+        except urllib.error.HTTPError as e:
+            msg = json.loads(e.read().decode())['error']['message']
+            print('   ⚠️ %-32s ทำไม่ได้ — %s' % (name[:32], msg[:70]))
+            continue
+        print('   %s %-32s %-10s → reader%s'
+              % ('✅' if ok else '❌', name[:32], was, ' · ย้ายแล้ว' if outside else ''))
         fixed += 1
-
-    for name, fid in loose:
-        was, ok = set_reader(fid, tk)
-        if was == 'reader':
-            already += 1
-            print('   %-30s reader                 ถูกต้องแล้ว (ตั้งที่ไฟล์)' % name[:30])
-        else:
-            print('   %s %-30s %-14s → reader (ตั้งที่ไฟล์)'
-                  % ('✅' if ok else '❌', name[:30], was))
-            fixed += 1
-    print('\nถูกต้องอยู่แล้ว %d · แก้ไป %d' % (already, fixed))
+    print('\nถูกต้องอยู่แล้ว %d · ย้าย %d · ตั้งสิทธิ์ %d' % (already, moved, fixed))
 
 
 if __name__ == '__main__':
