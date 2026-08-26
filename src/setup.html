@@ -8,6 +8,34 @@
 .msg{font-size:12.5px;color:var(--g-500)}
 .msg.bad{color:var(--red-600)} .msg.ok{color:var(--green-600)}
 </style>
+<style>
+dialog{border:0;border-radius:12px;padding:0;max-width:600px;width:calc(100% - 32px);
+  box-shadow:var(--sh-lg);background:var(--surface);color:var(--fg-1)}
+dialog::backdrop{background:rgba(13,27,42,.5)}
+dialog .dh{background:var(--navy-900);color:#fff;padding:18px 22px}
+dialog .dh h3{font-size:18px;font-weight:700;color:#fff}
+dialog .dh p{font-size:12.5px;color:rgba(255,255,255,.7);margin-top:3px}
+dialog .db{padding:20px 22px;max-height:60vh;overflow:auto}
+dialog .df{padding:14px 22px;border-top:1px solid var(--g-100);display:flex;gap:10px;
+  justify-content:flex-end;flex-wrap:wrap}
+.stabs{display:flex;gap:8px;margin:6px 0 18px;flex-wrap:wrap}
+.stabs button{padding:9px 16px;border-radius:9px;border:1px solid var(--border-light);
+  background:var(--surface);font-size:13.5px;cursor:pointer;color:var(--fg-2);font-family:inherit}
+.stabs button[aria-selected="true"]{background:var(--navy-900);color:#fff;border-color:var(--navy-900)}
+section[data-pane].off{display:none}
+.filters select{min-height:40px;padding:0 11px;border-radius:8px;border:1px solid var(--border-med);
+  background:var(--surface);font-size:13.5px;font-family:inherit;color:var(--fg-1)}
+.filters .cnt{font-size:12.5px;color:var(--g-500);margin-left:auto}
+.urow{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;
+  background:var(--surface);border:1px solid var(--border-light);border-radius:8px;
+  padding:12px 16px;margin-bottom:8px}
+.urow .nm{font-size:14.5px;font-weight:600}
+.urow .em{font-family:var(--font-mono);font-size:11.5px;color:var(--g-500)}
+.urow .tg{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
+.urow.off2{opacity:.55}
+.tag.rl{background:var(--g-100);color:var(--fg-2);font-size:11px}
+.tag.ps{background:var(--sky-50,#eaf2fb);color:var(--sky-600);font-family:var(--font-mono);font-size:10.5px}
+</style>
 </head><body>
 @@TOPBAR@@
 <div class="body">
@@ -21,14 +49,31 @@
     <div id="gate"></div>
 
     <div id="body" class="hide">
+      <div class="stabs" role="tablist">
+        <button role="tab" data-tab="users"  aria-selected="true">ผู้ใช้งาน</button>
+        <button role="tab" data-tab="me"     aria-selected="false">โปรไฟล์ของฉัน</button>
+        <button role="tab" data-tab="access" aria-selected="false">สิทธิ์และผู้รับฟอร์ม</button>
+        <button role="tab" data-tab="system" aria-selected="false">ระบบและทะเบียน</button>
+      </div>
 
-      <section>
+      <section data-pane="system">
         <div class="sh"><h2>สถานะข้อมูลตั้งต้น</h2><span class="en">Setup status</span>
           <span class="rt"><button class="fb" id="recheck">ตรวจใหม่</button></span></div>
         <div class="stats" id="status"></div>
       </section>
 
-      <section>
+      <section data-pane="users">
+        <div class="sh"><h2>รายชื่อผู้ใช้</h2><span class="en">User accounts</span>
+          <span class="rt"><button class="fb" id="uRel">โหลดใหม่</button></span></div>
+        <div class="filters">
+          <select id="uRole"><option value="">ทุกบทบาท</option></select>
+          <input id="uQ" type="search" placeholder="ค้นหาชื่อ · อีเมล">
+          <span class="cnt" id="uCnt"></span>
+        </div>
+        <div id="uList">—</div>
+      </section>
+
+      <section data-pane="users">
         <div class="sh"><h2>เพิ่มเจ้าหน้าที่</h2><span class="en">Add staff account</span></div>
         <div class="card">
           <p class="note" style="margin-bottom:14px">เปิดบัญชีให้เพื่อนร่วมงานด้วยอีเมลและรหัสผ่านตั้งต้น
@@ -62,7 +107,7 @@
         </div>
       </section>
 
-      <section>
+      <section data-pane="me">
         <div class="sh"><h2>โปรไฟล์และบทบาทของฉัน</h2><span class="en">My profile &amp; roles</span></div>
         <div class="card">
           <dl class="kv" id="me"></dl>
@@ -96,13 +141,13 @@
         </div>
       </section>
 
-      <section>
+      <section data-pane="access">
         <div class="sh"><h2>รายชื่อผู้รับฟอร์ม</h2><span class="en">Recipient directory</span>
           <span class="rt">อ่านได้ทั้งโลก — มีแค่ชื่อ ตำแหน่ง และประเภทฟอร์มที่รับ</span></div>
         <div class="card"><div id="dir">—</div></div>
       </section>
 
-      <section>
+      <section data-pane="access">
         <div class="sh"><h2>ผู้ดูแลระบบ</h2><span class="en">Administrators</span></div>
         <div class="card">
           <p class="hint" style="margin-bottom:12px">ผู้ดูแลระบบเท่านั้นที่เข้า
@@ -116,7 +161,7 @@
         </div>
       </section>
 
-      <section>
+      <section data-pane="system">
         <div class="sh"><h2>ทะเบียนเอกสาร</h2><span class="en">Form register</span></div>
         <div class="card">
           <p class="hint" style="margin-bottom:12px">ทะเบียนฉบับเต็มมี control code · สถานะ LEF · หมายเหตุ
@@ -131,7 +176,7 @@
         </div>
       </section>
 
-      <section>
+      <section data-pane="system">
         <div class="sh"><h2>ผลการทำงาน</h2><span class="en">Log</span></div>
         <div class="card"><pre id="out" style="font-family:var(--font-mono);font-size:12.5px;
           white-space:pre-wrap;margin:0;line-height:1.7">—</pre></div>
@@ -140,6 +185,11 @@
     </div>
   </main>
 </div>
+<dialog id="udlg"><form method="dialog">
+  <div class="dh"><h3 id="udt">—</h3><p id="uds"></p></div>
+  <div class="db" id="udb"></div>
+  <div class="df" id="udf"></div>
+</form></dialog>
 @@BOTNAV@@
 <footer>D-0507 Flight Training Co., Ltd. · Controlled Document System</footer>
 
@@ -179,6 +229,150 @@ document.getElementById('nGen').addEventListener('click', () => {
   document.getElementById('nPass').value =
     [...r].map(x => AB[x % AB.length]).join('');
 });
+
+/* ── แท็บ ─────────────────────────────────────────────────
+   หน้านี้มีเจ็ดส่วนเรียงลงมายาว ๆ ผู้ดูแลที่เข้ามาทำเรื่องเดียว
+   ต้องเลื่อนผ่านอีกหกส่วนที่ไม่เกี่ยว */
+function tab(name){
+  document.querySelectorAll('.stabs button').forEach(b =>
+    b.setAttribute('aria-selected', b.dataset.tab === name));
+  document.querySelectorAll('section[data-pane]').forEach(el =>
+    el.classList.toggle('off', el.dataset.pane !== name));
+  try { history.replaceState(null, '', '#' + name); } catch(e){}
+  if (name === 'users') users();
+}
+document.querySelectorAll('.stabs button').forEach(b =>
+  b.addEventListener('click', () => tab(b.dataset.tab)));
+
+/* ── รายชื่อผู้ใช้ ─────────────────────────────────────────
+   อ่าน users/* ได้ทั้งหมดตาม rules (staff อ่านได้) แต่แก้ได้เฉพาะผู้ดูแลระบบ
+   คนอื่นเห็นรายชื่อเพื่อรู้ว่าใครอยู่ในระบบบ้าง — ตอนเลือกผู้รับฟอร์มต้องรู้ */
+let USERS = [];
+async function users(force){
+  const host = document.getElementById('uList');
+  if (USERS.length && !force) return paintUsers();
+  host.innerHTML = '<p class="hint">กำลังโหลด…</p>';
+  try {
+    const s = await A.db.collection('users').get();
+    USERS = s.docs.map(d => Object.assign({ uid: d.id }, d.data()));
+  } catch(e){
+    host.innerHTML = `<p class="hint">อ่านไม่ได้: ${A.esc(e.code || e.message)}</p>`; return;
+  }
+  const sel = document.getElementById('uRole');
+  if (!sel.dataset.wired){
+    sel.dataset.wired = '1';
+    ROLE_KEYS.forEach(k => sel.add(new Option(A.L(A.ROLE_N[k]) || k, k)));
+    sel.addEventListener('change', paintUsers);
+    document.getElementById('uQ').addEventListener('input', paintUsers);
+    document.getElementById('uRel').addEventListener('click', () => users(true));
+  }
+  paintUsers();
+}
+
+function paintUsers(){
+  const host = document.getElementById('uList');
+  const role = document.getElementById('uRole').value;
+  const q = (document.getElementById('uQ').value || '').trim().toLowerCase();
+  let L = USERS.slice().sort((a,b) => (a.name||'').localeCompare(b.name||'', 'th'));
+  if (role) L = L.filter(u => (u.roles || []).includes(role));
+  if (q) L = L.filter(u => [u.name, u.email, u.cert].join(' ').toLowerCase().includes(q));
+  document.getElementById('uCnt').textContent =
+    L.length === USERS.length ? USERS.length + ' คน' : L.length + ' จาก ' + USERS.length + ' คน';
+
+  const canEdit = A.isAdmin();
+  host.innerHTML = L.length ? L.map(u => `
+    <div class="urow${u.active === false ? ' off2' : ''}">
+      <div>
+        <div class="nm">${A.esc(u.name || '(ยังไม่ตั้งชื่อ)')}
+          ${u.active === false ? '<span class="tag">ปิดใช้งาน</span>' : ''}
+          ${u.uid === A.user.uid ? '<span class="tag ok">คุณ</span>' : ''}</div>
+        <div class="em">${A.esc(u.email || '—')}${u.cert ? ' · ' + A.esc(u.cert) : ''}</div>
+        <div class="tg">
+          ${(u.roles || []).map(r => `<span class="tag rl">${A.esc(A.L(A.ROLE_N[r]) || r)}</span>`).join('')
+            || '<span class="tag warn">ยังไม่มีบทบาท</span>'}
+          ${(u.positions || []).map(x => `<span class="tag ps">${A.esc(x)}</span>`).join('')}
+        </div>
+      </div>
+      <div>${canEdit ? `<button class="fb" data-edit="${A.esc(u.uid)}">แก้ไข</button>`
+                     : '<span class="hint">เฉพาะผู้ดูแลระบบ</span>'}</div>
+    </div>`).join('') : '<p class="hint">ไม่พบผู้ใช้ที่ตรงเงื่อนไข</p>';
+
+  host.querySelectorAll('[data-edit]').forEach(b =>
+    b.addEventListener('click', () => editUser(b.dataset.edit)));
+}
+
+/* ── แก้ไขผู้ใช้ ───────────────────────────────────────────
+   เขียนสามที่เหมือนตอนสร้างบัญชี — users/{uid} · staffDirectory · publicDirectory
+   ถ้าเขียนแค่ users/{uid} คนนั้นจะยังโผล่ในตัวเลือกผู้รับฟอร์มด้วยชื่อเก่า
+   หรือยังโผล่ทั้งที่ถูกปิดใช้งานไปแล้ว */
+function editUser(uid){
+  const u = USERS.find(x => x.uid === uid);
+  if (!u) return;
+  const R = new Set(u.roles || []), P = new Set(u.positions || []);
+  document.getElementById('udt').textContent = u.name || u.email || uid;
+  document.getElementById('uds').textContent = u.email || '';
+  document.getElementById('udb').innerHTML = `
+    <div class="fk-f"><label for="eName">ชื่อ</label><input id="eName" type="text"></div>
+    <div class="fk-f"><label for="eCert">ตำแหน่ง / คุณวุฒิ</label>
+      <p class="hint">ข้อความที่ขึ้นใต้ชื่อ เช่น FI · หัวหน้าฝ่ายปฏิบัติการการบิน</p>
+      <input id="eCert" type="text"></div>
+    <div class="fk-f"><label>บทบาท</label>
+      <p class="hint">ใช้ตัดสินว่าเห็นฟอร์มอะไรและอยู่ในสายอนุมัติไหน</p>
+      <div class="fk-opts" id="eRoles"></div></div>
+    <div class="fk-f"><label>ตำแหน่งในผังอนุมัติ</label>
+      <p class="hint">ใบที่ส่งถึงตำแหน่งนี้จะเข้าคิวของคนนี้</p>
+      <div class="fk-opts" id="ePos"></div></div>
+    <div class="fk-f"><label>สถานะ</label>
+      <div class="fk-opts"><button type="button" class="fk-opt" id="eAct"
+        aria-pressed="${u.active !== false}">ใช้งานอยู่</button></div>
+      <p class="hint">ปิดใช้งานแล้วยังล็อกอินได้ แต่หายจากตัวเลือกผู้รับฟอร์ม
+        — ปิดบัญชีจริงต้องทำที่ Firebase Console</p></div>
+    <div class="msg" id="eMsg"></div>`;
+  document.getElementById('udf').innerHTML =
+    `<button class="fb" value="cancel">ยกเลิก</button>
+     <button class="fb" id="eSave" style="background:var(--navy-900);color:#fff;border-color:var(--navy-900)">บันทึก</button>`;
+  document.getElementById('eName').value = u.name || '';
+  document.getElementById('eCert').value = u.cert || '';
+  chips(document.getElementById('eRoles'), ROLE_KEYS, R, k => A.L(A.ROLE_N[k]) || k);
+  chips(document.getElementById('ePos'), POS_KEYS, P, k => k + ' · ' + POS_N[k]);
+  const act = document.getElementById('eAct');
+  act.addEventListener('click', e => { e.preventDefault();
+    act.setAttribute('aria-pressed', act.getAttribute('aria-pressed') !== 'true'); });
+
+  document.getElementById('eSave').addEventListener('click', async e => {
+    e.preventDefault();
+    const msg = (t, c) => { const el = document.getElementById('eMsg');
+      el.className = 'msg' + (c ? ' ' + c : ''); el.textContent = t; };
+    const name = document.getElementById('eName').value.trim();
+    const cert = document.getElementById('eCert').value.trim();
+    const active = act.getAttribute('aria-pressed') === 'true';
+    if (!name) { msg('ยังไม่ได้กรอกชื่อ', 'bad'); return; }
+    if (!R.size) { msg('เลือกบทบาทอย่างน้อยหนึ่งอย่าง — ไม่งั้นเข้ามาแล้วไม่เห็นฟอร์มอะไรเลย', 'bad'); return; }
+    msg('กำลังบันทึก…');
+    try {
+      await A.db.collection('users').doc(uid).set(
+        { name, cert, roles: [...R], positions: [...P], active }, { merge: true });
+
+      const sref = A.db.collection('staffDirectory').doc('current');
+      const sdoc = await sref.get();
+      const slist = ((sdoc.exists && sdoc.data().list) || []).filter(x => x.id !== uid);
+      slist.push({ id: uid, name, position: cert, positions: [...P],
+                   email: u.email || '', active });
+      await sref.set({ list: slist }, { merge: true });
+
+      const pref = A.db.collection('publicDirectory').doc('instructors');
+      const pdoc = await pref.get();
+      const plist = ((pdoc.exists && pdoc.data().list) || []).filter(x => x.id !== uid);
+      if (P.size && active) plist.push({ id: uid, name, position: cert, recv: [...P] });
+      await pref.set({ list: plist }, { merge: true });
+    } catch (err) { msg('บันทึกไม่สำเร็จ: ' + (err.code || err.message), 'bad'); return; }
+    Object.assign(u, { name, cert, roles: [...R], positions: [...P], active });
+    log('users/' + uid + ' — แก้ไขแล้ว · ' + name + ' · ' + [...R].join(', '), 'green-600');
+    document.getElementById('udlg').close();
+    paintUsers(); dir();
+  });
+  document.getElementById('udlg').showModal();
+}
 
 function log(s, cls){
   const el = document.getElementById('out');
@@ -316,6 +510,8 @@ async function boot(){
   chips(document.getElementById('nRoles'), ROLE_KEYS, NROLES, k => A.L(A.ROLE_N[k]) || k);
   chips(document.getElementById('nPos'), POS_KEYS, NPOS, k => k + ' · ' + POS_N[k]);
   check(); dir();
+  // เปิดแท็บตามที่อยู่ใน URL ถ้ามี — กลับมาหน้าเดิมได้หลังรีเฟรช
+  tab((location.hash || '#users').slice(1));
 }
 
 /* รายชื่อผู้ดูแลระบบ — ตราบใดที่ config/admins ยังไม่มี เจ้าหน้าที่ทุกคนเป็น admin ชั่วคราว
