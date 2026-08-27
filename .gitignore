@@ -8,3 +8,5 @@ node_modules/
 # ทะเบียนฉบับเต็ม — อัปโหลดขึ้น Firestore เท่านั้น ไม่เก็บใน repo สาธารณะ
 firebase/registry.json
 
+
+/frae-links.html
