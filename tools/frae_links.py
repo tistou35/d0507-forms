@@ -16,11 +16,23 @@
 # เจ้าตัวต้องเปิดลิงก์ ตรวจว่าตรงกับที่บินจริง แล้วเซ็นเอง — ลายเซ็นคือสิ่งที่
 # ทำให้เอกสารนี้เป็นหลักฐาน ไม่ใช่ข้อมูลที่กรอกไว้
 #
+# ── วันที่สองชนิด อย่าสับสน ─────────────────────────────────
+#   evalDate      วันที่ประเมิน = วันที่บิน — ตั้งให้ตรงกับสมุดบันทึกแล้ว
+#                 เป็นช่องที่บอกว่าใบนี้เป็นของเที่ยวบินวันไหน
+#   วันที่บันทึก   เวลาที่ระบบออกให้ตอนกดส่ง (submittedAt) เป็นหลักฐานว่า
+#                 บันทึกนี้ถูกสร้างขึ้นเมื่อไรจริง ๆ แก้ไม่ได้และไม่ควรแก้
+#                 ถ้าเปลี่ยนให้เป็นวันบิน ใบที่ลงย้อนหลังจะดูเหมือนทำก่อนบิน
+#                 ซึ่งเป็นคนละเรื่องกับการลงบันทึกช้า
+#
+# ใบพวกนี้จึงติดหมายเหตุไว้ว่าเป็นการลงบันทึกย้อนหลัง — ผู้ตรวจรับได้กับ
+# "พบว่าขาด แล้วตามลงให้ครบพร้อมระบุว่าลงเมื่อไร" แต่รับไม่ได้กับวันที่ที่ถูกแก้
+#
 # ── คะแนนความเสี่ยง ─────────────────────────────────────────
 # มาจากลำดับเที่ยวบินของวันนั้นอย่างเดียว (เที่ยวแรก 0 · ที่สอง 1 · ที่สามขึ้นไป 2)
 # เพราะช่องอื่นปล่อยว่างหมด — อยู่ในช่วง 0–3 ตามที่กำหนด
 # ============================================================
 import base64
+import datetime
 import json
 import os
 import sys
@@ -67,6 +79,10 @@ SKIP = {'LOG-202608-9', 'LOG-202608-10', 'LOG-202608-11', 'LOG-202608-12'}
 MON = {m: i + 1 for i, m in enumerate(
     ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])}
+# หมายเหตุที่ติดไปกับทุกใบ — ขึ้นบน PDF ให้เห็นชัดว่าลงบันทึกย้อนหลัง
+# PIC แก้ข้อความนี้ได้ก่อนเซ็น ถ้าอยากเขียนให้ตรงกับที่เกิดขึ้นจริงกว่านี้
+NOTE = ('บันทึกย้อนหลังจากสมุดบันทึกการบิน — ลงบันทึกเมื่อ %s '
+        'สภาพอากาศและปัจจัยเสี่ยงกรอกตามที่ผู้ควบคุมเอกสารยืนยันว่าเป็นวันอากาศดี')
 NTH = ['1st', '2nd', '3rd', 'gt3']
 NTH_SCORE = {'1st': 0, '2nd': 1, '3rd': 2, 'gt3': 2}
 
@@ -98,12 +114,13 @@ def rows():
     return out
 
 
-def link(r):
+def link(r, stamp):
     o = {'role': 'PIC', 'picFirst': r['first'], 'picLast': r['last'],
          'evalDate': r['date'], 'flightNo': r['no'], 'aircraftReg': r['reg'],
          'flightType': 'VFR',
          's1Icing': 'none', 's1PrevFlight': r['nth'],
-         's3Runway': 'dry', 's5Runway': 'dry', 'decision': 'GO'}
+         's3Runway': 'dry', 's5Runway': 'dry', 'decision': 'GO',
+         'mitigation': NOTE % stamp}
     p = base64.urlsafe_b64encode(
         json.dumps(o, ensure_ascii=False).encode()).decode()
     return SITE + 'fill/?c=FRAE&p=' + p
@@ -112,6 +129,8 @@ def link(r):
 def main():
     allowed = regs_allowed()
     L = rows()
+    # วันที่ลงบันทึกจริง = วันนี้ ไม่ใช่วันบิน
+    stamp = datetime.date.today().strftime('%d %b %Y').upper()
     bad = [r for r in L if r['reg'] not in allowed]
     if bad:
         sys.exit('ทะเบียนที่ฟอร์มไม่มี: %s — เพิ่มใน formdefs/FRAE.json ก่อน'
@@ -133,7 +152,7 @@ def main():
             parts.append('<h2>%s · %d เที่ยว</h2>' % (who, len(rs)))
             for r in rs:
                 parts.append('<a href="%s"><b>%s</b> <span>%s · %s · คะแนน %d</span></a>'
-                             % (link(r), r['no'], r['date'], r['reg'], r['score']))
+                             % (link(r, stamp), r['no'], r['date'], r['reg'], r['score']))
         out = os.path.join(HERE, 'frae-links.html')
         open(out, 'w', encoding='utf-8').write('\n'.join(parts))
         print('เขียน %s · %d เที่ยว' % (out, len(L)))
@@ -145,7 +164,7 @@ def main():
         print('%-15s %-11s %-8s %-24s %-5s %d' %
               (r['no'], r['date'], r['reg'], r['first'] + ' ' + r['last'],
                r['nth'], r['score']))
-        print('    %s' % link(r))
+        print('    %s' % link(r, stamp))
     print('\nรวม %d เที่ยว · ข้ามตามที่สั่ง %d ใบ · คะแนนสูงสุด %d'
           % (len(L), len(SKIP), max(r['score'] for r in L)))
 
