@@ -448,7 +448,7 @@
   },
   {
    "doc": "D-0507-CAR-001",
-   "code": "",
+   "code": "QA-CAR-301-A",
    "abbr": "CAR",
    "t": "Corrective Action Request",
    "th": "คำขอให้ดำเนินการแก้ไขข้อบกพร่อง",
@@ -484,7 +484,7 @@
     "ข้อบกพร่อง"
    ],
    "blank": "blank/CAR.pdf",
-   "edit": "1RXyk7di_JtZfb3IJX_8r0kL-G3lTG2lJykhBxzT7Rak"
+   "edit": "1EUJ-JjukrVM4ful0ptfwMLCXRcCa2_29oaRNEJau0Bs"
   },
   {
    "doc": "D-0507-DAF-001",
