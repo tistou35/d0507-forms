@@ -16,6 +16,17 @@
 # เก็บในรีโปแปลว่าเวอร์ชันของไฟล์เดินคู่กับทะเบียน ย้อนดูได้ว่าฉบับไหนหน้าตาอย่างไร
 # และหน้าเว็บไม่ต้องพึ่งสิทธิ์การแชร์ของ Drive ซึ่งบัญชีนี้ถูกนโยบายปิดไว้บางส่วน
 #
+# ── ต้นทางของ PDF ────────────────────────────────────────────
+# ใบที่มีต้นฉบับบน Google Docs (ช่อง edit — ปุ่ม "แก้ต้นฉบับ ✎") ให้ export
+# จากแฟ้มนั้นเสมอ ไม่ใช่จาก .docx
+#
+# เหตุผล: ปุ่ม "แก้ต้นฉบับ" คือที่ที่คนเข้าไปแก้จริง ถ้า PDF ยังทำจาก .docx
+# แก้ต้นฉบับแล้วฟอร์มเปล่าไม่ตาม กลายเป็นสองฉบับที่ไม่ตรงกัน — เจอมาแล้ว
+# ทั้งกับ ALR (ฟอร์มเปล่าเก่ากว่าต้นฉบับหนึ่งวัน) และ CAR (ต้นฉบับไม่มีเลขกำกับ
+# ขณะที่กระดาษมี)
+#
+# ใบที่ยังไม่มี edit ใช้ .docx ไปก่อน และบอกไว้ในผลลัพธ์ว่าใช้ทางไหน
+#
 # ── วิธีแปลง ─────────────────────────────────────────────────
 # เครื่องนี้ไม่มี LibreOffice จึงยืม Drive แปลงให้: อัปโหลด .docx แบบสั่งแปลง
 # เป็น Google Doc แล้ว export เป็น PDF จากนั้นลบไฟล์ชั่วคราวทิ้ง
@@ -69,6 +80,12 @@ def blank_docx(path):
                 data = t.encode('utf-8')
             out.writestr(it, data)
     return buf.getvalue()
+
+
+def export_pdf(fid, tk):
+    """export Google Doc ที่มีอยู่แล้วเป็น PDF — ไม่ได้สร้างสำเนาใหม่"""
+    return api('https://www.googleapis.com/drive/v3/files/%s/export'
+               '?mimeType=application/pdf' % fid, tk).read()
 
 
 def convert(path, tk):
@@ -128,17 +145,23 @@ def main(argv):
         if f.get('blankFrom') == 'tpl':
             print('⏭  %s ทำจากแม่แบบ — ใช้ tools/make_blank_tpl.mjs %s' % (a, a))
             continue
-        src = os.path.join(DOCX_DIR, f.get('docx') or '')
-        if not f.get('docx') or not os.path.exists(src):
-            print('🔴 %s ไม่มีไฟล์ต้นฉบับ %s' % (a, f.get('docx') or '(ไม่ระบุ)')); bad += 1; continue
         out = os.path.join(OUT, a + '.pdf')
+        # ต้นฉบับบน Google Docs มาก่อนเสมอ — เป็นแฟ้มเดียวกับที่ปุ่ม
+        # "แก้ต้นฉบับ ✎" พาไป PDF จึงตามการแก้ไขได้เองโดยไม่ต้องจำว่าต้องซิงก์
+        via = 'edit' if f.get('edit') else 'docx'
+        src = os.path.join(DOCX_DIR, f.get('docx') or '')
+        if via == 'docx' and (not f.get('docx') or not os.path.exists(src)):
+            print('🔴 %s ไม่มีทั้งต้นฉบับบน Docs และไฟล์ %s'
+                  % (a, f.get('docx') or '(ไม่ระบุ)')); bad += 1; continue
         try:
-            pdf = convert(src, tk)
+            pdf = export_pdf(f['edit'], tk) if via == 'edit' else convert(src, tk)
             if pdf[:4] != b'%PDF':
                 raise RuntimeError('ผลลัพธ์ไม่ใช่ PDF')
             open(out, 'wb').write(pdf)
             n = stamp(out, f)
-            print('✅ %-9s %d หน้า · %.0f KB · blank/%s.pdf' % (a, n, len(pdf) / 1024, a))
+            print('✅ %-9s %d หน้า · %.0f KB · blank/%s.pdf · จาก %s'
+                  % (a, n, len(pdf) / 1024, a,
+                     'ต้นฉบับ Google Docs' if via == 'edit' else '.docx (ยังไม่มีต้นฉบับบน Docs)'))
             if f.get('blank') != 'blank/%s.pdf' % a:
                 print('   ⚠️ ทะเบียนยังไม่ได้ตั้ง "blank": "blank/%s.pdf" — ใส่เองแล้วรัน build.py' % a)
         except Exception as e:

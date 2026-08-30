@@ -149,7 +149,8 @@
    "sysOK": "ยืนยันแล้ว 01 AUG 2026",
    "jotDup": "221334919954059",
    "note": "ฉบับที่ใช้จริงอยู่ในAeroFBO",
-   "blank": "blank/AFM.pdf"
+   "blank": "blank/AFM.pdf",
+   "edit": "1Ny7Mz-A9rsqVVc4DAhejY3aCHXiPD9cBetYT8fO9Yn4"
   },
   {
    "doc": "D-0507-ALR-001",
@@ -188,7 +189,8 @@
     "alr"
    ],
    "note": "สมุดที่ติดไปกับอากาศยาน บันทึกรายเที่ยวบิน นักบินลงนามทุกเที่ยว และผูกกับงานซ่อมบำรุง · กรอกใน AeroFBO ที่ flight-log-add.php · เที่ยวบินที่มีตารางแล้วกรอกได้จาก preflight-prep.php",
-   "blank": "blank/ALR.pdf"
+   "blank": "blank/ALR.pdf",
+   "edit": "1Bxgg9-3YAhPAWJLEU4zpKpGK2YNk7GyVQBxn4OWHcU0"
   },
   {
    "doc": "D-0507-APF-001",
@@ -228,7 +230,8 @@
     "apf"
    ],
    "blank": "blank/APF.pdf",
-   "tpl": "1rn_faqzQtkjsCqy9EpfGiustEfcuBnF9umGHybcvWRA"
+   "tpl": "1rn_faqzQtkjsCqy9EpfGiustEfcuBnF9umGHybcvWRA",
+   "edit": "1_PD7XSLjFpXFToDEmUMD8FYA0j2YvZM_D6jPHI62VK8"
   },
   {
    "doc": "D-0507-APP-001",
@@ -309,7 +312,8 @@
    "assignTo": "FI",
    "blank": "blank/ASF.pdf",
    "tpl": "1uY8DJHLfvBJeTS1FLwa1Dr6gBwJu8L86m_cjjQ-xGAM",
-   "unlisted": true
+   "unlisted": true,
+   "edit": "1XYJnMUzvMvCRT5RwRb6PfJgmVz-43Dc7BvX-uc6K7zw"
   },
   {
    "doc": "",
@@ -406,7 +410,8 @@
     "รายการตรวจ",
     "bck"
    ],
-   "blank": "blank/BCK.pdf"
+   "blank": "blank/BCK.pdf",
+   "edit": "1IXr-zA3miBwELxnmN46FOl0qt4f0wlUeKIiKRo2TNAE"
   },
   {
    "doc": "D-0507-CAP-001",
@@ -444,7 +449,8 @@
     "corrective action plan",
     "ป้องกันการเกิดซ้ำ"
    ],
-   "blank": "blank/CAP.pdf"
+   "blank": "blank/CAP.pdf",
+   "edit": "16MzYlAAAsAwZq0tvqrElci1ubJP6POZYEqT0RPseENg"
   },
   {
    "doc": "D-0507-CAR-001",
@@ -521,7 +527,8 @@
     "daf"
    ],
    "blank": "blank/DAF.pdf",
-   "tpl": "1ZneD6k6y7mU692SVZsYpKJuCKTYqE_HkJHhQfcbl6UU"
+   "tpl": "1ZneD6k6y7mU692SVZsYpKJuCKTYqE_HkJHhQfcbl6UU",
+   "edit": "1I65_gNwUjMmHj1qo9Ok-fBOht11Rv0CC7KT6gQvmDLk"
   },
   {
    "doc": "D-0507-DRC-001",
@@ -567,7 +574,8 @@
      "en": "Prepare distribution link"
     }
    },
-   "unlisted": true
+   "unlisted": true,
+   "edit": "1_nFoSbFMMZpNjUbKmz1wGGY7NX_VAOezzpLt9SGTrLw"
   },
   {
    "doc": "D-0507-DRF-001",
@@ -610,7 +618,8 @@
    ],
    "blank": "blank/DRF.pdf",
    "tpl": "1LRibEDPwiMmQAjeQmkP3gvgkhsyP5GVbTgZDCJcXA2o",
-   "unlisted": true
+   "unlisted": true,
+   "edit": "1RekprPWXxS_1TgPeTeYiHQDjCZ5QKN0M7RGVwCi9L38"
   },
   {
    "doc": "",
@@ -729,7 +738,8 @@
    ],
    "note": "ฉบับแก้ไข 01 (20 AUG 2026) — ถอดตารางหลักสูตรการฝึกบินออกทั้งหมด และ School Standard Subjects ตามที่เจ้าของงานสั่ง · เพิ่มช่วงเวลาเรียน ชั่วโมงเรียน และตารางรายวิชาจาก TrainHub ที่เติมอัตโนมัติผ่านลิงก์ prefill · ผลการฝึกบินจะไปทำในแอปอื่น ไม่ได้บันทึกในใบนี้แล้ว · ต้นฉบับก่อนแก้เก็บไว้ที่ D-0507-EFC-001-rev00-archive.docx",
    "blank": "blank/EFC.pdf",
-   "tpl": "1CdI-PRUriVZcaz78_QeXxYpaWcCCEfc7-gtafCC8RCk"
+   "tpl": "1CdI-PRUriVZcaz78_QeXxYpaWcCCEfc7-gtafCC8RCk",
+   "edit": "1N3-gmOZ-M9fjJPEXdhboJcPyUQwZIn9KBPEKNleELCU"
   },
   {
    "doc": "D-0507-EFM-001",
@@ -826,7 +836,8 @@
    "flow": {
     "th": "ประเมินผู้สมัครก่อนตัดสินใจจ้าง — ผ่านแล้วจึงเข้าสายมาตรฐานครู",
     "en": "Applicant assessment before the hiring decision"
-   }
+   },
+   "edit": "1rwAHKYbhRTOAtlzzvETjzxmKk6bH02d7iPXurCPTCZU"
   },
   {
    "doc": "D-0507-EPC-M-001",
@@ -863,7 +874,8 @@
     "c172m",
     "C172M"
    ],
-   "blank": "blank/EPC-M.pdf"
+   "blank": "blank/EPC-M.pdf",
+   "edit": "1dFmzU84Lyb6sMdoQkX2I4hjC-n-4WuORsDnxpQBLCsM"
   },
   {
    "doc": "D-0507-EPC-N-001",
@@ -900,7 +912,8 @@
     "c172n",
     "C172N"
    ],
-   "blank": "blank/EPC-N.pdf"
+   "blank": "blank/EPC-N.pdf",
+   "edit": "1-iJDJeRevyQpbefv41WNrmDUAiqYxfjarUqmhSDxMU0"
   },
   {
    "doc": "D-0507-EPC-S-001",
@@ -937,7 +950,8 @@
     "c172s",
     "C172S"
    ],
-   "blank": "blank/EPC-S.pdf"
+   "blank": "blank/EPC-S.pdf",
+   "edit": "1DMxcx4X-Duf8mOfhpxNTVRExilVAQ2jS5y8MfoeHMjc"
   },
   {
    "sys": "here",
@@ -965,7 +979,8 @@
     "Stationair",
     "ฉุกเฉิน"
    ],
-   "note": "ฉบับร่าง — ถอดจาก Cessna Pilot's Checklist T206H (Rev 4 · 13 May 2002) ภาพถ่ายต้นฉบับถูกตัดท้ายหน้า ยังขาดรายการที่ทำแถบแดงไว้ ต้องเติมจาก POH และให้หัวหน้าครูการบินรับรองก่อนใช้บิน"
+   "note": "ฉบับร่าง — ถอดจาก Cessna Pilot's Checklist T206H (Rev 4 · 13 May 2002) ภาพถ่ายต้นฉบับถูกตัดท้ายหน้า ยังขาดรายการที่ทำแถบแดงไว้ ต้องเติมจาก POH และให้หัวหน้าครูการบินรับรองก่อนใช้บิน",
+   "edit": "1x7j7YKiuG-TEHpAsIv6zjFaKjyEc8kYD5wTNDFT8bxE"
   },
   {
    "doc": "D-0507-FPL-001",
@@ -1000,7 +1015,8 @@
    "sysOK": "ยืนยันแล้ว 01 AUG 2026",
    "jotDup": "93194090184459",
    "note": "ฉบับที่ใช้จริงอยู่ในระบบ Dispatch · ฟอร์มเปล่าที่นี่คือแบบ ICAO แผ่นเดียวกับที่ Dispatch พิมพ์ทับเวลาออกแผนจริง ดึงมาจากตัวแอปโดยตรง · Dispatch มีหน้า FORMS ที่กดพิมพ์/ดาวน์โหลด ฟอร์มเปล่าได้ทั้งชุด (แผนการบิน · General Declaration · บัญชีผู้โดยสาร · W&B รายลำ) ที่ d0507.361vision.org/d0507-app/next/#forms",
-   "blank": "blank/FPL.pdf"
+   "blank": "blank/FPL.pdf",
+   "edit": "15iDjtuFjrRVttJhCEaf4sIbxAfNrpTU5L_B46ACq9TA"
   },
   {
    "doc": "D-0507-FRAE-001",
@@ -1048,7 +1064,8 @@
     "preflight"
    ],
    "blank": "blank/FRAE.pdf",
-   "tpl": "1iglI6fZuJjDp1AixRf2OIEokGbRnhT4RZFeIVtn6kCE"
+   "tpl": "1iglI6fZuJjDp1AixRf2OIEokGbRnhT4RZFeIVtn6kCE",
+   "edit": "12my_RbjqOTRE9qkYUBh1AlopHApkRLG1YFAoGhOpl2E"
   },
   {
    "doc": "D-0507-FTR-001",
@@ -1086,7 +1103,8 @@
    ],
    "blank": "blank/FTR.pdf",
    "tpl": "1iDeTikRktXxm59E8_U_1zfpxVcO5OgAS1sxcbgO3ZaY",
-   "blankFrom": "tpl"
+   "blankFrom": "tpl",
+   "edit": "1K6J33mOM8GfMmDObAAUwKb92qbiAkhBsHLksqpETP3Y"
   },
   {
    "doc": "D-0507-GDC-001",
@@ -1188,7 +1206,8 @@
       "w": "ขั้นตอนฉุกเฉิน รวมการเรียก MAYDAY"
      }
     ]
-   }
+   },
+   "edit": "1RTGcpC2_DoVbmfmpidFk4ZdqbwUUNZWkTwl52ZFfdPY"
   },
   {
    "doc": "D-0507-HIF-001",
@@ -1229,7 +1248,8 @@
    "assignTo": "SM",
    "blank": "blank/HIF.pdf",
    "tpl": "1jJLzzD-_v9rr1K8Fw6sqQsdH5JqRpCOj2o_EAvfpwF0",
-   "unlisted": true
+   "unlisted": true,
+   "edit": "1_foYPqDGV8aFJusQaA1TVKmgq2S0zlIyq8J_9dbpUmA"
   },
   {
    "doc": "D-0507-IAC-001",
@@ -1293,7 +1313,8 @@
     "management review",
     "evaluation"
    ],
-   "blank": "blank/MER.pdf"
+   "blank": "blank/MER.pdf",
+   "edit": "1g4TVlFmV14gfxw0uqaHLKB4LQj142IZI5JI9-cqTWnU"
   },
   {
    "doc": "D-0507-MOC-001",
@@ -1328,7 +1349,8 @@
    ],
    "blank": "blank/MOC.pdf",
    "tpl": "1lj9ie_H1-kct5Z4sA2L1L0RKTu2glwgxYa041OFpvZc",
-   "unlisted": true
+   "unlisted": true,
+   "edit": "1aZIGWtH33pAHqeGGWouQjR7a4CCrwrDQEH0XxQiL1Cg"
   },
   {
    "doc": "D-0507-MRF-001",
@@ -1364,7 +1386,8 @@
     "reimbursement",
     "mrf"
    ],
-   "blank": "blank/MRF.pdf"
+   "blank": "blank/MRF.pdf",
+   "edit": "1rYTVuOpIiLt-1p5uB0T2Rp7E7_BsW0mAqviUxIkEyRI"
   },
   {
    "doc": "D-0507-MTC-001",
@@ -1401,7 +1424,8 @@
    ],
    "sysOK": "ยืนยันแล้ว 01 AUG 2026",
    "jotDup": "230023273391042",
-   "blank": "blank/MTC.pdf"
+   "blank": "blank/MTC.pdf",
+   "edit": "1KQlUmy7Or0Bydgr38TrRDk3Bg9FGQTds-Pn6nex6NK8"
   },
   {
    "doc": "D-0507-NCHR-001",
@@ -1435,7 +1459,8 @@
     "non-conformance",
     "nchr"
    ],
-   "blank": "blank/NCHR.pdf"
+   "blank": "blank/NCHR.pdf",
+   "edit": "1EyM2Y8755pC6DGA4E7x44b_3MhlSDGNjQy4v402nCvU"
   },
   {
    "doc": "D-0507-NPC-M-001",
@@ -1472,7 +1497,8 @@
     "c172m",
     "C172M"
    ],
-   "blank": "blank/NPC-M.pdf"
+   "blank": "blank/NPC-M.pdf",
+   "edit": "1ErMPabjd88DKIpz6MOeG1LfVcPQPa2RwtrCBZ0d9pjQ"
   },
   {
    "doc": "D-0507-NPC-N-001",
@@ -1509,7 +1535,8 @@
     "c172n",
     "C172N"
    ],
-   "blank": "blank/NPC-N.pdf"
+   "blank": "blank/NPC-N.pdf",
+   "edit": "1XftZZOEtLjF_a8kbR5-34_XltpgYEcxDYODpwiVjkZQ"
   },
   {
    "doc": "D-0507-NPC-S-001",
@@ -1546,7 +1573,8 @@
     "c172s",
     "C172S"
    ],
-   "blank": "blank/NPC-S.pdf"
+   "blank": "blank/NPC-S.pdf",
+   "edit": "1vzZ29e7YQ92Cg6gwwjCzOgmk09sX8K1Mw79ztXFAEzQ"
   },
   {
    "sys": "here",
@@ -1574,7 +1602,8 @@
     "Stationair",
     "ปกติ"
    ],
-   "note": "ฉบับร่าง — ถอดจาก Cessna Pilot's Checklist T206H (Rev 4 · 13 May 2002) ภาพถ่ายต้นฉบับถูกตัดท้ายหน้า ยังขาดรายการที่ทำแถบแดงไว้ ต้องเติมจาก POH และให้หัวหน้าครูการบินรับรองก่อนใช้บิน"
+   "note": "ฉบับร่าง — ถอดจาก Cessna Pilot's Checklist T206H (Rev 4 · 13 May 2002) ภาพถ่ายต้นฉบับถูกตัดท้ายหน้า ยังขาดรายการที่ทำแถบแดงไว้ ต้องเติมจาก POH และให้หัวหน้าครูการบินรับรองก่อนใช้บิน",
+   "edit": "13xOUGpMTvtHXfdceZdhZiU21dj5QBaPsQHleojbowEQ"
   },
   {
    "doc": "D-0507-PCK-001",
@@ -1608,7 +1637,8 @@
     "pre-inspection",
     "pck"
    ],
-   "blank": "blank/PCK.pdf"
+   "blank": "blank/PCK.pdf",
+   "edit": "1tHxthhQAJ75KJZrERfgv74VpVlym-Nn0P9Aym6QnXhM"
   },
   {
    "doc": "D-0507-PCR-FI-001",
@@ -1658,7 +1688,8 @@
    "flow": {
     "th": "ตรวจสมรรถนะครูการบิน (D.2.9) — ไม่ผ่านจึงเปิดการอบรมแก้ไข",
     "en": "Flight instructor proficiency check — failure opens corrective training"
-   }
+   },
+   "edit": "10ab3qInFsroKmdpZE6xp3VqxtV9dnbt1Rk4D0FHvZig"
   },
   {
    "doc": "D-0507-PCR-TKI-001",
@@ -1708,7 +1739,8 @@
    "flow": {
     "th": "ตรวจสมรรถนะครูภาคทฤษฎี (D.2.9) — ไม่ผ่านจึงเปิดการอบรมแก้ไข",
     "en": "Theoretical knowledge instructor proficiency check"
-   }
+   },
+   "edit": "1pa6hcTjWjUtFF6Cef7wiAp0skh_6Q2q9zm0t3DJG1Hs"
   },
   {
    "doc": "D-0507-PWR-001",
@@ -1753,7 +1785,8 @@
    ],
    "blank": "blank/PWR.pdf",
    "note": "ฉบับแก้ไข 03 (21 AUG 2026) — เพิ่มความยินยอมและลายเซ็นของผู้ปกครองเป็นของตัวเองใน SECTION B ฉบับเดิมให้ผู้ปกครองกรอกแค่ข้อมูลติดต่อแล้วเซ็นในช่องลายเซ็นผู้โดยสาร อ่านจากใบที่กรอกเสร็จจึงแยกไม่ออกว่าใครเซ็น และไม่มีหลักฐานว่าผู้ปกครองยินยอมให้ผู้เยาว์ขึ้นบิน · หน้ากรอกออนไลน์แสดงข้อความสละสิทธิ์ฉบับเต็มทั้งสี่ข้อก่อนให้ยืนยันทีละข้อ ของเดิมมีแต่บทสรุปในป้ายช่องติ๊ก ผู้โดยสารจึงไม่เคยเห็นข้อความจริงที่ตัวเองผูกพัน · ท้ายกระดาษเดิมค้างที่ Issue 01 Rev 00 / AD/PWR/301-A ขณะที่ตัวเอกสารเป็น Rev 02 / -C — เลขกำกับสองชุดบนใบเดียว แก้แล้ว · เลิกใช้ Jotform 243218657614460 · ต้นฉบับก่อนแก้อยู่ที่ D-0507-PWR-001-rev02-archive.docx",
-   "tpl": "1QObAZ3_hOD_MkE7X1ejlshrCW9v0ymwjZXp9avQKB-I"
+   "tpl": "1QObAZ3_hOD_MkE7X1ejlshrCW9v0ymwjZXp9avQKB-I",
+   "edit": "1q4K91s3trvzeuZYUsAdNyeF5ovW7o9twRAb_BgPwlRA"
   },
   {
    "doc": "D-0507-PXM-001",
@@ -1847,7 +1880,8 @@
    "flow": {
     "th": "อบรมทบทวน / แก้ไขมาตรฐาน (D.2.7, D.2.8) — เสร็จแล้วตรวจซ้ำเสมอ",
     "en": "Refresher or corrective training — always followed by a re-check"
-   }
+   },
+   "edit": "1sp5g5RiUreq0z8Lh1C8cbuRU_UKQYXpulWy-XfxPRSQ"
   },
   {
    "doc": "D-0507-SAC-001",
@@ -1876,7 +1910,8 @@
    ],
    "sys": "audit",
    "public": false,
-   "blank": "blank/SAC.pdf"
+   "blank": "blank/SAC.pdf",
+   "edit": "1SDuKlP1S9jIxGkgwF3cIiK8JiQz8Lf56xNiHArzdRW0"
   },
   {
    "doc": "D-0507-SDF-001",
@@ -1915,7 +1950,8 @@
    ],
    "assignTo": "HT",
    "blank": "blank/SDF.pdf",
-   "tpl": "1FqiALWv4ZrDYWbWHVLCVE4_XOuUQei1ovP1Kk9Jekic"
+   "tpl": "1FqiALWv4ZrDYWbWHVLCVE4_XOuUQei1ovP1Kk9Jekic",
+   "edit": "1SYm-RRJKT4oOsEqULiSsNByyeW-Xa5o0TF45z9_VlPM"
   },
   {
    "doc": "D-0507-SEF-001",
@@ -1969,7 +2005,8 @@
      }
     ]
    },
-   "tpl": "1gBdSF2vQAMNwRNMYpe1XlAXc3vwR_51pfU8VkZsC6eE"
+   "tpl": "1gBdSF2vQAMNwRNMYpe1XlAXc3vwR_51pfU8VkZsC6eE",
+   "edit": "14pU59Jf-rJxI_dB81hUUI1x3u2oTGYEOn5Zyqel3yV4"
   },
   {
    "doc": "D-0507-SSC-001",
@@ -1997,7 +2034,8 @@
    ],
    "sys": "audit",
    "public": false,
-   "blank": "blank/SSC.pdf"
+   "blank": "blank/SSC.pdf",
+   "edit": "1Vh9nps4nmXhDhT48IdLDy1j14OgGHe4ZPDcygj4FlXM"
   },
   {
    "doc": "D-0507-STR-001",
@@ -2041,7 +2079,8 @@
    "flow": {
     "th": "อบรมมาตรฐานครู (D.2.8) — เสร็จแล้วต้องตรวจสมรรถนะครั้งแรกก่อนปฏิบัติหน้าที่",
     "en": "Standardisation training — initial proficiency check follows"
-   }
+   },
+   "edit": "1zK8FQrNqBN0QRqjxy2k3wWWT89inzmJ5ZZTAYQWfeDg"
   },
   {
    "doc": "D-0507-VAC-001",
@@ -2070,7 +2109,8 @@
    ],
    "sys": "audit",
    "public": false,
-   "blank": "blank/VAC.pdf"
+   "blank": "blank/VAC.pdf",
+   "edit": "1pkgNImaIA9ipVQGs9Sd5cHjnIczymYfwPW6NjljZanU"
   },
   {
    "doc": "D-0507-VSR-001",
@@ -2115,7 +2155,8 @@
    ],
    "assignTo": "SM",
    "blank": "blank/VSR.pdf",
-   "tpl": "1qTfU4JTCxvMJbrA8lKDedngn8MqdthT5zuTkr_Ma2Wo"
+   "tpl": "1qTfU4JTCxvMJbrA8lKDedngn8MqdthT5zuTkr_Ma2Wo",
+   "edit": "1DArZ897V-05YxhqvdryEu7wPHZjFFw-sfAyvmjh5vE8"
   }
  ],
  "systems": {

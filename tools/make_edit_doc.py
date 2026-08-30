@@ -7,6 +7,7 @@
 #   python3 tools/make_edit_doc.py --ops        ทุกใบในแท็บที่ไม่ใช่เครื่องบิน
 #   python3 tools/make_edit_doc.py --check      ดูว่าใบไหนยังไม่มีต้นฉบับ
 #   python3 tools/make_edit_doc.py --form ECA   เอกสารในทะเบียนฟอร์ม (ไม่ใช่เช็กลิสต์)
+#   python3 tools/make_edit_doc.py --all-forms  ทุกใบที่มี .docx แต่ยังไม่มีต้นฉบับ
 #
 # ── ทำไม ─────────────────────────────────────────────────────
 # เช็กลิสต์ของเครื่องบิน (NPC / EPC) มีปุ่ม "แก้ต้นฉบับ ✎" ให้เจ้าหน้าที่กดเข้าไป
@@ -64,11 +65,18 @@ def folder_id(tk):
 
 
 def upload(path, name, parent, tk):
-    """อัปโหลด .docx แล้วให้ Drive แปลงเป็น Google Doc — คืน id ที่เก็บไว้ใช้ต่อ"""
+    """อัปโหลด .docx แล้วให้ Drive แปลงเป็น Google Doc — คืน id ที่เก็บไว้ใช้ต่อ
+
+    ถอด {{token}} ออกก่อน — ต้นฉบับนี้เป็น "ฟอร์มเปล่า" ที่คนเข้าไปแก้เนื้อหา
+    และเป็นต้นทางของ PDF ฟอร์มเปล่าด้วย ไม่ใช่แม่แบบที่ระบบเติมคำตอบ
+    (แม่แบบคือช่อง tpl คนละแฟ้มกัน) ปล่อย token ไว้จะเห็น {{sig_paxSign}}
+    โผล่กลางกระดาษ ซึ่งอ่านแล้วเหมือนเอกสารเสีย
+    """
+    import make_blank
     meta = json.dumps({'name': name, 'mimeType': GDOC, 'parents': [parent]}).encode()
     body = (b'--x\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n' + meta
             + b'\r\n--x\r\nContent-Type: ' + DOCX.encode() + b'\r\n\r\n'
-            + open(path, 'rb').read() + b'\r\n--x--')
+            + make_blank.blank_docx(path) + b'\r\n--x--')
     return json.load(api('https://www.googleapis.com/upload/drive/v3/files'
                          '?uploadType=multipart&fields=id', tk, body,
                          'multipart/related; boundary=x'))['id']
@@ -121,6 +129,13 @@ def forms(abbrs):
 
 def main():
     args = sys.argv[1:]
+    if '--all-forms' in args:
+        reg0 = json.load(open(REG, encoding='utf-8'))
+        todo = [x['abbr'] for x in reg0['forms']
+                if x.get('blank') and not x.get('edit') and x.get('docx')
+                and os.path.exists(os.path.join(SRC_DIR, x['docx']))]
+        print('ยังไม่มีต้นฉบับบน Docs %d ใบ' % len(todo))
+        return forms(todo)
     if '--form' in args:
         return forms([a.upper() for a in args if a != '--form'])
     pubs = json.load(open(PUBS, encoding='utf-8'))
