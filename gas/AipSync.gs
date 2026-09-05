@@ -645,6 +645,20 @@ function aipStatusJson_() {
     var root = aipRoot_(), it = root.getFilesByName(AIP_MANIFEST);
     if (it.hasNext()) ads = JSON.parse(it.next().getBlob().getDataAsString()).ads || [];
   } catch (e) {}
+  /* สนามบินที่ดึงของรอบใหม่ครบแล้วจริง ๆ กับตัวที่กำลังดึงอยู่
+     คิวเรียงทีละสนามบินตาม AIP_ADS ใบสุดท้ายของสนามบินไหนอยู่ก่อนตัวชี้
+     ก็แปลว่าสนามบินนั้นล้างของเก่าและโหลดของใหม่เสร็จแล้ว
+
+     ต้องมีเพราะหน้าเว็บเคยเอา st.issue ไปทับวันมีผลของทุกแถวตั้งแต่ตั้งคิวเสร็จ
+     ทั้ง 12 สนามบินจึงขึ้น "ตรงรอบ" ภายในวินาทีที่กดปุ่ม ทั้งที่ในไดรฟ์ยังเป็น
+     ไฟล์รอบก่อนอยู่อีก 11 สนามบิน ป้ายที่มีไว้บอกว่าแผนภูมิยังใช้บินได้
+     จึงกลายเป็นป้ายที่เชื่อไม่ได้ */
+  var lastOf = {}, adsDone = [];
+  st.items.forEach(function (it, n) { lastOf[it.icao] = n; });
+  Object.keys(lastOf).forEach(function (icao) {
+    if (lastOf[icao] < st.i) adsDone.push(icao);
+  });
+
   return {
     started: true,
     issue: st.issue,                      // { date, text, amdt }
@@ -652,6 +666,8 @@ function aipStatusJson_() {
     i: st.i, total: st.items.length, done: st.done,
     fail: st.fail.length, failFirst: st.fail.slice(0, 3),
     finishedAt: st.finishedAt || '',
+    adsDone: adsDone,
+    adNow: st.i < st.items.length ? st.items[st.i].icao : '',
     ads: ads,
   };
 }

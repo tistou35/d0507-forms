@@ -74,6 +74,7 @@ span.gof i{background:var(--g-200);color:var(--g-500)}
 .adrow .ad .fresh{display:inline-block;margin-left:7px;font-size:10px;font-weight:700;
   padding:1px 6px;border-radius:99px;
   background:var(--green-100);color:var(--green-600);vertical-align:2px}
+.adrow .ad .fresh.busy{background:var(--amber-100);color:var(--amber-600)}
 
 /* แถวทั่วไป (ปฏิบัติการ · แผนภูมิ) */
 .prow{display:grid;grid-template-columns:1fr auto auto auto auto;gap:12px;align-items:center;
@@ -467,7 +468,9 @@ function chartHtml(){
          เป็นการบอกว่า "เพิ่งแตะของนี้" ไม่ใช่บอกว่า "ของนี้ยังใช้ได้"
          สองอย่างนี้ต่างกัน ป้ายสถานะข้าง ๆ เป็นตัวบอกว่ายังใช้ได้หรือไม่ */
       const d = daysSince(p.syncedAt);
-      const fresh = (d !== null && d <= FRESH_DAYS)
+      const fresh = p.syncing
+        ? `<span class="fresh busy">${A.esc(A.L({th:'กำลังดึง',en:'Syncing'}))}</span>`
+        : (d !== null && d <= FRESH_DAYS)
         ? `<span class="fresh">${A.esc(A.L({th:'อัปเดตแล้ว',en:'Updated'}))}</span>` : '';
       return `<div class="adrow">
         <div class="ad"><b>${A.esc(p.icao||'')}</b>${fresh}<span>${A.esc(LL(p))}</span></div>
@@ -551,11 +554,23 @@ function applySync(){
   if (!SYNC || !SYNC.started) return;
   const by = {};
   (SYNC.ads||[]).forEach(a => by[a.icao] = a);
+  /* ขึ้นวันมีผลของรอบใหม่ให้เฉพาะสนามบินที่ตัวดึงทำครบแล้ว
+     ตัวดึงเดินทีละสนามบิน ล้างของเก่าแล้วโหลดของใหม่ทับ ใช้เวลาทั้งชุดหลายรอบ
+     ระหว่างนั้นแถวที่ยังไม่ถึงคิวต้องคาวันมีผลรอบเก่าไว้ตามของที่อยู่ในไดรฟ์จริง
+     ไม่งั้นป้ายสถานะจะขึ้น "ตรงรอบ" ทั้ง 12 แถวทันทีที่กดปุ่ม ซึ่งอ่านแล้วเข้าใจว่า
+     ได้ของใหม่หมดแล้ว ทั้งที่เพิ่งตั้งคิวเสร็จเท่านั้น
+     (adsDone ไม่มีมาแปลว่าตัวส่งออกยังเป็นรุ่นก่อนหน้า — ยึดตอนจบงานแทน) */
+  const ok = SYNC.adsDone ? new Set(SYNC.adsDone)
+           : { has: () => !!SYNC.finishedAt };
   const eff = (SYNC.issue||{}).date || '';
   PUBS.forEach(p => {
     if (p.cat !== 'chart') return;
+    p.syncing = SYNC.adNow === p.icao;
+    if (!ok.has(p.icao)) return;
     const a = by[p.icao];
     if (!a) return;
+    /* จำนวนใบมาจากใบส่งงานที่เขียนตอนจบงานทั้งชุด ระหว่างทางจึงยังเป็นเลขของรอบก่อน
+       ต่างกันได้ (VTBD รอบ 2609 มีผังสนามบิน 7 ใบ รอบ 2608 มี 6) เลขจะตรงเมื่อดึงจบ */
     p.ap = a.ap || ''; p.op = a.op || '';
     p.nap = a.nap || 0; p.nop = a.nop || 0;
     p.eff = eff;
