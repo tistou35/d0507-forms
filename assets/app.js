@@ -627,7 +627,7 @@
     if (d) return d;
     const st = document.createElement('style');
     st.textContent = `
-#d0507-rev{border:0;border-radius:12px;padding:0;max-width:620px;width:calc(100% - 32px);
+#d0507-rev{border:0;border-radius:12px;padding:0;max-width:620px;width:calc(100% - 32px);margin:auto;
   box-shadow:0 20px 60px rgba(13,27,42,.35)}
 #d0507-rev::backdrop{background:rgba(13,27,42,.5)}
 #d0507-rev .dh{background:var(--navy-900);color:#fff;padding:16px 20px}
