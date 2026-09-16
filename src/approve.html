@@ -47,7 +47,7 @@ dialog .df{padding:14px 22px;border-top:1px solid var(--g-100);display:flex;gap:
 const REG=@@REG@@, DEFS=@@DEFS@@, A=D0507;
 const qs=new URLSearchParams(location.search);
 const TASKID=qs.get('t')||'';
-let TASK=null, SUB=null, SUBREF=null, DEF=null, F=null, FK=null, DIR=[], PICK='';
+let TASK=null, SUB=null, SUBREF=null, DEF=null, F=null, FK=null, DIR=[], PICK='', REV=null;
 
 A.reg = REG;
 A.initAuth(@@FBCFG@@, boot);
@@ -95,6 +95,12 @@ async function boot(){
         .filter(x=>x.id!==A.user.uid && (!want||(x.recv||[]).includes(want)));
     }catch(e){ DIR=[]; }
 
+    /* DRF ที่เปิดจาก "แก้ต้นฉบับ → ออกฉบับใหม่" — โหลดฉบับร่างมาให้ผู้อนุมัติเปิดดู */
+    if(SUB.revId){
+      try{ const r=await A.db.collection('revisions').doc(SUB.revId).get();
+           if(r.exists) REV=Object.assign({id:r.id},r.data()); }catch(e){}
+    }
+
     const party=(DEF.route||[])[1] ? DEF.route[1].party : (DEF.parties||[])[1]?.k;
     FK=new FormKit(DEF,{party:party,lang:A.lang,data:SUB.data||{},onChange:()=>paint(),
     upload:async f=>{const r=await A.gas('attach',Object.assign({code:DEF.code},f));
@@ -121,7 +127,14 @@ function paint(){
         <div><span>${A.esc(A.t('trackingNo'))}</span><b>${A.esc(SUB.tracking||'—')}</b></div>
         <div><span>${A.esc(A.t('submittedBy'))}</span><b>${A.esc(SUB.submitterName||'—')}</b></div>
         <div><span>${A.esc(A.t('issueRev'))}</span><b>${A.esc((SUB.issue||'')+' / '+(SUB.rev||''))}</b></div>
-      </div></div>`;
+      </div></div>${REV ? `<div class="fk-gate warn" style="margin:12px 0"><span>
+        <b>${A.esc(A.L({th:'คำขอนี้ผูกกับฉบับร่าง',en:'This request is tied to a draft'}))}</b> · ${A.esc(REV.doc)}
+        Issue ${A.esc(REV.iss)} / Rev ${A.esc(REV.rev)} → <b>Issue ${A.esc(REV.newIss)} / Rev ${A.esc(REV.newRev)}</b>${
+          REV.newCode?' · '+A.esc(REV.newCode):''}<br>
+        ${A.esc(A.L({th:'ตรวจเนื้อหาในฉบับร่างก่อนอนุมัติ · ไม่ต้องแก้เลขกำกับหรือวันมีผลในฉบับร่าง ระบบเลื่อนให้ตอนปิดงานจากวันมีผลที่กรอกในใบนี้ · ไม่อนุมัติ ฉบับร่างถูกติดป้ายและเก็บไว้ ',
+                      en:'Review the draft before approving. Do not change the control code or effective date in the draft — close-out sets them from the effective date entered here. Rejected drafts are labelled and kept. '}))}
+        <a href="https://docs.google.com/document/d/${A.esc(REV.draftId)}/edit" target="_blank" rel="noopener">${
+          A.esc(A.L({th:'เปิดฉบับร่าง',en:'Open draft'}))} ↗</a></span></div>` : ''}`;
 
   FK.render(document.getElementById('form'));
 
@@ -305,6 +318,26 @@ async function finish(status,action,note){
       }));
     }
 
+    /* ฉบับร่างของคำขอแก้ไข — อนุมัติแล้วติดป้าย APPROVED รอปิดงาน ตีกลับแล้วติดป้ายเก็บไว้
+       ต้นฉบับที่ใช้อยู่ไม่ขยับตรงนี้ ต้นฉบับใหม่สร้างจาก .docx ที่เลื่อนเลขแล้วตอนปิดงาน
+       ทำหลังบันทึกผลอนุมัติเสมอ ถ้าไดรฟ์ล้ม ใบยังอนุมัติแล้วตามจริง
+       และสถานะที่ค้างใน revisions บอกได้ว่าต้องเลื่อนฉบับร่างเองอีกครั้ง */
+    let rv=null;
+    if(REV && (REV.state==='submitted' || REV.state==='draft')){
+      const ref=A.db.collection('revisions').doc(REV.id);
+      const d=FK.data||{};
+      if(status==='complete'){
+        rv=await A.gas('revPromote',{ draftId:REV.draftId });
+        /* state approved แม้ไดรฟ์ล้ม — DRF อนุมัติแล้วจริง ที่ขาดคือป้ายกับสิทธิ์อ่านของฉบับร่าง
+           เก็บข้อผิดพลาดไว้ เครื่องมือปิดงานจะดาวน์โหลดไม่ได้และบอกเอง */
+        await ref.update({ state:'approved', newEff:d.newEff||'', approvedBy:d.approvedBy||me,
+          approvedAt:now(), promoteError: rv.ok ? '' : (rv.error||'') });
+      } else {
+        rv=await A.gas('revReject',{ draftId:REV.draftId });
+        await ref.update({ state:'rejected', closedAt:now(), closedBy:me, note:note||'' });
+      }
+    }
+
     /* ใบที่มาจากระบบอื่น — บอกผลการอนุมัติกลับไปด้วย
        สายผูกมากับตัวใบตั้งแต่ตอนส่ง (extRef) ไม่ได้อ่านจาก URL ของหน้านี้
        เพราะผู้อนุมัติเข้ามาทางคิวงาน ไม่ได้เดินตามลิงก์เดิมของผู้กรอก
@@ -323,7 +356,9 @@ async function finish(status,action,note){
       `<b>${A.esc(A.t(status==='complete'?'approved':'rejectedDone'))}</b><br>
        ${A.esc(A.t('trackingNo'))}: <span class="mono">${A.esc(SUB.tracking||'')}</span>
        ${ex&&ex.ok===false?'<br>'+A.esc(A.t('exportFailed'))+' '+A.esc(ex.error||''):''}
-       ${ex&&ex.pdf?`<br><a href="${A.esc(ex.pdf)}" target="_blank" rel="noopener">PDF ↗</a>`:''}`)+
+       ${ex&&ex.pdf?`<br><a href="${A.esc(ex.pdf)}" target="_blank" rel="noopener">PDF ↗</a>`:''}
+       ${rv&&rv.ok===false?'<br><b>'+A.esc(A.L({th:'ติดป้ายฉบับร่างไม่สำเร็จ — ใบอนุมัติแล้ว: ',en:'Could not label the draft — the request is approved: '}))+'</b>'+A.esc(rv.error||''):''}
+       ${rv&&rv.ok&&status==='complete'?'<br>'+A.esc(A.L({th:'ฉบับร่างอนุมัติแล้ว · รอปิดงานในทะเบียน — ระหว่างนี้ยังใช้ฉบับเดิม',en:'Draft approved · awaiting register close-out — current edition still in force'})):''}`)+
       `<div class="acts"><a class="big pri" href="@@BASE@@queue/">${A.esc(A.t('backToQueue'))}</a></div>`;
     window.scrollTo({top:foot.getBoundingClientRect().top+window.scrollY-90,behavior:'smooth'});
   }catch(e){

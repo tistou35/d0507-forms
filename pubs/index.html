@@ -96,9 +96,9 @@ span.gof i{background:var(--g-200);color:var(--g-500)}
 .prow .op.ed2{color:var(--fg-2)}
 /* ลิงก์ต้นฉบับที่แก้ไขได้ — เห็นเฉพาะเจ้าหน้าที่ ต่างจากปุ่มเปิดที่ทุกคนเห็น
    ไฟล์นี้คือตัวที่เอกสารควบคุมงอกมาจาก แก้แล้วต้องเลื่อนเลขกำกับและทำ PDF ใหม่ */
-.prow a.go.ed3{background:var(--surface);color:var(--fg-2);
+.go.ed3{background:var(--surface);color:var(--fg-2);cursor:pointer;font-family:var(--font-sans);
   border:1px dashed var(--border-med);white-space:nowrap}
-.prow a.go.ed3:hover{color:var(--navy-900);border-color:var(--navy-900)}
+.go.ed3:hover{color:var(--navy-900);border-color:var(--navy-900)}
 
 .badge{font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px;white-space:nowrap}
 .b-ok{background:var(--green-100);color:var(--green-600)}
@@ -106,7 +106,7 @@ span.gof i{background:var(--g-200);color:var(--g-500)}
 .b-out{background:var(--red-100);color:var(--red-600)}
 .b-next{background:var(--sky-100);color:var(--sky-600)}
 .b-none{background:var(--g-100);color:var(--g-600)}
-a.go,span.go{min-height:34px;padding:0 12px;border-radius:7px;display:grid;place-items:center;
+a.go,span.go,button.go{min-height:34px;padding:0 12px;border-radius:7px;display:grid;place-items:center;
   font-size:12.5px;text-decoration:none;white-space:nowrap}
 a.go{background:var(--navy-900);color:#fff}
 span.go{background:var(--g-100);color:var(--g-400)}
@@ -235,7 +235,7 @@ h2.psec .d{font-family:var(--font-sans);font-size:12.5px;color:var(--fg-2);font-
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="../assets/app.js?v=7eda98d1"></script>
+<script src="../assets/app.js?v=7f3f5702"></script>
 <script>D0507.GAS_URL='https://script.google.com/macros/s/AKfycby7rFFVxd92wPImX4m8pv8nHqTrK3Iq0O32A34844DAg1rP8N3RfgKEyGvAUkQu-NXd/exec';</script>
 <script>
 "use strict";
@@ -400,10 +400,9 @@ function cell(p, label){
     ${u ? `<a class="go" href="${A.esc(u)}" target="_blank" rel="noopener">${A.esc(T('open'))} ↗</a>`
         : `<span class="go">${A.esc(T('nofile'))}</span>`}
     ${p && p.edit && A.isAdmin()
-        ? `<a class="go ed3" href="https://docs.google.com/document/d/${A.esc(p.edit)}/edit"
-             target="_blank" rel="noopener"
-             title="ต้นฉบับที่แก้ไขได้ — แก้แล้วต้องเลื่อนเลขกำกับและทำ PDF ใหม่"
-             >${A.esc(T('editSrc'))} ✎</a>` : ''}</div>`;
+        ? `<button type="button" class="go ed3" data-edit="${A.esc(p.id)}"
+             title="แก้เล็กน้อยในฉบับเดิม หรือแก้ในฉบับร่างเพื่อออก Revision / Issue ใหม่"
+             >${A.esc(T('editSrc'))} ✎</button>` : ''}</div>`;
 }
 
 /* แท็บเครื่องบิน — หนึ่งแถวต่อหนึ่งแบบ ปกติกับฉุกเฉินอยู่ข้างกัน
@@ -502,9 +501,9 @@ function listHtml(tab){
         ${p.file ? `<a class="go" href="../${A.esc(p.file)}" target="_blank" rel="noopener"
              download="${A.esc((p.doc||p.id)+'.pdf')}">${A.esc(T('blank'))} ↓</a>` : ''}
         ${p.edit && A.isAdmin()
-            ? `<a class="go ed3" href="https://docs.google.com/document/d/${A.esc(p.edit)}/edit"
-                 target="_blank" rel="noopener" title="ต้นฉบับที่แก้ไขได้ — แก้แล้วต้องเลื่อนเลขกำกับและทำ PDF ใหม่"
-                 >${A.esc(T('editSrc'))} ✎</a>` : ''}</div>`;
+            ? `<button type="button" class="go ed3" data-edit="${A.esc(p.id)}"
+                 title="แก้เล็กน้อยในฉบับเดิม หรือแก้ในฉบับร่างเพื่อออก Revision / Issue ใหม่"
+                 >${A.esc(T('editSrc'))} ✎</button>` : ''}</div>`;
     }).join('') : `<p class="sub" style="padding:9px 14px;border:1px dashed var(--border-med);border-radius:8px">${A.esc(T('none'))}</p>`);
   }
   return out.join('');
@@ -545,6 +544,16 @@ function paint(){
 
   const b = document.getElementById('sync');
   if (b) b.onclick = () => startSync(b);
+
+  /* แก้ต้นฉบับ — ถามก่อนว่าแก้เล็กน้อยหรือออกฉบับใหม่ (A.editSource ใน app.js)
+     เลข Issue/Rev/เลขกำกับเอาจากทะเบียนฉบับเต็มก่อน เพราะทะเบียนคือที่ที่
+     ตอนปิดงานเลื่อนเลข publications.json อาจตามไม่ทันถ้ามีคนแก้มือ */
+  document.querySelectorAll('[data-edit]').forEach(el => el.onclick = () => {
+    const p = PUBS.find(x => x.id === el.dataset.edit); if (!p) return;
+    const r = ((A.reg && A.reg.forms) || []).find(f => f.doc === p.doc) || {};
+    A.editSource({ abbr: r.abbr || '', doc: p.doc || p.id, title: r.t || p.en || p.th,
+      code: r.code || p.code, iss: r.iss || p.ed, rev: r.rev || p.rev, edit: p.edit });
+  });
 }
 
 /* ── ดึงแผนภูมิ ──────────────────────────────────────────────

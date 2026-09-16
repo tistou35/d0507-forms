@@ -22,6 +22,7 @@
     </div>
 
     <div class="acts" id="acts"></div>
+    <div id="revban"></div>
     <div id="alerts"></div>
 
     <div class="card" id="guidewrap" style="display:none">
@@ -86,6 +87,21 @@ paint();
 // เปลี่ยนภาษาแล้ววาดใหม่ทั้งหน้า
 A.onLang.push(() => paint());
 
+/* ฉบับร่างที่ค้างของเอกสารนี้ — ให้เจ้าหน้าที่เห็นจากหน้าเอกสารเลย ไม่ต้องกดแก้ต้นฉบับก่อนถึงรู้
+   ฉบับที่ใช้อยู่ (ปุ่มฟอร์มเปล่า / เปิด) ยังเป็นฉบับเดิมจนกว่าจะปิดงานในทะเบียน */
+async function revBanner(){
+  const el = document.getElementById('revban');
+  if (!el || !A.isStaff() || !F || !F.doc) return;
+  const r = await A.openRevision(F.doc);
+  if (!r) { el.innerHTML = ''; return; }
+  const url = 'https://docs.google.com/document/d/' + r.draftId + '/edit';
+  el.innerHTML = `<div class="fk-gate warn" style="margin:12px 0"><span>
+    <b>${A.esc(A.L(A.REV_STATE[r.state]))}</b> · Issue ${A.esc(r.newIss)} / Rev ${A.esc(r.newRev)}${
+      r.newCode ? ' · ' + A.esc(r.newCode) : ''}${r.tracking ? ' · DRF <span class="mono">' + A.esc(r.tracking) + '</span>' : ''}<br>
+    ${A.esc(A.L({th:'ฟอร์มเปล่าและปุ่มเปิดยังเป็นฉบับที่ใช้อยู่ ',en:'The blank form and Open still show the current edition. '}))}
+    <a href="${A.esc(url)}" target="_blank" rel="noopener">${A.esc(A.L({th:'เปิดฉบับร่าง',en:'Open draft'}))} ↗</a></span></div>`;
+}
+
 function paint(){
   const staff = A.isStaff();
   document.getElementById('chain').textContent = A.L(CHAIN_N[F.chain]) || '—';
@@ -132,16 +148,21 @@ function paint(){
        เปิดให้ทุกคนดู ไม่ใช่แค่เจ้าหน้าที่ คนกรอกควรรู้ว่าใบที่ส่งไปจะไปถึงใคร */
     `<a class="big sec" href="@@BASE@@flow/?c=${encodeURIComponent(F.abbr)}">${
         A.esc(A.L({th:'ผังงาน',en:'Workflow'}))}</a>` +
-    (A.isAdmin() && F.edit ? `<a class="big sec" href="https://docs.google.com/document/d/${
-        A.esc(F.edit)}/edit" target="_blank" rel="noopener"
-        title="ต้นฉบับที่แก้ไขได้ — แก้แล้วต้องเลื่อนเลขกำกับ ดาวน์โหลดกลับมาทับ .docx และทำ PDF ใหม่"
-        >${A.esc(A.L({th:'แก้ต้นฉบับ',en:'Edit source'}))} ✎</a>` : '') +
+    /* ไม่ลิงก์ตรงไป Google Docs — ถามก่อนว่าแก้เล็กน้อยในฉบับเดิม หรือออกฉบับใหม่
+       ผ่าน DRF (ดู A.editSource ใน app.js) */
+    (A.isAdmin() && F.edit ? `<button type="button" class="big sec" id="editsrc"
+        title="แก้เล็กน้อยในฉบับเดิม หรือแก้ในฉบับร่างเพื่อออก Revision / Issue ใหม่"
+        >${A.esc(A.L({th:'แก้ต้นฉบับ',en:'Edit source'}))} ✎</button>` : '') +
     /* ใบที่มีหน้าจัดการของตัวเอง (ตอนนี้มี DRC — เตรียมรายการแล้วสร้างลิงก์ให้ผู้รับ)
        ที่อยู่มาจากทะเบียน ไม่ได้ฝังตัวย่อไว้ในหน้านี้ ใบต่อไปที่ต้องมีหน้าจัดการ
        จึงเพิ่มได้ที่ทะเบียนอย่างเดียว */
     (staff && F.admin ? `<a class="big sec" href="@@BASE@@${A.esc(F.admin.url)}">${
         A.esc(A.L(F.admin.n))}</a>` : '') +
     `<a class="big sec" href="@@BASE@@all/">${A.esc(A.t('backToAll'))}</a>`;
+  const eb = document.getElementById('editsrc');
+  if (eb) eb.onclick = () => A.editSource({ abbr: F.abbr, doc: F.doc, title: F.t || F.th,
+    code: F.code, iss: F.iss, rev: F.rev, edit: F.edit });
+  revBanner();
 
   /* ขอบเขตการประเมิน — ใช้กับฟอร์มที่ตัวเอกสารอยู่ที่นี่เพื่อควบคุม
      แต่การกรอกจริงไปทำที่ระบบอื่น หน้านี้จึงต้องบอกให้ชัดว่าครอบคลุมอะไรและใครเป็นผู้ประเมิน */

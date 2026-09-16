@@ -578,6 +578,213 @@
     }
   };
 
+  /* ── แก้ต้นฉบับเอกสารควบคุม ─────────────────────────────────
+     ปุ่ม "แก้ต้นฉบับ ✎" ไม่พาไป Google Docs ตรง ๆ แล้ว ถามก่อนว่าแก้แบบไหน
+
+       แก้ไขเล็กน้อย   เปิดต้นฉบับที่ใช้อยู่ทันที ไม่เลื่อน Issue/Rev
+                        แต่บันทึกไว้ใน revisions ว่าใครเปิดแก้เมื่อไร
+       ออกฉบับใหม่     คัดลอกต้นฉบับเป็นฉบับร่าง (Revision.gs) เปิดฉบับร่างในแท็บใหม่
+                        แล้วพาหน้านี้ไปกรอก DRF ที่เติมชื่อ/รหัส/ฉบับปัจจุบันไว้แล้ว
+
+     ทำไมแก้ในฉบับร่าง ไม่ใช่ต้นฉบับ: ระหว่างรออนุมัติ ต้นฉบับยังเป็นของที่ทุกคน
+     เปิดอ่านและเป็นต้นทางของฟอร์มเปล่า แก้ตรงนั้นก่อนอนุมัติ = ปล่อยฉบับที่ยังไม่อนุมัติ
+     ออกไปใช้ และถ้าตีกลับก็ไม่มีฉบับเดิมให้ถอย
+
+     หนึ่งเอกสารมีฉบับร่างเปิดอยู่ได้ทีละฉบับ — สองฉบับร่างของเอกสารเดียวกัน
+     แยกกันแก้แล้วรวมกลับไม่ได้ และจะได้เลข Rev ซ้ำกัน */
+  A.nextCode = function (code) {
+    const m = /^(.*-)([A-Y])$/.exec(code || '');
+    return m ? m[1] + String.fromCharCode(m[2].charCodeAt(0) + 1) : '';
+  };
+  const pad2 = n => String(parseInt(n, 10) || 0).padStart(2, '0');
+  const b64u = o => btoa(String.fromCharCode.apply(null,
+    new TextEncoder().encode(JSON.stringify(o)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  const docUrl = id => 'https://docs.google.com/document/d/' + id + '/edit';
+  const REV_OPEN = ['draft', 'submitted', 'approved'];
+  A.REV_STATE = {
+    draft:     { th: 'ร่างอยู่ — ยังไม่ได้ส่งคำขอแก้ไข', en: 'Draft — revision request not sent' },
+    submitted: { th: 'ส่งคำขอแล้ว รออนุมัติ', en: 'Request sent — awaiting approval' },
+    approved:  { th: 'อนุมัติแล้ว — รอปิดงานในทะเบียน (ยังใช้ฉบับเดิมอยู่)',
+                 en: 'Approved — awaiting register close-out (current edition still in force)' },
+    closed:    { th: 'ปิดงานแล้ว', en: 'Closed' },
+    rejected:  { th: 'ไม่อนุมัติ', en: 'Rejected' },
+    cancelled: { th: 'ยกเลิก', en: 'Cancelled' },
+    logged:    { th: 'แก้ไขเล็กน้อยในฉบับเดิม', en: 'Minor edit in current edition' },
+  };
+
+  /** ฉบับร่างที่ยังค้างของเอกสารนี้ (ร่าง · รออนุมัติ · อนุมัติแล้วรอปิดงาน) */
+  A.openRevision = async function (doc) {
+    try {
+      const qs = await A.db.collection('revisions').where('doc', '==', doc).get();
+      return qs.docs.map(d => Object.assign({ id: d.id }, d.data()))
+        .filter(r => REV_OPEN.includes(r.state))
+        .sort((a, b) => ((b.createdAt && b.createdAt.seconds) || 0) - ((a.createdAt && a.createdAt.seconds) || 0))[0] || null;
+    } catch (e) { return null; }
+  };
+
+  function revDialog() {
+    let d = document.getElementById('d0507-rev');
+    if (d) return d;
+    const st = document.createElement('style');
+    st.textContent = `
+#d0507-rev{border:0;border-radius:12px;padding:0;max-width:620px;width:calc(100% - 32px);
+  box-shadow:0 20px 60px rgba(13,27,42,.35)}
+#d0507-rev::backdrop{background:rgba(13,27,42,.5)}
+#d0507-rev .dh{background:var(--navy-900);color:#fff;padding:16px 20px}
+#d0507-rev .dh h3{font-size:17px;font-weight:700;color:#fff;margin:0}
+#d0507-rev .dh p{font-size:12.5px;color:rgba(255,255,255,.72);margin:3px 0 0;font-family:var(--font-mono)}
+#d0507-rev .db{padding:16px 20px;max-height:70vh;overflow:auto}
+#d0507-rev .df{padding:12px 20px;border-top:1px solid var(--g-100);display:flex;justify-content:flex-end}
+#d0507-rev .opt{border:1px solid var(--border-light);border-radius:10px;padding:14px 16px;margin-bottom:10px}
+#d0507-rev .opt h4{margin:0 0 4px;font-size:15px}
+#d0507-rev .opt p{margin:0 0 10px;font-size:13px;color:var(--fg-2);line-height:1.5}
+#d0507-rev .opt.off{opacity:.55}
+#d0507-rev .kinds{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+#d0507-rev .kind{text-align:left;border:1px solid var(--border-med);border-radius:8px;padding:9px 11px;
+  background:var(--surface);cursor:pointer;font-family:var(--font-sans)}
+#d0507-rev .kind b{display:block;font-size:13.5px}
+#d0507-rev .kind span{display:block;font-size:11.5px;color:var(--g-500);font-family:var(--font-mono);margin-top:2px}
+#d0507-rev .kind[aria-pressed="true"]{border-color:var(--navy-900);box-shadow:inset 0 0 0 1px var(--navy-900)}
+#d0507-rev .btn{min-height:40px;padding:0 14px;border-radius:8px;border:1px solid var(--navy-900);
+  background:var(--navy-900);color:#fff;font-size:13.5px;font-weight:600;cursor:pointer;font-family:var(--font-sans)}
+#d0507-rev .btn.sec{background:var(--surface);color:var(--navy-900);border-color:var(--border-med)}
+#d0507-rev .btn[disabled]{opacity:.5;cursor:not-allowed}
+#d0507-rev .row{display:flex;gap:8px;flex-wrap:wrap}
+#d0507-rev .cur{background:var(--amber-100);border-radius:10px;padding:12px 14px;margin-bottom:10px;font-size:13px;line-height:1.55}
+#d0507-rev .err{color:var(--red-600);font-size:12.5px;margin-top:8px}
+@media(max-width:520px){#d0507-rev .kinds{grid-template-columns:1fr}}`;
+    document.head.appendChild(st);
+    d = document.createElement('dialog');
+    d.id = 'd0507-rev';
+    d.innerHTML = '<div class="dh"><h3></h3><p></p></div><div class="db"></div>' +
+      '<div class="df"><button class="btn sec" data-close type="button"></button></div>';
+    document.body.appendChild(d);
+    d.querySelector('[data-close]').onclick = () => d.close();
+    return d;
+  }
+
+  /** o = { abbr, doc, title, code, iss, rev, edit } — ค่าจากทะเบียนฉบับเต็ม */
+  A.editSource = async function (o) {
+    if (!A.isAdmin() || !o || !o.edit) return;
+    const L = A.L, esc = A.esc, base = g.BASE || '';
+    const d = revDialog();
+    d.querySelector('h3').textContent = L({ th: 'แก้ต้นฉบับ', en: 'Edit source' }) + ' · ' + (o.doc || o.abbr);
+    d.querySelector('.dh p').textContent = L({ th: 'ฉบับที่ใช้อยู่ ', en: 'Current ' }) +
+      'Issue ' + pad2(o.iss) + ' / Rev ' + pad2(o.rev) + (o.code ? ' · ' + o.code : '');
+    d.querySelector('[data-close]').textContent = L({ th: 'ปิด', en: 'Close' });
+    const db = d.querySelector('.db');
+    db.innerHTML = '<p style="font-size:13px;color:var(--g-500)">…</p>';
+    if (!d.open) d.showModal();
+
+    const open = await A.openRevision(o.doc);
+    const who = A.user.displayName || A.user.email;
+    const stamp = () => firebase.firestore.FieldValue.serverTimestamp();
+
+    /* ── มีฉบับร่างค้างอยู่ — ไม่ให้เปิดใหม่ และไม่ให้แก้ต้นฉบับข้าง ๆ ── */
+    if (open) {
+      db.innerHTML = `<div class="cur"><b>${esc(L(A.REV_STATE[open.state]))}</b><br>
+          ${esc(L({ th: 'ขอออก', en: 'Proposed' }))} Issue ${esc(open.newIss)} / Rev ${esc(open.newRev)}
+          ${open.newCode ? ' · ' + esc(open.newCode) : ''}<br>
+          ${esc(L({ th: 'เปิดโดย ', en: 'Opened by ' }))}${esc(open.byName || '—')}
+          ${open.tracking ? ' · DRF <span style="font-family:var(--font-mono)">' + esc(open.tracking) + '</span>' : ''}</div>
+        <div class="opt"><p>${esc(L(open.state === 'approved'
+            ? { th: 'ฉบับร่างนี้อนุมัติแล้ว ต้นฉบับใหม่จะสร้างจาก .docx ที่เลื่อนเลขกำกับแล้วตอนปิดงาน (tools/revision_close.py) · ระหว่างนี้แก้ต้นฉบับหรือเปิดฉบับร่างใหม่ไม่ได้ เพราะเลข Issue/Rev ถัดไปขึ้นกับการปิดงานนี้',
+                en: 'This draft is approved. The new source is built from the renumbered .docx at close-out (tools/revision_close.py). No edits or new drafts until then — the next Issue/Rev depends on it.' }
+            : { th: 'แก้ต่อในฉบับร่างนี้ ต้นฉบับที่ใช้อยู่ยังไม่เปลี่ยน และเปิดแก้ข้าง ๆ ไม่ได้ระหว่างนี้ — แก้ต้นฉบับตอนนี้ ฉบับร่างจะไม่ได้การแก้นั้นไปด้วย',
+                en: 'Keep editing this draft. The current source stays unchanged and cannot be edited alongside — edits there would not reach the draft.' }))}</p>
+          <div class="row">
+            <a class="btn" style="display:inline-grid;place-items:center;text-decoration:none"
+               href="${esc(docUrl(open.draftId))}" target="_blank" rel="noopener">${esc(L({ th: 'เปิดฉบับร่าง', en: 'Open draft' }))} ↗</a>
+            ${open.state === 'draft' ? `<a class="btn sec" style="display:inline-grid;place-items:center;text-decoration:none"
+               href="${esc(base)}fill/?c=DRF&rv=${encodeURIComponent(open.id)}&p=${b64u(open.prefill || {})}">${
+               esc(L({ th: 'กรอกคำขอแก้ไข (DRF) ต่อ', en: 'Continue revision request (DRF)' }))}</a>
+               <button class="btn sec" type="button" data-cancel>${esc(L({ th: 'ยกเลิกฉบับร่าง', en: 'Cancel draft' }))}</button>` : ''}
+          </div></div>`;
+      const cb = db.querySelector('[data-cancel]');
+      if (cb) cb.onclick = async () => {
+        if (!confirm(L({ th: 'ยกเลิกฉบับร่างนี้? ไฟล์จะถูกติดป้ายและเก็บไว้ ไม่ถูกลบ',
+                         en: 'Cancel this draft? The file is labelled and kept, not deleted.' }))) return;
+        cb.disabled = true;
+        await A.gas('revReject', { draftId: open.draftId });
+        await A.db.collection('revisions').doc(open.id).update({ state: 'cancelled', closedAt: stamp(), closedBy: who });
+        d.close();
+      };
+      return;
+    }
+
+    /* ── สองทางเลือก ── */
+    const next = {
+      rev:   { iss: pad2(o.iss), rev: pad2((parseInt(o.rev, 10) || 0) + 1) },
+      issue: { iss: pad2((parseInt(o.iss, 10) || 0) + 1), rev: '00' },
+    };
+    const newCode = A.nextCode(o.code);
+    let kind = 'rev';
+    db.innerHTML = `
+      <div class="opt">
+        <h4>${esc(L({ th: 'แก้ไขเล็กน้อย — ฉบับเดิม', en: 'Minor edit — same edition' }))}</h4>
+        <p>${esc(L({ th: 'แก้คำผิด จัดรูปแบบ หรือสิ่งที่ไม่เปลี่ยนสาระของเอกสาร · Issue/Rev และเลขกำกับไม่เปลี่ยน · ไม่ต้องกรอกคำขอ แต่ระบบบันทึกว่าใครเปิดแก้เมื่อไร',
+                     en: 'Typos, formatting — nothing that changes what the document requires. Issue/Rev and control code stay. No request form, but the edit is logged.' }))}</p>
+        <div class="row"><button class="btn sec" type="button" data-minor>${esc(L({ th: 'เปิดต้นฉบับ', en: 'Open source' }))} ↗</button></div>
+      </div>
+      <div class="opt">
+        <h4>${esc(L({ th: 'แก้เพื่อออกฉบับใหม่', en: 'Edit for a new edition' }))}</h4>
+        <p>${esc(L({ th: 'แก้ในฉบับร่างที่คัดลอกจากต้นฉบับ ต้นฉบับที่ใช้อยู่ไม่เปลี่ยนจนกว่า DRF จะได้รับอนุมัติ · ฉบับร่างเปิดในแท็บใหม่ หน้านี้ไปกรอกคำขอแก้ไข',
+                     en: 'Edit a draft copy. The current source is untouched until the DRF is approved. The draft opens in a new tab; this page moves on to the request form.' }))}</p>
+        <div class="kinds">
+          <button type="button" class="kind" data-k="rev" aria-pressed="true"><b>Revision</b>
+            <span>Issue ${next.rev.iss} / Rev ${next.rev.rev}${newCode ? ' · ' + esc(newCode) : ''}</span></button>
+          <button type="button" class="kind" data-k="issue" aria-pressed="false"><b>Issue</b>
+            <span>Issue ${next.issue.iss} / Rev 00${newCode ? ' · ' + esc(newCode) : ''}</span></button>
+        </div>
+        <div class="row"><button class="btn" type="button" data-new>${esc(L({ th: 'สร้างฉบับร่างและกรอก DRF', en: 'Create draft & fill DRF' }))}</button></div>
+        <div class="err" hidden></div>
+      </div>`;
+    db.querySelectorAll('.kind').forEach(b => b.onclick = () => {
+      kind = b.dataset.k;
+      db.querySelectorAll('.kind').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+    });
+
+    db.querySelector('[data-minor]').onclick = () => {
+      window.open(docUrl(o.edit), '_blank', 'noopener');     // เปิดก่อน await — กันเบราว์เซอร์บล็อกป๊อปอัป
+      A.db.collection('revisions').add({
+        kind: 'minor', state: 'logged', abbr: o.abbr || '', doc: o.doc, title: o.title || '',
+        code: o.code || '', iss: pad2(o.iss), rev: pad2(o.rev), liveId: o.edit,
+        byUid: A.user.uid, byName: who, createdAt: stamp(),
+      }).catch(e => console.warn('[revisions] บันทึกการแก้เล็กน้อยไม่สำเร็จ', e));
+      d.close();
+    };
+
+    db.querySelector('[data-new]').onclick = async ev => {
+      const btn = ev.currentTarget, err = db.querySelector('.err');
+      btn.disabled = true; err.hidden = true;
+      /* เปิดแท็บไว้ก่อนตั้งแต่ตอนกด แล้วค่อยพาไปฉบับร่างเมื่อคัดลอกเสร็จ
+         ถ้ารอ await ก่อนค่อย window.open เบราว์เซอร์จะนับว่าไม่ได้มาจากการกดแล้วบล็อก */
+      const w = window.open('', '_blank');
+      if (w) { try { w.document.write('<p style="font:15px system-ui;padding:24px">กำลังสร้างฉบับร่าง… · Creating draft…</p>'); } catch (e) {} }
+      const n = next[kind];
+      const again = await A.openRevision(o.doc);          // อีกคนอาจเพิ่งเปิดไปเมื่อกี้
+      if (again) { if (w) w.close(); d.close(); return A.editSource(o); }
+      const r = await A.gas('revDraft', { liveId: o.edit,
+        name: `DRAFT — ${o.doc} Issue ${n.iss} Rev ${n.rev} — ${o.title || ''}` });
+      if (!r.ok) {
+        if (w) w.close();
+        btn.disabled = false; err.hidden = false;
+        err.textContent = L({ th: 'สร้างฉบับร่างไม่สำเร็จ: ', en: 'Could not create draft: ' }) + r.error;
+        return;
+      }
+      const prefill = { docTitle: o.title || '', docCode: o.doc, curRev: `Issue ${pad2(o.iss)} / Rev ${pad2(o.rev)}` };
+      const ref = await A.db.collection('revisions').add({
+        kind: kind, state: 'draft', abbr: o.abbr || '', doc: o.doc, title: o.title || '',
+        code: o.code || '', iss: pad2(o.iss), rev: pad2(o.rev),
+        newIss: n.iss, newRev: n.rev, newCode: newCode,
+        liveId: o.edit, draftId: r.result.draftId, prefill: prefill,
+        byUid: A.user.uid, byName: who, createdAt: stamp(),
+      });
+      if (w) w.location.href = r.result.url; else window.open(r.result.url, '_blank');
+      location.href = base + 'fill/?c=DRF&rv=' + encodeURIComponent(ref.id) + '&p=' + b64u(prefill);
+    };
+  };
+
   A.exportSubmission = async function (submission) {
     if (!A.GAS_URL) return { ok: false, error: 'ยังไม่ได้ตั้ง URL ของตัวส่งออก' };
     if (submission.status !== 'complete')

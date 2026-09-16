@@ -83,6 +83,14 @@ function doPost(e) {
       return json_({ ok: true, result: blankForm_(body.abbr) });
     }
 
+    /* ฉบับร่างของต้นฉบับระหว่างขอแก้ไข (ดู Revision.gs) — เจ้าหน้าที่เท่านั้น
+       คัดลอก/ย้าย/เปลี่ยนชื่อเอกสารควบคุม นักเรียนที่ล็อกอินแบบ anonymous ต้องกันออก */
+    if (body.action === 'revDraft' || body.action === 'revPromote' || body.action === 'revReject') {
+      if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบเจ้าหน้าที่ก่อน');
+      var fn = { revDraft: revDraft_, revPromote: revPromote_, revReject: revReject_ }[body.action];
+      return json_({ ok: true, result: fn(body) });
+    }
+
     if (body.action === 'checklistReport') {
       return json_({ ok: true, result: checklistReport_(body, who) });
     }

@@ -24,6 +24,7 @@ dialog .df{padding:14px 22px;border-top:1px solid var(--g-100);display:flex;gap:
 </head><body>
 @@TOPBAR@@
 <main class="main" style="max-width:860px;margin:0 auto">
+  <div id="revnote"></div>
   <div id="head"></div>
   <div id="form"></div>
   <div id="foot"></div>
@@ -131,6 +132,34 @@ const DIST_ID=(function(){
   try{ return sessionStorage.getItem(DKEY)||''; }catch(e){ return ''; }
 })();
 let DIST=null, DIST_TRIED=false;
+
+/* ?rv=<id ของ revisions> — DRF ที่เปิดมาจากปุ่ม "แก้ต้นฉบับ → ออกฉบับใหม่"
+   ผูกคำขอแก้ไขเข้ากับฉบับร่างที่สร้างไว้ ผู้อนุมัติจึงเปิดดูฉบับร่างจากใบได้
+   และพออนุมัติ ระบบรู้ว่าต้องเลื่อนฉบับร่างไหนขึ้นเป็นต้นฉบับ
+   เก็บลง sessionStorage ด้วยเหตุผลเดียวกับ ?d= — วนไปล็อกอินแล้วสายต้องไม่ขาด */
+const VKEY='d0507.rev.'+(new URLSearchParams(location.search).get('c')||'');
+const REV_ID=(function(){
+  const q=new URLSearchParams(location.search).get('rv');
+  if(q){ try{ sessionStorage.setItem(VKEY,q); }catch(e){} return q; }
+  try{ return sessionStorage.getItem(VKEY)||''; }catch(e){ return ''; }
+})();
+let REV=null;
+async function loadRev(){
+  if(!REV_ID||REV||!A.isStaff()) return;
+  try{
+    const s=await A.db.collection('revisions').doc(REV_ID).get();
+    if(!s.exists) return;
+    REV=Object.assign({id:s.id},s.data());
+    const url='https://docs.google.com/document/d/'+REV.draftId+'/edit';
+    document.getElementById('revnote').innerHTML=`<div class="fk-gate info" style="margin:0 0 14px"><span>
+      <b>${A.esc(A.L({th:'คำขอแก้ไขของฉบับร่าง',en:'Revision request for draft'}))}</b> · ${A.esc(REV.doc)}
+      Issue ${A.esc(REV.iss)} / Rev ${A.esc(REV.rev)} → <b>Issue ${A.esc(REV.newIss)} / Rev ${A.esc(REV.newRev)}</b>${
+        REV.newCode?' · '+A.esc(REV.newCode):''}<br>
+      ${A.esc(A.L({th:'แก้เนื้อหาในฉบับร่าง แล้วคัดข้อความเดิม/ข้อความใหม่มาใส่ในคำขอนี้ · ต้นฉบับที่ใช้อยู่ไม่เปลี่ยนจนกว่าจะอนุมัติ ',
+                    en:'Edit the draft, then copy the old/new text into this request. The current source stays unchanged until approval. '}))}
+      <a href="${A.esc(url)}" target="_blank" rel="noopener">${A.esc(A.L({th:'เปิดฉบับร่าง',en:'Open draft'}))} ↗</a></span></div>`;
+  }catch(e){ console.warn('[fill] อ่านฉบับร่างไม่ได้',e); }
+}
 async function loadDist(){
   if(!DIST_ID||DIST_TRIED) return;
   DIST_TRIED=true;
@@ -151,7 +180,7 @@ function distSeed(){
   return o;
 }
 
-A.initAuth(@@FBCFG@@, async ()=>{ await findInFull(); await loadDist(); boot(); });
+A.initAuth(@@FBCFG@@, async ()=>{ await findInFull(); await loadDist(); boot(); loadRev(); });
 loadDist().then(boot);
 boot();
 // เปลี่ยนภาษาแล้ว render ใหม่ทั้งใบ — ข้อมูลที่กรอกไว้อยู่ใน FK.data ไม่หาย
@@ -227,7 +256,7 @@ function boot(){
    ตอนนั้น ref ระดับบนสุดยังถูกทิ้ง ตอนนี้รับแล้วทั้งสองทาง (ดู linkRef ข้างล่าง)
    ค่าที่เป็นคำตอบของฟอร์มยังต้องอยู่ "ข้างใน" p เหมือนเดิม */
 (function warnUnknownParams(){
-  const KNOWN=new Set(['c','p','ref','sys','d']);
+  const KNOWN=new Set(['c','p','ref','sys','d','rv']);
   const extra=[...new URLSearchParams(location.search).keys()].filter(k=>!KNOWN.has(k));
   if(extra.length) console.warn(
     '[fill] ทิ้ง query param ที่ไม่รู้จัก: '+extra.join(', ')+
@@ -511,7 +540,17 @@ async function send(){
     const link=extLink();
     if(link){ sub.extRef=link.extRef; sub.extSystem=link.extSystem; }
     if(DIST_ID) sub.distId=DIST_ID;
+    if(REV_ID && F.abbr==='DRF') sub.revId=REV_ID;
     await ref.set(sub);
+    /* ฉบับร่างรู้แล้วว่ามีคำขอ — ปุ่มแก้ต้นฉบับจะขึ้นว่ารออนุมัติ ไม่ใช่ให้กรอกคำขอซ้ำ */
+    if(sub.revId){
+      try{
+        await A.db.collection('revisions').doc(REV_ID).update({
+          state:'submitted', subId:ref.id, tracking:trk,
+          submittedAt:firebase.firestore.FieldValue.serverTimestamp() });
+        sessionStorage.removeItem(VKEY);
+      }catch(e){ console.warn('[fill] ผูกคำขอกับฉบับร่างไม่สำเร็จ',e); }
+    }
     // ลบสายทิ้งเมื่อผูกกับใบเรียบร้อยแล้ว ไม่งั้นค้างไปโผล่ในใบถัดไปของแท็บเดียวกัน
     if(link){ try{ sessionStorage.removeItem(RKEY); }catch(e){} }
 

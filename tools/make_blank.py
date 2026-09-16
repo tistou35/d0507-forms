@@ -33,7 +33,7 @@
 # ต้องเขียน metadata ทับด้วย ไม่งั้นชื่อเรื่องใน PDF จะเป็นชื่อไฟล์ชั่วคราว
 # ซึ่งโผล่เป็นชื่อแท็บตอนเปิด และดูไม่ได้สำหรับเอกสารควบคุม
 # ============================================================
-import json, os, sys, urllib.request
+import json, os, sys, urllib.error, urllib.request
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(HERE, 'tools'))
@@ -83,9 +83,29 @@ def blank_docx(path):
 
 
 def export_pdf(fid, tk):
-    """export Google Doc ที่มีอยู่แล้วเป็น PDF — ไม่ได้สร้างสำเนาใหม่"""
-    return api('https://www.googleapis.com/drive/v3/files/%s/export'
-               '?mimeType=application/pdf' % fid, tk).read()
+    """export Google Doc ที่มีอยู่แล้วเป็น PDF — ไม่ได้สร้างสำเนาใหม่
+
+    ต้นฉบับที่ขึ้นมาจากฉบับร่างที่อนุมัติแล้ว ถูกสร้างโดย Apps Script (Revision.gs)
+    ไม่ใช่เครื่องมือนี้ สิทธิ์ drive.file ของเราจึงมองไม่เห็นไฟล์ (404)
+    ต้นฉบับทุกตัวตั้ง "ใครมีลิงก์ก็อ่านได้" อยู่แล้ว — ถอยไป export แบบสาธารณะแทน
+    """
+    try:
+        return api('https://www.googleapis.com/drive/v3/files/%s/export'
+                   '?mimeType=application/pdf' % fid, tk).read()
+    except urllib.error.HTTPError as e:
+        if e.code not in (403, 404):
+            raise
+        return public_export(fid, 'pdf')
+
+
+def public_export(fid, fmt):
+    """export ต้นฉบับที่แชร์แบบใครมีลิงก์ก็อ่านได้ โดยไม่ใช้ token"""
+    r = urllib.request.urlopen('https://docs.google.com/document/d/%s/export?format=%s' % (fid, fmt),
+                               context=SSLCTX, timeout=300)
+    data = r.read()
+    if data[:5] == b'<!DOC' or data[:5] == b'<html':
+        raise RuntimeError('export %s ได้หน้า HTML แทนไฟล์ — ต้นฉบับยังไม่ได้แชร์แบบอ่านได้' % fid)
+    return data
 
 
 def convert(path, tk):
