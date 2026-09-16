@@ -722,8 +722,10 @@
     db.innerHTML = `
       <div class="opt">
         <h4>${esc(L({ th: 'แก้ไขเล็กน้อย — ฉบับเดิม', en: 'Minor edit — same edition' }))}</h4>
-        <p>${esc(L({ th: 'แก้คำผิด จัดรูปแบบ หรือสิ่งที่ไม่เปลี่ยนสาระของเอกสาร · Issue/Rev และเลขกำกับไม่เปลี่ยน · ไม่ต้องกรอกคำขอ แต่ระบบบันทึกว่าใครเปิดแก้เมื่อไร',
-                     en: 'Typos, formatting — nothing that changes what the document requires. Issue/Rev and control code stay. No request form, but the edit is logged.' }))}</p>
+        <p>${esc(L({ th: 'ขยับ layout · แก้คำผิด · จัด format เท่านั้น · Issue/Rev และเลขกำกับไม่เปลี่ยน · ไม่ต้องกรอกคำขอ แต่ระบบบันทึกว่าใครเปิดแก้เมื่อไร',
+                     en: 'Layout adjustments, typo fixes, formatting only. Issue/Rev and control code stay. No request form, but the edit is logged.' }))}</p>
+        <p style="font-size:12.5px;color:var(--g-500)">${esc(L({ th: 'เปลี่ยนข้อความที่มีความหมาย ค่าตัวเลข ขั้นตอน เพิ่มหรือลบหัวข้อ/ช่องกรอก → ใช้ "แก้เพื่อออกฉบับใหม่"',
+                     en: 'Changing meaningful wording, values, steps, or adding/removing sections or fields → use "Edit for a new edition".' }))}</p>
         <div class="row"><button class="btn sec" type="button" data-minor>${esc(L({ th: 'เปิดต้นฉบับ', en: 'Open source' }))} ↗</button></div>
       </div>
       <div class="opt">
