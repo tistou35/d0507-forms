@@ -128,7 +128,8 @@ function paint() {
   const CAP = 6;
   let show, head, headEn, note, total;
   if (mine.length) {
-    const all = REG.forms.filter(f => f.kind !== 'ref' && f.r && mine.some(r => f.r[r]));
+    // ใบที่บทบาทของฉันเห็น — ตามทะเบียน หรือตามที่ผู้ดูแลปรับไว้ที่ config/roleForms
+    const all = REG.forms.filter(f => f.kind !== 'ref' && mine.some(r => A.seesForm(f, r)));
     total = all.length; show = all.slice(0, CAP);
     head = A.t('yourForms'); headEn = A.t('yourForms', A.other());
     note = A.L(A.T.byRoles)(A.roleNames().join(' · '));

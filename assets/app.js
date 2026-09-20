@@ -79,11 +79,13 @@
         } catch (e) { /* ยังไม่มี users/{uid} หรือ rule ไม่อนุญาต */ }
       }
       A.admins = null;
+      A.roleForms = null;
       if (A.user) {
         try {
           const d = await A.db.collection('config').doc('admins').get();
           A.admins = (d.exists && d.data().uids) || [];
         } catch (e) { A.admins = null; }
+        await A.loadRoleForms();
       }
       A.full = false;
       if (A.user && A.reg) await A.hydrate();
@@ -146,6 +148,30 @@
      ที่ล็อกอิน พอนักเรียนต้องล็อกอินด้วย เกณฑ์เดิมจะยกนักเรียนขึ้นเป็นเจ้าหน้าที่ทั้งกอง */
   A.STAFF_ROLES = ['ins', 'mnt', 'ops', 'mgt', 'sms'];
   A.roleNames = () => A.roles.map(r => A.L(A.ROLE_N[r]) || r);
+
+  /* ── บทบาทไหนเห็นฟอร์มอะไร ────────────────────────────────
+     ค่าตั้งต้นมาจากช่อง r ในทะเบียน ซึ่งเก็บ "หน้าที่ของบทบาทนั้นในใบนี้" ไว้ด้วย
+     ผู้ดูแลปรับได้ที่หน้าตั้งค่าระบบ > บทบาทและฟอร์ม เก็บไว้ที่ config/roleForms
+     เป็นรายการตัวย่อต่อบทบาท — บทบาทที่ไม่มีในเอกสารนั้น ใช้ค่าจากทะเบียนต่อไป
+
+     ทำไมไม่แก้ทะเบียนตรง ๆ: ทะเบียนมาจาก forms_register.json ในรีโป การกดในเว็บ
+     แก้ไฟล์ในรีโปไม่ได้ ถ้าเขียนทับ registry/current ค่าจะหายทุกครั้งที่ build ใหม่ */
+  A.roleForms = null;
+  A.loadRoleForms = async function () {
+    try {
+      const d = await A.db.collection('config').doc('roleForms').get();
+      A.roleForms = (d.exists && d.data().roles) || null;
+    } catch (e) { A.roleForms = null; }
+    return A.roleForms;
+  };
+  A.seesForm = function (f, role) {
+    if (!f || !role) return false;
+    const ov = A.roleForms && A.roleForms[role];
+    if (Array.isArray(ov)) return ov.indexOf(f.abbr) >= 0;
+    return !!(f.r && String(f.r[role] || '').length);
+  };
+  /* ใบที่บทบาทนี้เห็น (ไม่รวมเอกสารอ้างอิงซึ่งไม่ใช่ใบให้กรอก) */
+  A.formsFor = (reg, role) => (reg.forms || []).filter(f => f.kind !== 'ref' && A.seesForm(f, role));
 
   /* คนหนึ่งคนถือได้หลายตำแหน่ง — ครูที่เป็นผู้จัดการฝ่ายมาตรฐานด้วย, ช่างที่ทำ
      dispatch ด้วย users/{uid}.roles จึงเป็น array มาแต่แรก แต่หน้าหลักเดิม

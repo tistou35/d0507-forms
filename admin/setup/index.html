@@ -23,6 +23,13 @@ dialog .df{padding:14px 22px;border-top:1px solid var(--g-100);display:flex;gap:
   background:var(--surface);font-size:13.5px;cursor:pointer;color:var(--fg-2);font-family:inherit}
 .stabs button[aria-selected="true"]{background:var(--navy-900);color:#fff;border-color:var(--navy-900)}
 section[data-pane].off{display:none}
+.rfgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:6px 14px}
+.rfitem{display:flex;gap:9px;align-items:flex-start;padding:5px 2px;font-size:13.5px;line-height:1.45}
+.rfitem input{margin-top:3px;width:16px;height:16px;flex:none}
+.rfitem b{font-family:var(--font-mono);font-size:12px;color:var(--g-600);margin-right:4px}
+.rfitem i{display:block;font-style:normal;font-size:11.5px;color:var(--g-500)}
+.rfitem i.ok2{display:inline-block;background:var(--green-100);color:var(--green-600);
+  border-radius:99px;padding:1px 7px;margin-left:6px;font-size:10.5px;font-weight:700}
 .filters select{min-height:40px;padding:0 11px;border-radius:8px;border:1px solid var(--border-med);
   background:var(--surface);font-size:13.5px;font-family:inherit;color:var(--fg-1)}
 .filters .cnt{font-size:12.5px;color:var(--g-500);margin-left:auto}
@@ -112,6 +119,7 @@ section[data-pane].off{display:none}
       <div class="stabs" role="tablist">
         <button role="tab" data-tab="users"  aria-selected="true">ผู้ใช้งาน</button>
         <button role="tab" data-tab="me"     aria-selected="false">โปรไฟล์ของฉัน</button>
+        <button role="tab" data-tab="roles"  aria-selected="false">บทบาทและฟอร์ม</button>
         <button role="tab" data-tab="access" aria-selected="false">สิทธิ์และผู้รับฟอร์ม</button>
         <button role="tab" data-tab="system" aria-selected="false">ระบบและทะเบียน</button>
       </div>
@@ -165,6 +173,21 @@ section[data-pane].off{display:none}
             <span class="msg" id="nMsg"></span>
           </div>
         </div>
+      </section>
+
+      <section data-pane="roles">
+        <div class="sh"><h2>บทบาทไหนเห็นฟอร์มอะไร</h2><span class="en">Forms visible per role</span>
+          <span class="rt"><span class="msg" id="rfMsg"></span></span></div>
+        <p class="note" style="margin-bottom:12px">เลือกบทบาทแล้วติ๊กใบที่บทบาทนั้นต้องเห็นในหน้าหลักและคลังฟอร์ม ·
+          หนึ่งคนถือได้หลายบทบาท จะเห็นใบของทุกบทบาทที่ถือรวมกัน ·
+          ค่าตั้งต้นมาจากทะเบียน ปรับแล้วเก็บไว้ที่ระบบ ไม่ได้แก้ทะเบียน</p>
+        <div class="fk-opts" id="rfRoles" style="margin-bottom:14px"></div>
+        <div id="rfBox">—</div>
+      </section>
+
+      <section data-pane="roles">
+        <div class="sh"><h2>ผู้ที่ไม่ได้เข้าสู่ระบบเห็นอะไร</h2><span class="en">What a visitor sees</span></div>
+        <div id="rfPub">—</div>
       </section>
 
       <section data-pane="me">
@@ -269,7 +292,7 @@ section[data-pane].off{display:none}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="../../assets/app.js?v=69c5af72"></script>
+<script src="../../assets/app.js?v=5f35d273"></script>
 <script>D0507.GAS_URL='https://script.google.com/macros/s/AKfycby7rFFVxd92wPImX4m8pv8nHqTrK3Iq0O32A34844DAg1rP8N3RfgKEyGvAUkQu-NXd/exec';</script>
 <script>
 "use strict";
@@ -319,6 +342,7 @@ function tab(name){
     el.classList.toggle('off', el.dataset.pane !== name));
   try { history.replaceState(null, '', '#' + name); } catch(e){}
   if (name === 'users') users();
+  if (name === 'roles') roleForms();
 }
 document.querySelectorAll('.stabs button').forEach(b =>
   b.addEventListener('click', () => tab(b.dataset.tab)));
@@ -348,6 +372,14 @@ async function users(force){
   paintUsers();
 }
 
+/* ใบที่คนนี้เห็นรวมทุกบทบาทที่ถือ — ซ้ำกันนับครั้งเดียว
+   ถือหลายบทบาทเป็นเรื่องปกติในองค์กรขนาดนี้ (ครูที่เป็นผู้จัดการฝ่ายด้วย) */
+function seesCount(u){
+  const seen = new Set();
+  (u.roles || []).forEach(r => A.formsFor(A.reg, r).forEach(f => seen.add(f.abbr)));
+  return seen.size;
+}
+
 function paintUsers(){
   const host = document.getElementById('uList');
   const role = document.getElementById('uRole').value;
@@ -370,6 +402,7 @@ function paintUsers(){
           ${(u.roles || []).map(r => `<span class="tag rl">${A.esc(A.L(A.ROLE_N[r]) || r)}</span>`).join('')
             || '<span class="tag warn">ยังไม่มีบทบาท</span>'}
           ${(u.positions || []).map(x => `<span class="tag ps">${A.esc(x)}</span>`).join('')}
+          <span class="tag">เห็นฟอร์ม ${seesCount(u)} ใบ</span>
         </div>
       </div>
       <div>${canEdit ? `<button class="fb" data-edit="${A.esc(u.uid)}">แก้ไข</button>`
@@ -518,6 +551,111 @@ async function addStaff(){
   NROLES.clear(); NPOS.clear();
   chips(document.getElementById('nRoles'), ROLE_KEYS, NROLES, k => A.L(A.ROLE_N[k]) || k);
   chips(document.getElementById('nPos'), POS_KEYS, NPOS, k => k + ' · ' + POS_N[k]);
+}
+
+/* ── บทบาทไหนเห็นฟอร์มอะไร ───────────────────────────────
+   ติ๊กแล้วเก็บที่ config/roleForms เป็นรายการตัวย่อต่อบทบาท
+   ไม่แตะทะเบียน — ทะเบียนมาจากไฟล์ในรีโป เขียนทับแล้วหายตอน build รอบหน้า
+   บทบาทที่ไม่เคยกดบันทึก จะไม่มีคีย์ในเอกสารนั้นและใช้ค่าจากทะเบียนต่อไป */
+let RF_ROLE = 'stu', RF_SET = null;
+
+function rfDept(f){ return f.own || '—'; }
+
+async function roleForms(){
+  if (!A.reg || !A.reg.forms.length) return;
+  await A.loadRoleForms();
+  const host = document.getElementById('rfRoles');
+  host.innerHTML = ROLE_KEYS.map(k => {
+    const n = A.formsFor(A.reg, k).length;
+    const u = USERS.filter(x => (x.roles||[]).includes(k)).length;
+    return `<button type="button" class="fk-opt" data-r="${k}" aria-pressed="${k===RF_ROLE}">
+      ${A.esc(A.L(A.ROLE_N[k]) || k)} · ${n} ใบ${u?' · '+u+' คน':''}</button>`;
+  }).join('');
+  host.querySelectorAll('[data-r]').forEach(b => b.onclick = () => { RF_ROLE = b.dataset.r; RF_SET = null; roleForms(); });
+  paintRoleForms();
+  paintPublic();
+}
+
+function paintRoleForms(){
+  const box = document.getElementById('rfBox');
+  const forms = A.reg.forms.filter(f => f.kind !== 'ref')
+    .sort((a,b) => (rfDept(a)+a.abbr).localeCompare(rfDept(b)+b.abbr));
+  if (!RF_SET) RF_SET = new Set(forms.filter(f => A.seesForm(f, RF_ROLE)).map(f => f.abbr));
+  const custom = !!(A.roleForms && Array.isArray(A.roleForms[RF_ROLE]));
+  const by = {};
+  forms.forEach(f => (by[rfDept(f)] = by[rfDept(f)] || []).push(f));
+  const canEdit = A.isAdmin();
+  box.innerHTML = `
+    <p class="hint" style="margin-bottom:10px">${A.esc(A.L(A.ROLE_N[RF_ROLE]) || RF_ROLE)} —
+      เลือกไว้ <b id="rfN">${RF_SET.size}</b> ใบ จาก ${forms.length} ใบ ·
+      ${custom ? 'ปรับไว้เองแล้ว' : 'ยังใช้ค่าตามทะเบียน'}</p>
+    ${Object.keys(by).sort().map(d => `
+      <div class="card" style="margin-bottom:10px">
+        <div class="sh" style="margin-bottom:8px"><h2 style="font-size:14px">${A.esc(A.deptName(d))}</h2>
+          <span class="en">${A.esc(d)}</span></div>
+        <div class="rfgrid">${by[d].map(f => `
+          <label class="rfitem"><input type="checkbox" data-f="${A.esc(f.abbr)}"
+              ${RF_SET.has(f.abbr)?'checked':''} ${canEdit?'':'disabled'}>
+            <span><b>${A.esc(f.abbr)}</b> ${A.esc(A.nm(f))}
+              ${f.r && f.r[RF_ROLE] ? `<i>${A.esc(f.r[RF_ROLE])}</i>` : ''}</span></label>`).join('')}
+        </div></div>`).join('')}
+    ${canEdit ? `<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <button class="obtn" id="rfSave">บันทึก</button>
+      <button class="fb" id="rfAll">เลือกทั้งหมด</button>
+      <button class="fb" id="rfNone">ล้างทั้งหมด</button>
+      ${custom ? '<button class="fb" id="rfReset">กลับไปใช้ค่าตามทะเบียน</button>' : ''}</div>`
+      : '<p class="hint">เฉพาะผู้ดูแลระบบที่แก้ได้</p>'}`;
+
+  box.querySelectorAll('[data-f]').forEach(cb => cb.onchange = () => {
+    cb.checked ? RF_SET.add(cb.dataset.f) : RF_SET.delete(cb.dataset.f);
+    document.getElementById('rfN').textContent = RF_SET.size;
+  });
+  const $ = id => document.getElementById(id);
+  if ($('rfAll'))  $('rfAll').onclick  = () => { RF_SET = new Set(forms.map(f=>f.abbr)); paintRoleForms(); };
+  if ($('rfNone')) $('rfNone').onclick = () => { RF_SET = new Set(); paintRoleForms(); };
+  if ($('rfSave')) $('rfSave').onclick = () => saveRoleForms([...RF_SET]);
+  if ($('rfReset')) $('rfReset').onclick = () => {
+    if (confirm('เลิกใช้ค่าที่ปรับไว้ แล้วกลับไปใช้ค่าตามทะเบียนของบทบาทนี้?')) saveRoleForms(null);
+  };
+}
+
+async function saveRoleForms(list){
+  const msg = document.getElementById('rfMsg');
+  msg.textContent = 'กำลังบันทึก…';
+  try {
+    const roles = Object.assign({}, A.roleForms || {});
+    if (list) roles[RF_ROLE] = list; else delete roles[RF_ROLE];
+    await A.db.collection('config').doc('roleForms').set({
+      roles, updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+      byName: A.myName(),
+    });
+    A.roleForms = Object.keys(roles).length ? roles : null;
+    RF_SET = null;
+    msg.textContent = 'บันทึกแล้ว';
+    setTimeout(() => msg.textContent = '', 2500);
+    roleForms();
+  } catch(e){ msg.textContent = 'บันทึกไม่ได้: ' + (e.code || e.message); }
+}
+
+/* คนที่ยังไม่เข้าสู่ระบบเห็นอะไร — ธง public ในทะเบียนเป็นตัวกำหนด ไม่ใช่บทบาท
+   แก้ได้ที่ forms_register.json ในรีโปเท่านั้น หน้านี้จึงแสดงอย่างเดียว */
+function paintPublic(){
+  const pub = A.reg.forms.filter(f => f.kind !== 'ref' && f.public);
+  const unl = A.reg.forms.filter(f => f.unlisted);
+  document.getElementById('rfPub').innerHTML = `
+    <div class="card">
+      <p class="note" style="margin-bottom:12px">เมนูที่เห็น — หน้าหลัก · คลังฟอร์ม · เช็กลิสต์และเอกสาร
+        (คิวงาน ทะเบียน จัดการฟอร์ม ผังผู้อนุมัติ แจกจ่ายเอกสาร และหน้านี้ ซ่อนไว้จนกว่าจะเข้าสู่ระบบ)</p>
+      <p class="hint" style="margin-bottom:8px"><b>เห็นเป็นการ์ดในคลังฟอร์ม ${pub.length} ใบ</b> —
+        ในจำนวนนี้กรอกได้โดยไม่ต้องเข้าสู่ระบบเฉพาะใบที่มีป้าย "ไม่ต้องล็อกอิน"
+        ที่เหลือกดแล้วจะให้เข้าสู่ระบบก่อน</p>
+      <div class="rfgrid">${pub.map(f => `<div class="rfitem"><span><b>${A.esc(f.abbr)}</b> ${A.esc(A.nm(f))}
+        ${f.anon ? '<i class="ok2">ไม่ต้องล็อกอิน</i>' : ''}</span></div>`).join('')}</div>
+      <p class="hint" style="margin-top:12px">เปิดจากลิงก์ได้แต่ไม่ขึ้นเป็นการ์ด ${unl.length} ใบ —
+        ${A.esc(unl.map(f=>f.abbr).join(' · '))}</p>
+      <p class="hint" style="margin-top:8px">รายการนี้มาจากธง public ในทะเบียน แก้ได้ที่
+        <span class="mono">forms_register.json</span> ในรีโป ไม่ใช่ที่หน้านี้</p>
+    </div>`;
 }
 
 function chips(el, keys, set, label){

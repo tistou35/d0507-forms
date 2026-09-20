@@ -74,7 +74,7 @@ function list(){
   /* unlisted = อยู่ในชุดสาธารณะเพื่อให้เปิดจากลิงก์ได้ แต่ไม่ใช่ฟอร์มที่
      คนนอกเดินมาหยิบเอง จึงไม่ขึ้นเป็นการ์ดในคลัง */
   let L = A.isStaff() ? FORMS.slice() : FORMS.filter(f=>f.public);
-  if (GROUP!=='all') L = L.filter(f=>f.r && f.r[GROUP]);
+  if (GROUP!=='all') L = L.filter(f=>A.seesForm(f,GROUP));
   if (SYS!=='all')   L = L.filter(f=>f.sys===SYS);
   if (A.isStaff()){
     if (ST==='issue')  L = L.filter(f=>f.st!=='ok');
