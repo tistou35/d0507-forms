@@ -120,7 +120,9 @@ section[data-pane].off{display:none}
           <span class="rt"><span class="msg" id="rfMsg"></span></span></div>
         <p class="note" style="margin-bottom:12px">เลือกบทบาทแล้วติ๊กใบที่บทบาทนั้นต้องเห็นในหน้าหลักและคลังฟอร์ม ·
           หนึ่งคนถือได้หลายบทบาท จะเห็นใบของทุกบทบาทที่ถือรวมกัน ·
-          ค่าตั้งต้นมาจากทะเบียน ปรับแล้วเก็บไว้ที่ระบบ ไม่ได้แก้ทะเบียน</p>
+          ค่าตั้งต้นมาจากทะเบียน ปรับแล้วเก็บไว้ที่ระบบ ไม่ได้แก้ทะเบียน ·
+          ตารางนี้มีเฉพาะ<b>ใบที่กรอกได้</b> ส่วนเอกสารอ้างอิงและเช็กลิสต์อยู่ในหน้า
+          "เช็กลิสต์และเอกสาร" ซึ่งทุกคนเปิดอ่านได้ ไม่ได้แยกตามบทบาท</p>
         <div class="fk-opts" id="rfRoles" style="margin-bottom:14px"></div>
         <div id="rfBox">—</div>
       </section>
@@ -485,6 +487,7 @@ function rfDept(f){ return f.own || '—'; }
 async function roleForms(){
   if (!A.reg || !A.reg.forms.length) return;
   await A.loadRoleForms();
+  if (!USERS.length) { try { await users(); } catch(e){} }   // เอาไว้นับว่าบทบาทนั้นมีกี่คนถือ
   const host = document.getElementById('rfRoles');
   host.innerHTML = ROLE_KEYS.map(k => {
     const n = A.formsFor(A.reg, k).length;
