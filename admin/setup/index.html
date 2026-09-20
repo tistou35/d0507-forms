@@ -18,10 +18,75 @@ dialog .dh p{font-size:12.5px;color:rgba(255,255,255,.7);margin-top:3px}
 dialog .db{padding:20px 22px;max-height:60vh;overflow:auto}
 dialog .df{padding:14px 22px;border-top:1px solid var(--g-100);display:flex;gap:10px;
   justify-content:flex-end;flex-wrap:wrap}
-.stabs{display:flex;gap:8px;margin:6px 0 18px;flex-wrap:wrap}
-.stabs button{padding:9px 16px;border-radius:9px;border:1px solid var(--border-light);
-  background:var(--surface);font-size:13.5px;cursor:pointer;color:var(--fg-2);font-family:inherit}
-.stabs button[aria-selected="true"]{background:var(--navy-900);color:#fff;border-color:var(--navy-900)}
+.stabs{display:flex;gap:6px;margin:6px 0 20px;flex-wrap:wrap;border-bottom:1px solid var(--border-light);
+  padding-bottom:0}
+.stabs button{padding:10px 16px 12px;border:0;border-bottom:2px solid transparent;background:none;
+  font-size:14px;cursor:pointer;color:var(--g-500);font-family:inherit;font-weight:600}
+.stabs button:hover{color:var(--fg-1)}
+.stabs button[aria-selected="true"]{color:var(--navy-900);border-bottom-color:var(--navy-900)}
+.stabs button span{display:inline-block;margin-left:7px;font-size:11px;font-family:var(--font-mono);
+  background:var(--g-100);color:var(--g-600);border-radius:99px;padding:1px 7px;font-weight:700}
+
+/* แถบสรุปด้านบน — กดเพื่อกรองรายชื่อ ไม่ใช่แค่ตัวเลขประดับ */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.tile2{text-align:left;background:var(--surface);border:1px solid var(--border-light);border-radius:10px;
+  padding:12px 14px;cursor:pointer;font-family:inherit}
+.tile2:hover{border-color:var(--navy-900)}
+.tile2[aria-pressed="true"]{border-color:var(--navy-900);box-shadow:inset 0 0 0 1px var(--navy-900)}
+.tile2 b{display:block;font-size:22px;font-family:var(--font-display);line-height:1.1}
+.tile2 span{display:block;font-size:12px;color:var(--g-500);margin-top:3px}
+.tile2.warn b{color:var(--amber-600)} .tile2.bad b{color:var(--red-600)}
+
+/* กล่องพับ — ฟอร์มยาว ๆ ไม่ต้องกางค้างไว้ตลอด */
+.fold{border:1px solid var(--border-light);border-radius:10px;background:var(--surface);margin-bottom:16px}
+.fold>summary{padding:13px 16px;cursor:pointer;font-weight:600;font-size:14px;list-style:none;
+  display:flex;align-items:center;gap:9px}
+.fold>summary::-webkit-details-marker{display:none}
+.fold>summary::before{content:'+';font-family:var(--font-mono);font-size:16px;color:var(--navy-900)}
+.fold[open]>summary{border-bottom:1px solid var(--border-light)}
+.fold[open]>summary::before{content:'–'}
+.fold>summary em{font-style:normal;font-weight:400;color:var(--g-500);font-size:12.5px}
+.fold .in{padding:16px}
+details.h{margin-top:6px}
+details.h summary{cursor:pointer;font-size:12.5px;color:var(--sky-600);list-style:none}
+details.h summary::-webkit-details-marker{display:none}
+details.h summary::before{content:'▸ ';font-size:10px}
+details.h[open] summary::before{content:'▾ '}
+details.h .hint{margin-top:6px}
+
+/* แถวผู้ใช้ */
+.urow{display:grid;grid-template-columns:38px 1fr auto;gap:14px;align-items:center;
+  background:var(--surface);border:1px solid var(--border-light);border-radius:10px;
+  padding:12px 16px;margin-bottom:8px}
+.urow .av2{width:38px;height:38px;border-radius:50%;background:var(--navy-900);color:#fff;
+  display:grid;place-items:center;font-size:13px;font-weight:700;font-family:var(--font-mono)}
+.urow .nm{font-size:14.5px;font-weight:600;display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.urow .em{font-family:var(--font-mono);font-size:11.5px;color:var(--g-500);margin-top:2px}
+.urow .tg{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.urow.off2{opacity:.55}
+.urow .rt2{display:flex;align-items:center;gap:12px;white-space:nowrap}
+.urow .sees{font-size:11.5px;color:var(--g-500);font-family:var(--font-mono)}
+@media(max-width:700px){
+  .urow{grid-template-columns:38px 1fr;gap:10px}
+  .urow .rt2{grid-column:1/-1;justify-content:space-between}
+}
+.tag.rl{background:var(--navy-50,#eef2f7);color:var(--navy-900);font-size:11px}
+.tag.ps{background:var(--sky-50,#eaf2fb);color:var(--sky-600);font-family:var(--font-mono);font-size:10.5px}
+
+/* บทบาท × ฟอร์ม — รายการบทบาทซ้าย ตารางขวา */
+.rfwrap{display:grid;grid-template-columns:230px 1fr;gap:16px;align-items:start}
+@media(max-width:820px){.rfwrap{grid-template-columns:1fr}}
+.rlist{display:flex;flex-direction:column;gap:6px}
+.rlist button{text-align:left;padding:11px 13px;border-radius:9px;border:1px solid var(--border-light);
+  background:var(--surface);cursor:pointer;font-family:inherit;font-size:13.5px}
+.rlist button b{display:block;font-weight:600}
+.rlist button span{display:block;font-size:11.5px;color:var(--g-500);font-family:var(--font-mono);margin-top:2px}
+.rlist button[aria-pressed="true"]{border-color:var(--navy-900);background:var(--navy-900);color:#fff}
+.rlist button[aria-pressed="true"] span{color:rgba(255,255,255,.65)}
+.rbar{position:sticky;bottom:0;background:var(--surface);border:1px solid var(--border-light);
+  border-radius:10px;padding:11px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  box-shadow:0 -4px 14px rgba(13,27,42,.06);margin-top:12px}
+.rbar .sp{margin-left:auto}
 section[data-pane].off{display:none}
 .rfgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:6px 14px}
 .rfitem{display:flex;gap:9px;align-items:flex-start;padding:5px 2px;font-size:13.5px;line-height:1.45}
@@ -33,15 +98,6 @@ section[data-pane].off{display:none}
 .filters select{min-height:40px;padding:0 11px;border-radius:8px;border:1px solid var(--border-med);
   background:var(--surface);font-size:13.5px;font-family:inherit;color:var(--fg-1)}
 .filters .cnt{font-size:12.5px;color:var(--g-500);margin-left:auto}
-.urow{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;
-  background:var(--surface);border:1px solid var(--border-light);border-radius:8px;
-  padding:12px 16px;margin-bottom:8px}
-.urow .nm{font-size:14.5px;font-weight:600}
-.urow .em{font-family:var(--font-mono);font-size:11.5px;color:var(--g-500)}
-.urow .tg{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}
-.urow.off2{opacity:.55}
-.tag.rl{background:var(--g-100);color:var(--fg-2);font-size:11px}
-.tag.ps{background:var(--sky-50,#eaf2fb);color:var(--sky-600);font-family:var(--font-mono);font-size:10.5px}
 </style>
 </head><body>
 <div class="topbar">
@@ -111,16 +167,15 @@ section[data-pane].off{display:none}
     <div class="greet"><div>
       <p class="eyebrow">ผู้ดูแลระบบ · ADMIN</p>
       <h1>ตั้งค่าระบบ</h1>
-      <p class="sub">บทบาทผู้ใช้ · รายชื่อผู้รับฟอร์ม · ทะเบียนเอกสาร — เขียนด้วยสิทธิ์ของบัญชีที่เข้าสู่ระบบ</p></div></div>
+      <p class="sub">ใครใช้ระบบได้ · บทบาทไหนเห็นฟอร์มอะไร · ใครอนุมัติได้ — ทุกการเปลี่ยนแปลงเขียนด้วยสิทธิ์ของบัญชีที่เข้าสู่ระบบ</p></div></div>
 
     <div id="gate"></div>
 
     <div id="body" class="hide">
       <div class="stabs" role="tablist">
-        <button role="tab" data-tab="users"  aria-selected="true">ผู้ใช้งาน</button>
-        <button role="tab" data-tab="me"     aria-selected="false">โปรไฟล์ของฉัน</button>
+        <button role="tab" data-tab="users"  aria-selected="true">ผู้ใช้งาน<span id="tabN">—</span></button>
         <button role="tab" data-tab="roles"  aria-selected="false">บทบาทและฟอร์ม</button>
-        <button role="tab" data-tab="access" aria-selected="false">สิทธิ์และผู้รับฟอร์ม</button>
+        <button role="tab" data-tab="me"     aria-selected="false">โปรไฟล์ของฉัน</button>
         <button role="tab" data-tab="system" aria-selected="false">ระบบและทะเบียน</button>
       </div>
 
@@ -133,20 +188,22 @@ section[data-pane].off{display:none}
       <section data-pane="users">
         <div class="sh"><h2>รายชื่อผู้ใช้</h2><span class="en">User accounts</span>
           <span class="rt"><button class="fb" id="uRel">โหลดใหม่</button></span></div>
+        <div class="tiles" id="uTiles"></div>
         <div class="filters">
           <select id="uRole"><option value="">ทุกบทบาท</option></select>
-          <input id="uQ" type="search" placeholder="ค้นหาชื่อ · อีเมล">
+          <input id="uQ" type="search" placeholder="ค้นหาชื่อ · อีเมล · ตำแหน่ง">
           <span class="cnt" id="uCnt"></span>
         </div>
         <div id="uList">—</div>
       </section>
 
       <section data-pane="users">
-        <div class="sh"><h2>เพิ่มเจ้าหน้าที่</h2><span class="en">Add staff account</span></div>
-        <div class="card">
-          <p class="note" style="margin-bottom:14px">เปิดบัญชีให้เพื่อนร่วมงานด้วยอีเมลและรหัสผ่านตั้งต้น
-            แล้วกำหนดบทบาทกับตำแหน่งให้ในขั้นตอนเดียว — เจ้าตัวเปลี่ยนรหัสผ่านเองได้ทีหลังที่หน้าเข้าสู่ระบบ ·
-            ถ้ามีบัญชีอยู่แล้ว ระบบจะไม่สร้างใหม่ แต่จะตั้งบทบาทให้บัญชีเดิม</p>
+        <details class="fold" id="addFold">
+          <summary>เพิ่มบัญชีเจ้าหน้าที่ <em>— อีเมล · รหัสผ่านตั้งต้น · บทบาท ในขั้นตอนเดียว</em></summary>
+          <div class="in">
+          <p class="hint" style="margin-bottom:14px">เจ้าตัวเปลี่ยนรหัสผ่านเองได้ทีหลัง ·
+            ถ้ามีบัญชีอยู่แล้ว ระบบจะไม่สร้างใหม่ แต่จะตั้งบทบาทให้บัญชีเดิม ·
+            นักเรียนไม่ต้องเปิดให้ — สมัครเองได้ที่หน้ากรอกฟอร์ม</p>
           <div class="g2">
             <div class="fk-f"><label for="nName">ชื่อที่จะแสดง <span style="color:var(--red-500)">*</span></label>
               <input id="nName" type="text" placeholder="เช่น สมชาย ใจดี"></div>
@@ -172,19 +229,23 @@ section[data-pane].off{display:none}
             <button class="obtn" id="nAdd">สร้างบัญชีและกำหนดสิทธิ์</button>
             <span class="msg" id="nMsg"></span>
           </div>
-        </div>
+          </div>
+        </details>
       </section>
 
       <section data-pane="roles">
         <div class="sh"><h2>บทบาทไหนเห็นฟอร์มอะไร</h2><span class="en">Forms visible per role</span>
           <span class="rt"><span class="msg" id="rfMsg"></span></span></div>
-        <p class="note" style="margin-bottom:12px">เลือกบทบาทแล้วติ๊กใบที่บทบาทนั้นต้องเห็นในหน้าหลักและคลังฟอร์ม ·
-          หนึ่งคนถือได้หลายบทบาท จะเห็นใบของทุกบทบาทที่ถือรวมกัน ·
-          ค่าตั้งต้นมาจากทะเบียน ปรับแล้วเก็บไว้ที่ระบบ ไม่ได้แก้ทะเบียน ·
-          ตารางนี้มีเฉพาะ<b>ใบที่กรอกได้</b> ส่วนเอกสารอ้างอิงและเช็กลิสต์อยู่ในหน้า
-          "เช็กลิสต์และเอกสาร" ซึ่งทุกคนเปิดอ่านได้ ไม่ได้แยกตามบทบาท</p>
-        <div class="fk-opts" id="rfRoles" style="margin-bottom:14px"></div>
-        <div id="rfBox">—</div>
+        <p class="hint" style="margin-bottom:12px">เลือกบทบาททางซ้าย แล้วติ๊กใบที่บทบาทนั้นต้องเห็นในหน้าหลักและคลังฟอร์ม ·
+          หนึ่งคนถือได้หลายบทบาท จะเห็นใบของทุกบทบาทรวมกัน
+          <details class="h"><summary>ตารางนี้ครอบคลุมแค่ไหน</summary>
+            <p class="hint">มีเฉพาะ<b>ใบที่กรอกได้</b> — เอกสารอ้างอิงและเช็กลิสต์อยู่ในหน้า
+              "เช็กลิสต์และเอกสาร" ซึ่งทุกคนเปิดอ่านได้ ไม่ได้แยกตามบทบาท ·
+              ค่าตั้งต้นมาจากทะเบียน สิ่งที่ปรับที่นี่เก็บไว้ในระบบ ไม่ได้แก้ทะเบียนในรีโป</p></details></p>
+        <div class="rfwrap">
+          <div class="rlist" id="rfRoles"></div>
+          <div id="rfBox">—</div>
+        </div>
       </section>
 
       <section data-pane="roles">
@@ -226,13 +287,13 @@ section[data-pane].off{display:none}
         </div>
       </section>
 
-      <section data-pane="access">
+      <section data-pane="users">
         <div class="sh"><h2>รายชื่อผู้รับฟอร์ม</h2><span class="en">Recipient directory</span>
           <span class="rt">อ่านได้ทั้งโลก — มีแค่ชื่อ ตำแหน่ง และประเภทฟอร์มที่รับ</span></div>
         <div class="card"><div id="dir">—</div></div>
       </section>
 
-      <section data-pane="access">
+      <section data-pane="users">
         <div class="sh"><h2>ผู้ดูแลระบบ</h2><span class="en">Administrators</span></div>
         <div class="card">
           <p class="hint" style="margin-bottom:12px">ผู้ดูแลระบบเท่านั้นที่เข้า
@@ -301,6 +362,13 @@ section[data-pane].off{display:none}
 const REG = {"systems":{"here":{"n":"ระบบฟอร์มออนไลน์","en":"This portal","url":"","lg":"52","cl":"d"},"dispatch":{"n":"ระบบ Dispatch","en":"Flight dispatch","url":"https://d0507.361vision.org/d0507-app/dispatch/?v=final","lg":"DSP","cl":"a"},"training":{"n":"ระบบบันทึกการฝึก","en":"Training records","url":"https://d0507.361vision.org/","lg":"TRN","cl":"b"},"fbo":{"n":"AeroFBO","en":"Operations & maintenance","url":"https://indyzz.com/aerofbo/index.php","lg":"FBO","cl":"c"},"audit":{"n":"Audit Portal","en":"Internal audit","url":"../d0507-audit/","lg":"AUD","cl":"a"}},"forms":[{"doc":"D-0507-APF-001","abbr":"APF","t":"Appeal Form","th":"แบบอุทธรณ์","sys":"here","jot":"243218287458465","assignTo":"ACM","r":{"stu":"ยื่นอุทธรณ์คำวินิจฉัยของ ATO ภายใน 14 วัน"},"chain":"admin","kw":["อุทธรณ์","ไม่เป็นธรรม","ร้องเรียน","appeal","apf"],"public":true,"iss":"01","rev":"00","eff":"14 SEP 2022","hasDef":true},{"doc":"D-0507-APP-001","abbr":"APP","t":"Application Form","th":"ใบสมัคร","sys":"fbo","r":{"stu":"สมัครเข้าเรียน เปลี่ยนหลักสูตร หรือขอ licence / rating"},"chain":"admin","kw":["สมัคร","สมัครเรียน","เข้าเรียน","ใบสมัคร","โปรไฟล์","application","app"],"public":true,"iss":"01","rev":"01","eff":"24 AUG 2026","hasDef":false},{"doc":"D-0507-ASF-001","abbr":"ASF","t":"Authorize Solo Flight Form","th":"ใบอนุญาตบินเดี่ยว","sys":"here","jot":"241828892999078","assignTo":"FI","r":{"stu":"รับทราบเงื่อนไขก่อนออกบินเดี่ยว"},"chain":"preflight","kw":["บินเดี่ยว","solo","เดี่ยวครั้งแรก","นักเรียนบินเดี่ยว","asf"],"public":false,"unlisted":true,"iss":"01","rev":"00","eff":"07 JUL 2022","hasDef":true},{"doc":"D-0507-DRC-001","abbr":"DRC","t":"Document Receipt","th":"ใบรับเอกสารควบคุม","sys":"here","jot":"221830582177053","r":{},"chain":"doccontrol","kw":["รับเอกสาร","ลงนามรับ","receipt","drc"],"public":false,"unlisted":true,"iss":"01","rev":"00","eff":"20 AUG 2020","hasDef":true},{"doc":"D-0507-DRF-001","abbr":"DRF","t":"Document Revision Form","th":"แบบขอแก้ไขเอกสารควบคุม","sys":"here","jot":"193573500355053","r":{},"chain":"doccontrol","kw":["แก้คู่มือ","แก้ไขเอกสาร","ขอแก้","revision","คู่มือ","เอกสาร","drf"],"public":false,"unlisted":true,"iss":"01","rev":"00","eff":"20 AUG 2020","hasDef":true},{"doc":"D-0507-EFM-001","abbr":"EFM","t":"Progress and Evaluation Form","th":"แบบประเมินความคืบหน้า","sys":"training","r":{"ins":"ถูกประเมินก่อนรับเข้าเป็นครู — ทำในระบบบันทึกการฝึก"},"chain":"training","kw":["ผลการฝึก","ดูผล","เกรด","gradeslip","ความคืบหน้า","ประเมินความคืบหน้า","efm"],"public":true,"iss":"01","rev":"00","eff":"20 NOV 2024","hasDef":false,"next":["STR"],"flow":{"th":"ประเมินผู้สมัครก่อนตัดสินใจจ้าง — ผ่านแล้วจึงเข้าสายมาตรฐานครู","en":"Applicant assessment before the hiring decision"}},{"doc":"D-0507-FRAE-001","abbr":"FRAE","t":"Flight Risk Assessment and Evaluation","th":"การประเมินความเสี่ยงก่อนทำการบิน","sys":"here","jot":"210071253532038","assignTo":"FI","r":{"stu":"กรอกฝั่งนักเรียนก่อนบินทุกเที่ยว"},"chain":"preflight","kw":["บิน","จะบิน","ก่อนบิน","พรุ่งนี้","ความเสี่ยง","เสี่ยง","ประเมิน","ครู","fit to fly","frae","risk","preflight"],"public":true,"iss":"01","rev":"00","eff":"07 JUL 2022","hasDef":true},{"doc":"D-0507-GSP-001","abbr":"GSP","t":"Flight Training Evaluation","th":"บันทึกการฝึกภาคอากาศ","sys":"training","r":{"stu":"ดูบันทึกการฝึกและความคืบหน้าของตัวเอง (อ่านเท่านั้น)"},"chain":"training","kw":["ผลการฝึก","ความคืบหน้า","บันทึกการฝึก","gradeslip","training record","ppl","gsp"],"public":true,"iss":"01","rev":"00","eff":"07 JUL 2022","hasDef":false},{"doc":"D-0507-HIF-001","abbr":"HIF","t":"Hazard Identification Form","th":"แบบชี้บ่งอันตราย","sys":"here","jot":"210431245943449","assignTo":"SM","r":{"ins":"แจ้งอันตรายที่พบและเสนอมาตรการลดความเสี่ยง"},"chain":"safety","kw":["อันตราย","ชี้บ่งอันตราย","hazard","hif","ความเสี่ยง"],"public":false,"unlisted":true,"iss":"01","rev":"00","eff":"24 AUG 2021","hasDef":true},{"doc":"D-0507-MOC-001","abbr":"MOC","t":"Management of Change (MoC) Form","th":"แบบบริหารการเปลี่ยนแปลง","sys":"here","jot":"","r":{},"chain":"safety","kw":["เปลี่ยนแปลง","moc","change","บริหารการเปลี่ยนแปลง"],"public":false,"unlisted":true,"iss":"01","rev":"00","eff":"","hasDef":true},{"doc":"D-0507-PWR-001","abbr":"PWR","t":"Passenger Waiver and Release Form","th":"หนังสือสละสิทธิ์เรียกร้องของผู้โดยสาร","sys":"here","jot":"","r":{"stu":"ผู้โดยสาร trial flight อ่านเงื่อนไขและลงนามก่อนขึ้นบิน — กรอกเสร็จคือรับทราบแล้ว"},"chain":"admin","kw":["consent","guardian","minor","pwr","trial flight","waiver","ผู้ปกครอง","ผู้เยาว์","ผู้โดยสาร","พาคนขึ้น","ยินยอม","สละสิทธิ์"],"anon":true,"public":true,"iss":"01","rev":"03","eff":"21 AUG 2026","hasDef":true},{"doc":"D-0507-SDF-001","abbr":"SDF","t":"Self Declaration Form","th":"แบบแจ้งข้อมูลด้วยตนเอง","sys":"here","jot":"210394186308456","assignTo":"HT","r":{"stu":"แจ้งเมื่อหยุดบินเกิน 2 สัปดาห์ หรือมีการบินอื่นนอกหลักสูตร"},"chain":"preflight","kw":["แจ้ง","หยุด","หยุดบิน","ไม่ได้บิน","บินที่อื่น","ประกาศตน","declaration","sdf"],"public":true,"iss":"01","rev":"01","eff":"22 JUN 2026","hasDef":true},{"doc":"D-0507-SEF-001","abbr":"SEF","t":"Student Evaluation Form","th":"แบบประเมินครูผู้สอนโดยนักเรียน","sys":"training","jot":"210063447392452","r":{"stu":"ประเมินครูผู้สอนเมื่อจบแต่ละ Stage (ไม่เปิดเผยชื่อ) — ทำในระบบบันทึกการฝึก"},"chain":"training","kw":["ประเมินครู","ครูผู้สอน","ให้คะแนนครู","ความเห็น","feedback","sef"],"public":true,"iss":"01","rev":"00","eff":"20 AUG 2020","hasDef":false},{"doc":"D-0507-VSR-001","abbr":"VSR","t":"Voluntary Safety Report","th":"รายงานนิรภัยโดยสมัครใจ","sys":"here","jot":"221482584465058","assignTo":"SM","r":{"stu":"แจ้งเหตุหรือความเสี่ยงด้านนิรภัย (ไม่ระบุชื่อได้)"},"chain":"safety","kw":["ไม่ปลอดภัย","อันตราย","เหตุ","แจ้งเหตุ","นิรภัย","รายงาน","safety","vsr","เกือบเกิดเหตุ"],"anon":true,"public":true,"iss":"01","rev":"01","eff":"23 AUG 2026","hasDef":true}],"roles":[{"k":"stu","n":"นักเรียน","d":"นักศึกษาการบิน · ผู้เข้ารับการฝึก","en":"Students","den":"Student pilots · trainees"},{"k":"ins","n":"ครูการบิน / ครูภาคทฤษฎี","d":"FI · TKI · FIE","en":"Instructors","den":"FI · TKI · FIE"},{"k":"mnt","n":"ช่างอากาศยาน","d":"ฝ่ายซ่อมบำรุง (ME)","en":"Maintenance","den":"Maintenance (ME)"},{"k":"ops","n":"ฝ่ายปฏิบัติการ","d":"Operations · Dispatch · ธุรการเอกสาร","en":"Operations","den":"Operations · Dispatch · document control"},{"k":"mgt","n":"ฝ่ายบริหาร","d":"ACM · HT · CMM","en":"Management","den":"ACM · HT · CMM"},{"k":"sms","n":"นิรภัยการบิน (SMS)","d":"Safety Manager · SMS","en":"Safety (SMS)","den":"Safety Manager · SMS"}],"status":{"ok":{"n":"พร้อมใช้","lv":"ok","en":"Ready"},"linkwrong":{"n":"ลิงก์ใน LEF ผิดใบ","lv":"bad","en":"LEF links to the wrong form"},"nolink":{"n":"LEF ยังไม่ใส่ลิงก์","lv":"warn","en":"No link in LEF"},"noform":{"n":"ยังไม่มีฟอร์มออนไลน์","lv":"warn","en":"No online form yet"},"pdfonly":{"n":"เป็น PDF บน Drive","lv":"warn","en":"PDF on Drive"},"notinlef":{"n":"ยังไม่อยู่ใน LEF","lv":"warn","en":"Not in LEF yet"},"shadow":{"n":"ใช้บน Jotform · ไม่มีในคู่มือ","lv":"bad","en":"In use but not registered"},"dupsys":{"n":"มีสองฉบับ — ระบบภายนอกและ Jotform","lv":"bad","en":"Duplicate across systems"}},"lefcount":{"total":52}};
 const A = D0507;
 const ROLE_KEYS = ['stu','ins','mnt','ops','mgt','sms'];
+/* หน้าผู้ดูแลเขียนเป็นภาษาไทยทั้งหน้า (เหมือนหน้าทะเบียนและจัดการฟอร์ม)
+   ชื่อบทบาท/แผนก/ฟอร์ม จึงต้องดึงภาษาไทยด้วย ไม่งั้นพอสลับเป็น EN
+   จะได้หน้าที่หัวข้อเป็นไทยแต่ป้ายเป็นอังกฤษปนกันทั้งหน้า */
+const TH  = o => A.L(o, 'th');
+const RN  = k => TH(A.ROLE_N[k]) || k;
+const FN  = f => f.th || f.t || f.abbr;
+const DN  = k => TH(A.DEPT[k]) || k || '—';
 /* ตำแหน่งในองค์กรตาม OMA — คนหนึ่งมีได้หลายตำแหน่ง (HT ที่เป็น FI ด้วยเป็นเรื่องปกติ)
    ต่างจาก 'บทบาท' ที่บอกว่าเห็นฟอร์มกลุ่มไหน */
 const POS_KEYS = ['ACM','HT','CMM','SM','CFI','FI','TKI','ME','OPS','AD'];
@@ -382,34 +450,66 @@ function seesCount(u){
   return seen.size;
 }
 
+/* กล่องตัวเลขด้านบน = ตัวกรองด้วย กดแล้วเห็นเลยว่าใครยังไม่มีบทบาทหรือถูกปิดใช้งาน
+   ตัวเลขที่กดไม่ได้เป็นแค่ของประดับ คนอ่านแล้วต้องเดินต่อเองว่าจะหาคนพวกนั้นยังไง */
+let UFILTER = 'all';
+function paintTiles(){
+  const adm = A.admins || [];
+  const t = [
+    ['all',    USERS.length,                                              'ผู้ใช้ทั้งหมด', ''],
+    ['admin',  USERS.filter(u => adm.includes(u.uid)).length,             'ผู้ดูแลระบบ',  ''],
+    ['norole', USERS.filter(u => !(u.roles||[]).length).length,           'ยังไม่มีบทบาท', 'warn'],
+    ['off',    USERS.filter(u => u.active === false).length,              'ปิดใช้งาน',    'bad'],
+  ];
+  document.getElementById('uTiles').innerHTML = t.map(([k, n, label, cls]) =>
+    `<button type="button" class="tile2 ${n ? cls : ''}" data-t="${k}" aria-pressed="${UFILTER===k}">
+      <b>${n}</b><span>${A.esc(label)}</span></button>`).join('');
+  document.querySelectorAll('#uTiles [data-t]').forEach(b => b.onclick = () => {
+    UFILTER = UFILTER === b.dataset.t ? 'all' : b.dataset.t; paintUsers();
+  });
+  const tn = document.getElementById('tabN');
+  if (tn) tn.textContent = USERS.length;
+}
+
 function paintUsers(){
   const host = document.getElementById('uList');
   const role = document.getElementById('uRole').value;
   const q = (document.getElementById('uQ').value || '').trim().toLowerCase();
+  const adm = A.admins || [];
   let L = USERS.slice().sort((a,b) => (a.name||'').localeCompare(b.name||'', 'th'));
   if (role) L = L.filter(u => (u.roles || []).includes(role));
+  if (UFILTER === 'admin')  L = L.filter(u => adm.includes(u.uid));
+  if (UFILTER === 'norole') L = L.filter(u => !(u.roles||[]).length);
+  if (UFILTER === 'off')    L = L.filter(u => u.active === false);
   if (q) L = L.filter(u => [u.name, u.email, u.cert].join(' ').toLowerCase().includes(q));
+  paintTiles();
   document.getElementById('uCnt').textContent =
     L.length === USERS.length ? USERS.length + ' คน' : L.length + ' จาก ' + USERS.length + ' คน';
 
   const canEdit = A.isAdmin();
   host.innerHTML = L.length ? L.map(u => `
     <div class="urow${u.active === false ? ' off2' : ''}">
+      <div class="av2">${A.esc((u.name || u.email || '?').slice(0,2).toUpperCase())}</div>
       <div>
         <div class="nm">${A.esc(u.name || '(ยังไม่ตั้งชื่อ)')}
+          ${adm.includes(u.uid) ? '<span class="tag ok">ผู้ดูแลระบบ</span>' : ''}
           ${u.active === false ? '<span class="tag">ปิดใช้งาน</span>' : ''}
-          ${u.uid === A.user.uid ? '<span class="tag ok">คุณ</span>' : ''}</div>
+          ${u.uid === A.user.uid ? '<span class="tag">คุณ</span>' : ''}</div>
         <div class="em">${A.esc(u.email || '—')}${u.cert ? ' · ' + A.esc(u.cert) : ''}</div>
         <div class="tg">
-          ${(u.roles || []).map(r => `<span class="tag rl">${A.esc(A.L(A.ROLE_N[r]) || r)}</span>`).join('')
-            || '<span class="tag warn">ยังไม่มีบทบาท</span>'}
+          ${(u.roles || []).map(r => `<span class="tag rl">${A.esc(RN(r))}</span>`).join('')
+            || '<span class="tag warn">ยังไม่มีบทบาท — เข้ามาแล้วจะไม่เห็นฟอร์มอะไรเลย</span>'}
           ${(u.positions || []).map(x => `<span class="tag ps">${A.esc(x)}</span>`).join('')}
-          <span class="tag">เห็นฟอร์ม ${seesCount(u)} ใบ</span>
         </div>
       </div>
-      <div>${canEdit ? `<button class="fb" data-edit="${A.esc(u.uid)}">แก้ไข</button>`
-                     : '<span class="hint">เฉพาะผู้ดูแลระบบ</span>'}</div>
-    </div>`).join('') : '<p class="hint">ไม่พบผู้ใช้ที่ตรงเงื่อนไข</p>';
+      <div class="rt2"><span class="sees">เห็นฟอร์ม ${seesCount(u)} ใบ</span>
+        ${canEdit ? `<button class="fb" data-edit="${A.esc(u.uid)}">แก้ไข</button>`
+                  : '<span class="hint">เฉพาะผู้ดูแลระบบ</span>'}</div>
+    </div>`).join('') : `<p class="hint">ไม่พบผู้ใช้ที่ตรงเงื่อนไข${
+      UFILTER!=='all' || role || q ? ' — <a href="#" id="uClear">ล้างตัวกรอง</a>' : ''}</p>`;
+  const cl = document.getElementById('uClear');
+  if (cl) cl.onclick = e => { e.preventDefault(); UFILTER='all';
+    document.getElementById('uRole').value=''; document.getElementById('uQ').value=''; paintUsers(); };
 
   host.querySelectorAll('[data-edit]').forEach(b =>
     b.addEventListener('click', () => editUser(b.dataset.edit)));
@@ -571,8 +671,9 @@ async function roleForms(){
   host.innerHTML = ROLE_KEYS.map(k => {
     const n = A.formsFor(A.reg, k).length;
     const u = USERS.filter(x => (x.roles||[]).includes(k)).length;
-    return `<button type="button" class="fk-opt" data-r="${k}" aria-pressed="${k===RF_ROLE}">
-      ${A.esc(A.L(A.ROLE_N[k]) || k)} · ${n} ใบ${u?' · '+u+' คน':''}</button>`;
+    const custom = !!(A.roleForms && Array.isArray(A.roleForms[k]));
+    return `<button type="button" data-r="${k}" aria-pressed="${k===RF_ROLE}">
+      <b>${A.esc(RN(k))}</b><span>${n} ใบ · ${u} คน${custom ? ' · ปรับเอง' : ''}</span></button>`;
   }).join('');
   host.querySelectorAll('[data-r]').forEach(b => b.onclick = () => { RF_ROLE = b.dataset.r; RF_SET = null; roleForms(); });
   paintRoleForms();
@@ -583,35 +684,49 @@ function paintRoleForms(){
   const box = document.getElementById('rfBox');
   const forms = A.reg.forms.filter(f => f.kind !== 'ref')
     .sort((a,b) => (rfDept(a)+a.abbr).localeCompare(rfDept(b)+b.abbr));
-  if (!RF_SET) RF_SET = new Set(forms.filter(f => A.seesForm(f, RF_ROLE)).map(f => f.abbr));
+  const base = new Set(forms.filter(f => A.seesForm(f, RF_ROLE)).map(f => f.abbr));
+  if (!RF_SET) RF_SET = new Set(base);
   const custom = !!(A.roleForms && Array.isArray(A.roleForms[RF_ROLE]));
+  const dirty = forms.filter(f => RF_SET.has(f.abbr) !== base.has(f.abbr)).length;
   const by = {};
   forms.forEach(f => (by[rfDept(f)] = by[rfDept(f)] || []).push(f));
   const canEdit = A.isAdmin();
   box.innerHTML = `
-    <p class="hint" style="margin-bottom:10px">${A.esc(A.L(A.ROLE_N[RF_ROLE]) || RF_ROLE)} —
-      เลือกไว้ <b id="rfN">${RF_SET.size}</b> ใบ จาก ${forms.length} ใบ ·
-      ${custom ? 'ปรับไว้เองแล้ว' : 'ยังใช้ค่าตามทะเบียน'}</p>
-    ${Object.keys(by).sort().map(d => `
-      <div class="card" style="margin-bottom:10px">
-        <div class="sh" style="margin-bottom:8px"><h2 style="font-size:14px">${A.esc(A.deptName(d))}</h2>
-          <span class="en">${A.esc(d)}</span></div>
+    <div class="card" style="margin-bottom:10px;padding:12px 16px">
+      <b style="font-size:15px">${A.esc(RN(RF_ROLE))}</b>
+      <span class="hint"> · เห็น <b id="rfN">${RF_SET.size}</b> ใบ จากทั้งหมด ${forms.length} ใบ ·
+        ${custom ? 'ปรับไว้เองแล้ว' : 'ใช้ค่าตามทะเบียน'}</span>
+    </div>
+    ${Object.keys(by).sort().map(d => {
+      const on = by[d].filter(f => RF_SET.has(f.abbr)).length;
+      return `<div class="card" style="margin-bottom:10px">
+        <div class="sh" style="margin-bottom:8px">
+          <h2 style="font-size:14px">${A.esc(DN(d))} <span class="hint">${on}/${by[d].length}</span></h2>
+          <span class="rt">${canEdit ? `<button class="fb" data-grp="${A.esc(d)}">${
+            on === by[d].length ? 'เอาออกทั้งแผนก' : 'เลือกทั้งแผนก'}</button>` : ''}</span></div>
         <div class="rfgrid">${by[d].map(f => `
           <label class="rfitem"><input type="checkbox" data-f="${A.esc(f.abbr)}"
               ${RF_SET.has(f.abbr)?'checked':''} ${canEdit?'':'disabled'}>
-            <span><b>${A.esc(f.abbr)}</b> ${A.esc(A.nm(f))}
+            <span><b>${A.esc(f.abbr)}</b> ${A.esc(FN(f))}
               ${f.r && f.r[RF_ROLE] ? `<i>${A.esc(f.r[RF_ROLE])}</i>` : ''}</span></label>`).join('')}
-        </div></div>`).join('')}
-    ${canEdit ? `<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-      <button class="obtn" id="rfSave">บันทึก</button>
+        </div></div>`; }).join('')}
+    ${canEdit ? `<div class="rbar">
+      <span class="hint">${dirty ? '<b>ยังไม่ได้บันทึก ' + dirty + ' รายการ</b>' : 'ยังไม่มีอะไรเปลี่ยน'}</span>
+      <span class="sp"></span>
       <button class="fb" id="rfAll">เลือกทั้งหมด</button>
       <button class="fb" id="rfNone">ล้างทั้งหมด</button>
-      ${custom ? '<button class="fb" id="rfReset">กลับไปใช้ค่าตามทะเบียน</button>' : ''}</div>`
-      : '<p class="hint">เฉพาะผู้ดูแลระบบที่แก้ได้</p>'}`;
+      ${custom ? '<button class="fb" id="rfReset">กลับไปใช้ค่าตามทะเบียน</button>' : ''}
+      <button class="obtn" id="rfSave"${dirty?'':' disabled style="opacity:.5"'}>บันทึก</button></div>`
+      : '<p class="hint">ดูได้อย่างเดียว — เฉพาะผู้ดูแลระบบที่แก้ได้</p>'}`;
 
   box.querySelectorAll('[data-f]').forEach(cb => cb.onchange = () => {
     cb.checked ? RF_SET.add(cb.dataset.f) : RF_SET.delete(cb.dataset.f);
-    document.getElementById('rfN').textContent = RF_SET.size;
+    paintRoleForms();
+  });
+  box.querySelectorAll('[data-grp]').forEach(b => b.onclick = () => {
+    const g = by[b.dataset.grp], all = g.every(f => RF_SET.has(f.abbr));
+    g.forEach(f => all ? RF_SET.delete(f.abbr) : RF_SET.add(f.abbr));
+    paintRoleForms();
   });
   const $ = id => document.getElementById(id);
   if ($('rfAll'))  $('rfAll').onclick  = () => { RF_SET = new Set(forms.map(f=>f.abbr)); paintRoleForms(); };
