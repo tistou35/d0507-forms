@@ -76,7 +76,7 @@ details.h .hint{margin-top:6px}
 /* บทบาท × ฟอร์ม — รายการบทบาทซ้าย ตารางขวา */
 .rfwrap{display:grid;grid-template-columns:230px 1fr;gap:16px;align-items:start}
 @media(max-width:820px){.rfwrap{grid-template-columns:1fr}}
-.rlist{display:flex;flex-direction:column;gap:6px}
+.rlist{display:flex;flex-direction:column;gap:6px;position:sticky;top:12px}
 .rlist button{text-align:left;padding:11px 13px;border-radius:9px;border:1px solid var(--border-light);
   background:var(--surface);cursor:pointer;font-family:inherit;font-size:13.5px}
 .rlist button b{display:block;font-weight:600}
@@ -290,7 +290,7 @@ section[data-pane].off{display:none}
       <section data-pane="users">
         <div class="sh"><h2>รายชื่อผู้รับฟอร์ม</h2><span class="en">Recipient directory</span>
           <span class="rt">อ่านได้ทั้งโลก — มีแค่ชื่อ ตำแหน่ง และประเภทฟอร์มที่รับ</span></div>
-        <div class="card"><div id="dir">—</div></div>
+        <div class="card"><div id="dirWarn"></div><div id="dir">—</div></div>
       </section>
 
       <section data-pane="users">
@@ -547,7 +547,7 @@ function editUser(uid){
      <button class="fb" id="eSave" style="background:var(--navy-900);color:#fff;border-color:var(--navy-900)">บันทึก</button>`;
   document.getElementById('eName').value = u.name || '';
   document.getElementById('eCert').value = u.cert || '';
-  chips(document.getElementById('eRoles'), ROLE_KEYS, R, k => A.L(A.ROLE_N[k]) || k);
+  chips(document.getElementById('eRoles'), ROLE_KEYS, R, RN);
   chips(document.getElementById('ePos'), POS_KEYS, P, k => k + ' · ' + POS_N[k]);
   const act = document.getElementById('eAct');
   act.addEventListener('click', e => { e.preventDefault();
@@ -651,7 +651,7 @@ async function addStaff(){
   log('users/' + uid + ' — ' + email + ' · ' + [...NROLES].join(', '), 'green-600');
   ['nName','nEmail','nPass','nCert'].forEach(k => document.getElementById(k).value = '');
   NROLES.clear(); NPOS.clear();
-  chips(document.getElementById('nRoles'), ROLE_KEYS, NROLES, k => A.L(A.ROLE_N[k]) || k);
+  chips(document.getElementById('nRoles'), ROLE_KEYS, NROLES, RN);
   chips(document.getElementById('nPos'), POS_KEYS, NPOS, k => k + ' · ' + POS_N[k]);
 }
 
@@ -840,9 +840,9 @@ async function boot(){
   }
 
   admins();
-  chips(document.getElementById('roles'), ROLE_KEYS, ROLES, k => A.L(A.ROLE_N[k]) || k);
+  chips(document.getElementById('roles'), ROLE_KEYS, ROLES, RN);
   chips(document.getElementById('pos'), POS_KEYS, POS, k => k + ' · ' + POS_N[k]);
-  chips(document.getElementById('nRoles'), ROLE_KEYS, NROLES, k => A.L(A.ROLE_N[k]) || k);
+  chips(document.getElementById('nRoles'), ROLE_KEYS, NROLES, RN);
   chips(document.getElementById('nPos'), POS_KEYS, NPOS, k => k + ' · ' + POS_N[k]);
   check(); dir();
   // เปิดแท็บตามที่อยู่ใน URL ถ้ามี — กลับมาหน้าเดิมได้หลังรีเฟรช
@@ -938,7 +938,39 @@ async function dir(){
         `</tbody></table></div>`
       : '<p class="hint">ยังไม่มีใครในรายชื่อ — บันทึกโปรไฟล์ของคุณเพื่อเพิ่มตัวเองเป็นคนแรก</p>';
     document.querySelectorAll('[data-rm]').forEach(b => b.addEventListener('click', () => removeFromDir(b.dataset.rm)));
+
+    /* คนที่มีตำแหน่งแต่ไม่อยู่ในรายชื่อ = ส่งฟอร์มถึงเขาไม่ได้ ทั้งที่ระบบรู้ว่าเขารับได้
+       เกิดได้เมื่อโปรไฟล์ถูกแก้จากที่อื่น หรือรายชื่อถูกเขียนทับ (firebase/seed.mjs เคยทำ)
+       เตือนให้เห็นพร้อมปุ่มแก้ ไม่ใช่ปล่อยให้ไปเจอตอนนักเรียนส่งฟอร์มไม่ได้ */
+    const have = new Set(list.map(x => x.id));
+    const miss = USERS.filter(u => u.active !== false && (u.positions||[]).length && !have.has(u.uid));
+    const warn = document.getElementById('dirWarn');
+    warn.innerHTML = !miss.length ? '' :
+      `<div class="fk-gate warn" style="margin-bottom:12px"><span>
+        <b>มี ${miss.length} คนที่มีตำแหน่งแต่ไม่อยู่ในรายชื่อนี้</b> — ฟอร์มที่ต้องส่งถึงเขาจะส่งไม่ได้ ·
+        ${A.esc(miss.map(u => u.name || u.email).join(' · '))}<br>
+        <button class="fb" id="dirSync" style="margin-top:8px">เพิ่มทั้ง ${miss.length} คนเข้ารายชื่อ</button>
+      </span></div>`;
+    const sy = document.getElementById('dirSync');
+    if (sy) sy.onclick = () => syncDir(miss);
   } catch(e){ document.getElementById('dir').innerHTML = `<p class="hint">อ่านไม่ได้: ${A.esc(e.code)}</p>`; }
+}
+
+/* เพิ่มคนที่ขาดเข้ารายชื่อผู้รับ — เอาเฉพาะชื่อ ตำแหน่ง และประเภทฟอร์มที่รับ
+   ห้ามมีอีเมลหรือเบอร์โทรเด็ดขาด เอกสารนี้อ่านได้ทั้งโลก (ฝั่งนักเรียนต้องเลือกผู้รับได้) */
+async function syncDir(miss){
+  if (!confirm('เพิ่ม ' + miss.length + ' คนเข้ารายชื่อผู้รับฟอร์ม?\n\n'
+      + miss.map(u => '· ' + (u.name || u.email)).join('\n'))) return;
+  const ref = A.db.collection('publicDirectory').doc('instructors');
+  try {
+    const d = await ref.get();
+    const list = (d.exists && d.data().list) || [];
+    miss.forEach(u => list.push({ id: u.uid, name: u.name || '', position: u.cert || '',
+                                  recv: [...(u.positions || [])] }));
+    await ref.set({ list, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+    log('เพิ่มเข้ารายชื่อผู้รับฟอร์มแล้ว ' + miss.length + ' คน', 'green-600');
+    dir(); check();
+  } catch(e){ alert('เพิ่มไม่สำเร็จ: ' + (e.code || e.message)); }
 }
 
 async function removeFromDir(id){
