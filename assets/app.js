@@ -35,7 +35,12 @@
   A.deptName   = k => A.L(A.DEPT[k]) || k || '—';
   A.manualName = k => A.L(A.MANUAL[k]) || k;
 
-  A.isStaff = () => !!A.user && !A.user.isAnonymous;
+  A.isStaff = () => !!A.user && A.roles.some(r => A.STAFF_ROLES.indexOf(r) >= 0);
+  /* ล็อกอินแล้ว — ไม่ว่าจะเป็นเจ้าหน้าที่หรือนักเรียน (ใช้ตัดสินว่าให้กรอกฟอร์มได้ไหม) */
+  A.signedIn = () => !!A.user;
+  /* ชื่อที่ใช้เติมให้อัตโนมัติในช่อง "ชื่อผู้กรอก" — โปรไฟล์ในทะเบียนมาก่อน
+     เพราะเป็นชื่อที่ผู้ดูแลตั้งให้ตรงกับเอกสาร ส่วน displayName ผู้ใช้แก้เองได้ */
+  A.myName = () => (A.profile && A.profile.name) || (A.user && (A.user.displayName || A.user.email)) || '';
   /* admin = แก้ทะเบียน นิยามฟอร์ม ผังผู้อนุมัติ ตั้งค่าระบบได้
      รายชื่ออยู่ที่ config/admins — ยังไม่มีเอกสารนั้น = เจ้าหน้าที่ทุกคนเป็น admin ชั่วคราว
      (ต้องตรงกับ rules ไม่งั้นหน้าจอโชว์ปุ่มที่กดแล้วโดนปฏิเสธ) */
@@ -63,10 +68,14 @@
     firebase.auth().onAuthStateChanged(async u => {
       A.user = (u && !u.isAnonymous) ? u : null;
       A.roles = [];
+      A.profile = null;
       if (A.user) {
         try {
           const d = await A.db.collection('users').doc(A.user.uid).get();
-          if (d.exists && Array.isArray(d.data().roles)) A.roles = d.data().roles;
+          if (d.exists) {
+            A.profile = d.data();
+            if (Array.isArray(A.profile.roles)) A.roles = A.profile.roles;
+          }
         } catch (e) { /* ยังไม่มี users/{uid} หรือ rule ไม่อนุญาต */ }
       }
       A.admins = null;
@@ -107,9 +116,12 @@
     const box = document.getElementById('authbox');
     const base = (g.BASE || '');
     if (box) {
-      box.innerHTML = A.isStaff()
-        ? `<span class="acct"><span class="av">${A.esc((A.user.displayName || A.user.email || '?').slice(0, 2).toUpperCase())}</span>
-             <span class="who"><b>${A.esc(A.user.displayName || A.user.email)}</b>
+      /* ล็อกอินแล้วขึ้นชื่อผู้ใช้เสมอ ไม่ใช่เฉพาะเจ้าหน้าที่ — นักเรียนก็ล็อกอิน
+         ถ้าเช็ก isStaff() ตรงนี้ นักเรียนที่ล็อกอินแล้วจะเห็นปุ่ม "เข้าสู่ระบบ" ค้างอยู่
+         ทั้งที่ล็อกอินอยู่ กดแล้ววนกลับมาหน้าเดิมไม่รู้จบ */
+      box.innerHTML = A.signedIn()
+        ? `<span class="acct"><span class="av">${A.esc((A.myName() || '?').slice(0, 2).toUpperCase())}</span>
+             <span class="who"><b>${A.esc(A.myName())}</b>
              <span>${A.roles.length ? A.esc(A.roleNames().join(' · ')) : A.esc(A.t('noRole'))}</span></span></span>
            <a class="acct" href="#" onclick="D0507.logout();return false" style="padding:0 16px">
              <span class="who"><b>${A.esc(A.t('signOut'))}</b><span>${A.esc(A.t('signOutSub'))}</span></span></a>`
@@ -127,7 +139,12 @@
     mnt: { th: 'ช่างอากาศยาน', en: 'Aircraft maintenance' },
     ops: { th: 'ฝ่ายปฏิบัติการ', en: 'Flight operations' },
     mgt: { th: 'ฝ่ายบริหาร', en: 'Management' },
+    sms: { th: 'นิรภัยการบิน (SMS)', en: 'Safety management (SMS)' },
   };
+  /* บทบาทที่ถือว่าเป็นเจ้าหน้าที่ — นักเรียน (stu) ล็อกอินได้เหมือนกันแต่ไม่ใช่เจ้าหน้าที่
+     เดิมวัดจาก "ล็อกอินแล้วและไม่ใช่ anonymous" ซึ่งใช้ได้ตอนที่มีแต่เจ้าหน้าที่เท่านั้น
+     ที่ล็อกอิน พอนักเรียนต้องล็อกอินด้วย เกณฑ์เดิมจะยกนักเรียนขึ้นเป็นเจ้าหน้าที่ทั้งกอง */
+  A.STAFF_ROLES = ['ins', 'mnt', 'ops', 'mgt', 'sms'];
   A.roleNames = () => A.roles.map(r => A.L(A.ROLE_N[r]) || r);
 
   /* คนหนึ่งคนถือได้หลายตำแหน่ง — ครูที่เป็นผู้จัดการฝ่ายมาตรฐานด้วย, ช่างที่ทำ
@@ -576,6 +593,87 @@
     } catch (e) {
       return { ok: false, error: e.message };
     }
+  };
+
+  /* ── สมัครบัญชีเอง (นักเรียน) ────────────────────────────
+     ทุกคนที่กรอกฟอร์มต้องล็อกอิน ชื่อผู้กรอกจึงมาจากบัญชี ไม่ใช่จากที่พิมพ์เอง
+     บัญชีที่สมัครเองได้บทบาท stu เท่านั้น — บทบาทเจ้าหน้าที่ต้องให้ผู้ดูแลตั้งให้
+     (firestore.rules บังคับซ้ำอีกชั้น เปลี่ยนบทบาทตัวเองไม่ได้) */
+  A.signupEmail = async function (email, pw, name) {
+    const cred = await firebase.auth().createUserWithEmailAndPassword(email.trim(), pw);
+    const u = cred.user;
+    if (name) { try { await u.updateProfile({ displayName: name }); } catch (e) {} }
+    try {
+      await A.db.collection('users').doc(u.uid).set({
+        email: u.email || '', name: name || '', roles: ['stu'], active: true,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp(), self: true,
+      });
+    } catch (e) { console.warn('[signup] เขียนโปรไฟล์ไม่สำเร็จ', e); }
+    return u;
+  };
+
+  /* บัญชี Google ที่เพิ่งเข้ามาครั้งแรกยังไม่มีโปรไฟล์ — สร้างให้เป็นนักเรียน
+     ไม่งั้นจะล็อกอินได้แต่ไม่มีบทบาท กรอกฟอร์มได้แต่ไม่มีใครเห็นว่าเป็นใครในทะเบียน */
+  A.ensureProfile = async function () {
+    if (!A.user || A.profile) return A.profile;
+    try {
+      await A.db.collection('users').doc(A.user.uid).set({
+        email: A.user.email || '', name: A.user.displayName || '', roles: ['stu'],
+        active: true, createdAt: firebase.firestore.FieldValue.serverTimestamp(), self: true,
+      });
+      A.profile = { email: A.user.email || '', name: A.user.displayName || '', roles: ['stu'], active: true };
+      A.roles = ['stu'];
+    } catch (e) { console.warn('[profile] สร้างโปรไฟล์ไม่สำเร็จ', e); }
+    return A.profile;
+  };
+
+  /* กล่องเข้าสู่ระบบสำหรับหน้ากรอกฟอร์ม — Google หรืออีเมล และสมัครเองได้
+     แยกจากหน้า staff-login เพราะคนที่มาถึงตรงนี้ถือลิงก์ฟอร์มมาแล้ว
+     ส่งไปหน้าอื่นแล้ววนกลับมาทำให้ค่าที่เติมมากับลิงก์หายระหว่างทาง */
+  A.authGate = function (el, opts) {
+    const o = opts || {}, esc = A.esc, L = A.L;
+    el.innerHTML = `<div class="note" style="max-width:520px">
+      <b style="font-size:16px">${esc(L({ th: 'เข้าสู่ระบบก่อนกรอกฟอร์ม', en: 'Sign in to fill this form' }))}</b>
+      <p style="margin:8px 0 0;font-size:13.5px;color:var(--fg-2);line-height:1.6">${esc(o.why || L({
+        th: 'ทุกใบต้องรู้ว่าใครเป็นคนกรอก ระบบจะเติมชื่อให้อัตโนมัติจากบัญชีของคุณ',
+        en: 'Every record must show who filled it. Your name is filled in automatically from your account.' }))}</p>
+      <div class="acts" style="margin-top:14px"><button class="big pri" type="button" id="ag-g">${
+        esc(L({ th: 'เข้าสู่ระบบด้วย Google', en: 'Continue with Google' }))}</button></div>
+      <div style="margin:16px 0 10px;border-top:1px solid var(--border-light)"></div>
+      <div class="fk-f"><label for="ag-em">${esc(L({ th: 'อีเมล', en: 'Email' }))}</label>
+        <input id="ag-em" type="email" autocomplete="email"></div>
+      <div class="fk-f"><label for="ag-pw">${esc(L({ th: 'รหัสผ่าน', en: 'Password' }))}</label>
+        <input id="ag-pw" type="password" autocomplete="current-password"></div>
+      <div class="fk-f" id="ag-nmwrap" hidden><label for="ag-nm">${esc(L({ th: 'ชื่อ–นามสกุล', en: 'Full name' }))}</label>
+        <input id="ag-nm" type="text" autocomplete="name"></div>
+      <div class="acts">
+        <button class="big pri" type="button" id="ag-in">${esc(L({ th: 'เข้าสู่ระบบ', en: 'Sign in' }))}</button>
+        <button class="big sec" type="button" id="ag-up">${esc(L({ th: 'สมัครบัญชีใหม่', en: 'Create account' }))}</button></div>
+      <p id="ag-err" style="color:var(--red-600);font-size:13px;margin-top:10px" hidden></p></div>`;
+    const $ = id => document.getElementById(id);
+    const err = m => { const e = $('ag-err'); e.hidden = !m; e.textContent = m || ''; };
+    let signup = false;
+    $('ag-g').onclick = () => firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider())
+      .catch(e => err(e.message));
+    $('ag-in').onclick = async () => {
+      err('');
+      try { await firebase.auth().signInWithEmailAndPassword($('ag-em').value.trim(), $('ag-pw').value); }
+      catch (e) { err(e.message); }
+    };
+    $('ag-up').onclick = async () => {
+      err('');
+      if (!signup) {                       // กดครั้งแรก = ขอชื่อก่อน ไม่ใช่สมัครทันที
+        signup = true; $('ag-nmwrap').hidden = false; $('ag-nm').focus();
+        $('ag-up').textContent = L({ th: 'สมัครและเข้าสู่ระบบ', en: 'Create account & sign in' });
+        return;
+      }
+      const nm = $('ag-nm').value.trim();
+      if (!nm) return err(L({ th: 'ใส่ชื่อ–นามสกุลก่อน', en: 'Enter your full name first' }));
+      if (($('ag-pw').value || '').length < 6)
+        return err(L({ th: 'รหัสผ่านอย่างน้อย 6 ตัว', en: 'Password must be at least 6 characters' }));
+      try { await A.signupEmail($('ag-em').value, $('ag-pw').value, nm); }
+      catch (e) { err(e.message); }
+    };
   };
 
   /* ── แก้ต้นฉบับเอกสารควบคุม ─────────────────────────────────

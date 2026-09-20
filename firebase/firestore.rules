@@ -37,10 +37,31 @@ service cloud.firestore {
         || get(adminsDoc()).data.uids.hasAny([request.auth.uid]));
     }
 
-    // ── โปรไฟล์ + บทบาท · ผู้ใช้แก้ role ตัวเองไม่ได้ ────────
+    /* ── โปรไฟล์ + บทบาท ────────────────────────────────────
+       ทุกคนที่กรอกฟอร์มต้องล็อกอิน นักเรียนจึงสมัครบัญชีเองได้ และเขียนโปรไฟล์
+       ของตัวเองได้ครั้งแรก — แต่ตั้งบทบาทให้ตัวเองไม่ได้ ได้ stu อย่างเดียว
+       บทบาทเจ้าหน้าที่ต้องให้ผู้ดูแลตั้งให้ (หน้าตั้งค่าระบบ)
+
+       แก้ทีหลังได้เฉพาะชื่อกับใบอนุญาต ส่วน roles และ active ต้องเท่าเดิมทุกตัวอักษร
+       ไม่งั้นนักเรียนเติม 'mgt' ให้ตัวเองแล้วเห็นทะเบียนทั้งระบบ */
+    function selfProfileOk(uid) {
+      let d = request.resource.data;
+      return isSelf(uid)
+          && d.roles == ['stu']
+          && d.keys().hasOnly(['email', 'name', 'roles', 'active', 'createdAt', 'self'])
+          && d.active == true;
+    }
+    function selfProfileEditOk(uid) {
+      let d = request.resource.data;
+      return isSelf(uid)
+          && d.roles == resource.data.roles
+          && d.get('active', true) == resource.data.get('active', true);
+    }
     match /users/{uid} {
-      allow read:  if isSelf(uid) || staff();
-      allow write: if staff();
+      allow read:   if isSelf(uid) || staff();
+      allow create: if staff() || selfProfileOk(uid);
+      allow update: if staff() || selfProfileEditOk(uid);
+      allow delete: if staff();
     }
 
     // ── รายชื่อผู้รับฟอร์ม สำหรับตัวเลือกฝั่งนักเรียน ────────
@@ -157,7 +178,10 @@ service cloud.firestore {
 
     match /submissions/{subId} {
       // ฝั่งนักเรียนเขียนได้อย่างเดียว อ่านของใครไม่ได้เลย รวมทั้งของตัวเอง
-      allow create: if staff() || (anon() && (newSubmissionOk() || newReceiptOk()));
+      /* คนกรอกคือทุกคนที่ล็อกอิน — นักเรียนที่มีบัญชี หรือ anonymous สำหรับใบที่
+         คนกรอกไม่ใช่คนในระบบ (PWR ผู้โดยสาร · VSR รายงานนิรภัยไม่ระบุตัว)
+         เงื่อนไขที่กันของเสียคือ newSubmissionOk() ไม่ใช่วิธีล็อกอิน */
+      allow create: if staff() || (signedIn() && (newSubmissionOk() || newReceiptOk()));
       allow read:   if staff();
       allow update: if staff();
       allow delete: if false;
@@ -196,7 +220,8 @@ service cloud.firestore {
 
     match /tasks/{taskId} {
       allow read:   if staff();
-      allow create: if staff() || anon();
+      // ใบที่ส่งเข้ามาต้องสร้างงานให้ผู้อนุมัติเสมอ ไม่งั้นใบค้างโดยไม่มีใครเห็น
+      allow create: if staff() || signedIn();
       allow update: if staff();
       allow delete: if false;
     }

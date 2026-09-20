@@ -67,7 +67,8 @@
      "label": {
       "th": "ผู้แจกจ่าย",
       "en": "Issued by"
-     }
+     },
+     "self": true
     }
    ],
    "showLocked": true,
@@ -160,7 +161,8 @@
      "label": {
       "th": "ชื่อ-สกุลผู้รับ",
       "en": "Recipient name"
-     }
+     },
+     "self": true
     },
     {
      "k": "rcvRole",

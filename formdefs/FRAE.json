@@ -109,7 +109,8 @@
      "label": {
       "th": "ชื่อ PIC / นักเรียน",
       "en": "PIC / Student name — first name"
-     }
+     },
+     "self": "first"
     },
     {
      "k": "picLast",
@@ -118,7 +119,8 @@
      "label": {
       "th": "นามสกุล",
       "en": "Last name"
-     }
+     },
+     "self": "last"
     },
     {
      "k": "evalDate",

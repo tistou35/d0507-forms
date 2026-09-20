@@ -200,6 +200,17 @@ function boot(){
         <div><span>${A.esc(A.t('issueRev'))}</span><b>${F.iss?A.esc(F.iss)+' / '+A.esc(F.rev):'—'}</b></div>
         <div><span>${A.esc(A.t('effective'))}</span><b>${A.esc(F.eff||'—')}</b></div>
       </div></div>`;
+  /* ── ต้องล็อกอินก่อนกรอก ─────────────────────────────────
+     ทุกใบต้องรู้ว่าใครกรอก และชื่อผู้กรอกมาจากบัญชี ไม่ใช่จากที่พิมพ์เอง
+     ยกเว้นใบที่คนกรอกไม่ใช่คนในระบบ (ธง anon ในทะเบียน)
+       PWR ผู้โดยสารเป็นคนนอก ไม่มีบัญชี บังคับล็อกอินแล้วเซ็นไม่ได้เลย
+       VSR รายงานนิรภัยโดยสมัครใจ ต้องรายงานได้โดยไม่ต้องเปิดเผยตัว (ICAO Doc 9859)
+           ใบนี้จึงไม่เติมชื่อให้อัตโนมัติด้วย แม้คนกรอกจะล็อกอินอยู่ */
+  if(!F.anon && !A.signedIn()){
+    document.getElementById('foot').innerHTML='';
+    A.authGate(document.getElementById('form'));
+    return;
+  }
   if(!DEF){
     document.getElementById('form').innerHTML=`<div class="draftbar" style="margin-top:18px">
       <b>${A.esc(A.t('noDefTitle'))}</b><br>
@@ -222,6 +233,7 @@ function boot(){
     const d = A.draftLoad(code);
     if (d) { keep = Object.assign({}, keep, d.data); DRAFT_AT = d.at; }
   }
+  selfFill(keep);
   FK=new FormKit(DEF,{party:partyOf(),lang:A.lang,data:keep,
     onChange:()=>{ A.draftSave(code, FK.data); renderFoot(); },
     upload:async f=>{const r=await A.gas('attach',Object.assign({code:DEF.code},f));
@@ -231,6 +243,28 @@ function boot(){
   netBar();
   loadDir();
 }
+/* เติมชื่อผู้กรอกจากบัญชีที่ล็อกอิน — ช่องที่ทำเครื่องหมาย self ไว้ในนิยามฟอร์ม
+   (self: true = ชื่อเต็ม · 'first' / 'last' = ใบที่แยกชื่อกับนามสกุล)
+
+   ทำเฉพาะช่องของฝ่ายที่คนนี้กำลังกรอก และเฉพาะช่องที่ยังว่าง — ค่าที่ส่งมากับลิงก์
+   หรือร่างที่ค้างในเครื่องต้องมาก่อนเสมอ ไม่งั้นลิงก์ที่เตรียมชื่อคนอื่นไว้ให้
+   (เช่นใบประเมินความเสี่ยงย้อนหลัง) จะถูกทับด้วยชื่อคนที่เปิดลิงก์
+
+   ใบที่ตั้ง anon ไว้ไม่เติมให้ — VSR ต้องรายงานโดยไม่เปิดเผยตัวได้ */
+function selfFill(data){
+  if(!A.signedIn() || F.anon || !DEF) return;
+  const me=A.myName(); if(!me) return;
+  const parts=me.trim().split(/\s+/), first=parts[0]||'', last=parts.slice(1).join(' ');
+  const mine=partyOf();
+  (DEF.sections||[]).forEach(sec=>{
+    if(sec.party && sec.party!==mine) return;
+    (sec.fields||[]).forEach(f=>{
+      if(!f.self || (data[f.k]!==undefined && data[f.k]!=='')) return;
+      data[f.k] = f.self==='first' ? first : f.self==='last' ? last : me;
+    });
+  });
+}
+
 /* หน้านี้เป็นการ "เริ่มใบใหม่" เสมอ — คนที่กดกรอกคือผู้เริ่ม
    จึงได้ฝ่ายของขั้นแรกใน route ไม่ว่าจะล็อกอินหรือไม่ ไม่ว่ามีบทบาทอะไร
 
@@ -506,7 +540,12 @@ async function send(){
   const foot=document.getElementById('foot');
   foot.innerHTML=`<div class="note">${A.esc(A.t('sending'))}</div>`;
   try{
-    if(!firebase.auth().currentUser) await firebase.auth().signInAnonymously();
+    /* ใบทั่วไปต้องล็อกอินมาก่อนถึงจะเห็นฟอร์ม (ดูประตูใน boot)
+       เหลือ anonymous ไว้ให้เฉพาะใบที่คนกรอกไม่ใช่คนในระบบ */
+    if(!firebase.auth().currentUser){
+      if(!F.anon) throw new Error(A.L({th:'ต้องเข้าสู่ระบบก่อนส่งใบ',en:'Sign in before submitting'}));
+      await firebase.auth().signInAnonymously();
+    }
     const u=firebase.auth().currentUser;
     const ref=A.db.collection('submissions').doc();
     const d=new Date(), p2=n=>String(n).padStart(2,'0');
@@ -527,7 +566,7 @@ async function send(){
       assigneeUid: PICK||'',
       // ใบที่ยังไม่มีผู้รับต้องบอกว่าใครมีสิทธิ์รับไปอนุมัติ ไม่งั้นตกหล่นไม่มีใครรับผิดชอบ
       assignTo: (!PICK && st ? (approval().position || st.pool || F.assignTo || '') : ''),
-      submitterUid:u.uid, submitterName:FK.data.picFirst?`${FK.data.picFirst} ${FK.data.picLast||''}`.trim():(u.displayName||''),
+      submitterUid:u.uid, submitterName:FK.data.picFirst?`${FK.data.picFirst} ${FK.data.picLast||''}`.trim():(A.myName()||u.displayName||''),
       submitterEmail:u.email||'',
       submittedAt:firebase.firestore.FieldValue.serverTimestamp(),
       computed:FK.computed(),
