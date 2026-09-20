@@ -428,6 +428,9 @@ async function users(force){
   try {
     const s = await A.db.collection('users').get();
     USERS = s.docs.map(d => Object.assign({ uid: d.id }, d.data()));
+    /* รายชื่อผู้รับวาดไปก่อนหน้านี้แล้วตอนที่ยังไม่รู้จักผู้ใช้ จึงยังเทียบไม่ได้ว่าใครขาด
+       วาดซ้ำเมื่อรายชื่อผู้ใช้มาถึง ไม่งั้นคำเตือนจะว่างเปล่าเสมอ */
+    dir();
   } catch(e){
     host.innerHTML = `<p class="hint">อ่านไม่ได้: ${A.esc(e.code || e.message)}</p>`; return;
   }
