@@ -649,7 +649,10 @@ async function send(){
         ${ex&&ex.ok===false?'<br>'+A.esc(A.t('exportFailed'))+' '+A.esc(ex.error||''):''}
         ${ex&&ex.pdf?`<br><a href="${A.esc(ex.pdf)}" target="_blank" rel="noopener">PDF ↗</a>`:''}
       </span></div>
-      <div class="acts"><a class="big pri" href="${A.formUrl(F)}">${A.esc(A.t('backToForm'))}</a>
+      <div class="acts">${queued?'':`<a class="big pri" href="@@BASE@@view/?id=${encodeURIComponent(ref.id)}">${
+          A.esc(A.L({th:'ดู / พิมพ์ใบนี้',en:'View / print this form'}))}</a>`}
+        ${A.signedIn()?`<a class="big sec" href="@@BASE@@queue/">${A.esc(A.L({th:'งานของฉัน',en:'My queue'}))}</a>`:''}
+        <a class="big sec" href="${A.formUrl(F)}">${A.esc(A.t('backToForm'))}</a>
         <a class="big sec" href="@@BASE@@all/">${A.esc(A.t('backToAll'))}</a></div>`;
     window.scrollTo({top:foot.getBoundingClientRect().top+window.scrollY-90,behavior:'smooth'});
   }catch(e){

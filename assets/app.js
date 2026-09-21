@@ -132,6 +132,9 @@
              <span class="who"><b>${A.esc(A.t('signIn'))}</b><span>${A.esc(A.t('signInSub'))}</span></span></a>`;
     }
     document.querySelectorAll('.staffonly').forEach(el => el.classList.toggle('hide', !A.isStaff()));
+    /* useronly = ทุกคนที่ล็อกอิน รวมนักเรียน — งานของฉันมีใบที่ตัวเองส่งไปด้วย
+       ใส่คู่กับ staffonly ไม่ได้ เพราะ staffonly ซ่อนทุกอย่างจากนักเรียน */
+    document.querySelectorAll('.useronly').forEach(el => el.classList.toggle('hide', !A.signedIn()));
     document.querySelectorAll('.adminonly').forEach(el => el.classList.toggle('hide', !A.isAdmin()));
   };
 
@@ -148,6 +151,18 @@
      ที่ล็อกอิน พอนักเรียนต้องล็อกอินด้วย เกณฑ์เดิมจะยกนักเรียนขึ้นเป็นเจ้าหน้าที่ทั้งกอง */
   A.STAFF_ROLES = ['ins', 'mnt', 'ops', 'mgt', 'sms'];
   A.roleNames = () => A.roles.map(r => A.L(A.ROLE_N[r]) || r);
+
+  /* สถานะของใบที่ส่งแล้ว — ใช้คำเดียวกันทุกหน้า (งานของฉัน · หน้าดูใบ)
+     complete ที่ไม่มีใครอนุมัติ (ใบขั้นเดียว) = "ส่งแล้ว" ไม่ใช่ "อนุมัติแล้ว"
+     เรียกว่าอนุมัติทั้งที่ไม่มีใครดูคือคำที่ไม่จริง */
+  A.subStatus = function (s) {
+    const approved = (s.chain || []).some(c => c.action === 'approve');
+    if (s.status === 'rejected') return { k: 'no',   cls: 'no',   label: { th: 'ไม่อนุมัติ', en: 'Rejected' } };
+    if (s.status === 'complete') return approved
+      ? { k: 'ok', cls: 'ok', label: { th: 'อนุมัติแล้ว', en: 'Approved' } }
+      : { k: 'ok', cls: 'ok', label: { th: 'ส่งแล้ว', en: 'Submitted' } };
+    return { k: 'wait', cls: 'wait', label: { th: 'รออนุมัติ', en: 'Awaiting approval' } };
+  };
 
   /* ── บทบาทไหนเห็นฟอร์มอะไร ────────────────────────────────
      ค่าตั้งต้นมาจากช่อง r ในทะเบียน ซึ่งเก็บ "หน้าที่ของบทบาทนั้นในใบนี้" ไว้ด้วย

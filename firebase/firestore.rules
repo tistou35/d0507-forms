@@ -177,12 +177,14 @@ service cloud.firestore {
     }
 
     match /submissions/{subId} {
-      // ฝั่งนักเรียนเขียนได้อย่างเดียว อ่านของใครไม่ได้เลย รวมทั้งของตัวเอง
+      /* ผู้ส่งอ่านใบของตัวเองได้ (งานของฉัน · หน้าดูใบ · พิมพ์) — ใบของคนอื่นยังอ่านไม่ได้
+         ต้อง query ด้วย where('submitterUid','==',uid) ไม่งั้น rule ไม่ผ่านทั้งชุด
+         anonymous (PWR · VSR) ได้ uid ใหม่ทุกครั้ง จึงเปิดย้อนดูไม่ได้อยู่แล้ว — ถูกต้องสำหรับ VSR */
       /* คนกรอกคือทุกคนที่ล็อกอิน — นักเรียนที่มีบัญชี หรือ anonymous สำหรับใบที่
          คนกรอกไม่ใช่คนในระบบ (PWR ผู้โดยสาร · VSR รายงานนิรภัยไม่ระบุตัว)
          เงื่อนไขที่กันของเสียคือ newSubmissionOk() ไม่ใช่วิธีล็อกอิน */
       allow create: if staff() || (signedIn() && (newSubmissionOk() || newReceiptOk()));
-      allow read:   if staff();
+      allow read:   if staff() || (signedIn() && resource.data.submitterUid == request.auth.uid);
       allow update: if staff();
       allow delete: if false;
 

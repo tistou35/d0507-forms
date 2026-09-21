@@ -429,6 +429,7 @@ def main():
         ('fill.html',        'fill/index.html',                '../',   'all'),
         ('submit.html',      'submit/index.html',              '../',   'all'),
         ('approve.html',     'approve/index.html',             '../',   'queue'),
+        ('view.html',        'view/index.html',                '../',   'queue'),
         ('approvals.html',   'admin/approvals/index.html',     '../../','aprv'),
         ('pubs.html',        'pubs/index.html',                '../',   'pubs'),
         ('checklists.html',  'admin/checklists/index.html',    '../../','pubs'),

@@ -3,6 +3,30 @@
 <title>งานของฉัน — D-0507 Flight Training</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="../assets/app.css?v=55a3531d">
+<style>
+/* หนึ่งแถวต่อหนึ่งใบ — ชื่อใบและสถานะซ้าย ปุ่มขวา
+   เดิมเป็นการ์ดที่กดได้ทั้งใบ มีทางไปทางเดียว ตอนนี้ต้องมีสามทาง (ทำงาน · ดู · พิมพ์) */
+.qsec{margin-top:26px}
+.qsec:first-of-type{margin-top:6px}
+.qrow{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;
+  background:var(--surface);border:1px solid var(--border-light);border-radius:10px;
+  padding:12px 16px;margin-bottom:8px}
+.qrow.hot{border-left:4px solid var(--amber-500)}
+.qrow .t{font-size:14.5px;font-weight:600;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.qrow .m{font-size:12.5px;color:var(--g-500);margin-top:3px;line-height:1.55}
+.qrow .m .mono{font-size:11.5px}
+.qrow .b{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.qrow .b a{text-decoration:none}
+.qrow .go{background:var(--navy-900);color:#fff;border-color:var(--navy-900)}
+@media(max-width:640px){ .qrow{grid-template-columns:1fr} .qrow .b{justify-content:flex-start} }
+.st{display:inline-flex;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px}
+.st.wait{background:var(--amber-100);color:var(--amber-600)}
+.st.ok{background:var(--green-100);color:var(--green-600)}
+.st.no{background:var(--red-100);color:var(--red-600)}
+.st.dl{background:var(--sky-100);color:var(--sky-600)}
+.empty{padding:14px 16px;border:1px dashed var(--border-med);border-radius:10px;color:var(--g-500);font-size:13.5px}
+.qsec .sh .cnt{font-family:var(--font-mono);font-size:12px;color:var(--g-500);margin-left:8px}
+</style>
 </head><body>
 <div class="topbar">
   <a class="brand" href="../" style="text-decoration:none">
@@ -36,7 +60,7 @@
   <a class="nav" data-nav="all" href="../all/">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg>
     <span><span class="t" data-t="navAll">คลังฟอร์ม</span><span class="en" data-t2="navAll">All forms</span></span><span class="pill gry" data-cnt="forms">—</span></a>
-  <a class="nav staffonly on" data-nav="queue" href="../queue/">
+  <a class="nav useronly on" data-nav="queue" href="../queue/">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l4 4L14 8"/><path d="M10 13l4 4L22 8"/></svg>
     <span><span class="t" data-t="navQueue">งานของฉัน</span><span class="en" data-t2="navQueue">My queue</span></span><span class="pill amb" data-cnt="queue">0</span></a>
   <a class="nav" data-nav="pubs" href="../pubs/">
@@ -70,10 +94,13 @@
   <main class="main">
     <div class="greet"><div>
       <p class="eyebrow">งานของฉัน · MY QUEUE</p>
-      <h1>งานที่รอคุณ</h1>
-      <p class="sub">ฟอร์มที่ถูกส่งถึงคุณในระบบนี้ — งาน CAR อยู่ที่ระบบตรวจสอบ ต้องเข้าสู่ระบบแยก</p></div></div>
-    <div id="out"><p class="note">กำลังโหลด…</p></div>
-    <section id="pool" style="margin-top:28px"></section>
+      <h1>งานของฉัน</h1>
+      <p class="sub">ใบที่รอคุณอนุมัติหรือลงนาม และใบที่คุณส่งไปแล้ว — งาน CAR อยู่ที่ระบบตรวจสอบ ต้องเข้าสู่ระบบแยก</p></div></div>
+    <div id="gate"></div>
+    <section class="qsec" id="todo"></section>
+    <section class="qsec" id="pool"></section>
+    <section class="qsec" id="mine"></section>
+    <section class="qsec" id="done"></section>
   </main>
 </div>
 <nav class="botnav">
@@ -81,7 +108,7 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg><span data-t="navHome">หน้าหลัก</span></a>
   <a data-nav="all" href="../all/">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg><span data-t="navAll">คลังฟอร์ม</span></a>
-  <a class="on" data-nav="queue" class="staffonly" href="../queue/">
+  <a class="on" data-nav="queue" class="useronly" href="../queue/">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l4 4L14 8"/><path d="M10 13l4 4L22 8"/></svg><span data-t="navQueue">งานของฉัน</span></a>
   <a data-nav="pubs" href="../pubs/">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.5h6a2.5 2.5 0 0 1 2.5 2.5v13A2 2 0 0 0 10.5 18H4z"/><path d="M20 4.5h-6A2.5 2.5 0 0 0 11.5 7v13A2 2 0 0 1 13.5 18H20z"/></svg>
@@ -94,7 +121,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="../assets/app.js?v=5f35d273"></script>
+<script src="../assets/app.js?v=790af4d1"></script>
 <script>D0507.GAS_URL='https://script.google.com/macros/s/AKfycby7rFFVxd92wPImX4m8pv8nHqTrK3Iq0O32A34844DAg1rP8N3RfgKEyGvAUkQu-NXd/exec';</script>
 <script>
 "use strict";
@@ -109,71 +136,136 @@ A.initAuth({
   messagingSenderId: "38336897307",
   appId: "1:38336897307:web:0e423f959e635a07faf3be"
 }, load);
-// เปลี่ยนภาษาแล้ววาดใหม่ทั้งหน้า
 A.onLang.push(() => load());
 
+const esc=A.esc, L=o=>A.L(o);
+const $=id=>document.getElementById(id);
+const nameOf=code=>{ const f=REG.forms.find(x=>x.abbr===code); return f?A.nm(f):code; };
+const when=v=>{ try{ const d=v&&v.toDate?v.toDate():(v?new Date(v):null);
+  return d?d.toLocaleDateString(A.lang==='en'?'en-GB':'th-TH',{day:'2-digit',month:'short',year:'numeric'}):''; }catch(e){ return ''; } };
+const ms=v=>{ try{ return v&&v.toMillis?v.toMillis():(v?new Date(v).getTime():0); }catch(e){ return 0; } };
+const viewUrl=id=>'../view/?id='+encodeURIComponent(id);
+const btnView=id=>id?`<a class="fb" href="${viewUrl(id)}">${esc(L({th:'ดู',en:'View'}))}</a>
+  <a class="fb" href="${viewUrl(id)}&print=1" target="_blank" rel="noopener">${esc(L({th:'พิมพ์',en:'Print'}))}</a>`:'';
+const head=(title,en,n)=>`<div class="sh"><h2>${esc(title)}<span class="cnt">${n}</span></h2><span class="en">${esc(en)}</span></div>`;
+
 function load(){
-  const out=document.getElementById('out');
-  if(!A.isStaff()){
-    out.innerHTML=`<div class="note"><b>ต้องเข้าสู่ระบบก่อน</b> — คิวงานเป็นของเจ้าหน้าที่
-      <br><a class="big pri" style="margin-top:12px" href="../staff-login/">เข้าสู่ระบบ</a></div>`;
+  ['todo','pool','mine','done'].forEach(k=>$(k).innerHTML='');
+  if(!A.signedIn()){
+    A.authGate($('gate'), {why: L({th:'งานของฉันแสดงใบที่ส่งถึงคุณและใบที่คุณส่งไป — เข้าสู่ระบบเพื่อดู',
+                                  en:'My queue shows forms sent to you and forms you submitted — sign in to see them'})});
     return;
   }
-  // งานในกองรอ — ใบที่ส่งมาโดยยังไม่ระบุผู้อนุมัติ ใครมีสิทธิ์ตามบทบาทก็กดรับได้
-  A.db.collection('tasks').where('state','==','pool').get()
-   .then(async ps=>{
-      let recv=[];
-      try{
-        const d=await A.db.collection('publicDirectory').doc('instructors').get();
-        const me=((d.exists&&d.data().list)||[]).find(x=>x.id===A.user.uid);
-        recv=(me&&me.recv)||[];
-      }catch(e){ recv=[]; }
-      const mine=ps.docs.filter(d=>{ const p=d.data().pool; return !p||recv.includes(p); });
-      const el=document.getElementById('pool');
-      if(!el||!mine.length) return;
-      el.innerHTML=`<div class="sh"><h2>${A.esc(A.t('poolTitle'))}</h2>
-          <span class="en">Unassigned</span></div>
-        <p class="sub" style="margin-bottom:14px">${A.esc(A.t('poolSub'))}</p>
-        <div class="stats">`+mine.map(d=>{
-          const t=d.data();
-          return `<div class="stat sky"><div class="top">
-            <span><span class="ti">${A.esc(t.title||t.formCode)}</span>
-            <span class="en">${A.esc(t.tracking||'')}</span></span></div>
-            <p class="note">${A.esc(A.t('fromWho'))}: ${A.esc(t.fromName||'—')}</p>
-            <div class="acts" style="margin-top:10px">
-              <button class="fb" data-claim="${A.esc(d.id)}">${A.esc(A.t('claim'))}</button></div></div>`;
-        }).join('')+`</div>`;
-      el.querySelectorAll('[data-claim]').forEach(b=>b.addEventListener('click',async()=>{
-        b.disabled=true; b.textContent=A.t('working');
-        try{
-          await A.db.collection('tasks').doc(b.dataset.claim).update({
-            assigneeUid:A.user.uid, assigneeName:A.user.displayName||A.user.email,
-            state:'open', claimedAt:firebase.firestore.FieldValue.serverTimestamp() });
-          location.href='../approve/?t='+encodeURIComponent(b.dataset.claim);
-        }catch(e){ b.disabled=false; b.textContent=A.esc(e.code||e.message); }
-      }));
-   })
-   .catch(()=>{ /* ยังไม่มีสิทธิ์อ่านกองรอ — ไม่ใช่เรื่องคอขาดบาดตาย */ });
+  $('gate').innerHTML='';
+  if(A.isStaff()) loadTasks();
+  loadMine();
+}
 
-  A.db.collection('tasks').where('assigneeUid','==',A.user.uid).where('state','==','open').get()
-   .then(s=>{
-      document.querySelectorAll('[data-cnt="queue"]').forEach(e=>e.textContent=s.size);
-      out.innerHTML = s.size ? '<div class="stats">' + s.docs.map(d=>{
-        const t=d.data(), f=REG.forms.find(x=>x.abbr===t.formCode);
-        // งานอนุมัติต้องเปิดหน้าอนุมัติ ไม่ใช่หน้าฟอร์มเปล่า
-        const url = t.app==='audit' ? '../../d0507-audit/'
-                  : t.subId ? '../approve/?t='+encodeURIComponent(d.id)
-                  : (f?A.formUrl(f):'../all/');
-        return `<a class="stat amb lk" href="${url}"><div class="top">
-          <span><span class="ti">${A.esc(t.title||t.formCode)}</span>
-          <span class="en">${A.esc(t.tracking||'')}</span></span></div>
-          <p class="note">${A.esc(t.app==='audit'?'จากงานตรวจสอบ':'ฟอร์มที่ถูกส่งถึงคุณ')}</p>
-          <p class="cta">เปิดงาน <span>→</span></p></a>`;}).join('') + '</div>'
-        : `<div class="stat grn"><div class="top"><span class="ti">ไม่มีงานค้าง</span><span class="n">0</span></div>
-           <p class="note">งานที่ถูกส่งถึงคุณจะมาโผล่ที่นี่</p></div>`;
-   })
-   .catch(e=>{ out.innerHTML=`<div class="warn"><b>อ่านคิวงานไม่ได้</b><br>${A.esc(
-      e.code==='permission-denied'?'ยังไม่ได้วาง Security Rules ชุดใหม่ — ดู firebase/README.md':e.message)}</div>`; });
+/* ── งานที่ส่งถึงฉัน ─────────────────────────────────────────
+   อ่านทีเดียวด้วย assigneeUid แล้วแยกฝั่งเครื่อง — ค้างอยู่ / ทำไปแล้ว
+   ไม่ใช้ where state in [...] คู่กับ assigneeUid เพราะต้องสร้าง composite index เพิ่ม */
+async function loadTasks(){
+  let T=[];
+  try{
+    const s=await A.db.collection('tasks').where('assigneeUid','==',A.user.uid).get();
+    T=s.docs.map(d=>Object.assign({id:d.id},d.data()));
+  }catch(e){
+    $('todo').innerHTML=head(L({th:'รอฉันดำเนินการ',en:'Waiting for me'}),'To do','—')+
+      `<div class="fk-gate stop"><span>${esc(L({th:'อ่านคิวงานไม่ได้: ',en:'Could not read the queue: '}))+esc(e.code||e.message)}</span></div>`;
+    return;
+  }
+  const open=T.filter(t=>t.state==='open').sort((a,b)=>ms(b.createdAt)-ms(a.createdAt));
+  const done=T.filter(t=>t.state!=='open' && t.state!=='pool').sort((a,b)=>ms(b.closedAt||b.createdAt)-ms(a.closedAt||a.createdAt)).slice(0,20);
+  document.querySelectorAll('[data-cnt="queue"]').forEach(e=>e.textContent=open.length);
+
+  $('todo').innerHTML=head(L({th:'รอฉันดำเนินการ',en:'Waiting for me'}),'To do',open.length)+
+    (open.length ? open.map(t=>{
+      const audit=t.app==='audit';
+      const go=audit?'../../d0507-audit/':'../approve/?t='+encodeURIComponent(t.id);
+      return `<div class="qrow hot"><div>
+          <div class="t">${esc(t.title||nameOf(t.formCode))}
+            ${t.delegated?`<span class="st dl">${esc(L({th:'มอบหมายต่อมาจาก ',en:'Delegated by '}))+esc(t.fromName||'—')}</span>`:''}</div>
+          <div class="m"><span class="mono">${esc(t.tracking||'')}</span> ·
+            ${esc(L({th:'จาก ',en:'From '}))}${esc(t.fromName||'—')}${t.createdAt?' · '+esc(when(t.createdAt)):''}
+            ${t.note?'<br>'+esc(L({th:'หมายเหตุ: ',en:'Note: '}))+esc(t.note):''}</div></div>
+        <div class="b"><a class="fb go" href="${go}">${esc(audit?L({th:'เปิดงานตรวจสอบ',en:'Open audit task'}):L({th:'อนุมัติ / ลงนาม',en:'Approve / sign'}))} →</a>
+          ${audit?'':btnView(t.subId)}</div></div>`;
+    }).join('') : `<div class="empty">${esc(L({th:'ไม่มีงานค้าง — ใบที่ส่งถึงคุณหรือมอบหมายต่อมาให้คุณจะขึ้นที่นี่',
+                                              en:'Nothing waiting — forms sent or delegated to you appear here'}))}</div>`);
+
+  $('done').innerHTML = done.length ? head(L({th:'ที่ฉันดำเนินการแล้ว',en:'Handled by me'}),'Recently handled',done.length)+
+    done.map(t=>{
+      const lab = t.state==='delegated' ? {th:'มอบหมายต่อแล้ว',en:'Delegated'} : {th:'ดำเนินการแล้ว',en:'Done'};
+      return `<div class="qrow"><div>
+          <div class="t">${esc(t.title||nameOf(t.formCode))} <span class="st ${t.state==='delegated'?'dl':'ok'}">${esc(L(lab))}</span></div>
+          <div class="m"><span class="mono">${esc(t.tracking||'')}</span> · ${esc(L({th:'จาก ',en:'From '}))}${esc(t.fromName||'—')}
+            ${t.closedAt?' · '+esc(when(t.closedAt)):''}</div></div>
+        <div class="b">${btnView(t.subId)}</div></div>`;
+    }).join('') : '';
+
+  loadPool();
+}
+
+/* ── กองรอ — ใบที่ยังไม่มีผู้รับ ใครมีตำแหน่งตรงกดรับได้ ── */
+async function loadPool(){
+  let recv=[];
+  try{
+    const d=await A.db.collection('publicDirectory').doc('instructors').get();
+    const me=((d.exists&&d.data().list)||[]).find(x=>x.id===A.user.uid);
+    recv=(me&&me.recv)||[];
+  }catch(e){}
+  let P=[];
+  try{
+    const ps=await A.db.collection('tasks').where('state','==','pool').get();
+    P=ps.docs.map(d=>Object.assign({id:d.id},d.data())).filter(t=>!t.pool||recv.includes(t.pool));
+  }catch(e){ return; }
+  if(!P.length) return;
+  $('pool').innerHTML=head(A.t('poolTitle'),'Unassigned',P.length)+
+    `<p class="sub" style="margin-bottom:12px">${esc(A.t('poolSub'))}</p>`+
+    P.map(t=>`<div class="qrow"><div>
+        <div class="t">${esc(t.title||nameOf(t.formCode))} <span class="st wait">${esc(t.pool||'')}</span></div>
+        <div class="m"><span class="mono">${esc(t.tracking||'')}</span> · ${esc(A.t('fromWho'))}: ${esc(t.fromName||'—')}</div></div>
+      <div class="b"><button class="fb go" data-claim="${esc(t.id)}">${esc(A.t('claim'))}</button>${btnView(t.subId)}</div></div>`).join('');
+  $('pool').querySelectorAll('[data-claim]').forEach(b=>b.addEventListener('click',async()=>{
+    b.disabled=true; b.textContent=A.t('working');
+    try{
+      await A.db.collection('tasks').doc(b.dataset.claim).update({
+        assigneeUid:A.user.uid, assigneeName:A.myName(),
+        state:'open', claimedAt:firebase.firestore.FieldValue.serverTimestamp() });
+      location.href='../approve/?t='+encodeURIComponent(b.dataset.claim);
+    }catch(e){ b.disabled=false; b.textContent=e.code||e.message; }
+  }));
+}
+
+/* ── ใบที่ฉันส่ง ─────────────────────────────────────────────
+   ทุกคนที่ล็อกอินเห็นส่วนนี้ รวมนักเรียน — rules อนุญาตให้อ่านเฉพาะใบที่ submitterUid เป็นของตัวเอง
+   query ต้องมี where ตัวนั้นเสมอ ไม่งั้นทั้งชุดถูกปฏิเสธ
+   เรียงฝั่งเครื่อง ไม่ใช้ orderBy คู่กับ where เพราะต้องสร้าง composite index เพิ่ม */
+async function loadMine(){
+  let S=[];
+  try{
+    const s=await A.db.collection('submissions').where('submitterUid','==',A.user.uid).get();
+    S=s.docs.map(d=>Object.assign({id:d.id},d.data())).sort((a,b)=>ms(b.submittedAt)-ms(a.submittedAt));
+  }catch(e){
+    $('mine').innerHTML=head(L({th:'ใบที่ฉันส่ง',en:'Submitted by me'}),'My submissions','—')+
+      `<div class="fk-gate stop"><span>${esc(L({th:'อ่านไม่ได้: ',en:'Could not read: '}))+esc(e.code||e.message)}</span></div>`;
+    return;
+  }
+  const waiting=S.filter(x=>x.status==='pending').length;
+  $('mine').innerHTML=head(L({th:'ใบที่ฉันส่ง',en:'Submitted by me'}),
+      waiting?(waiting+' '+L({th:'ใบรออนุมัติ',en:'awaiting approval'})):'My submissions', S.length)+
+    (S.length ? S.slice(0,60).map(x=>{
+      const st=A.subStatus(x);
+      const who = x.status==='pending'
+        ? (x.delegatedFrom ? L({th:' · มอบหมายต่อแล้ว',en:' · delegated'}) : '')
+          + (x.assignTo ? ' · '+L({th:'รอ ',en:'waiting for '})+x.assignTo : '')
+        : (x.closedBy ? ' · '+x.closedBy : '');
+      return `<div class="qrow"><div>
+          <div class="t">${esc(x.title||nameOf(x.formCode))} <span class="st ${st.cls}">${esc(L(st.label))}</span></div>
+          <div class="m"><span class="mono">${esc(x.tracking||'')}</span> · ${esc(when(x.submittedAt))}${esc(who)}</div></div>
+        <div class="b">${btnView(x.id)}</div></div>`;
+    }).join('') : `<div class="empty">${esc(L({th:'ยังไม่ได้ส่งใบไหน — ใบที่คุณกรอกและส่งจะขึ้นที่นี่ พร้อมสถานะ',
+                                              en:'Nothing submitted yet — forms you submit appear here with their status'}))}</div>`);
 }
 </script>
 </body></html>

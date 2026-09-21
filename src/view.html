@@ -1,0 +1,204 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ดูใบที่ส่งแล้ว — D-0507 Flight Training</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="@@BASE@@assets/app.css">
+<style>
+/* ใบที่ส่งแล้วในรูปแบบเอกสาร — ทุกหัวข้อเรียงลงมาในหน้าเดียว ไม่แบ่งแท็บ
+   หน้ากรอกแบ่งแท็บเพื่อให้กรอกง่าย แต่ตอนอ่านหรือพิมพ์ต้องเห็นครบทั้งใบ */
+.vbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0}
+.vbar .sp{margin-left:auto}
+.st{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;
+  padding:4px 11px;border-radius:99px}
+.st.wait{background:var(--amber-100);color:var(--amber-600)}
+.st.ok{background:var(--green-100);color:var(--green-600)}
+.st.no{background:var(--red-100);color:var(--red-600)}
+.steps{list-style:none;margin:0;padding:0}
+.steps li{display:grid;grid-template-columns:26px 1fr;gap:10px;padding:8px 0;position:relative}
+.steps li:not(:last-child)::after{content:'';position:absolute;left:12px;top:32px;bottom:-4px;
+  width:2px;background:var(--border-light)}
+.steps .dot{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:12px;
+  font-weight:700;background:var(--g-100);color:var(--g-500);font-family:var(--font-mono)}
+.steps li.done .dot{background:var(--green-600);color:#fff}
+.steps li.now .dot{background:var(--amber-500);color:#fff}
+.steps li.no .dot{background:var(--red-600);color:#fff}
+.steps b{font-size:14px}
+.steps span{display:block;font-size:12.5px;color:var(--g-500);margin-top:2px}
+.doc{background:var(--surface);border:1px solid var(--border-light);border-radius:8px;padding:6px 22px 18px}
+.doc h3{font-family:var(--font-display);font-size:14.5px;color:var(--sky-600);margin:18px 0 6px;
+  padding-bottom:5px;border-bottom:1px solid var(--g-100)}
+.doc .r{display:grid;grid-template-columns:minmax(160px,38%) 1fr;gap:14px;padding:6px 0;
+  border-bottom:1px dashed var(--g-100);font-size:13.5px}
+.doc .r span{color:var(--g-600)}
+.doc .r b{font-weight:600;white-space:pre-wrap;word-break:break-word}
+.doc .r b.empty{color:var(--g-400);font-weight:400}
+.sigs{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:18px}
+.sig{border:1px solid var(--border-light);border-radius:8px;padding:10px 12px;min-height:96px}
+.sig span{display:block;font-size:12px;color:var(--g-500)}
+.sig img{max-height:64px;max-width:100%;margin-top:6px}
+.sig i{display:block;font-style:normal;color:var(--g-400);font-size:12.5px;margin-top:18px}
+.phead{display:none}
+@media print{
+  .topbar,.rail,.botnav,footer,.noprint{display:none !important}
+  .main{max-width:none !important;padding:0 !important}
+  .phead{display:block;font-size:11px;color:#555;margin-bottom:8px}
+  .doc{border:0;padding:0}
+  .doc .r,.sig{break-inside:avoid}
+  .fhero{border:1px solid #999}
+}
+</style>
+</head><body>
+@@TOPBAR@@
+<main class="main" style="max-width:880px;margin:0 auto">
+  <div class="phead" id="phead"></div>
+  <div id="head"><p class="note">กำลังโหลด…</p></div>
+  <div id="status"></div>
+  <div id="doc"></div>
+</main>
+@@BOTNAV@@
+<footer>D-0507 Flight Training Co., Ltd. · Controlled Document System</footer>
+
+<script>window.BASE='@@BASE@@';</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="@@BASE@@assets/app.js"></script>
+<script>D0507.GAS_URL='@@GASURL@@';</script>
+<script src="@@BASE@@assets/formkit.js"></script>
+<script>
+"use strict";
+/* ── ดูใบที่ส่งแล้ว / พิมพ์ ──────────────────────────────────
+   view/?id=<submission id>          ดู
+   view/?id=<submission id>&print=1  เปิดแล้วสั่งพิมพ์ทันที
+
+   ใครเปิดได้ (firestore.rules): ผู้ส่งใบเอง หรือเจ้าหน้าที่
+   ใบนี้อ่านอย่างเดียวเสมอ — การอนุมัติ/ลงนามทำที่หน้าอนุมัติ ซึ่งผูกกับงาน (task)
+   ไม่ใช่กับตัวใบ ถ้าคนที่เปิดอยู่มีงานค้างของใบนี้ จะมีปุ่มพาไปหน้านั้น */
+const REG=@@REG@@, DEFS=@@DEFS@@, A=D0507;
+const qs=new URLSearchParams(location.search);
+const ID=qs.get('id')||'', AUTOPRINT=qs.get('print')==='1';
+A.reg=REG;
+let printed=false;
+
+const esc=A.esc, L=o=>A.L(o);
+const box=(cls,html)=>`<div class="fk-gate ${cls}" style="margin:14px 0"><span>${html}</span></div>`;
+const dt=v=>{ try{ const d=v&&v.toDate?v.toDate():(v?new Date(v):null);
+  return d? d.toLocaleString(A.lang==='en'?'en-GB':'th-TH',{dateStyle:'medium',timeStyle:'short'}):''; }catch(e){ return ''; } };
+
+/* สถานะของใบ — คำเดียวกันกับที่หน้างานของฉันใช้ (A.subStatus ใน app.js) */
+function statusOf(s){ return A.subStatus(s); }
+
+A.initAuth(@@FBCFG@@, load);
+A.onLang.push(()=>load());
+
+async function load(){
+  const head=document.getElementById('head');
+  if(!ID){ head.innerHTML=box('stop',esc(L({th:'ไม่ได้ระบุใบที่จะดู',en:'No record specified'}))); return; }
+  if(!A.signedIn()){
+    head.innerHTML=box('warn',`<b>${esc(L({th:'ต้องเข้าสู่ระบบก่อน',en:'Sign in first'}))}</b> — ${
+      esc(L({th:'ใบที่ส่งแล้วเปิดได้เฉพาะผู้ส่งและเจ้าหน้าที่',en:'Submitted records are visible to the submitter and staff only'}))}`);
+    A.authGate(document.getElementById('doc'), {why: L({th:'เข้าสู่ระบบด้วยบัญชีที่ใช้ส่งใบนี้',en:'Sign in with the account that submitted this record'})});
+    return;
+  }
+  let S;
+  try{
+    const snap=await A.db.collection('submissions').doc(ID).get();
+    if(!snap.exists){ head.innerHTML=box('stop',esc(L({th:'ไม่พบใบนี้',en:'Record not found'}))); return; }
+    S=Object.assign({id:snap.id},snap.data());
+  }catch(e){
+    head.innerHTML=box('stop',esc(e.code==='permission-denied'
+      ? L({th:'ใบนี้ไม่ใช่ของคุณ — เปิดได้เฉพาะผู้ส่งและเจ้าหน้าที่',en:'This record is not yours — visible to the submitter and staff only'})
+      : (e.message||String(e))));
+    return;
+  }
+  const F=REG.forms.find(f=>f.abbr===S.formCode)||{abbr:S.formCode};
+  const DEF=DEFS[S.formCode];
+  const st=statusOf(S);
+
+  document.title=(S.tracking||'')+' — '+A.nm(F);
+  document.getElementById('phead').textContent =
+    'D-0507 Flight Training Co., Ltd. · '+(F.doc||S.doc||S.formCode)+' · '+(S.tracking||'')+
+    ' · '+L({th:'พิมพ์เมื่อ ',en:'Printed '})+new Date().toLocaleString(A.lang==='en'?'en-GB':'th-TH');
+
+  head.innerHTML=`<div class="fhero"><div class="band">
+      <p class="o">D-0507 Flight Training Co., Ltd.</p><h1>${esc(A.nm(F))}</h1>
+      <p class="en">${esc(A.lang==='en'?(F.th||''):(F.t||''))}</p></div>
+      <div class="grid">
+        <div><span>${esc(A.t('trackingNo'))}</span><b>${esc(S.tracking||'—')}</b></div>
+        <div><span>${esc(A.t('docCode'))}</span><b>${esc(F.doc||S.doc||'—')}</b></div>
+        <div><span>${esc(A.t('issueRev'))}</span><b>${esc((S.issue||F.iss||'')+' / '+(S.rev||F.rev||''))}</b></div>
+        <div><span>${esc(A.t('submittedBy'))}</span><b>${esc(S.submitterName||'—')}</b></div>
+        <div><span>${esc(L({th:'วันที่ส่ง',en:'Submitted'}))}</span><b>${esc(dt(S.submittedAt)||'—')}</b></div>
+      </div></div>
+    <div class="vbar noprint">
+      <span class="st ${st.cls}">${esc(L(st.label))}</span>
+      <span class="sp"></span>
+      <span id="act"></span>
+      <button class="fb" id="prt">${esc(L({th:'พิมพ์',en:'Print'}))}</button>
+      <a class="fb" href="@@BASE@@queue/">${esc(L({th:'← งานของฉัน',en:'← My queue'}))}</a>
+    </div>`;
+  document.getElementById('prt').onclick=()=>window.print();
+
+  // มีงานค้างของใบนี้ที่ส่งถึงคนที่เปิดอยู่ไหม — ถ้ามี ให้ปุ่มไปหน้าอนุมัติ
+  if(A.isStaff() && S.status==='pending'){
+    try{
+      const ts=await A.db.collection('tasks').where('subId','==',S.id)
+        .where('assigneeUid','==',A.user.uid).where('state','==','open').get();
+      if(!ts.empty) document.getElementById('act').innerHTML=
+        `<a class="big pri" style="min-height:40px;padding:0 16px" href="@@BASE@@approve/?t=${encodeURIComponent(ts.docs[0].id)}">${
+          esc(L({th:'ไปหน้าอนุมัติ / ลงนาม',en:'Go to approve / sign'}))} →</a>`;
+    }catch(e){}
+  }
+
+  document.getElementById('status').innerHTML=steps(S,DEF);
+
+  if(!DEF){
+    document.getElementById('doc').innerHTML=box('warn',esc(L({th:'ไม่พบนิยามของฟอร์มนี้ แสดงเนื้อหาไม่ได้',en:'Form definition not found'})));
+    return;
+  }
+  // ใช้ docSpec ตัวเดียวกับที่ส่งไปทำ PDF — หน้าจอกับกระดาษจึงเป็นเนื้อหาชุดเดียวกัน
+  const FK=new FormKit(DEF,{readonly:true,lang:A.lang,data:S.data||{}});
+  const spec=FK.docSpec();
+  document.getElementById('doc').innerHTML=`<div class="doc">`+
+    spec.sections.map(sec=>`<h3>${esc(sec.title)}</h3>`+sec.rows.map(r=>
+      `<div class="r"><span>${esc(r.label)}</span><b class="${r.value===''?'empty':''}">${
+        r.value===''?'—':esc(r.value)}</b></div>`).join('')).join('')+
+    (spec.signatures.length?`<div class="sigs">`+spec.signatures.map(g=>`<div class="sig"><span>${esc(g.label)}</span>${
+      g.image?`<img src="${esc(g.image)}" alt="">`:`<i>${esc(L({th:'ยังไม่ได้ลงนาม',en:'Not yet signed'}))}</i>`}</div>`).join('')+`</div>`:'')+
+    `</div>`;
+
+  if(AUTOPRINT && !printed){ printed=true; setTimeout(()=>window.print(),400); }
+}
+
+/* ขั้นตอนของใบ — ขั้นแรกคือผู้ส่ง ขั้นต่อไปตาม route ในนิยามฟอร์ม
+   ประวัติจริง (ใครทำอะไรเมื่อไร) มาจาก chain ที่หน้าอนุมัติเขียนไว้ */
+function steps(S,DEF){
+  const route=(DEF&&DEF.route)||[];
+  const parties=(DEF&&DEF.parties)||[];
+  const pn=k=>{ const p=parties.find(x=>x.k===k); return p?L(p.n):k; };
+  const chain=S.chain||[];
+  if(route.length<=1 && !chain.length) return '';   // ใบขั้นเดียว ไม่มีอะไรให้ตาม
+  const items=[];
+  items.push({cls:'done', t:pn(route[0]&&route[0].party)||L({th:'ผู้ส่ง',en:'Submitter'}),
+              d:(S.submitterName||'')+(S.submittedAt?' · '+dt(S.submittedAt):'')});
+  route.slice(1).forEach((r,i)=>{
+    const n=i+2;
+    const hit=chain.filter(c=>c.action==='approve'||c.action==='reject').find((c,j)=>j===i);
+    const dele=chain.filter(c=>c.action==='delegate');
+    let cls='', d='';
+    if(hit){ cls=hit.action==='reject'?'no':'done';
+      d=(hit.action==='reject'?L({th:'ไม่อนุมัติ',en:'Rejected'}):L({th:'อนุมัติแล้ว',en:'Approved'}))
+        +' · '+(hit.byName||'')+(hit.at?' · '+hit.at:'')+(hit.note?' — '+hit.note:''); }
+    else if(S.status==='pending' && (S.step||2)===n){ cls='now';
+      d=L({th:'รอดำเนินการ',en:'Waiting'})+(S.assignTo?' · '+S.assignTo:'')
+        +(dele.length?' · '+L({th:'มอบหมายต่อให้ ',en:'delegated to '})+(dele[dele.length-1].toName||''):''); }
+    else d=L({th:'ยังไม่ถึงขั้นนี้',en:'Not reached yet'});
+    items.push({cls, t:pn(r.party), d, n});
+  });
+  return `<div class="card noprint" style="margin:0 0 14px"><div class="sh" style="margin-bottom:6px">
+      <h2 style="font-size:15px">${esc(L({th:'ขั้นตอนของใบนี้',en:'Progress'}))}</h2></div>
+    <ol class="steps">${items.map((it,i)=>`<li class="${it.cls}"><span class="dot">${
+      it.cls==='done'?'✓':it.cls==='no'?'✕':(i+1)}</span><div><b>${esc(it.t)}</b><span>${esc(it.d)}</span></div></li>`).join('')}</ol></div>`;
+}
+</script>
+</body></html>
