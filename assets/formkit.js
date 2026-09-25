@@ -351,12 +351,12 @@
           // เก็บไว้ท้ายใบเสมอ แม้ยังไม่ได้เซ็น — ช่องลายเซ็นที่ว่างคือข้อมูล
           // ไม่ใช่ความว่างเปล่า คนตรวจต้องเห็นว่าใครยังไม่ได้ลงนาม
           signatures.push({
-            label: label(f.label),
+            label: this.labelOf(f, lg),
             image: (typeof v === 'string' && v.indexOf('data:image') === 0) ? v : '',
           });
           return;
         }
-        rows.push({ label: label(f.label), type: f.type, value: this.showValue(f, v, lg) });
+        rows.push({ label: this.labelOf(f, lg), type: f.type, value: this.showValue(f, v, lg) });
       });
       if (rows.length) sections.push({ title: label(sec.title), rows });
     });
@@ -437,7 +437,7 @@
                       (Array.isArray(v) && !v.length) ||
                       (f.type === 'checklist' && Object.keys(v || {}).length <
                         (f.items || []).length);
-        if (need && empty) miss.push({ k: f.k, label: L(f.label, this.lang) });
+        if (need && empty) miss.push({ k: f.k, label: this.labelOf(f) });
       }
     }
     return miss;
@@ -491,13 +491,21 @@
 
   /* แถวแบบกระชับ — ใช้กับช่องที่มีคะแนน จะได้ไม่กินความสูงช่องละ 3 บรรทัด
      คืน null เมื่อไม่เข้าเงื่อนไข ให้กลับไปใช้ตัวเรนเดอร์ปกติ */
+  /* ป้ายของช่องหนึ่ง โดยคิด labelIf ให้แล้ว — ช่องเดียวกันแต่ความหมายต่างตามบริบท
+     (FRAE: นักบินคนเดียวเห็น "ชื่อนักบิน (PIC)" · เที่ยวฝึกเห็น "ชื่อนักเรียน")
+     ต้องผ่านที่นี่ทุกทาง ไม่งั้นบนจอเป็นป้ายหนึ่ง ในใบที่พิมพ์ออกมาเป็นอีกป้าย */
+  FormKit.prototype.labelOf = function (f, lang) {
+    const alt = (f.labelIf || []).find(x => evalCond(x.when, this.ctx()));
+    return L(alt ? alt.label : f.label, lang || this.lang);
+  };
+
   FormKit.prototype.row = function (f) {
     if (!(this.def.ui && this.def.ui.compact) || !f.score) return null;
     const v = this.data[f.k];
     const ro = this.readonly || (this.party && f.__sec.party !== this.party);
     const dis = ro ? ' aria-disabled="true"' : '';
     const flag = (this.flagged || []).indexOf(f.k) >= 0 ? ' bad' : '';
-    const lab = esc(L(f.label, this.lang));
+    const lab = esc(this.labelOf(f));
 
     if (f.type === 'check' && typeof f.score === 'number') {
       return `<div class="fk-row chk${flag}" data-fk="${esc(f.k)}" data-toggle="${esc(f.k)}"
@@ -526,8 +534,7 @@
        EFC ช่องชั่วโมง: หลักสูตรภาคพื้นคือชั่วโมงเรียน ภาคอากาศคือชั่วโมงบิน
        ถ้าใช้ป้ายเดียวกันทั้งสองแบบ คนอ่านเอกสารจะเข้าใจผิดว่าเป็นชั่วโมงอะไร
        ใช้ป้ายแรกที่เงื่อนไขเป็นจริง ไม่มีตรงก็ใช้ label ปกติ */
-    const alt = (f.labelIf || []).find(x => evalCond(x.when, this.ctx()));
-    const lab = L(alt ? alt.label : f.label, this.lang);
+    const lab = this.labelOf(f);
     const star = f.star ? ' <span class="star" title="safety-critical">★</span>' : '';
     let body = '';
 
