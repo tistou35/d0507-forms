@@ -147,5 +147,152 @@
  },
  "VSR": {
   "_why": "ฉบับแก้ไข 01 วาง token ลงในเอกสารเองแล้ว — หัวข้อบรรยายทั้งสามเป็นหัวข้อเปล่า ไม่มีป้ายคู่ช่องให้ตัวจับคู่ทำงาน จึงต้องระบุตำแหน่งในเอกสารโดยตรง"
+ },
+ "BCK": {
+  "_why": "กระดาษมีช่องลงนามสองช่อง แต่ละช่องเป็นเซลล์เดียวที่รวมชื่อ ลายเซ็น และวันที่ไว้ด้วยกัน (\"Name / Signature / Date\") ตัวจับคู่วาง token ได้ทีละหนึ่งต่อหนึ่งเซลล์ จึงเขียนเนื้อเซลล์เองทั้งก้อน · ช่อง \"บทเรียน / เที่ยวบิน\" ไม่มีที่บนกระดาษ ปล่อยให้ไปอยู่ท้ายเอกสาร",
+  "cells": {
+   "Flight Instructor:\n_______________________________________\nName / Signature / Date": {
+    "head": "Flight Instructor:\n",
+    "tok": "{{sig_insSign}}\n{{insName}}  ·  {{briefDate}}"
+   },
+   "Trainee Acknowledged:\n_______________________________________\nName / Signature / Date": {
+    "head": "Trainee Acknowledged:\n",
+    "tok": "{{sig_stuSign}}\n{{stuName}}"
+   }
+  },
+  "skip": [
+   "{{sig_insSign}}",
+   "{{insName}}",
+   "{{briefDate}}",
+   "{{sig_stuSign}}",
+   "{{stuName}}"
+  ],
+  "_whyBoxes": "ลำดับช่องติ๊กถูกต้องแล้ว แต่ตัวตรวจอ่านข้อความข้าง ☐ จากเซลล์กลุ่มที่ merge ข้ามแถว (\"Aircraft Status\" ครอบสามข้อแรก) จึงเตือนทุกแถวที่ขึ้นกลุ่มใหม่ ยืนยันลำดับไว้เองพร้อมข้อความที่อยู่จริง ถ้ากระดาษถูกแก้จนข้อความเปลี่ยน ตัวตรวจจะเตือนอีกครั้ง",
+  "boxes": [
+   {
+    "tok": "{{k_c1_A1_done}}",
+    "ord": "Aircraft Status"
+   },
+   {
+    "tok": "{{k_c1_A2_done}}",
+    "ord": "Confirmed"
+   },
+   {
+    "tok": "{{k_c1_A3_done}}",
+    "ord": "Confirmed"
+   },
+   {
+    "tok": "{{k_c1_A4_done}}",
+    "ord": "Fuel & Oil"
+   },
+   {
+    "tok": "{{k_c1_A5_done}}",
+    "ord": "Confirmed"
+   },
+   {
+    "tok": "{{k_c1_A6_done}}",
+    "ord": "Weight & Balance"
+   },
+   {
+    "tok": "{{k_c2_B1_done}}",
+    "ord": "Weather"
+   },
+   {
+    "tok": "{{k_c2_B2_done}}",
+    "ord": "Confirmed"
+   },
+   {
+    "tok": "{{k_c2_B3_done}}",
+    "ord": "Confirmed"
+   },
+   {
+    "tok": "{{k_c2_B4_done}}",
+    "ord": "Confirmed"
+   },
+   {
+    "tok": "{{k_c2_B5_done}}",
+    "ord": "Confirmed"
+   },
+   {
+    "tok": "{{k_c3_C1_done}}",
+    "ord": "Confirmed"
+   },
+   {
+    "tok": "{{k_c3_C2_done}}",
+    "ord": "Confirmed"
+   },
+   {
+    "tok": "{{k_c3_C3_done}}",
+    "ord": "Confirmed"
+   },
+   {
+    "tok": "{{k_c3_C4_done}}",
+    "ord": "Confirmed"
+   },
+   {
+    "tok": "{{k_c3_C5_done}}",
+    "ord": "Confirmed"
+   },
+   {
+    "tok": "{{k_c4_D1_done}}",
+    "ord": "Confirmed"
+   },
+   {
+    "tok": "{{k_c4_D2_done}}",
+    "ord": "Confirmed"
+   },
+   {
+    "tok": "{{k_c4_D3_done}}",
+    "ord": "Confirmed"
+   },
+   {
+    "tok": "{{k_c5_E1_done}}",
+    "ord": "Lesson Plan"
+   },
+   {
+    "tok": "{{k_c5_E2_done}}",
+    "ord": "Confirmed"
+   },
+   {
+    "tok": "{{k_c5_E3_done}}",
+    "ord": "Confirmed"
+   },
+   {
+    "tok": "{{k_c5_E4_done}}",
+    "ord": "Confirmed"
+   },
+   {
+    "tok": "{{k_c6_F1_done}}",
+    "ord": "Confirmed"
+   },
+   {
+    "tok": "{{k_c6_F2_done}}",
+    "ord": "Confirmed"
+   },
+   {
+    "tok": "{{k_c6_F3_done}}",
+    "ord": "Confirmed"
+   },
+   {
+    "tok": "{{k_c6_F4_done}}",
+    "ord": "Confirmed"
+   },
+   {
+    "tok": "{{k_c7_G1_done}}",
+    "ord": "Student"
+   },
+   {
+    "tok": "{{k_c7_G2_done}}",
+    "ord": "Confirmed"
+   },
+   {
+    "tok": "{{k_c7_G3_done}}",
+    "ord": "Confirmed"
+   },
+   {
+    "tok": "{{k_c7_G4_done}}",
+    "ord": "Authorisation"
+   }
+  ]
  }
 }

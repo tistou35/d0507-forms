@@ -210,13 +210,14 @@ service cloud.firestore {
        ใบไหนบ้าง: ดูจาก route ในนิยามฟอร์ม (formdefs/) ที่มีขั้นเดียว
          PWR  ผู้โดยสารลงนามสละสิทธิ์ จบในตัว
          EFC  รายงานจบหลักสูตร หัวหน้าครูฝึกเป็นคนบันทึก ไม่มีขั้นอนุมัติ
+         BCK  รายการตรวจการบรรยายก่อนบิน ครูการบินกับนักเรียนลงนามพร้อมกันหน้างาน
          FRAE จบขั้นเดียว "เฉพาะเมื่อผู้ประเมินเป็น PIC" (route.onlyIf role == 'Student')
               จึงบังคับ data.role == 'PIC' ไว้ตรงนี้ด้วย ไม่งั้นเที่ยวฝึกของนักเรียน
               จะปิดใบตัวเองข้ามครูการบินได้
          DRC  มีกติกาของตัวเองอยู่แล้ว (newReceiptOk — ต้องอ้างประกาศที่มีจริง)
 
        ใบต้องเป็นของคนที่ส่งเอง และเวลาส่งใช้เวลาเซิร์ฟเวอร์ ปลอมย้อนหลังไม่ได้ */
-    function soloForms() { return ['PWR', 'EFC']; }
+    function soloForms() { return ['PWR', 'EFC', 'BCK']; }
     function newSoloOk() {
       let d = request.resource.data;
       return d.status == 'complete'

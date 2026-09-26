@@ -91,6 +91,35 @@ function doPost(e) {
       return json_({ ok: true, result: fn(body) });
     }
 
+    /* สร้างแม่แบบ PDF ของใบหนึ่งจาก .docx + TokenMap (ดู ImportTemplate.gs)
+       เดิมต้องเปิดตัวแก้ไข Apps Script แล้วกด Run เอง ซึ่งเครื่องที่ทำงานอัตโนมัติทำไม่ได้
+       ⚠️ สร้างใหม่ทับของเดิม การวาง token ด้วยมือในแม่แบบเก่าจะหายไป */
+    if (body.action === 'importTpl') {
+      if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบเจ้าหน้าที่ก่อน');
+      return json_({ ok: true, result: importTemplate(String(body.abbr || '')) });
+    }
+
+    /* ดึง PDF ของใบที่ส่งออกไปแล้วกลับมาเป็น base64 — ใช้ตรวจว่าเอกสารที่ได้หน้าตาถูกต้อง
+       (กฎของโครงการ: ตรวจด้วยการเปิดไฟล์ ไม่ใช่อ่าน log) เครื่องมือในรีโปถือสิทธิ์ drive.file
+       จึงมองไม่เห็นไฟล์ที่สคริปต์นี้สร้าง ต้องขอผ่านทางนี้
+
+       จำกัดไว้ที่โฟลเดอร์ของฟอร์มเท่านั้น และต้องระบุเลขที่ใบให้ตรง —
+       ไม่ใช่ช่องทางดึงไฟล์อะไรก็ได้ในไดรฟ์ของเจ้าของสคริปต์ */
+    if (body.action === 'formPdf') {
+      if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบเจ้าหน้าที่ก่อน');
+      var pf = subFolder_(String(body.abbr || '')).getFilesByName(String(body.tracking || '') + '.pdf');
+      if (!pf.hasNext()) throw new Error('ไม่พบ PDF ของใบนี้');
+      var pfile = pf.next();
+      return json_({ ok: true, result: { name: pfile.getName(),
+        bytes: Utilities.base64Encode(pfile.getBlob().getBytes()) } });
+    }
+
+    if (body.action === 'dropTest') {
+      if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบเจ้าหน้าที่ก่อน');
+      if (!/TEST/i.test(String(body.tracking || ''))) throw new Error('ใช้ลบได้เฉพาะใบที่มีคำว่า TEST ในเลขที่ใบ');
+      return json_({ ok: true, result: dropTestRecord(String(body.abbr || ''), String(body.tracking || '')) });
+    }
+
     if (body.action === 'checklistReport') {
       return json_({ ok: true, result: checklistReport_(body, who) });
     }

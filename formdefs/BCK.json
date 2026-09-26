@@ -1,0 +1,586 @@
+{
+ "code": "BCK",
+ "doc": "D-0507-BCK-001",
+ "control": "IM-BCK-303-A",
+ "issue": "01",
+ "rev": "00",
+ "eff": "18 JUL 2024",
+ "title": {
+  "th": "รายการตรวจการบรรยายก่อนบิน",
+  "en": "Briefing Checklist"
+ },
+ "intro": {
+  "th": "ครูการบินยืนยันทุกหัวข้อกับนักเรียนด้วยวาจา ก่อนทำการบินฝึกทุกเที่ยว",
+  "en": "Items shall be verbally confirmed by the Flight Instructor with the trainee prior to each training flight."
+ },
+ "retain": "OMA D.2",
+ "ui": {
+  "compact": true,
+  "tabs": [
+   {
+    "k": "T0",
+    "th": "ข้อมูลเที่ยวบิน",
+    "en": "Flight"
+   },
+   {
+    "k": "T1",
+    "th": "1. อากาศยานและเอกสาร",
+    "en": "1. Aircraft & documentation"
+   },
+   {
+    "k": "T2",
+    "th": "2. สภาพอากาศและ NOTAM",
+    "en": "2. Weather & NOTAM"
+   },
+   {
+    "k": "T3",
+    "th": "3. การวางแผนการบิน",
+    "en": "3. Flight planning"
+   },
+   {
+    "k": "T4",
+    "th": "4. ห้วงอากาศและวิธีปฏิบัติกับ ATC",
+    "en": "4. Airspace & ATC procedures"
+   },
+   {
+    "k": "T5",
+    "th": "5. การบรรยายบทเรียน",
+    "en": "5. Lesson brief"
+   },
+   {
+    "k": "T6",
+    "th": "6. ทบทวนวิธีปฏิบัติเมื่อเกิดเหตุฉุกเฉิน",
+    "en": "6. Emergency procedures review"
+   },
+   {
+    "k": "T7",
+    "th": "7. ความพร้อมของนักเรียน",
+    "en": "7. Student preparation"
+   },
+   {
+    "k": "T8",
+    "th": "ลงนาม",
+    "en": "Sign"
+   }
+  ]
+ },
+ "parties": [
+  {
+   "k": "ins",
+   "n": {
+    "th": "ครูการบิน",
+    "en": "Flight instructor"
+   },
+   "auth": "role:ins"
+  }
+ ],
+ "sections": [
+  {
+   "k": "INFO",
+   "tab": "T0",
+   "party": "ins",
+   "title": {
+    "th": "ข้อมูลเที่ยวบินฝึก",
+    "en": "Training flight"
+   },
+   "fields": [
+    {
+     "k": "briefDate",
+     "type": "date",
+     "req": true,
+     "half": true,
+     "prefill": "today",
+     "label": {
+      "th": "วันที่บรรยาย",
+      "en": "Briefing date"
+     }
+    },
+    {
+     "k": "insName",
+     "type": "text",
+     "req": true,
+     "half": true,
+     "self": true,
+     "label": {
+      "th": "ครูการบิน",
+      "en": "Flight instructor"
+     }
+    },
+    {
+     "k": "stuName",
+     "type": "text",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "นักเรียน",
+      "en": "Trainee"
+     }
+    },
+    {
+     "k": "flightRef",
+     "type": "text",
+     "half": true,
+     "label": {
+      "th": "บทเรียน / เที่ยวบิน",
+      "en": "Lesson / flight"
+     },
+     "hint": {
+      "th": "เว้นว่างได้ — ใส่ไว้ให้ค้นย้อนหลังได้ง่าย",
+      "en": "Optional — helps find the record later"
+     }
+    }
+   ]
+  },
+  {
+   "k": "C1",
+   "tab": "T1",
+   "party": "ins",
+   "title": {
+    "th": "1. อากาศยานและเอกสาร",
+    "en": "1. Aircraft & documentation"
+   },
+   "fields": [
+    {
+     "k": "c1",
+     "type": "checklist",
+     "req": true,
+     "opts": [
+      {
+       "v": "done",
+       "n": {
+        "th": "ยืนยันแล้ว",
+        "en": "Confirmed"
+       }
+      }
+     ],
+     "items": [
+      {
+       "id": "A1",
+       "th": "ที่จอดและความพร้อมของอากาศยาน",
+       "en": "Aircraft Location & Readiness",
+       "how": "Parked position confirmed · Tie-down / chocks removed · No damage or defects observed"
+      },
+      {
+       "id": "A2",
+       "th": "เอกสารประจำอากาศยาน",
+       "en": "Technical Documents",
+       "how": "Certificate of Airworthiness · Certificate of Registration · Radio Station Licence · Insurance · Flight Crew Licence"
+      },
+      {
+       "id": "A3",
+       "th": "MEL และงานซ่อมบำรุง",
+       "en": "MEL & Maintenance",
+       "how": "MEL reviewed · No open deferred defects affecting flight · Last maintenance release confirmed"
+      },
+      {
+       "id": "A4",
+       "th": "ตรวจการเติมน้ำมันเชื้อเพลิง",
+       "en": "Fuel Uplift Verified",
+       "how": "Required fuel calculated · Actual uplift confirmed · Reserve fuel sufficient · No fuel contamination"
+      },
+      {
+       "id": "A5",
+       "th": "ตรวจระดับน้ำมันหล่อลื่น",
+       "en": "Oil Level Checked",
+       "how": "Oil quantity within limits · No leaks observed"
+      },
+      {
+       "id": "A6",
+       "th": "คำนวณน้ำหนักและสมดุล",
+       "en": "W&B Calculation Completed",
+       "how": "Passenger / baggage weights accounted · C of G within limits · Max TOW not exceeded"
+      }
+     ],
+     "label": {
+      "th": "ยืนยันทุกหัวข้อกับนักเรียน",
+      "en": "Confirm each item with the trainee"
+     }
+    }
+   ]
+  },
+  {
+   "k": "C2",
+   "tab": "T2",
+   "party": "ins",
+   "title": {
+    "th": "2. สภาพอากาศและ NOTAM",
+    "en": "2. Weather & NOTAM"
+   },
+   "fields": [
+    {
+     "k": "c2",
+     "type": "checklist",
+     "req": true,
+     "opts": [
+      {
+       "v": "done",
+       "n": {
+        "th": "ยืนยันแล้ว",
+        "en": "Confirmed"
+       }
+      }
+     ],
+     "items": [
+      {
+       "id": "B1",
+       "th": "ตรวจ METAR / TAF",
+       "en": "METAR / TAF Reviewed",
+       "how": "Departure, en-route, and destination weather obtained · Ceiling and visibility within minima"
+      },
+      {
+       "id": "B2",
+       "th": "ตรวจ SIGMET / AIRMET",
+       "en": "SIGMET / AIRMET Checked",
+       "how": "No significant meteorological conditions affecting route · Turbulence, icing, or CBs noted"
+      },
+      {
+       "id": "B3",
+       "th": "ลมระดับสูง",
+       "en": "Winds Aloft",
+       "how": "Wind at cruising level noted · Crosswind component within aircraft limitation"
+      },
+      {
+       "id": "B4",
+       "th": "ตรวจ NOTAM",
+       "en": "NOTAM Review Completed",
+       "how": "Departure aerodrome · En-route · Destination · Alternate (if applicable)"
+      },
+      {
+       "id": "B5",
+       "th": "TFR และเขตหวงห้าม",
+       "en": "TFR / Restricted Areas",
+       "how": "No TFR along planned route · Restricted airspace annotated on nav log"
+      }
+     ],
+     "label": {
+      "th": "ยืนยันทุกหัวข้อกับนักเรียน",
+      "en": "Confirm each item with the trainee"
+     }
+    }
+   ]
+  },
+  {
+   "k": "C3",
+   "tab": "T3",
+   "party": "ins",
+   "title": {
+    "th": "3. การวางแผนการบิน",
+    "en": "3. Flight planning"
+   },
+   "fields": [
+    {
+     "k": "c3",
+     "type": "checklist",
+     "req": true,
+     "opts": [
+      {
+       "v": "done",
+       "n": {
+        "th": "ยืนยันแล้ว",
+        "en": "Confirmed"
+       }
+      }
+     ],
+     "items": [
+      {
+       "id": "C1",
+       "th": "จัดทำ navigation log",
+       "en": "Navigation Log Completed",
+       "how": "Route waypoints entered · Headings & distances calculated · Frequencies entered"
+      },
+      {
+       "id": "C2",
+       "th": "ระดับบินและห้วงอากาศ",
+       "en": "Altitude & Airspace",
+       "how": "Planned altitude reviewed · Airspace class noted · VFR cruising altitude rule applied"
+      },
+      {
+       "id": "C3",
+       "th": "วางแผนน้ำมันเชื้อเพลิง",
+       "en": "Fuel Planning Confirmed",
+       "how": "Trip fuel · Reserve · Alternate (if applicable) · Total required vs. available"
+      },
+      {
+       "id": "C4",
+       "th": "ยื่นแผนการบิน ICAO (ถ้าต้องยื่น)",
+       "en": "ICAO Flight Plan Filed (if required)",
+       "how": "Filed at least 30 min before departure · Time activated before departure"
+      },
+      {
+       "id": "C5",
+       "th": "สนามบินสำรอง (ถ้ามี)",
+       "en": "Alternate Aerodrome (if applicable)",
+       "how": "Alternate selected and weather acceptable · Fuel to alternate calculated"
+      }
+     ],
+     "label": {
+      "th": "ยืนยันทุกหัวข้อกับนักเรียน",
+      "en": "Confirm each item with the trainee"
+     }
+    }
+   ]
+  },
+  {
+   "k": "C4",
+   "tab": "T4",
+   "party": "ins",
+   "title": {
+    "th": "4. ห้วงอากาศและวิธีปฏิบัติกับ ATC",
+    "en": "4. Airspace & ATC procedures"
+   },
+   "fields": [
+    {
+     "k": "c4",
+     "type": "checklist",
+     "req": true,
+     "opts": [
+      {
+       "v": "done",
+       "n": {
+        "th": "ยืนยันแล้ว",
+        "en": "Confirmed"
+       }
+      }
+     ],
+     "items": [
+      {
+       "id": "D1",
+       "th": "บรรยายห้วงอากาศ",
+       "en": "Airspace Brief Completed",
+       "how": "Controlled vs. uncontrolled airspace reviewed · Entry / exit procedures for CTR / ATZ · Squawk code"
+      },
+      {
+       "id": "D2",
+       "th": "ทบทวนวิธีปฏิบัติทางวิทยุ",
+       "en": "Radio Procedures Reviewed",
+       "how": "Departure clearance · Radio failure procedure · Emergency frequency 121.5 MHz"
+      },
+      {
+       "id": "D3",
+       "th": "จุดรายงานด้วยสายตา",
+       "en": "Visual Reporting Points",
+       "how": "VRPs along route identified · Overhead joining procedure reviewed (if applicable)"
+      }
+     ],
+     "label": {
+      "th": "ยืนยันทุกหัวข้อกับนักเรียน",
+      "en": "Confirm each item with the trainee"
+     }
+    }
+   ]
+  },
+  {
+   "k": "C5",
+   "tab": "T5",
+   "party": "ins",
+   "title": {
+    "th": "5. การบรรยายบทเรียน",
+    "en": "5. Lesson brief"
+   },
+   "fields": [
+    {
+     "k": "c5",
+     "type": "checklist",
+     "req": true,
+     "opts": [
+      {
+       "v": "done",
+       "n": {
+        "th": "ยืนยันแล้ว",
+        "en": "Confirmed"
+       }
+      }
+     ],
+     "items": [
+      {
+       "id": "E1",
+       "th": "ระบุวัตถุประสงค์ของบทเรียน",
+       "en": "Lesson Objectives Stated",
+       "how": "Training aim · Exercises to be practised · Completion standards"
+      },
+      {
+       "id": "E2",
+       "th": "ลำดับการปฏิบัติ",
+       "en": "Sequence of Events",
+       "how": "Departure · Training area / airwork · Return to aerodrome · Estimated duration"
+      },
+      {
+       "id": "E3",
+       "th": "ข้อกำหนดเฉพาะของเที่ยวนี้",
+       "en": "Specific Requirements",
+       "how": "Solo or dual · Any special exercise or manoeuvre · Simulated emergency items"
+      },
+      {
+       "id": "E4",
+       "th": "ยืนยันพื้นที่ฝึก",
+       "en": "Training Area Confirmed",
+       "how": "Area boundaries · Altitude block · Conflicting traffic avoidance · Diversion plan if area occupied"
+      }
+     ],
+     "label": {
+      "th": "ยืนยันทุกหัวข้อกับนักเรียน",
+      "en": "Confirm each item with the trainee"
+     }
+    }
+   ]
+  },
+  {
+   "k": "C6",
+   "tab": "T6",
+   "party": "ins",
+   "title": {
+    "th": "6. ทบทวนวิธีปฏิบัติเมื่อเกิดเหตุฉุกเฉิน",
+    "en": "6. Emergency procedures review"
+   },
+   "fields": [
+    {
+     "k": "c6",
+     "type": "checklist",
+     "req": true,
+     "opts": [
+      {
+       "v": "done",
+       "n": {
+        "th": "ยืนยันแล้ว",
+        "en": "Confirmed"
+       }
+      }
+     ],
+     "items": [
+      {
+       "id": "F1",
+       "th": "เครื่องยนต์ขัดข้องหลังวิ่งขึ้น (EFATO)",
+       "en": "Engine Failure After Take-Off (EFATO)",
+       "how": "Action recalled by trainee · Speed / configuration · Forced landing area identified"
+      },
+      {
+       "id": "F2",
+       "th": "เครื่องยนต์ขัดข้องระหว่างทาง",
+       "en": "Engine Failure En-Route",
+       "how": "Glide distance · Forced landing field selection criteria · Mayday call on 121.5"
+      },
+      {
+       "id": "F3",
+       "th": "ไฟไหม้เครื่องยนต์ / ระบบไฟฟ้า",
+       "en": "Engine / Electrical Fire",
+       "how": "Fire checks sequence recalled · Cabin fire procedure"
+      },
+      {
+       "id": "F4",
+       "th": "เหตุฉุกเฉินอื่น (ตามที่เกี่ยวข้อง)",
+       "en": "Other Emergency Items (as applicable)",
+       "how": "Loss of communications · Inadvertent IMC · Bird strike · Medical emergency"
+      }
+     ],
+     "label": {
+      "th": "ยืนยันทุกหัวข้อกับนักเรียน",
+      "en": "Confirm each item with the trainee"
+     }
+    }
+   ]
+  },
+  {
+   "k": "C7",
+   "tab": "T7",
+   "party": "ins",
+   "title": {
+    "th": "7. ความพร้อมของนักเรียน",
+    "en": "7. Student preparation"
+   },
+   "fields": [
+    {
+     "k": "c7",
+     "type": "checklist",
+     "req": true,
+     "opts": [
+      {
+       "v": "done",
+       "n": {
+        "th": "ยืนยันแล้ว",
+        "en": "Confirmed"
+       }
+      }
+     ],
+     "items": [
+      {
+       "id": "G1",
+       "th": "ยืนยันความพร้อมทำการบินของนักเรียน",
+       "en": "Fitness to Fly Confirmed",
+       "how": "IMSAFE check — Illness, Medication, Stress, Alcohol, Fatigue, Emotion / Eating"
+      },
+      {
+       "id": "G2",
+       "th": "เอกสารที่นักเรียนต้องพกติดตัว",
+       "en": "Documents Carried",
+       "how": "Student Pilot Licence / PPL · Medical certificate · Photo ID · Radio Operator Licence"
+      },
+      {
+       "id": "G3",
+       "th": "เปิดโอกาสให้ซักถาม",
+       "en": "Questions & Clarification",
+       "how": "Student had opportunity to ask questions · All queries resolved before flight"
+      },
+      {
+       "id": "G4",
+       "th": "ครูการบินอนุญาตให้ทำการบิน",
+       "en": "Instructor Signature Required",
+       "how": "Briefing complete · Student ready · Flight authorised"
+      }
+     ],
+     "label": {
+      "th": "ยืนยันทุกหัวข้อกับนักเรียน",
+      "en": "Confirm each item with the trainee"
+     }
+    }
+   ]
+  },
+  {
+   "k": "SIGN",
+   "tab": "T8",
+   "party": "ins",
+   "title": {
+    "th": "ลงนาม",
+    "en": "Signatures"
+   },
+   "fields": [
+    {
+     "k": "insSign",
+     "type": "sign",
+     "req": true,
+     "label": {
+      "th": "ลายเซ็นครูการบิน",
+      "en": "Flight instructor signature"
+     },
+     "hint": {
+      "th": "บรรยายครบถ้วน นักเรียนพร้อม และอนุญาตให้ทำการบิน",
+      "en": "Briefing complete · student ready · flight authorised"
+     }
+    },
+    {
+     "k": "stuSign",
+     "type": "sign",
+     "req": true,
+     "label": {
+      "th": "ลายเซ็นนักเรียน (รับทราบ)",
+      "en": "Trainee signature (acknowledged)"
+     },
+     "hint": {
+      "th": "นักเรียนเซ็นรับทราบบนเครื่องเดียวกันหลังบรรยายเสร็จ",
+      "en": "The trainee signs on the same device after the briefing."
+     }
+    }
+   ]
+  }
+ ],
+ "route": [
+  {
+   "step": 1,
+   "party": "ins",
+   "sign": true
+  }
+ ],
+ "export": {
+  "docx": "D-0507-BCK-001.docx",
+  "lockUntilComplete": true
+ }
+}

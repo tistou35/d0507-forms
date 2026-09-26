@@ -172,3 +172,30 @@ function setupAurReport() {
   return out;
 }
 
+
+
+/**
+ * ลบใบทดสอบของฟอร์มหนึ่งออกจากโฟลเดอร์และแผ่นบันทึก
+ *
+ *   dropTestRecord('BCK', 'BCK-TEST-0001')
+ *
+ * ใบที่ยิงเข้ามาตอนทดสอบระบบไม่ใช่บันทึกจริง ปล่อยค้างไว้ในโฟลเดอร์เอกสารควบคุม
+ * ผู้ตรวจจะเจอ "BCK-TEST-0001" ปนอยู่กับของจริง แล้วต้องมาอธิบายทีหลัง
+ */
+function dropTestRecord(abbr, tracking) {
+  var folder = subFolder_(abbr), gone = [];
+  var it = folder.getFilesByName(tracking + '.pdf');
+  while (it.hasNext()) { var f = it.next(); f.setTrashed(true); gone.push(f.getName()); }
+  var sh = folder.getFilesByName(abbr + ' — Records');
+  while (sh.hasNext()) {
+    var ss = SpreadsheetApp.open(sh.next()).getSheets()[0];
+    var vals = ss.getDataRange().getValues();
+    for (var r = vals.length - 1; r >= 1; r--) {
+      if (String(vals[r][0]) === tracking || vals[r].indexOf(tracking) >= 0) {
+        ss.deleteRow(r + 1); gone.push('แถวในแผ่นบันทึก');
+      }
+    }
+  }
+  Logger.log('ลบ %s', gone.join(' · ') || '(ไม่พบอะไร)');
+  return gone;
+}

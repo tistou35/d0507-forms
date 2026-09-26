@@ -332,6 +332,226 @@ var TOKEN_MAP = {
     ],
     "manual": []
   },
+  "BCK": {
+    "abbr": "BCK",
+    "docx": "D-0507-BCK-001.docx",
+    "control": "IM-BCK-303-A",
+    "orderWarn": [],
+    "byLabel": [],
+    "byLine": [],
+    "byCell": [
+      {
+        "cell": "Flight Instructor:\n_______________________________________\nName / Signature / Date",
+        "head": "Flight Instructor:\n",
+        "tok": "{{sig_insSign}}\n{{insName}}  ·  {{briefDate}}"
+      },
+      {
+        "cell": "Trainee Acknowledged:\n_______________________________________\nName / Signature / Date",
+        "head": "Trainee Acknowledged:\n",
+        "tok": "{{sig_stuSign}}\n{{stuName}}"
+      }
+    ],
+    "boxes": [
+      {
+        "tok": "{{k_c1_A1_done}}",
+        "label": "Aircraft Location & Readiness · Confirmed",
+        "ord": "Aircraft Status",
+        "item": "Aircraft Location & Readiness"
+      },
+      {
+        "tok": "{{k_c1_A2_done}}",
+        "label": "Technical Documents · Confirmed",
+        "ord": "Confirmed",
+        "item": "Technical Documents"
+      },
+      {
+        "tok": "{{k_c1_A3_done}}",
+        "label": "MEL & Maintenance · Confirmed",
+        "ord": "Confirmed",
+        "item": "MEL & Maintenance"
+      },
+      {
+        "tok": "{{k_c1_A4_done}}",
+        "label": "Fuel Uplift Verified · Confirmed",
+        "ord": "Fuel & Oil",
+        "item": "Fuel Uplift Verified"
+      },
+      {
+        "tok": "{{k_c1_A5_done}}",
+        "label": "Oil Level Checked · Confirmed",
+        "ord": "Confirmed",
+        "item": "Oil Level Checked"
+      },
+      {
+        "tok": "{{k_c1_A6_done}}",
+        "label": "W&B Calculation Completed · Confirmed",
+        "ord": "Weight & Balance",
+        "item": "W&B Calculation Completed"
+      },
+      {
+        "tok": "{{k_c2_B1_done}}",
+        "label": "METAR / TAF Reviewed · Confirmed",
+        "ord": "Weather",
+        "item": "METAR / TAF Reviewed"
+      },
+      {
+        "tok": "{{k_c2_B2_done}}",
+        "label": "SIGMET / AIRMET Checked · Confirmed",
+        "ord": "Confirmed",
+        "item": "SIGMET / AIRMET Checked"
+      },
+      {
+        "tok": "{{k_c2_B3_done}}",
+        "label": "Winds Aloft · Confirmed",
+        "ord": "Confirmed",
+        "item": "Winds Aloft"
+      },
+      {
+        "tok": "{{k_c2_B4_done}}",
+        "label": "NOTAM Review Completed · Confirmed",
+        "ord": "Confirmed",
+        "item": "NOTAM Review Completed"
+      },
+      {
+        "tok": "{{k_c2_B5_done}}",
+        "label": "TFR / Restricted Areas · Confirmed",
+        "ord": "Confirmed",
+        "item": "TFR / Restricted Areas"
+      },
+      {
+        "tok": "{{k_c3_C1_done}}",
+        "label": "Navigation Log Completed · Confirmed",
+        "ord": "Confirmed",
+        "item": "Navigation Log Completed"
+      },
+      {
+        "tok": "{{k_c3_C2_done}}",
+        "label": "Altitude & Airspace · Confirmed",
+        "ord": "Confirmed",
+        "item": "Altitude & Airspace"
+      },
+      {
+        "tok": "{{k_c3_C3_done}}",
+        "label": "Fuel Planning Confirmed · Confirmed",
+        "ord": "Confirmed",
+        "item": "Fuel Planning Confirmed"
+      },
+      {
+        "tok": "{{k_c3_C4_done}}",
+        "label": "ICAO Flight Plan Filed (if required) · Confirmed",
+        "ord": "Confirmed",
+        "item": "ICAO Flight Plan Filed (if required)"
+      },
+      {
+        "tok": "{{k_c3_C5_done}}",
+        "label": "Alternate Aerodrome (if applicable) · Confirmed",
+        "ord": "Confirmed",
+        "item": "Alternate Aerodrome (if applicable)"
+      },
+      {
+        "tok": "{{k_c4_D1_done}}",
+        "label": "Airspace Brief Completed · Confirmed",
+        "ord": "Confirmed",
+        "item": "Airspace Brief Completed"
+      },
+      {
+        "tok": "{{k_c4_D2_done}}",
+        "label": "Radio Procedures Reviewed · Confirmed",
+        "ord": "Confirmed",
+        "item": "Radio Procedures Reviewed"
+      },
+      {
+        "tok": "{{k_c4_D3_done}}",
+        "label": "Visual Reporting Points · Confirmed",
+        "ord": "Confirmed",
+        "item": "Visual Reporting Points"
+      },
+      {
+        "tok": "{{k_c5_E1_done}}",
+        "label": "Lesson Objectives Stated · Confirmed",
+        "ord": "Lesson Plan",
+        "item": "Lesson Objectives Stated"
+      },
+      {
+        "tok": "{{k_c5_E2_done}}",
+        "label": "Sequence of Events · Confirmed",
+        "ord": "Confirmed",
+        "item": "Sequence of Events"
+      },
+      {
+        "tok": "{{k_c5_E3_done}}",
+        "label": "Specific Requirements · Confirmed",
+        "ord": "Confirmed",
+        "item": "Specific Requirements"
+      },
+      {
+        "tok": "{{k_c5_E4_done}}",
+        "label": "Training Area Confirmed · Confirmed",
+        "ord": "Confirmed",
+        "item": "Training Area Confirmed"
+      },
+      {
+        "tok": "{{k_c6_F1_done}}",
+        "label": "Engine Failure After Take-Off (EFATO) · Confirmed",
+        "ord": "Confirmed",
+        "item": "Engine Failure After Take-Off (EFATO)"
+      },
+      {
+        "tok": "{{k_c6_F2_done}}",
+        "label": "Engine Failure En-Route · Confirmed",
+        "ord": "Confirmed",
+        "item": "Engine Failure En-Route"
+      },
+      {
+        "tok": "{{k_c6_F3_done}}",
+        "label": "Engine / Electrical Fire · Confirmed",
+        "ord": "Confirmed",
+        "item": "Engine / Electrical Fire"
+      },
+      {
+        "tok": "{{k_c6_F4_done}}",
+        "label": "Other Emergency Items (as applicable) · Confirmed",
+        "ord": "Confirmed",
+        "item": "Other Emergency Items (as applicable)"
+      },
+      {
+        "tok": "{{k_c7_G1_done}}",
+        "label": "Fitness to Fly Confirmed · Confirmed",
+        "ord": "Student",
+        "item": "Fitness to Fly Confirmed"
+      },
+      {
+        "tok": "{{k_c7_G2_done}}",
+        "label": "Documents Carried · Confirmed",
+        "ord": "Confirmed",
+        "item": "Documents Carried"
+      },
+      {
+        "tok": "{{k_c7_G3_done}}",
+        "label": "Questions & Clarification · Confirmed",
+        "ord": "Confirmed",
+        "item": "Questions & Clarification"
+      },
+      {
+        "tok": "{{k_c7_G4_done}}",
+        "label": "Instructor Signature Required · Confirmed",
+        "ord": "Authorisation",
+        "item": "Instructor Signature Required"
+      }
+    ],
+    "boxesPartial": false,
+    "tables": [],
+    "boxesInDocx": 31,
+    "approval": [],
+    "manual": [
+      {
+        "tok": "{{flightRef}}",
+        "label": "Lesson / flight",
+        "labelTh": "บทเรียน / เที่ยวบิน",
+        "sign": false
+      }
+    ]
+  },
   "DAF": {
     "abbr": "DAF",
     "docx": "D-0507-DAF-001.docx",
