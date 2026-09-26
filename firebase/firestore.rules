@@ -12,14 +12,39 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ── รายชื่อเจ้าหน้าที่ — เพิ่ม/ลบคนที่นี่ ────────────────
+    /* ── ใครคือเจ้าหน้าที่ ───────────────────────────────────
+       ดูจาก "บทบาทในโปรไฟล์" (users/{uid}.roles) ซึ่งผู้ดูแลระบบเป็นคนตั้งให้
+       ตรงกับที่หน้าเว็บใช้ตัดสินอยู่แล้ว (A.STAFF_ROLES ใน assets/app.js)
+
+       เดิมเป็นรายชื่ออีเมลตายตัวและมีอีเมลเดียว เจ้าหน้าที่คนอื่นจึงอ่านทะเบียน
+       อ่านคิวงาน และอนุมัติใบไม่ได้เลย ใบที่ส่งถึงเขาค้างอยู่อย่างนั้น
+       (ทดลองด้วยบัญชีที่มีบทบาท ins แล้วได้ 403 ทั้งทะเบียน คิวงาน และรายชื่อเจ้าหน้าที่)
+
+       ปลอมบทบาทให้ตัวเองไม่ได้ — users/{uid} คนอื่นเขียนได้เฉพาะเจ้าหน้าที่
+       ส่วนเจ้าตัวเขียนได้แค่ตอนสมัครครั้งแรกและถูกบังคับให้เป็น ['stu'] เท่านั้น
+       (ดู selfProfileOk / selfProfileEditOk ข้างล่าง)
+
+       บัญชีที่ถูกปิดใช้งาน (active: false) ไม่นับเป็นเจ้าหน้าที่ แม้บทบาทยังอยู่
+
+       staffEmails ยังอยู่เป็นทางสำรอง — ถ้าโปรไฟล์ของผู้ดูแลเสียหรือถูกลบ
+       ต้องยังมีคนเข้าไปแก้ได้ ไม่งั้นระบบล็อกตัวเองทั้งระบบ */
     function staffEmails() {
       return [
         'tistou35@gmail.com'
       ];
     }
+    function staffRoles() { return ['ins', 'mnt', 'ops', 'mgt', 'sms']; }
     function signedIn()  { return request.auth != null; }
-    function staff()     { return signedIn() && request.auth.token.email in staffEmails(); }
+    function meDoc()     { return /databases/$(database)/documents/users/$(request.auth.uid); }
+    function hasStaffRole() {
+      return exists(meDoc())
+          && get(meDoc()).data.get('active', true) == true
+          && get(meDoc()).data.get('roles', []).hasAny(staffRoles());
+    }
+    function staff() {
+      return signedIn()
+          && (request.auth.token.get('email', '') in staffEmails() || hasStaffRole());
+    }
     function isSelf(uid) { return signedIn() && request.auth.uid == uid; }
     // ฝั่งนักเรียนล็อกอินแบบ anonymous เพื่อให้ส่งฟอร์มได้โดยไม่ต้องสมัคร
     function anon()      { return signedIn() && request.auth.token.firebase.sign_in_provider == 'anonymous'; }
