@@ -132,6 +132,10 @@ dialog .df{padding:14px 22px;border-top:1px solid var(--g-100);display:flex;gap:
           <button class="fb" data-f="draft" aria-pressed="false">ร่าง</button>
           <button class="fb" data-f="disabled" aria-pressed="false">ปิดใช้งาน</button>
           <button class="fb" data-f="none" aria-pressed="false">ยังไม่มีนิยาม</button>
+          <button class="fb" data-f="repo" aria-pressed="false">ยังไม่ publish</button>
+          <button class="fb" data-f="nosrc" aria-pressed="false">ยังไม่มีต้นฉบับ</button>
+          <button class="fb" data-f="ext" aria-pressed="false">กรอกที่ระบบอื่น</button>
+          <button class="fb" data-f="ref" aria-pressed="false">เอกสารอ้างอิง</button>
         </div>
         <div class="filters">
           <select id="fdep"><option value="">ทุกแผนก</option></select>
@@ -246,17 +250,37 @@ async function refresh(){
       `<div class="warn">อ่านนิยามฟอร์มไม่ได้: ${A.esc(e.code || e.message)}</div>`;
     return;
   }
-  const all = REG.forms.length;
   const n = s => Object.values(DEFS).filter(d => d.status === s).length;
+  const c = k => REG.forms.filter(f => stateOf(f, DEFS[f.abbr]) === k).length;
   document.getElementById('sum').innerHTML = [
     ['grn', n('published'), 'ใช้งานอยู่'],
     ['sky', n('draft'),     'ร่าง — ยังไม่ publish'],
     ['', n('disabled'),     'ปิดใช้งาน'],
-    ['amb', all - Object.keys(DEFS).length, 'ยังไม่มีนิยามฟอร์ม'],
+    ['sh2', c('repo'),      'มีนิยาม — ยังไม่ publish'],
+    ['amb', c('none'),      'ยังไม่มีนิยาม — ควรมี'],
+    ['', c('ref') + c('ext') + c('nosrc'), 'ไม่ต้องมีนิยามที่นี่'],
   ].map(b => `<div class="stat ${b[0]}"><div class="top"><span class="ti">${A.esc(b[2])}</span>
       <span class="n">${b[1]}</span></div></div>`).join('');
   fillPickers();
   render();
+}
+
+/* ใบไหน "ควรมี" นิยามฟอร์มกันแน่ — เดิมนับทุกแถวที่ยังไม่มีนิยามเป็นงานค้างเหมือนกันหมด
+   ทั้งที่ส่วนใหญ่ไม่ควรมีตั้งแต่แรก: เอกสารอ้างอิงไม่ใช่ใบให้กรอก · ใบที่กรอกในระบบอื่น
+   ถ้าทำซ้ำที่นี่จะได้บันทึกสองที่ที่ไม่ตรงกัน · ใบที่ยังไม่มี .docx ต้นฉบับ ถอดเป็นนิยามไม่ได้
+   ตัวเลขที่บอกว่าค้าง 33 ใบทั้งที่จริง ๆ ทำได้แค่ไม่กี่ใบ ทำให้ไล่งานไม่ถูก */
+const STATE_N = { none:'ยังไม่มีนิยาม', nosrc:'ยังไม่มีต้นฉบับ .docx',
+                  ext:'กรอกที่ระบบอื่น', ref:'เอกสารอ้างอิง — ไม่ต้องมีนิยาม',
+                  repo:'มีนิยามแล้ว — ยังไม่ publish ขึ้นระบบ' };
+function stateOf(f, d){
+  if (d) return d.status;
+  /* นิยามที่อยู่ในรีโปแล้วแต่ยังไม่ได้ publish ขึ้น formDefs — ฟอร์มใช้งานได้จริงบนเว็บ
+     (หน้ากรอกอ่านนิยามที่ฝังมากับหน้า) แต่ยังไม่มีเลขรุ่นในระบบจัดการฟอร์ม */
+  if (f.hasDef) return 'repo';
+  if (f.kind === 'ref') return 'ref';
+  if (f.sys && f.sys !== 'here') return 'ext';
+  if (!f.docx) return 'nosrc';
+  return 'none';
 }
 
 function render(){
@@ -266,15 +290,15 @@ function render(){
   let shown = 0;
   const rows = REG.forms.map(f => {
     const d = DEFS[f.abbr];
-    const st = d ? d.status : 'none';
+    const st = stateOf(f, d);
     if (FILTER !== 'all' && FILTER !== st) return '';
     if (dep && f.own !== dep) return '';
     if (man === '__none__' && (f.lef || []).length) return '';
     if (man && man !== '__none__' && !(f.lef || []).includes(man)) return '';
     if (q && ![f.abbr, f.doc, f.code, f.t, f.th].join(' ').toLowerCase().includes(q)) return '';
     shown++;
-    const lv = { published:'ok', draft:'sh2', disabled:'', none:'warn' }[st];
-    const label = d ? M.STATUS[st] : 'ยังไม่มีนิยาม';
+    const lv = { published:'ok', draft:'sh2', disabled:'', none:'warn', nosrc:'warn', ext:'', ref:'', repo:'sh2' }[st];
+    const label = d ? M.STATUS[st] : STATE_N[st];
     const ver = d && d.defRev ? `Issue ${d.issue}/Rev ${d.rev} · defRev ${d.defRev}` :
                 d ? 'ยังไม่เคย publish' : '—';
     const act = [];
