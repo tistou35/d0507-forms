@@ -176,6 +176,34 @@ service cloud.firestore {
           && d.keys().size() <= 22;
     }
 
+    /* ── ใบที่จบตั้งแต่ขั้นตอนแรก ─────────────────────────────
+       บางใบไม่มีใครต้องอนุมัติต่อ ระบบจึงปิดใบให้ทันทีที่กดส่ง (status 'complete')
+       ซึ่งเข้า newSubmissionOk() ไม่ได้ เพราะนั่นบังคับ 'pending'
+       ผลคือทุกคนที่ไม่ได้อยู่ใน staffEmails() กดส่งใบพวกนี้ไม่ได้เลย —
+       รายงานเข้ามาจริงกับ FRAE ของนักบินที่บินคนเดียว
+
+       ใบไหนบ้าง: ดูจาก route ในนิยามฟอร์ม (formdefs/) ที่มีขั้นเดียว
+         PWR  ผู้โดยสารลงนามสละสิทธิ์ จบในตัว
+         EFC  รายงานจบหลักสูตร หัวหน้าครูฝึกเป็นคนบันทึก ไม่มีขั้นอนุมัติ
+         FRAE จบขั้นเดียว "เฉพาะเมื่อผู้ประเมินเป็น PIC" (route.onlyIf role == 'Student')
+              จึงบังคับ data.role == 'PIC' ไว้ตรงนี้ด้วย ไม่งั้นเที่ยวฝึกของนักเรียน
+              จะปิดใบตัวเองข้ามครูการบินได้
+         DRC  มีกติกาของตัวเองอยู่แล้ว (newReceiptOk — ต้องอ้างประกาศที่มีจริง)
+
+       ใบต้องเป็นของคนที่ส่งเอง และเวลาส่งใช้เวลาเซิร์ฟเวอร์ ปลอมย้อนหลังไม่ได้ */
+    function soloForms() { return ['PWR', 'EFC']; }
+    function newSoloOk() {
+      let d = request.resource.data;
+      return d.status == 'complete'
+          && d.submitterUid == request.auth.uid
+          && d.submittedAt == request.time
+          && d.formCode is string
+          && d.tracking  is string && d.tracking.size() <= 60
+          && d.keys().size() <= 22
+          && (d.formCode in soloForms()
+              || (d.formCode == 'FRAE' && d.data.role == 'PIC'));
+    }
+
     match /submissions/{subId} {
       /* ผู้ส่งอ่านใบของตัวเองได้ (งานของฉัน · หน้าดูใบ · พิมพ์) — ใบของคนอื่นยังอ่านไม่ได้
          ต้อง query ด้วย where('submitterUid','==',uid) ไม่งั้น rule ไม่ผ่านทั้งชุด
@@ -183,7 +211,7 @@ service cloud.firestore {
       /* คนกรอกคือทุกคนที่ล็อกอิน — นักเรียนที่มีบัญชี หรือ anonymous สำหรับใบที่
          คนกรอกไม่ใช่คนในระบบ (PWR ผู้โดยสาร · VSR รายงานนิรภัยไม่ระบุตัว)
          เงื่อนไขที่กันของเสียคือ newSubmissionOk() ไม่ใช่วิธีล็อกอิน */
-      allow create: if staff() || (signedIn() && (newSubmissionOk() || newReceiptOk()));
+      allow create: if staff() || (signedIn() && (newSubmissionOk() || newReceiptOk() || newSoloOk()));
       allow read:   if staff() || (signedIn() && resource.data.submitterUid == request.auth.uid);
       allow update: if staff();
       allow delete: if false;
