@@ -1,0 +1,687 @@
+{
+ "code": "MRF",
+ "doc": "D-0507-MRF-001",
+ "control": "",
+ "issue": "01",
+ "rev": "00",
+ "eff": "",
+ "title": {
+  "th": "แบบเบิกค่าใช้จ่ายรายเดือน",
+  "en": "Monthly Reimbursement Form"
+ },
+ "retain": "HR / Finance",
+ "ui": {
+  "compact": true,
+  "tabs": [
+   {
+    "k": "T1",
+    "th": "ผู้เบิก",
+    "en": "Employee"
+   },
+   {
+    "k": "T2",
+    "th": "ตารางเวลา",
+    "en": "Timesheet"
+   },
+   {
+    "k": "T3",
+    "th": "ค่าตอบแทน",
+    "en": "Pay"
+   },
+   {
+    "k": "T4",
+    "th": "ค่าใช้จ่าย",
+    "en": "Expenses"
+   },
+   {
+    "k": "T5",
+    "th": "สรุปและลงนาม",
+    "en": "Summary & sign"
+   }
+  ]
+ },
+ "parties": [
+  {
+   "k": "emp",
+   "n": {
+    "th": "ผู้เบิก",
+    "en": "Employee"
+   },
+   "auth": "role:ins"
+  },
+  {
+   "k": "adm",
+   "n": {
+    "th": "ผู้ตรวจสอบ (ธุรการ)",
+    "en": "Verified by (Admin)"
+   },
+   "auth": "role:ops"
+  },
+  {
+   "k": "apv",
+   "n": {
+    "th": "ผู้อนุมัติ",
+    "en": "Approved by"
+   },
+   "auth": "role:mgt"
+  }
+ ],
+ "sections": [
+  {
+   "k": "S1",
+   "tab": "T1",
+   "party": "emp",
+   "title": {
+    "th": "ส่วนที่ 1 — ข้อมูลผู้เบิก",
+    "en": "Section 1 — Employee information"
+   },
+   "fields": [
+    {
+     "k": "empName",
+     "type": "text",
+     "req": true,
+     "half": true,
+     "self": true,
+     "label": {
+      "th": "ชื่อ–นามสกุล",
+      "en": "Employee's name"
+     }
+    },
+    {
+     "k": "empEmail",
+     "type": "email",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "อีเมล",
+      "en": "Employee's email"
+     }
+    },
+    {
+     "k": "period",
+     "type": "text",
+     "req": true,
+     "half": true,
+     "ph": "{YYYYMM}",
+     "label": {
+      "th": "เดือน / ปี",
+      "en": "Month / year"
+     },
+     "hint": {
+      "th": "เช่น 09/2026",
+      "en": "e.g. 09/2026"
+     }
+    },
+    {
+     "k": "bank",
+     "type": "text",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "ธนาคารและเลขที่บัญชี",
+      "en": "Bank name & account no."
+     }
+    }
+   ]
+  },
+  {
+   "k": "S2",
+   "tab": "T2",
+   "party": "emp",
+   "title": {
+    "th": "ส่วนที่ 2 — ตารางเวลารายเดือน",
+    "en": "Section 2 — Monthly timesheet"
+   },
+   "fields": [
+    {
+     "k": "note1",
+     "type": "static",
+     "text": {
+      "th": "รหัสประเภท: FLT = สอนการบิน · SIM = เครื่องฝึกบินจำลอง · GND = ภาคพื้น/บรรยาย · GS = ภาคทฤษฎี (TKI)",
+      "en": "Type codes: FLT = Flight Instruction · SIM = Simulator · GND = Ground / Briefing · GS = Ground School (TKI)"
+     }
+    },
+    {
+     "k": "sheet",
+     "type": "table",
+     "rows": 8,
+     "max": 22,
+     "req": true,
+     "label": {
+      "th": "รายการปฏิบัติงาน",
+      "en": "Work performed"
+     },
+     "hint": {
+      "th": "ชั่วโมงกรอกได้ทั้ง 1:30 และ 1.5 · ชั่วโมงบินใส่ช่อง \"ชม.บิน\" เฉพาะรายการประเภท FLT · กระดาษพิมพ์ไว้ 22 แถว กรอกได้ไม่เกินนั้น",
+      "en": "Hours accept 1:30 or 1.5 · flight hours count only on FLT rows · the printed form holds 22 rows"
+     },
+     "cols": [
+      {
+       "k": "date",
+       "type": "date",
+       "w": "14%",
+       "label": {
+        "th": "วันที่",
+        "en": "Date"
+       }
+      },
+      {
+       "k": "detail",
+       "type": "text",
+       "w": "26%",
+       "label": {
+        "th": "รายละเอียด",
+        "en": "Detail"
+       }
+      },
+      {
+       "k": "place",
+       "type": "text",
+       "w": "13%",
+       "label": {
+        "th": "อากาศยาน / ห้อง",
+        "en": "Aircraft / room"
+       }
+      },
+      {
+       "k": "type",
+       "type": "select",
+       "w": "12%",
+       "label": {
+        "th": "ประเภท",
+        "en": "Type"
+       },
+       "opt": [
+        {
+         "v": "FLT",
+         "n": {
+          "th": "FLT",
+          "en": "FLT"
+         }
+        },
+        {
+         "v": "SIM",
+         "n": {
+          "th": "SIM",
+          "en": "SIM"
+         }
+        },
+        {
+         "v": "GND",
+         "n": {
+          "th": "GND",
+          "en": "GND"
+         }
+        },
+        {
+         "v": "GS",
+         "n": {
+          "th": "GS",
+          "en": "GS"
+         }
+        }
+       ]
+      },
+      {
+       "k": "flt",
+       "type": "text",
+       "w": "10%",
+       "label": {
+        "th": "ชม.บิน",
+        "en": "Flt hrs"
+       }
+      },
+      {
+       "k": "gnd",
+       "type": "text",
+       "w": "10%",
+       "label": {
+        "th": "ชม.ภาคพื้น/SIM",
+        "en": "Gnd / sim hrs"
+       }
+      },
+      {
+       "k": "remark",
+       "type": "text",
+       "w": "15%",
+       "label": {
+        "th": "หมายเหตุ",
+        "en": "Remarks"
+       }
+      }
+     ]
+    },
+    {
+     "k": "note2",
+     "type": "static",
+     "text": {
+      "th": "รวมชั่วโมงบิน {fltHours} ชม. · รวมชั่วโมงภาคพื้น/SIM {gndHours} ชม.",
+      "en": "Total flight {fltHours} h · total ground / sim {gndHours} h"
+     }
+    }
+   ]
+  },
+  {
+   "k": "S3",
+   "tab": "T3",
+   "party": "emp",
+   "title": {
+    "th": "ส่วนที่ 3 — ค่าตอบแทนการบิน",
+    "en": "Section 3 — Flight pay"
+   },
+   "fields": [
+    {
+     "k": "fltRate",
+     "type": "number",
+     "req": true,
+     "half": true,
+     "min": 0,
+     "label": {
+      "th": "อัตราต่อชั่วโมง (บาท)",
+      "en": "Flight hourly rate (Baht/hr)"
+     }
+    },
+    {
+     "k": "note3",
+     "type": "static",
+     "text": {
+      "th": "ชั่วโมงบินจากส่วนที่ 2: {fltHours} ชม. → ค่าตอบแทนการบิน {fltPay} บาท",
+      "en": "Flight hours from Section 2: {fltHours} h → flight pay {fltPay} Baht"
+     }
+    }
+   ]
+  },
+  {
+   "k": "S4",
+   "tab": "T3",
+   "party": "emp",
+   "title": {
+    "th": "ส่วนที่ 4 — ค่าตอบแทนภาคพื้น / SIM",
+    "en": "Section 4 — Ground / simulator pay"
+   },
+   "fields": [
+    {
+     "k": "gndRate",
+     "type": "number",
+     "req": true,
+     "half": true,
+     "min": 0,
+     "label": {
+      "th": "อัตราต่อชั่วโมง (บาท)",
+      "en": "Ground / sim rate (Baht/hr)"
+     }
+    },
+    {
+     "k": "note4",
+     "type": "static",
+     "text": {
+      "th": "ชั่วโมงภาคพื้น/SIM จากส่วนที่ 2: {gndHours} ชม. → ค่าตอบแทน {gndPay} บาท",
+      "en": "Ground / sim hours from Section 2: {gndHours} h → pay {gndPay} Baht"
+     }
+    }
+   ]
+  },
+  {
+   "k": "S5",
+   "tab": "T4",
+   "party": "emp",
+   "title": {
+    "th": "ส่วนที่ 5 — ค่าใช้จ่ายที่ขอเบิก",
+    "en": "Section 5 — Reimbursement / expenses"
+   },
+   "fields": [
+    {
+     "k": "accomNights",
+     "type": "number",
+     "half": true,
+     "min": 0,
+     "label": {
+      "th": "ที่พัก (จำนวนคืน)",
+      "en": "Accommodation (nights)"
+     }
+    },
+    {
+     "k": "accomRate",
+     "type": "number",
+     "half": true,
+     "min": 0,
+     "label": {
+      "th": "อัตราค่าที่พัก (บาท/คืน)",
+      "en": "Accommodation rate (Baht/night)"
+     }
+    },
+    {
+     "k": "note5",
+     "type": "static",
+     "text": {
+      "th": "ค่าที่พักรวม {accomTotal} บาท",
+      "en": "Accommodation total {accomTotal} Baht"
+     }
+    },
+    {
+     "k": "exp",
+     "type": "table",
+     "rows": 5,
+     "max": 5,
+     "label": {
+      "th": "รายการค่าใช้จ่าย",
+      "en": "Expense detail"
+     },
+     "cols": [
+      {
+       "k": "desc",
+       "type": "text",
+       "w": "40%",
+       "label": {
+        "th": "รายการ",
+        "en": "Description"
+       }
+      },
+      {
+       "k": "qty",
+       "type": "number",
+       "w": "12%",
+       "label": {
+        "th": "จำนวน",
+        "en": "Qty"
+       }
+      },
+      {
+       "k": "unit",
+       "type": "number",
+       "w": "16%",
+       "label": {
+        "th": "ราคาต่อหน่วย (บาท)",
+        "en": "Unit (Baht)"
+       }
+      },
+      {
+       "k": "amount",
+       "type": "number",
+       "w": "16%",
+       "label": {
+        "th": "จำนวนเงิน (บาท)",
+        "en": "Amount (Baht)"
+       }
+      },
+      {
+       "k": "remark",
+       "type": "text",
+       "w": "16%",
+       "label": {
+        "th": "หมายเหตุ",
+        "en": "Remarks"
+       }
+      }
+     ]
+    },
+    {
+     "k": "note6",
+     "type": "static",
+     "text": {
+      "th": "ค่าใช้จ่ายตามรายการ {expTotal} บาท · รวมกับค่าที่พักเป็น {reimburse} บาท",
+      "en": "Listed expenses {expTotal} Baht · with accommodation {reimburse} Baht"
+     }
+    }
+   ]
+  },
+  {
+   "k": "S6",
+   "tab": "T5",
+   "party": "emp",
+   "title": {
+    "th": "ส่วนที่ 6 — สรุป",
+    "en": "Section 6 — Summary"
+   },
+   "fields": [
+    {
+     "k": "note7",
+     "type": "static",
+     "text": {
+      "th": "ค่าตอบแทนการบิน {fltPay} บาท · ค่าตอบแทนภาคพื้น/SIM {gndPay} บาท · ค่าใช้จ่ายที่ขอเบิก {reimburse} บาท",
+      "en": "Flight pay {fltPay} · ground / sim pay {gndPay} · reimbursement {reimburse} Baht"
+     }
+    },
+    {
+     "k": "note8",
+     "type": "static",
+     "text": {
+      "th": "รวมทั้งสิ้น {totalIncome} บาท · หลังหักภาษี ณ ที่จ่าย 3% ประมาณ {afterTax} บาท",
+      "en": "Total {totalIncome} Baht · approx. after 3% withholding {afterTax} Baht"
+     }
+    },
+    {
+     "k": "empSign",
+     "type": "sign",
+     "req": true,
+     "label": {
+      "th": "ลายเซ็นผู้เบิก",
+      "en": "Employee signature"
+     }
+    },
+    {
+     "k": "empDate",
+     "type": "date",
+     "req": true,
+     "half": true,
+     "prefill": "today",
+     "label": {
+      "th": "วันที่ยื่น",
+      "en": "Date submitted"
+     }
+    }
+   ]
+  },
+  {
+   "k": "S7",
+   "tab": "T5",
+   "party": "adm",
+   "hideOthers": true,
+   "title": {
+    "th": "ส่วนที่ 7 — การตรวจสอบโดยธุรการ",
+    "en": "Section 7 — Verified by admin"
+   },
+   "fields": [
+    {
+     "k": "admName",
+     "type": "text",
+     "req": true,
+     "half": true,
+     "self": true,
+     "label": {
+      "th": "ผู้ตรวจสอบ",
+      "en": "Verified by"
+     }
+    },
+    {
+     "k": "admDate",
+     "type": "date",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "วันที่ตรวจสอบ",
+      "en": "Date verified"
+     }
+    },
+    {
+     "k": "admNote",
+     "type": "textarea",
+     "label": {
+      "th": "ความเห็น",
+      "en": "Comment"
+     }
+    },
+    {
+     "k": "admSign",
+     "type": "sign",
+     "req": true,
+     "label": {
+      "th": "ลายเซ็นผู้ตรวจสอบ",
+      "en": "Verifier signature"
+     }
+    }
+   ]
+  },
+  {
+   "k": "S8",
+   "tab": "T5",
+   "party": "apv",
+   "hideOthers": true,
+   "title": {
+    "th": "ส่วนที่ 7 — การอนุมัติ",
+    "en": "Section 7 — Approval"
+   },
+   "fields": [
+    {
+     "k": "apvName",
+     "type": "text",
+     "req": true,
+     "half": true,
+     "self": true,
+     "label": {
+      "th": "ผู้อนุมัติ",
+      "en": "Approved by"
+     }
+    },
+    {
+     "k": "apvDate",
+     "type": "date",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "วันที่อนุมัติ",
+      "en": "Date approved"
+     }
+    },
+    {
+     "k": "apvSign",
+     "type": "sign",
+     "req": true,
+     "label": {
+      "th": "ลายเซ็นผู้อนุมัติ",
+      "en": "Approver signature"
+     }
+    }
+   ]
+  }
+ ],
+ "compute": [
+  {
+   "k": "fltHours",
+   "op": "sumCol",
+   "of": "sheet",
+   "col": "flt",
+   "where": {
+    "col": "type",
+    "in": [
+     "FLT"
+    ]
+   },
+   "round": 2
+  },
+  {
+   "k": "gndHours",
+   "op": "sumCol",
+   "of": "sheet",
+   "col": "gnd",
+   "round": 2
+  },
+  {
+   "k": "fltPay",
+   "op": "mul",
+   "of": [
+    "fltRate",
+    "fltHours"
+   ]
+  },
+  {
+   "k": "gndPay",
+   "op": "mul",
+   "of": [
+    "gndRate",
+    "gndHours"
+   ]
+  },
+  {
+   "k": "accomTotal",
+   "op": "mul",
+   "of": [
+    "accomNights",
+    "accomRate"
+   ]
+  },
+  {
+   "k": "expTotal",
+   "op": "sumCol",
+   "of": "exp",
+   "col": "amount",
+   "round": 2
+  },
+  {
+   "k": "reimburse",
+   "op": "sum",
+   "of": [
+    "accomTotal",
+    "expTotal"
+   ]
+  },
+  {
+   "k": "totalIncome",
+   "op": "sum",
+   "of": [
+    "fltPay",
+    "gndPay",
+    "reimburse"
+   ]
+  },
+  {
+   "k": "afterTax",
+   "op": "mul",
+   "of": [
+    "totalIncome",
+    "0.97"
+   ]
+  },
+  {
+   "k": "sumFltPay",
+   "op": "copy",
+   "of": "fltPay"
+  },
+  {
+   "k": "sumGndPay",
+   "op": "copy",
+   "of": "gndPay"
+  },
+  {
+   "k": "sumReimburse",
+   "op": "copy",
+   "of": "reimburse"
+  }
+ ],
+ "route": [
+  {
+   "step": 1,
+   "party": "emp",
+   "sign": true
+  },
+  {
+   "step": 2,
+   "party": "adm",
+   "sign": true,
+   "assignedBy": "submitter",
+   "slaDays": 7
+  },
+  {
+   "step": 3,
+   "party": "apv",
+   "sign": true,
+   "assignedBy": "later",
+   "pool": "ACM",
+   "slaDays": 7
+  }
+ ],
+ "export": {
+  "docx": "D-0507-MRF-001.docx",
+  "lockUntilComplete": true
+ }
+}

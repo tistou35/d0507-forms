@@ -120,6 +120,56 @@ function doPost(e) {
       return json_({ ok: true, result: dropTestRecord(String(body.abbr || ''), String(body.tracking || '')) });
     }
 
+    /* ข้อความในแม่แบบ — ใช้ตรวจว่า token ไปลงช่องไหนจริง เวลาผลลัพธ์ไม่ตรงที่คิด */
+    if (body.action === 'tplText') {
+      if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบเจ้าหน้าที่ก่อน');
+      var tf = subFolder_(String(body.abbr || '')).getFilesByName(String(body.abbr || '') + '_TEMPLATE');
+      if (!tf.hasNext()) throw new Error('ยังไม่มีแม่แบบของใบนี้');
+      return json_({ ok: true, result: { text: DocumentApp.openById(tf.next().getId()).getBody().getText() } });
+    }
+
+    /* โครงตารางในแม่แบบ — กี่แถว กี่ช่อง ช่องไหนมีข้อความอะไร ใช้ไล่หาว่า token ไปลงช่องไหน */
+    if (body.action === 'tplCells') {
+      if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบเจ้าหน้าที่ก่อน');
+      var cf = subFolder_(String(body.abbr || '')).getFilesByName(String(body.abbr || '') + '_TEMPLATE');
+      if (!cf.hasNext()) throw new Error('ยังไม่มีแม่แบบของใบนี้');
+      var cb = DocumentApp.openById(cf.next().getId()).getBody(), outT = [];
+      var tbs = cb.getTables();
+      for (var ti = 0; ti < tbs.length; ti++) {
+        for (var rr = 0; rr < tbs[ti].getNumRows(); rr++) {
+          var rw = tbs[ti].getRow(rr), cells = [];
+          for (var cc = 0; cc < rw.getNumCells(); cc++) {
+            var w = null; try { w = rw.getCell(cc).getWidth(); } catch (e) {}
+            cells.push({ t: rw.getCell(cc).getText().slice(0, 40), w: w });
+          }
+          if (String(body.find || '') && rw.getText().indexOf(body.find) < 0) continue;
+          outT.push({ t: ti, r: rr, cells: cells });
+        }
+      }
+      return json_({ ok: true, result: outT.slice(0, 40) });
+    }
+
+    /* ทดลองแทนค่าลงแม่แบบแล้วดูผลทันที — ใช้ไล่หาว่า token ตัวไหนไม่ถูกแทนและเพราะอะไร */
+    if (body.action === 'tplTry') {
+      if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบเจ้าหน้าที่ก่อน');
+      var yf = subFolder_(String(body.abbr || '')).getFilesByName(String(body.abbr || '') + '_TEMPLATE');
+      if (!yf.hasNext()) throw new Error('ยังไม่มีแม่แบบของใบนี้');
+      var ycopy = yf.next().makeCopy('tplTry-tmp', subFolder_(String(body.abbr || '')));
+      var ydoc = DocumentApp.openById(ycopy.getId()), yb = ydoc.getBody();
+      var hit = {};
+      Object.keys(body.values || {}).forEach(function (k) {
+        var before = yb.getText().indexOf('{{' + k + '}}') >= 0;
+        yb.replaceText('\\{\\{' + k + '\\}\\}', String(body.values[k]));
+        var after = yb.getText().indexOf('{{' + k + '}}') >= 0;
+        hit[k] = { inTemplate: before, stillThere: after };
+      });
+      ydoc.saveAndClose();
+      var ytxt = ydoc.getBody().getText();
+      var ii = ytxt.indexOf('SECTION 5');
+      ycopy.setTrashed(true);
+      return json_({ ok: true, result: { hit: hit, around: ytxt.slice(ii, ii + 200) } });
+    }
+
     if (body.action === 'checklistReport') {
       return json_({ ok: true, result: checklistReport_(body, who) });
     }
@@ -521,7 +571,9 @@ function signatures_(b, data) {
       var el = r.getElement().asText();
       el.deleteText(r.getStartOffset(), r.getEndOffsetInclusive());
       var img = el.getParent().asParagraph().insertInlineImage(0, blob);
-      var w = 150, h = img.getHeight() * w / img.getWidth();
+      /* กว้าง 110pt — เดิม 150 ทำให้แถวลายเซ็นของใบที่มีสามช่อง (MRF) สูงจนถูกตัดข้ามหน้า
+         รูปไปอยู่คนละหน้ากับชื่อผู้ลงนาม ซึ่งอ่านแล้วแยกไม่ออกว่าใครเซ็นอันไหน */
+      var w = 110, h = img.getHeight() * w / img.getWidth();
       img.setWidth(w).setHeight(Math.round(h));
       r = b.findText(tok);
     }

@@ -206,20 +206,37 @@ function fillTokens_(doc, map) {
         });
       return;
     }
-    // แถวข้อมูลเริ่มถัดจากหัวตาราง และมีเท่าที่กระดาษพิมพ์ไว้จริง
-    var n = Math.min(t.rows, hit.tbl.getNumRows() - hit.headRow - 1);
-    for (var i = 0; i < n; i++) {
+    /* แถวข้อมูลเริ่มถัดจากหัวตาราง และมีเท่าที่กระดาษพิมพ์ไว้จริง
+       เลขแถวของ token เดินตาม "แถวที่วางได้จริง" ไม่ใช่ตำแหน่งแถวในกระดาษ —
+       กระดาษบางใบมีแถวตัวอย่างคั่นอยู่ (MRF พิมพ์ Example / EQ ไว้ให้ดูเป็นแบบ)
+       ถ้านับแถวนั้นเป็นแถวข้อมูลด้วย ทุกแถวจะเลื่อนไปหนึ่ง แถวแรกที่คนกรอกหายไปจากใบ
+       เงียบ ๆ (เจอจริงตอนเปิด PDF ของ MRF ดู — รายการวันที่ 3 ก.ย. หายทั้งแถว) */
+    var n = hit.tbl.getNumRows() - hit.headRow - 1, di = 0;
+    for (var i = 0; i < n && di < t.rows; i++) {
       var row = hit.tbl.getRow(hit.headRow + 1 + i);
+      /* แถวตัวอย่างที่กระดาษพิมพ์ไว้ให้ดูเป็นแบบ (MRF มี Example และ EQ) ต้องข้ามทั้งแถว
+         ไม่ใช่แค่ไม่ทับช่องที่มีข้อความ — ถ้าแอบวาง token ลงช่องที่ยังว่างของแถวนั้น
+         เลขแถวจะเลื่อนไปหนึ่ง แล้วรายการแรกที่คนกรอกจะหายไปจากใบเงียบ ๆ
+         นับว่าเป็นแถวตัวอย่างเมื่อมีข้อความจริงตั้งแต่สองช่องขึ้นไปในคอลัมน์ที่จับคู่ไว้ */
+      var busy = 0;
+      t.cols.forEach(function (c, j) {
+        var ci = hit.colIdx[j];
+        if (ci == null || ci >= row.getNumCells()) return;
+        var cur = row.getCell(ci).getText().trim();
+        if (cur && !/^[_\.\s\/\-:]*$/.test(cur)) busy++;
+      });
+      if (busy >= 2) continue;
       t.cols.forEach(function (c, j) {
         var ci = hit.colIdx[j];
         if (ci == null || ci >= row.getNumCells()) return;
         var cell = row.getCell(ci), cur = cell.getText().trim();
         if (cur && !/^[_\.\s\/\-:]*$/.test(cur)) return;   // ช่องเลขลำดับ ฯลฯ อย่าไปทับ
-        cell.setText('{{' + t.k + '_' + (i + 1) + '_' + c.k + '}}');
+        cell.setText('{{' + t.k + '_' + (di + 1) + '_' + c.k + '}}');
         placed++;
       });
+      di++;
     }
-    for (var r2 = n + 1; r2 <= t.rows; r2++)
+    for (var r2 = di + 1; r2 <= t.rows; r2++)
       t.cols.forEach(function (c) {
         left.push('{{' + t.k + '_' + r2 + '_' + c.k + '}}  ← ' + t.label + ' แถว ' + r2 + ' (กระดาษมีไม่พอ)');
       });

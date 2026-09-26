@@ -294,5 +294,59 @@
     "ord": "Authorisation"
    }
   ]
+ },
+ "MRF": {
+  "_why": "กระดาษมีช่องลงนามสามช่อง แต่ละช่องรวม Signature / Name / Date ไว้ในเซลล์เดียว · ยอดที่คำนวณเองไม่ใช่ช่องกรอก ตัวจับคู่จึงไม่รู้จัก ต้องชี้ป้ายในกระดาษให้เอง · ยอดสามตัวพิมพ์สองที่ (ส่วนที่ 3–5 และส่วนสรุป) ใช้คีย์คู่ขนาน sumFltPay / sumGndPay / sumReimburse · ตัวจับคู่ในแม่แบบเทียบข้อความแบบตรงตัวหลัง trim ป้ายที่ลอกมาจาก .docx จึงต้องตัดช่องว่างท้ายออก ไม่งั้นหาไม่เจอและขึ้นว่า 'ไม่มีช่องว่างข้างเคียง' · สามแถวของส่วนที่ 5 อยู่ในตารางเดียวกับส่วนที่ 3–4 ซึ่ง Word รวมช่องไว้ ตอนแปลงเป็น Google Doc กลายเป็นห้าคอลัมน์ ช่องที่ byLabel วางให้ (คอลัมน์ 1) ไม่แสดงใน PDF ที่ออกมา จึงเขียนค่าไว้ต่อท้ายป้ายในช่องเดียวกันแทน — ตรวจด้วยการเปิด PDF แล้วเห็นค่าจริง · ในช่องลงนาม ชื่อกับวันที่ต้องมาก่อนรูปลายเซ็น ไม่งั้นรูปดันข้อความข้ามหน้า (เปิด PDF แล้วเห็นชื่อทั้งสามคนไปอยู่หน้าถัดไป)",
+  "labels": {
+   "Flight Pay (Baht) = Rate × Hours": "{{fltPay}}",
+   "Ground / Sim Pay (Baht) = Rate × Hours": "{{gndPay}}",
+   "Total Flight Pay (Baht)": "{{sumFltPay}}",
+   "Total Ground / Sim Pay (Baht)": "{{sumGndPay}}",
+   "Total Reimbursement / Expenses (Baht)": "{{sumReimburse}}",
+   "Total Income (Baht)": "{{totalIncome}}",
+   "Approx. Pay After Withholding Tax 3%  (Total × 0.97)": "{{afterTax}}",
+   "Total Flight Hours \nfrom Section 2": "{{fltHours}}",
+   "Total Ground / Sim Hours\nfrom Section 2": "{{gndHours}}"
+  },
+  "cells": {
+   "Employee\nSignature: ____________________\nName:      ____________________\nDate:       ____________________": {
+    "head": "Employee\n",
+    "tok": "{{empName}}  ·  {{empDate}}\n{{sig_empSign}}"
+   },
+   "Verified by (ADMIN)\nSignature: ____________________\nName:      ____________________\nDate:       ____________________": {
+    "head": "Verified by (ADMIN)\n",
+    "tok": "{{admName}}  ·  {{admDate}}\n{{sig_admSign}}"
+   },
+   "Approved by (\t\t             )\nSignature: ____________________\nName:      ____________________\nDate:       ____________________": {
+    "head": "Approved by\n",
+    "tok": "{{apvName}}  ·  {{apvDate}}\n{{sig_apvSign}}"
+   },
+   "Accommodation (nights)": {
+    "head": "Accommodation (nights)   ",
+    "tok": "{{accomNights}}"
+   },
+   "Accommodation Rate (Baht / night)": {
+    "head": "Accommodation Rate (Baht / night)   ",
+    "tok": "{{accomRate}}"
+   },
+   "Accommodation Total (Baht) = Nights × Rate": {
+    "head": "Accommodation Total (Baht) = Nights × Rate   ",
+    "tok": "{{accomTotal}}"
+   },
+   "Total Expenses": {
+    "head": "Total Expenses   ",
+    "tok": "{{expTotal}}"
+   }
+  },
+  "skip": [
+   "{{sig_empSign}}",
+   "{{empDate}}",
+   "{{sig_admSign}}",
+   "{{admName}}",
+   "{{admDate}}",
+   "{{sig_apvSign}}",
+   "{{apvName}}",
+   "{{apvDate}}"
+  ]
  }
 }

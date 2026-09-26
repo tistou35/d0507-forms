@@ -254,20 +254,35 @@
     return c;
   };
 
+  /* ค่าของตัวตั้งหนึ่งตัวในสูตร — เป็นคีย์ของคำตอบ คีย์ที่คำนวณไปแล้ว หรือตัวเลขคงที่ */
+  function valOf(data, k, out) {
+    if (data[k] !== undefined && data[k] !== '') return Number(data[k]) || 0;
+    if (out && out[k] !== undefined) return Number(out[k]) || 0;
+    const n = Number(k);
+    return isFinite(n) ? n : 0;
+  }
+
   FormKit.prototype.computed = function () {
+    const val = (k, out) => valOf(this.data, k, out);
     const out = {};
     let sum = 0;
     for (const k of Object.keys(this.fields)) sum += fieldScore(this.fields[k], this.data[k]);
     out.score = sum;
     for (const c of this.def.compute || []) {
       if (c.op === 'sumScore') out[c.k] = sum;
-      else if (c.op === 'sum') out[c.k] = (c.of || []).reduce((a, k) => a + (Number(this.data[k]) || 0), 0);
+      /* บวก/คูณต่อจากค่าที่คำนวณไว้ก่อนหน้าได้ และใส่ตัวเลขคงที่ตรง ๆ ได้
+         ใบเบิกค่าใช้จ่ายคิดเป็นทอด ๆ — ชั่วโมงจากตาราง → ค่าตอบแทน → รวมรายได้ → หักภาษี 3%
+         ถ้าอ่านได้แต่ this.data ทอดที่สองเป็นต้นไปจะได้ 0 ทั้งหมดโดยไม่มีอะไรฟ้อง */
+      else if (c.op === 'sum') out[c.k] = (c.of || []).reduce((a, k) => a + val(k, out), 0);
       else if (c.op === 'pct') out[c.k] = c.max ? Math.round((Number(out[c.of] ?? this.data[c.of]) || 0) / c.max * 100) : 0;
       else if (c.op === 'count') out[c.k] = (c.of || []).filter(k => this.data[k]).length;
       /* ค่าเดียวกันที่ต้องโผล่สองที่ในกระดาษ (ชื่อผู้โดยสารในส่วน ก และใต้ลายเซ็น)
          token ตัวเดียววางซ้ำสองที่ไม่ได้ — ตัววางแผนที่กันไม่ให้ token ซ้ำ
          และถ้าฝืนวาง ช่องหนึ่งจะว่างเงียบ ๆ โดยไม่มีใครรู้จนกว่าจะเปิด PDF ดู */
-      else if (c.op === 'copy') out[c.k] = this.data[c.of];
+      /* คัดค่าจากช่องอื่น — รวมถึงค่าที่คำนวณไว้ก่อนหน้า
+         ใบเบิกค่าใช้จ่ายพิมพ์ยอดเดียวกันสองที่ (ส่วนที่ 3 และส่วนสรุป) กระดาษมีช่องแยกกัน
+         token เดียวลงได้ที่เดียว จึงต้องมีคีย์คู่ขนานให้แต่ละช่อง */
+      else if (c.op === 'copy') out[c.k] = this.data[c.of] !== undefined ? this.data[c.of] : out[c.of];
       /* อายุจากวันเกิด — ผู้กรอกไม่ต้องคิดเอง และคิดผิดไม่ได้
          ยังไม่กรอกวันเกิดต้องคืน undefined ไม่ใช่ 0 ไม่งั้นเงื่อนไข "อายุ < 18"
          จะเป็นจริงตั้งแต่ฟอร์มยังว่าง แล้วขึ้นเตือนใส่คนที่ยังไม่ได้เริ่มกรอก */
@@ -283,8 +298,28 @@
           out[c.k] = y >= 0 && y < 130 ? y : undefined;
         }
       }
+      /* รวมคอลัมน์หนึ่งของตารางแถวซ้ำ — ใบเบิกค่าใช้จ่ายรวมชั่วโมงและยอดเงินจากตาราง
+           { k:'fltHours', op:'sumCol', of:'sheet', col:'flt', where:{ col:'type', in:['FLT'] } }
+         รับทั้ง 1.5 และ 1:30 เพราะกระดาษเขียนเวลาแบบ ชม.:นาที ส่วนคนกรอกในเว็บมักพิมพ์ทศนิยม
+         ตีความผิดแบบเดียวกันทั้งสองทางไม่ได้ — 1:30 ที่อ่านเป็น 1.30 คือค่าแรงหายไปสิบแปดนาที */
+      else if (c.op === 'sumCol') {
+        const rows = this.data[c.of];
+        const num = v => {
+          const t = String(v == null ? '' : v).trim();
+          if (!t) return 0;
+          const m = /^(\d+):([0-5]?\d)$/.exec(t);
+          if (m) return Number(m[1]) + Number(m[2]) / 60;
+          return Number(t.replace(/,/g, '')) || 0;
+        };
+        out[c.k] = !Array.isArray(rows) ? 0 : rows.reduce((a, r) => {
+          if (!r) return a;
+          if (c.where && !(c.where.in || []).includes(String(r[c.where.col] || ''))) return a;
+          return a + num(r[c.col]);
+        }, 0);
+        if (c.round != null) out[c.k] = Math.round(out[c.k] * Math.pow(10, c.round)) / Math.pow(10, c.round);
+      }
       else if (c.op === 'mul')
-        out[c.k] = (c.of || []).reduce((a, k) => a * (Number(this.data[k]) || 0), 1);
+        out[c.k] = (c.of || []).reduce((a, k) => a * val(k, out), 1);
       /* ตารางเปิดสองแกน — ใช้กับเมทริกซ์ความเสี่ยงที่ไม่ใช่ผลคูณ
          เมทริกซ์ใน HIF ถ่วงน้ำหนักความรุนแรงมากกว่าโอกาส
          คะแนน 8 เป็นได้ทั้งส้ม (รุนแรง4×โอกาส2) และเขียว (รุนแรง2×โอกาส4)

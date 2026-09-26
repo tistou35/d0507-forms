@@ -2309,6 +2309,188 @@ var TOKEN_MAP = {
       }
     ]
   },
+  "MRF": {
+    "abbr": "MRF",
+    "docx": "D-0507-MRF-001.docx",
+    "control": "",
+    "orderWarn": [],
+    "byLabel": [
+      {
+        "label": "Employee's Name",
+        "tok": "{{empName}}"
+      },
+      {
+        "label": "Employee's Email",
+        "tok": "{{empEmail}}"
+      },
+      {
+        "label": "Month / Year",
+        "tok": "{{period}}"
+      },
+      {
+        "label": "Bank Name & Account No.",
+        "tok": "{{bank}}"
+      },
+      {
+        "label": "Flight Hourly Rate \n(Baht / hr)",
+        "tok": "{{fltRate}}"
+      },
+      {
+        "label": "Ground / Sim Rate \n(Baht / hr)",
+        "tok": "{{gndRate}}"
+      },
+      {
+        "label": "Flight Pay (Baht) = Rate × Hours",
+        "tok": "{{fltPay}}"
+      },
+      {
+        "label": "Ground / Sim Pay (Baht) = Rate × Hours",
+        "tok": "{{gndPay}}"
+      },
+      {
+        "label": "Total Flight Pay (Baht)",
+        "tok": "{{sumFltPay}}"
+      },
+      {
+        "label": "Total Ground / Sim Pay (Baht)",
+        "tok": "{{sumGndPay}}"
+      },
+      {
+        "label": "Total Reimbursement / Expenses (Baht)",
+        "tok": "{{sumReimburse}}"
+      },
+      {
+        "label": "Total Income (Baht)",
+        "tok": "{{totalIncome}}"
+      },
+      {
+        "label": "Approx. Pay After Withholding Tax 3%  (Total × 0.97)",
+        "tok": "{{afterTax}}"
+      },
+      {
+        "label": "Total Flight Hours \nfrom Section 2",
+        "tok": "{{fltHours}}"
+      },
+      {
+        "label": "Total Ground / Sim Hours\nfrom Section 2",
+        "tok": "{{gndHours}}"
+      }
+    ],
+    "byLine": [],
+    "byCell": [
+      {
+        "cell": "Employee\nSignature: ____________________\nName:      ____________________\nDate:       ____________________",
+        "head": "Employee\n",
+        "tok": "{{empName}}  ·  {{empDate}}\n{{sig_empSign}}"
+      },
+      {
+        "cell": "Verified by (ADMIN)\nSignature: ____________________\nName:      ____________________\nDate:       ____________________",
+        "head": "Verified by (ADMIN)\n",
+        "tok": "{{admName}}  ·  {{admDate}}\n{{sig_admSign}}"
+      },
+      {
+        "cell": "Approved by (\t\t             )\nSignature: ____________________\nName:      ____________________\nDate:       ____________________",
+        "head": "Approved by\n",
+        "tok": "{{apvName}}  ·  {{apvDate}}\n{{sig_apvSign}}"
+      },
+      {
+        "cell": "Accommodation (nights)",
+        "head": "Accommodation (nights)   ",
+        "tok": "{{accomNights}}"
+      },
+      {
+        "cell": "Accommodation Rate (Baht / night)",
+        "head": "Accommodation Rate (Baht / night)   ",
+        "tok": "{{accomRate}}"
+      },
+      {
+        "cell": "Accommodation Total (Baht) = Nights × Rate",
+        "head": "Accommodation Total (Baht) = Nights × Rate   ",
+        "tok": "{{accomTotal}}"
+      },
+      {
+        "cell": "Total Expenses",
+        "head": "Total Expenses   ",
+        "tok": "{{expTotal}}"
+      }
+    ],
+    "boxes": [],
+    "boxesPartial": false,
+    "tables": [
+      {
+        "k": "sheet",
+        "rows": 22,
+        "label": "Work performed",
+        "cols": [
+          {
+            "k": "date",
+            "head": "Date"
+          },
+          {
+            "k": "detail",
+            "head": "Detail"
+          },
+          {
+            "k": "place",
+            "head": "Aircraft / room"
+          },
+          {
+            "k": "type",
+            "head": "Type"
+          },
+          {
+            "k": "flt",
+            "head": "Flt hrs"
+          },
+          {
+            "k": "gnd",
+            "head": "Gnd / sim hrs"
+          },
+          {
+            "k": "remark",
+            "head": "Remarks"
+          }
+        ]
+      },
+      {
+        "k": "exp",
+        "rows": 5,
+        "label": "Expense detail",
+        "cols": [
+          {
+            "k": "desc",
+            "head": "Description"
+          },
+          {
+            "k": "qty",
+            "head": "Qty"
+          },
+          {
+            "k": "unit",
+            "head": "Unit (Baht)"
+          },
+          {
+            "k": "amount",
+            "head": "Amount (Baht)"
+          },
+          {
+            "k": "remark",
+            "head": "Remarks"
+          }
+        ]
+      }
+    ],
+    "boxesInDocx": 0,
+    "approval": [
+      {
+        "tok": "{{admNote}}",
+        "label": "Comment",
+        "labelTh": "ความเห็น",
+        "sign": false
+      }
+    ],
+    "manual": []
+  },
   "PCR-FI": {
     "abbr": "PCR-FI",
     "docx": "D-0507-PCR-FI-001.docx",

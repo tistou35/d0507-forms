@@ -249,7 +249,10 @@ def build(abbr, verbose=False):
         if f.get('type') == 'table':
             tables.append({
                 'k': f['k'],
-                'rows': f.get('rows') or 1,
+                # กระดาษพิมพ์แถวไว้เท่าไร ก็ต้องมี token เท่านั้น — ใช้จำนวนแถวสูงสุด
+                # ที่ฟอร์มยอมให้กรอก ไม่ใช่จำนวนแถวที่ขึ้นมารอตอนเปิดฟอร์ม
+                # (MRF ขึ้นมา 8 แถวแต่กรอกได้ถึง 40 · กระดาษพิมพ์ไว้ 22 แถว)
+                'rows': f.get('max') or f.get('rows') or 1,
                 'label': (f.get('label') or {}).get('en') or f['k'],
                 'cols': [{'k': c['k'],
                           'head': (c.get('label') or {}).get('en') or c['k']}
@@ -321,6 +324,9 @@ def build(abbr, verbose=False):
         by_cell = [b for b in by_cell if b['tok'] != tok and b['cell'] != cell]
         by_cell.append({'cell': cell, 'head': head, 'tok': tok})
         unmatched = [u for u in unmatched if u['tok'] != tok]
+        # token เดียวกันต้องไม่ค้างอยู่ใน byLabel ด้วย ไม่งั้นตัวสร้างแม่แบบพยายามวางสองที่
+        # อันหลังจะรายงานว่าวางไม่ได้ ทั้งที่ค่าไปอยู่ในช่องเดิมที่เราตั้งใจจะเลี่ยง
+        by_label = [b for b in by_label if b['tok'] != tok]
     # manual: บังคับให้ต่อท้ายเอกสาร ไม่ต้องพยายามจับคู่กับป้ายบนกระดาษ
     # ใช้เมื่อกระดาษไม่มีที่ให้จริง ๆ และตัวจับคู่ดันไปเจอป้ายที่ "ดูคล้าย" เข้า
     # ของจริง: EFC ช่อง "รายงานผลรายวิชาจาก TrainHub" ถูกจับไปที่ป้าย "Result"
@@ -348,6 +354,9 @@ def build(abbr, verbose=False):
     if skip:
         boxes = [b for b in boxes if b['tok'] not in skip]
         unmatched = [u for u in unmatched if u['tok'] not in skip]
+        # รวมถึงบล็อกอนุมัติที่ต่อท้ายเอกสารด้วย — ใบที่กระดาษมีช่องลงนามของผู้อนุมัติอยู่แล้ว
+        # (MRF มีครบสามช่อง) ถ้ายังต่อท้ายอีก จะได้ชื่อและลายเซ็นเดียวกันพิมพ์สองที่คนละหน้า
+        approval = [a for a in approval if a['tok'] not in skip]
     if ov.get('boxes'):
         # เรียงเองตามที่ ☐ อยู่จริงในกระดาษ — ที่ไม่ได้ระบุถือว่าไม่มีช่องให้ติ๊ก
         # เขียนเป็น {"tok": "...", "ord": "ข้อความข้าง ☐ ในกระดาษ"} ได้ด้วย
