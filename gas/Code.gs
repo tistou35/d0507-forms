@@ -67,6 +67,22 @@ function doPost(e) {
       return json_({ ok: true, result: extNotify_(body) });
     }
 
+    /* สะพานกับระบบอื่นตั้งครบหรือยัง — เจ้าหน้าที่เท่านั้น
+       คืนแค่ "ตั้งแล้ว/ยังไม่ตั้ง" ไม่คืนค่า URL หรือกุญแจออกไป
+       มีไว้เพราะเดิมไม่มีทางรู้เลยว่าตั้งครบไหม นอกจากรอให้ผู้โดยสารกรอกจริง
+       แล้วเห็นข้อความว่าแจ้งกลับไม่สำเร็จ ซึ่งสายไปแล้ว */
+    if (body.action === 'extStatus') {
+      if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบเจ้าหน้าที่ก่อน');
+      var pr = PropertiesService.getScriptProperties();
+      var out = {};
+      Object.keys(EXT_SYSTEMS).forEach(function (k) {
+        var t = EXT_SYSTEMS[k];
+        out[k] = { url: !!pr.getProperty(t.url), key: !!pr.getProperty(t.key),
+                   urlKey: t.url, keyKey: t.key };
+      });
+      return json_({ ok: true, result: out });
+    }
+
     /* รายงานเช็กลิสต์ — เจ้าหน้าที่ที่ล็อกอินแล้วเท่านั้น (ดู Checklist.gs)
        เก็บเฉพาะแผ่นที่มีชื่อผู้ทำและวันที่ ไม่เก็บกระดาษเปล่ากับแบบฟอร์ม */
     /* ฟอร์มเปล่าจากแม่แบบ — เจ้าหน้าที่ที่ล็อกอินแล้วเท่านั้น (ดู BlankForm.gs)
