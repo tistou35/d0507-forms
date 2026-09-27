@@ -274,8 +274,9 @@
   A.T = {
     langTh:     { th: 'ไทย', en: 'ไทย' },
     langEn:     { th: 'EN', en: 'EN' },
-    signIn:     { th: 'เข้าสู่ระบบเจ้าหน้าที่', en: 'Staff sign in' },
-    signInSub:  { th: 'Staff sign in', en: 'เจ้าหน้าที่' },
+    /* ทุกคนต้องเข้าสู่ระบบแล้ว ไม่ใช่เฉพาะเจ้าหน้าที่ — ป้ายเดิมทำให้นักเรียนคิดว่าไม่ใช่ปุ่มของตัวเอง */
+    signIn:     { th: 'เข้าสู่ระบบ', en: 'Sign in' },
+    signInSub:  { th: 'Sign in', en: 'เข้าสู่ระบบ' },
     signOut:    { th: 'ออก', en: 'Sign out' },
     signOutSub: { th: 'Sign out', en: 'ออกจากระบบ' },
     noRole:     { th: 'ยังไม่ได้กำหนดบทบาท', en: 'No role assigned yet' },
