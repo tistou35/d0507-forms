@@ -638,6 +638,104 @@
     return null;
   };
   A.formUrl = f => (g.BASE || '') + 'f/' + encodeURIComponent(f.abbr) + '/';
+  /* ที่อยู่ของหน้ากรอก — เต็มรูปแบบ (มี https://…) สำหรับเอาไปส่งต่อ */
+  A.fillUrl = f => (g.BASE || '') + 'fill/?c=' + encodeURIComponent(f.abbr || f);
+  A.absUrl  = u => new URL(u, location.href).href;
+
+  /* ── ใบที่ผู้กรอก "ปิดเอง" ได้ ──────────────────────────
+     ใบที่จบตั้งแต่ขั้นแรก ไม่มีใครต้องอนุมัติต่อ ระบบจึงเขียนใบเป็น complete ทันที
+
+     รายการนี้ต้องตรงกับ newSoloOk() / newReceiptOk() ใน firebase/firestore.rules
+     เสมอ — หน้าจอที่ห้ามในสิ่งที่เซิร์ฟเวอร์ยอม ทำให้คนกรอกจนจบแล้วส่งไม่ได้
+     (เกิดกับ PWR ของผู้โดยสาร) ส่วนหน้าจอที่ยอมในสิ่งที่เซิร์ฟเวอร์ห้าม
+     จะไปตายตอนเขียนลงฐานข้อมูล ซึ่งคนกรอกอ่านไม่ออกว่าเพราะอะไร */
+  A.SOLO_FORMS = ['PWR', 'EFC', 'BCK'];
+  /** abbr = ตัวย่อฟอร์ม · data = คำตอบปัจจุบัน · o.anon = ธง anon ในทะเบียน
+      o.distId = ใบนี้มาจากประกาศแจกจ่าย (DRC) */
+  A.canSelfClose = function (abbr, data, o) {
+    o = o || {}; data = data || {};
+    if (A.isStaff()) return true;                       // เจ้าหน้าที่ปิดใบของตัวเองได้อยู่แล้ว
+    if (o.anon) return true;                            // PWR ผู้โดยสาร · VSR ผู้รายงาน
+    if (abbr === 'DRC' && o.distId) return true;        // ใบรับเอกสารจากประกาศที่มีอยู่จริง
+    if (A.SOLO_FORMS.indexOf(abbr) >= 0) return true;
+    if (abbr === 'FRAE' && data.role === 'PIC') return true;
+    return false;
+  };
+
+  /* ── ส่งลิงก์ให้คนนอกกรอก ───────────────────────────────
+     ใบที่คนกรอกไม่ใช่คนในระบบ (PWR ผู้โดยสาร · VSR ผู้รายงานนิรภัย) ต้องมีทาง
+     ส่งลิงก์ให้เขาโดยไม่ต้องพิมพ์ที่อยู่เอง — เจ้าหน้าที่เปิดหน้าเอกสาร กดปุ่มนี้
+     แล้วส่งทางไลน์หรืออีเมล ผู้รับเปิดแล้วกรอกได้ทันที ไม่มีขั้นล็อกอิน */
+  function shareDialog() {
+    let d = document.getElementById('d0507-share');
+    if (d) return d;
+    const st = document.createElement('style');
+    st.textContent = `
+#d0507-share{border:0;border-radius:12px;padding:0;max-width:560px;width:calc(100% - 32px);margin:auto;
+  box-shadow:0 20px 60px rgba(13,27,42,.35);background:var(--surface);color:var(--fg-1)}
+#d0507-share::backdrop{background:rgba(13,27,42,.5)}
+#d0507-share .dh{background:var(--navy-900);color:#fff;padding:16px 20px}
+#d0507-share .dh h3{font-size:17px;font-weight:700;color:#fff;margin:0}
+#d0507-share .dh p{font-size:12.5px;color:rgba(255,255,255,.72);margin:3px 0 0}
+#d0507-share .db{padding:16px 20px}
+#d0507-share .df{padding:12px 20px;border-top:1px solid var(--g-100);display:flex;justify-content:flex-end}
+#d0507-share .url{width:100%;font-family:var(--font-mono);font-size:12.5px;padding:10px 12px;
+  border:1px solid var(--border-med);border-radius:8px;background:var(--g-50);color:var(--fg-1)}
+#d0507-share .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+#d0507-share .btn{min-height:40px;padding:0 14px;border-radius:8px;border:1px solid var(--navy-900);
+  background:var(--navy-900);color:#fff;font-size:13.5px;font-weight:600;cursor:pointer;
+  font-family:var(--font-sans);display:inline-grid;place-items:center;text-decoration:none}
+#d0507-share .btn.sec{background:var(--surface);color:var(--navy-900);border-color:var(--border-med)}
+#d0507-share .hint{font-size:12.5px;color:var(--g-500);line-height:1.55;margin:10px 0 0}`;
+    document.head.appendChild(st);
+    d = document.createElement('dialog');
+    d.id = 'd0507-share';
+    d.innerHTML = '<div class="dh"><h3></h3><p></p></div><div class="db"></div>' +
+      '<div class="df"><button class="btn sec" data-close type="button"></button></div>';
+    document.body.appendChild(d);
+    d.querySelector('[data-close]').onclick = () => d.close();
+    return d;
+  }
+
+  /** f = ฟอร์มจากทะเบียน (ต้องมี abbr) · url = ที่อยู่ที่จะส่ง (ไม่ใส่ = หน้ากรอกของใบนี้) */
+  A.shareForm = function (f, url) {
+    const L = A.L, esc = A.esc;
+    const link = A.absUrl(url || A.fillUrl(f));
+    const name = A.nm(f) || f.abbr;
+    const d = shareDialog();
+    d.querySelector('h3').textContent = L({ th: 'ส่งลิงก์ให้กรอก', en: 'Share fill link' });
+    d.querySelector('.dh p').textContent = name + (f.doc ? ' · ' + f.doc : '');
+    d.querySelector('[data-close]').textContent = L({ th: 'ปิด', en: 'Close' });
+    const msg = name + '\n' + link;
+    d.querySelector('.db').innerHTML =
+      `<input class="url" readonly value="${esc(link)}">
+       <div class="row">
+         <button class="btn" type="button" data-copy>${esc(L({ th: 'คัดลอกลิงก์', en: 'Copy link' }))}</button>
+         ${navigator.share ? `<button class="btn sec" type="button" data-share>${
+            esc(L({ th: 'ส่งต่อ…', en: 'Share…' }))}</button>` : ''}
+         <a class="btn sec" href="https://line.me/R/msg/text/?${encodeURIComponent(msg)}"
+            target="_blank" rel="noopener">LINE</a>
+         <a class="btn sec" href="mailto:?subject=${encodeURIComponent(name)}&body=${
+            encodeURIComponent(msg)}">${esc(L({ th: 'อีเมล', en: 'Email' }))}</a>
+         <a class="btn sec" href="${esc(link)}" target="_blank" rel="noopener">${
+            esc(L({ th: 'เปิดดู', en: 'Open' }))} ↗</a>
+       </div>
+       <p class="hint">${esc(L({
+          th: 'ผู้รับลิงก์กรอกและลงนามได้ทันที ไม่ต้องเข้าสู่ระบบ — ใบที่ส่งเข้ามาจะอยู่ในระบบตามปกติ',
+          en: 'Whoever opens this link can fill and sign it without signing in. The record arrives in the system as usual.' }))}</p>`;
+    const cp = d.querySelector('[data-copy]');
+    cp.onclick = async () => {
+      const inp = d.querySelector('.url');
+      try { await navigator.clipboard.writeText(link); }
+      catch (e) { inp.select(); try { document.execCommand('copy'); } catch (e2) {} }
+      cp.textContent = L({ th: 'คัดลอกแล้ว ✓', en: 'Copied ✓' });
+      setTimeout(() => { cp.textContent = L({ th: 'คัดลอกลิงก์', en: 'Copy link' }); }, 2000);
+    };
+    const sh = d.querySelector('[data-share]');
+    if (sh) sh.onclick = () => navigator.share({ title: name, url: link }).catch(() => {});
+    if (!d.open) d.showModal();
+  };
+
 
   /* ── วันที่ พ.ศ. ──────────────────────────────────────── */
   const DAY = ['วันอาทิตย์','วันจันทร์','วันอังคาร','วันพุธ','วันพฤหัสบดี','วันศุกร์','วันเสาร์'];

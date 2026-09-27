@@ -230,7 +230,7 @@ section[data-pane].off{display:none}
       <section data-pane="users">
         <div class="sh"><h2>รายชื่อผู้รับฟอร์ม</h2><span class="en">Recipient directory</span>
           <span class="rt">อ่านได้ทั้งโลก — มีแค่ชื่อ ตำแหน่ง และประเภทฟอร์มที่รับ</span></div>
-        <div class="card"><div id="dirWarn"></div><div id="dir">—</div></div>
+        <div class="card"><div id="dirGap"></div><div id="dirWarn"></div><div id="dir">—</div></div>
       </section>
 
       <section data-pane="users">
@@ -877,6 +877,25 @@ async function dir(){
       </span></div>`;
     const sy = document.getElementById('dirSync');
     if (sy) sy.onclick = () => syncDir(miss);
+
+    /* ตำแหน่งที่ฟอร์ม "ส่งถึง" แต่ยังไม่มีใครรับได้เลย — ใบที่ส่งเข้ามาจะไปนอนใน
+       กองรอโดยไม่มีใครเห็น คนกรอกกดส่งผ่าน แต่เรื่องไม่ถึงใคร ซึ่งมองจากฝั่ง
+       คนกรอกไม่ออก (ตอนนี้: รายงานนิรภัย VSR/HIF ส่งถึง SM ที่ยังไม่มีผู้ดำรงตำแหน่ง)
+       ต่างจากคำเตือนข้างบนที่เป็นเรื่อง "มีคนแต่ยังไม่อยู่ในรายชื่อ" */
+    const covered = new Set();
+    list.forEach(x => (x.recv || []).forEach(p => covered.add(p)));
+    const need = {};
+    (REG.forms || []).forEach(f => {
+      if (f.assignTo && !covered.has(f.assignTo)) (need[f.assignTo] = need[f.assignTo] || []).push(f.abbr);
+    });
+    const gaps = Object.keys(need);
+    document.getElementById('dirGap').innerHTML = !gaps.length ? '' :
+      `<div class="fk-gate stop" style="margin-bottom:12px"><span>
+        <b>ยังไม่มีใครรับฟอร์มของ ${gaps.length} ตำแหน่ง</b> — ใบที่ส่งถึงตำแหน่งนี้จะค้างในกองรอ
+        โดยไม่มีใครกดรับได้<br>
+        ${gaps.map(p => `${A.esc(p)} · ${A.esc(POS_N[p] || '')} — ${A.esc(need[p].join(' · '))}`).join('<br>')}
+        <br>แก้โดยกำหนดตำแหน่งนี้ให้เจ้าหน้าที่ในหน้าผู้ใช้งาน แล้วเพิ่มเข้ารายชื่อผู้รับฟอร์ม
+      </span></div>`;
   } catch(e){ document.getElementById('dir').innerHTML = `<p class="hint">อ่านไม่ได้: ${A.esc(e.code)}</p>`; }
 }
 

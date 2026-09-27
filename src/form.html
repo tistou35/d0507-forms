@@ -148,6 +148,12 @@ function paint(){
        เปิดให้ทุกคนดู ไม่ใช่แค่เจ้าหน้าที่ คนกรอกควรรู้ว่าใบที่ส่งไปจะไปถึงใคร */
     `<a class="big sec" href="@@BASE@@flow/?c=${encodeURIComponent(F.abbr)}">${
         A.esc(A.L({th:'ผังงาน',en:'Workflow'}))}</a>` +
+    /* ใบที่กรอกได้โดยไม่ต้องเข้าสู่ระบบ (ธง anon ในทะเบียน — PWR ผู้โดยสาร · VSR ผู้รายงาน)
+       คนที่ต้องกรอกไม่ได้อยู่ในระบบ จึงต้องส่งลิงก์ให้เขา ไม่ใช่บอกให้เข้าเว็บมาหาเอง */
+    /* ใบที่มีหน้าจัดการของตัวเอง (DRC) ไม่ขึ้นปุ่มนี้ — ลิงก์ของมันต้องพ่วงเลขประกาศ
+       ลิงก์เปล่าจะกรอกได้แต่ส่งไม่ผ่าน เพราะกติกาบังคับว่าต้องอ้างประกาศที่มีอยู่จริง */
+    (F.anon && t && !F.admin ? `<button type="button" class="big sec" id="sharelink">${
+        A.esc(A.L({th:'ส่งลิงก์ให้กรอก',en:'Share fill link'}))} ↗</button>` : '') +
     /* ไม่ลิงก์ตรงไป Google Docs — ถามก่อนว่าแก้เล็กน้อยในฉบับเดิม หรือออกฉบับใหม่
        ผ่าน DRF (ดู A.editSource ใน app.js) */
     (A.isAdmin() && F.edit ? `<button type="button" class="big sec" id="editsrc"
@@ -159,6 +165,8 @@ function paint(){
     (staff && F.admin ? `<a class="big sec" href="@@BASE@@${A.esc(F.admin.url)}">${
         A.esc(A.L(F.admin.n))}</a>` : '') +
     `<a class="big sec" href="@@BASE@@all/">${A.esc(A.t('backToAll'))}</a>`;
+  const sb = document.getElementById('sharelink');
+  if (sb) sb.onclick = () => A.shareForm(F, t && !t.ext ? t.url : null);
   const eb = document.getElementById('editsrc');
   if (eb) eb.onclick = () => A.editSource({ abbr: F.abbr, doc: F.doc, title: F.t || F.th,
     code: F.code, iss: F.iss, rev: F.rev, edit: F.edit });

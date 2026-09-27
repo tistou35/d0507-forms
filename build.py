@@ -43,8 +43,11 @@ def firebase_config():
     return '{\n' + body + '\n}', todo, raw.get('gasUrl', '')
 
 PUBLIC_FORBIDDEN = ('code', 'lef', 'st', 'note', 'docx', 'own', 'jotDup')
+# admin = หน้าจัดการของใบนั้น (DRC ออกลิงก์พร้อมเลขประกาศ) — ต้องรู้ก่อน login ด้วย
+# เพราะใช้ตัดสินว่าจะขึ้นปุ่ม "ส่งลิงก์ให้กรอก" ไหม ลิงก์เปล่าของ DRC ส่งไม่ผ่าน
 PUBLIC_KEEP = ('doc', 'abbr', 't', 'th', 'sys', 'jot', 'assignTo', 'r', 'chain', 'kw', 'anon',
-               'public', 'unlisted', 'iss', 'rev', 'eff', 'hasDef', 'kind', 'next', 'refs', 'flow')
+               'public', 'unlisted', 'iss', 'rev', 'eff', 'hasDef', 'kind', 'next', 'refs',
+               'flow', 'admin')
 FIELD_TYPES = {'text', 'textarea', 'date', 'time', 'number', 'email', 'tel', 'select',
                'multi', 'check', 'checklist', 'grade', 'scale', 'sign', 'static', 'table', 'file', 'riskmatrix'}
 
@@ -467,9 +470,12 @@ def main():
         # ฝังเฉพาะฟิลด์ที่เปิดสาธารณะได้ — code / lef / st / note / docx มาจาก Firestore ตอน login
         # guide/blank เปิดสาธารณะได้ — เป็นคำอธิบายว่าฟอร์มครอบคลุมอะไรและฟอร์มเปล่าหน้าตาไหน
         # ต่างจาก note ที่เป็นบันทึกภายใน (มาจาก Firestore ตอน login เท่านั้น)
-        fpub = {k: f[k] for k in ('abbr','doc','t','th','sys','chain','public','r','with',
+        # anon = ใบที่คนกรอกไม่ใช่คนในระบบ (PWR ผู้โดยสาร · VSR ผู้รายงานนิรภัย)
+        # หน้านี้ต้องรู้ เพื่อขึ้นปุ่มส่งลิงก์ให้กรอก — คนกรอกไม่มีบัญชี จะให้เขา
+        # เดินเข้าเว็บมาหาเองไม่ได้
+        fpub = {k: f[k] for k in ('abbr','doc','t','th','sys','chain','public','anon','r','with',
                                   'assignTo','iss','rev','eff','jot','hasDef',
-                                  'guide','blank','kind','next','refs','flow') if k in f}
+                                  'guide','blank','kind','next','refs','flow','admin') if k in f}
         # ใบที่อยู่ก่อนหน้าคำนวณจาก next ของใบอื่น จะได้ไม่ต้องกรอกสองที่ให้ขัดกันเอง
         fpub['prev'] = [x['abbr'] for x in reg['forms'] if f['abbr'] in (x.get('next') or [])]
         if not fpub['prev']:

@@ -541,6 +541,7 @@
    "doc": "D-0507-DRC-001",
    "code": "QA-DRF-302-A",
    "abbr": "DRC",
+   "anon": true,
    "t": "Document Receipt",
    "th": "ใบรับเอกสารควบคุม",
    "iss": "01",

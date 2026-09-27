@@ -199,7 +199,14 @@ function boot(){
         <div><span>${A.esc(A.t('docCode'))}</span><b>${A.esc(F.doc||F.abbr)}</b></div>
         <div><span>${A.esc(A.t('issueRev'))}</span><b>${F.iss?A.esc(F.iss)+' / '+A.esc(F.rev):'—'}</b></div>
         <div><span>${A.esc(A.t('effective'))}</span><b>${A.esc(F.eff||'—')}</b></div>
-      </div></div>`;
+      </div></div>` +
+      /* ใบที่คนกรอกไม่ใช่คนในระบบ — ต้องส่งลิงก์ให้เขาได้จากหน้านี้เลย
+         (เจ้าหน้าที่เปิดค้างไว้บนเครื่องตัวเอง แล้วส่งต่อให้ผู้โดยสารกรอกบนเครื่องเขา) */
+      /* DRC มีหน้าจัดการของตัวเองที่ออกลิงก์พร้อมเลขประกาศ — ลิงก์เปล่าส่งไม่ผ่าน */
+      (F.anon && !F.admin ? `<div class="acts" style="margin:10px 0 0"><button type="button" class="big sec"
+         id="sharelink">${A.esc(A.L({th:'ส่งลิงก์ให้กรอก',en:'Share fill link'}))} ↗</button></div>` : '');
+  const sb=document.getElementById('sharelink');
+  if(sb) sb.onclick=()=>A.shareForm(F);
   /* ── ต้องล็อกอินก่อนกรอก ─────────────────────────────────
      ทุกใบต้องรู้ว่าใครกรอก และชื่อผู้กรอกมาจากบัญชี ไม่ใช่จากที่พิมพ์เอง
      ยกเว้นใบที่คนกรอกไม่ใช่คนในระบบ (ธง anon ในทะเบียน)
@@ -497,9 +504,13 @@ function review(){
     : st1.assignedBy==='submitter' ? A.t('goesToApproval')+' — '+(LL(nx&&nx.n)||st1.party)
     : A.t('goesToPool')+' — '+(LL(nx&&nx.n)||st1.party);
 
-  // ผู้ที่ไม่ได้ล็อกอินปิดใบเองไม่ได้ — ใบต้องมีคนรับผิดชอบเสมอ
-  const anon=!A.isStaff(), needs=needsApproval(), mustPick=pickAtSend();
-  if(anon && !needs){
+  /* ใบที่จบตั้งแต่ขั้นแรกต้องมีคนรับผิดชอบที่ระบุตัวได้ — แต่เกณฑ์ว่า "ระบุตัวได้"
+     ไม่ใช่ "เป็นเจ้าหน้าที่" เสมอไป ผู้โดยสารที่เซ็นใบสละสิทธิ์เป็นผู้รับผิดชอบใบนั้นเอง
+     เกณฑ์จริงอยู่ที่ firestore.rules (newSoloOk / newReceiptOk) และ A.canSelfClose
+     สะท้อนกฎเดียวกัน หน้าจอกับเซิร์ฟเวอร์จะได้ไม่ขัดกัน */
+  const needs=needsApproval(), mustPick=pickAtSend();
+  const canClose=A.canSelfClose(F.abbr, FK.data, {anon:F.anon, distId:DIST_ID});
+  if(!canClose && !needs){
     modal(A.t('needLoginTitle'), A.t('needLoginSub'),
       `<p class="fk-static">${A.esc(A.t('needLoginBody'))}</p>`,
       `<button class="fb" value="cancel">${A.esc(A.t('goBack'))}</button>
