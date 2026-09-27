@@ -315,6 +315,7 @@
     navForms:   { th: 'จัดการฟอร์ม', en: 'Form management' },
     navSetup:   { th: 'ตั้งค่าระบบ', en: 'Admin setup' },
     navAprv:    { th: 'ผังผู้อนุมัติ', en: 'Approvals' },
+    navSubs:    { th: 'ใบที่ส่งเข้ามา', en: 'Submitted records' },
     navAudit:   { th: 'งานตรวจสอบ', en: 'Audit' },
     navDrc:     { th: 'แจกจ่ายเอกสาร', en: 'Distribution · DRC' },
     auditNote:  { th: 'Audit ↗ login แยก', en: 'งานตรวจสอบ ↗ แยก login' },

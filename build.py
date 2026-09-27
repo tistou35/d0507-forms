@@ -436,6 +436,7 @@ def main():
         ('approve.html',     'approve/index.html',             '../',   'queue'),
         ('view.html',        'view/index.html',                '../',   'queue'),
         ('approvals.html',   'admin/approvals/index.html',     '../../','aprv'),
+        ('subs.html',        'admin/subs/index.html',          '../../','subs'),
         ('pubs.html',        'pubs/index.html',                '../',   'pubs'),
         ('checklists.html',  'admin/checklists/index.html',    '../../','pubs'),
         ('cl.html',          'cl/index.html',                  '../',   'pubs'),

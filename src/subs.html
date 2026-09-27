@@ -1,0 +1,437 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ใบที่ส่งเข้ามา — D-0507 Flight Training</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="@@BASE@@assets/app.css">
+<style>
+/* ทะเบียนใบที่ส่งเข้ามาทั้งหมด — ที่เดียวที่ตอบได้ว่า "ใบนั้นเข้ามาหรือยัง
+   ตอนนี้อยู่กับใคร และไปต่อทางไหน"
+
+   หน้างานของฉันตอบได้เฉพาะใบที่ส่งถึงเราหรือเราส่งเอง ส่วนใบที่จบตั้งแต่ขั้นแรก
+   (ผู้โดยสารเซ็น PWR) ไม่สร้างงานให้ใครเลย จึงไม่เคยโผล่ที่ใดในระบบก่อนมีหน้านี้
+   ผู้ดูแลระบบเท่านั้นที่เปิดได้ เพราะเห็นใบของทุกฝ่ายรวมถึงรายงานนิรภัย */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:4px 0 18px}
+.tile{background:var(--surface);border:1px solid var(--border-light);border-radius:10px;padding:12px 14px;
+  cursor:pointer;text-align:left;font-family:inherit}
+.tile:hover{border-color:var(--navy-900)}
+.tile[aria-pressed="true"]{border-color:var(--navy-900);box-shadow:inset 0 0 0 1px var(--navy-900)}
+.tile b{display:block;font-family:var(--font-display);font-size:24px;line-height:1.1}
+.tile span{display:block;font-size:12px;color:var(--g-500);margin-top:3px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.bar input,.bar select{min-height:38px;padding:0 11px;border-radius:8px;border:1px solid var(--border-med);
+  background:var(--surface);color:var(--fg-1);font-family:inherit;font-size:13.5px}
+.bar input{flex:1;min-width:190px}
+.twrap{overflow-x:auto;border:1px solid var(--border-light);border-radius:10px;background:var(--surface)}
+table.subs{width:100%;border-collapse:collapse;font-size:13.5px}
+table.subs th{text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--g-500);
+  padding:10px 12px;border-bottom:1px solid var(--border-light);white-space:nowrap}
+table.subs td{padding:10px 12px;border-bottom:1px solid var(--g-100);vertical-align:top}
+table.subs tr:last-child td{border-bottom:0}
+table.subs .mono{font-family:var(--font-mono);font-size:11.5px}
+table.subs .nm{font-weight:600}
+table.subs .b{display:flex;gap:6px;justify-content:flex-end;white-space:nowrap}
+table.subs .b a{text-decoration:none}
+.st{display:inline-flex;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;white-space:nowrap}
+.st.wait{background:var(--amber-100);color:var(--amber-600)}
+.st.ok{background:var(--green-100);color:var(--green-600)}
+.st.no{background:var(--red-100);color:var(--red-600)}
+.who i{font-style:normal;color:var(--g-400)}
+.nx{font-size:12.5px;line-height:1.5}
+.nx b{font-weight:600}
+.nx span{color:var(--g-500)}
+.empty{padding:16px;border:1px dashed var(--border-med);border-radius:10px;color:var(--g-500);font-size:13.5px}
+@media(max-width:820px){ table.subs .hide-s{display:none} }
+
+dialog#act{border:0;border-radius:12px;padding:0;max-width:560px;width:calc(100% - 28px);margin:auto;
+  background:var(--surface);color:var(--fg-1);box-shadow:var(--sh-lg)}
+dialog#act::backdrop{background:rgba(13,27,42,.5)}
+dialog#act .dh{background:var(--navy-900);color:#fff;padding:15px 20px}
+dialog#act .dh h3{margin:0;font-size:17px;color:#fff}
+dialog#act .dh p{margin:3px 0 0;font-size:12.5px;color:rgba(255,255,255,.72);font-family:var(--font-mono)}
+dialog#act .db{padding:16px 20px;max-height:66vh;overflow:auto}
+dialog#act .df{padding:12px 20px;border-top:1px solid var(--g-100);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+dialog#act label{display:block;font-size:12.5px;color:var(--g-600);margin:12px 0 5px}
+dialog#act textarea{width:100%;min-height:74px;border:1px solid var(--border-med);border-radius:8px;
+  padding:9px 11px;font-family:inherit;font-size:13.5px;background:var(--surface);color:var(--fg-1)}
+.kinds{display:grid;gap:8px}
+.kind{text-align:left;border:1px solid var(--border-med);border-radius:9px;padding:10px 12px;
+  background:var(--surface);cursor:pointer;font-family:inherit}
+.kind b{display:block;font-size:13.5px}
+.kind span{display:block;font-size:12px;color:var(--g-500);margin-top:2px;line-height:1.5}
+.kind[aria-pressed="true"]{border-color:var(--navy-900);box-shadow:inset 0 0 0 1px var(--navy-900)}
+.pick{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px}
+.pick button{border:1px solid var(--border-med);border-radius:8px;background:var(--surface);cursor:pointer;
+  padding:8px 11px;font-family:inherit;font-size:13px}
+.pick button[aria-pressed="true"]{border-color:var(--navy-900);box-shadow:inset 0 0 0 1px var(--navy-900)}
+</style>
+</head><body>
+@@TOPBAR@@
+<div class="body">
+@@RAIL@@
+  <main class="main">
+    <div class="greet"><div>
+      <p class="eyebrow">ใบที่ส่งเข้ามา · SUBMITTED RECORDS</p>
+      <h1>ใบที่ส่งเข้ามา</h1>
+      <p class="sub">ใบทุกฟอร์มที่ส่งเข้าระบบ บอกว่าตอนนี้อยู่กับใครและไปต่อทางไหน
+        รวมใบที่จบตั้งแต่ขั้นแรกและใบที่คนนอกกรอก (ผู้โดยสาร · ผู้รายงานนิรภัย) ซึ่งไม่ได้สร้างงานให้ใคร</p></div></div>
+    <div id="gate"></div>
+    <div id="body" style="display:none">
+      <div class="tiles" id="tiles"></div>
+      <div class="bar">
+        <input id="q" type="search" placeholder="ค้นหาเลขที่ใบ · ชื่อผู้ส่ง · ชื่อฟอร์ม">
+        <select id="fc"></select>
+        <select id="days">
+          <option value="7">7 วันล่าสุด</option>
+          <option value="30" selected>30 วันล่าสุด</option>
+          <option value="90">90 วันล่าสุด</option>
+          <option value="0">ทั้งหมดเท่าที่ดึงมา</option>
+        </select>
+        <button class="fb" id="csv">ดาวน์โหลด CSV</button>
+        <button class="fb" id="rl">โหลดใหม่</button>
+      </div>
+      <div id="list"></div>
+    </div>
+  </main>
+</div>
+
+<dialog id="act">
+  <div class="dh"><h3 id="ath">—</h3><p id="ats"></p></div>
+  <div class="db" id="atb"></div>
+  <div class="df">
+    <button class="fb" id="atx" type="button">ปิด</button>
+    <button class="big pri off" id="ato" type="button" disabled>ยืนยัน</button>
+  </div>
+</dialog>
+
+@@BOTNAV@@
+<footer>D-0507 Flight Training Co., Ltd. · Controlled Document System</footer>
+<script>window.BASE='@@BASE@@';</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="@@BASE@@assets/app.js"></script>
+<script>D0507.GAS_URL='@@GASURL@@';</script>
+<script>
+"use strict";
+const REG=@@REG@@, A=D0507;
+const esc=A.esc, L=o=>A.L(o), $=id=>document.getElementById(id);
+document.querySelectorAll('[data-cnt="forms"]').forEach(e=>e.textContent=REG.forms.length);
+A.reg = REG;
+
+let ROWS=[], TASKS={}, DIR=[], TILE='all';
+const LIMIT=400;      // ดึงมาชุดเดียวแล้วกรองในเครื่อง — ไม่ต้องทำ index ผสมใน Firestore
+const now=()=>firebase.firestore.FieldValue.serverTimestamp();
+
+A.initAuth(@@FBCFG@@, boot);
+A.onLang.push(()=>paint());
+$('q').addEventListener('input', paint);
+$('fc').addEventListener('change', paint);
+$('days').addEventListener('change', paint);
+$('rl').addEventListener('click', ()=>load());
+$('csv').addEventListener('click', csv);
+$('atx').addEventListener('click', ()=>$('act').close());
+
+function nameOf(code){ const f=(A.reg.forms||[]).find(x=>x.abbr===code); return f?A.nm(f):code; }
+function ms(v){ try{ return v&&v.toMillis?v.toMillis():(v?new Date(v).getTime():0); }catch(e){ return 0; } }
+function when(v){
+  const t=ms(v); if(!t) return '';
+  return new Date(t).toLocaleString(A.lang==='en'?'en-GB':'th-TH',
+    {day:'2-digit',month:'short',year:'2-digit',hour:'2-digit',minute:'2-digit'});
+}
+
+async function boot(){
+  /* เฉพาะผู้ดูแลระบบ — หน้านี้เห็นใบของทุกฝ่ายและสั่งปิด/ตีกลับ/โยกงานได้
+     รายงานนิรภัยโดยสมัครใจก็อยู่ในนี้ด้วย จึงไม่ใช่หน้าที่เปิดให้เจ้าหน้าที่ทุกคน */
+  if(!A.signedIn()){
+    $('body').style.display='none';
+    A.authGate($('gate'), {why: L({th:'หน้านี้แสดงใบที่ส่งเข้าระบบทุกฟอร์มและสั่งการต่อได้ เปิดได้เฉพาะผู้ดูแลระบบ',
+                                   en:'This page lists every submitted record and can act on them — administrators only'})});
+    return;
+  }
+  /* ล็อกอินแล้วแต่ไม่ใช่ผู้ดูแล — บอกตรง ๆ ว่าไม่มีสิทธิ์ ไม่ใช่ชวนให้ล็อกอินซ้ำ
+     ซึ่งอ่านแล้วเหมือนระบบจำไม่ได้ว่าเขาเข้าอยู่ */
+  if(!A.isAdmin()){
+    $('body').style.display='none';
+    $('gate').innerHTML=`<div class="fk-gate warn" style="margin-top:14px"><span>
+      <b>${esc(L({th:'หน้านี้เปิดได้เฉพาะผู้ดูแลระบบ',en:'Administrators only'}))}</b><br>
+      ${esc(L({th:'ใบที่ส่งถึงคุณและใบที่คุณส่งไปดูได้ที่หน้างานของฉัน',
+               en:'Records sent to you and records you submitted are in My queue.'}))}</span></div>
+      <div class="acts" style="margin-top:14px">
+        <a class="big pri" href="@@BASE@@queue/">${esc(L({th:'ไปที่งานของฉัน',en:'Go to My queue'}))}</a></div>`;
+    return;
+  }
+  $('gate').innerHTML=''; $('body').style.display='';
+  await load();
+}
+
+async function load(){
+  $('list').innerHTML=`<div class="empty">${esc(L({th:'กำลังโหลด…',en:'Loading…'}))}</div>`;
+  try{
+    const [s, t, d] = await Promise.all([
+      A.db.collection('submissions').orderBy('submittedAt','desc').limit(LIMIT).get(),
+      A.db.collection('tasks').get(),
+      A.db.collection('publicDirectory').doc('instructors').get(),
+    ]);
+    ROWS=s.docs.map(x=>Object.assign({id:x.id}, x.data()));
+    TASKS={};
+    t.docs.forEach(x=>{
+      const v=Object.assign({id:x.id}, x.data());
+      if(v.state!=='open' && v.state!=='pool') return;      // เหลือเฉพาะงานที่ยังค้าง
+      (TASKS[v.subId]=TASKS[v.subId]||[]).push(v);
+    });
+    DIR=((d.exists&&d.data().list)||[]);
+  }catch(e){
+    $('list').innerHTML=`<div class="empty">${esc(L({th:'อ่านไม่ได้: ',en:'Cannot read: '}))}${esc(e.code||e.message)}</div>`;
+    return;
+  }
+  const codes=[...new Set(ROWS.map(r=>r.formCode))].sort();
+  $('fc').innerHTML=`<option value="">${esc(L({th:'ทุกฟอร์ม',en:'All forms'}))}</option>`+
+    codes.map(c=>`<option value="${esc(c)}">${esc(c)} · ${esc(nameOf(c))}</option>`).join('');
+  paint();
+}
+
+function statusOf(r){
+  /* ปิดเชิงธุรการไม่ใช่การอนุมัติ — ไม่มีใครลงนาม ป้ายจึงต้องไม่เขียนว่า "อนุมัติแล้ว"
+     ไม่งั้นทะเบียนจะอ้างการอนุมัติที่ไม่เคยเกิดขึ้น ซึ่งผู้ตรวจไล่หาลายเซ็นแล้วไม่เจอ */
+  if(r.adminAction==='close') return {k:'ok', n:{th:'ปิดโดยผู้ดูแล',en:'Closed by admin'}};
+  if(r.status==='complete') return (r.step||1)>1
+    ? {k:'ok', n:{th:'อนุมัติแล้ว',en:'Approved'}} : {k:'ok', n:{th:'ส่งแล้ว',en:'Submitted'}};
+  if(r.status==='rejected') return {k:'no', n:{th:'ไม่อนุมัติ',en:'Rejected'}};
+  return {k:'wait', n:{th:'รอดำเนินการ',en:'Awaiting action'}};
+}
+
+/* ไปต่อทางไหน — อ่านจากงานที่ยังค้างของใบนั้น ไม่ใช่เดาจากนิยามฟอร์ม
+   ใบที่ปิดแล้วไม่มีงานค้าง · ใบที่ค้างแต่ไม่มีงาน = ตกหล่น ต้องเห็นว่าผิดปกติ */
+function nextOf(r){
+  const t=(TASKS[r.id]||[])[0];
+  if(r.status==='complete'||r.status==='rejected')
+    return {t, html:`<span>${esc(L({th:'จบแล้ว',en:'Closed'}))}</span>`};
+  if(t && t.state==='open')
+    return {t, html:`<b>${esc(t.assigneeName||L({th:'ผู้รับที่ระบุตัว',en:'Named assignee'}))}</b>
+      <span> · ${esc(L({th:'รอดำเนินการ',en:'awaiting action'}))}</span>`};
+  if(t && t.state==='pool'){
+    const who=DIR.filter(x=>(x.recv||[]).includes(t.pool)).map(x=>x.name);
+    return {t, html:`<b>${esc(L({th:'กองรอ',en:'Pool'}))} · ${esc(t.pool||'—')}</b>
+      <span> · ${who.length ? esc(L({th:'รับได้: ',en:'can claim: '}))+esc(who.join(' · '))
+        : '<b style="color:var(--red-600)">'+esc(L({th:'ยังไม่มีใครรับตำแหน่งนี้',en:'nobody holds this position'}))+'</b>'}</span>`};
+  }
+  return {t:null, html:`<b style="color:var(--red-600)">${esc(L({th:'ค้างโดยไม่มีงานให้ใคร',en:'Stuck — no task exists'}))}</b>
+    <span> · ${esc(L({th:'ต้องมอบหมายให้ใครสักคน',en:'assign it to someone'}))}</span>`};
+}
+
+function rows(){
+  const q=$('q').value.trim().toLowerCase();
+  const fc=$('fc').value;
+  const days=+$('days').value;
+  const from=days?Date.now()-days*86400000:0;
+  return ROWS.filter(r=>{
+    if(fc && r.formCode!==fc) return false;
+    if(from && ms(r.submittedAt)<from) return false;
+    const st=statusOf(r).k;
+    if(TILE==='wait' && st!=='wait') return false;
+    if(TILE==='stuck' && !(st==='wait' && !(TASKS[r.id]||[]).length)) return false;
+    if(TILE==='today' && ms(r.submittedAt)<new Date().setHours(0,0,0,0)) return false;
+    if(q){
+      const hay=[r.tracking,r.formCode,nameOf(r.formCode),r.submitterName,r.title,r.doc]
+        .filter(Boolean).join(' ').toLowerCase();
+      if(hay.indexOf(q)<0) return false;
+    }
+    return true;
+  });
+}
+
+function paint(){
+  if(!A.signedIn()||!A.isAdmin()) return;
+  const today=new Date().setHours(0,0,0,0);
+  const wait=ROWS.filter(r=>statusOf(r).k==='wait');
+  const n={ all:ROWS.length, today:ROWS.filter(r=>ms(r.submittedAt)>=today).length,
+            wait:wait.length, stuck:wait.filter(r=>!(TASKS[r.id]||[]).length).length };
+  const tiles=[['all',{th:'ทั้งหมด',en:'All'},n.all],
+               ['today',{th:'วันนี้',en:'Today'},n.today],
+               ['wait',{th:'รอดำเนินการ',en:'Awaiting action'},n.wait],
+               ['stuck',{th:'ค้างไม่มีผู้รับผิดชอบ',en:'Stuck — no task'},n.stuck]];
+  $('tiles').innerHTML=tiles.map(([k,lab,v])=>
+    `<button type="button" class="tile" data-tile="${k}" aria-pressed="${TILE===k}">
+      <b>${v}</b><span>${esc(L(lab))}</span></button>`).join('');
+  $('tiles').querySelectorAll('[data-tile]').forEach(b=>b.addEventListener('click',()=>{
+    TILE = TILE===b.dataset.tile ? 'all' : b.dataset.tile; paint();
+  }));
+
+  const R=rows();
+  if(!R.length){
+    $('list').innerHTML=`<div class="empty">${esc(L({th:'ไม่มีใบที่ตรงกับตัวกรอง',en:'No records match the filters'}))}</div>`;
+    return;
+  }
+  $('list').innerHTML=`<div class="twrap"><table class="subs"><thead><tr>
+      <th>${esc(L({th:'ส่งเมื่อ',en:'Submitted'}))}</th>
+      <th>${esc(L({th:'ฟอร์ม',en:'Form'}))}</th>
+      <th class="hide-s">${esc(L({th:'เลขที่ใบ',en:'Tracking'}))}</th>
+      <th class="hide-s">${esc(L({th:'ผู้ส่ง',en:'Submitted by'}))}</th>
+      <th>${esc(L({th:'สถานะ',en:'Status'}))}</th>
+      <th>${esc(L({th:'ไปต่อทางไหน',en:'Where next'}))}</th>
+      <th></th></tr></thead><tbody>`+
+    R.map(r=>{
+      const st=statusOf(r), nx=nextOf(r);
+      const u=esc(r.submitterName||'') ||
+        `<i>${esc(L({th:'ไม่ระบุตัว (ไม่ได้เข้าสู่ระบบ)',en:'Anonymous (not signed in)'}))}</i>`;
+      const v='@@BASE@@view/?id='+encodeURIComponent(r.id);
+      return `<tr>
+        <td class="mono">${esc(when(r.submittedAt))}</td>
+        <td><span class="nm">${esc(r.formCode)}</span><br>
+            <span style="font-size:12px;color:var(--g-500)">${esc(nameOf(r.formCode))}</span></td>
+        <td class="mono hide-s">${esc(r.tracking||'')}</td>
+        <td class="who hide-s">${u}</td>
+        <td><span class="st ${st.k}">${esc(L(st.n))}</span></td>
+        <td class="nx">${nx.html}</td>
+        <td><div class="b">
+          <a class="fb" href="${v}">${esc(L({th:'ดู',en:'View'}))}</a>
+          <a class="fb" href="${v}&print=1" target="_blank" rel="noopener">${esc(L({th:'พิมพ์',en:'Print'}))}</a>
+          <button class="fb" data-act="${esc(r.id)}">${esc(L({th:'จัดการ',en:'Manage'}))}</button>
+        </div></td></tr>`;
+    }).join('')+`</tbody></table></div>
+    <p class="hint" style="margin-top:10px">${esc(L({
+      th:'แสดง '+R.length+' จาก '+ROWS.length+' ใบล่าสุด (ดึงมาครั้งละ '+LIMIT+' ใบ) · ไฟล์ PDF ของทุกใบอยู่ใน Drive ตามแฟ้มของแต่ละฟอร์ม',
+      en:'Showing '+R.length+' of the latest '+ROWS.length+' records (fetched '+LIMIT+' at a time). PDFs live in each form’s Drive folder.'}))}</p>`;
+  $('list').querySelectorAll('[data-act]').forEach(b=>
+    b.addEventListener('click',()=>manage(ROWS.find(x=>x.id===b.dataset.act))));
+}
+
+/* ── สั่งการต่อ ────────────────────────────────────────────
+   สามทางที่ผู้ดูแลต้องมี เมื่อใบค้างอยู่กับคนที่ลาออก ลาพัก หรือส่งผิดคน
+     โยกงาน  — ปิดงานเดิมเป็น delegated แล้วเปิดงานใหม่ให้คนที่เลือก
+     ปิดใบ   — ปิดเชิงธุรการ ไม่ใช่การลงนามอนุมัติ จึงไม่ออก PDF ใหม่
+     ไม่อนุมัติ — ตีกลับพร้อมเหตุผล (บังคับกรอก)
+   ทุกทางเขียนลง chain ของใบและ events ซึ่งลบไม่ได้ — เอกสารควบคุมต้องบอกได้ว่า
+   ใครเปลี่ยนอะไรเมื่อไร ไม่ใช่แค่ผลลัพธ์สุดท้าย */
+let CUR=null, KIND='', PICK='';
+function manage(r){
+  if(!r) return;
+  CUR=r; KIND=''; PICK='';
+  const closed = r.status==='complete'||r.status==='rejected';
+  $('ath').textContent=L({th:'จัดการใบนี้',en:'Manage this record'});
+  $('ats').textContent=(r.tracking||r.id)+' · '+r.formCode;
+  $('atb').innerHTML=`
+    <div class="kinds">
+      <button type="button" class="kind" data-kind="delegate">
+        <b>${esc(L({th:'โยกให้คนอื่นดำเนินการ',en:'Reassign to someone else'}))}</b>
+        <span>${esc(L({th:'ปิดงานเดิมแล้วเปิดงานใหม่ให้ผู้ที่เลือก ใบยังอยู่ในขั้นเดิม',
+                       en:'Closes the current task and opens a new one for the person you pick. The record stays at the same step.'}))}</span></button>
+      <button type="button" class="kind" data-kind="close"${closed?' disabled style="opacity:.5"':''}>
+        <b>${esc(L({th:'ปิดใบ (จบ)',en:'Close the record'}))}</b>
+        <span>${esc(L({th:'ปิดเชิงธุรการ ไม่ใช่การลงนามอนุมัติ — ไม่ออก PDF ใหม่ และไม่เพิ่มลายเซ็นใคร',
+                       en:'An administrative close, not an approval signature — no new PDF and no signature is added.'}))}</span></button>
+      <button type="button" class="kind" data-kind="reject"${closed?' disabled style="opacity:.5"':''}>
+        <b>${esc(L({th:'ไม่อนุมัติ (ตีกลับ)',en:'Reject'}))}</b>
+        <span>${esc(L({th:'ต้องระบุเหตุผล ผู้ส่งเห็นสถานะนี้ในงานของฉัน',
+                       en:'A reason is required. The submitter sees this status in My queue.'}))}</span></button>
+    </div>
+    <div id="picker"></div>
+    <label for="anote">${esc(L({th:'บันทึกเหตุผล / หมายเหตุ',en:'Reason / note'}))}</label>
+    <textarea id="anote"></textarea>
+    <p class="hint" style="margin-top:8px">${esc(L({
+      th:'การสั่งการทุกครั้งบันทึกชื่อผู้สั่ง เวลา และเหตุผลไว้ในใบ ลบไม่ได้',
+      en:'Every action records who did it, when, and why. The log cannot be deleted.'}))}</p>`;
+  $('ato').textContent=L({th:'ยืนยัน',en:'Confirm'});
+  $('atb').querySelectorAll('[data-kind]').forEach(b=>b.addEventListener('click',()=>{
+    if(b.disabled) return;
+    KIND=b.dataset.kind; PICK='';
+    $('atb').querySelectorAll('[data-kind]').forEach(x=>x.setAttribute('aria-pressed', x===b));
+    $('picker').innerHTML = KIND!=='delegate' ? '' :
+      `<label>${esc(L({th:'โยกให้ใคร',en:'Reassign to'}))}</label>
+       <div class="pick">${DIR.length?DIR.map(x=>
+         `<button type="button" data-uid="${esc(x.id)}" aria-pressed="false">${esc(x.name)}
+            <span style="color:var(--g-500);font-size:11.5px"> ${esc((x.recv||[]).join(' · '))}</span></button>`).join('')
+         : `<span class="hint">${esc(L({th:'ยังไม่มีใครในรายชื่อผู้รับฟอร์ม — เพิ่มที่หน้าตั้งค่าระบบก่อน',
+                                        en:'The recipient directory is empty — add people in Admin setup first'}))}</span>`}</div>`;
+    $('picker').querySelectorAll('[data-uid]').forEach(p=>p.addEventListener('click',()=>{
+      PICK=p.dataset.uid;
+      $('picker').querySelectorAll('[data-uid]').forEach(x=>x.setAttribute('aria-pressed', x===p));
+      sync();
+    }));
+    sync();
+  }));
+  $('anote').addEventListener('input', sync);
+  sync();
+  $('act').showModal();
+}
+
+function sync(){
+  const note=$('anote') ? $('anote').value.trim() : '';
+  let ok=false;
+  if(KIND==='delegate') ok=!!PICK;
+  else if(KIND==='reject') ok=!!note;
+  else if(KIND==='close') ok=true;
+  $('ato').disabled=!ok;
+  $('ato').classList.toggle('off', !ok);
+}
+
+$('ato').addEventListener('click', async ()=>{
+  if($('ato').disabled||!CUR) return;
+  const note=$('anote').value.trim();
+  const me=A.myName()||A.user.email;
+  const stamp=new Date().toISOString().slice(0,10);
+  const ref=A.db.collection('submissions').doc(CUR.id);
+  const open=(TASKS[CUR.id]||[])[0];
+  $('ato').disabled=true; $('ato').textContent=L({th:'กำลังบันทึก…',en:'Saving…'});
+  try{
+    if(KIND==='delegate'){
+      const who=DIR.find(x=>x.id===PICK)||{};
+      if(open) await A.db.collection('tasks').doc(open.id).update(
+        {state:'delegated', closedAt:now(), note:note||''});
+      await A.db.collection('tasks').add({
+        subId:CUR.id, formCode:CUR.formCode, tracking:CUR.tracking||'', title:CUR.title||'',
+        assigneeUid:PICK, assigneeName:who.name||'', state:'open', step:CUR.step||2,
+        fromUid:A.user.uid, fromName:me, delegated:true, note:note||'', createdAt:now(),
+      });
+      await ref.update({ assigneeUid:PICK, assignTo:'', delegatedFrom:me,
+        chain:firebase.firestore.FieldValue.arrayUnion({
+          action:'delegate', byUid:A.user.uid, byName:me, toUid:PICK, toName:who.name||'',
+          at:stamp, note:note||'' }) });
+    } else {
+      const status = KIND==='reject' ? 'rejected' : 'complete';
+      if(open) await A.db.collection('tasks').doc(open.id).update(
+        {state:'done', closedAt:now(), note:note||''});
+      await ref.update({ status:status, closedAt:now(), closedBy:me,
+        adminAction:KIND,
+        chain:firebase.firestore.FieldValue.arrayUnion({
+          action: KIND==='reject'?'reject':'adminClose', byUid:A.user.uid, byName:me,
+          at:stamp, note:note||'' }) });
+    }
+    try{
+      await ref.collection('events').add({ action:'admin:'+KIND, byUid:A.user.uid, byName:me,
+        note:note||'', at:now() });
+    }catch(e){ /* log ล้มไม่ควรทำให้คำสั่งล้มตาม */ }
+    $('act').close();
+    await load();
+  }catch(e){
+    alert(L({th:'ทำไม่สำเร็จ: ',en:'Failed: '})+(e.code||e.message));
+  }finally{
+    $('ato').textContent=L({th:'ยืนยัน',en:'Confirm'});
+  }
+});
+
+/* ส่งออกไปทำรายงาน — ผู้ตรวจขอ "ใบที่ส่งเข้ามาช่วงนี้ทั้งหมด" ได้บ่อย
+   เอาเฉพาะหัวตาราง ไม่มีคำตอบในใบ ใบเต็มเปิดดูทีละใบจากปุ่มดู */
+function csv(){
+  const R=rows();
+  const esc2=s=>'"'+String(s==null?'':s).replace(/"/g,'""')+'"';
+  const head=['submittedAt','formCode','formName','tracking','status','step','submitterName','whereNext','docId'];
+  const body=R.map(r=>{
+    const t=(TASKS[r.id]||[])[0];
+    const nx = (r.status==='complete'||r.status==='rejected') ? 'closed'
+      : t ? (t.state==='open' ? 'assigned:'+(t.assigneeName||t.assigneeUid) : 'pool:'+(t.pool||''))
+      : 'stuck';
+    return [ms(r.submittedAt)?new Date(ms(r.submittedAt)).toISOString():'',
+      r.formCode||'', nameOf(r.formCode), r.tracking||'', r.status||'', r.step||'',
+      r.submitterName||'', nx, r.id].map(esc2).join(',');
+  });
+  const blob=new Blob(['﻿'+[head.map(esc2).join(',')].concat(body).join('\r\n')],
+    {type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='submissions-'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+}
+</script>
+</body></html>
