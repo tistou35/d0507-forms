@@ -378,7 +378,7 @@
       if (!evalCond(sec.showIf, ctx)) return;
       const rows = [];
       (sec.fields || []).forEach(f => {
-        if (f.type === 'static') return;
+        if (f.type === 'static' || f.type === 'scan') return;
         if (!evalCond(f.showIf, ctx)) return;
         const v = this.data[f.k];
 
@@ -499,7 +499,7 @@
         .filter(s => !(s.hideOthers && this.party && s.party !== this.party));
       let sc = 0, ans = 0, tot = 0;
       secs.forEach(s => (s.fields || []).forEach(f => {
-        if (f.type === 'static' || !evalCond(f.showIf, ctx)) return;
+        if (f.type === 'static' || f.type === 'scan' || !evalCond(f.showIf, ctx)) return;
         sc += fieldScore(f, this.data[f.k]);
         tot++;
         if (this.filled(f)) ans++;
@@ -584,6 +584,25 @@
         return `<div class="fk-f"><div class="fk-static">${
           String(raw).replace(/\{([a-zA-Z0-9_]+)\}/g, (m, k) =>
             esc(ctx[k] == null || ctx[k] === '' ? '—' : String(ctx[k])))}</div></div>`;
+      }
+
+      /* ถ่ายรูปเอกสารแล้วกรอกให้ — ปุ่มลัด ไม่ใช่ช่องเก็บข้อมูล ใบที่ส่งไม่มีค่าของฟิลด์นี้
+         map บอกว่าค่าที่อ่านได้ (name · dob · docNo) ไปลงช่องไหนของใบนี้
+         รูปไม่ถูกเก็บและไม่ถูกส่งขึ้นระบบ — ดูเหตุผลใน assets/idscan.js
+         ผู้อ่านอย่างเดียว (ผู้อนุมัติ · หน้าดูใบ) ไม่ต้องเห็นปุ่มนี้ */
+      case 'scan': {
+        if (ro) return '';
+        const note = L(f.note, this.lang) || (this.lang === 'en'
+          ? 'The photo is read on your device and discarded at once — no image of your ID or passport is uploaded, stored, or attached to this record.'
+          : 'ระบบอ่านรูปในเครื่องของท่านแล้วทิ้งทันที — ไม่ส่งรูปขึ้นระบบ ไม่เก็บภาพบัตรประชาชนหรือหนังสือเดินทางไว้ที่ใด และไม่แนบไปกับใบนี้');
+        return `<div class="fk-f fk-scan">
+          <button type="button" class="fk-scan-b" data-scanb="${esc(f.k)}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M3 9a2 2 0 0 1 2-2h2l1.2-1.8A2 2 0 0 1 9.9 4h4.2a2 2 0 0 1 1.7.9L17 7h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <circle cx="12" cy="13" r="3.2"/></svg>
+            <span>${esc(lab)}</span></button>
+          <p class="fk-scan-note">${esc(note)}</p></div>`;
       }
 
       /* ไฟล์แนบ — ใช้เมื่อผลลัพธ์ออกมาจากระบบอื่นแล้ว ไม่ต้องกรอกซ้ำทีละหัวข้อ
@@ -979,6 +998,27 @@
         if (i.value === '') delete cur[i.dataset.item];
         else cur[i.dataset.item] = Number(i.value);
         self.set(k, cur);
+      }));
+
+    /* ถ่ายรูปเอกสารแล้วกรอกให้ — เติมเฉพาะช่องที่อ่านได้จริง ช่องอื่นไม่แตะ
+       ค่าที่ได้เขียนทับของเดิมได้ เพราะผู้กรอกเป็นคนกดปุ่มนี้เอง
+       ไม่มี IDScan ในหน้านั้น (เช่นหน้าอนุมัติ) = ไม่ทำอะไร ไม่ใช่ขึ้นข้อผิดพลาด */
+    el.querySelectorAll('[data-scanb]').forEach(b =>
+      b.addEventListener('click', async () => {
+        if (!global.IDScan) return;
+        const f = self.fields[b.dataset.scanb] || {};
+        b.disabled = true;
+        try {
+          const got = await global.IDScan.open({ lang: self.lang });
+          if (!got) return;
+          const map = f.map || { name: 'paxName', dob: 'paxDob', docNo: 'paxId' };
+          let n = 0;
+          Object.keys(map).forEach(src => {
+            const k = map[src];
+            if (k && got[src]) { self.set(k, got[src]); n++; }
+          });
+          if (n) rerender();
+        } finally { b.disabled = false; }
       }));
 
     el.querySelectorAll('[data-fx]').forEach(b =>

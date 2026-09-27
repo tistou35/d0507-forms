@@ -48,8 +48,10 @@ PUBLIC_FORBIDDEN = ('code', 'lef', 'st', 'note', 'docx', 'own', 'jotDup')
 PUBLIC_KEEP = ('doc', 'abbr', 't', 'th', 'sys', 'jot', 'assignTo', 'r', 'chain', 'kw', 'anon',
                'public', 'unlisted', 'iss', 'rev', 'eff', 'hasDef', 'kind', 'next', 'refs',
                'flow', 'admin')
+# scan = ปุ่มถ่ายรูปเอกสารแล้วกรอกให้ ไม่ใช่ช่องเก็บข้อมูล (assets/idscan.js)
 FIELD_TYPES = {'text', 'textarea', 'date', 'time', 'number', 'email', 'tel', 'select',
-               'multi', 'check', 'checklist', 'grade', 'scale', 'sign', 'static', 'table', 'file', 'riskmatrix'}
+               'multi', 'check', 'checklist', 'grade', 'scale', 'sign', 'static', 'table', 'file',
+               'riskmatrix', 'scan'}
 
 
 def jsonjs(o):
