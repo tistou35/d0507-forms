@@ -108,9 +108,48 @@
     } catch (e) { /* ยังไม่ได้อัปโหลดทะเบียน หรือ rule ไม่อนุญาต — ใช้ชุดสาธารณะต่อไป */ }
   };
 
-  A.login  = () => firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch(e => alert(e.message));
-  A.loginEmail = (em, pw) => firebase.auth().signInWithEmailAndPassword(em, pw).catch(e => alert(e.message));
-  A.signup = (em, pw) => firebase.auth().createUserWithEmailAndPassword(em, pw).catch(e => alert(e.message));
+  /* เครื่องหมาย G ของ Google — ตามข้อกำหนดการใช้ตราสัญลักษณ์ ปุ่มเข้าสู่ระบบต้องใช้ตัว G
+     ไม่ใช่ไอคอนซองจดหมายของ Gmail ซึ่งเป็นคนละบริการกัน */
+  A.googleMark = (size) => `<svg width="${size || 18}" height="${size || 18}" viewBox="0 0 48 48"
+     aria-hidden="true" focusable="false" style="flex:none"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8
+     C35.9 2.4 30.400 0 24 0 14.6 0 6.5 5.4 2.5 13.2l7.9 6.2C12.3 13.7 17.7 9.5 24 9.5z"/><path fill="#4285F4"
+     d="M46.98 24.55c0-1.6-.15-3.15-.4-4.65H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36
+     7.09-17.55z"/><path fill="#FBBC05" d="M10.39 28.62A14.5 14.5 0 0 1 9.64 24c0-1.61.29-3.16.75-4.62l-7.9-6.19A23.97
+     23.97 0 0 0 0 24c0 3.88.93 7.54 2.49 10.81l7.9-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13
+     15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>`;
+
+  /* ข้อความผิดพลาดตอนเข้าสู่ระบบ — Firebase ส่งมาเป็นอังกฤษปนรหัส เช่น
+     "Firebase: Error (auth/invalid-credential)." ซึ่งคนกรอกอ่านแล้วไม่รู้ว่าต้องทำอะไรต่อ
+     แปลเป็นประโยคที่บอกทางออก และคงรหัสไว้ท้ายข้อความสำหรับคนที่ต้องแจ้งปัญหา */
+  A.AUTH_ERR = {
+    'auth/invalid-credential':        { th: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง', en: 'Wrong email or password' },
+    'auth/wrong-password':            { th: 'รหัสผ่านไม่ถูกต้อง', en: 'Wrong password' },
+    'auth/user-not-found':            { th: 'ยังไม่มีบัญชีของอีเมลนี้ — กดสมัครใหม่ก่อน', en: 'No account for this email — create one first' },
+    'auth/invalid-email':             { th: 'รูปแบบอีเมลไม่ถูกต้อง', en: 'That email address is not valid' },
+    'auth/missing-password':          { th: 'ยังไม่ได้กรอกรหัสผ่าน', en: 'Enter your password' },
+    'auth/weak-password':             { th: 'รหัสผ่านสั้นเกินไป — อย่างน้อย 6 ตัว', en: 'Password too short — at least 6 characters' },
+    'auth/email-already-in-use':      { th: 'อีเมลนี้มีบัญชีอยู่แล้ว — กดเข้าสู่ระบบด้วยอีเมลแทน', en: 'This email already has an account — sign in instead' },
+    'auth/user-disabled':             { th: 'บัญชีนี้ถูกระงับ — ติดต่อผู้ดูแลระบบ', en: 'This account is disabled — contact the administrator' },
+    'auth/too-many-requests':         { th: 'ลองผิดหลายครั้งเกินไป รอสักครู่แล้วลองใหม่', en: 'Too many attempts — wait a moment and try again' },
+    'auth/network-request-failed':    { th: 'เครือข่ายมีปัญหา — ตรวจสัญญาณแล้วลองใหม่', en: 'Network problem — check your connection and try again' },
+    'auth/popup-closed-by-user':      { th: 'ปิดหน้าต่าง Google ก่อนเลือกบัญชี', en: 'The Google window closed before an account was chosen' },
+    'auth/cancelled-popup-request':   { th: 'ยกเลิกการเข้าสู่ระบบด้วย Google', en: 'Google sign-in was cancelled' },
+    'auth/popup-blocked':             { th: 'เบราว์เซอร์บล็อกหน้าต่าง Google — อนุญาต pop-up แล้วลองใหม่', en: 'The browser blocked the Google window — allow pop-ups and try again' },
+    'auth/operation-not-allowed':     { th: 'ยังไม่ได้เปิดวิธีเข้าสู่ระบบนี้ในระบบ — แจ้งผู้ดูแล', en: 'This sign-in method is not enabled — tell the administrator' },
+    'auth/unauthorized-domain':       { th: 'โดเมนนี้ยังไม่ได้รับอนุญาตให้เข้าสู่ระบบ — แจ้งผู้ดูแล', en: 'This domain is not authorised for sign-in — tell the administrator' },
+  };
+  A.authError = function (e) {
+    const code = (e && e.code) || '';
+    const m = A.AUTH_ERR[code];
+    return m ? A.L(m) + (code ? ' (' + code.replace('auth/', '') + ')' : '')
+             : (e && e.message) || String(e);
+  };
+
+  /* คืน promise เสมอ ให้หน้าที่เรียกเลือกเองว่าจะแสดงข้อความผิดพลาดตรงไหน
+     เดิมดักด้วย alert() ในตัวมันเอง หน้าไหนอยากขึ้นข้อความในกล่องของตัวเองจึงทำไม่ได้ */
+  A.login  = () => firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider());
+  A.loginEmail = (em, pw) => firebase.auth().signInWithEmailAndPassword(em, pw);
+  A.signup = (em, pw) => firebase.auth().createUserWithEmailAndPassword(em, pw);
   A.logout = () => firebase.auth().signOut();
 
   /* แถบผู้ใช้ + ซ่อนเมนูของเจ้าหน้าที่เมื่อยังไม่ login */
@@ -678,7 +717,9 @@
       <p style="margin:8px 0 0;font-size:13.5px;color:var(--fg-2);line-height:1.6">${esc(o.why || L({
         th: 'ทุกใบต้องรู้ว่าใครเป็นคนกรอก ระบบจะเติมชื่อให้อัตโนมัติจากบัญชีของคุณ',
         en: 'Every record must show who filled it. Your name is filled in automatically from your account.' }))}</p>
-      <div class="acts" style="margin-top:14px"><button class="big pri" type="button" id="ag-g">${
+      <div class="acts" style="margin-top:14px"><button class="big pri" type="button" id="ag-g"
+        style="display:inline-flex;align-items:center;justify-content:center;gap:10px;background:var(--surface);
+               color:var(--fg-1);border:1px solid var(--border-med)">${A.googleMark(18)}${
         esc(L({ th: 'เข้าสู่ระบบด้วย Google', en: 'Continue with Google' }))}</button></div>
       <div style="margin:16px 0 10px;border-top:1px solid var(--border-light)"></div>
       <div class="fk-f"><label for="ag-em">${esc(L({ th: 'อีเมล', en: 'Email' }))}</label>
@@ -694,12 +735,11 @@
     const $ = id => document.getElementById(id);
     const err = m => { const e = $('ag-err'); e.hidden = !m; e.textContent = m || ''; };
     let signup = false;
-    $('ag-g').onclick = () => firebase.auth().signInWithPopup(new firebase.auth.GoogleAuthProvider())
-      .catch(e => err(e.message));
+    $('ag-g').onclick = () => A.login().catch(e => err(A.authError(e)));
     $('ag-in').onclick = async () => {
       err('');
-      try { await firebase.auth().signInWithEmailAndPassword($('ag-em').value.trim(), $('ag-pw').value); }
-      catch (e) { err(e.message); }
+      try { await A.loginEmail($('ag-em').value.trim(), $('ag-pw').value); }
+      catch (e) { err(A.authError(e)); }
     };
     $('ag-up').onclick = async () => {
       err('');
@@ -713,7 +753,7 @@
       if (($('ag-pw').value || '').length < 6)
         return err(L({ th: 'รหัสผ่านอย่างน้อย 6 ตัว', en: 'Password must be at least 6 characters' }));
       try { await A.signupEmail($('ag-em').value, $('ag-pw').value, nm); }
-      catch (e) { err(e.message); }
+      catch (e) { err(A.authError(e)); }
     };
   };
 

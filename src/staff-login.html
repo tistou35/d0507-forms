@@ -3,19 +3,33 @@
 <title>เข้าสู่ระบบเจ้าหน้าที่ — D-0507</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="@@BASE@@assets/app.css">
+<style>
+#loginui button#g{display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  background:var(--surface);color:var(--fg-1);border:1px solid var(--border-med)}
+#loginui button#g:hover{border-color:var(--navy-900)}
+#loginui .sep{display:flex;align-items:center;gap:10px;margin:16px 0 2px;color:var(--g-400);font-size:12px}
+#loginui .sep::before,#loginui .sep::after{content:'';flex:1;height:1px;background:var(--border-light)}
+#loginui .err{margin-top:12px;font-size:13px;color:var(--red-600);background:var(--red-100);
+  border-radius:8px;padding:9px 12px;text-align:left;line-height:1.5}
+#loginui .ok2{color:var(--green-600);background:var(--green-100)}
+#loginui button[disabled]{opacity:.55;cursor:progress}
+</style>
 </head><body>
 @@TOPBAR@@
 <main class="main" style="max-width:640px;margin:0 auto">
   <div id="loginui">
-    <h2>เข้าสู่ระบบเจ้าหน้าที่</h2><span class="en">Staff sign in</span>
-    <button onclick="D0507.login()">เข้าสู่ระบบด้วย Google</button>
-    <input id="em" type="email" placeholder="อีเมล" autocomplete="username">
-    <input id="pw" type="password" placeholder="รหัสผ่าน" autocomplete="current-password">
-    <button class="alt" onclick="D0507.loginEmail(em.value.trim(),pw.value)">เข้าสู่ระบบด้วยอีเมล</button>
-    <button class="alt" onclick="D0507.signup(em.value.trim(),pw.value)">สมัครใหม่ (ครั้งแรกของอีเมลนี้)</button>
-    <p class="hint">ระบบนี้ใช้บัญชีแยกจาก D-0507 Audit — เข้าที่นี่แล้วยังต้องเข้าระบบตรวจสอบอีกรอบ<br>
-      อีเมลต้องอยู่ในรายชื่อขององค์กร (Security Rules)</p>
-    <p class="hint"><a href="@@BASE@@">← กลับหน้าหลัก</a> · นักเรียนไม่ต้องเข้าสู่ระบบ</p>
+    <h2>เข้าสู่ระบบ</h2><span class="en">Sign in</span>
+    <button id="g"></button>
+    <div class="sep"><span>หรือใช้อีเมล · or use email</span></div>
+    <input id="em" type="email" placeholder="อีเมล · Email" autocomplete="username" inputmode="email">
+    <input id="pw" type="password" placeholder="รหัสผ่าน · Password" autocomplete="current-password">
+    <input id="nm" type="text" placeholder="ชื่อ–นามสกุล · Full name" autocomplete="name" hidden>
+    <button class="alt" id="in">เข้าสู่ระบบด้วยอีเมล</button>
+    <button class="alt" id="up">สมัครใหม่ (ครั้งแรกของอีเมลนี้)</button>
+    <p class="err" id="err" hidden></p>
+    <p class="hint" id="note">บัญชีที่สมัครเองได้สิทธิ์ผู้ใช้ทั่วไป — ผู้ดูแลระบบกำหนดบทบาทให้ทีหลัง<br>
+      ระบบนี้ใช้บัญชีแยกจาก D-0507 Audit — เข้าที่นี่แล้วยังต้องเข้าระบบตรวจสอบอีกรอบ</p>
+    <p class="hint"><a href="@@BASE@@">← กลับหน้าหลัก</a></p>
   </div>
 </main>
 <footer>D-0507 Flight Training Co., Ltd.</footer>
@@ -40,6 +54,38 @@ function safeNext() {
   if (/^[a-z][a-z0-9+.-]*:/i.test(v) || v.startsWith('//') || v.includes('\\')) return '@@BASE@@';
   return v.startsWith('/') ? v : '@@BASE@@' + v.replace(/^\.?\//, '');
 }
-D0507.initAuth(@@FBCFG@@, u => { if (u) location.href = safeNext(); });
+const A = D0507, $ = id => document.getElementById(id);
+const say = (msg, ok) => { const e = $('err'); e.hidden = !msg; e.textContent = msg || '';
+  e.className = 'err' + (ok ? ' ok2' : ''); };
+const busy = on => ['g','in','up'].forEach(k => { $(k).disabled = on; });
+
+$('g').innerHTML = A.googleMark(18) + '<span>เข้าสู่ระบบด้วย Google</span>';
+$('g').onclick = async () => { say(''); busy(true);
+  try { await A.login(); } catch (e) { say(A.authError(e)); busy(false); } };
+
+$('in').onclick = async () => {
+  say(''); busy(true);
+  try { await A.loginEmail($('em').value.trim(), $('pw').value); }
+  catch (e) { say(A.authError(e)); busy(false); }
+};
+
+/* สมัครใหม่ต้องมีชื่อด้วย — โปรไฟล์ที่ไม่มีชื่อจะไปโผล่ในรายชื่อผู้ใช้เป็น "(ยังไม่ตั้งชื่อ)"
+   และช่อง "ชื่อผู้กรอก" ในฟอร์มจะเติมให้อัตโนมัติไม่ได้
+   กดครั้งแรกจึงเปิดช่องชื่อก่อน ไม่ใช่สมัครทันที */
+let signup = false;
+$('up').onclick = async () => {
+  say('');
+  if (!signup) { signup = true; $('nm').hidden = false; $('nm').focus();
+    $('up').textContent = 'สมัครและเข้าสู่ระบบ';
+    say('ใส่ชื่อ–นามสกุลที่จะใช้ในเอกสาร แล้วกดอีกครั้ง', true); return; }
+  const nm = $('nm').value.trim();
+  if (!nm) return say('ยังไม่ได้ใส่ชื่อ–นามสกุล');
+  if (($('pw').value || '').length < 6) return say('รหัสผ่านอย่างน้อย 6 ตัว');
+  busy(true);
+  try { await A.signupEmail($('em').value.trim(), $('pw').value, nm); }
+  catch (e) { say(A.authError(e)); busy(false); }
+};
+
+A.initAuth(@@FBCFG@@, u => { if (u) location.href = safeNext(); });
 </script>
 </body></html>
