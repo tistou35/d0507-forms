@@ -21,7 +21,7 @@ for (const abbr of (only.length?only:defs)){
   const want=[];
   (d.sections||[]).forEach(s=>(s.fields||[]).forEach(f=>{
     const t=f.type||'text';
-    if(t==='static') return;
+    if(t==='static'||t==='scan') return;
     if(t==='sign'){ want.push('sig_'+f.k); return; }
     if(t==='check'||t==='select'||t==='scale'||t==='grade'||t==='checklist'||t==='multi'||t==='riskmatrix'||t==='table') return; // มีรูปแบบ token ของตัวเอง
     want.push(f.k);

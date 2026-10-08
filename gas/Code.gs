@@ -112,6 +112,10 @@ function doPost(e) {
        ⚠️ สร้างใหม่ทับของเดิม การวาง token ด้วยมือในแม่แบบเก่าจะหายไป */
     if (body.action === 'importTpl') {
       if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบเจ้าหน้าที่ก่อน');
+      /* ไม่ระบุ abbr = สร้างแม่แบบใหม่ทุกใบ ซึ่งลบ token ที่วางด้วยมือทิ้งทั้งชุด
+         เคยเกิดจริงเพราะส่งชื่อพารามิเตอร์ผิด (formCode) — บังคับให้ขอทั้งชุดอย่างจงใจเท่านั้น */
+      if (!body.abbr && body.all !== true)
+        throw new Error('ต้องระบุ abbr ของใบที่จะสร้างแม่แบบ (หรือส่ง all: true ถ้าตั้งใจสร้างใหม่ทุกใบ)');
       return json_({ ok: true, result: importTemplate(String(body.abbr || '')) });
     }
 
@@ -185,8 +189,11 @@ function doPost(e) {
       ydoc.saveAndClose();
       var ytxt = ydoc.getBody().getText();
       var ii = ytxt.indexOf('SECTION 5');
+      /* pdf: true — คืน PDF ของแม่แบบที่เติมค่าทดลองแล้ว ไว้เปิดดูว่าแต่ละค่าลงช่องไหน
+         ตรวจตำแหน่งได้โดยไม่ต้องส่งใบจริงทีละฟอร์ม (กฎ: ตรวจด้วยการเปิดไฟล์) */
+      var ypdf = body.pdf ? Utilities.base64Encode(ycopy.getAs('application/pdf').getBytes()) : '';
       ycopy.setTrashed(true);
-      return json_({ ok: true, result: { hit: hit, around: ytxt.slice(ii, ii + 200) } });
+      return json_({ ok: true, result: { hit: hit, around: ytxt.slice(ii, ii + 200), pdf: ypdf } });
     }
 
     if (body.action === 'checklistReport') {

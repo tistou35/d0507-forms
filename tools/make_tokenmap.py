@@ -433,6 +433,8 @@ def build(abbr, verbose=False):
         'boxesInDocx': n_box_docx,
         'approval': approval,
         'manual': unmatched,
+        # ข้อความในต้นฉบับที่ต้องตัดออกจากเอกสารที่ระบบออก (regex) — ImportTemplate.gs ทำตอนสร้างแม่แบบ
+        'strip': list(ov.get('strip') or []),
     }, unmatched, lines
 
 

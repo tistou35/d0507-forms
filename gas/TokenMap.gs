@@ -51,18 +51,6 @@ var TOKEN_MAP = {
         "tok": "{{decBy}}"
       },
       {
-        "label": "Appellant Signature:\n___________________________",
-        "tok": "{{sig_appSign}}"
-      },
-      {
-        "label": "Date Submitted:\n___________________________",
-        "tok": "{{submitDate}}"
-      },
-      {
-        "label": "Received by (Admin):\n___________________________",
-        "tok": "{{recvBy}}"
-      },
-      {
         "label": "Date Notified:",
         "tok": "{{notifyDate}}"
       },
@@ -76,7 +64,23 @@ var TOKEN_MAP = {
       }
     ],
     "byLine": [],
-    "byCell": [],
+    "byCell": [
+      {
+        "cell": "Appellant Signature:\n___________________________",
+        "head": "Appellant Signature:\n",
+        "tok": "{{sig_appSign}}"
+      },
+      {
+        "cell": "Date Submitted:\n___________________________",
+        "head": "Date Submitted:\n",
+        "tok": "{{submitDate}}"
+      },
+      {
+        "cell": "Received by (Admin):\n___________________________",
+        "head": "Received by (Admin):\n",
+        "tok": "{{recvBy}}"
+      }
+    ],
     "boxes": [
       {
         "tok": "{{k_decCat_assessment}}",
@@ -609,18 +613,6 @@ var TOKEN_MAP = {
       {
         "label": "Remarks / Special Conditions:",
         "tok": "{{remark}}"
-      },
-      {
-        "label": "Subject Signature:\n___________________________",
-        "tok": "{{sig_subSign}}"
-      },
-      {
-        "label": "Issued by (Manager):\n___________________________",
-        "tok": "{{mgrName}}"
-      },
-      {
-        "label": "Date:\n___________________________",
-        "tok": "{{mgrDate}}"
       }
     ],
     "byLine": [
@@ -630,7 +622,23 @@ var TOKEN_MAP = {
         "tok": "{{suspendDays}}"
       }
     ],
-    "byCell": [],
+    "byCell": [
+      {
+        "cell": "Subject Signature:\n___________________________",
+        "head": "Subject Signature:\n",
+        "tok": "{{sig_subSign}}"
+      },
+      {
+        "cell": "Issued by (Manager):\n___________________________",
+        "head": "Issued by (Manager):\n",
+        "tok": "{{mgrName}}"
+      },
+      {
+        "cell": "Date:\n___________________________",
+        "head": "Date:\n",
+        "tok": "{{mgrDate}}"
+      }
+    ],
     "boxes": [
       {
         "tok": "{{k_infCat_sop}}",
@@ -845,7 +853,14 @@ var TOKEN_MAP = {
         "sign": true
       }
     ],
-    "manual": []
+    "manual": [
+      {
+        "tok": "{{rcvEmail}}",
+        "label": "Recipient email",
+        "labelTh": "อีเมลผู้รับ",
+        "sign": false
+      }
+    ]
   },
   "DRF": {
     "abbr": "DRF",
@@ -896,22 +911,26 @@ var TOKEN_MAP = {
       {
         "label": "Additional explanation:",
         "tok": "{{explain}}"
-      },
-      {
-        "label": "Reviewed by (QM):\n___________________________",
-        "tok": "{{qmName}}"
-      },
-      {
-        "label": "Approved by:\n___________________________",
-        "tok": "{{approvedBy}}"
-      },
-      {
-        "label": "Effective Date:\n___________________________",
-        "tok": "{{newEff}}"
       }
     ],
     "byLine": [],
-    "byCell": [],
+    "byCell": [
+      {
+        "cell": "Reviewed by (QM):\n___________________________",
+        "head": "Reviewed by (QM):\n",
+        "tok": "{{qmName}}"
+      },
+      {
+        "cell": "Approved by:\n___________________________",
+        "head": "Approved by:\n",
+        "tok": "{{approvedBy}}"
+      },
+      {
+        "cell": "Effective Date:\n___________________________",
+        "head": "Effective Date:\n",
+        "tok": "{{newEff}}"
+      }
+    ],
     "boxes": [
       {
         "tok": "{{k_changeType_minor}}",
@@ -1132,6 +1151,9 @@ var TOKEN_MAP = {
         "labelTh": "ลายเซ็นหัวหน้าครูฝึก",
         "sign": true
       }
+    ],
+    "strip": [
+      "\\s*Date: _+ / _+ / _+"
     ]
   },
   "FRAE": {
@@ -1548,10 +1570,6 @@ var TOKEN_MAP = {
         "tok": "{{acType}}"
       },
       {
-        "label": "Registration:",
-        "tok": "{{acReg}}"
-      },
-      {
         "label": "Date of Test:",
         "tok": "{{testDate}}"
       },
@@ -1586,14 +1604,21 @@ var TOKEN_MAP = {
       {
         "label": "Test Altitude:",
         "tok": "{{testAlt}}"
-      },
-      {
-        "label": "Licence No.:\n___________________________",
-        "tok": "{{tpLicence}}"
       }
     ],
     "byLine": [],
-    "byCell": [],
+    "byCell": [
+      {
+        "cell": "Licence No.:\n___________________________",
+        "head": "Licence No.:\n",
+        "tok": "{{tpLicence}}"
+      },
+      {
+        "cell": "HS-",
+        "head": "",
+        "tok": "{{acReg}}"
+      }
+    ],
     "boxes": [
       {
         "tok": "{{k_reason_rts}}",
@@ -1870,10 +1895,6 @@ var TOKEN_MAP = {
         "tok": "{{matrix}}"
       },
       {
-        "label": "Prepared by:\n___________________________",
-        "tok": "{{sig_prepSign}}"
-      },
-      {
         "label": "Likelihood (1–5):",
         "tok": "{{lik}}"
       },
@@ -1891,7 +1912,13 @@ var TOKEN_MAP = {
       }
     ],
     "byLine": [],
-    "byCell": [],
+    "byCell": [
+      {
+        "cell": "Prepared by:\n___________________________",
+        "head": "Prepared by:\n",
+        "tok": "{{sig_prepSign}}"
+      }
+    ],
     "boxes": [
       {
         "tok": "{{k_riskLevel_H}}",
@@ -2856,18 +2883,6 @@ var TOKEN_MAP = {
       {
         "label": "No. of Students in Class",
         "tok": "{{students}}"
-      },
-      {
-        "label": "Conductor Remarks / Areas for Improvement:",
-        "tok": "{{remarks}}"
-      },
-      {
-        "label": "Follow-up Action Required:",
-        "tok": "{{followup}}"
-      },
-      {
-        "label": "Re-check Due Date (if applicable):",
-        "tok": "{{recheckDue}}"
       }
     ],
     "byLine": [
@@ -2887,7 +2902,23 @@ var TOKEN_MAP = {
         "tok": "{{tkiAckDate}}"
       }
     ],
-    "byCell": [],
+    "byCell": [
+      {
+        "cell": "Conductor Remarks / Areas for Improvement:",
+        "head": "Conductor Remarks / Areas for Improvement:\n",
+        "tok": "{{remarks}}"
+      },
+      {
+        "cell": "Follow-up Action Required:",
+        "head": "Follow-up Action Required:\n",
+        "tok": "{{followup}}"
+      },
+      {
+        "cell": "Re-check Due Date (if applicable):",
+        "head": "Re-check Due Date (if applicable):\n",
+        "tok": "{{recheckDue}}"
+      }
+    ],
     "boxes": [
       {
         "tok": "{{k_ipcType_annual}}",

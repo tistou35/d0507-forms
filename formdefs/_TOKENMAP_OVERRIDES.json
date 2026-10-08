@@ -63,7 +63,22 @@
   "_why": "คำรับรองในกระดาษเป็นความเรียง ไม่มีช่องติ๊ก — การลงนามคือการรับรอง ระบบทำเป็น checkbox เพื่อบังคับให้อ่านก่อนส่ง",
   "skip": [
    "{{k_declare}}"
-  ]
+  ],
+  "cells": {
+   "Appellant Signature:\n___________________________": {
+    "tok": "{{sig_appSign}}",
+    "head": "Appellant Signature:\n"
+   },
+   "Date Submitted:\n___________________________": {
+    "tok": "{{submitDate}}",
+    "head": "Date Submitted:\n"
+   },
+   "Received by (Admin):\n___________________________": {
+    "tok": "{{recvBy}}",
+    "head": "Received by (Admin):\n"
+   }
+  },
+  "_why_cells": "ป้ายลายเซ็น/วันที่ยื่น/ผู้รับเรื่อง อยู่เซลล์เดียวกับเส้นว่าง ไม่มีเซลล์ว่างข้าง ๆ ให้ตัววางหาเจอ"
  },
  "DRC": {
   "_why": "เหตุผลเดียวกับ APF — ข้อความรับรองการรับเอกสารเป็นความเรียง ช่องติ๊กในกระดาษมีแค่ Hard Copy / Digital",
@@ -86,7 +101,18 @@
    "{{k_checks_A2_NA}}",
    "{{k_checks_P1_NA}}",
    "{{k_checks_P2_NA}}"
-  ]
+  ],
+  "cells": {
+   "Licence No.:\n___________________________": {
+    "tok": "{{tpLicence}}",
+    "head": "Licence No.:\n"
+   },
+   "HS-": {
+    "tok": "{{acReg}}",
+    "head": ""
+   }
+  },
+  "_why_cells": "ช่องเลขใบอนุญาตอยู่เซลล์เดียวกับเส้นว่าง · ช่องทะเบียนใต้ป้ายมี HS- พิมพ์ไว้แล้ว ตัววางจึงถือว่าไม่ว่าง ค่าที่กรอกมี HS- อยู่แล้วจึงแทนทั้งเซลล์"
  },
  "HIF": {
   "_why": "☐ 5 ช่องในกระดาษคือ High/Medium/Low แล้วตามด้วย Yes/No ของ residual risk — ระดับความเสี่ยงมาจากตารางเมทริกซ์ (riskLevel) ไม่ใช่ช่องที่ผู้กรอกเลือก ส่วน lik กับ sev เป็นช่องกรอกตัวเลข กระดาษไม่มีช่องติ๊กให้",
@@ -115,7 +141,14 @@
    "Severity (1–5):": "{{sev}}",
    "Risk Score (L×S):": "{{riskScore}}",
    "Risk Level:": "{{riskLevel}}"
-  }
+  },
+  "cells": {
+   "Prepared by:\n___________________________": {
+    "tok": "{{sig_prepSign}}",
+    "head": "Prepared by:\n"
+   }
+  },
+  "_why_cells": "ป้ายผู้จัดทำอยู่เซลล์เดียวกับเส้นว่าง"
  },
  "EFM": {
   "_why": "ป้าย \"Signature:\" ในกระดาษสั้นเกินกว่าจะจับคู่อัตโนมัติกับ \"Evaluator signature\" ในนิยามฟอร์ม (คำว่า signature กว้างเกินไป ตัวจับคู่จึงไม่กล้าเดา) ระบุเองให้ชัด",
@@ -128,7 +161,11 @@
   "labels": {
    "Course Attended": "{{course}}",
    "Percentile": "{{pct}}"
-  }
+  },
+  "strip": [
+   "\\s*Date: _+ / _+ / _+"
+  ],
+  "_why_strip": "ชื่อเอกสารมี tab แล้วต่อด้วย \"Date: ___ / ___ / ______\" ตัวแปลงทิ้ง tab จึงติดชื่อเอกสาร และไม่มีฟิลด์ใดเติม ผู้ควบคุมเอกสารสั่งให้ตัดออกจากเอกสารที่ระบบออก (08 OCT 2026)"
  },
  "VSR": {
   "_why": "ฉบับแก้ไข 01 วาง token ลงในเอกสารเองแล้ว — หัวข้อบรรยายทั้งสามเป็นหัวข้อเปล่า ไม่มีป้ายคู่ช่องให้ตัวจับคู่ทำงาน จึงต้องระบุตำแหน่งในเอกสารโดยตรง"
@@ -333,5 +370,56 @@
    "{{apvName}}",
    "{{apvDate}}"
   ]
+ },
+ "DAF": {
+  "cells": {
+   "Subject Signature:\n___________________________": {
+    "tok": "{{sig_subSign}}",
+    "head": "Subject Signature:\n"
+   },
+   "Issued by (Manager):\n___________________________": {
+    "tok": "{{mgrName}}",
+    "head": "Issued by (Manager):\n"
+   },
+   "Date:\n___________________________": {
+    "tok": "{{mgrDate}}",
+    "head": "Date:\n"
+   }
+  },
+  "_why_cells": "ป้ายลายเซ็นผู้ถูกลงโทษ/ผู้ออกคำสั่ง/วันที่ อยู่เซลล์เดียวกับเส้นว่าง"
+ },
+ "DRF": {
+  "cells": {
+   "Reviewed by (QM):\n___________________________": {
+    "tok": "{{qmName}}",
+    "head": "Reviewed by (QM):\n"
+   },
+   "Approved by:\n___________________________": {
+    "tok": "{{approvedBy}}",
+    "head": "Approved by:\n"
+   },
+   "Effective Date:\n___________________________": {
+    "tok": "{{newEff}}",
+    "head": "Effective Date:\n"
+   }
+  },
+  "_why_cells": "ป้ายผู้ทบทวน (QM)/ผู้อนุมัติ/วันมีผล อยู่เซลล์เดียวกับเส้นว่าง"
+ },
+ "PCR-TKI": {
+  "cells": {
+   "Conductor Remarks / Areas for Improvement:": {
+    "tok": "{{remarks}}",
+    "head": "Conductor Remarks / Areas for Improvement:\n"
+   },
+   "Follow-up Action Required:": {
+    "tok": "{{followup}}",
+    "head": "Follow-up Action Required:\n"
+   },
+   "Re-check Due Date (if applicable):": {
+    "tok": "{{recheckDue}}",
+    "head": "Re-check Due Date (if applicable):\n"
+   }
+  },
+  "_why_cells": "ช่องบรรยายสามช่องเป็นเซลล์เดียวที่มีป้ายแล้วเว้นบรรทัดว่างไว้เขียน ไม่มีเซลล์ว่างแยก"
  }
 }

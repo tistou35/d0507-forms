@@ -137,6 +137,11 @@ function fillTokens_(doc, map) {
      แทนที่จะอยู่ในช่องลายเซ็น แล้วดูเผิน ๆ เหมือนเอกสารมีลายเซ็นครบ */
   var inert = function (s) { return s.replace(/\{\{/g, '⟦').replace(/\}\}/g, '⟧'); };
 
+  // 0) ข้อความในต้นฉบับที่ไม่ควรขึ้นในเอกสารที่ระบบออก (map.strip — regex)
+  //    เช่น EFC มี "Date: ___ / ___ / ______" ต่อท้ายชื่อเอกสารด้วย tab ตัวแปลงทิ้ง tab
+  //    จึงกลายเป็นข้อความติดชื่อเอกสาร และไม่มีฟิลด์ใดมาเติม ปล่อยไว้ก็เป็นช่องว่างลอย ๆ
+  (map.strip || []).forEach(function (re) { body.replaceText(re, ''); });
+
   // 1) ป้ายในเซลล์ -> ช่องว่างที่คู่กัน (ขวาก่อน แล้วล่าง)
   //    ป้ายซ้ำกันได้ในใบเดียว เช่น PWR มี "Phone Number" ทั้งของผู้โดยสารและผู้ปกครอง
   //    จึงต้องกันเซลล์ที่ใช้ไปแล้ว ไม่งั้นอันหลังไปทับอันแรกหรือหาไม่เจอ
@@ -146,7 +151,9 @@ function fillTokens_(doc, map) {
     var target = cell && nextCell_(cell);
     if (!target) { left.push(it.tok + '  ← ' + it.label + ' (ไม่มีช่องว่างข้างเคียง)'); return; }
     usedCells[cell.key] = true;
-    target.setText(it.tok);
+    // ช่องที่มีเส้นว่างพร้อมหน่วยกำกับ ("_____ hr(s)") แทนเฉพาะเส้นว่าง หน่วยต้องอยู่ต่อ
+    if (/[^_\s.\/\-:☐]/.test(target.getText())) target.editAsText().replaceText('_{3,}', it.tok);
+    else target.setText(it.tok);
     placed++;
   });
 
@@ -356,6 +363,13 @@ function nextCell_(pos) {
   for (var i = 0; i < cand.length; i++) {
     var t = cand[i].getText().trim();
     if (!t || /^[_\.\s\/\-:☐]*$/.test(t)) return cand[i];
+  }
+  /* รอบสอง: ช่องที่มีเส้นว่างพร้อมหน่วยสั้น ๆ ("_____ hr(s)") — เดิมถือว่าไม่ว่าง
+     token จึงตกไปอยู่ในรายการวางมือทั้งห้าช่องของ SDF ทั้งที่ช่องนั้นมีไว้ให้กรอกจริง
+     จำกัดส่วนที่ไม่ใช่เส้นว่างไว้ไม่เกิน 12 ตัว ไม่ให้ไปทับข้อความของเอกสาร */
+  for (var j = 0; j < cand.length; j++) {
+    var u = cand[j].getText().trim();
+    if (/_{3,}/.test(u) && u.replace(/[_\s]/g, '').length <= 12) return cand[j];
   }
   return null;
 }
