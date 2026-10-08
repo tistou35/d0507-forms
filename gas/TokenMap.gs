@@ -1033,6 +1033,14 @@ var TOKEN_MAP = {
       {
         "label": "Learning / Flight Hours",
         "tok": "{{learningHours}}"
+      },
+      {
+        "label": "Course Attended",
+        "tok": "{{course}}"
+      },
+      {
+        "label": "Percentile",
+        "tok": "{{pct}}"
       }
     ],
     "byLine": [],
@@ -1098,6 +1106,12 @@ var TOKEN_MAP = {
         "tok": "{{htComment}}",
         "label": "Comment",
         "labelTh": "ความเห็น",
+        "sign": false
+      },
+      {
+        "tok": "{{attach}}",
+        "label": "Attach result report (PDF)",
+        "labelTh": "แนบรายงานผล (PDF)",
         "sign": false
       },
       {

@@ -214,6 +214,14 @@ def build(abbr, verbose=False):
             continue
         tok = '{{sig_%s}}' % f['k'] if f.get('type') == 'sign' else '{{%s}}' % f['k']
 
+        # ไฟล์แนบไม่ใช่ช่องบนกระดาษ — ห้ามเอาไปจับคู่กับป้ายใด ๆ
+        # ("Attach result report" เคยไปเข้าคู่กับช่อง Result ของ EFC ซึ่งจะพิมพ์
+        #  ชื่อไฟล์ทับผลสอบ) ส่งไปต่อท้ายเอกสารพร้อมชื่อไฟล์แทน
+        if f.get('type') == 'file':
+            unmatched.append({'tok': tok, 'label': (f.get('label') or {}).get('en') or f['k'],
+                              'labelTh': (f.get('label') or {}).get('th') or '', 'sign': False})
+            continue
+
         # ช่องติ๊กและตัวเลือก — เก็บไว้ใส่แทน ☐ ตามลำดับ
         if f.get('type') == 'check':
             lb = (f.get('label') or {}).get('en') or ''

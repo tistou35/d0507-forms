@@ -20,6 +20,22 @@ dialog .df{padding:14px 22px;border-top:1px solid var(--g-100);display:flex;gap:
   padding:6px 0;border-bottom:1px solid var(--g-100);font-size:13.5px}
 .rvr span{color:var(--g-600);flex:1}
 .rvr b{font-weight:600;text-align:right;max-width:55%}
+/* กล่อง "ทำต่อที่ระบบอื่น" ท้ายหน้าหลังส่งใบ */
+.afterbox{margin-top:16px;border:1px solid var(--border-light);border-radius:12px;
+  background:var(--surface);padding:16px 18px}
+.afterbox h3{font-family:var(--font-display);font-size:16px;margin:0 0 10px}
+.afterbox h4{font-size:13px;color:var(--sky-600);margin:18px 0 4px;letter-spacing:.02em}
+.afchk{display:flex;gap:9px;align-items:flex-start;font-size:14px;line-height:1.5;cursor:pointer}
+.afchk input{margin-top:3px;width:17px;height:17px}
+.afstat{font-size:12.5px;color:var(--g-500);align-self:center}
+.afstat.ok{color:var(--green-600)}
+table.aftbl{width:100%;border-collapse:collapse;font-size:13.5px}
+table.aftbl th{text-align:left;font-weight:500;color:var(--g-600);padding:7px 10px 7px 0;
+  border-bottom:1px solid var(--g-100);width:40%}
+table.aftbl td{padding:7px 0;border-bottom:1px solid var(--g-100);font-weight:600}
+table.aftbl td.c{width:1%;text-align:right;font-weight:400;white-space:nowrap}
+table.aftbl tr:last-child th,table.aftbl tr:last-child td{border-bottom:0}
+@media print{ .afterbox{display:none} }
 </style>
 </head><body>
 @@TOPBAR@@
@@ -662,11 +678,13 @@ async function send(){
         ${ex&&ex.ok===false?'<br>'+A.esc(A.t('exportFailed'))+' '+A.esc(ex.error||''):''}
         ${ex&&ex.pdf?`<br><a href="${A.esc(ex.pdf)}" target="_blank" rel="noopener">PDF ↗</a>`:''}
       </span></div>
-      <div class="acts">${queued?'':`<a class="big pri" href="@@BASE@@view/?id=${encodeURIComponent(ref.id)}">${
-          A.esc(A.L({th:'ดู / พิมพ์ใบนี้',en:'View / print this form'}))}</a>`}
+      <div class="acts">${queued?'':`<a class="big pri" href="@@BASE@@view/?id=${encodeURIComponent(ref.id)}"${
+          DEF.after?' target="_blank" rel="noopener"':''}>${
+          A.esc(A.L({th:'ดู / พิมพ์ใบนี้',en:'View / print this form'}))}${DEF.after?' ↗':''}</a>`}
         ${A.signedIn()?`<a class="big sec" href="@@BASE@@queue/">${A.esc(A.L({th:'งานของฉัน',en:'My queue'}))}</a>`:''}
         <a class="big sec" href="${A.formUrl(F)}">${A.esc(A.t('backToForm'))}</a>
         <a class="big sec" href="@@BASE@@all/">${A.esc(A.t('backToAll'))}</a></div>`;
+    if(!queued) afterPanel(ref.id, trk);
     window.scrollTo({top:foot.getBoundingClientRect().top+window.scrollY-90,behavior:'smooth'});
   }catch(e){
     foot.innerHTML=`<div class="fk-gate stop" style="margin-bottom:14px"><span>
@@ -675,6 +693,95 @@ async function send(){
     renderFootRetry();
   }
 }
+/* ── ทำต่อที่ระบบอื่นหลังส่งใบ ─────────────────────────────
+   บางใบจบในระบบนี้แล้วยังต้องเอาผลไปบันทึกในระบบที่คุยกับเราไม่ได้
+   (EFC → โปรไฟล์ผู้เรียนใน AeroFBO ซึ่งไม่มีทางรับข้อมูลอัตโนมัติ)
+
+   สิ่งที่กล่องนี้ทำ สามอย่าง
+     1 ถามตรง ๆ ว่าจะไปบันทึกต่อไหม แล้วเปิดหน้าปลายทางให้ในแท็บใหม่
+     2 ค้างค่าทั้งชุดไว้ให้คัดลอก ทีละช่องหรือทั้งแถว — หน้านี้ไม่เด้งไปไหน
+     3 บันทึกลงใบว่าไปบันทึกต่อแล้วหรือข้ามไป ไม่งั้นไม่มีใครรู้ว่าทำหรือยัง
+
+   เปิดแท็บตอนกดปุ่มทันที ไม่รอ await — เบราว์เซอร์บล็อกหน้าต่างที่เปิดหลัง
+   งานไม่ซิงค์ ถ้ารอบันทึกก่อนแล้วค่อยเปิด ผู้ใช้จะกดแล้วไม่เกิดอะไรขึ้น */
+function afterPanel(subId, trk){
+  const AF = DEF && DEF.after;
+  if(!AF || !FK) return;
+  const L2 = o => A.L(o), esc = A.esc;
+  const comp = FK.computed();
+  const rows = (AF.copy||[]).map(k=>{
+    const f = FK.fields[k];
+    if(f){
+      const v = FK.data[k];
+      if(v===undefined || v==='' || v===null) return null;
+      // วันที่ส่งเป็น YYYY-MM-DD ตามที่ช่องวันที่ของเว็บรับได้ ไม่ใช่รูปแบบที่พิมพ์บนกระดาษ
+      return { label: FK.labelOf(f), value: f.type==='date' ? String(v) : FK.showValue(f, v) };
+    }
+    const c = (DEF.compute||[]).find(x=>x.k===k);
+    if(c && comp[k]!==undefined && comp[k]!=='')
+      return { label: L2(c.label)||k, value: String(comp[k]) };
+    return null;
+  }).filter(Boolean);
+
+  const box=document.createElement('div');
+  box.className='afterbox';
+  box.innerHTML=`
+    <h3>${esc(L2({th:'ยังต้องทำต่ออีกหนึ่งที่',en:'One more place to record this'}))}</h3>
+    <label class="afchk"><input type="checkbox" id="afgo" checked>
+      <span>${esc(L2(AF.ask))}</span></label>
+    <div class="acts" style="margin:12px 0 0">
+      <button class="big pri" id="afok">${esc(L2({th:'ยืนยัน',en:'Confirm'}))}</button>
+      <span class="afstat" id="afstat"></span>
+    </div>
+    ${rows.length?`
+      <h4>${esc(L2({th:'ข้อมูลสำหรับคัดลอกไปวาง',en:'Values to copy across'}))}</h4>
+      <p class="hint" style="margin:0 0 8px">${esc(L2(AF.note||{th:'',en:''}))}</p>
+      <table class="aftbl"><tbody>${rows.map((r,i)=>`<tr>
+        <th>${esc(r.label)}</th><td>${esc(r.value)}</td>
+        <td class="c"><button class="fb" data-cp="${i}">${esc(L2({th:'คัดลอก',en:'Copy'}))}</button></td>
+      </tr>`).join('')}</tbody></table>
+      <div class="acts" style="margin-top:10px">
+        <button class="fb" id="afall">${esc(L2({th:'คัดลอกทั้งแถว (วางในตารางได้)',en:'Copy the whole row (pastes into a table)'}))}</button>
+        <button class="fb" id="aflist">${esc(L2({th:'คัดลอกแบบมีชื่อช่อง',en:'Copy with field names'}))}</button>
+      </div>`:''}`;
+  document.getElementById('foot').appendChild(box);
+
+  const say=(t,ok)=>{ const e=document.getElementById('afstat');
+    e.textContent=t; e.className='afstat'+(ok?' ok':''); };
+  const copy=async(text,btn)=>{
+    try{ await navigator.clipboard.writeText(text); }
+    catch(e){ const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta);
+      ta.select(); try{ document.execCommand('copy'); }catch(e2){} ta.remove(); }
+    if(btn){ const old=btn.textContent; btn.textContent=L2({th:'คัดลอกแล้ว ✓',en:'Copied ✓'});
+      setTimeout(()=>{ btn.textContent=old; }, 1800); }
+  };
+  box.querySelectorAll('[data-cp]').forEach(b=>b.addEventListener('click',()=>
+    copy(rows[+b.dataset.cp].value, b)));
+  const all=document.getElementById('afall');
+  if(all) all.addEventListener('click',()=>copy(rows.map(r=>r.value).join('\t'), all));
+  const list=document.getElementById('aflist');
+  if(list) list.addEventListener('click',()=>copy(rows.map(r=>r.label+': '+r.value).join('\n'), list));
+
+  document.getElementById('afok').addEventListener('click', ()=>{
+    const go=document.getElementById('afgo').checked;
+    // เปิดก่อน บันทึกทีหลัง — เบราว์เซอร์ยอมให้เปิดเฉพาะตอนที่ยังอยู่ในจังหวะคลิก
+    if(go && AF.url) window.open(AF.url, '_blank', 'noopener');
+    say(go ? L2({th:'เปิดหน้าปลายทางแล้ว · ข้อมูลยังอยู่ที่หน้านี้ กลับมาคัดลอกต่อได้',
+                 en:'Destination opened — the values stay on this page, come back and keep copying'})
+           : L2({th:'บันทึกไว้แล้วว่าไม่ได้บันทึกต่อในรอบนี้',en:'Recorded that this was not carried across'}), true);
+    const me=A.myName()||(A.user&&A.user.email)||'';
+    const ref=A.db.collection('submissions').doc(subId);
+    ref.collection('events').add({ action: go?'aerofbo:open':'aerofbo:skip',
+      byUid:(A.user&&A.user.uid)||'', byName:me, note:trk||'',
+      at:firebase.firestore.FieldValue.serverTimestamp() })
+      .catch(e=>console.warn('[after] บันทึกเหตุการณ์ไม่สำเร็จ',e));
+    // ตัวใบเองก็ติดธงไว้ ผู้ดูแลจะได้เห็นจากหน้าใบที่ส่งเข้ามาโดยไม่ต้องเปิด log
+    ref.update({ followUp: go?'aerofbo:opened':'aerofbo:skipped',
+      followUpAt:firebase.firestore.FieldValue.serverTimestamp() })
+      .catch(e=>console.warn('[after] ติดธงในใบไม่สำเร็จ (ไม่กระทบใบ)',e));
+  });
+}
+
 function renderFootRetry(){
   const d=document.createElement('div'); d.className='acts';
   d.innerHTML=`<button class="big pri" id="again">${A.esc(A.t('tryAgain'))}</button>`;

@@ -182,6 +182,18 @@ function setupAurReport() {
  * ใบที่ยิงเข้ามาตอนทดสอบระบบไม่ใช่บันทึกจริง ปล่อยค้างไว้ในโฟลเดอร์เอกสารควบคุม
  * ผู้ตรวจจะเจอ "BCK-TEST-0001" ปนอยู่กับของจริง แล้วต้องมาอธิบายทีหลัง
  */
+/** ลบไฟล์แนบของใบทดสอบ — รับเฉพาะไฟล์ที่อยู่ในโฟลเดอร์ Attachments ของฟอร์มนั้นจริง
+    กันไม่ให้ id ที่ส่งมาผิดไปลบไฟล์อื่นในไดรฟ์ */
+function dropAttachment(abbr, fileId) {
+  var f = DriveApp.getFileById(String(fileId));
+  var ok = false, ps = f.getParents();
+  while (ps.hasNext()) { if (ps.next().getName() === 'Attachments') ok = true; }
+  if (!ok) throw new Error('ไฟล์นี้ไม่ได้อยู่ในโฟลเดอร์ไฟล์แนบ — ไม่ลบให้');
+  var name = f.getName();
+  f.setTrashed(true);
+  return name;
+}
+
 function dropTestRecord(abbr, tracking) {
   var folder = subFolder_(abbr), gone = [];
   var it = folder.getFilesByName(tracking + '.pdf');

@@ -133,7 +133,10 @@ function doPost(e) {
     if (body.action === 'dropTest') {
       if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบเจ้าหน้าที่ก่อน');
       if (!/TEST/i.test(String(body.tracking || ''))) throw new Error('ใช้ลบได้เฉพาะใบที่มีคำว่า TEST ในเลขที่ใบ');
-      return json_({ ok: true, result: dropTestRecord(String(body.abbr || ''), String(body.tracking || '')) });
+      var dropped = dropTestRecord(String(body.abbr || ''), String(body.tracking || ''));
+      // ใบทดสอบที่แนบไฟล์ไว้ ต้องเก็บไฟล์แนบด้วย ไม่งั้นค้างอยู่ใน Attachments ตลอดไป
+      if (body.attachId) dropped.push(dropAttachment(String(body.abbr || ''), String(body.attachId)));
+      return json_({ ok: true, result: dropped });
     }
 
     /* ข้อความในแม่แบบ — ใช้ตรวจว่า token ไปลงช่องไหนจริง เวลาผลลัพธ์ไม่ตรงที่คิด */

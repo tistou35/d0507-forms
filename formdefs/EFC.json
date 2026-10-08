@@ -885,6 +885,19 @@
      }
     },
     {
+     "k": "attach",
+     "type": "file",
+     "label": {
+      "th": "แนบรายงานผล (PDF)",
+      "en": "Attach result report (PDF)"
+     },
+     "hint": {
+      "th": "ใบคะแนน ใบรายงานผล หรือเอกสารประกอบ — ไฟล์ขึ้นไปเก็บใน Drive ของใบนี้ทันทีที่เลือก",
+      "en": "Score sheet, result report or supporting document — uploaded to this record’s Drive folder as soon as you choose it"
+     },
+     "accept": "application/pdf,image/*"
+    },
+    {
      "k": "htName",
      "type": "text",
      "label": {
@@ -923,7 +936,11 @@
    "k": "pct",
    "op": "pct",
    "of": "examScore",
-   "max": 100
+   "max": 100,
+   "label": {
+    "th": "คิดเป็นร้อยละ",
+    "en": "Percentage"
+   }
   }
  ],
  "gates": [
@@ -950,5 +967,34 @@
  "export": {
   "docx": "D-0507-EFC-001.docx",
   "lockUntilComplete": true
+ },
+ "after": {
+  "ask": {
+   "th": "บันทึกผลหลักสูตรนี้ลงโปรไฟล์ผู้เรียนใน AeroFBO ต่อ",
+   "en": "Also record this course result in the learner’s AeroFBO profile"
+  },
+  "url": "https://indyzz.com/aerofbo/admin-panel.php?tab=training&subtab=classes",
+  "urlName": {
+   "th": "AeroFBO › Training › Classes",
+   "en": "AeroFBO › Training › Classes"
+  },
+  "note": {
+   "th": "หน้านี้ค้างไว้จนกว่าจะปิดเอง — คัดลอกค่าไปวางใน AeroFBO ได้ทีละช่องหรือทั้งแถว",
+   "en": "This page stays open — copy the values into AeroFBO one field at a time or as a whole row"
+  },
+  "copy": [
+   "stuName",
+   "course",
+   "courseType",
+   "studyFrom",
+   "studyTo",
+   "learningHours",
+   "completeDate",
+   "examType",
+   "examScore",
+   "totalScore",
+   "pct",
+   "result"
+  ]
  }
 }
