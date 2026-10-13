@@ -480,6 +480,22 @@ def main():
                                   'assignTo','iss','rev','eff','jot','hasDef',
                                   'guide','blank','kind','next','refs','flow','admin') if k in f}
         # ใบที่อยู่ก่อนหน้าคำนวณจาก next ของใบอื่น จะได้ไม่ต้องกรอกสองที่ให้ขัดกันเอง
+        # ตารางบันทึกที่ส่งเข้ามาใต้หน้าเอกสาร (records ในทะเบียน) — ใครเห็น และคอลัมน์อะไร
+        # ป้ายกับตัวเลือกของแต่ละคอลัมน์ดึงจากนิยามฟอร์มตอน build หน้าเอกสารจะได้ไม่ต้องโหลดนิยามทั้งใบ
+        if f.get('records'):
+            rd = f['records']
+            fl = {x['k']: x for sec in (defs.get(f['abbr']) or {}).get('sections', [])
+                  for x in sec.get('fields', [])}
+            cols = []
+            for k in rd.get('cols', []):
+                x = fl.get(k)
+                if not x:
+                    sys.exit("%s: records.cols อ้าง '%s' ที่ไม่มีในนิยามฟอร์ม" % (f['abbr'], k))
+                c = {'k': k, 'label': x.get('label'), 'type': x.get('type', 'text')}
+                if x.get('opt'):
+                    c['opt'] = {str(o['v']): o.get('n') for o in x['opt']}
+                cols.append(c)
+            fpub['records'] = {'pos': rd.get('pos', []), 'roles': rd.get('roles', []), 'cols': cols}
         fpub['prev'] = [x['abbr'] for x in reg['forms'] if f['abbr'] in (x.get('next') or [])]
         if not fpub['prev']:
             del fpub['prev']

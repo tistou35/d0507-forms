@@ -320,7 +320,27 @@
    "blank": "blank/ASF.pdf",
    "tpl": "1uY8DJHLfvBJeTS1FLwa1Dr6gBwJu8L86m_cjjQ-xGAM",
    "unlisted": true,
-   "edit": "1XYJnMUzvMvCRT5RwRb6PfJgmVz-43Dc7BvX-uc6K7zw"
+   "edit": "1XYJnMUzvMvCRT5RwRb6PfJgmVz-43Dc7BvX-uc6K7zw",
+   "records": {
+    "pos": [
+     "OPS",
+     "FI",
+     "CFI",
+     "HT",
+     "ACM"
+    ],
+    "roles": [
+     "ops",
+     "ins"
+    ],
+    "cols": [
+     "stuName",
+     "insName",
+     "acReg",
+     "fltDate",
+     "soloType"
+    ]
+   }
   },
   {
    "doc": "",

@@ -227,6 +227,20 @@
   /* ใบที่บทบาทนี้เห็น (ไม่รวมเอกสารอ้างอิงซึ่งไม่ใช่ใบให้กรอก) */
   A.formsFor = (reg, role) => (reg.forms || []).filter(f => f.kind !== 'ref' && A.seesForm(f, role));
 
+  /* ใครเปิดดูบันทึกที่ส่งเข้ามาของใบนี้ได้ (records ในทะเบียน)
+     ผ่านอย่างใดอย่างหนึ่ง — บทบาทในระบบ (roles) หรือตำแหน่งในองค์กร (pos)
+     ตำแหน่งต้องมีเพราะหลายคนถือบทบาทเดียวกันแต่หน้าที่ต่างกัน เช่น CFI กับ HT
+     ต่างก็เป็นบทบาท ins/mgt แต่ใบอนุญาตบินเดี่ยวต้องให้สองตำแหน่งนี้เห็น
+     ผู้ดูแลระบบเห็นทุกใบ · กติกาฝั่ง Firestore ให้เจ้าหน้าที่ทุกคนอ่านใบได้อยู่แล้ว
+     ตัวนี้จึงเป็นการคัดว่าจะแสดงตารางให้ใคร ไม่ใช่ตัวกันข้อมูล */
+  A.myPositions = () => ((A.profile && A.profile.positions) || []);
+  A.canSeeRecords = function (spec) {
+    if (!spec || !A.signedIn() || !A.isStaff()) return false;
+    if (A.isAdmin()) return true;
+    const r = spec.roles || [], p = spec.pos || [];
+    return A.myRoles().some(x => r.indexOf(x) >= 0) || A.myPositions().some(x => p.indexOf(x) >= 0);
+  };
+
   /* คนหนึ่งคนถือได้หลายตำแหน่ง — ครูที่เป็นผู้จัดการฝ่ายมาตรฐานด้วย, ช่างที่ทำ
      dispatch ด้วย users/{uid}.roles จึงเป็น array มาแต่แรก แต่หน้าหลักเดิม
      หยิบแค่ roles[0] ทั้งที่ป้ายบอกว่า "ตามบทบาท A · B" — เห็นแค่ครึ่งเดียว
@@ -316,6 +330,7 @@
     navSetup:   { th: 'ตั้งค่าระบบ', en: 'Admin setup' },
     navAprv:    { th: 'ผังผู้อนุมัติ', en: 'Approvals' },
     navSubs:    { th: 'ใบที่ส่งเข้ามา', en: 'Submitted records' },
+    recsTitle:  { th: 'บันทึกที่ส่งเข้ามา', en: 'Submitted records' },
     navAudit:   { th: 'งานตรวจสอบ', en: 'Audit' },
     navDrc:     { th: 'แจกจ่ายเอกสาร', en: 'Distribution · DRC' },
     auditNote:  { th: 'Audit ↗ login แยก', en: 'งานตรวจสอบ ↗ แยก login' },

@@ -3,6 +3,32 @@
 <title>การประเมินความเสี่ยงก่อนทำการบิน — D-0507 Flight Training</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="../../assets/app.css?v=c6bc4fc1">
+<style>
+/* ตารางบันทึกที่ส่งเข้ามาของใบนี้ — กดแถวเพื่อเปิดดูรายละเอียด */
+#recs .rbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:2px 0 12px}
+#recs .rbar input{flex:1;min-width:180px;min-height:38px;padding:0 11px;border-radius:8px;
+  border:1px solid var(--border-med);background:var(--surface);color:var(--fg-1);font-family:inherit;font-size:13.5px}
+#recs .chip{min-height:34px;padding:0 12px;border-radius:99px;border:1px solid var(--border-med);
+  background:var(--surface);cursor:pointer;font-family:inherit;font-size:12.5px;color:var(--fg-2)}
+#recs .chip[aria-pressed="true"]{background:var(--navy-900);border-color:var(--navy-900);color:#fff}
+#recs .twrap{overflow-x:auto;border:1px solid var(--border-light);border-radius:10px}
+#recs table{width:100%;border-collapse:collapse;font-size:13.5px}
+#recs th{text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--g-500);
+  padding:9px 12px;border-bottom:1px solid var(--border-light);white-space:nowrap;background:var(--g-50)}
+#recs td{padding:9px 12px;border-bottom:1px solid var(--g-100);vertical-align:top}
+#recs tbody tr{cursor:pointer}
+#recs tbody tr:hover,#recs tbody tr:focus{background:var(--sky-100);outline:none}
+#recs tr:last-child td{border-bottom:0}
+#recs .mono{font-family:var(--font-mono);font-size:11.5px;white-space:nowrap}
+#recs .st{display:inline-flex;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;white-space:nowrap}
+#recs .st.wait{background:var(--amber-100);color:var(--amber-600)}
+#recs .st.ok{background:var(--green-100);color:var(--green-600)}
+#recs .st.no{background:var(--red-100);color:var(--red-600)}
+#recs .who{display:block;font-size:11.5px;color:var(--g-500);margin-top:3px}
+#recs .go{color:var(--sky-600);white-space:nowrap}
+#recs .empty{padding:14px;border:1px dashed var(--border-med);border-radius:10px;color:var(--g-500);font-size:13.5px}
+@media(max-width:640px){ #recs .hide-s{display:none} }
+</style>
 </head><body>
 <div class="topbar">
   <a class="brand" href="../../" style="text-decoration:none">
@@ -88,6 +114,12 @@
     <div id="revban"></div>
     <div id="alerts"></div>
 
+    <div class="card" id="recs" style="display:none">
+      <h3 data-t="recsTitle">บันทึกที่ส่งเข้ามา</h3>
+      <p class="hint" id="recsSub" style="margin:2px 0 10px"></p>
+      <div id="recsBody"></div>
+    </div>
+
     <div class="card" id="guidewrap" style="display:none">
       <h3 id="guidehd"></h3>
       <div class="gitems" id="guide"></div>
@@ -133,7 +165,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="../../assets/app.js?v=5496a277"></script>
+<script src="../../assets/app.js?v=a8aa3f32"></script>
 <script>D0507.GAS_URL='https://script.google.com/macros/s/AKfycby7rFFVxd92wPImX4m8pv8nHqTrK3Iq0O32A34844DAg1rP8N3RfgKEyGvAUkQu-NXd/exec';</script>
 <script>
 "use strict";
@@ -153,6 +185,9 @@ document.getElementById('en').textContent = F.t;
 
 A.reg = REG;
 /* เมื่อ login แล้ว A.hydrate() จะดึงทะเบียนเต็มมาใส่ A.reg — เอารายละเอียดควบคุมของฟอร์มนี้มาเติม */
+/* สเปกตารางบันทึกจากตอน build — เก็บไว้ก่อน hydrate เพราะทะเบียนใน Firestore
+   เก็บ records แบบดิบ (คอลัมน์เป็นแค่ชื่อช่อง ไม่มีป้าย) ถ้าถูกทับ ตารางจะไม่มีหัว */
+const REC = F.records || null;
 A.initAuth({
   apiKey: "AIzaSyCVR8EiBJDT4Qr3KZ2DRPhmFzUksHTwAjg",
   authDomain: "d0507-forms.firebaseapp.com",
@@ -163,7 +198,9 @@ A.initAuth({
 }, () => {
   const full = (A.reg.forms || []).find(x => x.abbr === F.abbr);
   if (full) Object.assign(F, full);
+  RECS = null;
   paint();
+  loadRecords();
 });
 paint();
 // เปลี่ยนภาษาแล้ววาดใหม่ทั้งหน้า
@@ -182,6 +219,109 @@ async function revBanner(){
       r.newCode ? ' · ' + A.esc(r.newCode) : ''}${r.tracking ? ' · DRF <span class="mono">' + A.esc(r.tracking) + '</span>' : ''}<br>
     ${A.esc(A.L({th:'ฟอร์มเปล่าและปุ่มเปิดยังเป็นฉบับที่ใช้อยู่ ',en:'The blank form and Open still show the current edition. '}))}
     <a href="${A.esc(url)}" target="_blank" rel="noopener">${A.esc(A.L({th:'เปิดฉบับร่าง',en:'Open draft'}))} ↗</a></span></div>`;
+}
+
+/* ── บันทึกที่ส่งเข้ามาของใบนี้ ─────────────────────────────
+   ใครเห็นกำหนดที่ records ในทะเบียน (บทบาทหรือตำแหน่ง) ผู้ดูแลระบบเห็นทุกใบ
+   ก่อนมีตารางนี้ ใบที่ส่งเข้ามาเปิดดูได้แค่สองทาง — ผู้ส่งดูของตัวเอง และผู้ดูแลระบบ
+   ครูการบินที่ต้องรู้ว่านักเรียนคนไหนได้รับอนุญาตบินเดี่ยวแล้ว จึงไม่มีทางรู้เลย */
+let RECS = null, RTASK = {}, RQ = '', RST = 'all', RALL = false;
+const RST_N = { all:{th:'ทั้งหมด',en:'All'}, wait:{th:'รออนุมัติ',en:'Pending'},
+                ok:{th:'อนุมัติแล้ว',en:'Approved'}, no:{th:'ไม่อนุมัติ',en:'Rejected'} };
+function recState(r){
+  if (r.adminAction === 'close') return { k:'ok', n:{th:'ปิดโดยผู้ดูแล',en:'Closed by admin'} };
+  if (r.status === 'complete') return { k:'ok', n:(r.step||1) > 1 ? {th:'อนุมัติแล้ว',en:'Approved'} : {th:'ส่งแล้ว',en:'Submitted'} };
+  if (r.status === 'rejected') return { k:'no', n:{th:'ไม่อนุมัติ',en:'Rejected'} };
+  return { k:'wait', n:{th:'รออนุมัติ',en:'Pending'} };
+}
+function recVal(c, v){
+  if (v === undefined || v === null || v === '') return '';
+  if (c.opt && c.opt[String(v)]) return A.L(c.opt[String(v)]) || String(v);
+  if (c.type === 'date' && /^\d{4}-\d{2}-\d{2}$/.test(v)) {
+    const d = new Date(v + 'T00:00:00');
+    return d.toLocaleDateString(A.lang === 'en' ? 'en-GB' : 'th-TH', {day:'2-digit',month:'short',year:'numeric'});
+  }
+  return String(v);
+}
+const recMs = v => { try { return v && v.toMillis ? v.toMillis() : (v ? new Date(v).getTime() : 0); } catch (e) { return 0; } };
+async function loadRecords(){
+  const box = document.getElementById('recs');
+  if (!REC || !A.canSeeRecords(REC)) { box.style.display = 'none'; return; }
+  box.style.display = '';
+  document.getElementById('recsBody').innerHTML = `<div class="empty">${A.esc(A.L({th:'กำลังโหลด…',en:'Loading…'}))}</div>`;
+  try {
+    // เทียบเท่ากันช่องเดียว ไม่ต้องทำ index ผสม — เรียงในเครื่องเอง
+    const [s, t] = await Promise.all([
+      A.db.collection('submissions').where('formCode', '==', F.abbr).get(),
+      A.db.collection('tasks').where('formCode', '==', F.abbr).get(),
+    ]);
+    RECS = s.docs.map(d => Object.assign({ id: d.id }, d.data()))
+      .sort((a, b) => recMs(b.submittedAt) - recMs(a.submittedAt));
+    RTASK = {};
+    t.docs.forEach(d => { const v = d.data();
+      if (v.state === 'open' || v.state === 'pool') RTASK[v.subId] = v; });
+  } catch (e) {
+    document.getElementById('recsBody').innerHTML = `<div class="empty">${
+      A.esc(A.L({th:'อ่านบันทึกไม่ได้: ',en:'Cannot read records: '}))}${A.esc(e.code || e.message)}</div>`;
+    return;
+  }
+  paintRecords();
+}
+function paintRecords(){
+  const box = document.getElementById('recs');
+  if (!REC || !RECS || box.style.display === 'none') return;
+  const esc = A.esc, cols = REC.cols || [];
+  const n = { all: RECS.length };
+  RECS.forEach(r => { const k = recState(r).k; n[k] = (n[k] || 0) + 1; });
+  document.getElementById('recsSub').textContent = A.L({
+    th: 'ใบที่ส่งเข้ามาแล้วทั้งหมด ' + RECS.length + ' ใบ · กดแถวเพื่อเปิดดูรายละเอียดและพิมพ์',
+    en: RECS.length + ' submitted record(s) · click a row to open, view and print' });
+  const q = RQ.trim().toLowerCase();
+  const rows = RECS.filter(r => {
+    if (RST !== 'all' && recState(r).k !== RST) return false;
+    if (!q) return true;
+    const d = r.data || {};
+    return [r.tracking, r.submitterName].concat(cols.map(c => recVal(c, d[c.k])))
+      .join(' ').toLowerCase().indexOf(q) >= 0;
+  });
+  const shown = RALL ? rows : rows.slice(0, 30);
+  const bar = `<div class="rbar">
+      <input type="search" id="rq" value="${esc(RQ)}" placeholder="${esc(A.L({th:'ค้นหาชื่อ ทะเบียน เลขที่ใบ',en:'Search name, registration, tracking'}))}">
+      ${['all','wait','ok','no'].filter(k => k === 'all' || n[k]).map(k =>
+        `<button type="button" class="chip" data-rst="${k}" aria-pressed="${RST === k}">${esc(A.L(RST_N[k]))} ${n[k] || 0}</button>`).join('')}
+    </div>`;
+  const table = !rows.length
+    ? `<div class="empty">${esc(A.L(RECS.length ? {th:'ไม่มีใบที่ตรงกับที่ค้นหา',en:'No records match'}
+                                             : {th:'ยังไม่มีใบที่ส่งเข้ามา',en:'No records yet'}))}</div>`
+    : `<div class="twrap"><table><thead><tr>
+        <th>${esc(A.L({th:'ส่งเมื่อ',en:'Submitted'}))}</th>
+        ${cols.map((c, i) => `<th${i > 1 && i < cols.length - 1 ? ' class="hide-s"' : ''}>${esc(A.L(c.label) || c.k)}</th>`).join('')}
+        <th>${esc(A.L({th:'สถานะ',en:'Status'}))}</th><th></th></tr></thead><tbody>${
+        shown.map(r => {
+          const st = recState(r), d = r.data || {}, tk = RTASK[r.id];
+          const who = st.k !== 'wait' ? '' : tk
+            ? (tk.state === 'open' ? (tk.assigneeName || '') : A.L({th:'กองรอ ',en:'Pool '}) + (tk.pool || ''))
+            : A.L({th:'ยังไม่มีผู้รับ',en:'No one assigned'});
+          return `<tr tabindex="0" data-open="${esc(r.id)}">
+            <td class="mono">${esc(new Date(recMs(r.submittedAt)).toLocaleDateString(A.lang === 'en' ? 'en-GB' : 'th-TH',
+                {day:'2-digit',month:'short',year:'2-digit'}))}</td>
+            ${cols.map((c, i) => `<td${i > 1 && i < cols.length - 1 ? ' class="hide-s"' : ''}>${esc(recVal(c, d[c.k]))}</td>`).join('')}
+            <td><span class="st ${st.k}">${esc(A.L(st.n))}</span>${who ? `<span class="who">${esc(who)}</span>` : ''}</td>
+            <td class="go">${esc(A.L({th:'เปิด',en:'Open'}))} →</td></tr>`;
+        }).join('')}</tbody></table></div>
+      ${rows.length > shown.length ? `<div class="acts" style="margin-top:10px"><button class="fb" id="rall">${
+        esc(A.L({th:'แสดงทั้งหมด ' + rows.length + ' ใบ',en:'Show all ' + rows.length}))}</button></div>` : ''}`;
+  document.getElementById('recsBody').innerHTML = bar + table;
+  const qi = document.getElementById('rq');
+  qi.addEventListener('input', () => { RQ = qi.value; const pos = qi.selectionStart; paintRecords();
+    const q2 = document.getElementById('rq'); q2.focus(); q2.setSelectionRange(pos, pos); });
+  document.querySelectorAll('#recs [data-rst]').forEach(b => b.addEventListener('click', () => { RST = b.dataset.rst; paintRecords(); }));
+  const ra = document.getElementById('rall'); if (ra) ra.addEventListener('click', () => { RALL = true; paintRecords(); });
+  const open = id => { location.href = '../../view/?id=' + encodeURIComponent(id); };
+  document.querySelectorAll('#recs [data-open]').forEach(tr => {
+    tr.addEventListener('click', () => open(tr.dataset.open));
+    tr.addEventListener('keydown', e => { if (e.key === 'Enter') open(tr.dataset.open); });
+  });
 }
 
 function paint(){
