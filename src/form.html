@@ -145,7 +145,7 @@ async function revBanner(){
    ครูการบินที่ต้องรู้ว่านักเรียนคนไหนได้รับอนุญาตบินเดี่ยวแล้ว จึงไม่มีทางรู้เลย */
 let RECS = null, RTASK = {}, RQ = '', RST = 'all', RALL = false;
 const RST_N = { all:{th:'ทั้งหมด',en:'All'}, wait:{th:'รออนุมัติ',en:'Pending'},
-                ok:{th:'อนุมัติแล้ว',en:'Approved'}, no:{th:'ไม่อนุมัติ',en:'Rejected'} };
+                ok:{th:'เสร็จแล้ว',en:'Completed'}, no:{th:'ไม่อนุมัติ',en:'Rejected'} };
 function recState(r){
   if (r.adminAction === 'close') return { k:'ok', n:{th:'ปิดโดยผู้ดูแล',en:'Closed by admin'} };
   if (r.status === 'complete') return { k:'ok', n:(r.step||1) > 1 ? {th:'อนุมัติแล้ว',en:'Approved'} : {th:'ส่งแล้ว',en:'Submitted'} };
@@ -199,7 +199,7 @@ function paintRecords(){
     if (RST !== 'all' && recState(r).k !== RST) return false;
     if (!q) return true;
     const d = r.data || {};
-    return [r.tracking, r.submitterName].concat(cols.map(c => recVal(c, d[c.k])))
+    return [r.tracking, r.submitterName].concat(cols.map(c => recVal(c, c.computed ? (r.computed || {})[c.k] : d[c.k])))
       .join(' ').toLowerCase().indexOf(q) >= 0;
   });
   const shown = RALL ? rows : rows.slice(0, 30);
@@ -223,7 +223,7 @@ function paintRecords(){
           return `<tr tabindex="0" data-open="${esc(r.id)}">
             <td class="mono">${esc(new Date(recMs(r.submittedAt)).toLocaleDateString(A.lang === 'en' ? 'en-GB' : 'th-TH',
                 {day:'2-digit',month:'short',year:'2-digit'}))}</td>
-            ${cols.map((c, i) => `<td${i > 1 && i < cols.length - 1 ? ' class="hide-s"' : ''}>${esc(recVal(c, d[c.k]))}</td>`).join('')}
+            ${cols.map((c, i) => `<td${i > 1 && i < cols.length - 1 ? ' class="hide-s"' : ''}>${esc(recVal(c, c.computed ? (r.computed || {})[c.k] : d[c.k]))}</td>`).join('')}
             <td><span class="st ${st.k}">${esc(A.L(st.n))}</span>${who ? `<span class="who">${esc(who)}</span>` : ''}</td>
             <td class="go">${esc(A.L({th:'เปิด',en:'Open'}))} →</td></tr>`;
         }).join('')}</tbody></table></div>

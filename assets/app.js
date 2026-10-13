@@ -773,21 +773,29 @@
 
   /* เรียกงานฝั่ง Apps Script ที่ไม่ใช่การส่งออกใบฟอร์ม (เช่น ดึงแผนภูมิ AIP)
      ตัวนี้ต้องอ่าน response ให้ได้จริง ต่างจาก exportSubmission ที่ยอมรับว่าอ่านไม่ได้ */
-  A.gas = async function (action, extra) {
+  /* opt.timeout (ms) — ตัดรอเมื่อตัวส่งออกไม่ตอบ คืน { ok:false, timeout:true }
+     ไม่ตั้งเป็นค่าตั้งต้น เพราะบางงานใช้เวลานานจริง (สร้างแม่แบบ · ฟอร์มเปล่า)
+     เคยเกิด: Apps Script รับคำสั่งและทำเสร็จแล้ว แต่คำตอบไม่กลับมาหลายนาที
+     ปุ่มจึงค้างที่ "กำลังสร้างบัญชี…" ตลอดไปโดยผู้ใช้ไม่รู้ว่าต้องทำอะไรต่อ */
+  A.gas = async function (action, extra, opt) {
     if (!A.GAS_URL) return { ok: false, error: 'ยังไม่ได้ตั้ง URL ของตัวส่งออก' };
     const u = firebase.auth().currentUser;
     if (!u) return { ok: false, error: 'ต้องเข้าสู่ระบบก่อน' };
+    const ctl = (opt && opt.timeout) ? new AbortController() : null;
+    const tm = ctl ? setTimeout(() => ctl.abort(), opt.timeout) : null;
     try {
       const res = await fetch(A.GAS_URL, {
-        method: 'POST', redirect: 'follow',
+        method: 'POST', redirect: 'follow', signal: ctl ? ctl.signal : undefined,
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify(Object.assign({ idToken: await u.getIdToken(), action }, extra || {})),
       });
       const out = await res.json();
       return out.ok ? { ok: true, result: out.result } : { ok: false, error: out.error };
     } catch (e) {
+      if (e && e.name === 'AbortError')
+        return { ok: false, timeout: true, error: 'ระบบหลังบ้านไม่ตอบภายใน ' + Math.round(opt.timeout / 1000) + ' วินาที' };
       return { ok: false, error: e.message };
-    }
+    } finally { if (tm) clearTimeout(tm); }
   };
 
   /* ── สมัครบัญชีเอง (นักเรียน) ────────────────────────────

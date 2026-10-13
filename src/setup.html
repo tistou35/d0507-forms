@@ -38,6 +38,7 @@ dialog .df{padding:14px 22px;border-top:1px solid var(--g-100);display:flex;gap:
 .tile2.warn b{color:var(--amber-600)} .tile2.bad b{color:var(--red-600)}
 
 /* กล่องพับ — ฟอร์มยาว ๆ ไม่ต้องกางค้างไว้ตลอด */
+.sh .rt{display:inline-flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 .fold{border:1px solid var(--border-light);border-radius:10px;background:var(--surface);margin-bottom:16px}
 .fold>summary{padding:13px 16px;cursor:pointer;font-weight:600;font-size:14px;list-style:none;
   display:flex;align-items:center;gap:9px}
@@ -127,23 +128,14 @@ section[data-pane].off{display:none}
 
       <section data-pane="users">
         <div class="sh"><h2>รายชื่อผู้ใช้</h2><span class="en">User accounts</span>
-          <span class="rt"><button class="fb" id="uRel">โหลดใหม่</button></span></div>
-        <div class="tiles" id="uTiles"></div>
-        <div class="filters">
-          <select id="uRole"><option value="">ทุกบทบาท</option></select>
-          <input id="uQ" type="search" placeholder="ค้นหาชื่อ · อีเมล · ตำแหน่ง">
-          <span class="cnt" id="uCnt"></span>
-        </div>
-        <div id="uList">—</div>
-      </section>
-
-      <section data-pane="users">
+          <span class="rt"><button class="obtn" id="uAdd" type="button">+ เพิ่มผู้ใช้</button>
+            <button class="fb" id="uRel">โหลดใหม่</button></span></div>
         <details class="fold" id="addFold">
-          <summary>เพิ่มบัญชีเจ้าหน้าที่ <em>— อีเมล · รหัสผ่านตั้งต้น · บทบาท ในขั้นตอนเดียว</em></summary>
+          <summary>เพิ่มผู้ใช้ <em>— อีเมล · รหัสผ่านตั้งต้น · บทบาท · ตำแหน่ง ในขั้นตอนเดียว</em></summary>
           <div class="in">
           <p class="hint" style="margin-bottom:14px">เจ้าตัวเปลี่ยนรหัสผ่านเองได้ทีหลัง ·
             ถ้ามีบัญชีอยู่แล้ว ระบบจะไม่สร้างใหม่ แต่จะตั้งบทบาทให้บัญชีเดิม ·
-            นักเรียนไม่ต้องเปิดให้ — สมัครเองได้ที่หน้ากรอกฟอร์ม</p>
+            เพิ่มได้ทั้งเจ้าหน้าที่และนักเรียน (นักเรียนสมัครเองที่หน้ากรอกฟอร์มได้ด้วย)</p>
           <div class="g2">
             <div class="fk-f"><label for="nName">ชื่อที่จะแสดง <span style="color:var(--red-500)">*</span></label>
               <input id="nName" type="text" placeholder="เช่น สมชาย ใจดี"></div>
@@ -167,11 +159,20 @@ section[data-pane].off{display:none}
             <div class="fk-opts" id="nPos"></div></div>
           <div style="display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap">
             <button class="obtn" id="nAdd">สร้างบัญชีและกำหนดสิทธิ์</button>
+            <button class="fb" id="nCancel" type="button">ปิด</button>
             <span class="msg" id="nMsg"></span>
           </div>
           </div>
         </details>
+        <div class="tiles" id="uTiles"></div>
+        <div class="filters">
+          <select id="uRole"><option value="">ทุกบทบาท</option></select>
+          <input id="uQ" type="search" placeholder="ค้นหาชื่อ · อีเมล · ตำแหน่ง">
+          <span class="cnt" id="uCnt"></span>
+        </div>
+        <div id="uList">—</div>
       </section>
+
 
       <section data-pane="roles">
         <div class="sh"><h2>บทบาทไหนเห็นฟอร์มอะไร</h2><span class="en">Forms visible per role</span>
@@ -312,6 +313,18 @@ A.reg = REG;
 A.initAuth(@@FBCFG@@, boot);
 
 document.getElementById('nAdd').addEventListener('click', addStaff);
+/* เปิดกล่องเพิ่มผู้ใช้จากหัวรายชื่อ — สุ่มรหัสผ่านตั้งต้นให้เลย เหลือแค่ชื่อกับอีเมล */
+document.getElementById('uAdd').addEventListener('click', () => {
+  const f = document.getElementById('addFold');
+  f.open = true;
+  const pw = document.getElementById('nPass');
+  if (!pw.value) document.getElementById('nGen').click();
+  f.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setTimeout(() => document.getElementById('nName').focus(), 250);
+});
+document.getElementById('nCancel').addEventListener('click', () => {
+  document.getElementById('addFold').open = false;
+});
 
 /* สุ่มรหัสตั้งต้น 6 ตัว — ตัดตัวที่อ่านสับสนออก (0/O · 1/l/I)
    รหัสนี้ถูกบอกกันด้วยปากหรือเขียนใส่กระดาษ ตัวที่อ่านผิดได้จะกลายเป็น
@@ -518,13 +531,39 @@ function log(s, cls){
   el.innerHTML += (cls ? `<span style="color:var(--${cls})">${A.esc(s)}</span>` : A.esc(s)) + '\n';
 }
 
-/* ── เพิ่มเจ้าหน้าที่ ──────────────────────────────────────
-   บัญชีสร้างที่ฝั่งตัวส่งออก ไม่ใช่ในเบราว์เซอร์ —
-   createUserWithEmailAndPassword() จะสลับผู้ใช้ที่ล็อกอินอยู่ไปเป็นบัญชีใหม่
-   ผู้ดูแลที่กดเพิ่มคนจะหลุดจากบัญชีตัวเองทันที แล้วเขียนโปรไฟล์ต่อไม่ได้
+/* ── เพิ่มผู้ใช้ ──────────────────────────────────────────
+   สร้างบัญชีผ่าน Firebase "อีกตัวหนึ่ง" ในหน้านี้ (secondary app) ไม่ใช่ตัวหลัก
+   createUserWithEmailAndPassword() บนตัวหลักจะสลับผู้ดูแลไปเป็นบัญชีใหม่ทันที
+   ตัวที่สองแยกขาดจากตัวหลัก ผู้ดูแลจึงยังล็อกอินอยู่ แล้วเขียนโปรไฟล์ต่อได้
+
+   เดิมสร้างผ่านตัวส่งออก (Apps Script · createStaff) ซึ่งมีปัญหาสองข้อ
+     1 ตัวส่งออกเคยค้างไม่ตอบหลายนาที (13 OCT 2026) ปุ่มจึงค้างที่ "กำลังสร้างบัญชี…"
+     2 อีเมลที่มีบัญชีอยู่แล้ว หา uid ด้วย accounts:lookup + API key ซึ่งค้นด้วยอีเมลไม่ได้
+       (ต้องเป็นสิทธิ์ผู้ดูแลของโปรเจกต์) ทาง "มีอยู่แล้ว → ตั้งบทบาทให้" จึงไม่เคยทำงาน
+   ตอนนี้คนที่มีอยู่แล้วหาจากรายชื่อผู้ใช้ที่หน้านี้โหลดไว้ ไม่ต้องถามใคร
 
    ได้ uid มาแล้วค่อยเขียน users/{uid} กับ staffDirectory จากเบราว์เซอร์
    ด้วยสิทธิ์ของผู้ดูแลตาม firestore.rules — ให้มีทางเขียนทางเดียว */
+async function createAccount(email, password){
+  const have = USERS.find(x => String(x.email || '').toLowerCase() === email);
+  if (have) return { uid: have.uid, email, created: false };
+  const sec = firebase.initializeApp(firebase.app().options, 'adder-' + Date.now());
+  try {
+    // ไม่ให้บัญชีใหม่ค้างอยู่ในเบราว์เซอร์ของผู้ดูแล
+    await sec.auth().setPersistence(firebase.auth.Auth.Persistence.NONE);
+    const cred = await sec.auth().createUserWithEmailAndPassword(email, password);
+    return { uid: cred.user.uid, email, created: true };
+  } catch (e) {
+    if (e && e.code === 'auth/email-already-in-use')
+      return { error: 'มีบัญชีอีเมลนี้อยู่แล้ว แต่ยังไม่เคยเข้าสู่ระบบจึงยังไม่มีชื่อในรายชื่อ — '
+        + 'ให้เจ้าตัวเข้าสู่ระบบหนึ่งครั้ง แล้วชื่อจะขึ้นในรายชื่อด้านล่าง กด "แก้ไข" เพื่อตั้งบทบาทได้' };
+    return { error: (A.authError ? A.authError(e) : (e.message || String(e))) };
+  } finally {
+    try { await sec.auth().signOut(); } catch (e) {}
+    try { await sec.delete(); } catch (e) {}
+  }
+}
+
 async function addStaff(){
   const v = id => (document.getElementById(id).value || '').trim();
   const msg = (t, c) => { const e = document.getElementById('nMsg');
@@ -538,9 +577,10 @@ async function addStaff(){
   if (!NROLES.size) { msg('เลือกบทบาทอย่างน้อยหนึ่งอย่าง — ไม่งั้นเข้ามาแล้วไม่เห็นฟอร์มอะไรเลย', 'bad'); return; }
 
   btn.disabled = true; msg('กำลังสร้างบัญชี…');
-  const r = await A.gas('createStaff', { email: v('nEmail'), password: v('nPass') });
-  if (!r.ok) { btn.disabled = false; msg(r.error, 'bad'); return; }
-  const { uid, email, created } = r.result;
+  if (!USERS.length) { try { await users(true); } catch (e) {} }   // ต้องรู้ก่อนว่ามีคนนี้อยู่แล้วไหม
+  const r = await createAccount(v('nEmail').toLowerCase(), v('nPass'));
+  if (r.error) { btn.disabled = false; msg(r.error, 'bad'); return; }
+  const { uid, email, created } = r;
 
   try {
     await A.db.collection('users').doc(uid).set({
@@ -570,9 +610,12 @@ async function addStaff(){
 
   btn.disabled = false;
   msg((created ? 'สร้างบัญชีแล้ว' : 'บัญชีนี้มีอยู่แล้ว — ตั้งบทบาทให้เรียบร้อย')
-      + ' · ' + email + ' · บทบาท ' + [...NROLES].join(', ')
+      + ' · ' + email + ' · บทบาท ' + [...NROLES].map(RN).join(', ')
       + (NPOS.size ? ' · ตำแหน่ง ' + [...NPOS].join(', ') : ''), 'ok');
   log('users/' + uid + ' — ' + email + ' · ' + [...NROLES].join(', '), 'green-600');
+  /* ให้เห็นคนที่เพิ่งเพิ่มในรายชื่อทันที — เดิมต้องกดโหลดใหม่เองถึงจะขึ้น */
+  const q = document.getElementById('uQ'); q.value = email;
+  await users(true);
   ['nName','nEmail','nPass','nCert'].forEach(k => document.getElementById(k).value = '');
   NROLES.clear(); NPOS.clear();
   chips(document.getElementById('nRoles'), ROLE_KEYS, NROLES, RN);

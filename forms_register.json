@@ -1135,7 +1135,28 @@
    ],
    "blank": "blank/FRAE.pdf",
    "tpl": "1iglI6fZuJjDp1AixRf2OIEokGbRnhT4RZFeIVtn6kCE",
-   "edit": "12my_RbjqOTRE9qkYUBh1AlopHApkRLG1YFAoGhOpl2E"
+   "edit": "12my_RbjqOTRE9qkYUBh1AlopHApkRLG1YFAoGhOpl2E",
+   "records": {
+    "pos": [
+     "OPS",
+     "FI",
+     "CFI",
+     "HT",
+     "ACM"
+    ],
+    "roles": [
+     "ops",
+     "ins"
+    ],
+    "cols": [
+     "picFirst",
+     "picLast",
+     "aircraftReg",
+     "flightType",
+     "score",
+     "decision"
+    ]
+   }
   },
   {
    "doc": "D-0507-FTR-001",
@@ -2025,7 +2046,46 @@
    "assignTo": "HT",
    "blank": "blank/SDF.pdf",
    "tpl": "1FqiALWv4ZrDYWbWHVLCVE4_XOuUQei1ovP1Kk9Jekic",
-   "edit": "1SYm-RRJKT4oOsEqULiSsNByyeW-Xa5o0TF45z9_VlPM"
+   "edit": "1SYm-RRJKT4oOsEqULiSsNByyeW-Xa5o0TF45z9_VlPM",
+   "records": {
+    "pos": [
+     "OPS",
+     "FI",
+     "CFI",
+     "HT",
+     "ACM"
+    ],
+    "roles": [
+     "ops",
+     "ins"
+    ],
+    "cols": [
+     "name",
+     "youAre",
+     "lastFlightDate",
+     {
+      "k": "h7",
+      "h": {
+       "th": "7 วัน (≤28 ชม.)",
+       "en": "7 days (≤28 h)"
+      }
+     },
+     {
+      "k": "h28",
+      "h": {
+       "th": "28 วัน (≤100 ชม.)",
+       "en": "28 days (≤100 h)"
+      }
+     },
+     {
+      "k": "h365",
+      "h": {
+       "th": "365 วัน (≤1,000 ชม.)",
+       "en": "365 days (≤1,000 h)"
+      }
+     }
+    ]
+   }
   },
   {
    "doc": "D-0507-SEF-001",

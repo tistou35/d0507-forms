@@ -2,7 +2,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>แบบขอแก้ไขเอกสารควบคุม — D-0507 Flight Training</title>
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="../../assets/app.css?v=c6bc4fc1">
+<link rel="stylesheet" href="../../assets/app.css?v=5c6ac7cf">
 <style>
 /* ตารางบันทึกที่ส่งเข้ามาของใบนี้ — กดแถวเพื่อเปิดดูรายละเอียด */
 #recs .rbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:2px 0 12px}
@@ -165,7 +165,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="../../assets/app.js?v=a8aa3f32"></script>
+<script src="../../assets/app.js?v=f5187b19"></script>
 <script>D0507.GAS_URL='https://script.google.com/macros/s/AKfycby7rFFVxd92wPImX4m8pv8nHqTrK3Iq0O32A34844DAg1rP8N3RfgKEyGvAUkQu-NXd/exec';</script>
 <script>
 "use strict";
@@ -227,7 +227,7 @@ async function revBanner(){
    ครูการบินที่ต้องรู้ว่านักเรียนคนไหนได้รับอนุญาตบินเดี่ยวแล้ว จึงไม่มีทางรู้เลย */
 let RECS = null, RTASK = {}, RQ = '', RST = 'all', RALL = false;
 const RST_N = { all:{th:'ทั้งหมด',en:'All'}, wait:{th:'รออนุมัติ',en:'Pending'},
-                ok:{th:'อนุมัติแล้ว',en:'Approved'}, no:{th:'ไม่อนุมัติ',en:'Rejected'} };
+                ok:{th:'เสร็จแล้ว',en:'Completed'}, no:{th:'ไม่อนุมัติ',en:'Rejected'} };
 function recState(r){
   if (r.adminAction === 'close') return { k:'ok', n:{th:'ปิดโดยผู้ดูแล',en:'Closed by admin'} };
   if (r.status === 'complete') return { k:'ok', n:(r.step||1) > 1 ? {th:'อนุมัติแล้ว',en:'Approved'} : {th:'ส่งแล้ว',en:'Submitted'} };
@@ -281,7 +281,7 @@ function paintRecords(){
     if (RST !== 'all' && recState(r).k !== RST) return false;
     if (!q) return true;
     const d = r.data || {};
-    return [r.tracking, r.submitterName].concat(cols.map(c => recVal(c, d[c.k])))
+    return [r.tracking, r.submitterName].concat(cols.map(c => recVal(c, c.computed ? (r.computed || {})[c.k] : d[c.k])))
       .join(' ').toLowerCase().indexOf(q) >= 0;
   });
   const shown = RALL ? rows : rows.slice(0, 30);
@@ -305,7 +305,7 @@ function paintRecords(){
           return `<tr tabindex="0" data-open="${esc(r.id)}">
             <td class="mono">${esc(new Date(recMs(r.submittedAt)).toLocaleDateString(A.lang === 'en' ? 'en-GB' : 'th-TH',
                 {day:'2-digit',month:'short',year:'2-digit'}))}</td>
-            ${cols.map((c, i) => `<td${i > 1 && i < cols.length - 1 ? ' class="hide-s"' : ''}>${esc(recVal(c, d[c.k]))}</td>`).join('')}
+            ${cols.map((c, i) => `<td${i > 1 && i < cols.length - 1 ? ' class="hide-s"' : ''}>${esc(recVal(c, c.computed ? (r.computed || {})[c.k] : d[c.k]))}</td>`).join('')}
             <td><span class="st ${st.k}">${esc(A.L(st.n))}</span>${who ? `<span class="who">${esc(who)}</span>` : ''}</td>
             <td class="go">${esc(A.L({th:'เปิด',en:'Open'}))} →</td></tr>`;
         }).join('')}</tbody></table></div>

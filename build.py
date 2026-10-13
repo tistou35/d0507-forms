@@ -484,14 +484,25 @@ def main():
         # ป้ายกับตัวเลือกของแต่ละคอลัมน์ดึงจากนิยามฟอร์มตอน build หน้าเอกสารจะได้ไม่ต้องโหลดนิยามทั้งใบ
         if f.get('records'):
             rd = f['records']
-            fl = {x['k']: x for sec in (defs.get(f['abbr']) or {}).get('sections', [])
-                  for x in sec.get('fields', [])}
+            dd = defs.get(f['abbr']) or {}
+            fl = {x['k']: x for sec in dd.get('sections', []) for x in sec.get('fields', [])}
+            # ค่าคำนวณใช้เป็นคอลัมน์ได้ (เช่นคะแนนความเสี่ยงรวมของ FRAE) — ต้องมีป้ายในนิยาม
+            for cp in dd.get('compute', []):
+                if cp.get('label') and cp['k'] not in fl:
+                    fl[cp['k']] = {'k': cp['k'], 'label': cp['label'], 'type': 'number', '_computed': True}
             cols = []
             for k in rd.get('cols', []):
+                # คอลัมน์เป็นสตริง (ชื่อช่อง) หรือ {k, h} ถ้าป้ายในฟอร์มยาวเกินหัวตาราง
+                head = None
+                if isinstance(k, dict):
+                    head, k = k.get('h'), k['k']
                 x = fl.get(k)
                 if not x:
-                    sys.exit("%s: records.cols อ้าง '%s' ที่ไม่มีในนิยามฟอร์ม" % (f['abbr'], k))
-                c = {'k': k, 'label': x.get('label'), 'type': x.get('type', 'text')}
+                    sys.exit("%s: records.cols อ้าง '%s' ที่ไม่มีในนิยามฟอร์ม (หรือค่าคำนวณที่ไม่มีป้าย)"
+                             % (f['abbr'], k))
+                c = {'k': k, 'label': head or x.get('label'), 'type': x.get('type', 'text')}
+                if x.get('_computed'):
+                    c['computed'] = True
                 if x.get('opt'):
                     c['opt'] = {str(o['v']): o.get('n') for o in x['opt']}
                 cols.append(c)

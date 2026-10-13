@@ -2,7 +2,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>การประเมินความเสี่ยงก่อนทำการบิน — D-0507 Flight Training</title>
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="../../assets/app.css?v=c6bc4fc1">
+<link rel="stylesheet" href="../../assets/app.css?v=5c6ac7cf">
 <style>
 /* ตารางบันทึกที่ส่งเข้ามาของใบนี้ — กดแถวเพื่อเปิดดูรายละเอียด */
 #recs .rbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:2px 0 12px}
@@ -165,12 +165,12 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="../../assets/app.js?v=a8aa3f32"></script>
+<script src="../../assets/app.js?v=f5187b19"></script>
 <script>D0507.GAS_URL='https://script.google.com/macros/s/AKfycby7rFFVxd92wPImX4m8pv8nHqTrK3Iq0O32A34844DAg1rP8N3RfgKEyGvAUkQu-NXd/exec';</script>
 <script>
 "use strict";
 const REG = {"systems":{"here":{"n":"ระบบฟอร์มออนไลน์","en":"This portal","url":"","lg":"52","cl":"d"},"dispatch":{"n":"ระบบ Dispatch","en":"Flight dispatch","url":"https://d0507.361vision.org/d0507-app/dispatch/?v=final","lg":"DSP","cl":"a"},"training":{"n":"ระบบบันทึกการฝึก","en":"Training records","url":"https://d0507.361vision.org/","lg":"TRN","cl":"b"},"fbo":{"n":"AeroFBO","en":"Operations & maintenance","url":"https://indyzz.com/aerofbo/index.php","lg":"FBO","cl":"c"},"audit":{"n":"Audit Portal","en":"Internal audit","url":"../d0507-audit/","lg":"AUD","cl":"a"}},"roles":[{"k":"stu","n":"นักเรียน","d":"นักศึกษาการบิน · ผู้เข้ารับการฝึก","en":"Students","den":"Student pilots · trainees"},{"k":"ins","n":"ครูการบิน / ครูภาคทฤษฎี","d":"FI · TKI · FIE","en":"Instructors","den":"FI · TKI · FIE"},{"k":"mnt","n":"ช่างอากาศยาน","d":"ฝ่ายซ่อมบำรุง (ME)","en":"Maintenance","den":"Maintenance (ME)"},{"k":"ops","n":"ฝ่ายปฏิบัติการ","d":"Operations · Dispatch · ธุรการเอกสาร","en":"Operations","den":"Operations · Dispatch · document control"},{"k":"mgt","n":"ฝ่ายบริหาร","d":"ACM · HT · CMM","en":"Management","den":"ACM · HT · CMM"},{"k":"sms","n":"นิรภัยการบิน (SMS)","d":"Safety Manager · SMS","en":"Safety (SMS)","den":"Safety Manager · SMS"}],"status":{"ok":{"n":"พร้อมใช้","lv":"ok","en":"Ready"},"linkwrong":{"n":"ลิงก์ใน LEF ผิดใบ","lv":"bad","en":"LEF links to the wrong form"},"nolink":{"n":"LEF ยังไม่ใส่ลิงก์","lv":"warn","en":"No link in LEF"},"noform":{"n":"ยังไม่มีฟอร์มออนไลน์","lv":"warn","en":"No online form yet"},"pdfonly":{"n":"เป็น PDF บน Drive","lv":"warn","en":"PDF on Drive"},"notinlef":{"n":"ยังไม่อยู่ใน LEF","lv":"warn","en":"Not in LEF yet"},"shadow":{"n":"ใช้บน Jotform · ไม่มีในคู่มือ","lv":"bad","en":"In use but not registered"},"dupsys":{"n":"มีสองฉบับ — ระบบภายนอกและ Jotform","lv":"bad","en":"Duplicate across systems"}},"forms":[{"abbr":"AFM","doc":"D-0507-AFM-001","t":"Authorize Flight Form","th":"ใบอนุญาตทำการบิน","sys":"fbo","chain":"preflight","public":false,"r":{"ops":"ออกใบอนุญาตทำการบินรายวัน ต้องมี FRAE ผ่านแนบก่อน","ins":"ตรวจสอบรายการบินของตนก่อนออกบิน","mgt":"อนุมัติตารางบินรายวัน"},"hasDef":false},{"abbr":"ASF","doc":"D-0507-ASF-001","t":"Authorize Solo Flight Form","th":"ใบอนุญาตบินเดี่ยว","sys":"here","chain":"preflight","public":false,"r":{"stu":"รับทราบเงื่อนไขก่อนออกบินเดี่ยว","ins":"ตรวจ pre-solo checklist แล้วส่งให้ HT อนุมัติ","mgt":"อนุมัติการบินเดี่ยว — ขั้นสุดท้ายก่อนออกบิน"},"jot":"241828892999078","assignTo":"FI","hasDef":true},{"abbr":"BCK","doc":"D-0507-BCK-001","t":"Briefing Checklist","th":"รายการตรวจการบรรยายก่อนบิน","sys":"here","chain":"preflight","public":false,"r":{"ins":"ยืนยันหัวข้อ briefing กับนักเรียนก่อนบินทุกเที่ยว"},"jot":"242818896187071","hasDef":true},{"abbr":"SDF","doc":"D-0507-SDF-001","t":"Self Declaration Form","th":"แบบแจ้งข้อมูลด้วยตนเอง","sys":"here","chain":"preflight","public":true,"r":{"stu":"แจ้งเมื่อหยุดบินเกิน 2 สัปดาห์ หรือมีการบินอื่นนอกหลักสูตร","ins":"แจ้งเมื่อหยุดปฏิบัติหน้าที่เกิน 2 สัปดาห์ หรือมีหน้าที่บินอื่น"},"jot":"210394186308456","assignTo":"HT","hasDef":true}],"lefcount":{"total":52}};
-const F   = {"abbr":"FRAE","doc":"D-0507-FRAE-001","t":"Flight Risk Assessment and Evaluation","th":"การประเมินความเสี่ยงก่อนทำการบิน","sys":"here","chain":"preflight","public":true,"r":{"stu":"กรอกฝั่งนักเรียนก่อนบินทุกเที่ยว","ins":"กรอกฝั่งครู แล้วยืนยัน fit to fly ร่วมกับนักเรียน","mgt":"อนุมัติเมื่อคะแนนความเสี่ยงอยู่ระดับเหลืองหรือแดง"},"with":["นักเรียน","ครูการบิน","HT"],"assignTo":"FI","iss":"01","rev":"00","eff":"07 JUL 2022","jot":"210071253532038","hasDef":true,"blank":"blank/FRAE.pdf"};
+const F   = {"abbr":"FRAE","doc":"D-0507-FRAE-001","t":"Flight Risk Assessment and Evaluation","th":"การประเมินความเสี่ยงก่อนทำการบิน","sys":"here","chain":"preflight","public":true,"r":{"stu":"กรอกฝั่งนักเรียนก่อนบินทุกเที่ยว","ins":"กรอกฝั่งครู แล้วยืนยัน fit to fly ร่วมกับนักเรียน","mgt":"อนุมัติเมื่อคะแนนความเสี่ยงอยู่ระดับเหลืองหรือแดง"},"with":["นักเรียน","ครูการบิน","HT"],"assignTo":"FI","iss":"01","rev":"00","eff":"07 JUL 2022","jot":"210071253532038","hasDef":true,"blank":"blank/FRAE.pdf","records":{"pos":["OPS","FI","CFI","HT","ACM"],"roles":["ops","ins"],"cols":[{"k":"picFirst","label":{"th":"ชื่อนักบิน (PIC)","en":"Pilot name (PIC)"},"type":"text"},{"k":"picLast","label":{"th":"นามสกุลนักบิน","en":"Pilot last name"},"type":"text"},{"k":"aircraftReg","label":{"th":"ทะเบียนอากาศยาน","en":"Aircraft reg."},"type":"select","opt":{"HS-VVD":null,"HS-VVB":null,"HS-CCM":null,"HS-VST":null,"HS-POP":null,"HS-BTM":null,"HS-BSC":{"th":"HS-BSC","en":"HS-BSC"}}},{"k":"flightType","label":{"th":"ประเภทการบิน","en":"Type of flight"},"type":"select","opt":{"VFR":null,"IFR":null}},{"k":"score","label":{"th":"คะแนนความเสี่ยงรวม","en":"TOTAL RISK SCORE"},"type":"number","computed":true},{"k":"decision","label":{"th":"ตัดสินใจ","en":"GO / NO-GO"},"type":"select","opt":{"GO":null,"NO-GO":null}}]}};
 const A   = D0507;
 const CHAIN_N = {
   preflight:{th:'ก่อนทำการบิน',en:'Pre-flight'}, training:{th:'บันทึกการฝึก',en:'Training records'},
@@ -227,7 +227,7 @@ async function revBanner(){
    ครูการบินที่ต้องรู้ว่านักเรียนคนไหนได้รับอนุญาตบินเดี่ยวแล้ว จึงไม่มีทางรู้เลย */
 let RECS = null, RTASK = {}, RQ = '', RST = 'all', RALL = false;
 const RST_N = { all:{th:'ทั้งหมด',en:'All'}, wait:{th:'รออนุมัติ',en:'Pending'},
-                ok:{th:'อนุมัติแล้ว',en:'Approved'}, no:{th:'ไม่อนุมัติ',en:'Rejected'} };
+                ok:{th:'เสร็จแล้ว',en:'Completed'}, no:{th:'ไม่อนุมัติ',en:'Rejected'} };
 function recState(r){
   if (r.adminAction === 'close') return { k:'ok', n:{th:'ปิดโดยผู้ดูแล',en:'Closed by admin'} };
   if (r.status === 'complete') return { k:'ok', n:(r.step||1) > 1 ? {th:'อนุมัติแล้ว',en:'Approved'} : {th:'ส่งแล้ว',en:'Submitted'} };
@@ -281,7 +281,7 @@ function paintRecords(){
     if (RST !== 'all' && recState(r).k !== RST) return false;
     if (!q) return true;
     const d = r.data || {};
-    return [r.tracking, r.submitterName].concat(cols.map(c => recVal(c, d[c.k])))
+    return [r.tracking, r.submitterName].concat(cols.map(c => recVal(c, c.computed ? (r.computed || {})[c.k] : d[c.k])))
       .join(' ').toLowerCase().indexOf(q) >= 0;
   });
   const shown = RALL ? rows : rows.slice(0, 30);
@@ -305,7 +305,7 @@ function paintRecords(){
           return `<tr tabindex="0" data-open="${esc(r.id)}">
             <td class="mono">${esc(new Date(recMs(r.submittedAt)).toLocaleDateString(A.lang === 'en' ? 'en-GB' : 'th-TH',
                 {day:'2-digit',month:'short',year:'2-digit'}))}</td>
-            ${cols.map((c, i) => `<td${i > 1 && i < cols.length - 1 ? ' class="hide-s"' : ''}>${esc(recVal(c, d[c.k]))}</td>`).join('')}
+            ${cols.map((c, i) => `<td${i > 1 && i < cols.length - 1 ? ' class="hide-s"' : ''}>${esc(recVal(c, c.computed ? (r.computed || {})[c.k] : d[c.k]))}</td>`).join('')}
             <td><span class="st ${st.k}">${esc(A.L(st.n))}</span>${who ? `<span class="who">${esc(who)}</span>` : ''}</td>
             <td class="go">${esc(A.L({th:'เปิด',en:'Open'}))} →</td></tr>`;
         }).join('')}</tbody></table></div>
