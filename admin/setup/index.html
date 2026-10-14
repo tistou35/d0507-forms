@@ -192,6 +192,7 @@ section[data-pane].off{display:none}
       <section data-pane="users">
         <div class="sh"><h2>รายชื่อผู้ใช้</h2><span class="en">User accounts</span>
           <span class="rt"><button class="obtn" id="uAdd" type="button">+ เพิ่มผู้ใช้</button>
+            <button class="fb" id="uImp" type="button">นำเข้าหลายคน</button>
             <button class="fb" id="uRel">โหลดใหม่</button></span></div>
         <details class="fold" id="addFold">
           <summary>เพิ่มผู้ใช้ <em>— อีเมล · รหัสผ่านตั้งต้น · บทบาท · ตำแหน่ง ในขั้นตอนเดียว</em></summary>
@@ -225,6 +226,22 @@ section[data-pane].off{display:none}
             <button class="fb" id="nCancel" type="button">ปิด</button>
             <span class="msg" id="nMsg"></span>
           </div>
+          </div>
+        </details>
+        <details class="fold" id="impFold">
+          <summary>นำเข้าหลายคน <em>— วางรายชื่อ ตรวจก่อน แล้วสร้างบัญชีทีเดียว</em></summary>
+          <div class="in">
+          <p class="hint" style="margin-bottom:10px">หนึ่งบรรทัดต่อหนึ่งคน คั่นด้วย Tab หรือจุลภาค:
+            <b>ชื่อ–นามสกุล · อีเมล · ปีเกิด (ค.ศ.) · ตำแหน่งใน AeroFBO</b> ·
+            รหัสผ่านตั้งต้น = อักษรแรกของชื่อ (ตัวใหญ่) + อักษรแรกของนามสกุล (ตัวเล็ก) + ปีเกิด ค.ศ. ·
+            คนที่มีในระบบอยู่แล้วจะข้าม ไม่แตะบทบาทเดิม</p>
+          <textarea id="impText" rows="7" style="width:100%;font-family:var(--font-mono);font-size:12.5px;
+            border:1px solid var(--border-med);border-radius:8px;padding:9px 11px"
+            placeholder="Somchai Jaidee&#9;somchai@example.com&#9;1990&#9;Instructor"></textarea>
+          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+            <button class="fb" id="impPrev" type="button">ตรวจรายชื่อ</button>
+          </div>
+          <div id="impOut" style="margin-top:12px"></div>
           </div>
         </details>
         <div class="tiles" id="uTiles"></div>
@@ -404,6 +421,101 @@ document.getElementById('uAdd').addEventListener('click', () => {
   f.scrollIntoView({ behavior: 'smooth', block: 'start' });
   setTimeout(() => document.getElementById('nName').focus(), 250);
 });
+document.getElementById('uImp').addEventListener('click', () => {
+  const f = document.getElementById('impFold'); f.open = true;
+  f.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setTimeout(() => document.getElementById('impText').focus(), 250);
+});
+document.getElementById('impPrev').addEventListener('click', impPreview);
+
+/* ── นำเข้าหลายคน ─────────────────────────────────────────
+   ตำแหน่งใน AeroFBO -> บทบาทในระบบนี้ (+ ตำแหน่งในองค์กรที่ตัดสินได้แน่)
+   ตำแหน่งอนุมัติอื่น (CFI · HT · ACM …) ไม่เดา — ตั้งทีหลังที่ปุ่ม "แก้ไข" ของแต่ละคน
+   เพราะเป็นตัวกำหนดว่าใครอนุมัติฟอร์มไหนได้ ผิดแล้วใบไปถึงคนผิด */
+const IMP_MAP = {
+  'administrator':            { roles: ['mgt'] },
+  'instructor':               { roles: ['ins'], pos: ['FI'] },
+  'ae instructor':            { roles: ['ins'] },
+  'qa manager instructor':    { roles: ['ins','mgt'] },
+  'general staff':            { roles: ['ops'] },
+  'fa':                       { roles: ['ops'] },
+  'maintenace manager':       { roles: ['mnt'] },
+  'maintenance manager':      { roles: ['mnt'] },
+  'mechanic':                 { roles: ['mnt'] },
+  'pilot':                    { roles: ['ins'] },
+  'student pilot':            { roles: ['stu'] },
+};
+/* รหัสผ่านตั้งต้นตามที่ผู้ดูแลกำหนด (14 OCT 2026):
+   อักษรแรกของชื่อตัวใหญ่ + อักษรแรกของนามสกุลตัวเล็ก + ปีเกิด ค.ศ.
+   ชื่อที่ไม่ใช่อักษรโรมันหรือไม่มีปีเกิด ทำตามสูตรไม่ได้ — ไม่เดาแทน ข้ามให้เห็น */
+function impPassword(name, year){
+  const parts = String(name || '').trim().split(/\s+/);
+  const a = (parts[0] || '')[0], b = (parts[parts.length - 1] || '')[0];
+  if (parts.length < 2 || !/^[A-Za-z]$/.test(a || '') || !/^[A-Za-z]$/.test(b || '')) return '';
+  if (!/^(19|20)\d{2}$/.test(String(year || ''))) return '';
+  return a.toUpperCase() + b.toLowerCase() + year;
+}
+let IMP = [];
+async function impPreview(){
+  if (!USERS.length) { try { await users(true); } catch (e) {} }
+  const lines = document.getElementById('impText').value.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  IMP = lines.map(l => {
+    const c = l.split(l.indexOf('\t') >= 0 ? '\t' : ',').map(x => x.trim());
+    const [name, email0, year, role] = c;
+    const email = String(email0 || '').toLowerCase();
+    const map = IMP_MAP[String(role || '').toLowerCase()] || null;
+    const have = USERS.find(u => String(u.email || '').toLowerCase() === email);
+    const pwd = impPassword(name, year);
+    let st = 'new', why = '';
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { st = 'skip'; why = 'อีเมลไม่ถูกต้อง'; }
+    else if (have) { st = 'skip'; why = 'มีในระบบแล้ว — ไม่แตะบทบาทเดิม'; }
+    else if (!pwd) { st = 'skip'; why = year ? 'ชื่อทำรหัสตามสูตรไม่ได้' : 'ไม่มีปีเกิด — ทำรหัสตามสูตรไม่ได้'; }
+    else if (!map) { st = 'skip'; why = 'ไม่รู้จักตำแหน่ง "' + (role || '') + '"'; }
+    return { name, email, year, role, map, pwd, st, why, on: st === 'new', res: '' };
+  });
+  impPaint();
+}
+function impPaint(){
+  const esc = A.esc, n = IMP.filter(x => x.on).length;
+  document.getElementById('impOut').innerHTML = !IMP.length ? '<p class="hint">ยังไม่มีรายชื่อ</p>' : `
+    <div class="twrap"><table class="reg"><thead><tr><th></th><th>ชื่อ</th><th>อีเมล</th>
+      <th>ตำแหน่งใน AeroFBO → บทบาท</th><th>รหัสตั้งต้น</th><th>สถานะ</th></tr></thead><tbody>${
+      IMP.map((x, i) => `<tr${x.st === 'skip' ? ' style="opacity:.55"' : ''}>
+        <td><input type="checkbox" data-imp="${i}" ${x.on ? 'checked' : ''} ${x.st === 'skip' || x.res ? 'disabled' : ''}></td>
+        <td class="nm">${esc(x.name)}</td><td>${esc(x.email)}</td>
+        <td>${esc(x.role || '—')}${x.map ? ' → ' + esc(x.map.roles.map(RN).join(', ')) + (x.map.pos ? ' · ' + esc(x.map.pos.join(', ')) : '') : ''}</td>
+        <td class="c" style="font-family:var(--font-mono)">${esc(x.pwd || '—')}</td>
+        <td>${esc(x.res || (x.st === 'skip' ? x.why : 'จะสร้างใหม่'))}</td></tr>`).join('')}
+    </tbody></table></div>
+    <div style="display:flex;gap:10px;align-items:center;margin-top:12px;flex-wrap:wrap">
+      <button class="obtn" id="impGo" type="button" ${n ? '' : 'disabled'}>สร้างบัญชี ${n} คน</button>
+      <span class="msg" id="impMsg"></span></div>`;
+  document.querySelectorAll('[data-imp]').forEach(b => b.addEventListener('change', () => {
+    IMP[+b.dataset.imp].on = b.checked; impPaint(); }));
+  const go = document.getElementById('impGo'); if (go) go.addEventListener('click', impRun);
+}
+async function impRun(){
+  const todo = IMP.filter(x => x.on && !x.res);
+  if (!todo.length) return;
+  if (!confirm('สร้างบัญชี ' + todo.length + ' คน ตามรายชื่อที่ติ๊กไว้?')) return;
+  const go = document.getElementById('impGo'); go.disabled = true;
+  let ok = 0, bad = 0;
+  for (const x of todo) {
+    document.getElementById('impMsg').textContent = 'กำลังสร้าง ' + (ok + bad + 1) + ' / ' + todo.length + ' · ' + x.name;
+    const r = await createAccount(x.email, x.pwd);
+    if (r.error) { x.res = '✗ ' + r.error; bad++; x.on = false; impPaint(); continue; }
+    try {
+      await saveProfile(r.uid, x.email, x.name, x.role || '', x.map.roles, x.map.pos || []);
+      x.res = r.created ? '✓ สร้างแล้ว' : '✓ ตั้งบทบาทให้บัญชีเดิม'; ok++;
+    } catch (e) { x.res = '✗ บันทึกโปรไฟล์ไม่สำเร็จ: ' + (e.code || e.message); bad++; }
+    x.on = false; impPaint();
+    await new Promise(r => setTimeout(r, 400));   // ไม่ยิงถี่จนระบบยืนยันตัวตนบล็อก
+  }
+  log('นำเข้าผู้ใช้ — สร้าง ' + ok + ' คน' + (bad ? ' · ไม่สำเร็จ ' + bad : ''), bad ? 'amber-600' : 'green-600');
+  document.getElementById('impMsg').textContent = 'เสร็จ — สำเร็จ ' + ok + ' คน' + (bad ? ' · ไม่สำเร็จ ' + bad + ' คน' : '');
+  await users(true);
+}
+
 document.getElementById('nCancel').addEventListener('click', () => {
   document.getElementById('addFold').open = false;
 });
@@ -626,6 +738,24 @@ function log(s, cls){
 
    ได้ uid มาแล้วค่อยเขียน users/{uid} กับ staffDirectory จากเบราว์เซอร์
    ด้วยสิทธิ์ของผู้ดูแลตาม firestore.rules — ให้มีทางเขียนทางเดียว */
+/* โปรไฟล์ + รายชื่อเจ้าหน้าที่สองชุด — ชุดเต็มมีอีเมล ชุดสาธารณะมีแค่ชื่อกับตำแหน่ง
+   ต้องเขียนทั้งคู่ ไม่งั้นคนใหม่ไม่โผล่ในตัวเลือกผู้รับฝั่งนักเรียน */
+async function saveProfile(uid, email, name, cert, roles, positions){
+  await A.db.collection('users').doc(uid).set({
+    email, name, cert, roles, positions, active: true,
+  }, { merge: true });
+  const sref = A.db.collection('staffDirectory').doc('current');
+  const sdoc = await sref.get();
+  const slist = ((sdoc.exists && sdoc.data().list) || []).filter(x => x.id !== uid);
+  slist.push({ id: uid, name, position: cert, positions, email, active: true });
+  await sref.set({ list: slist }, { merge: true });
+  const pref = A.db.collection('publicDirectory').doc('instructors');
+  const pdoc = await pref.get();
+  const plist = ((pdoc.exists && pdoc.data().list) || []).filter(x => x.id !== uid);
+  if (positions.length) plist.push({ id: uid, name, position: cert, recv: positions });
+  await pref.set({ list: plist }, { merge: true });
+}
+
 async function createAccount(email, password){
   const have = USERS.find(x => String(x.email || '').toLowerCase() === email);
   if (have) return { uid: have.uid, email, created: false };
@@ -665,25 +795,7 @@ async function addStaff(){
   const { uid, email, created } = r;
 
   try {
-    await A.db.collection('users').doc(uid).set({
-      email, name: v('nName'), cert: v('nCert'), roles: [...NROLES],
-      positions: [...NPOS], active: true,
-    }, { merge: true });
-
-    /* รายชื่อเจ้าหน้าที่สองชุด — ชุดเต็มมีอีเมล ชุดสาธารณะมีแค่ชื่อกับตำแหน่ง
-       ต้องเขียนทั้งคู่ ไม่งั้นคนใหม่ไม่โผล่ในตัวเลือกผู้รับฝั่งนักเรียน */
-    const sref = A.db.collection('staffDirectory').doc('current');
-    const sdoc = await sref.get();
-    const slist = ((sdoc.exists && sdoc.data().list) || []).filter(x => x.id !== uid);
-    slist.push({ id: uid, name: v('nName'), position: v('nCert'),
-                 positions: [...NPOS], email, active: true });
-    await sref.set({ list: slist }, { merge: true });
-
-    const pref = A.db.collection('publicDirectory').doc('instructors');
-    const pdoc = await pref.get();
-    const plist = ((pdoc.exists && pdoc.data().list) || []).filter(x => x.id !== uid);
-    if (NPOS.size) plist.push({ id: uid, name: v('nName'), position: v('nCert'), recv: [...NPOS] });
-    await pref.set({ list: plist }, { merge: true });
+    await saveProfile(uid, email, v('nName'), v('nCert'), [...NROLES], [...NPOS]);
   } catch (e) {
     btn.disabled = false;
     msg('สร้างบัญชีแล้วแต่บันทึกโปรไฟล์ไม่สำเร็จ: ' + (e.code || e.message), 'bad');
