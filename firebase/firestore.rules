@@ -274,6 +274,73 @@ service cloud.firestore {
       allow read, update, delete: if false;
     }
 
+    // ── บันทึกข้อความภายใน (memo) ─────────────────────────────
+    /* กฎกลางที่บังคับทุกประเภท — ฝังไว้ที่นี่ ไม่ใช่แค่หน้าเว็บ
+       · เลขที่กับวันที่ออกเกิดตอนลงนามเท่านั้น และแก้ไม่ได้อีกเลย
+         วันที่ออก = เวลาเซิร์ฟเวอร์ ณ วินาทีที่ลงนาม (ลงวันที่ออกย้อนหลังไม่ได้ทางเทคนิค)
+       · เลขเรียงต่อกันไม่ข้ามไม่ซ้ำ — ออกใน transaction เดียวกับตัวนับ
+         memo.seq ต้องเท่ากับค่าตัวนับก่อนเขียน และตัวนับหลังเขียนต้องเป็น seq + 1
+       · ผู้ลงนามต้องเป็นคนที่ระบุไว้ในหนังสือ และต้องไม่ใช่ผู้ได้รับประโยชน์
+       · ห้ามลบ — ยกเลิกหรือออกฉบับใหม่แทนเท่านั้น
+       · หลังออกแล้ว เนื้อหา ผู้ลงนาม วันมีผล แก้ไม่ได้ เปลี่ยนได้แค่สถานะ (ยกเลิก/ถูกแทน/หมดอายุ)
+         กับข้อมูล PDF และการรับทราบ */
+    function memoFixedKeys() {
+      return ['type', 'number', 'seq', 'year', 'counter', 'issuedAt', 'signer', 'subject',
+              'body', 'fields', 'effectiveFrom', 'expiresOn', 'beneficiaryUid', 'signature', 'test',
+              'render', 'beneficiaryName', 'purpose'];
+    }
+    function memoCounterPath(d) {
+      return /databases/$(database)/documents/counters/$(d.counter);
+    }
+    function memoSeqOk(d) {
+      return d.seq == (exists(memoCounterPath(d)) ? get(memoCounterPath(d)).data.next : 1)
+          && getAfter(memoCounterPath(d)).data.next == d.seq + 1;
+    }
+    match /memos/{memoId} {
+      allow read: if staff()
+                  || (signedIn() && resource.data.beneficiaryUid == request.auth.uid);
+      allow create: if staff()
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.status in ['draft', 'submitted']
+        && !request.resource.data.keys().hasAny(['number', 'seq', 'issuedAt', 'signature']);
+      allow update: if staff() && (
+        // ก่อนออก — แก้ร่าง เสนอ ตีกลับ ยกเลิก (ยังไม่มีเลข)
+        (resource.data.status in ['draft', 'submitted', 'returned']
+          && request.resource.data.status in ['draft', 'submitted', 'returned', 'cancelled']
+          && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['number', 'seq', 'issuedAt', 'signature'])
+          && (request.auth.uid == resource.data.createdBy || admin()
+              || request.auth.uid == resource.data.signer.uid))
+        ||
+        // ลงนาม/ออก — เฉพาะผู้ลงนามที่ระบุ และไม่ใช่ผู้ได้ประโยชน์
+        (resource.data.status == 'submitted' && request.resource.data.status == 'issued'
+          && request.auth.uid == resource.data.signer.uid
+          && request.auth.uid != resource.data.beneficiaryUid
+          && request.resource.data.signer == resource.data.signer
+          && request.resource.data.issuedAt == request.time
+          && request.resource.data.number is string && request.resource.data.number.size() > 0
+          && memoSeqOk(request.resource.data))
+        ||
+        // หลังออก — ล็อกเนื้อหา เปลี่ยนได้แค่สถานะปลายทาง PDF และการรับทราบ
+        (resource.data.status in ['issued', 'superseded', 'expired', 'cancelled']
+          && !request.resource.data.diff(resource.data).affectedKeys().hasAny(memoFixedKeys())
+          && request.resource.data.status in ['issued', 'cancelled', 'superseded', 'expired'])
+      );
+      allow delete: if false;
+
+      match /events/{eventId} {
+        allow create: if staff();
+        allow read:   if staff();
+        allow update, delete: if false;
+      }
+    }
+    // ตัวนับเลขที่ — ขยับได้ทีละหนึ่งเท่านั้น ลดหรือกระโดดไม่ได้ (เลขที่ออกไปแล้วไม่มีวันซ้ำ)
+    match /counters/{cid} {
+      allow read:   if staff();
+      allow create: if staff() && request.resource.data.next == 2;
+      allow update: if staff() && request.resource.data.next == resource.data.next + 1;
+      allow delete: if false;
+    }
+
     match /tasks/{taskId} {
       allow read:   if staff();
       // ใบที่ส่งเข้ามาต้องสร้างงานให้ผู้อนุมัติเสมอ ไม่งั้นใบค้างโดยไม่มีใครเห็น

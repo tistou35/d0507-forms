@@ -390,6 +390,12 @@ def main():
     wf_path = os.path.join(HERE, 'workflows.json')
     WF = json.load(open(wf_path, encoding='utf-8')) if os.path.exists(wf_path) else {}
     WF = {k: v for k, v in WF.items() if not k.startswith('_')}
+    # ประเภทบันทึกข้อความ (memotypes/*.json) — config ล้วน หน้า memo อ่านจากตรงนี้
+    MEMOTYPES = {}
+    for mp in sorted(glob.glob(os.path.join(HERE, 'memotypes', '*.json'))):
+        mt = json.load(open(mp, encoding='utf-8'))
+        mt.pop('_README', None)
+        MEMOTYPES[mt['code']] = mt
 
     sys.path.insert(0, os.path.join(HERE, 'tools'))
     from airac import table as airac_table
@@ -442,6 +448,7 @@ def main():
         ('cl.html',          'cl/index.html',                  '../',   'pubs'),
         ('flow.html',        'flow/index.html',                '../',   'all'),
         ('drc.html',         'admin/drc/index.html',           '../../','drc'),
+        ('memo.html',        'memo/index.html',                '../',   'memo'),
     ]
     VER = asset_versions()
     # sw.js อยู่ราก path ในนั้นจึงอ้างอิงจากตำแหน่งตัวเอง ไม่ใช่ base ของแต่ละหน้า
@@ -450,7 +457,7 @@ def main():
         sub = {'@@REG@@': R, '@@REGPUB@@': P, '@@FBCFG@@': FB, '@@GASURL@@': GAS,
                '@@STATS@@': jsonjs(stats), '@@DEFS@@': jsonjs(defs),
                '@@PUBS@@': jsonjs(PUBS), '@@AIRAC@@': jsonjs(AIRAC),
-               '@@WF@@': jsonjs(WF)}
+               '@@WF@@': jsonjs(WF), '@@MEMOTYPES@@': jsonjs(MEMOTYPES)}
         n = emit(src, os.path.join(HERE, out), base, active, sub, VER)
         total += n
         print('  built: %-30s %7d bytes' % (out, n))

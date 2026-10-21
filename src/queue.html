@@ -101,8 +101,8 @@ async function loadTasks(){
 
   $('todo').innerHTML=head(L({th:'รอฉันดำเนินการ',en:'Waiting for me'}),'To do',open.length)+
     (open.length ? open.map(t=>{
-      const audit=t.app==='audit';
-      const go=audit?'@@BASE@@../d0507-audit/':'@@BASE@@approve/?t='+encodeURIComponent(t.id);
+      const audit=t.app==='audit', memo=t.app==='memo';
+      const go=audit?'@@BASE@@../d0507-audit/':memo?'@@BASE@@memo/?id='+encodeURIComponent(t.memoId):'@@BASE@@approve/?t='+encodeURIComponent(t.id);
       return `<div class="qrow hot"><div>
           <div class="t">${esc(t.title||nameOf(t.formCode))}
             ${t.delegated?`<span class="st dl">${esc(L({th:'มอบหมายต่อมาจาก ',en:'Delegated by '}))+esc(t.fromName||'—')}</span>`:''}</div>
@@ -110,7 +110,7 @@ async function loadTasks(){
             ${esc(L({th:'จาก ',en:'From '}))}${esc(t.fromName||'—')}${t.createdAt?' · '+esc(when(t.createdAt)):''}
             ${t.note?'<br>'+esc(L({th:'หมายเหตุ: ',en:'Note: '}))+esc(t.note):''}</div></div>
         <div class="b"><a class="fb go" href="${go}">${esc(audit?L({th:'เปิดงานตรวจสอบ',en:'Open audit task'}):L({th:'อนุมัติ / ลงนาม',en:'Approve / sign'}))} →</a>
-          ${audit?'':btnView(t.subId)}</div></div>`;
+          ${audit||memo?'':btnView(t.subId)}</div></div>`;
     }).join('') : `<div class="empty">${esc(L({th:'ไม่มีงานค้าง — ใบที่ส่งถึงคุณหรือมอบหมายต่อมาให้คุณจะขึ้นที่นี่',
                                               en:'Nothing waiting — forms sent or delegated to you appear here'}))}</div>`);
 

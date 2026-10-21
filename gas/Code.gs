@@ -134,6 +134,13 @@ function doPost(e) {
         bytes: Utilities.base64Encode(pfile.getBlob().getBytes()) } });
     }
 
+    /* PDF ของบันทึกข้อความที่ออกแล้ว (ดู Memo.gs) — อ่านตัวหนังสือจาก Firestore ด้วย token
+       ของผู้เรียก ไม่รับเนื้อหาจากหน้าเว็บ กันการทำ PDF "ฉบับลงนาม" ที่ไม่ตรงกับที่ออกจริง */
+    if (body.action === 'memoPdf') {
+      if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบเจ้าหน้าที่ก่อน');
+      return json_({ ok: true, result: memoPdf_(body) });
+    }
+
     if (body.action === 'dropTest') {
       if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบเจ้าหน้าที่ก่อน');
       if (!/TEST/i.test(String(body.tracking || ''))) throw new Error('ใช้ลบได้เฉพาะใบที่มีคำว่า TEST ในเลขที่ใบ');

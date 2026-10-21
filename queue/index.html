@@ -84,6 +84,9 @@
   <a class="nav staffonly" data-nav="drc" href="../admin/drc/">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3.5h9L19 8v12.5H5z"/><path d="M14 3.5V8h5"/><path d="M8.5 16.5c1.4-2.4 2.4-3.6 3-3.6.9 0 .3 3 1.2 3 .6 0 1-.7 2.8-1.4"/></svg>
     <span><span class="t" data-t="navDrc">แจกจ่ายเอกสาร</span><span class="en" data-t2="navDrc">Distribution · DRC</span></span></a>
+  <a class="nav staffonly" data-nav="memo" href="../memo/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5h16v13H4z"/><path d="M4 6l8 6 8-6"/></svg>
+    <span><span class="t" data-t="navMemo">บันทึกข้อความ</span><span class="en" data-t2="navMemo">Internal memo</span></span></a>
   <a class="nav staffonly" data-nav="audit" href="../../d0507-audit/">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.4 15.4L21 21"/></svg>
     <span><span class="t" data-t="navAudit">งานตรวจสอบ</span><span class="en" data-t="auditNote">Audit ↗ login แยก</span></span></a>
@@ -124,7 +127,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="../assets/app.js?v=f5187b19"></script>
+<script src="../assets/app.js?v=883f86ea"></script>
 <script>D0507.GAS_URL='https://script.google.com/macros/s/AKfycby7rFFVxd92wPImX4m8pv8nHqTrK3Iq0O32A34844DAg1rP8N3RfgKEyGvAUkQu-NXd/exec';</script>
 <script>
 "use strict";
@@ -183,8 +186,8 @@ async function loadTasks(){
 
   $('todo').innerHTML=head(L({th:'รอฉันดำเนินการ',en:'Waiting for me'}),'To do',open.length)+
     (open.length ? open.map(t=>{
-      const audit=t.app==='audit';
-      const go=audit?'../../d0507-audit/':'../approve/?t='+encodeURIComponent(t.id);
+      const audit=t.app==='audit', memo=t.app==='memo';
+      const go=audit?'../../d0507-audit/':memo?'../memo/?id='+encodeURIComponent(t.memoId):'../approve/?t='+encodeURIComponent(t.id);
       return `<div class="qrow hot"><div>
           <div class="t">${esc(t.title||nameOf(t.formCode))}
             ${t.delegated?`<span class="st dl">${esc(L({th:'มอบหมายต่อมาจาก ',en:'Delegated by '}))+esc(t.fromName||'—')}</span>`:''}</div>
@@ -192,7 +195,7 @@ async function loadTasks(){
             ${esc(L({th:'จาก ',en:'From '}))}${esc(t.fromName||'—')}${t.createdAt?' · '+esc(when(t.createdAt)):''}
             ${t.note?'<br>'+esc(L({th:'หมายเหตุ: ',en:'Note: '}))+esc(t.note):''}</div></div>
         <div class="b"><a class="fb go" href="${go}">${esc(audit?L({th:'เปิดงานตรวจสอบ',en:'Open audit task'}):L({th:'อนุมัติ / ลงนาม',en:'Approve / sign'}))} →</a>
-          ${audit?'':btnView(t.subId)}</div></div>`;
+          ${audit||memo?'':btnView(t.subId)}</div></div>`;
     }).join('') : `<div class="empty">${esc(L({th:'ไม่มีงานค้าง — ใบที่ส่งถึงคุณหรือมอบหมายต่อมาให้คุณจะขึ้นที่นี่',
                                               en:'Nothing waiting — forms sent or delegated to you appear here'}))}</div>`);
 
