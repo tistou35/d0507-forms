@@ -289,7 +289,7 @@ service cloud.firestore {
               'body', 'fields', 'effectiveFrom', 'expiresOn', 'beneficiaryUid', 'test',
               'render', 'beneficiaryName', 'purpose', 'font', 'proposerSig',
               'endorsement', 'endorsedAt', 'endorsementImg', 'mode', 'paper', 'transcribedAt',
-              'circular', 'recipients', 'recipientUids', 'recipientSel'];
+              'circular', 'recipients', 'recipientUids', 'recipientSel', 'ackChannel'];
     }
     function memoSignKeys() {
       return ['number', 'seq', 'year', 'counter', 'issuedAt', 'proposerSig',

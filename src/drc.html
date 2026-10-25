@@ -381,7 +381,8 @@ async function loadDists(force){
     + DISTS.map(d => `<tr>
         <td class="mono">${A.esc(dmy(d.issDate))}</td>
         <td>${A.esc(d.title || '—')}${d.ref ? ' <span class="none">' + A.esc(d.ref) + '</span>' : ''}
-          ${d.memoId ? `<br><a href="@@BASE@@memo/?id=${A.esc(d.memoId)}" style="font-size:12px">หนังสือเวียน · การรับทราบ <span data-ack="${A.esc(d.memoId)}">…</span> ↗</a>` : ''}</td>
+          ${d.memoId && d.ackChannel==='aerofbo' ? `<br><a href="@@BASE@@memo/?id=${A.esc(d.memoId)}" style="font-size:12px">หนังสือเวียน · รับทราบผ่าน AeroFBO Bulletin${d.aerofbo?' ✓':' (ยังไม่ได้ส่ง)'} ↗</a>`
+            : d.memoId ? `<br><a href="@@BASE@@memo/?id=${A.esc(d.memoId)}" style="font-size:12px">หนังสือเวียน · การรับทราบ <span data-ack="${A.esc(d.memoId)}">…</span> ↗</a>` : ''}</td>
         <td class="mono">${(d.docs||[]).length}</td>
         <td>${A.esc(d.issBy || '—')}</td>
         <td><button type="button" class="obtn sec" data-link="${A.esc(d.id)}"

@@ -367,7 +367,7 @@ async function listMemos(){
         return `<tr data-id="${esc(m.id)}"><td class="mono">${esc(m.number||'— (ยังไม่ออกเลข)')}${m.test?' <b style="color:var(--red-600)">TEST</b>':''}</td>
         <td class="mono">${esc(issued)}</td><td>${esc(m.type)}</td><td>${esc(m.subject||'')}</td><td>${sg(m)}</td>
         <td class="mono">${esc(long(m.effectiveFrom))}</td><td class="mono">${esc(long(m.expiresOn))}</td>
-        <td><span class="st ${esc(st)}">${esc(STATUS[st]||st)}</span></td></tr>`; }).join('')}</tbody></table></div>`;
+        <td><span class="st ${esc(st)}">${esc(STATUS[st]||st)}</span>${m.ackChannel==='aerofbo'&&m.status==='issued'?(m.aerofbo?' <span class="st issued">AeroFBO ✓</span>':' <span class="st proposed">รอส่ง AeroFBO</span>'):''}</td></tr>`; }).join('')}</tbody></table></div>`;
   document.querySelectorAll('[data-id]').forEach(tr=>tr.addEventListener('click',()=>{ location.href='?id='+encodeURIComponent(tr.dataset.id); }));
 }
 
@@ -409,6 +409,9 @@ function formMemo(type, existing){
         <select id="s_endorser" data-k="s"><option value="">—</option>${opts}</select><div class="hint" id="s_endorser_h"></div></div>
       ${cfg.circular?`<div class="sect">หนังสือเวียน — ผู้ต้องรับทราบ</div>
       <div class="full">${cfg.circular==='optional'?'<label class="ck" style="margin-bottom:8px"><input type="checkbox" id="r_on" data-k="s"> เวียนให้รับทราบ</label>':''}
+        <div id="r_chbox" style="margin-bottom:10px"><label for="r_ch">ส่งและเก็บการรับทราบที่</label>
+          <select id="r_ch" data-k="s" style="max-width:420px"><option value="aerofbo">AeroFBO › Bulletin (ทุกคน · แจ้งทาง LINE · ติดตามรับทราบใน AeroFBO)</option><option value="forms">ระบบฟอร์ม (เลือกผู้รับ · กดรับทราบในงานของฉัน)</option></select>
+          <div class="hint">หนังสือหนึ่งฉบับเก็บการรับทราบที่เดียว ผู้ตรวจจะได้ไม่ต้องถามว่าที่ไหนเป็นของจริง</div></div>
         <div id="r_box"><div class="rgrp">${GROUPS.map(g=>`<label class="ck"><input type="checkbox" data-g="${g.k}"> ${esc(g.n)}</label>`).join('')}</div>
         <div style="display:flex;gap:8px;margin:8px 0"><select id="r_add"><option value="">+ เพิ่มรายคน</option>${opts}</select></div>
         <div class="hint" id="r_sum"></div><div class="rchips" id="r_list"></div></div></div>`:''}
@@ -431,6 +434,8 @@ function formMemo(type, existing){
   if(cfg.circular){
     RCP = existing && existing.recipientSel ? JSON.parse(JSON.stringify(existing.recipientSel)) : {groups:(cfg.recipientsDefault||[]).slice(), extra:[], excl:[]};
     if($('r_on')) $('r_on').checked = !!(existing ? existing.circular : false);
+    $('r_ch').value = (existing && existing.ackChannel) || 'aerofbo';
+    $('r_ch').addEventListener('change',paintRcp);
     document.querySelectorAll('[data-g]').forEach(c=>{ c.checked=RCP.groups.includes(c.dataset.g);
       c.addEventListener('change',()=>{ RCP.groups=[...document.querySelectorAll('[data-g]:checked')].map(x=>x.dataset.g); paintRcp(); }); });
     $('r_add').addEventListener('change',e=>{ const v=e.target.value; if(v){ RCP.extra.push(v); RCP.excl=RCP.excl.filter(x=>x!==v); e.target.value=''; paintRcp(); } });
@@ -476,10 +481,12 @@ function readForm(type, fieldsChanged){
   checks(type).then(r=>{ CHK=r; paintChecks(); $('pv').innerHTML = letterHtml(draftModel(type)); });
 }
 const circOn=type=>MT[type].circular==='always' || (MT[type].circular==='optional' && $('r_on') && $('r_on').checked);
+const viaAero=()=>!$('r_ch') || $('r_ch').value==='aerofbo';
 function paintRcp(noRead){
   const type=EDIT?EDIT.type:Q.get('new'); if(!$('r_box')) return;
-  const on=circOn(type); $('r_box').hidden=!on;
+  const on=circOn(type); $('r_chbox').hidden=!on; $('r_box').hidden=!on || viaAero();
   const list=recipientsOf({proposer:signerOf('proposer'),endorser:signerOf('endorser')});
+  if(viaAero()){ if(!noRead) readForm(type,false); return; }
   $('r_sum').textContent = on ? (list.length+' คนต้องรับทราบ · กด × เพื่อตัดออก (ผู้ลงนามทั้งสองไม่ต้องรับทราบซ้ำ)') : '';
   $('r_list').innerHTML = on ? list.map(u=>`<span class="chip">${esc(u.name)} <button type="button" data-x="${esc(u.uid)}" aria-label="ตัดออก">×</button></span>`).join('') : '';
   $('r_list').querySelectorAll('[data-x]').forEach(b=>b.addEventListener('click',()=>{ RCP.excl.push(b.dataset.x); RCP.extra=RCP.extra.filter(x=>x!==b.dataset.x); paintRcp(); }));
@@ -507,7 +514,7 @@ async function checks(type){
   if(!p) errors.push('ยังไม่ได้เลือกผู้เสนอ');
   if(!e) errors.push('ยังไม่ได้เลือกผู้รับทราบ / สั่งการ');
   if(p&&e&&p.uid===e.uid) errors.push('ผู้เสนอกับผู้สั่งการต้องเป็นคนละคน');
-  if(cfg.circular && circOn(type) && !recipientsOf({proposer:p,endorser:e}).length) errors.push('หนังสือเวียนยังไม่มีผู้ต้องรับทราบ');
+  if(cfg.circular && circOn(type) && !viaAero() && !recipientsOf({proposer:p,endorser:e}).length) errors.push('หนังสือเวียนยังไม่มีผู้ต้องรับทราบ');
   if(ben&&p&&samePerson(p,ben)) errors.push('ผู้เสนอเป็นผู้ได้รับประโยชน์จากหนังสือฉบับนี้');
   if(ben&&e&&samePerson(e,ben)) errors.push('ผู้สั่งการเป็นผู้ได้รับประโยชน์จากหนังสือฉบับนี้');
   if(ben && F.evaluator && personKey(ben)===personKey(F.evaluator))
@@ -536,8 +543,12 @@ async function checks(type){
 function textOf(type){
   const cfg=MT[type], v=vars(type,F);
   const r=renderOf(type,F,CHK.supersedes);
-  if(cfg.circular && circOn(type)) r.circ=circLine(recipientsOf({proposer:signerOf('proposer'),endorser:signerOf('endorser')}));
-  return { subject:fill(cfg.subject,v), body:bodyOf(type,v), purpose:purposeOf(type,F), render:r };
+  if(cfg.circular && circOn(type)) r.circ = viaAero() ? 'Distributed to all personnel through AeroFBO Bulletin; acknowledgement is recorded in AeroFBO'
+                                                      : circLine(recipientsOf({proposer:signerOf('proposer'),endorser:signerOf('endorser')}));
+  // ประโยครับทราบมาตรฐานต้องชี้ไปที่ช่องทางที่ใช้จริงของฉบับนี้
+  const via = cfg.circular && circOn(type) && viaAero() ? 'on AeroFBO Bulletin' : 'through the D-0507 Forms system';
+  const body=bodyOf(type,v).map(x=>x.replace(/through the D-0507 Forms system/g, via));
+  return { subject:fill(cfg.subject,v), body, purpose:purposeOf(type,F), render:r };
 }
 function draftModel(type){
   const t=textOf(type);
@@ -556,8 +567,8 @@ async function saveMemo(type, submit){
     beneficiaryName:(F.beneficiary&&F.beneficiary.name)||'',
     signers:{ proposer:signerOf('proposer')||blank, endorser:signerOf('endorser')||blank },
     font:$('s_font').value, supersedes: CHK.supersedes||null });
-  const cf=MT[type].circular, con=!!(cf && circOn(type)), rl=con?recipientsOf(data.signers):[];
-  Object.assign(data,{ circular:con, recipients:rl, recipientUids:rl.map(x=>x.uid), recipientSel:cf?JSON.parse(JSON.stringify(RCP)):null });
+  const cf=MT[type].circular, con=!!(cf && circOn(type)), aero=con&&viaAero(), rl=con&&!aero?recipientsOf(data.signers):[];
+  Object.assign(data,{ circular:con, ackChannel:con?(aero?'aerofbo':'forms'):'', recipients:rl, recipientUids:rl.map(x=>x.uid), recipientSel:cf?JSON.parse(JSON.stringify(RCP)):null });
   $('save').disabled=$('submit').disabled=true;
   try{
     let ref;
@@ -713,6 +724,7 @@ function paintActions(acts){
 /* ── การรับทราบ ── acks/<uid> เขียนได้เฉพาะเจ้าตัว ครั้งเดียว เวลาเซิร์ฟเวอร์ */
 async function paintAcks(){
   const box=$('ackbox'), R=M.recipients||[];
+  if(M.ackChannel==='aerofbo') return aeroPanel(box);
   if(M.status!=='issued'){ box.innerHTML = R.length?`<div class="hint">หนังสือเวียน · ${R.length} คนต้องรับทราบหลังผู้สั่งการลงนาม</div>`:''; return; }
   let acks={}; try{ (await MREF.collection('acks').get()).docs.forEach(d=>acks[d.id]=d.data()); }catch(e){}
   const me=A.user.uid, mine=R.some(r=>r.uid===me), done=R.filter(r=>acks[r.uid]).length;
@@ -727,21 +739,73 @@ async function paintAcks(){
          await closeTasksFor(M.id, me); paintAcks(); }
     catch(e){ $('doAck').disabled=false; say('บันทึกไม่สำเร็จ: '+(e.code||e.message),true); } });
 }
+/* ════════════════ ส่งเข้า AeroFBO › Bulletin ════════════════
+   AeroFBO ส่งประกาศถึงทุกคน (แจ้งทาง LINE) และเก็บการรับทราบเอง แต่ฟอร์มประกาศของมันต้องล็อกอิน
+   ระบบนี้จึงยิงเข้าไปตรง ๆ ไม่ได้ — เตรียมข้อความให้คัดลอกทีละช่อง เปิดหน้า Bulletin ให้
+   แล้วเก็บลิงก์ประกาศกลับมาไว้ในบันทึก เป็นหลักฐานว่าฉบับนี้ไปถึงทุกคนทางไหน */
+const AERO_URL='https://indyzz.com/aerofbo/admin-panel.php?tab=bulletin';
+const AERO_CAT={SAF:'Safety',FOC:'Operations',TR:'Operations',AUD:'Operations',DOC:'General',POL:'General',DLG:'General',APPT:'General',GEN:'General',AUTH:'General',APR:'General'};
+function aeroText(m){
+  const S=m.signers||{}, en=m.endorsement||{}, r=m.render||{};
+  return [ m.number+' — '+(m.subject||''),
+    'Date of issue: '+long(tsDate(m.issuedAt))+'  ·  From: '+[S.proposer&&S.proposer.title,S.proposer&&S.proposer.name].filter(Boolean).join(' — ')
+      +'  ·  '+(en.action||'Endorsed')+' by: '+[S.endorser&&S.endorser.title,S.endorser&&S.endorser.name].filter(Boolean).join(' — '),
+    '', ...(m.body||[]).map((p,i)=>(i+1)+'. '+p+'\n'),
+    r.validity||'', en.text?'Instruction: '+en.text:'', '',
+    'The signed memorandum is attached as PDF. Please read it and acknowledge on AeroFBO.' ].join('\n').replace(/\n{3,}/g,'\n\n').trim();
+}
+function aeroDeadline(m){ const iss=tsDate(m.issuedAt)||bkkToday(); return m.effectiveFrom && m.effectiveFrom>iss ? m.effectiveFrom : addDays(iss,7); }
+function aeroPanel(box){
+  const m=M, a=m.aerofbo||{}, canPost=A.isAdmin()||m.createdBy===A.user.uid||(m.signers&&m.signers.endorser&&m.signers.endorser.uid===A.user.uid);
+  if(m.status!=='issued'){ box.innerHTML='<div class="hint">หนังสือเวียน · ส่งเข้า AeroFBO › Bulletin หลังผู้สั่งการลงนาม</div>'; return; }
+  const title=m.number+' — '+m.subject, body=aeroText(m), cat=AERO_CAT[m.type]||'General', dl=aeroDeadline(m);
+  const pdfId=m.pdf&&m.pdf.id, dlUrl=pdfId?'https://drive.google.com/uc?export=download&id='+encodeURIComponent(pdfId):'';
+  box.innerHTML=`<div class="card"><h3>AeroFBO › Bulletin ${a.url||a.ref?'<span class="st issued">ส่งแล้ว</span>':'<span class="st proposed">ยังไม่ได้ส่ง</span>'}</h3>
+    ${a.url||a.ref?`<p style="margin-bottom:10px">ส่งเมื่อ ${esc(tsFull(a.at))} โดย ${esc(a.byName||'')} · ${a.url?`<a href="${esc(a.url)}" target="_blank" rel="noopener">เปิดประกาศใน AeroFBO ↗</a>`:esc(a.ref)} · ดูยอดรับทราบได้ที่ปุ่ม tracking ของประกาศนั้น</p>`:''}
+    ${canPost?`<ol class="hint" style="font-size:13px;line-height:1.7;padding-left:18px;margin-bottom:12px">
+      <li>เปิด <a href="${AERO_URL}" target="_blank" rel="noopener"><b>AeroFBO › Bulletin ↗</b></a> แล้วกด <b>New Circular</b></li>
+      <li>คัดลอกแต่ละช่องด้านล่างไปวาง · Category <b>${cat}</b> · Response deadline <b>${esc(long(dl))}</b> · Publish status <b>Published</b></li>
+      <li>Attach file: ${dlUrl?`<a href="${esc(dlUrl)}" target="_blank" rel="noopener">ดาวน์โหลด PDF ฉบับลงนาม</a> แล้วแนบ`:'สร้าง PDF ก่อน (ปุ่มด้านบน)'}</li>
+      <li>กด Post Circular แล้วกลับมาบันทึกลิงก์ประกาศด้านล่าง</li></ol>
+    <div class="mf" style="grid-template-columns:1fr">
+      <div><label>Title <button type="button" class="fb" data-cp="t">คัดลอก</button></label><input type="text" id="ae_t" readonly value="${esc(title)}"></div>
+      <div><label>Content <button type="button" class="fb" data-cp="c">คัดลอก</button></label><textarea id="ae_c" readonly style="min-height:220px">${esc(body)}</textarea></div>
+      <div><label for="ae_u">ลิงก์หรือเลขประกาศใน AeroFBO หลังโพสต์</label><input type="text" id="ae_u" placeholder="วางลิงก์ หรือพิมพ์ชื่อ/ลำดับประกาศ" value="${esc(a.url||a.ref||'')}"></div>
+    </div>
+    <div class="acts2"><button class="big pri" id="ae_save">${a.url||a.ref?'แก้ลิงก์ประกาศ':'บันทึกว่าส่งเข้า AeroFBO แล้ว'}</button>
+      <a class="big sec" href="${AERO_URL}" target="_blank" rel="noopener">เปิด AeroFBO › Bulletin ↗</a></div><div id="amsg"></div>`
+    :`<p class="hint"><a href="${AERO_URL}" target="_blank" rel="noopener">AeroFBO › Bulletin ↗</a></p>`}</div>`;
+  box.querySelectorAll('[data-cp]').forEach(b=>b.addEventListener('click',async()=>{
+    const el=$(b.dataset.cp==='t'?'ae_t':'ae_c');
+    try{ await navigator.clipboard.writeText(el.value); b.textContent='คัดลอกแล้ว ✓'; setTimeout(()=>b.textContent='คัดลอก',1600); }
+    catch(e){ el.select(); b.textContent='กด ⌘C / Ctrl+C'; } }));
+  if($('ae_save')) $('ae_save').addEventListener('click',async()=>{
+    const v=$('ae_u').value.trim(); if(!v){ say('ใส่ลิงก์หรือเลขประกาศใน AeroFBO ก่อน',true); return; }
+    const isUrl=/^https:\/\/(www\.)?indyzz\.com\/aerofbo\//i.test(v);
+    if(/^https?:/i.test(v) && !isUrl){ say('ลิงก์ต้องเป็นของ AeroFBO (indyzz.com/aerofbo/…)',true); return; }
+    const me=A.myName()||A.user.email, rec={url:isUrl?v:'', ref:isUrl?'':v, at:now(), byUid:A.user.uid, byName:me};
+    try{ await MREF.update({aerofbo:rec});
+      await MREF.collection('events').add({action:'aerofbo', byUid:A.user.uid, byName:me, note:v, at:now()});
+      if(m.distId) await A.db.collection('distributions').doc(m.distId).update({aerofbo:{url:rec.url, ref:rec.ref}}).catch(()=>{});
+      await viewMemo(m.id); }
+    catch(e){ say('บันทึกไม่สำเร็จ: '+(e.code||e.message),true); } });
+}
 async function closeTasksFor(id, uid){
   try{ const ts=await A.db.collection('tasks').where('memoId','==',id).get();
        for(const d of ts.docs){ const t=d.data(); if(t.state==='open' && t.assigneeUid===uid) await d.ref.update({state:'done', closedAt:now()}); } }catch(e){}
 }
 /* หนังสือเวียนที่ออกแล้ว: งานรับทราบให้ทุกคนในรายชื่อ + ประกาศในระบบแจกจ่าย (distributions) */
 async function circulate(){
-  if(!M.circular || !(M.recipients||[]).length || M.distId) return;
+  const aero=M.ackChannel==='aerofbo';
+  if(!M.circular || M.distId || (!aero && !(M.recipients||[]).length)) return;
   const me=A.myName()||A.user.email;
   try{
     const d=await A.db.collection('distributions').add({ issDate:bkkToday(), issBy:me, title:M.subject, ref:M.number,
-      docs:[{title:M.subject, code:M.number, rev:'', eff:M.effectiveFrom||''}], memoId:M.id,
+      docs:[{title:M.subject, code:M.number, rev:'', eff:M.effectiveFrom||''}], memoId:M.id, ackChannel:aero?'aerofbo':'forms',
       issUid:A.user.uid, issEmail:A.user.email||'', createdAt:now() });
     await MREF.update({distId:d.id});
   }catch(e){}
-  for(const r of M.recipients){
+  for(const r of (aero?[]:M.recipients)){
     try{ await A.db.collection('tasks').add({ app:'memo', kind:'ack', memoId:M.id, subId:'', formCode:'MEMO-'+M.type,
       title:'รับทราบ: '+M.subject, tracking:M.number, assigneeUid:r.uid, assigneeName:r.name, state:'open', step:3,
       fromUid:A.user.uid, fromName:me, createdAt:now() }); }catch(e){}
@@ -750,7 +814,7 @@ async function circulate(){
 async function paintHistory(){
   try{
     const ev=(await MREF.collection('events').get()).docs.map(d=>d.data()).sort((a,b)=>((a.at&&a.at.seconds)||0)-((b.at&&b.at.seconds)||0));
-    const N={ack:'รับทราบ',draft:'บันทึกร่าง',submit:'ส่งให้ผู้เสนอ',resubmit:'แก้และส่งอีกครั้ง',return:'ตีกลับ',propose:'ผู้เสนอลงนาม · ออกเลข',
+    const N={aerofbo:'ส่งเข้า AeroFBO Bulletin',ack:'รับทราบ',draft:'บันทึกร่าง',submit:'ส่งให้ผู้เสนอ',resubmit:'แก้และส่งอีกครั้ง',return:'ตีกลับ',propose:'ผู้เสนอลงนาม · ออกเลข',
              endorse:'ผู้สั่งการลงนาม',cancel:'ยกเลิก',pdf:'สร้าง PDF',supersede:'ถูกแทน',record:'ลงทะเบียนฉบับกระดาษ'};
     $('hist').innerHTML=`<h3>ประวัติ</h3><div class="twrap"><table class="ml"><tbody>${ev.map(e=>`<tr><td class="mono">${esc(tsFull(e.at))}</td><td>${esc(N[e.action]||e.action)}</td><td>${esc(e.byName||'')}</td><td>${esc(e.note||'')}</td></tr>`).join('')}</tbody></table></div>`;
   }catch(e){}
