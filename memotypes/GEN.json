@@ -125,5 +125,12 @@
  "subject": "{subjectText}",
  "body": [
   "{bodyText}"
- ]
+ ],
+ "order": 110,
+ "circular": "optional",
+ "recipientsDefault": [],
+ "desc": {
+  "en": "Any other matter — for information, consideration or approval",
+  "th": "เรื่องอื่น ๆ · แจ้งเพื่อทราบ/พิจารณา/อนุมัติ · เวียนได้"
+ }
 }

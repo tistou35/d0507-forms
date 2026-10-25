@@ -1,0 +1,125 @@
+{
+ "code": "TR",
+ "order": 60,
+ "title": {
+  "en": "Temporary Revision / Cancellation",
+  "th": "Temporary Revision / ยกเลิก TR"
+ },
+ "desc": {
+  "en": "Issue a Temporary Revision to a manual, or cancel one",
+  "th": "ออกหรือยกเลิกการแก้ไขชั่วคราวของคู่มือ · เวียน"
+ },
+ "purpose": "compliance",
+ "requiresSignature": true,
+ "circular": "always",
+ "recipientsDefault": [
+  "all"
+ ],
+ "signers": {
+  "proposer": {
+   "position": "CMM"
+  },
+  "endorser": {
+   "position": "ACM",
+   "conflictPosition": "HT",
+   "actions": [
+    "APPROVED",
+    "NOT APPROVED"
+   ]
+  }
+ },
+ "backdate": {
+  "allowed": false
+ },
+ "fields": [
+  {
+   "k": "trMode",
+   "type": "select",
+   "req": true,
+   "label": {
+    "en": "Action",
+    "th": "การดำเนินการ"
+   },
+   "opt": [
+    {
+     "v": "issue",
+     "n": {
+      "en": "Issue",
+      "th": "ออก TR"
+     },
+     "modeTitle": "Issue",
+     "lead": "Temporary Revision {trNo} to {manualRef} is issued with effect from {effectiveFromLong}{untilPhrase}, or until it is incorporated into the next revision of the manual."
+    },
+    {
+     "v": "cancel",
+     "n": {
+      "en": "Cancellation",
+      "th": "ยกเลิก TR"
+     },
+     "modeTitle": "Cancellation Notice",
+     "lead": "Temporary Revision {trNo} to {manualRef} is cancelled with effect from {effectiveFromLong}. The TR shall be removed from all controlled copies."
+    }
+   ]
+  },
+  {
+   "k": "trNo",
+   "type": "text",
+   "req": true,
+   "label": {
+    "en": "TR number",
+    "th": "เลข TR"
+   },
+   "ph": "e.g. TR 2026-01"
+  },
+  {
+   "k": "manualRef",
+   "type": "text",
+   "req": true,
+   "label": {
+    "en": "Manual and section",
+    "th": "คู่มือและหัวข้อ"
+   },
+   "ph": "e.g. OMA Part A, Section A.8.3"
+  },
+  {
+   "k": "effectiveFrom",
+   "type": "date",
+   "req": true,
+   "label": {
+    "en": "Effective from",
+    "th": "วันมีผล"
+   }
+  },
+  {
+   "k": "expiresOn",
+   "type": "date",
+   "label": {
+    "en": "Valid until (issue only, optional)",
+    "th": "ใช้ถึง (ไม่บังคับ)"
+   }
+  },
+  {
+   "k": "bodyText",
+   "type": "textarea",
+   "req": true,
+   "label": {
+    "en": "Change / reason",
+    "th": "สิ่งที่แก้ / เหตุผล"
+   }
+  }
+ ],
+ "compute": [
+  {
+   "k": "untilPhrase",
+   "op": "tpl",
+   "of": "expiresOn",
+   "tpl": " and remains valid until {expiresOnLong}"
+  }
+ ],
+ "subject": "Temporary Revision {trNo} — {modeTitle}",
+ "body": [
+  "{lead}",
+  "{bodyText}",
+  "Holders of controlled copies shall insert or remove the TR accordingly and acknowledge receipt through the D-0507 Forms system."
+ ]
+}

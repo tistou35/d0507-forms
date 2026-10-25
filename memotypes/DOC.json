@@ -1,0 +1,106 @@
+{
+ "code": "DOC",
+ "order": 20,
+ "title": {
+  "en": "Issue of Controlled Document",
+  "th": "ประกาศใช้เอกสาร / คู่มือฉบับใหม่"
+ },
+ "desc": {
+  "en": "New or revised manual, SOP or form — notify copy holders before the effective date",
+  "th": "แจ้งผู้ถือสำเนาก่อนวันมีผล · เวียนให้รับทราบ"
+ },
+ "purpose": "compliance",
+ "requiresSignature": true,
+ "circular": "always",
+ "recipientsDefault": [
+  "all"
+ ],
+ "signers": {
+  "proposer": {
+   "position": "CMM"
+  },
+  "endorser": {
+   "position": "ACM",
+   "conflictPosition": "HT",
+   "actions": [
+    "APPROVED",
+    "NOT APPROVED"
+   ]
+  }
+ },
+ "backdate": {
+  "allowed": false
+ },
+ "fields": [
+  {
+   "k": "subjectText",
+   "type": "text",
+   "req": true,
+   "label": {
+    "en": "Document issued",
+    "th": "เอกสารที่ประกาศใช้"
+   },
+   "ph": "e.g. OMA 2026 Issue 05 Revision 01"
+  },
+  {
+   "k": "docList",
+   "type": "textarea",
+   "req": true,
+   "label": {
+    "en": "Documents (one per line)",
+    "th": "รายการเอกสาร (บรรทัดละฉบับ)"
+   },
+   "ph": "D-0507-OM — Operation Manual — Issue 05 / Revision 01"
+  },
+  {
+   "k": "effectiveFrom",
+   "type": "date",
+   "req": true,
+   "label": {
+    "en": "Effective from",
+    "th": "วันมีผล"
+   }
+  },
+  {
+   "k": "changeSummary",
+   "type": "textarea",
+   "req": true,
+   "label": {
+    "en": "Summary of changes",
+    "th": "สรุปสิ่งที่เปลี่ยน"
+   }
+  },
+  {
+   "k": "drfRef",
+   "type": "text",
+   "label": {
+    "en": "Revision request reference (optional)",
+    "th": "เลขใบขอแก้ไข DRF (ไม่บังคับ)"
+   }
+  },
+  {
+   "k": "refText",
+   "type": "text",
+   "label": {
+    "en": "Where to read it (optional)",
+    "th": "อ่านฉบับเต็มได้ที่ (ไม่บังคับ)"
+   },
+   "ph": "e.g. Forms portal › Publications"
+  }
+ ],
+ "compute": [
+  {
+   "k": "drfSentence",
+   "op": "tpl",
+   "of": "drfRef",
+   "tpl": "This issue follows Document Revision Request {drfRef}."
+  }
+ ],
+ "subject": "Issue of {subjectText}",
+ "body": [
+  "The following controlled document(s) have been approved and are issued with effect from {effectiveFromLong}:\n{docList}",
+  "Summary of changes:\n{changeSummary}",
+  "{drfSentence}",
+  "Holders of controlled copies shall replace the superseded pages, withdraw superseded copies from use, and acknowledge receipt through the D-0507 Forms system before the effective date."
+ ]
+}

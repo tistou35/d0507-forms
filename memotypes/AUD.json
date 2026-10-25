@@ -1,0 +1,154 @@
+{
+ "code": "AUD",
+ "order": 90,
+ "title": {
+  "en": "Audit Programme Memorandum",
+  "th": "บันทึกเรื่องการตรวจ"
+ },
+ "desc": {
+  "en": "Audit schedule distribution, audit team appointment or unscheduled audit — auditee notifications stay in the Audit Portal",
+  "th": "แจกแผนตรวจ · แต่งตั้งคณะผู้ตรวจ · ตรวจนอกแผน (หนังสือแจ้งผู้ถูกตรวจยังออกจาก Audit Portal)"
+ },
+ "purpose": "inform",
+ "requiresSignature": true,
+ "circular": "always",
+ "recipientsDefault": [
+  "mgt"
+ ],
+ "signers": {
+  "proposer": {
+   "position": "CMM"
+  },
+  "endorser": {
+   "position": "ACM",
+   "conflictPosition": "HT",
+   "actions": [
+    "APPROVED",
+    "NOT APPROVED"
+   ]
+  }
+ },
+ "backdate": {
+  "allowed": false
+ },
+ "fields": [
+  {
+   "k": "audKind",
+   "type": "select",
+   "req": true,
+   "label": {
+    "en": "Kind",
+    "th": "เรื่อง"
+   },
+   "opt": [
+    {
+     "v": "schedule",
+     "n": {
+      "en": "Annual audit schedule",
+      "th": "แผนการตรวจประจำปี"
+     },
+     "audKindTitle": "Audit Schedule",
+     "audLead": "The audit schedule {subjectText} has been prepared and is distributed to the post holders for planning purposes."
+    },
+    {
+     "v": "team",
+     "n": {
+      "en": "Appointment of audit team",
+      "th": "แต่งตั้งคณะผู้ตรวจ"
+     },
+     "audKindTitle": "Appointment of Audit Team",
+     "audLead": "The audit team named below is appointed for {subjectText}."
+    },
+    {
+     "v": "unscheduled",
+     "n": {
+      "en": "Unscheduled audit",
+      "th": "ตรวจนอกแผน"
+     },
+     "audKindTitle": "Unscheduled Audit",
+     "audLead": "An unscheduled audit, {subjectText}, is to be conducted."
+    }
+   ]
+  },
+  {
+   "k": "subjectText",
+   "type": "text",
+   "req": true,
+   "label": {
+    "en": "Audit / schedule",
+    "th": "ชื่อรอบตรวจ / แผน"
+   },
+   "ph": "e.g. Compliance Monitoring Schedule 2027"
+  },
+  {
+   "k": "refText",
+   "type": "text",
+   "label": {
+    "en": "Audit plan reference (optional)",
+    "th": "เลขแผน/รอบตรวจ (ไม่บังคับ)"
+   },
+   "ph": "e.g. AP-2027-01"
+  },
+  {
+   "k": "scope",
+   "type": "textarea",
+   "req": true,
+   "label": {
+    "en": "Scope",
+    "th": "ขอบเขต"
+   }
+  },
+  {
+   "k": "team",
+   "type": "text",
+   "label": {
+    "en": "Lead auditor and auditors (optional)",
+    "th": "หัวหน้าผู้ตรวจและผู้ตรวจ (ไม่บังคับ)"
+   }
+  },
+  {
+   "k": "effectiveFrom",
+   "type": "date",
+   "label": {
+    "en": "Period from (optional)",
+    "th": "ช่วงตั้งแต่ (ไม่บังคับ)"
+   }
+  },
+  {
+   "k": "expiresOn",
+   "type": "date",
+   "label": {
+    "en": "Period to (optional)",
+    "th": "ถึง (ไม่บังคับ)"
+   }
+  }
+ ],
+ "compute": [
+  {
+   "k": "teamSentence",
+   "op": "tpl",
+   "of": "team",
+   "tpl": "Audit team: {team}."
+  },
+  {
+   "k": "periodSentence",
+   "op": "tpl",
+   "of": "effectiveFrom",
+   "tpl": "Period: {effectiveFromLong}{untilPhrase}."
+  },
+  {
+   "k": "untilPhrase",
+   "op": "tpl",
+   "of": "expiresOn",
+   "tpl": " to {expiresOnLong}"
+  }
+ ],
+ "subject": "{audKindTitle} — {subjectText}",
+ "body": [
+  "{audLead}",
+  "Scope:\n{scope}",
+  "{teamSentence}",
+  "{periodSentence}",
+  "Notifications to individual auditees are issued separately through the Audit Portal (D-0507-ANF-001)."
+ ]
+}

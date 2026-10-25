@@ -1,0 +1,211 @@
+{
+ "code": "APPT",
+ "order": 80,
+ "title": {
+  "en": "Appointment of Key Personnel",
+  "th": "แต่งตั้งบุคลากรหลัก"
+ },
+ "desc": {
+  "en": "Appointment to a nominated or management post — recorded in D-0507-KPA-001",
+  "th": "แต่งตั้งตำแหน่งบริหาร/nominated · ลงทะเบียน KPA"
+ },
+ "purpose": "inform",
+ "requiresSignature": true,
+ "circular": "optional",
+ "recipientsDefault": [
+  "all"
+ ],
+ "signers": {
+  "proposer": {
+   "position": "CMM",
+   "conflictPosition": "HT"
+  },
+  "endorser": {
+   "position": "ACM",
+   "conflictPosition": "HT",
+   "actions": [
+    "APPROVED",
+    "NOT APPROVED"
+   ]
+  }
+ },
+ "backdate": {
+  "allowed": true,
+  "statement": "ISSUED RETROSPECTIVELY. This memorandum confirms an appointment that took effect on {effectiveFromLong}. The date of issue is the date of signature and has not been back-dated."
+ },
+ "fields": [
+  {
+   "k": "beneficiary",
+   "type": "person",
+   "req": true,
+   "label": {
+    "en": "Person appointed",
+    "th": "ผู้ได้รับแต่งตั้ง"
+   }
+  },
+  {
+   "k": "post",
+   "type": "select",
+   "req": true,
+   "label": {
+    "en": "Post",
+    "th": "ตำแหน่ง"
+   },
+   "opt": [
+    {
+     "v": "HT",
+     "n": {
+      "en": "Head of Training",
+      "th": "Head of Training"
+     },
+     "postTitle": "Head of Training"
+    },
+    {
+     "v": "CFI",
+     "n": {
+      "en": "Chief Flight Instructor",
+      "th": "Chief Flight Instructor"
+     },
+     "postTitle": "Chief Flight Instructor"
+    },
+    {
+     "v": "CTKI",
+     "n": {
+      "en": "Chief Theoretical Knowledge Instructor",
+      "th": "Chief Theoretical Knowledge Instructor"
+     },
+     "postTitle": "Chief Theoretical Knowledge Instructor"
+    },
+    {
+     "v": "CMM",
+     "n": {
+      "en": "Compliance Monitoring Manager",
+      "th": "Compliance Monitoring Manager"
+     },
+     "postTitle": "Compliance Monitoring Manager"
+    },
+    {
+     "v": "SM",
+     "n": {
+      "en": "Safety Manager",
+      "th": "Safety Manager"
+     },
+     "postTitle": "Safety Manager"
+    },
+    {
+     "v": "MM",
+     "n": {
+      "en": "Maintenance Manager",
+      "th": "Maintenance Manager"
+     },
+     "postTitle": "Maintenance Manager"
+    },
+    {
+     "v": "OPS",
+     "n": {
+      "en": "Flight Operations",
+      "th": "Flight Operations"
+     },
+     "postTitle": "Flight Operations"
+    }
+   ]
+  },
+  {
+   "k": "roleText",
+   "type": "text",
+   "label": {
+    "en": "Title in OMM, if different (optional)",
+    "th": "ชื่อตำแหน่งตาม OMM ถ้าต่างกัน (ไม่บังคับ)"
+   }
+  },
+  {
+   "k": "effectiveFrom",
+   "type": "date",
+   "req": true,
+   "label": {
+    "en": "Effective from",
+    "th": "วันมีผล"
+   }
+  },
+  {
+   "k": "caat",
+   "type": "select",
+   "req": true,
+   "label": {
+    "en": "CAAT acceptance",
+    "th": "การยอมรับจาก CAAT"
+   },
+   "opt": [
+    {
+     "v": "na",
+     "n": {
+      "en": "Not a nominated post",
+      "th": "ไม่ใช่ตำแหน่ง nominated"
+     },
+     "caatSentence": ""
+    },
+    {
+     "v": "pending",
+     "n": {
+      "en": "To be submitted to CAAT",
+      "th": "ยังไม่ได้ยื่น"
+     },
+     "caatSentence": "This is a nominated post. The nomination shall be submitted to CAAT for acceptance."
+    },
+    {
+     "v": "submitted",
+     "n": {
+      "en": "Submitted, awaiting CAAT",
+      "th": "ยื่นแล้ว รอ CAAT"
+     },
+     "caatSentence": "This is a nominated post. The nomination has been submitted to CAAT and is awaiting acceptance."
+    },
+    {
+     "v": "accepted",
+     "n": {
+      "en": "Accepted by CAAT",
+      "th": "CAAT ยอมรับแล้ว"
+     },
+     "caatSentence": "This is a nominated post. The nomination has been accepted by CAAT{caatRefPhrase}."
+    }
+   ]
+  },
+  {
+   "k": "caatRef",
+   "type": "text",
+   "label": {
+    "en": "CAAT reference (optional)",
+    "th": "เลขหนังสือ CAAT (ไม่บังคับ)"
+   }
+  },
+  {
+   "k": "qualText",
+   "type": "textarea",
+   "label": {
+    "en": "Qualifications (optional)",
+    "th": "คุณวุฒิ (ไม่บังคับ)"
+   }
+  }
+ ],
+ "compute": [
+  {
+   "k": "roleSentence",
+   "op": "tpl",
+   "of": "roleText",
+   "tpl": " (OMM title: {roleText})"
+  },
+  {
+   "k": "caatRefPhrase",
+   "op": "tpl",
+   "of": "caatRef",
+   "tpl": " (reference {caatRef})"
+  }
+ ],
+ "subject": "Appointment of {beneficiaryName} as {postTitle}",
+ "body": [
+  "{beneficiaryName} is appointed as {postTitle}{roleSentence} with effect from {effectiveFromLong}.",
+  "{caatSentence}",
+  "{qualText}",
+  "The appointment shall be recorded in the Key Personnel Appointment Record (D-0507-KPA-001)."
+ ]
+}

@@ -1,0 +1,116 @@
+{
+ "code": "APR",
+ "order": 100,
+ "title": {
+  "en": "Request for Approval",
+  "th": "ขออนุมัติ"
+ },
+ "desc": {
+  "en": "Matters the manuals require to be approved in writing",
+  "th": "เรื่องที่คู่มือกำหนดให้อนุมัติเป็นลายลักษณ์อักษร"
+ },
+ "purpose": "approve",
+ "requiresSignature": true,
+ "signers": {
+  "proposer": {
+   "self": true
+  },
+  "endorser": {
+   "byField": "aprKind",
+   "map": {
+    "passenger": "HT",
+    "booking": "HT",
+    "records": "CMM",
+    "other": "ACM"
+   },
+   "conflictPosition": "ACM",
+   "actions": [
+    "APPROVED",
+    "NOT APPROVED"
+   ]
+  }
+ },
+ "backdate": {
+  "allowed": false
+ },
+ "fields": [
+  {
+   "k": "aprKind",
+   "type": "select",
+   "req": true,
+   "label": {
+    "en": "Subject of approval",
+    "th": "เรื่องที่ขออนุมัติ"
+   },
+   "opt": [
+    {
+     "v": "passenger",
+     "n": {
+      "en": "Carriage of a passenger (HT, OMA)",
+      "th": "นำผู้โดยสารขึ้นบิน (HT)"
+     }
+    },
+    {
+     "v": "booking",
+     "n": {
+      "en": "Urgent booking outside the standard schedule (HT, OMA)",
+      "th": "จองบินด่วนนอกตาราง (HT)"
+     }
+    },
+    {
+     "v": "records",
+     "n": {
+      "en": "Destruction of retained records (CMM, OMA)",
+      "th": "ทำลายเอกสารที่เก็บรักษา (CMM)"
+     }
+    },
+    {
+     "v": "other",
+     "n": {
+      "en": "Other",
+      "th": "อื่น ๆ"
+     }
+    }
+   ]
+  },
+  {
+   "k": "subjectText",
+   "type": "text",
+   "req": true,
+   "label": {
+    "en": "Subject",
+    "th": "เรื่อง"
+   }
+  },
+  {
+   "k": "bodyText",
+   "type": "textarea",
+   "req": true,
+   "label": {
+    "en": "Details and justification",
+    "th": "รายละเอียดและเหตุผล"
+   }
+  },
+  {
+   "k": "refText",
+   "type": "text",
+   "label": {
+    "en": "Reference (optional)",
+    "th": "อ้างอิง (ไม่บังคับ)"
+   }
+  },
+  {
+   "k": "effectiveFrom",
+   "type": "date",
+   "label": {
+    "en": "Date of the activity (optional)",
+    "th": "วันที่ดำเนินการ (ไม่บังคับ)"
+   }
+  }
+ ],
+ "subject": "Request for approval — {subjectText}",
+ "body": [
+  "{bodyText}",
+  "Approval is requested."
+ ]
+}

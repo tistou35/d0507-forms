@@ -69,6 +69,19 @@ table.ml tr:last-child td{border-bottom:0}
 .stage .blk img{display:block;width:100%;height:auto;pointer-events:none}
 .endogrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:20px;align-items:start}
 @media(max-width:900px){ .endogrid{grid-template-columns:1fr} }
+/* ── การ์ดประเภท · ผู้รับ ── */
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-bottom:6px}
+.tcard{display:flex;flex-direction:column;gap:4px;padding:12px 14px;border:1px solid var(--border-light);border-radius:10px;
+  background:var(--surface);color:var(--fg-1);text-decoration:none}
+.tcard:hover{border-color:var(--navy-900)}
+.tcard .tc{font-family:var(--font-mono);font-size:11px;color:var(--g-500)}
+.tcard .tc i{font-style:normal;background:var(--sky-100);color:var(--navy-900);border-radius:99px;padding:1px 7px;margin-left:4px}
+.tcard .tc i.o{background:var(--g-100);color:var(--g-600)}
+.tcard b{font-size:14px} .tcard .td{font-size:12px;color:var(--g-500);line-height:1.45}
+.rgrp{display:flex;flex-wrap:wrap;gap:8px 18px}
+.rchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chip{display:inline-flex;align-items:center;gap:4px;background:var(--g-100);border-radius:99px;padding:2px 4px 2px 10px;font-size:12.5px}
+.chip button{border:0;background:none;cursor:pointer;font-size:14px;color:var(--g-500);padding:0 4px}
 @media print{ .noprint,header,nav,footer,.rail,.botnav{display:none!important} .letter{border:0;padding:0} }
 </style>
 </head><body>
@@ -165,8 +178,13 @@ function defaultSigners(type, f){
   const cfg=(MT[type].signers)||{}, ben=f.beneficiary, ev=f.evaluator;
   const selfEval = ben && ev && personKey(ben)===personKey(ev);
   const pick=pos=>{ const h=holders(pos); return h.length===1?h[0]:null; };
-  const one=(c,avoid)=>{ if(!c||!c.position) return null;
-    let pos=c.position, u=pick(pos);
+  const one=(c,avoid)=>{ if(!c) return null;
+    if(c.self){ const u=userById(A.user.uid); const pt=posTitle(u); return u?{pos:pt.pos, uid:u.uid, name:u.name, title:pt.title}:null; }
+    if(c.fromField){ const p=f[c.fromField]; if(!p||!p.uid) return null; const u=userById(p.uid); const pt=posTitle(u);
+      return u?{pos:pt.pos, uid:u.uid, name:u.name, title:pt.title}:null; }
+    const position = c.byField ? (c.map||{})[f[c.byField]] : c.position;
+    if(!position) return null;
+    let pos=position, u=pick(pos);
     if(!u || avoid(u)){ if(c.conflictPosition){ pos=c.conflictPosition; u=pick(pos); } }
     if(!u || avoid(u)) return {pos, uid:'', name:'', title:POSN[pos]||pos};
     return {pos, uid:u.uid, name:u.name, title:POSN[pos]||pos}; };
@@ -184,17 +202,21 @@ function vars(type, f){
     else if(x.type==='select'){ const o=(x.opt||[]).find(o=>o.v===val)||{}; v[x.k]=val||''; Object.keys(o).forEach(k=>{ if(!['v','n'].includes(k)) v[k]=o[k]; }); }
     else { v[x.k]=val==null?'':val; if(x.type==='date') v[x.k+'Long']=long(val); }
   });
-  computeInto(type, f); (cfg.compute||[]).forEach(c=>{ v[c.k]=f[c.k]||''; v[c.k+'Long']=long(f[c.k]); });
+  computeInto(type, f); (cfg.compute||[]).filter(c=>c.op!=='tpl').forEach(c=>{ v[c.k]=f[c.k]||''; v[c.k+'Long']=long(f[c.k]); });
   v.scopeSentence = f.scope ? 'This authorisation is limited to: '+f.scope+'.' : '';
+  // ประโยคที่ขึ้นเฉพาะเมื่อช่องต้นทางมีค่า — สองรอบ เพราะประโยคหนึ่งอ้างอีกประโยคได้
+  for(let i=0;i<2;i++) (cfg.compute||[]).filter(c=>c.op==='tpl').forEach(c=>{ v[c.k] = f[c.of] ? fill(c.tpl,v) : ''; });
   return v;
 }
 function computeInto(type, f){
   (MT[type].compute||[]).forEach(c=>{
     const src=f[c.of];
+    if(c.op==='tpl') return;
     f[c.k] = c.op==='addDays' ? addDays(src,c.n) : c.op==='addYearsMinusDay' ? addYearsMinusDay(src,c.n) : '';
   });
 }
-const fill=(t,v)=>String(t||'').replace(/\{([a-zA-Z0-9_]+)\}/g,(m,k)=>v[k]==null?'':v[k]);
+const fill1=(t,v)=>String(t||'').replace(/\{([a-zA-Z0-9_]+)\}/g,(m,k)=>v[k]==null?'':v[k]);
+const fill=(t,v)=>fill1(fill1(t,v),v);
 /* ย่อหน้า — ช่องเนื้อหาแบบพิมพ์เองแยกย่อหน้าด้วยบรรทัดว่าง */
 function bodyOf(type, v){ return (MT[type].body||[]).flatMap(p=>fill(p,v).split(/\n\s*\n/)).map(p=>p.trim()).filter(Boolean); }
 const purposeOf=(type,f)=> (f&&f.purposeSel) || MT[type].purpose;
@@ -211,20 +233,46 @@ function renderOf(type, f, sup){
     validity: f.effectiveFrom ? ('Effective from: '+long(f.effectiveFrom)+(f.expiresOn?'   ·   Valid until: '+long(f.expiresOn):'')) : '',
     note: cfg.fixedNote ? 'Note: '+cfg.fixedNote : '' };
 }
+/* ── หนังสือเวียน — ผู้ต้องรับทราบ ─────────────────────────
+   เลือกเป็นกลุ่มตามบทบาท แล้วเพิ่ม/ตัดรายคนได้ · ผู้ลงนามทั้งสองไม่ต้องรับทราบซ้ำ
+   รายชื่อตรึงไว้ตอนส่ง — คนที่เพิ่มเข้าระบบทีหลังไม่ถูกนับว่าค้าง */
+const STAFF_ROLES=['ins','mnt','ops','mgt','sms'];
+const GROUPS=[{k:'all',n:'เจ้าหน้าที่ทั้งหมด'},{k:'ins',n:'ครูการบิน / ครูภาคทฤษฎี'},{k:'ops',n:'ฝ่ายปฏิบัติการ'},
+              {k:'mgt',n:'ฝ่ายบริหาร'},{k:'mnt',n:'ช่างอากาศยาน'},{k:'sms',n:'นิรภัยการบิน'}];
+const isStaffUser=u=>!u.test && (u.roles||[]).some(r=>STAFF_ROLES.includes(r));
+let RCP={groups:[], extra:[], excl:[]};
+function recipientsOf(signers){
+  const sg=[signers&&signers.proposer&&signers.proposer.uid, signers&&signers.endorser&&signers.endorser.uid];
+  const inG=u=>RCP.groups.includes('all') ? true : (u.roles||[]).some(r=>RCP.groups.includes(r));
+  return USERS.filter(u=>isStaffUser(u) && (inG(u)||RCP.extra.includes(u.uid)) && !RCP.excl.includes(u.uid) && !sg.includes(u.uid))
+    .sort((a,b)=>String(a.name).localeCompare(String(b.name))).map(u=>({uid:u.uid,name:u.name||u.email}));
+}
+const GROUP_EN={all:'all staff',ins:'instructors',ops:'operations',mgt:'management',mnt:'maintenance',sms:'safety'};
+function circLine(list){
+  const g=RCP.groups.map(k=>GROUP_EN[k]).filter(Boolean);
+  return list.length ? 'For acknowledgement by '+list.length+' personnel'+(g.length?' ('+g.join(', ')+')':'') : '';
+}
 
 /* ════════════════ รายการ ════════════════ */
 async function listMemos(){
   $('h1').textContent='บันทึกข้อความ';
-  const types=Object.values(MT);
-  $('app').innerHTML=`<div class="acts2 noprint">${types.map(t=>`<a class="big pri" href="?new=${esc(t.code)}">+ ${esc(A.L(t.title))}</a>`).join('')}
-      ${A.isAdmin()?'<a class="big sec" href="?paper">+ ลงทะเบียนฉบับกระดาษที่ลงนามแล้ว</a>':''}
+  const types=Object.values(MT).sort((a,b)=>(a.order||99)-(b.order||99));
+  $('app').innerHTML=`<h3 style="margin-bottom:8px">สร้างบันทึกข้อความ</h3><div class="tgrid noprint">${types.map(t=>`<a class="tcard" href="?new=${esc(t.code)}">
+        <span class="tc">${esc(t.code)}${t.circular==='always'?' <i>เวียน</i>':t.circular==='optional'?' <i class="o">เวียนได้</i>':''}</span>
+        <b>${esc(A.L(t.title))}</b><span class="td">${esc(A.L(t.desc||{}))}</span></a>`).join('')}</div>
+    <div class="acts2 noprint">${A.isAdmin()?'<a class="big sec" href="?paper">+ ลงทะเบียนฉบับกระดาษที่ลงนามแล้ว</a>':''}
       <a class="big sec" href="?sig">ลายเซ็นของฉัน${MYSIG?' ✓':''}</a></div>
+    <div id="myack"></div>
     <div id="list"><div class="empty">กำลังโหลด…</div></div>`;
   try{ MEMOS=(await A.db.collection('memos').get()).docs.map(d=>Object.assign({id:d.id},d.data())); }
   catch(e){ $('list').innerHTML=`<div class="empty">อ่านไม่ได้: ${esc(e.code||e.message)}</div>`; return; }
   MEMOS.sort((a,b)=>((b.issuedAt&&b.issuedAt.seconds)||(b.createdAt&&b.createdAt.seconds)||0)-((a.issuedAt&&a.issuedAt.seconds)||(a.createdAt&&a.createdAt.seconds)||0));
   const today=bkkToday();
   const shown=MEMOS.filter(m=>!m.test || A.isAdmin());
+  const mine=shown.filter(m=>m.status==='issued' && (m.recipientUids||[]).includes(A.user.uid));
+  if(mine.length){ const acked=new Set(); await Promise.all(mine.map(async m=>{ try{ if((await A.db.collection('memos').doc(m.id).collection('acks').doc(A.user.uid).get()).exists) acked.add(m.id); }catch(e){} }));
+    const todo=mine.filter(m=>!acked.has(m.id));
+    if(todo.length) $('myack').innerHTML=`<div class="fk-gate warn"><span><b>หนังสือเวียนที่รอคุณรับทราบ ${todo.length} ฉบับ:</b> ${todo.map(m=>`<a href="?id=${esc(m.id)}">${esc(m.number)}</a>`).join(' · ')}</span></div>`; }
   const sg=m=>{ const s=m.signers||{}; return m.mode==='paper' ? esc((m.paper&&m.paper.proposerName)||'')+' → '+esc((m.paper&&m.paper.endorserName)||'')
     : esc((s.proposer&&s.proposer.name)||'—')+' → '+esc((s.endorser&&s.endorser.name)||'—'); };
   $('list').innerHTML = !shown.length ? '<div class="empty">ยังไม่มีบันทึกข้อความ</div>' :
@@ -274,6 +322,11 @@ function formMemo(type, existing){
         <select id="s_proposer" data-k="s"><option value="">—</option>${opts}</select><div class="hint" id="s_proposer_h"></div></div>
       <div><label for="s_endorser">ผู้รับทราบ / สั่งการ (ลงนามคนที่สอง) <span style="color:var(--red-500)">*</span></label>
         <select id="s_endorser" data-k="s"><option value="">—</option>${opts}</select><div class="hint" id="s_endorser_h"></div></div>
+      ${cfg.circular?`<div class="sect">หนังสือเวียน — ผู้ต้องรับทราบ</div>
+      <div class="full">${cfg.circular==='optional'?'<label class="ck" style="margin-bottom:8px"><input type="checkbox" id="r_on" data-k="s"> เวียนให้รับทราบ</label>':''}
+        <div id="r_box"><div class="rgrp">${GROUPS.map(g=>`<label class="ck"><input type="checkbox" data-g="${g.k}"> ${esc(g.n)}</label>`).join('')}</div>
+        <div style="display:flex;gap:8px;margin:8px 0"><select id="r_add"><option value="">+ เพิ่มรายคน</option>${opts}</select></div>
+        <div class="hint" id="r_sum"></div><div class="rchips" id="r_list"></div></div></div>`:''}
       <div><label for="s_font">แบบอักษรใน PDF</label><select id="s_font" data-k="s">${Object.keys(FONTS).map(k=>`<option value="${k}">${esc(FONTS[k])}</option>`).join('')}</select></div>
       </div>
       <div id="chk" style="margin-top:14px"></div>
@@ -289,6 +342,14 @@ function formMemo(type, existing){
       if(x.type==='person'){ if(v.uid && userById(v.uid)) el.value=v.uid; else if(v.name){ el.value='__free'; $('f_'+x.k+'_free').value=v.name; } }
       else if(x.type==='check') el.checked=!!v; else el.value=v; });
     $('s_font').value=existing.font||'Helvetica';
+  }
+  if(cfg.circular){
+    RCP = existing && existing.recipientSel ? JSON.parse(JSON.stringify(existing.recipientSel)) : {groups:(cfg.recipientsDefault||[]).slice(), extra:[], excl:[]};
+    if($('r_on')) $('r_on').checked = !!(existing ? existing.circular : false);
+    document.querySelectorAll('[data-g]').forEach(c=>{ c.checked=RCP.groups.includes(c.dataset.g);
+      c.addEventListener('change',()=>{ RCP.groups=[...document.querySelectorAll('[data-g]:checked')].map(x=>x.dataset.g); paintRcp(); }); });
+    $('r_add').addEventListener('change',e=>{ const v=e.target.value; if(v){ RCP.extra.push(v); RCP.excl=RCP.excl.filter(x=>x!==v); e.target.value=''; paintRcp(); } });
+    if($('r_on')) $('r_on').addEventListener('change',paintRcp);
   }
   readForm(type, true);
   if(existing && existing.signers){
@@ -326,7 +387,18 @@ function readForm(type, fieldsChanged){
     const c=(cfg.signers||{})[r]||{};
     $('s_'+r+'_h').textContent = d[r] ? ('ค่าตั้งต้นตามตำแหน่ง '+d[r].pos+(c.conflictPosition&&d[r].pos!==c.position?' (ใช้ตำแหน่งสำรองเพราะคนในตำแหน่ง '+c.position+' ลงนามไม่ได้)':'')+(d[r].uid?'':' — ยังไม่มีผู้ถือตำแหน่งนี้ เลือกเองได้')) : '';
   });
+  if(MT[type].circular) paintRcp(true);
   checks(type).then(r=>{ CHK=r; paintChecks(); $('pv').innerHTML = letterHtml(draftModel(type)); });
+}
+const circOn=type=>MT[type].circular==='always' || (MT[type].circular==='optional' && $('r_on') && $('r_on').checked);
+function paintRcp(noRead){
+  const type=EDIT?EDIT.type:Q.get('new'); if(!$('r_box')) return;
+  const on=circOn(type); $('r_box').hidden=!on;
+  const list=recipientsOf({proposer:signerOf('proposer'),endorser:signerOf('endorser')});
+  $('r_sum').textContent = on ? (list.length+' คนต้องรับทราบ · กด × เพื่อตัดออก (ผู้ลงนามทั้งสองไม่ต้องรับทราบซ้ำ)') : '';
+  $('r_list').innerHTML = on ? list.map(u=>`<span class="chip">${esc(u.name)} <button type="button" data-x="${esc(u.uid)}" aria-label="ตัดออก">×</button></span>`).join('') : '';
+  $('r_list').querySelectorAll('[data-x]').forEach(b=>b.addEventListener('click',()=>{ RCP.excl.push(b.dataset.x); RCP.extra=RCP.extra.filter(x=>x!==b.dataset.x); paintRcp(); }));
+  if(!noRead) readForm(type,false);
 }
 function signerOf(role){
   const uid=$('s_'+role).value; if(!uid) return null;
@@ -350,6 +422,7 @@ async function checks(type){
   if(!p) errors.push('ยังไม่ได้เลือกผู้เสนอ');
   if(!e) errors.push('ยังไม่ได้เลือกผู้รับทราบ / สั่งการ');
   if(p&&e&&p.uid===e.uid) errors.push('ผู้เสนอกับผู้สั่งการต้องเป็นคนละคน');
+  if(cfg.circular && circOn(type) && !recipientsOf({proposer:p,endorser:e}).length) errors.push('หนังสือเวียนยังไม่มีผู้ต้องรับทราบ');
   if(ben&&p&&samePerson(p,ben)) errors.push('ผู้เสนอเป็นผู้ได้รับประโยชน์จากหนังสือฉบับนี้');
   if(ben&&e&&samePerson(e,ben)) errors.push('ผู้สั่งการเป็นผู้ได้รับประโยชน์จากหนังสือฉบับนี้');
   if(ben && F.evaluator && personKey(ben)===personKey(F.evaluator))
@@ -377,7 +450,9 @@ async function checks(type){
 }
 function textOf(type){
   const cfg=MT[type], v=vars(type,F);
-  return { subject:fill(cfg.subject,v), body:bodyOf(type,v), purpose:purposeOf(type,F), render:renderOf(type,F,CHK.supersedes) };
+  const r=renderOf(type,F,CHK.supersedes);
+  if(cfg.circular && circOn(type)) r.circ=circLine(recipientsOf({proposer:signerOf('proposer'),endorser:signerOf('endorser')}));
+  return { subject:fill(cfg.subject,v), body:bodyOf(type,v), purpose:purposeOf(type,F), render:r };
 }
 function draftModel(type){
   const t=textOf(type);
@@ -396,6 +471,8 @@ async function saveMemo(type, submit){
     beneficiaryName:(F.beneficiary&&F.beneficiary.name)||'',
     signers:{ proposer:signerOf('proposer')||blank, endorser:signerOf('endorser')||blank },
     font:$('s_font').value, supersedes: CHK.supersedes||null });
+  const cf=MT[type].circular, con=!!(cf && circOn(type)), rl=con?recipientsOf(data.signers):[];
+  Object.assign(data,{ circular:con, recipients:rl, recipientUids:rl.map(x=>x.uid), recipientSel:cf?JSON.parse(JSON.stringify(RCP)):null });
   $('save').disabled=$('submit').disabled=true;
   try{
     let ref;
@@ -449,9 +526,10 @@ function letterHtml(m){
       <tr><td class="k">Subject</td><td><b>${esc(m.subject||'')}</b></td></tr>
       <tr><td class="k">Purpose</td><td>${esc(r.purpose||'')}</td></tr>
       ${r.reference?`<tr><td class="k">Reference</td><td>${esc(r.reference)}</td></tr>`:''}
+      ${r.circ?`<tr><td class="k">Circulation</td><td>${esc(r.circ)}</td></tr>`:''}
     </table>
     ${retro?`<div class="retro">${esc(r.retro)}</div>`:''}
-    <ol>${(m.body||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ol>
+    <ol>${(m.body||[]).map(x=>`<li style="white-space:pre-line">${esc(x)}</li>`).join('')}</ol>
     ${r.validity?`<div class="val"><b>${esc(r.validity)}</b></div>`:''}
     ${r.note?`<div class="note">${esc(r.note)}</div>`:''}
     <div class="sig">${numbered && m.proposerSig ? `<img src="${esc(m.proposerSig)}" alt="">` : '<div style="height:64px"></div>'}
@@ -494,8 +572,10 @@ async function viewMemo(id){
     <div class="noprint" id="actbox"></div>
     <div class="noprint" id="pmsg"></div>
     ${acts.includes('endorse')?'':letterHtml(M)}
+    <div class="noprint" id="ackbox" style="margin-top:18px"></div>
     <div class="noprint" id="hist" style="margin-top:18px"></div>`;
   if($('mkpdf')) $('mkpdf').addEventListener('click',()=>makePdf(true));
+  if(M.circular) paintAcks();
   paintActions(acts);
   paintHistory();
 }
@@ -545,10 +625,47 @@ function paintActions(acts){
   if($('doEndoImg')) $('doEndoImg').addEventListener('click',finishEndorsement);
   if(acts.includes('endorse')) bindEndorse();
 }
+/* ── การรับทราบ ── acks/<uid> เขียนได้เฉพาะเจ้าตัว ครั้งเดียว เวลาเซิร์ฟเวอร์ */
+async function paintAcks(){
+  const box=$('ackbox'), R=M.recipients||[];
+  if(M.status!=='issued'){ box.innerHTML = R.length?`<div class="hint">หนังสือเวียน · ${R.length} คนต้องรับทราบหลังผู้สั่งการลงนาม</div>`:''; return; }
+  let acks={}; try{ (await MREF.collection('acks').get()).docs.forEach(d=>acks[d.id]=d.data()); }catch(e){}
+  const me=A.user.uid, mine=R.some(r=>r.uid===me), done=R.filter(r=>acks[r.uid]).length;
+  box.innerHTML=`<div class="card"><h3>การรับทราบ ${done}/${R.length}</h3>
+    ${mine&&!acks[me]?'<div class="acts2"><button class="big pri" id="doAck">รับทราบ</button><span class="hint">ยืนยันว่าได้อ่านและจะปฏิบัติตาม</span></div>':''}
+    ${M.distId?`<div class="hint" style="margin-bottom:8px">อยู่ในระบบแจกจ่ายเอกสารแล้ว — <a href="${esc(window.BASE)}admin/drc/">แจกจ่ายเอกสาร</a> · ผู้ที่ไม่มีบัญชีใช้ลิงก์ DRC ของประกาศนี้ได้</div>`:''}
+    <div class="twrap"><table class="ml"><tbody>${R.map(r=>`<tr><td>${esc(r.name)}</td><td>${acks[r.uid]?'<span class="st issued">รับทราบแล้ว</span>':'<span class="st proposed">ยังไม่รับทราบ</span>'}</td><td class="mono">${acks[r.uid]?esc(tsFull(acks[r.uid].at)):''}</td></tr>`).join('')}</tbody></table></div></div>`;
+  if($('doAck')) $('doAck').addEventListener('click',async()=>{
+    $('doAck').disabled=true;
+    try{ await MREF.collection('acks').doc(me).set({uid:me, name:A.myName()||A.user.email, at:now()});
+         await MREF.collection('events').add({action:'ack', byUid:me, byName:A.myName()||'', at:now()});
+         await closeTasksFor(M.id, me); paintAcks(); }
+    catch(e){ $('doAck').disabled=false; say('บันทึกไม่สำเร็จ: '+(e.code||e.message),true); } });
+}
+async function closeTasksFor(id, uid){
+  try{ const ts=await A.db.collection('tasks').where('memoId','==',id).get();
+       for(const d of ts.docs){ const t=d.data(); if(t.state==='open' && t.assigneeUid===uid) await d.ref.update({state:'done', closedAt:now()}); } }catch(e){}
+}
+/* หนังสือเวียนที่ออกแล้ว: งานรับทราบให้ทุกคนในรายชื่อ + ประกาศในระบบแจกจ่าย (distributions) */
+async function circulate(){
+  if(!M.circular || !(M.recipients||[]).length || M.distId) return;
+  const me=A.myName()||A.user.email;
+  try{
+    const d=await A.db.collection('distributions').add({ issDate:bkkToday(), issBy:me, title:M.subject, ref:M.number,
+      docs:[{title:M.subject, code:M.number, rev:'', eff:M.effectiveFrom||''}], memoId:M.id,
+      issUid:A.user.uid, issEmail:A.user.email||'', createdAt:now() });
+    await MREF.update({distId:d.id});
+  }catch(e){}
+  for(const r of M.recipients){
+    try{ await A.db.collection('tasks').add({ app:'memo', kind:'ack', memoId:M.id, subId:'', formCode:'MEMO-'+M.type,
+      title:'รับทราบ: '+M.subject, tracking:M.number, assigneeUid:r.uid, assigneeName:r.name, state:'open', step:3,
+      fromUid:A.user.uid, fromName:me, createdAt:now() }); }catch(e){}
+  }
+}
 async function paintHistory(){
   try{
     const ev=(await MREF.collection('events').get()).docs.map(d=>d.data()).sort((a,b)=>((a.at&&a.at.seconds)||0)-((b.at&&b.at.seconds)||0));
-    const N={draft:'บันทึกร่าง',submit:'ส่งให้ผู้เสนอ',resubmit:'แก้และส่งอีกครั้ง',return:'ตีกลับ',propose:'ผู้เสนอลงนาม · ออกเลข',
+    const N={ack:'รับทราบ',draft:'บันทึกร่าง',submit:'ส่งให้ผู้เสนอ',resubmit:'แก้และส่งอีกครั้ง',return:'ตีกลับ',propose:'ผู้เสนอลงนาม · ออกเลข',
              endorse:'ผู้สั่งการลงนาม',cancel:'ยกเลิก',pdf:'สร้าง PDF',supersede:'ถูกแทน',record:'ลงทะเบียนฉบับกระดาษ'};
     $('hist').innerHTML=`<h3>ประวัติ</h3><div class="twrap"><table class="ml"><tbody>${ev.map(e=>`<tr><td class="mono">${esc(tsFull(e.at))}</td><td>${esc(N[e.action]||e.action)}</td><td>${esc(e.byName||'')}</td><td>${esc(e.note||'')}</td></tr>`).join('')}</tbody></table></div>`;
   }catch(e){}
@@ -716,6 +833,7 @@ async function endorse(){
   }catch(e){ $('doEndorse').disabled=false; say('บันทึกไม่สำเร็จ: '+(e.code||e.message),true); return; }
   try{ await MREF.collection('events').add({action:'endorse', byUid:A.user.uid, byName:me, note:action, at:now()}); }catch(e){}
   await closeTasks(M.id);
+  if(!declined){ const s2=await MREF.get(); M=Object.assign({id:s2.id},s2.data()); await circulate(); }
   if(!declined && M.supersedes&&M.supersedes.id){
     try{ await A.db.collection('memos').doc(M.supersedes.id).update({status:'superseded', supersededBy:M.number});
          await A.db.collection('memos').doc(M.supersedes.id).collection('events').add({action:'supersede', byUid:A.user.uid, byName:me, note:M.number, at:now()}); }catch(e){}

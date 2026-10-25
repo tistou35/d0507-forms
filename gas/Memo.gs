@@ -67,6 +67,7 @@ function memoPdf_(body) {
   rows.push(['Subject', m.subject || '']);
   rows.push(['Purpose', r.purpose || '']);
   if (r.reference) rows.push(['Reference', r.reference]);
+  if (r.circ) rows.push(['Circulation', r.circ]);
   rows = rows.map(function (x) { return [x[0], String(x[1] || '—')]; });   // ช่องว่างแทรกไม่ได้
   var t = b.appendTable(rows);
   t.setBorderColor('#999999').setBorderWidth(0.75);

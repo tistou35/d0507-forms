@@ -465,12 +465,23 @@ async function loadDists(force){
     + '<th style="width:96px"></th></tr></thead><tbody>'
     + DISTS.map(d => `<tr>
         <td class="mono">${A.esc(dmy(d.issDate))}</td>
-        <td>${A.esc(d.title || '—')}${d.ref ? ' <span class="none">' + A.esc(d.ref) + '</span>' : ''}</td>
+        <td>${A.esc(d.title || '—')}${d.ref ? ' <span class="none">' + A.esc(d.ref) + '</span>' : ''}
+          ${d.memoId ? `<br><a href="../../memo/?id=${A.esc(d.memoId)}" style="font-size:12px">หนังสือเวียน · การรับทราบ <span data-ack="${A.esc(d.memoId)}">…</span> ↗</a>` : ''}</td>
         <td class="mono">${(d.docs||[]).length}</td>
         <td>${A.esc(d.issBy || '—')}</td>
         <td><button type="button" class="obtn sec" data-link="${A.esc(d.id)}"
               style="padding:5px 11px;font-size:12.5px">เอาลิงก์</button></td>
       </tr>`).join('') + '</tbody></table>';
+  /* หนังสือเวียนจากบันทึกข้อความ — ผู้รับเข้าสู่ระบบแล้วกดรับทราบในหน้าบันทึกข้อความ
+     นับจาก memos/<id>/acks เทียบกับรายชื่อที่ตรึงไว้ตอนส่ง */
+  host.querySelectorAll('[data-ack]').forEach(async el => {
+    try {
+      const id = el.dataset.ack, m = await A.db.collection('memos').doc(id).get();
+      const n = ((m.exists && m.data().recipientUids) || []).length;
+      const a = (await A.db.collection('memos').doc(id).collection('acks').get()).size;
+      el.textContent = a + '/' + n;
+    } catch(e) { el.textContent = '—'; }
+  });
   host.querySelectorAll('[data-link]').forEach(b => b.addEventListener('click', () => {
     const d = DISTS.find(x => x.id === b.dataset.link);
     showLink(b.dataset.link, (d && (d.docs||[]).length) || 0);

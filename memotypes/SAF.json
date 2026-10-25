@@ -1,0 +1,116 @@
+{
+ "code": "SAF",
+ "order": 50,
+ "title": {
+  "en": "Safety Notice",
+  "th": "ประกาศด้านความปลอดภัย (Safety Notice)"
+ },
+ "desc": {
+  "en": "Hazard or safety information that personnel must act on or know",
+  "th": "แจ้งอันตรายหรือข้อมูลนิรภัย · เวียน"
+ },
+ "purpose": "compliance",
+ "requiresSignature": true,
+ "circular": "always",
+ "recipientsDefault": [
+  "all"
+ ],
+ "signers": {
+  "proposer": {
+   "position": "SM"
+  },
+  "endorser": {
+   "position": "ACM",
+   "conflictPosition": "HT",
+   "actions": [
+    "APPROVED",
+    "ACKNOWLEDGED",
+    "FOR ACTION",
+    "NOT APPROVED"
+   ]
+  }
+ },
+ "backdate": {
+  "allowed": false
+ },
+ "fields": [
+  {
+   "k": "subjectText",
+   "type": "text",
+   "req": true,
+   "label": {
+    "en": "Subject",
+    "th": "เรื่อง"
+   }
+  },
+  {
+   "k": "source",
+   "type": "select",
+   "req": true,
+   "label": {
+    "en": "Source",
+    "th": "ที่มา"
+   },
+   "opt": [
+    {
+     "v": "internal",
+     "n": {
+      "en": "Internal report / occurrence",
+      "th": "รายงานภายใน / เหตุการณ์"
+     },
+     "sourceTitle": "internal report or occurrence"
+    },
+    {
+     "v": "external",
+     "n": {
+      "en": "External bulletin (CAAT, EASA SIB, manufacturer)",
+      "th": "ประกาศจากภายนอก"
+     },
+     "sourceTitle": "external safety publication"
+    }
+   ]
+  },
+  {
+   "k": "sourceRef",
+   "type": "text",
+   "label": {
+    "en": "Source reference (optional)",
+    "th": "อ้างอิงที่มา (ไม่บังคับ)"
+   },
+   "ph": "e.g. EASA SIB 2026-05 / VSR ref"
+  },
+  {
+   "k": "bodyText",
+   "type": "textarea",
+   "req": true,
+   "label": {
+    "en": "Description of the hazard",
+    "th": "รายละเอียดอันตราย"
+   }
+  },
+  {
+   "k": "actionText",
+   "type": "textarea",
+   "req": true,
+   "label": {
+    "en": "Action required",
+    "th": "สิ่งที่ต้องปฏิบัติ"
+   }
+  }
+ ],
+ "compute": [
+  {
+   "k": "sourceRefPhrase",
+   "op": "tpl",
+   "of": "sourceRef",
+   "tpl": " ({sourceRef})"
+  }
+ ],
+ "subject": "Safety Notice — {subjectText}",
+ "body": [
+  "Source: {sourceTitle}{sourceRefPhrase}.",
+  "Description:\n{bodyText}",
+  "Action required:\n{actionText}",
+  "All personnel concerned shall read this memorandum and acknowledge receipt through the D-0507 Forms system."
+ ]
+}

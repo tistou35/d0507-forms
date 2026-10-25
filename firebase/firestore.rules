@@ -288,7 +288,8 @@ service cloud.firestore {
       return ['type', 'number', 'seq', 'year', 'counter', 'issuedAt', 'signers', 'subject',
               'body', 'fields', 'effectiveFrom', 'expiresOn', 'beneficiaryUid', 'test',
               'render', 'beneficiaryName', 'purpose', 'font', 'proposerSig',
-              'endorsement', 'endorsedAt', 'endorsementImg', 'mode', 'paper', 'transcribedAt'];
+              'endorsement', 'endorsedAt', 'endorsementImg', 'mode', 'paper', 'transcribedAt',
+              'circular', 'recipients', 'recipientUids', 'recipientSel'];
     }
     function memoSignKeys() {
       return ['number', 'seq', 'year', 'counter', 'issuedAt', 'proposerSig',
@@ -370,6 +371,16 @@ service cloud.firestore {
       match /events/{eventId} {
         allow create: if staff();
         allow read:   if staff();
+        allow update, delete: if false;
+      }
+      // รับทราบหนังสือเวียน — เจ้าตัวเท่านั้น ครั้งเดียว เวลาเซิร์ฟเวอร์ เฉพาะคนในรายชื่อและฉบับที่ออกแล้ว
+      match /acks/{uid} {
+        allow read:   if staff() || (signedIn() && request.auth.uid == uid);
+        allow create: if signedIn() && request.auth.uid == uid
+          && request.resource.data.at == request.time
+          && request.resource.data.uid == uid
+          && get(/databases/$(database)/documents/memos/$(memoId)).data.status == 'issued'
+          && uid in get(/databases/$(database)/documents/memos/$(memoId)).data.recipientUids;
         allow update, delete: if false;
       }
     }

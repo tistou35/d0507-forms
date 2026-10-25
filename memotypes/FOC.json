@@ -1,0 +1,107 @@
+{
+ "code": "FOC",
+ "order": 40,
+ "title": {
+  "en": "Flight Operations Circular",
+  "th": "หนังสือเวียนฝ่ายปฏิบัติการบิน (FOC)"
+ },
+ "desc": {
+  "en": "Supplement to OMA Part A for flight crew and instructors",
+  "th": "ส่วนเสริม OMA Part A ถึงครูการบินและฝ่ายปฏิบัติการ · เวียน"
+ },
+ "purpose": "compliance",
+ "requiresSignature": true,
+ "circular": "always",
+ "recipientsDefault": [
+  "ins",
+  "ops"
+ ],
+ "signers": {
+  "proposer": {
+   "position": "CFI",
+   "conflictPosition": "HT"
+  },
+  "endorser": {
+   "position": "HT",
+   "conflictPosition": "ACM",
+   "actions": [
+    "APPROVED",
+    "NOT APPROVED"
+   ]
+  }
+ },
+ "backdate": {
+  "allowed": false
+ },
+ "fields": [
+  {
+   "k": "focNo",
+   "type": "text",
+   "req": true,
+   "label": {
+    "en": "FOC number",
+    "th": "เลข FOC"
+   },
+   "ph": "e.g. FOC 2026-03"
+  },
+  {
+   "k": "subjectText",
+   "type": "text",
+   "req": true,
+   "label": {
+    "en": "Subject",
+    "th": "เรื่อง"
+   }
+  },
+  {
+   "k": "applicability",
+   "type": "text",
+   "req": true,
+   "label": {
+    "en": "Applicability",
+    "th": "ใช้กับ"
+   },
+   "ph": "e.g. All flight instructors and student pilots"
+  },
+  {
+   "k": "bodyText",
+   "type": "textarea",
+   "req": true,
+   "label": {
+    "en": "Text",
+    "th": "เนื้อหา"
+   }
+  },
+  {
+   "k": "effectiveFrom",
+   "type": "date",
+   "req": true,
+   "label": {
+    "en": "Effective from",
+    "th": "วันมีผล"
+   }
+  },
+  {
+   "k": "expiresOn",
+   "type": "date",
+   "label": {
+    "en": "Valid until (optional)",
+    "th": "ใช้ถึง (ไม่บังคับ)"
+   }
+  }
+ ],
+ "compute": [
+  {
+   "k": "untilPhrase",
+   "op": "tpl",
+   "of": "expiresOn",
+   "tpl": " and remains valid until {expiresOnLong}"
+  }
+ ],
+ "subject": "Flight Operations Circular {focNo} — {subjectText}",
+ "body": [
+  "Applicability: {applicability}.",
+  "{bodyText}",
+  "This circular supplements OMA Part A. It is effective from {effectiveFromLong}{untilPhrase}. All personnel concerned shall read this memorandum and acknowledge receipt through the D-0507 Forms system."
+ ]
+}

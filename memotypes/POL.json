@@ -1,0 +1,110 @@
+{
+ "code": "POL",
+ "order": 30,
+ "title": {
+  "en": "Policy / Order / Announcement",
+  "th": "ประกาศ / นโยบาย / คำสั่ง"
+ },
+ "desc": {
+  "en": "Company policy, order or announcement that personnel must acknowledge",
+  "th": "ประกาศหรือคำสั่งที่ทุกคนต้องรับทราบ · เวียน"
+ },
+ "purpose": "compliance",
+ "requiresSignature": true,
+ "circular": "always",
+ "recipientsDefault": [
+  "all"
+ ],
+ "signers": {
+  "proposer": {
+   "position": "CMM"
+  },
+  "endorser": {
+   "position": "ACM",
+   "conflictPosition": "HT",
+   "actions": [
+    "APPROVED",
+    "NOT APPROVED"
+   ]
+  }
+ },
+ "backdate": {
+  "allowed": false
+ },
+ "fields": [
+  {
+   "k": "polKind",
+   "type": "select",
+   "req": true,
+   "label": {
+    "en": "Kind",
+    "th": "ประเภท"
+   },
+   "opt": [
+    {
+     "v": "policy",
+     "n": {
+      "en": "Policy",
+      "th": "นโยบาย"
+     },
+     "kindTitle": "Policy",
+     "kindLower": "policy"
+    },
+    {
+     "v": "order",
+     "n": {
+      "en": "Order",
+      "th": "คำสั่ง"
+     },
+     "kindTitle": "Order",
+     "kindLower": "order"
+    },
+    {
+     "v": "announcement",
+     "n": {
+      "en": "Announcement",
+      "th": "ประกาศ"
+     },
+     "kindTitle": "Announcement",
+     "kindLower": "announcement"
+    }
+   ]
+  },
+  {
+   "k": "subjectText",
+   "type": "text",
+   "req": true,
+   "label": {
+    "en": "Subject",
+    "th": "เรื่อง"
+   }
+  },
+  {
+   "k": "bodyText",
+   "type": "textarea",
+   "req": true,
+   "label": {
+    "en": "Text",
+    "th": "เนื้อหา"
+   },
+   "hint": {
+    "en": "",
+    "th": "ภาษาอังกฤษ · ย่อหน้าแยกด้วยบรรทัดว่าง"
+   }
+  },
+  {
+   "k": "effectiveFrom",
+   "type": "date",
+   "req": true,
+   "label": {
+    "en": "Effective from",
+    "th": "วันมีผล"
+   }
+  }
+ ],
+ "subject": "{kindTitle}: {subjectText}",
+ "body": [
+  "{bodyText}",
+  "This {kindLower} is effective from {effectiveFromLong}. All personnel concerned shall read this memorandum and acknowledge receipt through the D-0507 Forms system."
+ ]
+}

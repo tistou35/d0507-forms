@@ -194,7 +194,7 @@ async function loadTasks(){
           <div class="m"><span class="mono">${esc(t.tracking||'')}</span> ·
             ${esc(L({th:'จาก ',en:'From '}))}${esc(t.fromName||'—')}${t.createdAt?' · '+esc(when(t.createdAt)):''}
             ${t.note?'<br>'+esc(L({th:'หมายเหตุ: ',en:'Note: '}))+esc(t.note):''}</div></div>
-        <div class="b"><a class="fb go" href="${go}">${esc(audit?L({th:'เปิดงานตรวจสอบ',en:'Open audit task'}):L({th:'อนุมัติ / ลงนาม',en:'Approve / sign'}))} →</a>
+        <div class="b"><a class="fb go" href="${go}">${esc(audit?L({th:'เปิดงานตรวจสอบ',en:'Open audit task'}):t.kind==='ack'?L({th:'อ่านและรับทราบ',en:'Read & acknowledge'}):L({th:'อนุมัติ / ลงนาม',en:'Approve / sign'}))} →</a>
           ${audit||memo?'':btnView(t.subId)}</div></div>`;
     }).join('') : `<div class="empty">${esc(L({th:'ไม่มีงานค้าง — ใบที่ส่งถึงคุณหรือมอบหมายต่อมาให้คุณจะขึ้นที่นี่',
                                               en:'Nothing waiting — forms sent or delegated to you appear here'}))}</div>`);

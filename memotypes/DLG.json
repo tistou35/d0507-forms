@@ -1,0 +1,179 @@
+{
+ "code": "DLG",
+ "order": 70,
+ "title": {
+  "en": "Delegation of Duties (Absence)",
+  "th": "มอบหมายรักษาการแทน"
+ },
+ "desc": {
+  "en": "Deputy for a manager's temporary absence — OMA A.1.2",
+  "th": "ผู้รักษาการระหว่างผู้บริหารไม่อยู่ · เวียนถึงฝ่ายบริหาร"
+ },
+ "purpose": "inform",
+ "requiresSignature": true,
+ "circular": "always",
+ "recipientsDefault": [
+  "mgt"
+ ],
+ "signers": {
+  "proposer": {
+   "fromField": "absentee"
+  },
+  "endorser": {
+   "position": "ACM",
+   "conflictPosition": "HT",
+   "actions": [
+    "APPROVED",
+    "NOT APPROVED"
+   ]
+  }
+ },
+ "backdate": {
+  "allowed": true,
+  "statement": "ISSUED RETROSPECTIVELY. This memorandum records a delegation that took effect on {effectiveFromLong}. The date of issue is the date of signature and has not been back-dated."
+ },
+ "fields": [
+  {
+   "k": "absentee",
+   "type": "person",
+   "req": true,
+   "label": {
+    "en": "Manager absent",
+    "th": "ผู้ที่ไม่อยู่"
+   }
+  },
+  {
+   "k": "absPos",
+   "type": "select",
+   "req": true,
+   "label": {
+    "en": "Post",
+    "th": "ตำแหน่ง"
+   },
+   "opt": [
+    {
+     "v": "HT",
+     "n": {
+      "en": "Head of Training",
+      "th": "Head of Training"
+     },
+     "absPosTitle": "Head of Training"
+    },
+    {
+     "v": "CFI",
+     "n": {
+      "en": "Chief Flight Instructor",
+      "th": "Chief Flight Instructor"
+     },
+     "absPosTitle": "Chief Flight Instructor"
+    },
+    {
+     "v": "CTKI",
+     "n": {
+      "en": "Chief Theoretical Knowledge Instructor",
+      "th": "Chief Theoretical Knowledge Instructor"
+     },
+     "absPosTitle": "Chief Theoretical Knowledge Instructor"
+    },
+    {
+     "v": "CMM",
+     "n": {
+      "en": "Compliance Monitoring Manager",
+      "th": "Compliance Monitoring Manager"
+     },
+     "absPosTitle": "Compliance Monitoring Manager"
+    },
+    {
+     "v": "SM",
+     "n": {
+      "en": "Safety Manager",
+      "th": "Safety Manager"
+     },
+     "absPosTitle": "Safety Manager"
+    },
+    {
+     "v": "MM",
+     "n": {
+      "en": "Maintenance Manager",
+      "th": "Maintenance Manager"
+     },
+     "absPosTitle": "Maintenance Manager"
+    },
+    {
+     "v": "ACM",
+     "n": {
+      "en": "Accountable Manager",
+      "th": "Accountable Manager"
+     },
+     "absPosTitle": "Accountable Manager"
+    },
+    {
+     "v": "OPS",
+     "n": {
+      "en": "Flight Operations",
+      "th": "Flight Operations"
+     },
+     "absPosTitle": "Flight Operations"
+    }
+   ]
+  },
+  {
+   "k": "deputy",
+   "type": "person",
+   "req": true,
+   "label": {
+    "en": "Deputy",
+    "th": "ผู้รักษาการแทน"
+   }
+  },
+  {
+   "k": "effectiveFrom",
+   "type": "date",
+   "req": true,
+   "label": {
+    "en": "From",
+    "th": "ตั้งแต่"
+   }
+  },
+  {
+   "k": "expiresOn",
+   "type": "date",
+   "req": true,
+   "label": {
+    "en": "To",
+    "th": "ถึง"
+   }
+  },
+  {
+   "k": "reason",
+   "type": "text",
+   "label": {
+    "en": "Reason (optional)",
+    "th": "เหตุผล (ไม่บังคับ)"
+   }
+  },
+  {
+   "k": "handover",
+   "type": "check",
+   "req": true,
+   "label": {
+    "en": "Handover briefing given to the deputy at least one day before the absence (OMA A.1.2)",
+    "th": "ส่งมอบงานให้ผู้รักษาการแล้ว อย่างน้อยหนึ่งวันก่อนไม่อยู่ (OMA A.1.2)"
+   }
+  }
+ ],
+ "compute": [
+  {
+   "k": "reasonSentence",
+   "op": "tpl",
+   "of": "reason",
+   "tpl": "Reason for absence: {reason}."
+  }
+ ],
+ "subject": "Delegation of duties — {absPosTitle} — {effectiveFromLong} to {expiresOnLong}",
+ "body": [
+  "During the absence of {absenteeName} ({absPosTitle}) from {effectiveFromLong} to {expiresOnLong}, {deputyName} is delegated to perform the duties of {absPosTitle} in accordance with OMA A.1.2.",
+  "{reasonSentence}",
+  "A handover briefing has been given to the deputy. Matters concerning this post shall be referred to {deputyName} during the period stated."
+ ]
+}
