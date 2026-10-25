@@ -140,6 +140,10 @@ function doPost(e) {
       if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบเจ้าหน้าที่ก่อน');
       return json_({ ok: true, result: memoPdf_(body) });
     }
+    if (body.action === 'memoPdfBytes') {
+      if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบเจ้าหน้าที่ก่อน');
+      return json_({ ok: true, result: memoPdfBytes_(body) });
+    }
 
     if (body.action === 'dropTest') {
       if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบเจ้าหน้าที่ก่อน');

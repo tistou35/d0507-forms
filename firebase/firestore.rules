@@ -285,9 +285,14 @@ service cloud.firestore {
        · หลังออกแล้ว เนื้อหา ผู้ลงนาม วันมีผล แก้ไม่ได้ เปลี่ยนได้แค่สถานะ (ยกเลิก/ถูกแทน/หมดอายุ)
          กับข้อมูล PDF และการรับทราบ */
     function memoFixedKeys() {
-      return ['type', 'number', 'seq', 'year', 'counter', 'issuedAt', 'signer', 'subject',
-              'body', 'fields', 'effectiveFrom', 'expiresOn', 'beneficiaryUid', 'signature', 'test',
-              'render', 'beneficiaryName', 'purpose'];
+      return ['type', 'number', 'seq', 'year', 'counter', 'issuedAt', 'signers', 'subject',
+              'body', 'fields', 'effectiveFrom', 'expiresOn', 'beneficiaryUid', 'test',
+              'render', 'beneficiaryName', 'purpose', 'font', 'proposerSig',
+              'endorsement', 'endorsedAt', 'endorsementImg', 'mode', 'paper', 'transcribedAt'];
+    }
+    function memoSignKeys() {
+      return ['number', 'seq', 'year', 'counter', 'issuedAt', 'proposerSig',
+              'endorsement', 'endorsedAt', 'endorsementImg', 'transcribedAt', 'paper', 'mode'];
     }
     function memoCounterPath(d) {
       return /databases/$(database)/documents/counters/$(d.counter);
@@ -296,34 +301,69 @@ service cloud.firestore {
       return d.seq == (exists(memoCounterPath(d)) ? get(memoCounterPath(d)).data.next : 1)
           && getAfter(memoCounterPath(d)).data.next == d.seq + 1;
     }
+    function memoChanged() {
+      return request.resource.data.diff(resource.data).affectedKeys();
+    }
+    /* บันทึกข้อความภายใน — สองผู้ลงนาม
+         draft/submitted/returned  ร่าง แก้ได้ ยังไม่มีเลข
+         submitted → proposed      ผู้เสนอลงนาม: ออกเลข + issuedAt = เวลาเซิร์ฟเวอร์ (วันที่ออก ย้อนไม่ได้)
+         proposed → issued/declined ผู้รับทราบ/สั่งการลงนาม: endorsedAt = เวลาเซิร์ฟเวอร์
+         recorded                  ฉบับกระดาษที่ลงนามจริงแล้ว — ผู้ดูแลลงทะเบียน แนบสแกน ใช้เลขบนกระดาษ
+                                   ห้ามใช้เลขชุด D0507-MEMO ซึ่งออกได้เฉพาะตอนลงนามในระบบ
+       ผู้ลงนามแต่ละฝั่งต้องเป็นคนที่ระบุไว้ (ผู้ดูแลลงนามแทนไม่ได้) และไม่ใช่ผู้ได้ประโยชน์ · ลบไม่ได้ */
     match /memos/{memoId} {
       allow read: if staff()
                   || (signedIn() && resource.data.beneficiaryUid == request.auth.uid);
-      allow create: if staff()
-        && request.resource.data.createdBy == request.auth.uid
-        && request.resource.data.status in ['draft', 'submitted']
-        && !request.resource.data.keys().hasAny(['number', 'seq', 'issuedAt', 'signature']);
+      allow create: if staff() && request.resource.data.createdBy == request.auth.uid && (
+        (request.resource.data.status in ['draft', 'submitted']
+          && !request.resource.data.keys().hasAny(memoSignKeys()))
+        ||
+        (admin() && request.resource.data.status == 'recorded' && request.resource.data.mode == 'paper'
+          && request.resource.data.transcribedAt == request.time
+          && request.resource.data.paper.scanId is string && request.resource.data.paper.scanId.size() > 0
+          && request.resource.data.number is string && request.resource.data.number.size() > 0
+          && !request.resource.data.number.matches('(?i)^(TEST-)?D0507-MEMO-.*')
+          && !request.resource.data.keys().hasAny(['seq', 'counter', 'issuedAt', 'proposerSig',
+                                                    'endorsement', 'endorsedAt', 'endorsementImg']))
+      );
       allow update: if staff() && (
         // ก่อนออก — แก้ร่าง เสนอ ตีกลับ ยกเลิก (ยังไม่มีเลข)
         (resource.data.status in ['draft', 'submitted', 'returned']
           && request.resource.data.status in ['draft', 'submitted', 'returned', 'cancelled']
-          && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['number', 'seq', 'issuedAt', 'signature'])
+          && !memoChanged().hasAny(memoSignKeys())
           && (request.auth.uid == resource.data.createdBy || admin()
-              || request.auth.uid == resource.data.signer.uid))
+              || request.auth.uid == resource.data.signers.proposer.uid))
         ||
-        // ลงนาม/ออก — เฉพาะผู้ลงนามที่ระบุ และไม่ใช่ผู้ได้ประโยชน์
-        (resource.data.status == 'submitted' && request.resource.data.status == 'issued'
-          && request.auth.uid == resource.data.signer.uid
+        // ผู้เสนอลงนาม — ออกเลขและวันที่ออก
+        (resource.data.status == 'submitted' && request.resource.data.status == 'proposed'
+          && request.auth.uid == resource.data.signers.proposer.uid
           && request.auth.uid != resource.data.beneficiaryUid
-          && request.resource.data.signer == resource.data.signer
+          && memoChanged().hasOnly(['status', 'number', 'seq', 'year', 'counter', 'issuedAt', 'proposerSig', 'chain'])
           && request.resource.data.issuedAt == request.time
+          && request.resource.data.proposerSig is string && request.resource.data.proposerSig.size() > 0
           && request.resource.data.number is string && request.resource.data.number.size() > 0
           && memoSeqOk(request.resource.data))
         ||
-        // หลังออก — ล็อกเนื้อหา เปลี่ยนได้แค่สถานะปลายทาง PDF และการรับทราบ
-        (resource.data.status in ['issued', 'superseded', 'expired', 'cancelled']
-          && !request.resource.data.diff(resource.data).affectedKeys().hasAny(memoFixedKeys())
-          && request.resource.data.status in ['issued', 'cancelled', 'superseded', 'expired'])
+        // ผู้รับทราบ/สั่งการลงนาม
+        (resource.data.status == 'proposed' && request.resource.data.status in ['issued', 'declined']
+          && request.auth.uid == resource.data.signers.endorser.uid
+          && request.auth.uid != resource.data.beneficiaryUid
+          && memoChanged().hasOnly(['status', 'endorsement', 'endorsedAt', 'chain'])
+          && request.resource.data.endorsedAt == request.time
+          && request.resource.data.endorsement.sig is string)
+        ||
+        // ภาพบล็อกสั่งการ — ผู้สั่งการเขียนได้ครั้งเดียว หลังลงนาม (วาดจาก endorsedAt ของเซิร์ฟเวอร์)
+        (resource.data.status in ['issued', 'declined'] && request.resource.data.status == resource.data.status
+          && request.auth.uid == resource.data.signers.endorser.uid
+          && !('endorsementImg' in resource.data)
+          && memoChanged().hasOnly(['endorsementImg', 'endorsementH']))
+        ||
+        // หลังออก — ล็อกเนื้อหา · แก้ได้แค่ PDF ที่แนบ · ยกเลิกโดยผู้ดูแล · ถูกแทนโดยฉบับใหม่
+        (resource.data.status in ['proposed', 'issued', 'declined', 'superseded', 'expired', 'cancelled', 'recorded']
+          && !memoChanged().hasAny(memoFixedKeys())
+          && (request.resource.data.status == resource.data.status
+              || (request.resource.data.status == 'cancelled' && admin())
+              || (request.resource.data.status == 'superseded' && resource.data.status in ['issued', 'recorded'])))
       );
       allow delete: if false;
 
@@ -332,6 +372,10 @@ service cloud.firestore {
         allow read:   if staff();
         allow update, delete: if false;
       }
+    }
+    // ลายเซ็นที่บันทึกไว้ — ของใครของมัน ผู้ดูแลก็อ่านหรือใช้แทนไม่ได้
+    match /signatures/{uid} {
+      allow read, write: if signedIn() && request.auth.uid == uid && staff();
     }
     // ตัวนับเลขที่ — ขยับได้ทีละหนึ่งเท่านั้น ลดหรือกระโดดไม่ได้ (เลขที่ออกไปแล้วไม่มีวันซ้ำ)
     match /counters/{cid} {

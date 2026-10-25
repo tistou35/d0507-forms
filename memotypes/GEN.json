@@ -1,0 +1,129 @@
+{
+ "_README": [
+  "บันทึกข้อความทั่วไป — ผู้จัดทำพิมพ์เรื่องและเนื้อหาเอง",
+  "ย่อหน้าในเนื้อหาแยกด้วยบรรทัดว่าง"
+ ],
+ "code": "GEN",
+ "title": {
+  "en": "General Memorandum",
+  "th": "บันทึกข้อความทั่วไป"
+ },
+ "purpose": "inform",
+ "requiresSignature": true,
+ "signers": {
+  "proposer": {
+   "position": "CMM"
+  },
+  "endorser": {
+   "position": "ACM",
+   "conflictPosition": "HT",
+   "actions": [
+    "ACKNOWLEDGED",
+    "APPROVED",
+    "FOR ACTION",
+    "NOT APPROVED"
+   ]
+  }
+ },
+ "backdate": {
+  "allowed": true,
+  "statement": "ISSUED RETROSPECTIVELY. This memorandum records a matter that took effect on {effectiveFromLong}. The date of issue is the date of signature and has not been back-dated."
+ },
+ "distribution": [],
+ "storage": "staff",
+ "fields": [
+  {
+   "k": "subjectText",
+   "type": "text",
+   "req": true,
+   "label": {
+    "en": "Subject",
+    "th": "เรื่อง"
+   }
+  },
+  {
+   "k": "purposeSel",
+   "type": "select",
+   "req": true,
+   "label": {
+    "en": "Purpose",
+    "th": "วัตถุประสงค์"
+   },
+   "opt": [
+    {
+     "v": "consider",
+     "n": {
+      "th": "เพื่อพิจารณา",
+      "en": "For consideration"
+     }
+    },
+    {
+     "v": "approve",
+     "n": {
+      "th": "เพื่ออนุมัติ",
+      "en": "For approval"
+     }
+    },
+    {
+     "v": "inform",
+     "n": {
+      "th": "เพื่อทราบ",
+      "en": "For information"
+     }
+    },
+    {
+     "v": "compliance",
+     "n": {
+      "th": "เพื่อถือปฏิบัติ",
+      "en": "For compliance"
+     }
+    }
+   ]
+  },
+  {
+   "k": "ccText",
+   "type": "text",
+   "label": {
+    "en": "CC (optional)",
+    "th": "สำเนาถึง (ไม่บังคับ)"
+   },
+   "ph": "e.g. Chief Flight Instructor · Flight Operations"
+  },
+  {
+   "k": "refText",
+   "type": "text",
+   "label": {
+    "en": "Reference (optional)",
+    "th": "อ้างอิง (ไม่บังคับ)"
+   },
+   "ph": "e.g. OMA D.2.8"
+  },
+  {
+   "k": "bodyText",
+   "type": "textarea",
+   "req": true,
+   "label": {
+    "en": "Text",
+    "th": "เนื้อหา"
+   },
+   "hint": {
+    "th": "ภาษาอังกฤษ · ย่อหน้าแยกด้วยบรรทัดว่าง ระบบใส่เลขข้อให้เอง"
+   }
+  },
+  {
+   "k": "effectiveFrom",
+   "type": "date",
+   "label": {
+    "en": "Effective from (optional)",
+    "th": "วันมีผล (ไม่บังคับ)"
+   },
+   "hint": {
+    "th": "ใส่เมื่อเรื่องนี้มีผลตั้งแต่วันที่ระบุ — ถ้าก่อนวันลงนาม PDF จะพิมพ์ ISSUED RETROSPECTIVELY ให้เอง"
+   }
+  }
+ ],
+ "subject": "{subjectText}",
+ "body": [
+  "{bodyText}"
+ ]
+}

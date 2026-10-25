@@ -5,56 +5,70 @@
 <link rel="stylesheet" href="../assets/app.css?v=5c6ac7cf">
 <style>
 /* ── หน้ารายการ ── */
-.mbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
-.mbar input,.mbar select{min-height:38px;padding:0 11px;border-radius:8px;border:1px solid var(--border-med);
-  background:var(--surface);color:var(--fg-1);font-family:inherit;font-size:13.5px}
-.mbar input{flex:1;min-width:180px}
 .twrap{overflow-x:auto;border:1px solid var(--border-light);border-radius:10px;background:var(--surface)}
 table.ml{width:100%;border-collapse:collapse;font-size:13.5px}
 table.ml th{text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--g-500);
   padding:9px 12px;border-bottom:1px solid var(--border-light);white-space:nowrap;background:var(--g-50)}
 table.ml td{padding:9px 12px;border-bottom:1px solid var(--g-100);vertical-align:top}
-table.ml tbody tr{cursor:pointer} table.ml tbody tr:hover{background:var(--sky-100)}
+table.ml tbody tr[data-id]{cursor:pointer} table.ml tbody tr[data-id]:hover{background:var(--sky-100)}
 table.ml tr:last-child td{border-bottom:0}
 .mono{font-family:var(--font-mono);font-size:11.5px;white-space:nowrap}
 .st{display:inline-flex;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;white-space:nowrap}
-.st.draft{background:var(--g-100);color:var(--g-600)} .st.submitted{background:var(--amber-100);color:var(--amber-600)}
-.st.issued{background:var(--green-100);color:var(--green-600)} .st.returned{background:var(--red-100);color:var(--red-600)}
+.st.draft{background:var(--g-100);color:var(--g-600)} .st.submitted,.st.proposed{background:var(--amber-100);color:var(--amber-600)}
+.st.issued{background:var(--green-100);color:var(--green-600)} .st.returned,.st.declined{background:var(--red-100);color:var(--red-600)}
+.st.recorded{background:var(--sky-100);color:var(--navy-900)}
 .st.cancelled,.st.superseded,.st.expired{background:var(--g-100);color:var(--g-500);text-decoration:line-through}
 .empty{padding:16px;border:1px dashed var(--border-med);border-radius:10px;color:var(--g-500);font-size:13.5px}
-/* ── ฟอร์มสร้าง ── */
+/* ── ฟอร์ม ── */
 .mf{display:grid;grid-template-columns:1fr 1fr;gap:14px 18px}
 .mf .full{grid-column:1/-1}
 .mf label{display:block;font-size:12.5px;color:var(--g-600);margin-bottom:5px}
-.mf input[type=text],.mf input[type=date],.mf input[type=url],.mf select,.mf textarea{width:100%;min-height:40px;
+.mf input[type=text],.mf input[type=date],.mf input[type=url],.mf input[type=file],.mf select,.mf textarea{width:100%;min-height:40px;
   padding:8px 11px;border-radius:8px;border:1px solid var(--border-med);background:var(--surface);
   color:var(--fg-1);font-family:inherit;font-size:14px}
-.mf .hint{font-size:12px;color:var(--g-500);margin-top:4px}
-.mf .ck{display:flex;gap:9px;align-items:flex-start;font-size:14px}
-.mf .ck input{width:17px;height:17px;margin-top:2px}
+.mf textarea{min-height:160px;line-height:1.5}
+.mf .hint,.hint{font-size:12px;color:var(--g-500);margin-top:4px}
+.ck{display:flex;gap:9px;align-items:flex-start;font-size:14px}
+.ck input{width:17px;height:17px;margin-top:2px}
 .calc{background:var(--g-50);border-radius:8px;padding:9px 11px;font-family:var(--font-mono);font-size:13px;min-height:40px}
+.sect{grid-column:1/-1;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--g-500);
+  border-top:1px solid var(--border-light);padding-top:12px;margin-top:4px}
 @media(max-width:700px){ .mf{grid-template-columns:1fr} }
-.warnbox{margin:12px 0}
-/* ── ตัวหนังสือ ── */
+/* ── ตัวหนังสือบนจอ (ใกล้เคียง PDF — ฉบับจริงคือ PDF) ── */
 .letter{background:#fff;color:#111;border:1px solid var(--border-light);border-radius:6px;padding:40px 48px;
-  max-width:820px;font-family:Georgia,'Times New Roman',serif;font-size:14.5px;line-height:1.6}
+  max-width:820px;font-size:14px;line-height:1.55}
+.letter.f-Helvetica,.letter.f-Arial{font-family:Helvetica,Arial,sans-serif}
+.letter.f-Courier{font-family:"Courier New",Courier,monospace;font-size:13px}
 .letter .org{text-align:center;font-weight:700;letter-spacing:.04em;font-size:15px}
 .letter .org2{text-align:center;font-size:12px;color:#444}
 .letter h2{text-align:center;font-size:18px;letter-spacing:.12em;margin:18px 0 14px;font-family:inherit}
-.letter table.hd{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:13.5px}
+.letter table.hd{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:13px}
 .letter table.hd td{padding:4px 8px;border:1px solid #bbb;vertical-align:top}
 .letter table.hd td.k{width:22%;font-weight:700;background:#f4f4f4}
-.letter .retro{border:2px solid #b45309;background:#fff7ed;padding:10px 12px;margin:10px 0 14px;font-size:13px}
+.letter .retro{border:2px solid #b45309;background:#fff7ed;padding:10px 12px;margin:10px 0 14px;font-size:12.5px}
 .letter ol{padding-left:22px} .letter li{margin-bottom:8px}
-.letter .val{margin:12px 0;font-size:13.5px}
-.letter .note{font-style:italic;font-size:13px;margin-top:10px}
-.letter .sig{margin-top:30px;min-height:110px}
-.letter .sig img{max-height:70px;display:block}
-.letter .sig .ln{border-top:1px solid #333;width:280px;margin-top:4px;padding-top:4px;font-size:13.5px}
-.letter .stamp{font-size:11.5px;color:#555;margin-top:6px}
+.letter .val{margin:12px 0;font-size:13px}
+.letter .note{font-style:italic;font-size:12.5px;margin-top:10px}
+.letter .sig{margin-top:26px}
+.letter .sig img{max-height:64px;display:block}
+.letter .sig .ln{border-top:1px solid #333;width:260px;margin-top:4px;padding-top:4px;font-size:13px}
+.letter .stamp{font-size:11px;color:#555;margin-top:6px}
 .letter .draftmark{color:#b91c1c;font-weight:700;text-align:center;letter-spacing:.2em;margin-bottom:8px}
-.acts2{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}
+.letter .endo{margin-top:22px}
+.letter .endo img{max-width:100%;display:block}
+.acts2{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0;align-items:center}
 .pad{border:1px dashed var(--border-med);border-radius:8px;background:#fff;touch-action:none;width:100%;max-width:420px;height:150px}
+.savedsig{border:1px solid var(--border-light);border-radius:8px;background:#fff;padding:8px;max-width:420px}
+.savedsig img{max-height:90px;display:block}
+.sigpick{display:flex;gap:18px;flex-wrap:wrap;margin:6px 0 10px}
+/* ── วางบล็อกสั่งการบนหน้ากระดาษ ── */
+.stage{position:relative;display:inline-block;border:1px solid var(--border-med);background:#fff;max-width:100%;
+  box-shadow:0 2px 10px rgba(0,0,0,.08);touch-action:none}
+.stage canvas.pg{display:block;max-width:100%;height:auto}
+.stage .blk{position:absolute;cursor:move;outline:2px dashed #2563eb;outline-offset:2px;background:rgba(255,255,255,.55)}
+.stage .blk img{display:block;width:100%;height:auto;pointer-events:none}
+.endogrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:20px;align-items:start}
+@media(max-width:900px){ .endogrid{grid-template-columns:1fr} }
 @media print{ .noprint,header,nav,footer,.rail,.botnav{display:none!important} .letter{border:0;padding:0} }
 </style>
 </head><body>
@@ -131,7 +145,7 @@ table.ml tr:last-child td{border-bottom:0}
     <div class="greet noprint"><div>
       <p class="eyebrow">บันทึกข้อความภายใน · INTERNAL MEMORANDUM</p>
       <h1 id="h1">บันทึกข้อความ</h1>
-      <p class="sub" id="sub">ออกเลขที่ตอนลงนามเท่านั้น · วันที่ออกคือเวลาที่ลงนามจริง แก้ไม่ได้ · ห้ามลบ ยกเลิกหรือออกฉบับใหม่แทนเท่านั้น</p></div></div>
+      <p class="sub" id="sub">ผู้เสนอลงนาม → ออกเลขและวันที่ออก · ผู้รับทราบ/สั่งการลงนามและวางบล็อกสั่งการบนหน้ากระดาษ · วันที่ออกคือเวลาที่ลงนามจริง แก้ไม่ได้ · ห้ามลบ</p></div></div>
     <div id="gate"></div>
     <div id="app"></div>
   </main>
@@ -158,12 +172,13 @@ table.ml tr:last-child td{border-bottom:0}
 <script>D0507.GAS_URL='https://script.google.com/macros/s/AKfycby7rFFVxd92wPImX4m8pv8nHqTrK3Iq0O32A34844DAg1rP8N3RfgKEyGvAUkQu-NXd/exec';</script>
 <script>
 "use strict";
-const REG={"systems":{"here":{"n":"ระบบฟอร์มออนไลน์","en":"This portal","url":"","lg":"52","cl":"d"},"dispatch":{"n":"ระบบ Dispatch","en":"Flight dispatch","url":"https://d0507.361vision.org/d0507-app/dispatch/?v=final","lg":"DSP","cl":"a"},"training":{"n":"ระบบบันทึกการฝึก","en":"Training records","url":"https://d0507.361vision.org/","lg":"TRN","cl":"b"},"fbo":{"n":"AeroFBO","en":"Operations & maintenance","url":"https://indyzz.com/aerofbo/index.php","lg":"FBO","cl":"c"},"audit":{"n":"Audit Portal","en":"Internal audit","url":"../d0507-audit/","lg":"AUD","cl":"a"}},"forms":[{"doc":"D-0507-APF-001","abbr":"APF","t":"Appeal Form","th":"แบบอุทธรณ์","sys":"here","jot":"243218287458465","assignTo":"ACM","r":{"stu":"ยื่นอุทธรณ์คำวินิจฉัยของ ATO ภายใน 14 วัน"},"chain":"admin","kw":["อุทธรณ์","ไม่เป็นธรรม","ร้องเรียน","appeal","apf"],"public":true,"iss":"01","rev":"00","eff":"14 SEP 2022","hasDef":true},{"doc":"D-0507-APP-001","abbr":"APP","t":"Application Form","th":"ใบสมัคร","sys":"fbo","r":{"stu":"สมัครเข้าเรียน เปลี่ยนหลักสูตร หรือขอ licence / rating"},"chain":"admin","kw":["สมัคร","สมัครเรียน","เข้าเรียน","ใบสมัคร","โปรไฟล์","application","app"],"public":true,"iss":"01","rev":"01","eff":"24 AUG 2026","hasDef":false},{"doc":"D-0507-ASF-001","abbr":"ASF","t":"Authorize Solo Flight Form","th":"ใบอนุญาตบินเดี่ยว","sys":"here","jot":"241828892999078","assignTo":"FI","r":{"stu":"รับทราบเงื่อนไขก่อนออกบินเดี่ยว"},"chain":"preflight","kw":["บินเดี่ยว","solo","เดี่ยวครั้งแรก","นักเรียนบินเดี่ยว","asf"],"public":false,"unlisted":true,"iss":"01","rev":"00","eff":"07 JUL 2022","hasDef":true},{"doc":"D-0507-DRC-001","abbr":"DRC","t":"Document Receipt","th":"ใบรับเอกสารควบคุม","sys":"here","jot":"221830582177053","r":{},"chain":"doccontrol","kw":["รับเอกสาร","ลงนามรับ","receipt","drc"],"anon":true,"public":false,"unlisted":true,"iss":"01","rev":"00","eff":"20 AUG 2020","hasDef":true,"admin":{"url":"admin/drc/","n":{"th":"เตรียมลิงก์แจกจ่าย","en":"Prepare distribution link"}}},{"doc":"D-0507-DRF-001","abbr":"DRF","t":"Document Revision Form","th":"แบบขอแก้ไขเอกสารควบคุม","sys":"here","jot":"193573500355053","r":{},"chain":"doccontrol","kw":["แก้คู่มือ","แก้ไขเอกสาร","ขอแก้","revision","คู่มือ","เอกสาร","drf"],"public":false,"unlisted":true,"iss":"01","rev":"00","eff":"20 AUG 2020","hasDef":true},{"doc":"D-0507-EFM-001","abbr":"EFM","t":"Progress and Evaluation Form","th":"แบบประเมินความคืบหน้า","sys":"training","r":{"ins":"ถูกประเมินก่อนรับเข้าเป็นครู — ทำในระบบบันทึกการฝึก"},"chain":"training","kw":["ผลการฝึก","ดูผล","เกรด","gradeslip","ความคืบหน้า","ประเมินความคืบหน้า","efm"],"public":true,"iss":"01","rev":"00","eff":"20 NOV 2024","hasDef":false,"next":["STR"],"flow":{"th":"ประเมินผู้สมัครก่อนตัดสินใจจ้าง — ผ่านแล้วจึงเข้าสายมาตรฐานครู","en":"Applicant assessment before the hiring decision"}},{"doc":"D-0507-FRAE-001","abbr":"FRAE","t":"Flight Risk Assessment and Evaluation","th":"การประเมินความเสี่ยงก่อนทำการบิน","sys":"here","jot":"210071253532038","assignTo":"FI","r":{"stu":"กรอกฝั่งนักเรียนก่อนบินทุกเที่ยว"},"chain":"preflight","kw":["บิน","จะบิน","ก่อนบิน","พรุ่งนี้","ความเสี่ยง","เสี่ยง","ประเมิน","ครู","fit to fly","frae","risk","preflight"],"public":true,"iss":"01","rev":"00","eff":"07 JUL 2022","hasDef":true},{"doc":"D-0507-GSP-001","abbr":"GSP","t":"Flight Training Evaluation","th":"บันทึกการฝึกภาคอากาศ","sys":"training","r":{"stu":"ดูบันทึกการฝึกและความคืบหน้าของตัวเอง (อ่านเท่านั้น)"},"chain":"training","kw":["ผลการฝึก","ความคืบหน้า","บันทึกการฝึก","gradeslip","training record","ppl","gsp"],"public":true,"iss":"01","rev":"00","eff":"07 JUL 2022","hasDef":false},{"doc":"D-0507-HIF-001","abbr":"HIF","t":"Hazard Identification Form","th":"แบบชี้บ่งอันตราย","sys":"here","jot":"210431245943449","assignTo":"SM","r":{"ins":"แจ้งอันตรายที่พบและเสนอมาตรการลดความเสี่ยง"},"chain":"safety","kw":["อันตราย","ชี้บ่งอันตราย","hazard","hif","ความเสี่ยง"],"public":false,"unlisted":true,"iss":"01","rev":"00","eff":"24 AUG 2021","hasDef":true},{"doc":"D-0507-MOC-001","abbr":"MOC","t":"Management of Change (MoC) Form","th":"แบบบริหารการเปลี่ยนแปลง","sys":"here","jot":"","r":{},"chain":"safety","kw":["เปลี่ยนแปลง","moc","change","บริหารการเปลี่ยนแปลง"],"public":false,"unlisted":true,"iss":"01","rev":"00","eff":"","hasDef":true},{"doc":"D-0507-PWR-001","abbr":"PWR","t":"Passenger Waiver and Release Form","th":"หนังสือสละสิทธิ์เรียกร้องของผู้โดยสาร","sys":"here","jot":"","r":{"stu":"ผู้โดยสาร trial flight อ่านเงื่อนไขและลงนามก่อนขึ้นบิน — กรอกเสร็จคือรับทราบแล้ว"},"chain":"admin","kw":["consent","guardian","minor","pwr","trial flight","waiver","ผู้ปกครอง","ผู้เยาว์","ผู้โดยสาร","พาคนขึ้น","ยินยอม","สละสิทธิ์"],"anon":true,"public":true,"iss":"01","rev":"03","eff":"21 AUG 2026","hasDef":true},{"doc":"D-0507-SDF-001","abbr":"SDF","t":"Self Declaration Form","th":"แบบแจ้งข้อมูลด้วยตนเอง","sys":"here","jot":"210394186308456","assignTo":"HT","r":{"stu":"แจ้งเมื่อหยุดบินเกิน 2 สัปดาห์ หรือมีการบินอื่นนอกหลักสูตร"},"chain":"preflight","kw":["แจ้ง","หยุด","หยุดบิน","ไม่ได้บิน","บินที่อื่น","ประกาศตน","declaration","sdf"],"public":true,"iss":"01","rev":"01","eff":"22 JUN 2026","hasDef":true},{"doc":"D-0507-SEF-001","abbr":"SEF","t":"Student Evaluation Form","th":"แบบประเมินครูผู้สอนโดยนักเรียน","sys":"training","jot":"210063447392452","r":{"stu":"ประเมินครูผู้สอนเมื่อจบแต่ละ Stage (ไม่เปิดเผยชื่อ) — ทำในระบบบันทึกการฝึก"},"chain":"training","kw":["ประเมินครู","ครูผู้สอน","ให้คะแนนครู","ความเห็น","feedback","sef"],"public":true,"iss":"01","rev":"00","eff":"20 AUG 2020","hasDef":false},{"doc":"D-0507-VSR-001","abbr":"VSR","t":"Voluntary Safety Report","th":"รายงานนิรภัยโดยสมัครใจ","sys":"here","jot":"221482584465058","assignTo":"SM","r":{"stu":"แจ้งเหตุหรือความเสี่ยงด้านนิรภัย (ไม่ระบุชื่อได้)"},"chain":"safety","kw":["ไม่ปลอดภัย","อันตราย","เหตุ","แจ้งเหตุ","นิรภัย","รายงาน","safety","vsr","เกือบเกิดเหตุ"],"anon":true,"public":true,"iss":"01","rev":"01","eff":"23 AUG 2026","hasDef":true}],"roles":[{"k":"stu","n":"นักเรียน","d":"นักศึกษาการบิน · ผู้เข้ารับการฝึก","en":"Students","den":"Student pilots · trainees"},{"k":"ins","n":"ครูการบิน / ครูภาคทฤษฎี","d":"FI · TKI · FIE","en":"Instructors","den":"FI · TKI · FIE"},{"k":"mnt","n":"ช่างอากาศยาน","d":"ฝ่ายซ่อมบำรุง (ME)","en":"Maintenance","den":"Maintenance (ME)"},{"k":"ops","n":"ฝ่ายปฏิบัติการ","d":"Operations · Dispatch · ธุรการเอกสาร","en":"Operations","den":"Operations · Dispatch · document control"},{"k":"mgt","n":"ฝ่ายบริหาร","d":"ACM · HT · CMM","en":"Management","den":"ACM · HT · CMM"},{"k":"sms","n":"นิรภัยการบิน (SMS)","d":"Safety Manager · SMS","en":"Safety (SMS)","den":"Safety Manager · SMS"}],"status":{"ok":{"n":"พร้อมใช้","lv":"ok","en":"Ready"},"linkwrong":{"n":"ลิงก์ใน LEF ผิดใบ","lv":"bad","en":"LEF links to the wrong form"},"nolink":{"n":"LEF ยังไม่ใส่ลิงก์","lv":"warn","en":"No link in LEF"},"noform":{"n":"ยังไม่มีฟอร์มออนไลน์","lv":"warn","en":"No online form yet"},"pdfonly":{"n":"เป็น PDF บน Drive","lv":"warn","en":"PDF on Drive"},"notinlef":{"n":"ยังไม่อยู่ใน LEF","lv":"warn","en":"Not in LEF yet"},"shadow":{"n":"ใช้บน Jotform · ไม่มีในคู่มือ","lv":"bad","en":"In use but not registered"},"dupsys":{"n":"มีสองฉบับ — ระบบภายนอกและ Jotform","lv":"bad","en":"Duplicate across systems"}},"lefcount":{"total":52}}, MT={"AUTH":{"code":"AUTH","title":{"en":"Authorisation / Assignment of Duties","th":"หนังสือแต่งตั้ง / มอบหมายหน้าที่"},"purpose":"compliance","requiresSignature":true,"signer":{"position":"HT","conflictPosition":"ACM"},"backdate":{"allowed":true,"statement":"ISSUED RETROSPECTIVELY. This memorandum confirms an authorisation that took effect on {effectiveFromLong}, the day after the {checkName} recorded under Flight ID {flightId} on form {evalForm}. The date of issue is the date of signature and has not been back-dated."},"distribution":[{"who":"beneficiary","ack":true},{"position":"HT","label":"Head of Training"},{"position":"CFI","label":"Chief Flight Instructor"},{"position":"OPS","label":"Flight Operations / Scheduling"},{"position":"CMM","label":"Quality / Compliance Monitoring"}],"storage":"staff","expiryWarnDays":[60,30],"warnTo":["HT","CFI","OPS"],"fields":[{"k":"beneficiary","type":"person","req":true,"label":{"en":"Person authorised","th":"ผู้ได้รับมอบหมาย"}},{"k":"duty","type":"select","req":true,"label":{"en":"Duty","th":"ประเภทหน้าที่"},"opt":[{"v":"Instructor","n":{"en":"Instructor","th":"ครูการบิน"},"dutyTitle":"Flight Instructor","checkName":"Instructor Check","evalForm":"D-0507-PCR-FI-001 (Proficiency Check Record — Flight Instructor)"},{"v":"Pilot","n":{"en":"Pilot","th":"นักบิน"},"dutyTitle":"Pilot","checkName":"Standard Check","evalForm":"D-0507-STR-001 (Standardisation Training Record)"}]},{"k":"flightId","type":"text","req":true,"pattern":"^LOG-\\d{6}-\\d+$","label":{"en":"Flight ID (evaluation flight)","th":"Flight ID ของเที่ยวประเมิน"},"ph":"LOG-202608-7"},{"k":"flightDate","type":"date","req":true,"label":{"en":"Date of evaluation flight","th":"วันที่บิน"}},{"k":"evaluator","type":"person","req":true,"label":{"en":"Evaluator","th":"ผู้ประเมิน"}},{"k":"evalPdf","type":"url","label":{"en":"Evaluation result (PDF link)","th":"ลิงก์ PDF ผลประเมิน"}},{"k":"evaluated","type":"check","req":true,"label":{"en":"The evaluation has been submitted (status: evaluated)","th":"ผลประเมินส่งแล้ว (สถานะ evaluated)"},"hint":{"th":"ระบบยังตรวจสถานะจาก Annual Eval เองไม่ได้ — ผู้จัดทำยืนยันและแนบลิงก์ผลประเมินไว้เป็นหลักฐาน"}},{"k":"scope","type":"text","label":{"en":"Scope / limitations (optional)","th":"ขอบเขต / ข้อจำกัด (ไม่บังคับ)"},"ph":"e.g. C172 series only"}],"compute":[{"k":"effectiveFrom","op":"addDays","of":"flightDate","n":1,"label":{"en":"Effective from","th":"วันมีผล"}},{"k":"expiresOn","op":"addYearsMinusDay","of":"effectiveFrom","n":1,"label":{"en":"Valid until","th":"วันหมดอายุ"}}],"subject":"Authorisation to act as {dutyTitle} — {beneficiaryName}","body":["Following the {checkName} conducted on {flightDateLong} (Flight ID {flightId}) by {evaluatorName}, and the evaluation recorded on form {evalForm}, {beneficiaryName} is hereby authorised to act as {dutyTitle} for D-0507 Flight Training Co., Ltd.","This authorisation is effective from {effectiveFromLong} and remains valid until {expiresOnLong}, unless withdrawn, suspended or superseded earlier.","{scopeSentence}","The holder shall exercise this authorisation in accordance with the Operations Manual and within the privileges and limitations of the licences, ratings and medical certificate held."],"fixedNote":"This authorisation does not certify recency or currency."}}, A=D0507;
+const REG={"systems":{"here":{"n":"ระบบฟอร์มออนไลน์","en":"This portal","url":"","lg":"52","cl":"d"},"dispatch":{"n":"ระบบ Dispatch","en":"Flight dispatch","url":"https://d0507.361vision.org/d0507-app/dispatch/?v=final","lg":"DSP","cl":"a"},"training":{"n":"ระบบบันทึกการฝึก","en":"Training records","url":"https://d0507.361vision.org/","lg":"TRN","cl":"b"},"fbo":{"n":"AeroFBO","en":"Operations & maintenance","url":"https://indyzz.com/aerofbo/index.php","lg":"FBO","cl":"c"},"audit":{"n":"Audit Portal","en":"Internal audit","url":"../d0507-audit/","lg":"AUD","cl":"a"}},"forms":[{"doc":"D-0507-APF-001","abbr":"APF","t":"Appeal Form","th":"แบบอุทธรณ์","sys":"here","jot":"243218287458465","assignTo":"ACM","r":{"stu":"ยื่นอุทธรณ์คำวินิจฉัยของ ATO ภายใน 14 วัน"},"chain":"admin","kw":["อุทธรณ์","ไม่เป็นธรรม","ร้องเรียน","appeal","apf"],"public":true,"iss":"01","rev":"00","eff":"14 SEP 2022","hasDef":true},{"doc":"D-0507-APP-001","abbr":"APP","t":"Application Form","th":"ใบสมัคร","sys":"fbo","r":{"stu":"สมัครเข้าเรียน เปลี่ยนหลักสูตร หรือขอ licence / rating"},"chain":"admin","kw":["สมัคร","สมัครเรียน","เข้าเรียน","ใบสมัคร","โปรไฟล์","application","app"],"public":true,"iss":"01","rev":"01","eff":"24 AUG 2026","hasDef":false},{"doc":"D-0507-ASF-001","abbr":"ASF","t":"Authorize Solo Flight Form","th":"ใบอนุญาตบินเดี่ยว","sys":"here","jot":"241828892999078","assignTo":"FI","r":{"stu":"รับทราบเงื่อนไขก่อนออกบินเดี่ยว"},"chain":"preflight","kw":["บินเดี่ยว","solo","เดี่ยวครั้งแรก","นักเรียนบินเดี่ยว","asf"],"public":false,"unlisted":true,"iss":"01","rev":"00","eff":"07 JUL 2022","hasDef":true},{"doc":"D-0507-DRC-001","abbr":"DRC","t":"Document Receipt","th":"ใบรับเอกสารควบคุม","sys":"here","jot":"221830582177053","r":{},"chain":"doccontrol","kw":["รับเอกสาร","ลงนามรับ","receipt","drc"],"anon":true,"public":false,"unlisted":true,"iss":"01","rev":"00","eff":"20 AUG 2020","hasDef":true,"admin":{"url":"admin/drc/","n":{"th":"เตรียมลิงก์แจกจ่าย","en":"Prepare distribution link"}}},{"doc":"D-0507-DRF-001","abbr":"DRF","t":"Document Revision Form","th":"แบบขอแก้ไขเอกสารควบคุม","sys":"here","jot":"193573500355053","r":{},"chain":"doccontrol","kw":["แก้คู่มือ","แก้ไขเอกสาร","ขอแก้","revision","คู่มือ","เอกสาร","drf"],"public":false,"unlisted":true,"iss":"01","rev":"00","eff":"20 AUG 2020","hasDef":true},{"doc":"D-0507-EFM-001","abbr":"EFM","t":"Progress and Evaluation Form","th":"แบบประเมินความคืบหน้า","sys":"training","r":{"ins":"ถูกประเมินก่อนรับเข้าเป็นครู — ทำในระบบบันทึกการฝึก"},"chain":"training","kw":["ผลการฝึก","ดูผล","เกรด","gradeslip","ความคืบหน้า","ประเมินความคืบหน้า","efm"],"public":true,"iss":"01","rev":"00","eff":"20 NOV 2024","hasDef":false,"next":["STR"],"flow":{"th":"ประเมินผู้สมัครก่อนตัดสินใจจ้าง — ผ่านแล้วจึงเข้าสายมาตรฐานครู","en":"Applicant assessment before the hiring decision"}},{"doc":"D-0507-FRAE-001","abbr":"FRAE","t":"Flight Risk Assessment and Evaluation","th":"การประเมินความเสี่ยงก่อนทำการบิน","sys":"here","jot":"210071253532038","assignTo":"FI","r":{"stu":"กรอกฝั่งนักเรียนก่อนบินทุกเที่ยว"},"chain":"preflight","kw":["บิน","จะบิน","ก่อนบิน","พรุ่งนี้","ความเสี่ยง","เสี่ยง","ประเมิน","ครู","fit to fly","frae","risk","preflight"],"public":true,"iss":"01","rev":"00","eff":"07 JUL 2022","hasDef":true},{"doc":"D-0507-GSP-001","abbr":"GSP","t":"Flight Training Evaluation","th":"บันทึกการฝึกภาคอากาศ","sys":"training","r":{"stu":"ดูบันทึกการฝึกและความคืบหน้าของตัวเอง (อ่านเท่านั้น)"},"chain":"training","kw":["ผลการฝึก","ความคืบหน้า","บันทึกการฝึก","gradeslip","training record","ppl","gsp"],"public":true,"iss":"01","rev":"00","eff":"07 JUL 2022","hasDef":false},{"doc":"D-0507-HIF-001","abbr":"HIF","t":"Hazard Identification Form","th":"แบบชี้บ่งอันตราย","sys":"here","jot":"210431245943449","assignTo":"SM","r":{"ins":"แจ้งอันตรายที่พบและเสนอมาตรการลดความเสี่ยง"},"chain":"safety","kw":["อันตราย","ชี้บ่งอันตราย","hazard","hif","ความเสี่ยง"],"public":false,"unlisted":true,"iss":"01","rev":"00","eff":"24 AUG 2021","hasDef":true},{"doc":"D-0507-MOC-001","abbr":"MOC","t":"Management of Change (MoC) Form","th":"แบบบริหารการเปลี่ยนแปลง","sys":"here","jot":"","r":{},"chain":"safety","kw":["เปลี่ยนแปลง","moc","change","บริหารการเปลี่ยนแปลง"],"public":false,"unlisted":true,"iss":"01","rev":"00","eff":"","hasDef":true},{"doc":"D-0507-PWR-001","abbr":"PWR","t":"Passenger Waiver and Release Form","th":"หนังสือสละสิทธิ์เรียกร้องของผู้โดยสาร","sys":"here","jot":"","r":{"stu":"ผู้โดยสาร trial flight อ่านเงื่อนไขและลงนามก่อนขึ้นบิน — กรอกเสร็จคือรับทราบแล้ว"},"chain":"admin","kw":["consent","guardian","minor","pwr","trial flight","waiver","ผู้ปกครอง","ผู้เยาว์","ผู้โดยสาร","พาคนขึ้น","ยินยอม","สละสิทธิ์"],"anon":true,"public":true,"iss":"01","rev":"03","eff":"21 AUG 2026","hasDef":true},{"doc":"D-0507-SDF-001","abbr":"SDF","t":"Self Declaration Form","th":"แบบแจ้งข้อมูลด้วยตนเอง","sys":"here","jot":"210394186308456","assignTo":"HT","r":{"stu":"แจ้งเมื่อหยุดบินเกิน 2 สัปดาห์ หรือมีการบินอื่นนอกหลักสูตร"},"chain":"preflight","kw":["แจ้ง","หยุด","หยุดบิน","ไม่ได้บิน","บินที่อื่น","ประกาศตน","declaration","sdf"],"public":true,"iss":"01","rev":"01","eff":"22 JUN 2026","hasDef":true},{"doc":"D-0507-SEF-001","abbr":"SEF","t":"Student Evaluation Form","th":"แบบประเมินครูผู้สอนโดยนักเรียน","sys":"training","jot":"210063447392452","r":{"stu":"ประเมินครูผู้สอนเมื่อจบแต่ละ Stage (ไม่เปิดเผยชื่อ) — ทำในระบบบันทึกการฝึก"},"chain":"training","kw":["ประเมินครู","ครูผู้สอน","ให้คะแนนครู","ความเห็น","feedback","sef"],"public":true,"iss":"01","rev":"00","eff":"20 AUG 2020","hasDef":false},{"doc":"D-0507-VSR-001","abbr":"VSR","t":"Voluntary Safety Report","th":"รายงานนิรภัยโดยสมัครใจ","sys":"here","jot":"221482584465058","assignTo":"SM","r":{"stu":"แจ้งเหตุหรือความเสี่ยงด้านนิรภัย (ไม่ระบุชื่อได้)"},"chain":"safety","kw":["ไม่ปลอดภัย","อันตราย","เหตุ","แจ้งเหตุ","นิรภัย","รายงาน","safety","vsr","เกือบเกิดเหตุ"],"anon":true,"public":true,"iss":"01","rev":"01","eff":"23 AUG 2026","hasDef":true}],"roles":[{"k":"stu","n":"นักเรียน","d":"นักศึกษาการบิน · ผู้เข้ารับการฝึก","en":"Students","den":"Student pilots · trainees"},{"k":"ins","n":"ครูการบิน / ครูภาคทฤษฎี","d":"FI · TKI · FIE","en":"Instructors","den":"FI · TKI · FIE"},{"k":"mnt","n":"ช่างอากาศยาน","d":"ฝ่ายซ่อมบำรุง (ME)","en":"Maintenance","den":"Maintenance (ME)"},{"k":"ops","n":"ฝ่ายปฏิบัติการ","d":"Operations · Dispatch · ธุรการเอกสาร","en":"Operations","den":"Operations · Dispatch · document control"},{"k":"mgt","n":"ฝ่ายบริหาร","d":"ACM · HT · CMM","en":"Management","den":"ACM · HT · CMM"},{"k":"sms","n":"นิรภัยการบิน (SMS)","d":"Safety Manager · SMS","en":"Safety (SMS)","den":"Safety Manager · SMS"}],"status":{"ok":{"n":"พร้อมใช้","lv":"ok","en":"Ready"},"linkwrong":{"n":"ลิงก์ใน LEF ผิดใบ","lv":"bad","en":"LEF links to the wrong form"},"nolink":{"n":"LEF ยังไม่ใส่ลิงก์","lv":"warn","en":"No link in LEF"},"noform":{"n":"ยังไม่มีฟอร์มออนไลน์","lv":"warn","en":"No online form yet"},"pdfonly":{"n":"เป็น PDF บน Drive","lv":"warn","en":"PDF on Drive"},"notinlef":{"n":"ยังไม่อยู่ใน LEF","lv":"warn","en":"Not in LEF yet"},"shadow":{"n":"ใช้บน Jotform · ไม่มีในคู่มือ","lv":"bad","en":"In use but not registered"},"dupsys":{"n":"มีสองฉบับ — ระบบภายนอกและ Jotform","lv":"bad","en":"Duplicate across systems"}},"lefcount":{"total":52}}, MT={"AUTH":{"code":"AUTH","title":{"en":"Authorisation / Assignment of Duties","th":"หนังสือแต่งตั้ง / มอบหมายหน้าที่"},"purpose":"compliance","requiresSignature":true,"signers":{"proposer":{"position":"CFI","conflictPosition":"HT"},"endorser":{"position":"HT","conflictPosition":"ACM","actions":["APPROVED","NOT APPROVED"]}},"backdate":{"allowed":true,"statement":"ISSUED RETROSPECTIVELY. This memorandum confirms an authorisation that took effect on {effectiveFromLong}, the day after the {checkName} recorded under Flight ID {flightId} on form {evalForm}. The date of issue is the date of signature and has not been back-dated."},"distribution":[{"who":"beneficiary","ack":true},{"position":"HT","label":"Head of Training"},{"position":"CFI","label":"Chief Flight Instructor"},{"position":"OPS","label":"Flight Operations / Scheduling"},{"position":"CMM","label":"Quality / Compliance Monitoring"}],"storage":"staff","expiryWarnDays":[60,30],"warnTo":["HT","CFI","OPS"],"fields":[{"k":"beneficiary","type":"person","req":true,"label":{"en":"Person authorised","th":"ผู้ได้รับมอบหมาย"}},{"k":"duty","type":"select","req":true,"label":{"en":"Duty","th":"ประเภทหน้าที่"},"opt":[{"v":"Instructor","n":{"en":"Instructor","th":"ครูการบิน"},"dutyTitle":"Flight Instructor","checkName":"Instructor Check","evalForm":"D-0507-PCR-FI-001 (Proficiency Check Record — Flight Instructor)"},{"v":"Pilot","n":{"en":"Pilot","th":"นักบิน"},"dutyTitle":"Pilot","checkName":"Standard Check","evalForm":"D-0507-STR-001 (Standardisation Training Record)"}]},{"k":"flightId","type":"text","req":true,"pattern":"^LOG-\\d{6}-\\d+$","label":{"en":"Flight ID (evaluation flight)","th":"Flight ID ของเที่ยวประเมิน"},"ph":"LOG-202608-7"},{"k":"flightDate","type":"date","req":true,"label":{"en":"Date of evaluation flight","th":"วันที่บิน"}},{"k":"evaluator","type":"person","req":true,"label":{"en":"Evaluator","th":"ผู้ประเมิน"}},{"k":"evalPdf","type":"url","label":{"en":"Evaluation result (PDF link)","th":"ลิงก์ PDF ผลประเมิน"}},{"k":"evaluated","type":"check","req":true,"label":{"en":"The evaluation has been submitted (status: evaluated)","th":"ผลประเมินส่งแล้ว (สถานะ evaluated)"},"hint":{"th":"ระบบยังตรวจสถานะจาก Annual Eval เองไม่ได้ — ผู้จัดทำยืนยันและแนบลิงก์ผลประเมินไว้เป็นหลักฐาน"}},{"k":"scope","type":"text","label":{"en":"Scope / limitations (optional)","th":"ขอบเขต / ข้อจำกัด (ไม่บังคับ)"},"ph":"e.g. C172 series only"}],"compute":[{"k":"effectiveFrom","op":"addDays","of":"flightDate","n":1,"label":{"en":"Effective from","th":"วันมีผล"}},{"k":"expiresOn","op":"addYearsMinusDay","of":"effectiveFrom","n":1,"label":{"en":"Valid until","th":"วันหมดอายุ"}}],"subject":"Authorisation to act as {dutyTitle} — {beneficiaryName}","body":["Following the {checkName} conducted on {flightDateLong} (Flight ID {flightId}) by {evaluatorName}, and the evaluation recorded on form {evalForm}, it is proposed that {beneficiaryName} be authorised to act as {dutyTitle} for D-0507 Flight Training Co., Ltd.","Upon approval, this authorisation is effective from {effectiveFromLong} and remains valid until {expiresOnLong}, unless withdrawn, suspended or superseded earlier.","{scopeSentence}","The holder shall exercise this authorisation in accordance with the Operations Manual and within the privileges and limitations of the licences, ratings and medical certificate held."],"fixedNote":"This authorisation does not certify recency or currency."},"GEN":{"code":"GEN","title":{"en":"General Memorandum","th":"บันทึกข้อความทั่วไป"},"purpose":"inform","requiresSignature":true,"signers":{"proposer":{"position":"CMM"},"endorser":{"position":"ACM","conflictPosition":"HT","actions":["ACKNOWLEDGED","APPROVED","FOR ACTION","NOT APPROVED"]}},"backdate":{"allowed":true,"statement":"ISSUED RETROSPECTIVELY. This memorandum records a matter that took effect on {effectiveFromLong}. The date of issue is the date of signature and has not been back-dated."},"distribution":[],"storage":"staff","fields":[{"k":"subjectText","type":"text","req":true,"label":{"en":"Subject","th":"เรื่อง"}},{"k":"purposeSel","type":"select","req":true,"label":{"en":"Purpose","th":"วัตถุประสงค์"},"opt":[{"v":"consider","n":{"th":"เพื่อพิจารณา","en":"For consideration"}},{"v":"approve","n":{"th":"เพื่ออนุมัติ","en":"For approval"}},{"v":"inform","n":{"th":"เพื่อทราบ","en":"For information"}},{"v":"compliance","n":{"th":"เพื่อถือปฏิบัติ","en":"For compliance"}}]},{"k":"ccText","type":"text","label":{"en":"CC (optional)","th":"สำเนาถึง (ไม่บังคับ)"},"ph":"e.g. Chief Flight Instructor · Flight Operations"},{"k":"refText","type":"text","label":{"en":"Reference (optional)","th":"อ้างอิง (ไม่บังคับ)"},"ph":"e.g. OMA D.2.8"},{"k":"bodyText","type":"textarea","req":true,"label":{"en":"Text","th":"เนื้อหา"},"hint":{"th":"ภาษาอังกฤษ · ย่อหน้าแยกด้วยบรรทัดว่าง ระบบใส่เลขข้อให้เอง"}},{"k":"effectiveFrom","type":"date","label":{"en":"Effective from (optional)","th":"วันมีผล (ไม่บังคับ)"},"hint":{"th":"ใส่เมื่อเรื่องนี้มีผลตั้งแต่วันที่ระบุ — ถ้าก่อนวันลงนาม PDF จะพิมพ์ ISSUED RETROSPECTIVELY ให้เอง"}}],"subject":"{subjectText}","body":["{bodyText}"]}}, A=D0507;
 const esc=A.esc, $=id=>document.getElementById(id);
 const now=()=>firebase.firestore.FieldValue.serverTimestamp();
+const arrU=x=>firebase.firestore.FieldValue.arrayUnion(x);
 A.reg=REG;
 const Q=new URLSearchParams(location.search);
-let USERS=[], MEMOS=[];
+let USERS=[], MEMOS=[], MYSIG=null;
 
 /* ── วันที่ ────────────────────────────────────────────────
    เก็บเป็น YYYY-MM-DD เสมอ (ไม่มีเขตเวลามาปน) พิมพ์ออกเป็น DD MMM YYYY ตามคู่มือ */
@@ -184,10 +199,15 @@ const tsFull=v=>{ try{ const d=v&&v.toDate?v.toDate():null; if(!d) return '';
 
 const PURPOSE={ consider:{th:'เพื่อพิจารณา',en:'For consideration'}, approve:{th:'เพื่ออนุมัติ',en:'For approval'},
                 inform:{th:'เพื่อทราบ',en:'For information'}, compliance:{th:'เพื่อถือปฏิบัติ',en:'For compliance'} };
-const STATUS={ draft:'ร่าง', submitted:'รอลงนาม', returned:'ตีกลับ', issued:'ออกแล้ว',
-               cancelled:'ยกเลิก', superseded:'ถูกแทน', expired:'หมดอายุ' };
+const STATUS={ draft:'ร่าง', submitted:'รอผู้เสนอลงนาม', returned:'ตีกลับ', proposed:'รอผู้สั่งการ', issued:'ออกแล้ว',
+               declined:'ไม่อนุมัติ', recorded:'ฉบับกระดาษ', cancelled:'ยกเลิก', superseded:'ถูกแทน', expired:'หมดอายุ' };
 const POSN={ HT:'Head of Training', ACM:'Accountable Manager', CFI:'Chief Flight Instructor', CMM:'Compliance Monitoring Manager',
-             OPS:'Flight Operations', SM:'Safety Manager' };
+             OPS:'Flight Operations', SM:'Safety Manager', CTKI:'Chief Theoretical Knowledge Instructor', AD:'Administration',
+             FI:'Flight Instructor', TKI:'Theoretical Knowledge Instructor', ME:'Maintenance' };
+/* Helvetica ไม่มีใน Google Docs — PDF จึงใช้ Arial ซึ่งความกว้างตัวอักษรเท่ากันทุกตัว */
+const FONTS={ Helvetica:'Helvetica (PDF ใช้ Arial — ขนาดเท่ากันทุกตัวอักษร)', Arial:'Arial', Courier:'Courier' };
+const CSSFONT={ Helvetica:'Helvetica, Arial, sans-serif', Arial:'Arial, Helvetica, sans-serif', Courier:'"Courier New", Courier, monospace' };
+const ACTION_TH={ 'APPROVED':'อนุมัติ', 'NOT APPROVED':'ไม่อนุมัติ', 'ACKNOWLEDGED':'รับทราบ', 'FOR ACTION':'ให้ดำเนินการ' };
 
 A.initAuth({
   apiKey: "AIzaSyCVR8EiBJDT4Qr3KZ2DRPhmFzUksHTwAjg",
@@ -206,34 +226,38 @@ async function boot(){
   }
   $('gate').innerHTML='';
   try{ USERS=(await A.db.collection('users').get()).docs.map(d=>Object.assign({uid:d.id},d.data())).filter(u=>u.active!==false); }catch(e){ USERS=[]; }
+  try{ const s=await A.db.collection('signatures').doc(A.user.uid).get(); MYSIG=s.exists?s.data().png:null; }catch(e){ MYSIG=null; }
   if(Q.get('id')) return viewMemo(Q.get('id'));
-  if(Q.get('new')) return newMemo(Q.get('new'));
+  if(Q.get('edit')) return editMemo(Q.get('edit'));
+  if(Q.get('new')) return formMemo(Q.get('new'), null);
+  if(Q.get('paper')!==null && A.isAdmin()) return paperForm();
+  if(Q.get('sig')!==null) return mySignature();
   return listMemos();
 }
 
 /* ── คน ───────────────────────────────────────────────────
-   ผู้ได้รับมอบหมายบางคนยังไม่มีบัญชีในระบบ — พิมพ์ชื่อได้ uid ว่างไว้
-   (หนังสือออกได้ตามปกติ ส่วนการกดรับทราบรอจนเจ้าตัวมีบัญชี) */
+   ผู้ได้รับมอบหมายบางคนยังไม่มีบัญชีในระบบ — พิมพ์ชื่อได้ uid ว่างไว้ */
 const norm=s=>String(s||'').trim().toLowerCase().replace(/\s+/g,' ');
 function personKey(p){ return p ? (p.uid || 'name:'+norm(p.name)) : ''; }
 function holders(pos){ return USERS.filter(u=>(u.positions||[]).includes(pos)); }
+const userById=uid=>USERS.find(u=>u.uid===uid);
+const posTitle=(u,pref)=>{ const ps=(u&&u.positions)||[]; const p=pref&&ps.includes(pref)?pref:(ps.find(x=>POSN[x])||ps[0]||''); return {pos:p, title:POSN[p]||p||''}; };
+const samePerson=(a,b)=>!!(a&&b&&((a.uid&&a.uid===b.uid)||norm(a.name)===norm(b.name)));
 
-/* ผู้ลงนามตามตำแหน่ง — ถ้าผู้ลงนามปกติเป็นผู้ได้ประโยชน์ หรือผู้ประเมินประเมินตัวเอง
-   ให้ขึ้นไปที่ตำแหน่งสำรอง (AUTH: HT → ACM) และผู้ลงนามต้องไม่ใช่ผู้ได้ประโยชน์เสมอ */
-function resolveSigner(type, f){
-  const cfg=MT[type].signer||{}, ben=f.beneficiary, ev=f.evaluator;
+/* ผู้ลงนามตั้งต้นตามตำแหน่ง — เป็นค่าแนะนำ ผู้จัดทำเปลี่ยนเป็นคนอื่นได้
+   ขึ้นไปตำแหน่งสำรองเมื่อ: เป็นผู้ได้ประโยชน์ · ผู้ประเมินประเมินตัวเอง (ฝั่งผู้สั่งการ) · ซ้ำกับผู้เสนอ */
+function defaultSigners(type, f){
+  const cfg=(MT[type].signers)||{}, ben=f.beneficiary, ev=f.evaluator;
   const selfEval = ben && ev && personKey(ben)===personKey(ev);
-  const pick = pos=>{ const h=holders(pos); return h.length===1 ? h[0] : (h.length>1 ? {multi:h} : null); };
-  let pos=cfg.position, s=pick(pos), why='';
-  const isBen = x=> x && !x.multi && ben && (x.uid===ben.uid || norm(x.name)===norm(ben.name));
-  if(selfEval || isBen(s)){
-    pos=cfg.conflictPosition; s=pick(pos);
-    why = selfEval ? 'ผู้ประเมินประเมินตัวเอง' : 'ผู้ลงนามปกติเป็นผู้ได้รับประโยชน์';
-  }
-  if(!s) return { pos, why, error:'ยังไม่มีผู้ถือตำแหน่ง '+pos+' ('+(POSN[pos]||pos)+') ในระบบ — ตั้งตำแหน่งให้ที่หน้าตั้งค่าระบบก่อน' };
-  if(s.multi) return { pos, why, error:'มีผู้ถือตำแหน่ง '+pos+' มากกว่าหนึ่งคน ('+s.multi.map(u=>u.name).join(', ')+') — ต้องเหลือคนเดียว' };
-  if(isBen(s)) return { pos, why, error:'ผู้ลงนามเป็นผู้ได้รับประโยชน์จากหนังสือฉบับนี้ — ลงนามไม่ได้' };
-  return { pos, why, uid:s.uid, name:s.name, title:POSN[pos]||pos };
+  const pick=pos=>{ const h=holders(pos); return h.length===1?h[0]:null; };
+  const one=(c,avoid)=>{ if(!c||!c.position) return null;
+    let pos=c.position, u=pick(pos);
+    if(!u || avoid(u)){ if(c.conflictPosition){ pos=c.conflictPosition; u=pick(pos); } }
+    if(!u || avoid(u)) return {pos, uid:'', name:'', title:POSN[pos]||pos};
+    return {pos, uid:u.uid, name:u.name, title:POSN[pos]||pos}; };
+  const proposer=one(cfg.proposer, u=>samePerson(u,ben));
+  const endorser=one(cfg.endorser, u=>samePerson(u,ben) || selfEval || (proposer&&proposer.uid===u.uid));
+  return {proposer, endorser};
 }
 
 /* ── ค่าที่ใช้แทนในหัวเรื่องและเนื้อหา ── */
@@ -256,85 +280,150 @@ function computeInto(type, f){
   });
 }
 const fill=(t,v)=>String(t||'').replace(/\{([a-zA-Z0-9_]+)\}/g,(m,k)=>v[k]==null?'':v[k]);
-function bodyOf(type, v){ return (MT[type].body||[]).map(p=>fill(p,v)).filter(p=>p.trim()); }
+/* ย่อหน้า — ช่องเนื้อหาแบบพิมพ์เองแยกย่อหน้าด้วยบรรทัดว่าง */
+function bodyOf(type, v){ return (MT[type].body||[]).flatMap(p=>fill(p,v).split(/\n\s*\n/)).map(p=>p.trim()).filter(Boolean); }
+const purposeOf=(type,f)=> (f&&f.purposeSel) || MT[type].purpose;
+
+/* ข้อความที่พิมพ์ลง PDF — ตรึงไว้ในเอกสาร ตัวส่งออกอ่านจากตรงนี้ ไม่รับจากเบราว์เซอร์ */
+function renderOf(type, f, sup){
+  const cfg=MT[type], v=vars(type, Object.assign({}, f));
+  const cc=[].concat((cfg.distribution||[]).filter(d=>d.position).map(d=>d.label), f.ccText?[f.ccText]:[],
+                     f.beneficiary&&f.beneficiary.name?[f.beneficiary.name]:[]);
+  return { cc:cc.join(' · '),
+    purpose:(PURPOSE[purposeOf(type,f)]||{}).en||'',
+    reference:[f.flightId?'Flight ID '+f.flightId:'', v.evalForm||'', f.refText||'', sup&&sup.number?'Supersedes '+sup.number:''].filter(Boolean).join(' · '),
+    retro: cfg.backdate && f.effectiveFrom ? fill(cfg.backdate.statement, v) : '',
+    validity: f.effectiveFrom ? ('Effective from: '+long(f.effectiveFrom)+(f.expiresOn?'   ·   Valid until: '+long(f.expiresOn):'')) : '',
+    note: cfg.fixedNote ? 'Note: '+cfg.fixedNote : '' };
+}
 
 /* ════════════════ รายการ ════════════════ */
 async function listMemos(){
   $('h1').textContent='บันทึกข้อความ';
   const types=Object.values(MT);
-  $('app').innerHTML=`<div class="acts2 noprint">${types.map(t=>`<a class="big pri" href="?new=${esc(t.code)}">+ ${esc(A.L(t.title))}</a>`).join('')}</div>
+  $('app').innerHTML=`<div class="acts2 noprint">${types.map(t=>`<a class="big pri" href="?new=${esc(t.code)}">+ ${esc(A.L(t.title))}</a>`).join('')}
+      ${A.isAdmin()?'<a class="big sec" href="?paper">+ ลงทะเบียนฉบับกระดาษที่ลงนามแล้ว</a>':''}
+      <a class="big sec" href="?sig">ลายเซ็นของฉัน${MYSIG?' ✓':''}</a></div>
     <div id="list"><div class="empty">กำลังโหลด…</div></div>`;
   try{ MEMOS=(await A.db.collection('memos').get()).docs.map(d=>Object.assign({id:d.id},d.data())); }
   catch(e){ $('list').innerHTML=`<div class="empty">อ่านไม่ได้: ${esc(e.code||e.message)}</div>`; return; }
-  MEMOS.sort((a,b)=>(b.seq||0)-(a.seq||0) || ((b.createdAt&&b.createdAt.seconds)||0)-((a.createdAt&&a.createdAt.seconds)||0));
+  MEMOS.sort((a,b)=>((b.issuedAt&&b.issuedAt.seconds)||(b.createdAt&&b.createdAt.seconds)||0)-((a.issuedAt&&a.issuedAt.seconds)||(a.createdAt&&a.createdAt.seconds)||0));
   const today=bkkToday();
   const shown=MEMOS.filter(m=>!m.test || A.isAdmin());
+  const sg=m=>{ const s=m.signers||{}; return m.mode==='paper' ? esc((m.paper&&m.paper.proposerName)||'')+' → '+esc((m.paper&&m.paper.endorserName)||'')
+    : esc((s.proposer&&s.proposer.name)||'—')+' → '+esc((s.endorser&&s.endorser.name)||'—'); };
   $('list').innerHTML = !shown.length ? '<div class="empty">ยังไม่มีบันทึกข้อความ</div>' :
-    `<div class="twrap"><table class="ml"><thead><tr><th>เลขที่</th><th>ประเภท</th><th>เรื่อง</th><th>ผู้ลงนาม</th><th>มีผล</th><th>หมดอายุ</th><th>สถานะ</th></tr></thead><tbody>${
+    `<div class="twrap"><table class="ml"><thead><tr><th>เลขที่</th><th>วันที่ออก</th><th>ประเภท</th><th>เรื่อง</th><th>เสนอ → สั่งการ</th><th>มีผล</th><th>หมดอายุ</th><th>สถานะ</th></tr></thead><tbody>${
       shown.map(m=>{ const st = (m.status==='issued' && m.expiresOn && m.expiresOn<today) ? 'expired' : m.status;
+        const issued = m.mode==='paper' ? long(m.paper&&m.paper.date) : long(tsDate(m.issuedAt));
         return `<tr data-id="${esc(m.id)}"><td class="mono">${esc(m.number||'— (ยังไม่ออกเลข)')}${m.test?' <b style="color:var(--red-600)">TEST</b>':''}</td>
-        <td>${esc(m.type)}</td><td>${esc(m.subject||'')}</td><td>${esc((m.signer&&m.signer.name)||'—')}</td>
+        <td class="mono">${esc(issued)}</td><td>${esc(m.type)}</td><td>${esc(m.subject||'')}</td><td>${sg(m)}</td>
         <td class="mono">${esc(long(m.effectiveFrom))}</td><td class="mono">${esc(long(m.expiresOn))}</td>
         <td><span class="st ${esc(st)}">${esc(STATUS[st]||st)}</span></td></tr>`; }).join('')}</tbody></table></div>`;
   document.querySelectorAll('[data-id]').forEach(tr=>tr.addEventListener('click',()=>{ location.href='?id='+encodeURIComponent(tr.dataset.id); }));
 }
 
-/* ════════════════ สร้าง ════════════════ */
-let F={};
-function newMemo(type){
+/* ════════════════ สร้าง / แก้ร่าง ════════════════ */
+let F={}, EDIT=null, CHK={errors:[],warns:[],supersedes:null}, SIG_TOUCHED={proposer:false,endorser:false};
+const userOpts=()=>USERS.slice().sort((a,b)=>String(a.name).localeCompare(String(b.name)))
+  .map(u=>`<option value="${esc(u.uid)}">${esc(u.name||u.email)}${(u.positions||[]).length?' · '+esc(u.positions.join(',')):''}</option>`).join('');
+
+async function editMemo(id){
+  const s=await A.db.collection('memos').doc(id).get();
+  if(!s.exists){ $('app').innerHTML='<div class="empty">ไม่พบร่างนี้</div>'; return; }
+  const m=Object.assign({id:s.id},s.data());
+  if(!['draft','returned'].includes(m.status)){ location.href='?id='+encodeURIComponent(id); return; }
+  formMemo(m.type, m);
+}
+function formMemo(type, existing){
   const cfg=MT[type]; if(!cfg){ $('app').innerHTML='<div class="empty">ไม่รู้จักประเภทนี้</div>'; return; }
-  $('h1').textContent='สร้าง'+A.L({th:'',en:' '})+A.L(cfg.title);
-  F={};
-  const opts=USERS.slice().sort((a,b)=>String(a.name).localeCompare(String(b.name)))
-    .map(u=>`<option value="${esc(u.uid)}">${esc(u.name||u.email)}</option>`).join('');
+  EDIT=existing; F={};
+  SIG_TOUCHED={proposer:!!(existing&&existing.signers), endorser:!!(existing&&existing.signers)};
+  $('h1').textContent=(existing?'แก้ร่าง — ':'สร้าง — ')+A.L(cfg.title);
+  const opts=userOpts();
   const fieldHtml=(cfg.fields||[]).map(x=>{
     const lab=`<label for="f_${x.k}">${esc(A.L(x.label))}${x.req?' <span style="color:var(--red-500)">*</span>':''}</label>`;
     const hint=x.hint?`<div class="hint">${esc(A.L(x.hint))}</div>`:'';
-    if(x.type==='person') return `<div>${lab}<select id="f_${x.k}" data-k="${x.k}" data-t="person"><option value="">— เลือกจากรายชื่อ —</option>${opts}<option value="__free">ไม่มีในรายชื่อ — พิมพ์ชื่อเอง</option></select>
-        <input type="text" id="f_${x.k}_free" data-k="${x.k}" data-t="personFree" placeholder="ชื่อ–นามสกุล (ตามที่ใช้ในเอกสาร)" style="display:none;margin-top:6px">${hint}</div>`;
+    if(x.type==='person') return `<div>${lab}<select id="f_${x.k}" data-k="${x.k}"><option value="">— เลือกจากรายชื่อ —</option>${opts}<option value="__free">ไม่มีในรายชื่อ — พิมพ์ชื่อเอง</option></select>
+        <input type="text" id="f_${x.k}_free" data-k="${x.k}" placeholder="ชื่อ–นามสกุล (ตามที่ใช้ในเอกสาร)" style="display:none;margin-top:6px">${hint}</div>`;
     if(x.type==='select') return `<div>${lab}<select id="f_${x.k}" data-k="${x.k}"><option value="">—</option>${(x.opt||[]).map(o=>`<option value="${esc(o.v)}">${esc(A.L(o.n)||o.v)}</option>`).join('')}</select>${hint}</div>`;
     if(x.type==='check') return `<div class="full"><label class="ck"><input type="checkbox" id="f_${x.k}" data-k="${x.k}"> <span>${esc(A.L(x.label))}${x.req?' <span style="color:var(--red-500)">*</span>':''}</span></label>${hint}</div>`;
+    if(x.type==='textarea') return `<div class="full">${lab}<textarea id="f_${x.k}" data-k="${x.k}"></textarea>${hint}</div>`;
     const it = x.type==='date'?'date':x.type==='url'?'url':'text';
-    return `<div${x.type==='url'||x.k==='scope'?' class="full"':''}>${lab}<input type="${it}" id="f_${x.k}" data-k="${x.k}" placeholder="${esc(x.ph||'')}">${hint}</div>`;
+    return `<div${['url'].includes(x.type)||['scope','subjectText','refText','ccText'].includes(x.k)?' class="full"':''}>${lab}<input type="${it}" id="f_${x.k}" data-k="${x.k}" placeholder="${esc(x.ph||'')}">${hint}</div>`;
   }).join('');
   const calcHtml=(cfg.compute||[]).map(c=>`<div><label>${esc(A.L(c.label))} <span class="hint">(คำนวณเอง)</span></label><div class="calc" id="c_${c.k}">—</div></div>`).join('');
-  $('app').innerHTML=`<div class="card"><div class="mf">${fieldHtml}${calcHtml}</div>
-      <div id="chk" class="warnbox"></div>
+  $('app').innerHTML=`<div class="card"><div class="mf">${fieldHtml}${calcHtml}
+      <div class="sect">ผู้ลงนาม · รูปแบบ</div>
+      <div><label for="s_proposer">ผู้เสนอ (ลงนามคนแรก — ออกเลขและวันที่ออก) <span style="color:var(--red-500)">*</span></label>
+        <select id="s_proposer" data-k="s"><option value="">—</option>${opts}</select><div class="hint" id="s_proposer_h"></div></div>
+      <div><label for="s_endorser">ผู้รับทราบ / สั่งการ (ลงนามคนที่สอง) <span style="color:var(--red-500)">*</span></label>
+        <select id="s_endorser" data-k="s"><option value="">—</option>${opts}</select><div class="hint" id="s_endorser_h"></div></div>
+      <div><label for="s_font">แบบอักษรใน PDF</label><select id="s_font" data-k="s">${Object.keys(FONTS).map(k=>`<option value="${k}">${esc(FONTS[k])}</option>`).join('')}</select></div>
+      </div>
+      <div id="chk" style="margin-top:14px"></div>
       <h3 style="margin-top:18px">ตัวอย่างหนังสือ</h3><div id="pv"></div>
       <div class="acts2"><button class="big sec" id="save">บันทึกร่าง</button>
-        <button class="big pri" id="submit">ส่งให้ผู้ลงนาม</button>
-        ${A.isAdmin()?'<label class="ck" style="align-self:center;font-size:13px"><input type="checkbox" id="isTest"> ฉบับทดสอบ (ใช้เลขชุด TEST ไม่กินเลขจริง)</label>':''}
-        <a class="big sec" href="./">ยกเลิก</a></div><div id="msg"></div></div>`;
+        <button class="big pri" id="submit">ส่งให้ผู้เสนอลงนาม</button>
+        ${A.isAdmin()&&!existing?'<label class="ck" style="font-size:13px"><input type="checkbox" id="isTest"> ฉบับทดสอบ (ใช้เลขชุด TEST ไม่กินเลขจริง)</label>':''}
+        <a class="big sec" href="${existing?'?id='+esc(existing.id):'./'}">ยกเลิก</a></div><div id="msg"></div></div>`;
+  // เติมค่าเดิมเมื่อแก้ร่าง
+  if(existing){
+    const f=existing.fields||{};
+    (cfg.fields||[]).forEach(x=>{ const el=$('f_'+x.k), v=f[x.k]; if(v==null) return;
+      if(x.type==='person'){ if(v.uid && userById(v.uid)) el.value=v.uid; else if(v.name){ el.value='__free'; $('f_'+x.k+'_free').value=v.name; } }
+      else if(x.type==='check') el.checked=!!v; else el.value=v; });
+    $('s_font').value=existing.font||'Helvetica';
+  }
+  readForm(type, true);
+  if(existing && existing.signers){
+    if(existing.signers.proposer&&existing.signers.proposer.uid) $('s_proposer').value=existing.signers.proposer.uid;
+    if(existing.signers.endorser&&existing.signers.endorser.uid) $('s_endorser').value=existing.signers.endorser.uid;
+    readForm(type, false);
+  }
   document.querySelectorAll('#app [data-k]').forEach(el=>{
-    el.addEventListener('input',()=>readForm(type)); el.addEventListener('change',()=>readForm(type));
+    const isField=el.dataset.k!=='s';
+    el.addEventListener('input',()=>readForm(type,isField)); el.addEventListener('change',()=>readForm(type,isField));
   });
   $('save').addEventListener('click',()=>saveMemo(type,false));
   $('submit').addEventListener('click',()=>saveMemo(type,true));
-  readForm(type);
 }
-function readForm(type){
+/* อ่านฟอร์ม · ตั้งผู้ลงนามตั้งต้นใหม่เมื่อช่องข้อมูลเปลี่ยน (ไม่ทับที่ผู้จัดทำเลือกเองไว้) */
+function readForm(type, fieldsChanged){
   const cfg=MT[type]; F={};
   (cfg.fields||[]).forEach(x=>{
     const el=$('f_'+x.k);
     if(x.type==='person'){
       const free=$('f_'+x.k+'_free'); free.style.display = el.value==='__free' ? '' : 'none';
       if(el.value==='__free') F[x.k] = free.value.trim() ? {uid:'', name:free.value.trim()} : null;
-      else if(el.value){ const u=USERS.find(u=>u.uid===el.value); F[x.k]={uid:u.uid,name:u.name||u.email}; }
+      else if(el.value){ const u=userById(el.value); F[x.k]={uid:u.uid,name:u.name||u.email}; }
       else F[x.k]=null;
     } else if(x.type==='check') F[x.k]=el.checked;
     else F[x.k]=el.value.trim();
   });
   computeInto(type,F);
   (cfg.compute||[]).forEach(c=>{ $('c_'+c.k).textContent = F[c.k] ? long(F[c.k]) : '—'; });
-  checks(type).then(r=>{ CHK=r; paintChecks(); });
-  $('pv').innerHTML = letterHtml(draftModel(type));
+  const d=defaultSigners(type,F);
+  ['proposer','endorser'].forEach(r=>{
+    const sel=$('s_'+r);
+    if(!fieldsChanged && document.activeElement===sel) SIG_TOUCHED[r]=true;
+    if(fieldsChanged && !SIG_TOUCHED[r] && d[r]) sel.value=d[r].uid||'';
+    const c=(cfg.signers||{})[r]||{};
+    $('s_'+r+'_h').textContent = d[r] ? ('ค่าตั้งต้นตามตำแหน่ง '+d[r].pos+(c.conflictPosition&&d[r].pos!==c.position?' (ใช้ตำแหน่งสำรองเพราะคนในตำแหน่ง '+c.position+' ลงนามไม่ได้)':'')+(d[r].uid?'':' — ยังไม่มีผู้ถือตำแหน่งนี้ เลือกเองได้')) : '';
+  });
+  checks(type).then(r=>{ CHK=r; paintChecks(); $('pv').innerHTML = letterHtml(draftModel(type)); });
 }
-let CHK={errors:[],warns:[],supersedes:null};
+function signerOf(role){
+  const uid=$('s_'+role).value; if(!uid) return null;
+  const u=userById(uid), d=defaultSigners(EDIT?EDIT.type:Q.get('new'),F)[role]||{};
+  const pt=posTitle(u, d.pos);
+  return {uid:u.uid, name:u.name||u.email, pos:pt.pos, title:pt.title};
+}
 function paintChecks(){
   $('chk').innerHTML = CHK.errors.map(e=>`<div class="fk-gate stop" style="margin-bottom:8px"><span>${esc(e)}</span></div>`).join('')
     + CHK.warns.map(e=>`<div class="fk-gate warn" style="margin-bottom:8px"><span>${esc(e)}</span></div>`).join('');
 }
-/* ตรวจก่อนเสนอ — กฎกลาง + กฎเฉพาะ AUTH */
+/* ตรวจก่อนเสนอ — กฎกลาง + กฎเฉพาะประเภท */
 async function checks(type){
   const cfg=MT[type], errors=[], warns=[];
   (cfg.fields||[]).forEach(x=>{
@@ -342,109 +431,119 @@ async function checks(type){
     if(x.req && (v==null||v===''||v===false)) errors.push('ยังไม่ได้กรอก: '+A.L(x.label));
     if(x.pattern && v && !new RegExp(x.pattern).test(v)) errors.push(A.L(x.label)+' ต้องอยู่ในรูปแบบ '+(x.ph||x.pattern));
   });
-  const sg=resolveSigner(type,F);
-  if(sg.error) errors.push('ผู้ลงนาม: '+sg.error);
-  else if(sg.why) warns.push('ผู้ลงนามเปลี่ยนเป็น '+sg.title+' ('+sg.name+') เพราะ'+sg.why);
-  if(F.beneficiary && F.evaluator && personKey(F.beneficiary)===personKey(F.evaluator))
+  const p=signerOf('proposer'), e=signerOf('endorser'), ben=F.beneficiary;
+  if(!p) errors.push('ยังไม่ได้เลือกผู้เสนอ');
+  if(!e) errors.push('ยังไม่ได้เลือกผู้รับทราบ / สั่งการ');
+  if(p&&e&&p.uid===e.uid) errors.push('ผู้เสนอกับผู้สั่งการต้องเป็นคนละคน');
+  if(ben&&p&&samePerson(p,ben)) errors.push('ผู้เสนอเป็นผู้ได้รับประโยชน์จากหนังสือฉบับนี้');
+  if(ben&&e&&samePerson(e,ben)) errors.push('ผู้สั่งการเป็นผู้ได้รับประโยชน์จากหนังสือฉบับนี้');
+  if(ben && F.evaluator && personKey(ben)===personKey(F.evaluator))
     warns.push('ผู้ประเมินกับผู้ถูกประเมินเป็นคนเดียวกัน — ตรวจให้แน่ใจก่อนเสนอลงนาม');
-  if(F.beneficiary && !F.beneficiary.uid) warns.push('ผู้ได้รับมอบหมายยังไม่มีบัญชีในระบบ — ออกหนังสือได้ แต่จะกดรับทราบได้เมื่อมีบัญชีแล้ว');
-  if(F.effectiveFrom && F.effectiveFrom < bkkToday()) warns.push('วันมีผลอยู่ก่อนวันนี้ — หนังสือจะพิมพ์ข้อความ "ออกหนังสือยืนยันย้อนหลัง" ให้เอง (วันที่ออกยังเป็นวันที่ลงนามจริง)');
-  if(F.effectiveFrom && F.effectiveFrom < bkkToday() && !(cfg.backdate&&cfg.backdate.allowed)) errors.push('ประเภทนี้ย้อนวันมีผลไม่ได้');
+  if(e && F.evaluator && samePerson(e,F.evaluator) && ben && samePerson(ben,F.evaluator)) errors.push('ผู้สั่งการประเมินตัวเอง');
+  if(ben && !ben.uid) warns.push('ผู้ได้รับมอบหมายยังไม่มีบัญชีในระบบ — ออกหนังสือได้ แต่จะกดรับทราบได้เมื่อมีบัญชีแล้ว');
+  if(F.effectiveFrom && F.effectiveFrom < bkkToday()){
+    if(!(cfg.backdate&&cfg.backdate.allowed)) errors.push('ประเภทนี้ย้อนวันมีผลไม่ได้');
+    else warns.push('วันมีผลอยู่ก่อนวันนี้ — PDF จะพิมพ์ข้อความ "ISSUED RETROSPECTIVELY" ให้เอง วันที่ออกยังเป็นวันที่ลงนามจริง');
+  }
+  if(cfg.code!=='AUTH' || !ben || !F.duty) return {errors,warns,supersedes:null};
   // ฉบับเดิมที่ยังไม่หมดอายุ — ฉบับใหม่ต้องเป็น "แทนฉบับเลขที่ …"
   let supersedes=null;
-  if(F.beneficiary && F.duty){
-    try{
-      if(!MEMOS.length) MEMOS=(await A.db.collection('memos').where('type','==',type).get()).docs.map(d=>Object.assign({id:d.id},d.data()));
-      const old=MEMOS.filter(m=>m.type===type && m.status==='issued' && !m.test
-        && m.beneficiaryKey===personKey(F.beneficiary) && m.fields && m.fields.duty===F.duty
-        && (m.expiresOn||'')>=bkkToday());
-      if(old.length){ supersedes={id:old[0].id, number:old[0].number};
-        warns.push('มีหนังสือแต่งตั้งหน้าที่เดียวกันที่ยังไม่หมดอายุ ('+old[0].number+') — ฉบับนี้จะออกเป็น "แทนฉบับเลขที่ '+old[0].number+'"'); }
-      const pending=MEMOS.filter(m=>m.type===type && ['draft','submitted','returned'].includes(m.status)
-        && m.beneficiaryKey===personKey(F.beneficiary) && m.fields && m.fields.duty===F.duty);
-      if(pending.length) warns.push('มีร่างหรือฉบับรอลงนามของคนนี้หน้าที่เดียวกันอยู่แล้ว '+pending.length+' ฉบับ');
-    }catch(e){}
-  }
-  return {errors,warns,supersedes,signer:sg};
+  try{
+    if(!MEMOS.length) MEMOS=(await A.db.collection('memos').where('type','==',type).get()).docs.map(d=>Object.assign({id:d.id},d.data()));
+    const old=MEMOS.filter(m=>m.type===type && ['issued','recorded'].includes(m.status) && !m.test
+      && m.beneficiaryKey===personKey(ben) && m.fields && m.fields.duty===F.duty && (m.expiresOn||'')>=bkkToday());
+    if(old.length){ supersedes={id:old[0].id, number:old[0].number};
+      warns.push('มีหนังสือแต่งตั้งหน้าที่เดียวกันที่ยังไม่หมดอายุ ('+old[0].number+') — ฉบับนี้จะออกเป็น "แทนฉบับเลขที่ '+old[0].number+'"'); }
+    const pending=MEMOS.filter(m=>m.type===type && ['draft','submitted','returned','proposed'].includes(m.status) && (!EDIT||m.id!==EDIT.id)
+      && m.beneficiaryKey===personKey(ben) && m.fields && m.fields.duty===F.duty);
+    if(pending.length) warns.push('มีร่างหรือฉบับที่ยังไม่จบของคนนี้หน้าที่เดียวกันอยู่แล้ว '+pending.length+' ฉบับ');
+  }catch(e){}
+  return {errors,warns,supersedes};
+}
+function textOf(type){
+  const cfg=MT[type], v=vars(type,F);
+  return { subject:fill(cfg.subject,v), body:bodyOf(type,v), purpose:purposeOf(type,F), render:renderOf(type,F,CHK.supersedes) };
 }
 function draftModel(type){
-  const cfg=MT[type], v=vars(type,F), sg=resolveSigner(type,F);
-  return { type, subject:fill(cfg.subject,v), body:bodyOf(type,v), purpose:cfg.purpose,
-    signer: sg.error?{name:'(position vacant)',title:POSN[sg.pos]||sg.pos||''}:sg, fields:F, effectiveFrom:F.effectiveFrom, expiresOn:F.expiresOn,
-    beneficiaryName: F.beneficiary?F.beneficiary.name:'', status:'draft', supersedesNumber: CHK.supersedes&&CHK.supersedes.number };
-}
-function renderOf(type, f, sup){
-  const cfg=MT[type], v=vars(type, Object.assign({}, f));
-  return { cc:(cfg.distribution||[]).filter(d=>d.position).map(d=>d.label).join(' · '),
-    purpose:(PURPOSE[cfg.purpose]||{}).en||'',
-    reference:[f.flightId?'Flight ID '+f.flightId:'', v.evalForm||'', sup&&sup.number?'Supersedes '+sup.number:''].filter(Boolean).join(' · '),
-    retro: cfg.backdate ? fill(cfg.backdate.statement, v) : '',
-    validity:'Effective from: '+long(f.effectiveFrom)+'   ·   Valid until: '+long(f.expiresOn),
-    note: cfg.fixedNote ? 'Note: '+cfg.fixedNote : '' };
+  const t=textOf(type);
+  return Object.assign(t, { type, status:'draft', fields:F, effectiveFrom:F.effectiveFrom||'', expiresOn:F.expiresOn||'',
+    beneficiaryName:F.beneficiary?F.beneficiary.name:'', font:$('s_font').value,
+    signers:{proposer:signerOf('proposer'), endorser:signerOf('endorser')} });
 }
 async function saveMemo(type, submit){
   CHK=await checks(type); paintChecks();
   if(submit && CHK.errors.length){ $('msg').innerHTML='<div class="fk-gate stop"><span>ยังส่งไม่ได้ — แก้ข้อที่แดงก่อน</span></div>'; return; }
-  const cfg=MT[type], v=vars(type,F), sg=CHK.signer, me=A.myName()||A.user.email;
-  const test=!!($('isTest')&&$('isTest').checked);
-  const doc={ type, status: submit?'submitted':'draft', test,
-    subject:fill(cfg.subject,v), body:bodyOf(type,v), purpose:cfg.purpose,
+  const t=textOf(type), me=A.myName()||A.user.email, act=submit?(EDIT?'resubmit':'submit'):'draft';
+  const blank={uid:'',name:'',pos:'',title:''};
+  const data=Object.assign(t, { type, status: submit?'submitted':'draft',
     fields: JSON.parse(JSON.stringify(F)), effectiveFrom:F.effectiveFrom||'', expiresOn:F.expiresOn||'',
     beneficiaryUid:(F.beneficiary&&F.beneficiary.uid)||'', beneficiaryKey:personKey(F.beneficiary),
     beneficiaryName:(F.beneficiary&&F.beneficiary.name)||'',
-    signer: sg.error ? {uid:'',name:'',title:sg.pos||'',pos:sg.pos||''} : {uid:sg.uid,name:sg.name,title:sg.title,pos:sg.pos},
-    supersedes: CHK.supersedes||null,
-    // ข้อความที่พิมพ์ลง PDF — ตรึงไว้ตอนสร้าง ตัวส่งออกอ่านจากตรงนี้ ไม่รับจากเบราว์เซอร์
-    render: renderOf(type, F, CHK.supersedes),
-    to: [ F.beneficiary ? F.beneficiary.name : '' ],
-    cc: (cfg.distribution||[]).filter(d=>d.position).map(d=>d.label),
-    createdBy:A.user.uid, createdByName:me, createdAt:now(),
-    chain:[{action: submit?'submit':'draft', byUid:A.user.uid, byName:me, at:bkkToday()}] };
+    signers:{ proposer:signerOf('proposer')||blank, endorser:signerOf('endorser')||blank },
+    font:$('s_font').value, supersedes: CHK.supersedes||null });
   $('save').disabled=$('submit').disabled=true;
   try{
-    const ref=await A.db.collection('memos').add(doc);
-    await ref.collection('events').add({action: submit?'submit':'draft', byUid:A.user.uid, byName:me, at:now()});
-    if(submit) await taskFor(ref.id, doc);
+    let ref;
+    if(EDIT){
+      ref=A.db.collection('memos').doc(EDIT.id);
+      await ref.update(Object.assign(data,{ chain:arrU({action:act, byUid:A.user.uid, byName:me, at:bkkToday()}) }));
+      if(EDIT.signer!==undefined) await ref.update({signer:firebase.firestore.FieldValue.delete()}).catch(()=>{});
+    } else {
+      data.test=!!($('isTest')&&$('isTest').checked);
+      ref=await A.db.collection('memos').add(Object.assign(data,{ createdBy:A.user.uid, createdByName:me, createdAt:now(),
+        chain:[{action:act, byUid:A.user.uid, byName:me, at:bkkToday()}] }));
+    }
+    await ref.collection('events').add({action:act, byUid:A.user.uid, byName:me, at:now()});
+    if(submit) await taskFor(ref.id, data, 'proposer');
     location.href='?id='+encodeURIComponent(ref.id);
   }catch(e){ $('save').disabled=$('submit').disabled=false;
     $('msg').innerHTML=`<div class="fk-gate stop"><span>บันทึกไม่สำเร็จ: ${esc(e.code||e.message)}</span></div>`; }
 }
 /* งานในคิวของผู้ลงนาม — ไม่สร้าง = หนังสือค้างโดยไม่มีใครเห็น */
-async function taskFor(id, m){
+async function taskFor(id, m, role){
+  const s=m.signers[role];
   await A.db.collection('tasks').add({ app:'memo', memoId:id, subId:'', formCode:'MEMO-'+m.type,
-    title:'ลงนาม: '+m.subject, tracking:'(ออกเลขเมื่อลงนาม)', assigneeUid:m.signer.uid, assigneeName:m.signer.name,
-    state:'open', step:1, fromUid:A.user.uid, fromName:A.myName()||A.user.email, createdAt:now() });
+    title:(role==='proposer'?'ลงนามเสนอ: ':'รับทราบ/สั่งการ: ')+m.subject, tracking:m.number||'(ออกเลขเมื่อผู้เสนอลงนาม)',
+    assigneeUid:s.uid, assigneeName:s.name, state:'open', step:role==='proposer'?1:2,
+    fromUid:A.user.uid, fromName:A.myName()||A.user.email, createdAt:now() });
+}
+async function closeTasks(id, patch){
+  try{ const ts=await A.db.collection('tasks').where('memoId','==',id).get();
+       for(const d of ts.docs) if(d.data().state==='open') await d.ref.update(Object.assign({state:'done', closedAt:now()},patch||{})); }catch(e){}
 }
 
-/* ════════════════ ตัวหนังสือ (หน้าจอ = PDF) ════════════════ */
+/* ════════════════ ตัวหนังสือบนจอ ════════════════ */
 function letterHtml(m){
-  const issued = m.status!=='draft' && m.status!=='submitted' && m.status!=='returned' && m.number;
-  const issueDate = issued ? long(tsDate(m.issuedAt)) : '(set on signature)';
-  const retro = m.effectiveFrom && (issued ? m.effectiveFrom < tsDate(m.issuedAt) : m.effectiveFrom < bkkToday());
-  const cfg=MT[m.type]||{}, v=vars(m.type, Object.assign({}, m.fields||{}));
-  const refs=[ m.fields&&m.fields.flightId ? 'Flight ID '+m.fields.flightId : '', v.evalForm||'',
-               m.supersedesNumber||(m.supersedes&&m.supersedes.number) ? 'Supersedes '+(m.supersedesNumber||m.supersedes.number) : '' ].filter(Boolean);
-  return `<div class="letter">
-    ${issued?'':'<div class="draftmark">DRAFT — NOT ISSUED</div>'}
+  const numbered = !!m.number && m.mode!=='paper';
+  const r=m.render||{}, s=m.signers||{}, p=s.proposer||{}, e=s.endorser||{};
+  const issueYmd = numbered ? tsDate(m.issuedAt) : bkkToday();
+  const retro = m.effectiveFrom && m.effectiveFrom < issueYmd && r.retro;
+  const who=x=>x&&x.name?[x.title,x.name].filter(Boolean).join(' — '):'(not selected)';
+  return `<div class="letter f-${esc(m.font||'Helvetica')}">
+    ${numbered?'':'<div class="draftmark">DRAFT — NOT ISSUED</div>'}
+    ${m.test?'<div class="draftmark">TEST — NOT A VALID MEMORANDUM</div>':''}
     <div class="org">D-0507 FLIGHT TRAINING CO., LTD.</div>
     <div class="org2">Approved Training Organisation</div>
     <h2>INTERNAL MEMORANDUM</h2>
     <table class="hd">
-      <tr><td class="k">No.</td><td>${esc(issued?m.number:'(assigned on signature)')}</td><td class="k">Date of issue</td><td>${esc(issueDate)}</td></tr>
-      <tr><td class="k">From</td><td colspan="3">${esc((m.signer&&m.signer.title)||POSN[m.signer&&m.signer.pos]||'')}${m.signer&&m.signer.name?' — '+esc(m.signer.name):' — (position vacant)'}</td></tr>
-      <tr><td class="k">To</td><td colspan="3">${esc(m.beneficiaryName||'')}</td></tr>
-      <tr><td class="k">CC</td><td colspan="3">${esc((cfg.distribution||[]).filter(d=>d.position).map(d=>d.label).join(' · '))}</td></tr>
-      <tr><td class="k">Subject</td><td colspan="3"><b>${esc(m.subject||'')}</b></td></tr>
-      <tr><td class="k">Purpose</td><td colspan="3">${esc((PURPOSE[m.purpose]||{}).en||'')}</td></tr>
-      <tr><td class="k">Reference</td><td colspan="3">${esc(refs.join(' · '))}</td></tr>
+      <tr><td class="k">No.</td><td><b>${esc(numbered?m.number:'(assigned when the proposer signs)')}</b></td></tr>
+      <tr><td class="k">Date of issue</td><td>${esc(numbered?long(tsDate(m.issuedAt)):'(date of the proposer\'s signature)')}</td></tr>
+      <tr><td class="k">From</td><td>${esc(who(p))}</td></tr>
+      <tr><td class="k">To</td><td>${esc(who(e))}</td></tr>
+      ${r.cc?`<tr><td class="k">CC</td><td>${esc(r.cc)}</td></tr>`:''}
+      <tr><td class="k">Subject</td><td><b>${esc(m.subject||'')}</b></td></tr>
+      <tr><td class="k">Purpose</td><td>${esc(r.purpose||'')}</td></tr>
+      ${r.reference?`<tr><td class="k">Reference</td><td>${esc(r.reference)}</td></tr>`:''}
     </table>
-    ${retro && cfg.backdate ? `<div class="retro">${esc(fill(cfg.backdate.statement, v))}</div>`:''}
-    <ol>${(m.body||[]).map(p=>`<li>${esc(p)}</li>`).join('')}</ol>
-    <div class="val"><b>Effective from:</b> ${esc(long(m.effectiveFrom))} &nbsp;·&nbsp; <b>Valid until:</b> ${esc(long(m.expiresOn))}</div>
-    ${cfg.fixedNote?`<div class="note">Note: ${esc(cfg.fixedNote)}</div>`:''}
-    <div class="sig">${issued && m.signature ? `<img src="${esc(m.signature)}" alt="">` : '<div style="height:70px"></div>'}
-      <div class="ln">${esc((m.signer&&m.signer.name)||'')}<br>${esc((m.signer&&m.signer.title)||'')}</div>
-      ${issued?`<div class="stamp">Signed electronically on ${esc(tsFull(m.issuedAt))} in the D-0507 Forms system.</div>`:''}</div>
+    ${retro?`<div class="retro">${esc(r.retro)}</div>`:''}
+    <ol>${(m.body||[]).map(x=>`<li>${esc(x)}</li>`).join('')}</ol>
+    ${r.validity?`<div class="val"><b>${esc(r.validity)}</b></div>`:''}
+    ${r.note?`<div class="note">${esc(r.note)}</div>`:''}
+    <div class="sig">${numbered && m.proposerSig ? `<img src="${esc(m.proposerSig)}" alt="">` : '<div style="height:64px"></div>'}
+      <div class="ln">${esc(p.name||'')}<br>${esc(p.title||'')}</div>
+      ${numbered?`<div class="stamp">Proposed and signed electronically on ${esc(tsFull(m.issuedAt))}.</div>`:''}</div>
+    ${m.endorsementImg?`<div class="endo"><img src="${esc(m.endorsementImg)}" alt=""><div class="stamp">ใน PDF บล็อกนี้อยู่ตรงตำแหน่งที่ผู้สั่งการวางไว้</div></div>`:''}
+    ${m.status==='proposed'?'<div class="stamp" style="color:#b45309;margin-top:14px">Awaiting endorsement</div>':''}
   </div>`;
 }
 
@@ -455,138 +554,389 @@ async function viewMemo(id){
   let s; try{ s=await MREF.get(); }catch(e){ $('app').innerHTML=`<div class="empty">เปิดไม่ได้: ${esc(e.code||e.message)}</div>`; return; }
   if(!s.exists){ $('app').innerHTML='<div class="empty">ไม่พบบันทึกข้อความนี้</div>'; return; }
   M=Object.assign({id:s.id},s.data());
+  if(M.mode==='paper') return viewPaper();
   $('h1').textContent = M.number || 'ร่างบันทึกข้อความ';
   $('sub').textContent = A.L((MT[M.type]||{}).title||{}) + ' · ' + (STATUS[M.status]||M.status);
-  const me=A.user.uid, isSigner = M.signer && M.signer.uid===me, isOwner = M.createdBy===me;
+  const me=A.user.uid, S=M.signers||{}, isP=S.proposer&&S.proposer.uid===me, isE=S.endorser&&S.endorser.uid===me, isOwner=M.createdBy===me;
   const acts=[];
-  if(M.status==='submitted' && isSigner) acts.push('sign');
-  if(['draft','returned'].includes(M.status) && (isOwner||A.isAdmin())) acts.push('resubmit');
+  if(M.status==='submitted' && isP) acts.push('propose');
+  if(M.status==='proposed' && isE) acts.push('endorse');
+  if(['issued','declined'].includes(M.status) && isE && !M.endorsementImg) acts.push('endoImg');
+  if(['draft','returned'].includes(M.status) && (isOwner||A.isAdmin())) acts.push('edit');
   if(['draft','submitted','returned'].includes(M.status) && (isOwner||A.isAdmin())) acts.push('cancel');
-  if(M.status==='issued' && A.isAdmin()) acts.push('cancelIssued');
+  if(['proposed','issued'].includes(M.status) && A.isAdmin()) acts.push('cancel');
+  if(!S.proposer && M.signer) acts.push('legacy');
+  const pdfBtn = M.pdf&&M.pdf.url ? `<a class="big pri" href="${esc(M.pdf.url)}" target="_blank" rel="noopener">PDF ↗</a>`
+               : M.pdfProposed&&M.pdfProposed.url ? `<a class="big sec" href="${esc(M.pdfProposed.url)}" target="_blank" rel="noopener">PDF (รอสั่งการ) ↗</a>` : '';
+  const needPdf = ['proposed','issued','declined'].includes(M.status) && !((M.status==='proposed'?M.pdfProposed:M.pdf)||{}).url;
   $('app').innerHTML=`
-    <div class="acts2 noprint"><a class="big sec" href="./">← รายการ</a>
-      <button class="big sec" onclick="print()">พิมพ์</button>
-      ${M.pdf&&M.pdf.url?`<a class="big sec" href="${esc(M.pdf.url)}" target="_blank" rel="noopener">PDF ↗</a>`:''}
-      ${M.status==='issued'&&!(M.pdf&&M.pdf.url)?'<button class="big sec" id="mkpdf">สร้าง PDF</button>':''}
-      ${M.test?'<b style="color:var(--red-600);align-self:center">ฉบับทดสอบ</b>':''}</div>
-    ${M.status==='returned'&&M.returnNote?`<div class="fk-gate stop noprint" style="margin-bottom:12px"><span><b>ตีกลับ:</b> ${esc(M.returnNote)}</span></div>`:''}
-    ${M.cancelNote?`<div class="fk-gate warn noprint" style="margin-bottom:12px"><span><b>ยกเลิก:</b> ${esc(M.cancelNote)}</span></div>`:''}
-    ${M.supersededBy?`<div class="fk-gate warn noprint" style="margin-bottom:12px"><span>ถูกแทนด้วย ${esc(M.supersededBy)}</span></div>`:''}
-    ${letterHtml(M)}
+    <div class="acts2 noprint"><a class="big sec" href="./">← รายการ</a>${pdfBtn}
+      ${needPdf?'<button class="big sec" id="mkpdf">สร้าง PDF</button>':''}
+      ${M.test?'<b style="color:var(--red-600)">ฉบับทดสอบ</b>':''}</div>
+    ${M.status==='returned'&&M.returnNote?`<div class="fk-gate stop noprint"><span><b>ตีกลับ:</b> ${esc(M.returnNote)}</span></div>`:''}
+    ${M.cancelNote?`<div class="fk-gate warn noprint"><span><b>ยกเลิก:</b> ${esc(M.cancelNote)}</span></div>`:''}
+    ${M.supersededBy?`<div class="fk-gate warn noprint"><span>ถูกแทนด้วย ${esc(M.supersededBy)}</span></div>`:''}
+    <div class="noprint" id="actbox"></div>
     <div class="noprint" id="pmsg"></div>
-    <div class="noprint" id="actbox" style="margin-top:18px"></div>
+    ${acts.includes('endorse')?'':letterHtml(M)}
     <div class="noprint" id="hist" style="margin-top:18px"></div>`;
   if($('mkpdf')) $('mkpdf').addEventListener('click',()=>makePdf(true));
   paintActions(acts);
   paintHistory();
 }
+const say=(t,bad)=>{ const e=$('amsg')||$('pmsg'); if(e) e.innerHTML=`<div class="fk-gate ${bad?'stop':'info'}" style="margin-top:10px"><span>${esc(t)}</span></div>`; };
+
+/* ส่วนเลือกลายเซ็น — ลายเซ็นที่บันทึกไว้ (ของเจ้าตัวเท่านั้น) หรือเซ็นใหม่ */
+function sigPicker(prefix){
+  return `<div class="sigpick">${MYSIG?`<label class="ck"><input type="radio" name="${prefix}_m" value="saved" checked> ใช้ลายเซ็นที่บันทึกไว้</label>`:''}
+      <label class="ck"><input type="radio" name="${prefix}_m" value="draw"${MYSIG?'':' checked'}> เซ็นใหม่</label></div>
+    ${MYSIG?`<div class="savedsig" id="${prefix}_saved"><img src="${esc(MYSIG)}" alt=""></div>`:''}
+    <div id="${prefix}_drawbox"${MYSIG?' hidden':''}><canvas class="pad" id="${prefix}_pad" width="840" height="300"></canvas>
+      <div class="acts2" style="margin:8px 0"><button class="fb" type="button" id="${prefix}_clr">ล้างลายเซ็น</button>
+      <label class="ck" style="font-size:13px"><input type="checkbox" id="${prefix}_keep"> บันทึกเป็นลายเซ็นของฉัน</label></div></div>`;
+}
+function bindSigPicker(prefix){
+  const P=makePad($(prefix+'_pad'), $(prefix+'_clr'));
+  document.querySelectorAll(`[name="${prefix}_m"]`).forEach(r=>r.addEventListener('change',()=>{
+    const draw=document.querySelector(`[name="${prefix}_m"]:checked`).value==='draw';
+    $(prefix+'_drawbox').hidden=!draw; if($(prefix+'_saved')) $(prefix+'_saved').hidden=draw; if(P.onchange) P.onchange(); }));
+  return { pad:P, get(){ const m=document.querySelector(`[name="${prefix}_m"]:checked`).value;
+      if(m==='saved') return MYSIG; return P.dirty() ? P.png() : null; },
+    async keep(png){ if($(prefix+'_keep')&&$(prefix+'_keep').checked&&png) await saveMySig(png); } };
+}
+async function saveMySig(png){
+  await A.db.collection('signatures').doc(A.user.uid).set({png, name:A.myName()||'', updatedAt:now()});
+  MYSIG=png;
+}
+
 function paintActions(acts){
-  const box=$('actbox'); if(!acts.length){ box.innerHTML=''; return; }
-  let h='';
-  if(acts.includes('sign')) h+=`<div class="card"><h3>ลงนามและออกหนังสือ</h3>
-      <p class="hint">ลงนามแล้วระบบออกเลขที่ถัดไปและล็อกวันที่ออกเป็นเวลานี้ทันที แก้ภายหลังไม่ได้</p>
-      <canvas class="pad" id="pad" width="840" height="300"></canvas>
-      <div class="acts2"><button class="fb" id="clr">ล้างลายเซ็น</button>
-        <button class="big pri" id="doSign">ลงนามและออกเลข</button>
-        <button class="big sec" id="doReturn">ตีกลับ</button></div><div id="amsg"></div></div>`;
-  if(acts.includes('resubmit')) h+=`<div class="acts2"><button class="big pri" id="doResubmit">${M.status==='returned'?'ส่งให้ผู้ลงนามอีกครั้ง':'ส่งให้ผู้ลงนาม'}</button></div>`;
-  if(acts.includes('cancel')||acts.includes('cancelIssued')) h+=`<div class="acts2"><button class="big sec" id="doCancel">ยกเลิกฉบับนี้</button></div>`;
-  box.innerHTML=h+'<div id="amsg2"></div>';
-  if($('pad')) pad($('pad'));
-  if($('doSign')) $('doSign').addEventListener('click',signIssue);
+  const box=$('actbox'); let h='';
+  if(acts.includes('legacy')) h+=`<div class="fk-gate warn"><span>ร่างนี้บันทึกไว้ก่อนมีผู้ลงนามสองคน — กด "แก้ร่าง" เพื่อเลือกผู้เสนอและผู้สั่งการ แล้วส่งใหม่</span></div>`;
+  if(acts.includes('propose')) h+=`<div class="card" style="margin-bottom:16px"><h3>ลงนามเสนอ</h3>
+      <p class="hint">ลงนามแล้วระบบออกเลขที่ถัดไป และล็อกวันที่ออกเป็นเวลานี้ทันที แก้ภายหลังไม่ได้ จากนั้นส่งต่อให้ ${esc(M.signers.endorser.name)} รับทราบ/สั่งการ</p>
+      ${sigPicker('ps')}
+      <div class="acts2"><button class="big pri" id="doPropose">ลงนามเสนอและออกเลข</button>
+        <button class="big sec" id="doReturn">ตีกลับให้ผู้จัดทำ</button></div><div id="amsg"></div></div>`;
+  if(acts.includes('endorse')) h+=endorsePanelHtml();
+  if(acts.includes('endoImg')) h+=`<div class="card" style="margin-bottom:16px"><h3>บล็อกสั่งการยังไม่ถูกสร้าง</h3>
+      <p class="hint">การสั่งการบันทึกแล้ว แต่ภาพบล็อกที่วางบนกระดาษยังไม่ได้บันทึก กดเพื่อสร้างจากข้อมูลที่บันทึกไว้</p>
+      <button class="big pri" id="doEndoImg">สร้างบล็อกสั่งการและ PDF</button><div id="amsg"></div></div>`;
+  if(acts.includes('edit')) h+=`<div class="acts2"><a class="big pri" href="?edit=${esc(M.id)}">แก้ร่าง / ส่งให้ผู้เสนอ</a></div>`;
+  if(acts.includes('cancel')) h+=`<div class="acts2"><button class="big sec" id="doCancel">ยกเลิกฉบับนี้</button></div>`;
+  box.innerHTML=h;
+  if($('doPropose')){ const SP=bindSigPicker('ps'); $('doPropose').addEventListener('click',()=>propose(SP)); }
   if($('doReturn')) $('doReturn').addEventListener('click',()=>simple('return'));
-  if($('doResubmit')) $('doResubmit').addEventListener('click',()=>simple('resubmit'));
   if($('doCancel')) $('doCancel').addEventListener('click',()=>simple('cancel'));
+  if($('doEndoImg')) $('doEndoImg').addEventListener('click',finishEndorsement);
+  if(acts.includes('endorse')) bindEndorse();
 }
 async function paintHistory(){
   try{
     const ev=(await MREF.collection('events').get()).docs.map(d=>d.data()).sort((a,b)=>((a.at&&a.at.seconds)||0)-((b.at&&b.at.seconds)||0));
-    const N={draft:'บันทึกร่าง',submit:'ส่งให้ผู้ลงนาม',resubmit:'ส่งอีกครั้ง',return:'ตีกลับ',issue:'ลงนามและออกเลข',cancel:'ยกเลิก',pdf:'สร้าง PDF',supersede:'ถูกแทน'};
-    $('hist').innerHTML=`<h3>ประวัติ</h3><div class="twrap"><table class="ml"><tbody>${ev.map(e=>`<tr style="cursor:default"><td class="mono">${esc(tsFull(e.at))}</td><td>${esc(N[e.action]||e.action)}</td><td>${esc(e.byName||'')}</td><td>${esc(e.note||'')}</td></tr>`).join('')}</tbody></table></div>`;
+    const N={draft:'บันทึกร่าง',submit:'ส่งให้ผู้เสนอ',resubmit:'แก้และส่งอีกครั้ง',return:'ตีกลับ',propose:'ผู้เสนอลงนาม · ออกเลข',
+             endorse:'ผู้สั่งการลงนาม',cancel:'ยกเลิก',pdf:'สร้าง PDF',supersede:'ถูกแทน',record:'ลงทะเบียนฉบับกระดาษ'};
+    $('hist').innerHTML=`<h3>ประวัติ</h3><div class="twrap"><table class="ml"><tbody>${ev.map(e=>`<tr><td class="mono">${esc(tsFull(e.at))}</td><td>${esc(N[e.action]||e.action)}</td><td>${esc(e.byName||'')}</td><td>${esc(e.note||'')}</td></tr>`).join('')}</tbody></table></div>`;
   }catch(e){}
 }
 /* แผ่นลงนาม — เส้นดำบนพื้นโปร่ง ส่งออกเป็น PNG */
-let PAD_DIRTY=false;
-function pad(cv){
+function makePad(cv, clr){
+  if(!cv) return {dirty:()=>false,png:()=>null};
   const x=cv.getContext('2d'); x.lineWidth=3.2; x.lineCap='round'; x.lineJoin='round'; x.strokeStyle='#111';
-  let on=false; const pt=e=>{ const r=cv.getBoundingClientRect(); return [(e.clientX-r.left)*cv.width/r.width,(e.clientY-r.top)*cv.height/r.height]; };
+  let on=false, dirty=false; const o={dirty:()=>dirty, png:()=>cv.toDataURL('image/png'), onchange:null};
+  const pt=e=>{ const r=cv.getBoundingClientRect(); return [(e.clientX-r.left)*cv.width/r.width,(e.clientY-r.top)*cv.height/r.height]; };
   cv.addEventListener('pointerdown',e=>{ on=true; cv.setPointerCapture(e.pointerId); const [a,b]=pt(e); x.beginPath(); x.moveTo(a,b); });
-  cv.addEventListener('pointermove',e=>{ if(!on) return; const [a,b]=pt(e); x.lineTo(a,b); x.stroke(); PAD_DIRTY=true; });
-  cv.addEventListener('pointerup',()=>{ on=false; });
-  $('clr').addEventListener('click',()=>{ x.clearRect(0,0,cv.width,cv.height); PAD_DIRTY=false; });
+  cv.addEventListener('pointermove',e=>{ if(!on) return; const [a,b]=pt(e); x.lineTo(a,b); x.stroke(); dirty=true; });
+  cv.addEventListener('pointerup',()=>{ on=false; if(o.onchange) o.onchange(); });
+  if(clr) clr.addEventListener('click',()=>{ x.clearRect(0,0,cv.width,cv.height); dirty=false; if(o.onchange) o.onchange(); });
+  return o;
 }
-const say=(t,bad)=>{ const e=$('amsg')||$('amsg2')||$('pmsg'); if(e) e.innerHTML=`<div class="fk-gate ${bad?'stop':'info'}" style="margin-top:10px"><span>${esc(t)}</span></div>`; };
 
-/* ลงนาม = ออกเลข + ล็อกวันที่ออก ใน transaction เดียวกับตัวนับ
+/* ── ผู้เสนอลงนาม = ออกเลข + ล็อกวันที่ออก ใน transaction เดียวกับตัวนับ
    เลขที่ = D0507-MEMO-<ปี พ.ศ.>/<ลำดับ 4 หลัก> (<ประเภท>) ลำดับเดียวทั้งองค์กรต่อปี
    ฉบับทดสอบใช้ตัวนับแยก (memo-test) และขึ้นต้นด้วย TEST- ไม่กินเลขจริง */
-async function signIssue(){
-  if(!PAD_DIRTY){ say('ยังไม่ได้ลงลายมือชื่อ',true); return; }
-  if(!confirm('ลงนามและออกเลขที่ตอนนี้? วันที่ออกจะล็อกเป็นเวลานี้ และแก้ไม่ได้อีก')) return;
-  $('doSign').disabled=true; say('กำลังออกเลข…');
-  const sig=$('pad').toDataURL('image/png'), me=A.myName()||A.user.email;
-  const yearBE = new Date(Date.now()+7*3600e3).getUTCFullYear()+543;
+async function propose(SP){
+  const sig=SP.get(); if(!sig){ say('ยังไม่ได้ลงลายมือชื่อ',true); return; }
+  if(!confirm('ลงนามเสนอและออกเลขที่ตอนนี้? วันที่ออกจะล็อกเป็นเวลานี้ และแก้ไม่ได้อีก')) return;
+  $('doPropose').disabled=true; say('กำลังออกเลข…');
+  try{ await SP.keep(sig); }catch(e){}
+  const me=A.myName()||A.user.email, yearBE=new Date(Date.now()+7*3600e3).getUTCFullYear()+543;
   const ctr = M.test ? 'memo-test' : 'memo-'+yearBE;
   let number='';
   try{
     await A.db.runTransaction(async tx=>{
       const cref=A.db.collection('counters').doc(ctr);
-      const [c,m]=[await tx.get(cref), await tx.get(MREF)];
-      if(!m.exists || m.data().status!=='submitted') throw new Error('หนังสือฉบับนี้ไม่ได้อยู่ในสถานะรอลงนามแล้ว');
+      const c=await tx.get(cref), m=await tx.get(MREF);
+      if(!m.exists || m.data().status!=='submitted') throw new Error('หนังสือฉบับนี้ไม่ได้อยู่ในสถานะรอผู้เสนอลงนามแล้ว');
       const seq = c.exists ? c.data().next : 1;
       number = (M.test?'TEST-':'') + 'D0507-MEMO-'+yearBE+'/'+String(seq).padStart(4,'0')+' ('+M.type+')';
       tx.set(cref,{next:seq+1});
-      tx.update(MREF,{ status:'issued', number, seq, year:yearBE, counter:ctr, issuedAt:now(), signature:sig,
-        chain:firebase.firestore.FieldValue.arrayUnion({action:'issue', byUid:A.user.uid, byName:me, at:bkkToday(), note:number}) });
+      tx.update(MREF,{ status:'proposed', number, seq, year:yearBE, counter:ctr, issuedAt:now(), proposerSig:sig,
+        chain:arrU({action:'propose', byUid:A.user.uid, byName:me, at:bkkToday(), note:number}) });
     });
-  }catch(e){ $('doSign').disabled=false; say('ออกเลขไม่สำเร็จ: '+(e.code||e.message),true); return; }
-  try{ await MREF.collection('events').add({action:'issue', byUid:A.user.uid, byName:me, note:number, at:now()}); }catch(e){}
-  try{ const ts=await A.db.collection('tasks').where('memoId','==',M.id).get();
-       for(const d of ts.docs) if(d.data().state==='open') await d.ref.update({state:'done', closedAt:now(), tracking:number}); }catch(e){}
-  // ฉบับเดิมที่ถูกแทน
-  if(M.supersedes&&M.supersedes.id){
-    try{ await A.db.collection('memos').doc(M.supersedes.id).update({status:'superseded', supersededBy:number});
-         await A.db.collection('memos').doc(M.supersedes.id).collection('events').add({action:'supersede', byUid:A.user.uid, byName:me, note:number, at:now()}); }catch(e){}
+  }catch(e){ $('doPropose').disabled=false; say('ออกเลขไม่สำเร็จ: '+(e.code||e.message),true); return; }
+  try{ await MREF.collection('events').add({action:'propose', byUid:A.user.uid, byName:me, note:number, at:now()}); }catch(e){}
+  await closeTasks(M.id, {tracking:number});
+  try{ await taskFor(M.id, Object.assign({}, M, {number}), 'endorser'); }catch(e){}
+  await viewMemo(M.id);
+  await makePdf(false);   // ฉบับรอสั่งการ — ผู้สั่งการใช้เป็นพื้นหลังตอนวางบล็อก
+}
+
+/* ════════════════ ผู้รับทราบ / สั่งการ ════════════════
+   บล็อกสั่งการ = การกระทำ + คำสั่ง (ไม่บังคับ) + ลายเซ็น + ชื่อ ตำแหน่ง วันที่
+   ผู้สั่งการวางบล็อกบนหน้า 1 ของ PDF ฉบับรอสั่งการ ลากย้ายได้ ปรับความกว้างได้
+   ตำแหน่งเก็บเป็นพอยต์จากมุมซ้ายบนของหน้า A4 ตัวส่งออกวางภาพที่ตำแหน่งเดียวกัน */
+const PAGE={w:595.28,h:841.89};
+let ENDO={x:null,y:null,w:250,h:0,img:null,scale:1}, ESP=null;
+function endorsePanelHtml(){
+  const acts=((MT[M.type].signers||{}).endorser||{}).actions||['ACKNOWLEDGED','APPROVED','FOR ACTION','NOT APPROVED'];
+  return `<div class="card" style="margin-bottom:16px"><h3>รับทราบ / สั่งการ</h3>
+    <div class="endogrid"><div class="mf" style="grid-template-columns:1fr">
+      <div><label for="e_act">การสั่งการ</label><select id="e_act">${acts.map(a=>`<option value="${esc(a)}">${esc(a)}${ACTION_TH[a]?' — '+esc(ACTION_TH[a]):''}</option>`).join('')}</select></div>
+      <div><label for="e_text">ให้ดำเนินการอย่างไร (ไม่บังคับ)</label><textarea id="e_text" style="min-height:100px" placeholder="เช่น Proceed as proposed. Update the instructor roster and inform Flight Operations."></textarea>
+        <div class="hint">ข้อความนี้กับลายเซ็นอยู่ในบล็อกเดียวกัน วางลงในที่ว่างบนกระดาษตามตำแหน่งที่ลากไว้</div></div>
+      <div><label for="e_font">แบบอักษรของบล็อก</label><select id="e_font">${Object.keys(FONTS).map(k=>`<option value="${k}"${k===(M.font||'Helvetica')?' selected':''}>${esc(k)}</option>`).join('')}</select></div>
+      <div><label for="e_w">ความกว้างบล็อก <span id="e_wv">250</span> pt</label><input type="range" id="e_w" min="160" max="460" step="5" value="250" style="width:100%"></div>
+      <div><label>ลายเซ็น</label>${sigPicker('es')}</div>
+      <div class="acts2"><button class="big pri" id="doEndorse">ลงนามสั่งการ</button></div><div id="amsg"></div>
+    </div>
+    <div><div class="hint" style="margin-bottom:6px">ลากกรอบสีน้ำเงินไปวางในที่ว่างบนหน้ากระดาษ — ตำแหน่งนี้คือตำแหน่งใน PDF</div>
+      <div class="stage" id="stage"><canvas class="pg" id="pg"></canvas><div class="blk" id="blk"><img id="blkimg" alt=""></div></div>
+      <div class="hint" id="stagemsg">กำลังโหลดหน้ากระดาษ…</div></div></div></div>`;
+}
+async function bindEndorse(){
+  ESP=bindSigPicker('es');
+  const redraw=()=>drawBlock(false);
+  ['e_act','e_text','e_font'].forEach(id=>{ $(id).addEventListener('input',redraw); $(id).addEventListener('change',redraw); });
+  $('e_w').addEventListener('input',()=>{ ENDO.w=+$('e_w').value; $('e_wv').textContent=ENDO.w; redraw(); });
+  ESP.pad.onchange=redraw;
+  $('doEndorse').addEventListener('click',endorse);
+  await drawBlock(false);
+  await loadPage();
+  dragBlock();
+}
+/* วาดบล็อกบน canvas ความละเอียด 3 เท่า — ภาษาไทยในคำสั่งใช้ฟอนต์ระบบแทนได้ */
+async function blockPng(o){
+  const S=3, W=o.w, pad=8, fam=CSSFONT[o.font]||CSSFONT.Helvetica;
+  const cv=document.createElement('canvas'), x=cv.getContext('2d');
+  const wrap=(txt,size,bold)=>{ x.font=(bold?'bold ':'')+size+'px '+fam; const out=[];
+    String(txt||'').split(/\n/).forEach(par=>{ let line=''; par.split(/(\s+)/).forEach(w=>{
+      const t=line+w; if(x.measureText(t).width>W-2*pad && line.trim()){ out.push(line.trim()); line=w.trimStart(); } else line=t; });
+      out.push(line.trim()); }); return out; };
+  const actL=wrap(o.action,11,true), txtL=o.text?wrap(o.text,9.5,false):[];
+  let sig=null; if(o.sig){ sig=await new Promise(r=>{ const i=new Image(); i.onload=()=>r(i); i.onerror=()=>r(null); i.src=o.sig; }); }
+  const sigH=sig?36:24, lines=[...actL.map(t=>({t,s:11,b:true,g:3})),...txtL.map(t=>({t,s:9.5,g:2}))];
+  const tail=[{t:o.name||'',s:9.5,b:true,g:1},{t:o.title||'',s:9,g:1},{t:o.date||'',s:8.5,g:1,c:'#444'}];
+  const H=pad+lines.reduce((a,l)=>a+l.s+l.g,0)+4+sigH+2+tail.reduce((a,l)=>a+l.s+l.g,0)+pad;
+  cv.width=Math.ceil(W*S); cv.height=Math.ceil(H*S); x.scale(S,S);
+  x.fillStyle='#fff'; x.fillRect(0,0,W,H); x.strokeStyle='#555'; x.lineWidth=.8; x.strokeRect(.4,.4,W-.8,H-.8);
+  let y=pad; x.textBaseline='top';
+  for(const l of lines){ x.font=(l.b?'bold ':'')+l.s+'px '+fam; x.fillStyle='#111'; x.fillText(l.t,pad,y); y+=l.s+l.g; }
+  y+=4; if(sig){ const h=sigH, w=Math.min(W-2*pad, sig.width*h/sig.height); x.drawImage(sig,pad,y,w,h); } y+=sigH;
+  x.strokeStyle='#333'; x.beginPath(); x.moveTo(pad,y); x.lineTo(Math.min(W-pad,pad+180),y); x.stroke(); y+=2;
+  for(const l of tail){ x.font=(l.b?'bold ':'')+l.s+'px '+fam; x.fillStyle=l.c||'#111'; x.fillText(l.t,pad,y); y+=l.s+l.g; }
+  return {png:cv.toDataURL('image/png'), h:H};
+}
+async function drawBlock(){
+  const e=M.signers.endorser, r=await blockPng({ w:ENDO.w, font:$('e_font').value, action:$('e_act').value, text:$('e_text').value.trim(),
+    sig:ESP.get(), name:e.name, title:e.title, date:'Date: (set on signature)' });
+  ENDO.h=r.h; $('blkimg').src=r.png; placeBlock();
+}
+function placeBlock(){
+  if(ENDO.x==null){ ENDO.x=PAGE.w-64-ENDO.w; ENDO.y=PAGE.h-54-ENDO.h-24; }   // ค่าตั้งต้น: มุมขวาล่าง เหนือขอบล่าง
+  ENDO.x=Math.max(0,Math.min(PAGE.w-ENDO.w,ENDO.x)); ENDO.y=Math.max(0,Math.min(PAGE.h-ENDO.h,ENDO.y));
+  const k=ENDO.scale, b=$('blk'); if(!b) return;
+  b.style.left=(ENDO.x*k)+'px'; b.style.top=(ENDO.y*k)+'px'; b.style.width=(ENDO.w*k)+'px';
+}
+/* หน้า 1 ของ PDF ฉบับรอสั่งการ — เรนเดอร์ด้วย pdf.js เป็นพื้นหลังให้เห็นที่ว่างจริง */
+async function loadPage(){
+  const msg=$('stagemsg');
+  try{
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+    pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    let r=await A.gas('memoPdfBytes',{memoId:M.id},{timeout:60000});
+    if(!r.ok){ msg.textContent='ยังไม่มี PDF ฉบับรอสั่งการ — กำลังสร้าง…'; await makePdf(false,true); r=await A.gas('memoPdfBytes',{memoId:M.id},{timeout:60000}); }
+    if(!r.ok) throw new Error(r.error);
+    const bytes=Uint8Array.from(atob(r.result.bytes),c=>c.charCodeAt(0));
+    const doc=await pdfjsLib.getDocument({data:bytes}).promise, pg=await doc.getPage(1);
+    const vp1=pg.getViewport({scale:1}); PAGE.w=vp1.width; PAGE.h=vp1.height;
+    const cssW=Math.min(620, $('stage').parentElement.clientWidth-2); ENDO.scale=cssW/PAGE.w;
+    const vp=pg.getViewport({scale:ENDO.scale*2}), cv=$('pg');
+    cv.width=vp.width; cv.height=vp.height; cv.style.width=cssW+'px'; cv.style.height=(PAGE.h*ENDO.scale)+'px';
+    await pg.render({canvasContext:cv.getContext('2d'), viewport:vp}).promise;
+    // ขนาดที่เห็นจริงอาจเล็กกว่าที่ตั้ง (max-width:100%) — วัดใหม่ทุกครั้งที่หน้าจอเปลี่ยน
+    const remeasure=()=>{ const w=cv.getBoundingClientRect().width; if(w){ ENDO.scale=w/PAGE.w; placeBlock(); } };
+    remeasure(); window.addEventListener('resize',remeasure);
+    msg.textContent = doc.numPages>1 ? 'หนังสือมี '+doc.numPages+' หน้า — บล็อกวางได้บนหน้า 1 เท่านั้น' : '';
+    placeBlock();
+  }catch(e){ msg.textContent='โหลดหน้ากระดาษไม่ได้: '+(e.message||e)+' — ยังลงนามได้ บล็อกจะวางที่มุมขวาล่างของหน้า 1'; ENDO.scale=0.9; placeBlock(); }
+}
+function loadScript(src){ return new Promise((ok,no)=>{ if(document.querySelector(`script[src="${src}"]`)) return ok();
+  const s=document.createElement('script'); s.src=src; s.onload=ok; s.onerror=()=>no(new Error('โหลด '+src+' ไม่ได้')); document.head.appendChild(s); }); }
+function dragBlock(){
+  const b=$('blk'); let st=null;
+  b.addEventListener('pointerdown',e=>{ st={x:e.clientX,y:e.clientY,ox:ENDO.x,oy:ENDO.y}; b.setPointerCapture(e.pointerId); e.preventDefault(); });
+  b.addEventListener('pointermove',e=>{ if(!st) return; ENDO.x=st.ox+(e.clientX-st.x)/ENDO.scale; ENDO.y=st.oy+(e.clientY-st.y)/ENDO.scale; placeBlock(); });
+  b.addEventListener('pointerup',()=>{ st=null; });
+}
+/* ลงนามสั่งการ — สองจังหวะ
+   ① transaction: สถานะ + เนื้อหาบล็อก + ตำแหน่ง + endorsedAt = เวลาเซิร์ฟเวอร์
+   ② อ่าน endorsedAt กลับมา แล้ววาดบล็อกพร้อมวันที่จริงจากเซิร์ฟเวอร์ (ไม่ใช่นาฬิกาเครื่อง)
+   ภาพบล็อกเขียนได้ครั้งเดียวโดยผู้สั่งการ แล้วล็อก */
+async function endorse(){
+  const sig=ESP.get(); if(!sig){ say('ยังไม่ได้ลงลายมือชื่อ',true); return; }
+  const action=$('e_act').value, declined=action==='NOT APPROVED';
+  if(!confirm((declined?'ไม่อนุมัติ':'ลงนาม '+action)+' ตอนนี้? บันทึกแล้วแก้ไม่ได้')) return;
+  $('doEndorse').disabled=true; say('กำลังบันทึก…');
+  try{ await ESP.keep(sig); }catch(e){}
+  const me=A.myName()||A.user.email;
+  const endorsement={ action, text:$('e_text').value.trim(), font:$('e_font').value, sig,
+    x:Math.round(ENDO.x*10)/10, y:Math.round(ENDO.y*10)/10, w:ENDO.w, page:1 };
+  try{
+    await A.db.runTransaction(async tx=>{
+      const m=await tx.get(MREF);
+      if(!m.exists || m.data().status!=='proposed') throw new Error('หนังสือไม่ได้อยู่ในสถานะรอสั่งการแล้ว');
+      tx.update(MREF,{ status:declined?'declined':'issued', endorsement, endorsedAt:now(),
+        chain:arrU({action:'endorse', byUid:A.user.uid, byName:me, at:bkkToday(), note:action}) });
+    });
+  }catch(e){ $('doEndorse').disabled=false; say('บันทึกไม่สำเร็จ: '+(e.code||e.message),true); return; }
+  try{ await MREF.collection('events').add({action:'endorse', byUid:A.user.uid, byName:me, note:action, at:now()}); }catch(e){}
+  await closeTasks(M.id);
+  if(!declined && M.supersedes&&M.supersedes.id){
+    try{ await A.db.collection('memos').doc(M.supersedes.id).update({status:'superseded', supersededBy:M.number});
+         await A.db.collection('memos').doc(M.supersedes.id).collection('events').add({action:'supersede', byUid:A.user.uid, byName:me, note:M.number, at:now()}); }catch(e){}
   }
-  say('ออกเลขแล้ว — '+number+' · กำลังสร้าง PDF…');
+  await finishEndorsement();
+}
+async function finishEndorsement(){
+  say('กำลังสร้างบล็อกสั่งการ…');
+  const s=await MREF.get(); M=Object.assign({id:s.id},s.data());
+  const e=M.signers.endorser, en=M.endorsement||{};
+  const r=await blockPng({ w:en.w||250, font:en.font, action:en.action, text:en.text, sig:en.sig, name:e.name, title:e.title,
+    date:'Date: '+tsFull(M.endorsedAt) });
+  try{ await MREF.update({endorsementImg:r.png, endorsementH:Math.round(r.h*10)/10}); }
+  catch(err){ say('บันทึกบล็อกสั่งการไม่สำเร็จ: '+(err.code||err.message),true); return; }
   await viewMemo(M.id);
   await makePdf(false);
 }
-/* PDF สร้างที่ตัวส่งออก (Apps Script) — ล้มได้โดยหนังสือไม่เสีย เลขและวันที่ออกบันทึกไว้แล้ว */
-async function makePdf(manual){
-  say('กำลังสร้าง PDF… (อาจใช้เวลาเกือบนาที)');
+
+/* PDF สร้างที่ตัวส่งออก (Apps Script) จากข้อมูลใน Firestore — ล้มได้โดยหนังสือไม่เสีย
+   ฉบับรอสั่งการเก็บที่ pdfProposed · ฉบับสมบูรณ์เก็บที่ pdf */
+async function makePdf(manual, quiet){
+  if(!quiet) say('กำลังสร้าง PDF… (อาจใช้เวลาเกือบนาที)');
   if($('mkpdf')) $('mkpdf').disabled=true;
   const r=await A.gas('memoPdf', {memoId:M.id}, {timeout:120000});
-  if(!r.ok){ if($('mkpdf')) $('mkpdf').disabled=false; say('ออกหนังสือแล้ว แต่สร้าง PDF ไม่สำเร็จ: '+r.error+' — กด "สร้าง PDF" อีกครั้งได้',true); return; }
-  try{ await MREF.update({pdf:{id:r.result.id, url:r.result.url, at:now()}});
-       await MREF.collection('events').add({action:'pdf', byUid:A.user.uid, byName:A.myName()||'', at:now()}); }catch(e){}
+  if(!r.ok){ if($('mkpdf')) $('mkpdf').disabled=false; if(!quiet) say('สร้าง PDF ไม่สำเร็จ: '+r.error+' — กด "สร้าง PDF" อีกครั้งได้',true); return false; }
+  const key = r.result.stage==='proposed' ? 'pdfProposed' : 'pdf';
+  try{ await MREF.update({[key]:{id:r.result.id, url:r.result.url, at:now()}});
+       await MREF.collection('events').add({action:'pdf', byUid:A.user.uid, byName:A.myName()||'', note:key, at:now()}); }catch(e){}
+  if(quiet) return true;
   await viewMemo(M.id);
   if(manual) say('สร้าง PDF แล้ว');
+  return true;
 }
 async function simple(kind){
   const me=A.myName()||A.user.email;
-  let note='';
-  if(kind==='return'||kind==='cancel'){
-    note=prompt(kind==='return'?'เหตุผลที่ตีกลับ (บังคับ)':'เหตุผลที่ยกเลิก (บังคับ)')||'';
-    if(!note.trim()) return;
-  }
-  const patch={ chain:firebase.firestore.FieldValue.arrayUnion({action:kind, byUid:A.user.uid, byName:me, at:bkkToday(), note}) };
+  const note=prompt(kind==='return'?'เหตุผลที่ตีกลับ (บังคับ)':'เหตุผลที่ยกเลิก (บังคับ)')||'';
+  if(!note.trim()) return;
+  const patch={ chain:arrU({action:kind, byUid:A.user.uid, byName:me, at:bkkToday(), note}) };
   if(kind==='return'){ patch.status='returned'; patch.returnNote=note; }
-  if(kind==='resubmit'){
-    // ร่างที่บันทึกไว้ตอนตำแหน่งยังว่าง ไม่มีผู้ลงนาม — หาใหม่ทุกครั้งที่ส่ง ตามผู้ถือตำแหน่งปัจจุบัน
-    const sg=resolveSigner(M.type, Object.assign({}, M.fields||{}));
-    if(sg.error){ say('ส่งไม่ได้ — ผู้ลงนาม: '+sg.error, true); return; }
-    patch.status='submitted'; patch.signer={uid:sg.uid, name:sg.name, title:sg.title, pos:sg.pos}; M.signer=patch.signer;
-  }
   if(kind==='cancel'){ patch.status='cancelled'; patch.cancelNote=note; patch.cancelledBy=me; }
   try{
     await MREF.update(patch);
     await MREF.collection('events').add({action:kind, byUid:A.user.uid, byName:me, note, at:now()});
-    const ts=await A.db.collection('tasks').where('memoId','==',M.id).get();
-    for(const d of ts.docs) if(d.data().state==='open' && kind!=='resubmit') await d.ref.update({state:'done', closedAt:now(), note});
-    if(kind==='resubmit') await taskFor(M.id, M);
+    await closeTasks(M.id, {note});
     await viewMemo(M.id);
   }catch(e){ say('ทำไม่สำเร็จ: '+(e.code||e.message),true); }
+}
+
+/* ════════════════ ลายเซ็นของฉัน ════════════════
+   เก็บที่ signatures/<uid> — อ่านและเขียนได้เฉพาะเจ้าของ ผู้ดูแลก็ใช้ลายเซ็นของคนอื่นไม่ได้ */
+function mySignature(){
+  $('h1').textContent='ลายเซ็นของฉัน';
+  $('app').innerHTML=`<div class="card" style="max-width:520px">
+    <p class="hint" style="margin-bottom:12px">บันทึกลายเซ็นไว้ครั้งเดียว เวลาลงนามบันทึกข้อความกดปุ่มเดียวได้เลย · ลายเซ็นนี้ใช้ได้เฉพาะตอนคุณเข้าสู่ระบบและเป็นคนกดลงนามเอง คนอื่นรวมถึงผู้ดูแลระบบนำไปใช้แทนไม่ได้</p>
+    ${MYSIG?`<div class="savedsig" style="margin-bottom:12px"><img src="${esc(MYSIG)}" alt=""></div>`:''}
+    <canvas class="pad" id="my_pad" width="840" height="300"></canvas>
+    <div class="acts2"><button class="fb" id="my_clr">ล้าง</button><button class="big pri" id="my_save">บันทึกลายเซ็น</button>
+      ${MYSIG?'<button class="big sec" id="my_del">ลบลายเซ็นที่บันทึกไว้</button>':''}<a class="big sec" href="./">← รายการ</a></div><div id="amsg"></div></div>`;
+  const P=makePad($('my_pad'),$('my_clr'));
+  $('my_save').addEventListener('click',async()=>{ if(!P.dirty()){ say('ยังไม่ได้เซ็น',true); return; }
+    try{ await saveMySig(P.png()); mySignature(); say('บันทึกแล้ว'); }catch(e){ say('บันทึกไม่สำเร็จ: '+(e.code||e.message),true); } });
+  if($('my_del')) $('my_del').addEventListener('click',async()=>{ if(!confirm('ลบลายเซ็นที่บันทึกไว้?')) return;
+    await A.db.collection('signatures').doc(A.user.uid).delete(); MYSIG=null; mySignature(); });
+}
+
+/* ════════════════ ฉบับกระดาษที่ลงนามแล้ว ════════════════
+   สำหรับหนังสือที่ลงนามบนกระดาษจริงในวันนั้นแล้ว — ต้นฉบับกระดาษคือฉบับจริง
+   ระบบเก็บสแกนเป็นหลักฐาน ใช้เลขที่และวันที่ตามที่พิมพ์บนกระดาษ และบันทึกวันที่ถอดความแยกไว้
+   ไม่ออกเลขชุด D0507-MEMO ให้ — เลขชุดนั้นออกได้เฉพาะตอนลงนามในระบบ */
+function paperForm(){
+  $('h1').textContent='ลงทะเบียนฉบับกระดาษที่ลงนามแล้ว';
+  const opts=userOpts(), auth=MT.AUTH;
+  const dutyOpts=auth?((auth.fields.find(f=>f.k==='duty')||{}).opt||[]).map(o=>`<option value="${esc(o.v)}">${esc(A.L(o.n))}</option>`).join(''):'';
+  $('app').innerHTML=`<div class="card"><div class="fk-gate warn"><span>ใช้กับหนังสือที่<b>ลงนามบนกระดาษจริงแล้ว</b>เท่านั้น ต้องแนบสแกนต้นฉบับ · เลขที่และวันที่ต้องตรงกับที่พิมพ์บนกระดาษ · ระบบบันทึกว่าใครถอดความเมื่อไร และติดป้ายว่าต้นฉบับกระดาษเป็นฉบับจริง</span></div>
+    <div class="mf" style="margin-top:12px">
+      <div><label for="p_type">ประเภท</label><select id="p_type">${Object.values(MT).map(t=>`<option value="${esc(t.code)}">${esc(A.L(t.title))}</option>`).join('')}</select></div>
+      <div><label for="p_scan">สแกนต้นฉบับ (PDF / JPG / PNG) <span style="color:var(--red-500)">*</span></label><input type="file" id="p_scan" accept="application/pdf,image/jpeg,image/png"></div>
+      <div><label for="p_no">เลขที่ตามกระดาษ <span style="color:var(--red-500)">*</span></label><input type="text" id="p_no"></div>
+      <div><label for="p_date">วันที่ตามกระดาษ <span style="color:var(--red-500)">*</span></label><input type="date" id="p_date"></div>
+      <div class="full"><label for="p_subj">เรื่อง <span style="color:var(--red-500)">*</span></label><input type="text" id="p_subj"></div>
+      <div><label for="p_pn">ผู้เสนอ (ตามกระดาษ) <span style="color:var(--red-500)">*</span></label><input type="text" id="p_pn"></div>
+      <div><label for="p_en">ผู้รับทราบ / สั่งการ (ตามกระดาษ)</label><input type="text" id="p_en"></div>
+      <div><label for="p_eff">วันมีผล (ถ้ามี)</label><input type="date" id="p_eff"></div>
+      <div><label for="p_exp">หมดอายุ (ถ้ามี)</label><input type="date" id="p_exp"></div>
+      <div id="p_authbox" class="full" style="display:contents">
+        <div><label for="p_ben">ผู้ได้รับแต่งตั้ง (AUTH)</label><select id="p_ben"><option value="">—</option>${opts}<option value="__free">ไม่มีในรายชื่อ — พิมพ์ชื่อเอง</option></select>
+          <input type="text" id="p_ben_free" placeholder="ชื่อ–นามสกุล" style="display:none;margin-top:6px"></div>
+        <div><label for="p_duty">หน้าที่ (AUTH)</label><select id="p_duty"><option value="">—</option>${dutyOpts}</select></div>
+      </div>
+    </div><div class="acts2"><button class="big pri" id="p_save">ลงทะเบียน</button><a class="big sec" href="./">ยกเลิก</a></div><div id="amsg"></div></div>`;
+  const sync=()=>{ const a=$('p_type').value==='AUTH'; $('p_authbox').style.display=a?'contents':'none'; $('p_ben_free').style.display=$('p_ben').value==='__free'?'':'none'; };
+  $('p_type').addEventListener('change',sync); $('p_ben').addEventListener('change',sync); sync();
+  $('p_save').addEventListener('click',savePaper);
+}
+async function savePaper(){
+  const v=id=>$(id).value.trim(), file=$('p_scan').files[0];
+  const miss=[[file,'สแกนต้นฉบับ'],[v('p_no'),'เลขที่'],[v('p_date'),'วันที่'],[v('p_subj'),'เรื่อง'],[v('p_pn'),'ผู้เสนอ']].filter(x=>!x[0]).map(x=>x[1]);
+  if(miss.length){ say('ยังไม่ได้กรอก: '+miss.join(' · '),true); return; }
+  if(/^(TEST-)?D0507-MEMO-/i.test(v('p_no'))){ say('เลขชุด D0507-MEMO ออกได้เฉพาะตอนลงนามในระบบ — ใส่เลขที่ตามที่พิมพ์บนกระดาษ',true); return; }
+  if(v('p_date')>bkkToday()){ say('วันที่ตามกระดาษอยู่ในอนาคต',true); return; }
+  if(file.size>10*1024*1024){ say('ไฟล์ใหญ่เกิน 10 MB',true); return; }
+  const type=v('p_type'); let ben=null, duty='';
+  if(type==='AUTH'){ const b=$('p_ben').value; ben = b==='__free' ? (v('p_ben_free')?{uid:'',name:v('p_ben_free')}:null) : (b?{uid:b,name:userById(b).name}:null); duty=v('p_duty'); }
+  $('p_save').disabled=true; say('กำลังอัปโหลดสแกน…');
+  const b64=await new Promise(r=>{ const fr=new FileReader(); fr.onload=()=>r(String(fr.result).split(',')[1]); fr.readAsDataURL(file); });
+  const up=await A.gas('attach',{code:'MEMO', name:'paper-'+v('p_no').replace(/[^\w.-]+/g,'_')+'-'+file.name, mime:file.type, b64},{timeout:120000});
+  if(!up.ok){ $('p_save').disabled=false; say('อัปโหลดไม่สำเร็จ: '+up.error,true); return; }
+  const me=A.myName()||A.user.email;
+  try{
+    const ref=await A.db.collection('memos').add({ mode:'paper', status:'recorded', type, number:v('p_no'), subject:v('p_subj'),
+      paper:{ number:v('p_no'), date:v('p_date'), scanId:up.result.id, scanUrl:up.result.url, scanName:file.name,
+              proposerName:v('p_pn'), endorserName:v('p_en') },
+      fields: type==='AUTH' ? {beneficiary:ben, duty} : {}, effectiveFrom:v('p_eff'), expiresOn:v('p_exp'),
+      beneficiaryUid:(ben&&ben.uid)||'', beneficiaryKey:personKey(ben), beneficiaryName:(ben&&ben.name)||'',
+      transcribedAt:now(), createdBy:A.user.uid, createdByName:me, createdAt:now(), test:false,
+      chain:[{action:'record', byUid:A.user.uid, byName:me, at:bkkToday()}] });
+    await ref.collection('events').add({action:'record', byUid:A.user.uid, byName:me, note:file.name, at:now()});
+    location.href='?id='+encodeURIComponent(ref.id);
+  }catch(e){ $('p_save').disabled=false; say('บันทึกไม่สำเร็จ: '+(e.code||e.message),true); }
+}
+function viewPaper(){
+  const p=M.paper||{};
+  $('h1').textContent=M.number; $('sub').textContent='ฉบับกระดาษที่ลงนามแล้ว · ต้นฉบับกระดาษเป็นฉบับจริง';
+  $('app').innerHTML=`<div class="acts2"><a class="big sec" href="./">← รายการ</a><a class="big pri" href="${esc(p.scanUrl)}" target="_blank" rel="noopener">เปิดสแกนต้นฉบับ ↗</a>
+      ${A.isAdmin()&&M.status==='recorded'?'<button class="big sec" id="doCancel">ยกเลิกรายการนี้</button>':''}</div>
+    ${M.cancelNote?`<div class="fk-gate warn"><span><b>ยกเลิก:</b> ${esc(M.cancelNote)}</span></div>`:''}
+    <div class="card"><table class="ml"><tbody>
+      <tr><th>เลขที่ตามกระดาษ</th><td>${esc(p.number)}</td></tr><tr><th>วันที่ตามกระดาษ</th><td>${esc(long(p.date))}</td></tr>
+      <tr><th>เรื่อง</th><td>${esc(M.subject)}</td></tr><tr><th>ผู้เสนอ</th><td>${esc(p.proposerName)}</td></tr>
+      <tr><th>ผู้รับทราบ / สั่งการ</th><td>${esc(p.endorserName||'—')}</td></tr>
+      ${M.beneficiaryName?`<tr><th>ผู้ได้รับแต่งตั้ง</th><td>${esc(M.beneficiaryName)} · ${esc((M.fields||{}).duty||'')}</td></tr>`:''}
+      <tr><th>มีผล / หมดอายุ</th><td>${esc(long(M.effectiveFrom)||'—')} / ${esc(long(M.expiresOn)||'—')}</td></tr>
+      <tr><th>ถอดความเข้าระบบ</th><td>${esc(tsFull(M.transcribedAt))} โดย ${esc(M.createdByName||'')}</td></tr>
+    </tbody></table></div><div id="amsg"></div><div id="hist" style="margin-top:18px"></div>`;
+  if($('doCancel')) $('doCancel').addEventListener('click',()=>simple('cancel'));
+  paintHistory();
 }
 </script>
 </body></html>
