@@ -3,7 +3,8 @@
  *
  * ทำที่นี่เพราะการตั้งรหัสให้บัญชีของคนอื่นต้องใช้ Firebase Admin API (accounts:update)
  * เบราว์เซอร์ของผู้ดูแลทำเองไม่ได้ · สคริปต์เรียกด้วยสิทธิ์ของเจ้าของสคริปต์
- * (scope identitytoolkit ใน appsscript.json — เจ้าของต้องกดอนุญาตหนึ่งครั้ง ดู grantPasswordAccess)
+ * (scope cloud-platform ใน appsscript.json — scope identitytoolkit อย่างเดียวไม่พอ ได้ "insufficient authentication scopes"
+ *  เจ้าของต้องกดอนุญาตหนึ่งครั้ง ดู grantPasswordAccess)
  *
  * ขั้นตอน
  *   1) ผู้เรียกต้องอยู่ใน config/admins — อ่านด้วย token ของผู้เรียกเอง (กติกาเดียวกับหน้าเว็บ)
@@ -16,7 +17,7 @@
 function setTempPw_(body, who) {
   var uid = String(body.uid || '');
   var pw = String(body.password || '');
-  if (!/^[A-Za-z0-9]{6,128}$/.test(uid)) throw new Error('uid ไม่ถูกต้อง');
+  if (!/^[A-Za-z0-9_-]{6,128}$/.test(uid)) throw new Error('uid ไม่ถูกต้อง');
   if (pw.length < 8 || pw.length > 64 || /\s/.test(pw)) throw new Error('รหัสชั่วคราวต้องยาว 8–64 ตัว ไม่มีช่องว่าง');
 
   var admins = {};
@@ -29,10 +30,12 @@ function setTempPw_(body, who) {
     headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() },
     payload: JSON.stringify({ localId: uid, password: pw }) });
   if (res.getResponseCode() !== 200) {
-    var msg = res.getContentText().slice(0, 300);
-    if (res.getResponseCode() === 403 || /insufficient|scope/i.test(msg))
-      throw new Error('สคริปต์ยังไม่ได้รับอนุญาตให้ตั้งรหัส — เจ้าของสคริปต์ต้องเปิด Apps Script แล้วรัน grantPasswordAccess หนึ่งครั้ง');
-    throw new Error('ตั้งรหัสไม่สำเร็จ (' + res.getResponseCode() + '): ' + msg);
+    var msg = res.getContentText().slice(0, 400);
+    var why = '';
+    try { why = JSON.parse(res.getContentText()).error.message; } catch (e) { why = msg; }
+    if (/insufficient.*scope/i.test(msg))
+      throw new Error('สคริปต์ยังไม่ได้รับอนุญาตให้ตั้งรหัส — เจ้าของสคริปต์ต้องรัน grantPasswordAccess หนึ่งครั้ง (' + why + ')');
+    throw new Error('ตั้งรหัสไม่สำเร็จ (' + res.getResponseCode() + '): ' + why);
   }
 
   var logged = true;
@@ -61,7 +64,7 @@ function fsCreate_(coll, idToken, data) {
 }
 
 /**
- * รันหนึ่งครั้งจากหน้าแก้ไข Apps Script (เจ้าของสคริปต์) เพื่อกดอนุญาต scope identitytoolkit
+ * รันหนึ่งครั้งจากหน้าแก้ไข Apps Script (เจ้าของสคริปต์) เพื่อกดอนุญาต scope cloud-platform
  * แล้วตรวจว่าเรียก Firebase Admin API ได้จริง — อ่านข้อมูลบัญชีของผู้ดูแลคนแรกหนึ่งบัญชี ไม่แก้อะไร
  */
 function grantPasswordAccess() {
