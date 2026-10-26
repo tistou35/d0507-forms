@@ -89,7 +89,12 @@
       }
       A.full = false;
       if (A.user && A.reg) await A.hydrate();
+      /* เข้าด้วยอีเมล + รหัสชั่วคราวที่ผู้ดูแลตั้งให้ → ต้องตั้งรหัสใหม่ก่อนใช้งาน
+         เข้าด้วย Google ไม่ต้อง (รหัสชั่วคราวใช้กับการเข้าด้วยอีเมลเท่านั้น) */
+      A.signInBy = '';
+      if (A.user) { try { A.signInBy = (await A.user.getIdTokenResult()).signInProvider || ''; } catch (e) {} }
       A.paintAuth();
+      if (A.user && A.profile && A.profile.mustChangePw && A.signInBy === 'password') A.pwDialog(true);
       if (onChange) onChange(A.user, A.roles);
     });
   };
@@ -152,6 +157,55 @@
   A.signup = (em, pw) => firebase.auth().createUserWithEmailAndPassword(em, pw);
   A.logout = () => firebase.auth().signOut();
 
+  /* เปลี่ยนรหัสผ่าน — force = รหัสชั่วคราวจากผู้ดูแล ปิดไม่ได้จนกว่าจะตั้งใหม่ (หรือออกจากระบบ)
+     ไม่ force = เปลี่ยนเอง ต้องใส่รหัสเดิมยืนยันตัวตนก่อน (Firebase บังคับเมื่อเข้าสู่ระบบมานาน) */
+  A.pwDialog = function (force) {
+    const L = A.L, esc = A.esc;
+    let dlg = document.getElementById('d0507-pw');
+    if (dlg) dlg.remove();
+    dlg = document.createElement('dialog'); dlg.id = 'd0507-pw';
+    dlg.style.cssText = 'max-width:420px;width:calc(100% - 32px);border:0;border-radius:12px;padding:22px;margin:auto;inset:0;'
+      + 'box-shadow:0 20px 60px rgba(0,0,0,.35);background:var(--surface,#fff);color:var(--fg-1,#111)';
+    dlg.innerHTML = `<form method="dialog" style="display:flex;flex-direction:column;gap:12px">
+      <b style="font-size:16px">${esc(force ? L({ th: 'ตั้งรหัสผ่านใหม่ก่อนใช้งาน', en: 'Set a new password to continue' })
+                                     : L({ th: 'เปลี่ยนรหัสผ่าน', en: 'Change password' }))}</b>
+      ${force ? `<p style="font-size:13.5px;margin:0;color:var(--fg-2)">${esc(L({ th: 'คุณเข้าด้วยรหัสชั่วคราวที่ผู้ดูแลตั้งให้ ตั้งรหัสของคุณเองก่อน', en: 'You signed in with a temporary password set by an administrator. Choose your own password first.' }))}</p>`
+              : `<label style="font-size:13px">${esc(L({ th: 'รหัสผ่านเดิม', en: 'Current password' }))}<input id="pwOld" type="password" autocomplete="current-password" style="width:100%;min-height:40px;margin-top:4px"></label>`}
+      <label style="font-size:13px">${esc(L({ th: 'รหัสผ่านใหม่ (อย่างน้อย 8 ตัว)', en: 'New password (at least 8 characters)' }))}<input id="pwNew" type="password" autocomplete="new-password" style="width:100%;min-height:40px;margin-top:4px"></label>
+      <label style="font-size:13px">${esc(L({ th: 'ยืนยันรหัสผ่านใหม่', en: 'Confirm new password' }))}<input id="pwNew2" type="password" autocomplete="new-password" style="width:100%;min-height:40px;margin-top:4px"></label>
+      <p id="pwErr" style="color:var(--red-600);font-size:13px;margin:0" hidden></p>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        ${force ? `<button type="button" class="big sec" id="pwOut">${esc(L({ th: 'ออกจากระบบ', en: 'Sign out' }))}</button>`
+                : `<button type="button" class="big sec" id="pwCancel">${esc(L({ th: 'ยกเลิก', en: 'Cancel' }))}</button>`}
+        <button type="button" class="big pri" id="pwGo">${esc(L({ th: 'บันทึก', en: 'Save' }))}</button></div></form>`;
+    document.body.appendChild(dlg);
+    const $ = id => document.getElementById(id), err = t => { $('pwErr').hidden = !t; $('pwErr').textContent = t || ''; };
+    if (force) dlg.addEventListener('cancel', e => e.preventDefault());   // กด Esc ปิดไม่ได้
+    if ($('pwOut')) $('pwOut').onclick = () => { dlg.close(); A.logout(); };
+    if ($('pwCancel')) $('pwCancel').onclick = () => dlg.close();
+    $('pwGo').onclick = async () => {
+      const n = $('pwNew').value, n2 = $('pwNew2').value;
+      if (n.length < 8) return err(L({ th: 'รหัสผ่านใหม่ต้องยาวอย่างน้อย 8 ตัว', en: 'At least 8 characters' }));
+      if (n !== n2) return err(L({ th: 'รหัสผ่านใหม่สองช่องไม่ตรงกัน', en: 'The two new passwords do not match' }));
+      $('pwGo').disabled = true; err('');
+      try {
+        const u = firebase.auth().currentUser;
+        if (!force) await u.reauthenticateWithCredential(firebase.auth.EmailAuthProvider.credential(u.email, $('pwOld').value));
+        await u.updatePassword(n);
+        try { await A.db.collection('users').doc(u.uid).set({ mustChangePw: false,
+                pwChangedAt: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true }); } catch (e) {}
+        if (A.profile) A.profile.mustChangePw = false;
+        dlg.close(); alert(L({ th: 'เปลี่ยนรหัสผ่านแล้ว', en: 'Password changed' }));
+      } catch (e) {
+        $('pwGo').disabled = false;
+        err(e && e.code === 'auth/requires-recent-login'
+          ? L({ th: 'เข้าสู่ระบบมานานแล้ว — ออกแล้วเข้าใหม่ก่อนเปลี่ยนรหัส', en: 'Please sign out and sign in again first' })
+          : A.authError(e));
+      }
+    };
+    dlg.showModal();
+  };
+
   /* แถบผู้ใช้ + ซ่อนเมนูของเจ้าหน้าที่เมื่อยังไม่ login */
   A.paintAuth = function () {
     const box = document.getElementById('authbox');
@@ -164,6 +218,9 @@
         ? `<span class="acct"><span class="av">${A.esc((A.myName() || '?').slice(0, 2).toUpperCase())}</span>
              <span class="who"><b>${A.esc(A.myName())}</b>
              <span>${A.roles.length ? A.esc(A.roleNames().join(' · ')) : A.esc(A.t('noRole'))}</span></span></span>
+           ${(A.user.providerData || []).some(p => p.providerId === 'password')
+             ? `<a class="acct" href="#" onclick="D0507.pwDialog(false);return false" style="padding:0 12px">
+                  <span class="who"><b>${A.esc(A.L({ th: 'รหัสผ่าน', en: 'Password' }))}</b><span>${A.esc(A.L({ th: 'เปลี่ยน', en: 'Change' }))}</span></span></a>` : ''}
            <a class="acct" href="#" onclick="D0507.logout();return false" style="padding:0 16px">
              <span class="who"><b>${A.esc(A.t('signOut'))}</b><span>${A.esc(A.t('signOutSub'))}</span></span></a>`
         : `<a class="acct" href="${base}staff-login/?next=${

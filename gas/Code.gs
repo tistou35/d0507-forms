@@ -136,6 +136,12 @@ function doPost(e) {
 
     /* PDF ของบันทึกข้อความที่ออกแล้ว (ดู Memo.gs) — อ่านตัวหนังสือจาก Firestore ด้วย token
        ของผู้เรียก ไม่รับเนื้อหาจากหน้าเว็บ กันการทำ PDF "ฉบับลงนาม" ที่ไม่ตรงกับที่ออกจริง */
+    /* ตั้งรหัสผ่านชั่วคราว (ดู Password.gs) — ตรวจผู้ดูแลจาก config/admins ด้วย token ของผู้เรียก */
+    if (body.action === 'setTempPw') {
+      if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบเจ้าหน้าที่ก่อน');
+      return json_({ ok: true, result: setTempPw_(body, who) });
+    }
+
     if (body.action === 'memoPdf') {
       if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบเจ้าหน้าที่ก่อน');
       return json_({ ok: true, result: memoPdf_(body) });

@@ -388,7 +388,7 @@ section[data-pane].off{display:none}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="../../assets/app.js?v=883f86ea"></script>
+<script src="../../assets/app.js?v=74b93d1d"></script>
 <script>D0507.GAS_URL='https://script.google.com/macros/s/AKfycby7rFFVxd92wPImX4m8pv8nHqTrK3Iq0O32A34844DAg1rP8N3RfgKEyGvAUkQu-NXd/exec';</script>
 <script>
 "use strict";
@@ -673,7 +673,7 @@ async function adminLog(action, target, detail){
   } catch (e) { console.warn('adminLog', e); }
 }
 const ALOG_N = { view:'เปิดดูข้อมูลผู้ใช้', edit:'แก้ข้อมูลผู้ใช้', create:'เพิ่มผู้ใช้', pwreset:'ส่งลิงก์ตั้งรหัสผ่านใหม่',
-                 dirEdit:'แก้รายชื่อผู้รับฟอร์ม', dirAdd:'เพิ่มเข้ารายชื่อผู้รับฟอร์ม', dirRemove:'เอาออกจากรายชื่อผู้รับฟอร์ม' };
+                 pwtemp:'ตั้งรหัสผ่านชั่วคราว', dirEdit:'แก้รายชื่อผู้รับฟอร์ม', dirAdd:'เพิ่มเข้ารายชื่อผู้รับฟอร์ม', dirRemove:'เอาออกจากรายชื่อผู้รับฟอร์ม' };
 async function paintAdminLog(){
   const host = document.getElementById('alog'); if (!host) return;
   try {
@@ -717,7 +717,15 @@ function editUser(uid){
       <p class="hint">ไม่มีใครดูรหัสผ่านได้ รวมถึงผู้ดูแล — ระบบเก็บแบบเข้ารหัสทางเดียว ·
         กรณีลืมหรืออยากตั้งใหม่ ส่งลิงก์ให้เจ้าตัวตั้งรหัสใหม่เองทางอีเมล (ลิงก์ใช้ได้ครั้งเดียว มีอายุจำกัด)</p>
       ${u.email ? `<button type="button" class="fb" id="ePw">ส่งลิงก์ตั้งรหัสผ่านใหม่ไปที่ ${A.esc(u.email)}</button>`
-                : '<p class="hint">บัญชีนี้ไม่มีอีเมล</p>'}</div>
+                : '<p class="hint">บัญชีนี้ไม่มีอีเมล</p>'}
+      ${uid !== A.user.uid ? `<div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--border-light)">
+        <p class="hint">หรือตั้งรหัสชั่วคราวให้ แล้วแจ้งเจ้าตัวเอง — ใช้กับการเข้าด้วยอีเมล เข้าครั้งถัดไประบบบังคับให้ตั้งรหัสใหม่ ·
+          เข้าด้วย Google ยังใช้ได้ตามเดิม · ระบบไม่เก็บรหัสนี้ ปิดหน้าต่างแล้วดูอีกไม่ได้</p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
+          <input id="eTmp" type="text" autocomplete="off" spellcheck="false" style="font-family:var(--font-mono);max-width:200px">
+          <button type="button" class="fb" id="eTmpGen">สุ่มใหม่</button>
+          <button type="button" class="fb" id="eTmpSet">ตั้งรหัสชั่วคราวนี้</button></div>
+        <div class="hint" id="eTmpMsg"></div></div>` : ''}</div>
     <div class="msg" id="eMsg"></div>`;
   adminLog('view', u, '');
   document.getElementById('udf').innerHTML =
@@ -727,6 +735,29 @@ function editUser(uid){
   document.getElementById('eCert').value = u.cert || '';
   chips(document.getElementById('eRoles'), ROLE_KEYS, R, RN);
   chips(document.getElementById('ePos'), POS_KEYS, P, k => k + ' · ' + POS_N[k]);
+  /* รหัสชั่วคราว 10 ตัว — ตัดตัวที่อ่านสับสน (0/O · 1/l/I) เพราะต้องบอกกันด้วยปากหรือกระดาษ */
+  const genTmp = () => { const AB = 'ABCDEFGHJKMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+    return [...crypto.getRandomValues(new Uint32Array(10))].map(x => AB[x % AB.length]).join(''); };
+  const tmp = document.getElementById('eTmp');
+  if (tmp) {
+    tmp.value = genTmp();
+    document.getElementById('eTmpGen').onclick = e => { e.preventDefault(); tmp.value = genTmp(); };
+    document.getElementById('eTmpSet').onclick = async e => {
+      e.preventDefault();
+      const m = document.getElementById('eTmpMsg'), v = tmp.value.trim();
+      if (v.length < 8 || /\s/.test(v)) { m.textContent = 'ต้องยาวอย่างน้อย 8 ตัว ไม่มีช่องว่าง'; return; }
+      if (!confirm('ตั้งรหัสชั่วคราวให้ ' + (u.name || u.email) + ' ?\nรหัสเดิมจะใช้ไม่ได้ทันที')) return;
+      e.target.disabled = true; m.textContent = 'กำลังตั้งรหัส…';
+      const r = await A.gas('setTempPw', { uid, password: v, targetName: u.name || '', targetEmail: u.email || '',
+                                           byName: A.myName() || '' }, { timeout: 60000 });
+      if (!r.ok) { e.target.disabled = false; m.textContent = 'ตั้งไม่สำเร็จ: ' + r.error; return; }
+      try { await A.db.collection('users').doc(uid).set({ mustChangePw: true }, { merge: true }); } catch (err) {}
+      tmp.readOnly = true;
+      m.innerHTML = '<b style="color:var(--green-600)">ตั้งแล้ว</b> — แจ้งรหัสนี้ให้เจ้าตัวทางที่ปลอดภัย (ไม่ใช่กลุ่มแชต) · เข้าด้วยอีเมลครั้งถัดไปต้องตั้งรหัสใหม่'
+        + (r.result && r.result.logged === false ? ' · ⚠️ บันทึก log ไม่สำเร็จ' : '');
+      paintAdminLog();
+    };
+  }
   const pw = document.getElementById('ePw');
   if (pw) pw.addEventListener('click', async e => {
     e.preventDefault();
