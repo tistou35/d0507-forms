@@ -27,7 +27,7 @@ function setTempPw_(body, who) {
 
   var res = UrlFetchApp.fetch('https://identitytoolkit.googleapis.com/v1/projects/' + cfg_('FIREBASE_PROJECT') + '/accounts:update', {
     method: 'post', contentType: 'application/json', muteHttpExceptions: true,
-    headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() },
+    headers: adminHeaders_(),
     payload: JSON.stringify({ localId: uid, password: pw }) });
   if (res.getResponseCode() !== 200) {
     var msg = res.getContentText().slice(0, 400);
@@ -70,9 +70,19 @@ function fsCreate_(coll, idToken, data) {
 function grantPasswordAccess() {
   var res = UrlFetchApp.fetch('https://identitytoolkit.googleapis.com/v1/projects/' + cfg_('FIREBASE_PROJECT') + '/accounts:query', {
     method: 'post', contentType: 'application/json', muteHttpExceptions: true,
-    headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() },
+    headers: adminHeaders_(),
     payload: JSON.stringify({ returnUserInfo: false }) });
-  Logger.log('Firebase Admin API: %s %s', res.getResponseCode(), res.getContentText().slice(0, 200));
-  if (res.getResponseCode() !== 200) throw new Error('ยังเรียกไม่ได้ — บัญชีเจ้าของสคริปต์ต้องมีสิทธิ์ในโปรเจกต์ Firebase');
+  Logger.log('Firebase Admin API: %s %s', res.getResponseCode(), res.getContentText().slice(0, 400));
+  if (res.getResponseCode() !== 200) {
+    var why = res.getContentText().slice(0, 400);
+    try { why = JSON.parse(res.getContentText()).error.message; } catch (e) {}
+    throw new Error('ยังเรียกไม่ได้ (' + res.getResponseCode() + '): ' + why);
+  }
   return 'พร้อมใช้ — ตั้งรหัสชั่วคราวจากหน้าตั้งค่าระบบได้แล้ว';
+}
+
+/* token ของเจ้าของสคริปต์ออกในนามโปรเจกต์ Cloud ที่ Apps Script สร้างเอง ซึ่งไม่ได้เปิด Identity Toolkit API
+   x-goog-user-project ให้คิดโควตาและตรวจ API กับโปรเจกต์ Firebase แทน (เจ้าของต้องมีสิทธิ์ในโปรเจกต์นั้น) */
+function adminHeaders_() {
+  return { Authorization: 'Bearer ' + ScriptApp.getOAuthToken(), 'x-goog-user-project': cfg_('FIREBASE_PROJECT') };
 }
