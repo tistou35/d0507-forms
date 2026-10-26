@@ -94,6 +94,7 @@
       A.signInBy = '';
       if (A.user) { try { A.signInBy = (await A.user.getIdTokenResult()).signInProvider || ''; } catch (e) {} }
       A.paintAuth();
+      A.queueCount();
       if (A.user && A.profile && A.profile.mustChangePw && A.signInBy === 'password') A.pwDialog(true);
       if (onChange) onChange(A.user, A.roles);
     });
@@ -156,6 +157,23 @@
   A.loginEmail = (em, pw) => firebase.auth().signInWithEmailAndPassword(em, pw);
   A.signup = (em, pw) => firebase.auth().createUserWithEmailAndPassword(em, pw);
   A.logout = () => firebase.auth().signOut();
+
+  /* ตัวเลขบนเมนู "งานของฉัน" — งานที่ส่งถึงฉันและยังเปิดอยู่ ทุกหน้า
+     เดิมมีแค่หน้างานของฉันที่นับ หน้าอื่นขึ้น 0 ที่เขียนไว้ในแม่แบบตลอด ·
+     กรองด้วย assigneeUid อย่างเดียวแล้วนับ state ในเครื่อง — where สองช่องต้องมี composite index
+     ซึ่งไม่มี คำค้นจึงล้มเงียบ ๆ (หน้าแรกเคยเป็นแบบนั้น) */
+  A.queueCount = async function () {
+    const els = document.querySelectorAll('[data-cnt="queue"]');
+    if (!els.length) return;
+    if (!A.user) { els.forEach(e => { e.textContent = ''; e.style.display = 'none'; }); return; }
+    try {
+      const s = await A.db.collection('tasks').where('assigneeUid', '==', A.user.uid).get();
+      const n = s.docs.filter(d => d.data().state === 'open').length;
+      els.forEach(e => { e.textContent = n; e.style.display = n ? '' : 'none'; });   // .pill เป็น display:grid ทับ hidden
+      A.myOpenTasks = s.docs.filter(d => d.data().state === 'open').map(d => Object.assign({ id: d.id }, d.data()));
+      return n;
+    } catch (e) { els.forEach(el => { el.textContent = '—'; el.style.display = ''; }); }
+  };
 
   /* เปลี่ยนรหัสผ่าน — force = รหัสชั่วคราวจากผู้ดูแล ปิดไม่ได้จนกว่าจะตั้งใหม่ (หรือออกจากระบบ)
      ไม่ force = เปลี่ยนเอง ต้องใส่รหัสเดิมยืนยันตัวตนก่อน (Firebase บังคับเมื่อเข้าสู่ระบบมานาน) */

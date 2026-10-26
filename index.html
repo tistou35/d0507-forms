@@ -146,7 +146,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="assets/app.js?v=74b93d1d"></script>
+<script src="assets/app.js?v=edfcb1b3"></script>
 <script>D0507.GAS_URL='https://script.google.com/macros/s/AKfycby7rFFVxd92wPImX4m8pv8nHqTrK3Iq0O32A34844DAg1rP8N3RfgKEyGvAUkQu-NXd/exec';</script>
 <script>
 "use strict";
@@ -263,13 +263,13 @@ document.getElementById('q').addEventListener('input', search);
 async function loadQueue() {
   const sec = document.getElementById('queuesec');
   try {
-    const snap = await A.db.collection('tasks')
-      .where('assigneeUid', '==', A.user.uid).where('state', '==', 'open').limit(3).get();
-    const n = snap.size;
-    document.querySelectorAll('[data-cnt="queue"]').forEach(e => e.textContent = n);
+    // นับจาก A.queueCount (ตัวเดียวกับเมนู) — where สองช่องต้องมี composite index ที่ไม่มี
+    const n = await A.queueCount();
+    if (n == null) throw new Error(A.t('queueDown'));
+    const top = (A.myOpenTasks || []).sort((x, y) => ((y.createdAt && y.createdAt.seconds) || 0) - ((x.createdAt && x.createdAt.seconds) || 0)).slice(0, 3);
     sec.classList.remove('hide');
     document.getElementById('queue').innerHTML = n
-      ? snap.docs.map(d => { const t = d.data();
+      ? top.map(t => {
           return `<a class="stat amb lk" href="queue/"><div class="top">
             <span><span class="ti">${A.esc(t.title || t.formCode)}</span>
             <span class="en">${A.esc(t.tracking || '')}</span></span></div>
