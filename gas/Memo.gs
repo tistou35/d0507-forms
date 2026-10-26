@@ -167,6 +167,30 @@ function pngBlob_(dataUrl) {
   return Utilities.newBlob(Utilities.base64Decode(String(dataUrl).split(',')[1]), 'image/png', 'img.png');
 }
 
+/* แชร์ PDF ฉบับสมบูรณ์ให้คนที่เกี่ยวข้อง — ผู้จัดทำ · ผู้เสนอ · ผู้สั่งการ · ผู้ดูแลระบบ (ดูอย่างเดียว)
+   ไม่เปิด "ทุกคนที่มีลิงก์" เพราะเป็นหนังสือที่ลงนามแล้ว · อีเมลอ่านจาก users ด้วย token ของผู้เรียก
+   อีเมลที่ไม่ใช่บัญชี Google เพิ่มไม่ได้ (Drive ปฏิเสธ) — ข้ามไปและรายงานกลับ คนกลุ่มนี้เปิด PDF ในระบบได้อยู่แล้ว */
+function memoShare_(body) {
+  var id = String(body.memoId || '');
+  if (!/^[A-Za-z0-9_-]{1,64}$/.test(id)) throw new Error('memoId ไม่ถูกต้อง');
+  var m = fsGet_('memos/' + id, body.idToken);
+  if (!m.pdf || !m.pdf.id) throw new Error('ยังไม่มี PDF ฉบับสมบูรณ์');
+  var file = DriveApp.getFileById(m.pdf.id);
+  var S = m.signers || {}, uids = [m.createdBy, S.proposer && S.proposer.uid, S.endorser && S.endorser.uid];
+  try { (fsGet_('config/admins', body.idToken).uids || []).forEach(function (u) { uids.push(u); }); } catch (e) {}
+  var seen = {}, shared = [], skipped = [];
+  uids.filter(function (u) { return u && !seen[u] && (seen[u] = true); }).forEach(function (u) {
+    var em = '';
+    try { em = fsGet_('users/' + u, body.idToken).email || ''; } catch (e) {}
+    if (!em) return;
+    try { file.addViewer(em); shared.push(em); } catch (e) { skipped.push(em); }
+  });
+  var folder = file.getParents().hasNext() ? file.getParents().next() : null, path = [];
+  for (var f = folder, i = 0; f && i < 3; i++) { path.unshift(f.getName()); var ps = f.getParents(); f = ps.hasNext() ? ps.next() : null; }
+  return { url: file.getUrl(), name: file.getName(), folderUrl: folder ? folder.getUrl() : '',
+           folderPath: path.join(' › '), shared: shared, skipped: skipped };
+}
+
 function memoFolder_(yearBE, test) {
   var top = subFolder_('MEMO');
   var nm = test ? 'TEST' : String(yearBE);

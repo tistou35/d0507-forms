@@ -612,10 +612,12 @@ async function viewMemo(id){
     <div class="noprint" id="actbox"></div>
     <div class="noprint" id="pmsg"></div>
     ${acts.includes('endorse')?'':`<div id="letterbox">${letterHtml(M)}</div>`}
+    <div class="noprint" id="filebox" style="margin-top:18px"></div>
     <div class="noprint" id="ackbox" style="margin-top:18px"></div>
     <div class="noprint" id="hist" style="margin-top:18px"></div>`;
   if($('mkpdf')) $('mkpdf').addEventListener('click',()=>makePdf(true));
   if(!acts.includes('endorse')) showPdfPages();
+  paintFile();
   if(M.circular) paintAcks();
   paintActions(acts);
   paintHistory();
@@ -873,6 +875,38 @@ function placeBlock(){
   const k=ENDO.scale, b=$('blk'); if(!b) return;
   b.style.left=(ENDO.x*k)+'px'; b.style.top=(ENDO.y*k)+'px'; b.style.width=(ENDO.w*k)+'px';
 }
+/* ── ที่เก็บไฟล์ ── PDF ฉบับสมบูรณ์อยู่ใน Google Drive แชร์ให้ผู้จัดทำ ผู้เสนอ ผู้สั่งการ และผู้ดูแล (ดูอย่างเดียว) */
+function paintFile(){
+  const box=$('filebox'), p=M.pdf; if(!box) return;
+  if(!p||!p.url||!['issued','declined','superseded','expired'].includes(M.status)){ box.innerHTML=''; return; }
+  const sh=p.share||{}, canShare=A.isAdmin()||[M.createdBy,(M.signers||{}).proposer&&M.signers.proposer.uid,(M.signers||{}).endorser&&M.signers.endorser.uid].includes(A.user.uid);
+  box.innerHTML=`<div class="card"><h3>ที่เก็บไฟล์ PDF</h3>
+    <table class="ml"><tbody>
+      <tr><th style="width:150px">ไฟล์</th><td>${esc(sh.name||((M.number||'').replace(/\//g,'_')+'.pdf'))}</td></tr>
+      <tr><th>Google Drive</th><td><a href="${esc(p.url)}" target="_blank" rel="noopener" style="word-break:break-all">${esc(p.url)}</a>
+        <button class="fb" type="button" id="cpUrl" style="margin-left:6px">คัดลอก</button></td></tr>
+      <tr><th>โฟลเดอร์</th><td>${sh.folderUrl?`<a href="${esc(sh.folderUrl)}" target="_blank" rel="noopener">${esc(sh.folderPath||'เปิดโฟลเดอร์')}</a>`:'—'}</td></tr>
+      <tr><th>เปิดใน Drive ได้</th><td>${sh.shared?esc(sh.shared.join(' · ')||'—'):'<span class="hint">ยังไม่ได้แชร์</span>'}
+        ${sh.skipped&&sh.skipped.length?`<div class="hint">แชร์ไม่ได้ (ไม่ใช่บัญชี Google): ${esc(sh.skipped.join(' · '))} — เปิด PDF ในระบบนี้ได้ตามปกติ</div>`:''}</td></tr>
+    </tbody></table>
+    <div class="acts2"><button class="big sec" type="button" id="dlPdf">ดาวน์โหลด PDF</button>
+      ${canShare?`<button class="big sec" type="button" id="doShare">${sh.shared?'แชร์ให้ผู้เกี่ยวข้องอีกครั้ง':'แชร์ให้ผู้เกี่ยวข้อง'}</button>`:''}</div><div id="fmsg"></div></div>`;
+  $('cpUrl').onclick=async()=>{ try{ await navigator.clipboard.writeText(p.url); $('cpUrl').textContent='คัดลอกแล้ว ✓'; }catch(e){} };
+  $('dlPdf').onclick=async()=>{ $('dlPdf').disabled=true; const r=await A.gas('memoPdfBytes',{memoId:M.id},{timeout:60000}); $('dlPdf').disabled=false;
+    if(!r.ok){ $('fmsg').innerHTML=`<div class="hint">ดาวน์โหลดไม่ได้: ${esc(r.error)}</div>`; return; }
+    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([Uint8Array.from(atob(r.result.bytes),c=>c.charCodeAt(0))],{type:'application/pdf'}));
+    a.download=r.result.name||'memo.pdf'; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),5000); };
+  if($('doShare')) $('doShare').onclick=()=>shareMemoPdf(true);
+}
+async function shareMemoPdf(manual){
+  if($('doShare')) $('doShare').disabled=true;
+  const r=await A.gas('memoShare',{memoId:M.id},{timeout:90000});
+  if(!r.ok){ if($('fmsg')) $('fmsg').innerHTML=`<div class="hint">แชร์ไม่สำเร็จ: ${esc(r.error)}</div>`; if($('doShare')) $('doShare').disabled=false; return; }
+  const sh={name:r.result.name, folderUrl:r.result.folderUrl, folderPath:r.result.folderPath, shared:r.result.shared, skipped:r.result.skipped, at:now()};
+  try{ await MREF.update({'pdf.share':sh}); }catch(e){}
+  M.pdf=Object.assign({},M.pdf,{share:sh}); paintFile();
+}
+
 /* ตัวหนังสือบนหน้าจอ = PDF จริง เมื่อมีแล้ว
    หน้าจอแบบ HTML จัดหน้าไม่ตรงกับ PDF — บล็อกสั่งการที่ผู้สั่งการวางไว้ข้างลายเซ็นผู้เสนอ
    ไปโผล่ต่อท้ายแทน ผู้อ่านเข้าใจว่า PDF ผิด จึงแสดง PDF ที่ออกจริงทุกหน้าแทน (HTML เป็นสำรอง) */
@@ -982,6 +1016,7 @@ async function makePdf(manual, quiet){
   const key = r.result.stage==='proposed' ? 'pdfProposed' : 'pdf';
   try{ await MREF.update({[key]:{id:r.result.id, url:r.result.url, at:now()}});
        await MREF.collection('events').add({action:'pdf', byUid:A.user.uid, byName:A.myName()||'', note:key, at:now()}); }catch(e){}
+  if(key==='pdf'){ const s2=await MREF.get(); M=Object.assign({id:s2.id},s2.data()); await shareMemoPdf(false); }
   if(quiet) return true;
   await viewMemo(M.id);
   if(manual) say('สร้าง PDF แล้ว');
