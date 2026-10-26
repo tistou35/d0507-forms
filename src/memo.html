@@ -206,7 +206,7 @@ function vars(type, f){
   v.scopeSentence = f.scope ? 'This authorisation is limited to: '+f.scope+'.' : '';
   v.retroReasonSentence = f.retroReason ? ' Reason: '+String(f.retroReason).replace(/[.\s]+$/,'')+'.' : '';
   // ประโยคที่ขึ้นเฉพาะเมื่อช่องต้นทางมีค่า — สองรอบ เพราะประโยคหนึ่งอ้างอีกประโยคได้
-  for(let i=0;i<2;i++) (cfg.compute||[]).filter(c=>c.op==='tpl').forEach(c=>{ v[c.k] = f[c.of] ? fill(c.tpl,v) : ''; });
+  for(let i=0;i<2;i++) (cfg.compute||[]).filter(c=>c.op==='tpl').forEach(c=>{ v[c.k] = f[c.of] ? fill(c.tpl,v) : fill(c.else||'',v); });
   return v;
 }
 function computeInto(type, f){
@@ -455,6 +455,12 @@ async function checks(type){
   if(cfg.circular && circOn(type) && !viaAero() && !recipientsOf({proposer:p,endorser:e}).length) errors.push('หนังสือเวียนยังไม่มีผู้ต้องรับทราบ');
   if(ben&&p&&samePerson(p,ben)) errors.push('ผู้เสนอเป็นผู้ได้รับประโยชน์จากหนังสือฉบับนี้');
   if(ben&&e&&samePerson(e,ben)) errors.push('ผู้สั่งการเป็นผู้ได้รับประโยชน์จากหนังสือฉบับนี้');
+  if(cfg.code==='DLG'){
+    if(F.dlgKind==='duty' && !F.dutyText) errors.push('ยังไม่ได้ระบุหน้าที่ที่มอบ');
+    if(F.dlgKind==='absence' && !F.handover) errors.push('รักษาการระหว่างไม่อยู่ต้องส่งมอบงานก่อน (OMA A.1.2)');
+    if(F.dlgKind==='absence' && !F.expiresOn) errors.push('รักษาการระหว่างไม่อยู่ต้องมีวันสิ้นสุด');
+    if(F.absentee && F.deputy && personKey(F.absentee)===personKey(F.deputy)) errors.push('ผู้มอบกับผู้รับมอบเป็นคนเดียวกัน');
+  }
   if(ben && F.evaluator && personKey(ben)===personKey(F.evaluator))
     warns.push('ผู้ประเมินกับผู้ถูกประเมินเป็นคนเดียวกัน — ตรวจให้แน่ใจก่อนเสนอลงนาม');
   if(e && F.evaluator && samePerson(e,F.evaluator) && ben && samePerson(ben,F.evaluator)) errors.push('ผู้สั่งการประเมินตัวเอง');

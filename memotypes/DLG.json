@@ -2,12 +2,12 @@
  "code": "DLG",
  "order": 70,
  "title": {
-  "en": "Delegation of Duties (Absence)",
-  "th": "มอบหมายรักษาการแทน"
+  "en": "Delegation of Duties",
+  "th": "มอบหมายหน้าที่ / รักษาการแทน"
  },
  "desc": {
-  "en": "Deputy for a manager's temporary absence — OMA A.1.2",
-  "th": "ผู้รักษาการระหว่างผู้บริหารไม่อยู่ · เวียนถึงฝ่ายบริหาร"
+  "en": "Deputy during a manager's absence, or delegation of a specific duty — OMA A.1.2",
+  "th": "รักษาการระหว่างไม่อยู่ หรือมอบหน้าที่เฉพาะเรื่องให้คนอื่นทำแทน · เวียนถึงฝ่ายบริหาร"
  },
  "purpose": "inform",
  "requiresSignature": true,
@@ -24,6 +24,7 @@
    "conflictPosition": "HT",
    "actions": [
     "APPROVED",
+    "ACKNOWLEDGED",
     "NOT APPROVED"
    ]
   }
@@ -34,12 +35,43 @@
  },
  "fields": [
   {
+   "k": "dlgKind",
+   "type": "select",
+   "req": true,
+   "label": {
+    "en": "Kind",
+    "th": "ลักษณะการมอบหมาย"
+   },
+   "opt": [
+    {
+     "v": "absence",
+     "n": {
+      "en": "Temporary absence (whole post)",
+      "th": "รักษาการแทนระหว่างไม่อยู่ (ทั้งตำแหน่ง)"
+     },
+     "lead": "During the absence of {absenteeName} ({absPosTitle}) from {effectiveFromLong}{untilText}, {deputyName} is delegated to perform the duties of {absPosTitle} in accordance with OMA A.1.2.",
+     "closing": "A handover briefing has been given to the deputy. Matters concerning this post shall be referred to {deputyName} during the period stated.",
+     "kindTitle": "Delegation of duties"
+    },
+    {
+     "v": "duty",
+     "n": {
+      "en": "Specific duty only",
+      "th": "มอบหน้าที่เฉพาะเรื่อง"
+     },
+     "lead": "{absenteeName} ({absPosTitle}) delegates the following duty to {deputyName} with effect from {effectiveFromLong}{untilText}: {dutyText}.",
+     "closing": "When this delegation ends, the duty reverts to {absenteeName}. {absenteeName} remains accountable for the duty delegated.",
+     "kindTitle": "Delegation of duty"
+    }
+   ]
+  },
+  {
    "k": "absentee",
    "type": "person",
    "req": true,
    "label": {
-    "en": "Manager absent",
-    "th": "ผู้ที่ไม่อยู่"
+    "en": "Manager delegating",
+    "th": "ผู้มอบหมาย"
    }
   },
   {
@@ -118,12 +150,21 @@
    ]
   },
   {
+   "k": "dutyText",
+   "type": "text",
+   "label": {
+    "en": "Duty delegated (specific duty only)",
+    "th": "หน้าที่ที่มอบ (กรณีมอบเฉพาะเรื่อง)"
+   },
+   "ph": "e.g. authorisation of training flights"
+  },
+  {
    "k": "deputy",
    "type": "person",
    "req": true,
    "label": {
-    "en": "Deputy",
-    "th": "ผู้รักษาการแทน"
+    "en": "Delegate / deputy",
+    "th": "ผู้รับมอบ / ผู้รักษาการ"
    }
   },
   {
@@ -138,10 +179,10 @@
   {
    "k": "expiresOn",
    "type": "date",
-   "req": true,
+   "req": false,
    "label": {
-    "en": "To",
-    "th": "ถึง"
+    "en": "To (blank = until further notice)",
+    "th": "ถึง (เว้นว่าง = จนกว่าจะมีการเปลี่ยนแปลง)"
    }
   },
   {
@@ -155,25 +196,32 @@
   {
    "k": "handover",
    "type": "check",
-   "req": true,
+   "req": false,
    "label": {
-    "en": "Handover briefing given to the deputy at least one day before the absence (OMA A.1.2)",
-    "th": "ส่งมอบงานให้ผู้รักษาการแล้ว อย่างน้อยหนึ่งวันก่อนไม่อยู่ (OMA A.1.2)"
+    "en": "Handover briefing given to the deputy (OMA A.1.2 — required for absence)",
+    "th": "ส่งมอบงานให้ผู้รับมอบแล้ว (OMA A.1.2 — บังคับเมื่อรักษาการระหว่างไม่อยู่)"
    }
   }
  ],
  "compute": [
   {
+   "k": "untilText",
+   "op": "tpl",
+   "of": "expiresOn",
+   "tpl": " to {expiresOnLong}",
+   "else": " until further notice"
+  },
+  {
    "k": "reasonSentence",
    "op": "tpl",
    "of": "reason",
-   "tpl": "Reason for absence: {reason}."
+   "tpl": "Reason: {reason}."
   }
  ],
- "subject": "Delegation of duties — {absPosTitle} — {effectiveFromLong} to {expiresOnLong}",
+ "subject": "{kindTitle} — {absPosTitle} — {deputyName} from {effectiveFromLong}{untilText}",
  "body": [
-  "During the absence of {absenteeName} ({absPosTitle}) from {effectiveFromLong} to {expiresOnLong}, {deputyName} is delegated to perform the duties of {absPosTitle} in accordance with OMA A.1.2.",
+  "{lead}",
   "{reasonSentence}",
-  "A handover briefing has been given to the deputy. Matters concerning this post shall be referred to {deputyName} during the period stated."
+  "{closing}"
  ]
 }
