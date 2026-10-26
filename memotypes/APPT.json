@@ -31,7 +31,7 @@
  },
  "backdate": {
   "allowed": true,
-  "statement": "ISSUED RETROSPECTIVELY. This memorandum confirms an appointment that took effect on {effectiveFromLong}. The date of issue is the date of signature and has not been back-dated."
+  "statement": "ISSUED RETROSPECTIVELY. This memorandum confirms an appointment that took effect on {effectiveFromLong}.{retroReasonSentence} The date of issue is the date of signature and has not been back-dated."
  },
  "fields": [
   {

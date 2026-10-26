@@ -29,7 +29,11 @@
   }
  },
  "backdate": {
-  "allowed": false
+  "allowed": true,
+  "statement": "ISSUED RETROSPECTIVELY. This memorandum takes effect retrospectively from {effectiveFromLong}.{retroReasonSentence} The date of issue is the date of signature and has not been back-dated.",
+  "warn": {
+   "th": "เอกสารประเภทนี้ควรแจ้งก่อนวันมีผล — ย้อนหลังได้ แต่ต้องระบุเหตุผล และ PDF จะพิมพ์ว่าออกย้อนหลัง"
+  }
  },
  "fields": [
   {

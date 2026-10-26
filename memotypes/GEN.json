@@ -27,7 +27,7 @@
  },
  "backdate": {
   "allowed": true,
-  "statement": "ISSUED RETROSPECTIVELY. This memorandum records a matter that took effect on {effectiveFromLong}. The date of issue is the date of signature and has not been back-dated."
+  "statement": "ISSUED RETROSPECTIVELY. This memorandum takes effect retrospectively from {effectiveFromLong}.{retroReasonSentence} The date of issue is the date of signature and has not been back-dated."
  },
  "distribution": [],
  "storage": "staff",

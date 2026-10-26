@@ -204,6 +204,7 @@ function vars(type, f){
   });
   computeInto(type, f); (cfg.compute||[]).filter(c=>c.op!=='tpl').forEach(c=>{ v[c.k]=f[c.k]||''; v[c.k+'Long']=long(f[c.k]); });
   v.scopeSentence = f.scope ? 'This authorisation is limited to: '+f.scope+'.' : '';
+  v.retroReasonSentence = f.retroReason ? ' Reason: '+String(f.retroReason).replace(/[.\s]+$/,'')+'.' : '';
   // ประโยคที่ขึ้นเฉพาะเมื่อช่องต้นทางมีค่า — สองรอบ เพราะประโยคหนึ่งอ้างอีกประโยคได้
   for(let i=0;i<2;i++) (cfg.compute||[]).filter(c=>c.op==='tpl').forEach(c=>{ v[c.k] = f[c.of] ? fill(c.tpl,v) : ''; });
   return v;
@@ -230,7 +231,7 @@ function renderOf(type, f, sup){
     purpose:(PURPOSE[purposeOf(type,f)]||{}).en||'',
     reference:[f.flightId?'Flight ID '+f.flightId:'', v.evalForm||'', f.refText||'', sup&&sup.number?'Supersedes '+sup.number:''].filter(Boolean).join(' · '),
     retro: cfg.backdate && f.effectiveFrom ? fill(cfg.backdate.statement, v) : '',
-    validity: f.effectiveFrom ? ('Effective from: '+long(f.effectiveFrom)+(f.expiresOn?'   ·   Valid until: '+long(f.expiresOn):'')) : '',
+    validity: f.effectiveFrom ? ((f.effectiveFrom<bkkToday()?'Effective retrospectively from: ':'Effective from: ')+long(f.effectiveFrom)+(f.expiresOn?'   ·   Valid until: '+long(f.expiresOn):'')) : '',
     note: cfg.fixedNote ? 'Note: '+cfg.fixedNote : '' };
 }
 /* ── หนังสือเวียน — ผู้ต้องรับทราบ ─────────────────────────
@@ -316,7 +317,12 @@ function formMemo(type, existing){
     return `<div${['url'].includes(x.type)||['scope','subjectText','refText','ccText'].includes(x.k)?' class="full"':''}>${lab}<input type="${it}" id="f_${x.k}" data-k="${x.k}" placeholder="${esc(x.ph||'')}">${hint}</div>`;
   }).join('');
   const calcHtml=(cfg.compute||[]).map(c=>`<div><label>${esc(A.L(c.label))} <span class="hint">(คำนวณเอง)</span></label><div class="calc" id="c_${c.k}">—</div></div>`).join('');
-  $('app').innerHTML=`<div class="card"><div class="mf">${fieldHtml}${calcHtml}
+  const retroHtml = cfg.backdate&&cfg.backdate.allowed ? `<div class="full" id="retroBox" hidden>
+      <div class="fk-gate warn" style="margin-bottom:8px"><span id="retroMsg"></span></div>
+      <label for="f_retroReason">เหตุผลที่มีผลย้อนหลัง${cfg.backdate.reasonOptional?' (ไม่บังคับ)':' <span style="color:var(--red-500)">*</span>'}</label>
+      <input type="text" id="f_retroReason" data-k="retroReason" placeholder="e.g. The revision was in use before this notice was circulated">
+      <div class="hint">ภาษาอังกฤษ — พิมพ์ลงในกล่อง ISSUED RETROSPECTIVELY ของ PDF</div></div>` : '';
+  $('app').innerHTML=`<div class="card"><div class="mf">${fieldHtml}${calcHtml}${retroHtml}
       <div class="sect">ผู้ลงนาม · รูปแบบ</div>
       <div><label for="s_proposer">ผู้เสนอ (ลงนามคนแรก — ออกเลขและวันที่ออก) <span style="color:var(--red-500)">*</span></label>
         <select id="s_proposer" data-k="s"><option value="">—</option>${opts}</select><div class="hint" id="s_proposer_h"></div></div>
@@ -345,6 +351,7 @@ function formMemo(type, existing){
       if(x.type==='person'){ if(v.uid && userById(v.uid)) el.value=v.uid; else if(v.name){ el.value='__free'; $('f_'+x.k+'_free').value=v.name; } }
       else if(x.type==='check') el.checked=!!v; else el.value=v; });
     $('s_font').value=existing.font||'Helvetica';
+    if($('f_retroReason')&&f.retroReason) $('f_retroReason').value=f.retroReason;
   }
   if(cfg.circular){
     RCP = existing && existing.recipientSel ? JSON.parse(JSON.stringify(existing.recipientSel)) : {groups:(cfg.recipientsDefault||[]).slice(), extra:[], excl:[]};
@@ -383,7 +390,15 @@ function readForm(type, fieldsChanged){
     else F[x.k]=el.value.trim();
   });
   computeInto(type,F);
-  (cfg.compute||[]).forEach(c=>{ $('c_'+c.k).textContent = F[c.k] ? long(F[c.k]) : '—'; });
+  (cfg.compute||[]).filter(c=>c.op!=='tpl').forEach(c=>{ $('c_'+c.k).textContent = F[c.k] ? long(F[c.k]) : '—'; });
+  // มีผลย้อนหลัง — วันที่ออกยังเป็นวันที่ลงนามจริง ระบุเหตุผลแล้วพิมพ์ลง PDF
+  const retro = !!(F.effectiveFrom && F.effectiveFrom < bkkToday());
+  if($('retroBox')){
+    $('retroBox').hidden=!retro;
+    if(retro){ F.retroReason=$('f_retroReason').value.trim();
+      $('retroMsg').innerHTML='ฉบับนี้<b>มีผลย้อนหลังตั้งแต่วันที่ '+esc(long(F.effectiveFrom))+'</b> · วันที่ออกคือวันที่ผู้เสนอลงนามจริง · PDF พิมพ์กล่อง ISSUED RETROSPECTIVELY พร้อมเหตุผล'
+        + (cfg.backdate.warn?'<br>'+esc(A.L(cfg.backdate.warn)):''); }
+  }
   const d=defaultSigners(type,F);
   ['proposer','endorser'].forEach(r=>{
     const sel=$('s_'+r);
@@ -438,7 +453,7 @@ async function checks(type){
   if(ben && !ben.uid) warns.push('ผู้ได้รับมอบหมายยังไม่มีบัญชีในระบบ — ออกหนังสือได้ แต่จะกดรับทราบได้เมื่อมีบัญชีแล้ว');
   if(F.effectiveFrom && F.effectiveFrom < bkkToday()){
     if(!(cfg.backdate&&cfg.backdate.allowed)) errors.push('ประเภทนี้ย้อนวันมีผลไม่ได้');
-    else warns.push('วันมีผลอยู่ก่อนวันนี้ — PDF จะพิมพ์ข้อความ "ISSUED RETROSPECTIVELY" ให้เอง วันที่ออกยังเป็นวันที่ลงนามจริง');
+    else if(!cfg.backdate.reasonOptional && !F.retroReason) errors.push('ยังไม่ได้ใส่เหตุผลที่มีผลย้อนหลัง');
   }
   if(cfg.code!=='AUTH' || !ben || !F.duty) return {errors,warns,supersedes:null};
   // ฉบับเดิมที่ยังไม่หมดอายุ — ฉบับใหม่ต้องเป็น "แทนฉบับเลขที่ …"
