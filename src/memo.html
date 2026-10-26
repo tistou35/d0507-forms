@@ -575,7 +575,7 @@ function letterHtml(m){
     <div class="sig">${numbered && m.proposerSig ? `<img src="${esc(m.proposerSig)}" alt="">` : '<div style="height:64px"></div>'}
       <div class="ln">${esc(p.name||'')}<br>${esc(p.title||'')}</div>
       ${numbered?`<div class="stamp">Proposed and signed electronically on ${esc(tsFull(m.issuedAt))}.</div>`:''}</div>
-    ${m.endorsementImg?`<div class="endo"><img src="${esc(m.endorsementImg)}" alt=""><div class="stamp">ใน PDF บล็อกนี้อยู่ตรงตำแหน่งที่ผู้สั่งการวางไว้</div></div>`:''}
+    ${m.endorsementImg?`<div class="endo"><img src="${esc(m.endorsementImg)}" alt=""><div class="stamp">หน้าจอนี้จัดหน้าโดยประมาณ — ใน PDF บล็อกนี้อยู่ตรงตำแหน่งที่ผู้สั่งการวางไว้</div></div>`:''}
     ${m.status==='proposed'?'<div class="stamp" style="color:#b45309;margin-top:14px">Awaiting endorsement</div>':''}
   </div>`;
 }
@@ -611,10 +611,11 @@ async function viewMemo(id){
     ${M.supersededBy?`<div class="fk-gate warn noprint"><span>ถูกแทนด้วย ${esc(M.supersededBy)}</span></div>`:''}
     <div class="noprint" id="actbox"></div>
     <div class="noprint" id="pmsg"></div>
-    ${acts.includes('endorse')?'':letterHtml(M)}
+    ${acts.includes('endorse')?'':`<div id="letterbox">${letterHtml(M)}</div>`}
     <div class="noprint" id="ackbox" style="margin-top:18px"></div>
     <div class="noprint" id="hist" style="margin-top:18px"></div>`;
   if($('mkpdf')) $('mkpdf').addEventListener('click',()=>makePdf(true));
+  if(!acts.includes('endorse')) showPdfPages();
   if(M.circular) paintAcks();
   paintActions(acts);
   paintHistory();
@@ -872,6 +873,32 @@ function placeBlock(){
   const k=ENDO.scale, b=$('blk'); if(!b) return;
   b.style.left=(ENDO.x*k)+'px'; b.style.top=(ENDO.y*k)+'px'; b.style.width=(ENDO.w*k)+'px';
 }
+/* ตัวหนังสือบนหน้าจอ = PDF จริง เมื่อมีแล้ว
+   หน้าจอแบบ HTML จัดหน้าไม่ตรงกับ PDF — บล็อกสั่งการที่ผู้สั่งการวางไว้ข้างลายเซ็นผู้เสนอ
+   ไปโผล่ต่อท้ายแทน ผู้อ่านเข้าใจว่า PDF ผิด จึงแสดง PDF ที่ออกจริงทุกหน้าแทน (HTML เป็นสำรอง) */
+async function showPdfPages(){
+  const ref = M.status==='proposed' ? M.pdfProposed : (['issued','declined','superseded','expired'].includes(M.status) ? M.pdf : null);
+  const box=$('letterbox'); if(!ref || !ref.id || !box) return;
+  const keep=box.innerHTML;
+  box.innerHTML='<div class="hint">กำลังโหลด PDF…</div>';
+  try{
+    await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+    pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    const r=await A.gas('memoPdfBytes',{memoId:M.id},{timeout:60000});
+    if(!r.ok) throw new Error(r.error);
+    const doc=await pdfjsLib.getDocument({data:Uint8Array.from(atob(r.result.bytes),c=>c.charCodeAt(0))}).promise;
+    box.innerHTML='<div class="hint noprint" style="margin-bottom:6px">แสดง PDF ที่ออกจริง'+(M.status==='proposed'?' (ฉบับรอสั่งการ)':'')+'</div>';
+    const w=Math.min(820, box.clientWidth||820);
+    for(let i=1;i<=doc.numPages;i++){
+      const pg=await doc.getPage(i), vp1=pg.getViewport({scale:1}), vp=pg.getViewport({scale:(w/vp1.width)*2});
+      const cv=document.createElement('canvas'); cv.width=vp.width; cv.height=vp.height;
+      cv.style.cssText='display:block;width:100%;max-width:'+w+'px;height:auto;border:1px solid var(--border-light);box-shadow:0 2px 10px rgba(0,0,0,.06);margin-bottom:12px;background:#fff';
+      box.appendChild(cv);
+      await pg.render({canvasContext:cv.getContext('2d'), viewport:vp}).promise;
+    }
+  }catch(e){ box.innerHTML=keep+`<div class="hint noprint">แสดง PDF ไม่ได้ (${esc(e.message||e)}) — หน้าจอนี้เป็นฉบับจัดหน้าโดยประมาณ ตำแหน่งบล็อกสั่งการที่ถูกต้องอยู่ใน PDF</div>`; }
+}
+
 /* หน้า 1 ของ PDF ฉบับรอสั่งการ — เรนเดอร์ด้วย pdf.js เป็นพื้นหลังให้เห็นที่ว่างจริง */
 async function loadPage(){
   const msg=$('stagemsg');
