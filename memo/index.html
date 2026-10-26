@@ -410,9 +410,11 @@ function formMemo(type, existing){
   $('app').innerHTML=`<div class="card"><div class="mf">${fieldHtml}${calcHtml}${retroHtml}
       <div class="sect">ผู้ลงนาม · รูปแบบ</div>
       <div><label for="s_proposer">ผู้เสนอ (ลงนามคนแรก — ออกเลขและวันที่ออก) <span style="color:var(--red-500)">*</span></label>
-        <select id="s_proposer" data-k="s"><option value="">—</option>${opts}</select><div class="hint" id="s_proposer_h"></div></div>
+        <select id="s_proposer" data-k="s"><option value="">—</option>${opts}</select>
+        <select id="s_proposer_pos" data-k="s" style="margin-top:6px" title="ลงนามในตำแหน่ง"></select><div class="hint" id="s_proposer_h"></div></div>
       <div><label for="s_endorser">ผู้รับทราบ / สั่งการ (ลงนามคนที่สอง) <span style="color:var(--red-500)">*</span></label>
-        <select id="s_endorser" data-k="s"><option value="">—</option>${opts}</select><div class="hint" id="s_endorser_h"></div></div>
+        <select id="s_endorser" data-k="s"><option value="">—</option>${opts}</select>
+        <select id="s_endorser_pos" data-k="s" style="margin-top:6px" title="ลงนามในตำแหน่ง"></select><div class="hint" id="s_endorser_h"></div></div>
       ${cfg.circular?`<div class="sect">หนังสือเวียน — ผู้ต้องรับทราบ</div>
       <div class="full">${cfg.circular==='optional'?'<label class="ck" style="margin-bottom:8px"><input type="checkbox" id="r_on" data-k="s"> เวียนให้รับทราบ</label>':''}
         <div id="r_chbox" style="margin-bottom:10px"><label for="r_ch">ส่งและเก็บการรับทราบที่</label>
@@ -453,6 +455,8 @@ function formMemo(type, existing){
     if(existing.signers.proposer&&existing.signers.proposer.uid) $('s_proposer').value=existing.signers.proposer.uid;
     if(existing.signers.endorser&&existing.signers.endorser.uid) $('s_endorser').value=existing.signers.endorser.uid;
     readForm(type, false);
+    ['proposer','endorser'].forEach(r=>{ const sp=existing.signers[r]; if(sp&&sp.pos&&$('s_'+r+'_pos')) $('s_'+r+'_pos').value=sp.pos; });
+    readForm(type, false);
   }
   document.querySelectorAll('#app [data-k]').forEach(el=>{
     const isField=el.dataset.k!=='s';
@@ -489,6 +493,9 @@ function readForm(type, fieldsChanged){
     const sel=$('s_'+r);
     if(!fieldsChanged && document.activeElement===sel) SIG_TOUCHED[r]=true;
     if(fieldsChanged && !SIG_TOUCHED[r] && d[r]) sel.value=d[r].uid||'';
+    const ps=$('s_'+r+'_pos'), u=userById(sel.value), keep=ps.value, have=((u&&u.positions)||[]);
+    ps.innerHTML = have.length ? have.map(k=>`<option value="${esc(k)}">ลงนามในตำแหน่ง ${esc(k)} — ${esc(POSN[k]||k)}</option>`).join('') : '<option value="">(ไม่มีตำแหน่งในระบบ)</option>';
+    ps.hidden=!u; if(have.includes(keep)) ps.value=keep; else if(d[r]&&have.includes(d[r].pos)) ps.value=d[r].pos;
     const c=(cfg.signers||{})[r]||{};
     $('s_'+r+'_h').textContent = d[r] ? ('ค่าตั้งต้นตามตำแหน่ง '+d[r].pos+(c.conflictPosition&&d[r].pos!==c.position?' (ใช้ตำแหน่งสำรองเพราะคนในตำแหน่ง '+c.position+' ลงนามไม่ได้)':'')+(d[r].uid?'':' — ยังไม่มีผู้ถือตำแหน่งนี้ เลือกเองได้')) : '';
   });
@@ -510,7 +517,8 @@ function paintRcp(noRead){
 function signerOf(role){
   const uid=$('s_'+role).value; if(!uid) return null;
   const u=userById(uid), d=defaultSigners(EDIT?EDIT.type:Q.get('new'),F)[role]||{};
-  const pt=posTitle(u, d.pos);
+  const chosen=$('s_'+role+'_pos')&&$('s_'+role+'_pos').value;
+  const pt=posTitle(u, chosen||d.pos);
   return {uid:u.uid, name:u.name||u.email, pos:pt.pos, title:pt.title};
 }
 function paintChecks(){
