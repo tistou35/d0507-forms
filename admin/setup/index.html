@@ -321,6 +321,12 @@ section[data-pane].off{display:none}
       </section>
 
       <section data-pane="users">
+        <div class="sh"><h2>บันทึกการกระทำของผู้ดูแล</h2><span class="en">Admin activity log</span>
+          <span class="rt">เพิ่มได้อย่างเดียว แก้หรือลบไม่ได้ · 100 รายการล่าสุด</span></div>
+        <div class="card"><div id="alog">—</div></div>
+      </section>
+
+      <section data-pane="users">
         <div class="sh"><h2>ผู้ดูแลระบบ</h2><span class="en">Administrators</span></div>
         <div class="card">
           <p class="hint" style="margin-bottom:12px">ผู้ดูแลระบบเท่านั้นที่เข้า
@@ -513,6 +519,7 @@ async function impRun(){
     if (r.error) { x.res = '✗ ' + r.error; bad++; x.on = false; impPaint(); continue; }
     try {
       await saveProfile(r.uid, x.email, x.name, x.role || '', x.map.roles, x.map.pos || []);
+      await adminLog('create', { uid: r.uid, name: x.name, email: x.email }, 'นำเข้าหลายคน · บทบาท ' + x.map.roles.join(',') + ((x.map.pos || []).length ? ' · ตำแหน่ง ' + x.map.pos.join(',') : ''));
       x.res = r.created ? '✓ สร้างแล้ว' : '✓ ตั้งบทบาทให้บัญชีเดิม'; ok++;
     } catch (e) { x.res = '✗ บันทึกโปรไฟล์ไม่สำเร็จ: ' + (e.code || e.message); bad++; }
     x.on = false; impPaint();
@@ -653,6 +660,33 @@ function paintUsers(){
     b.addEventListener('click', () => editUser(b.dataset.edit)));
 }
 
+/* ── บันทึกการกระทำของผู้ดูแล ─────────────────────────────
+   adminLog เขียนได้เฉพาะผู้ดูแล เพิ่มได้อย่างเดียว แก้/ลบไม่ได้ เวลาเป็นของเซิร์ฟเวอร์
+   เก็บทุกครั้งที่ผู้ดูแลเปิดดูข้อมูลผู้ใช้ แก้บทบาท/ตำแหน่ง/สถานะ แก้รายชื่อผู้รับฟอร์ม
+   และส่งลิงก์ตั้งรหัสผ่านใหม่ — ไม่เก็บรหัสผ่าน (ระบบไม่มีและอ่านไม่ได้) */
+async function adminLog(action, target, detail){
+  try {
+    await A.db.collection('adminLog').add({ action, targetUid: (target && target.uid) || '',
+      targetName: (target && target.name) || '', targetEmail: (target && target.email) || '',
+      detail: detail || '', byUid: A.user.uid, byName: A.myName() || A.user.email || '',
+      at: firebase.firestore.FieldValue.serverTimestamp() });
+  } catch (e) { console.warn('adminLog', e); }
+}
+const ALOG_N = { view:'เปิดดูข้อมูลผู้ใช้', edit:'แก้ข้อมูลผู้ใช้', create:'เพิ่มผู้ใช้', pwreset:'ส่งลิงก์ตั้งรหัสผ่านใหม่',
+                 dirEdit:'แก้รายชื่อผู้รับฟอร์ม', dirAdd:'เพิ่มเข้ารายชื่อผู้รับฟอร์ม', dirRemove:'เอาออกจากรายชื่อผู้รับฟอร์ม' };
+async function paintAdminLog(){
+  const host = document.getElementById('alog'); if (!host) return;
+  try {
+    const s = await A.db.collection('adminLog').orderBy('at', 'desc').limit(100).get();
+    const rows = s.docs.map(d => d.data());
+    const when = v => { try { const d = v.toDate(); return d.toLocaleString('th-TH', { timeZone: 'Asia/Bangkok', dateStyle: 'medium', timeStyle: 'short' }); } catch (e) { return ''; } };
+    host.innerHTML = rows.length ? `<div class="twrap"><table class="reg"><thead><tr><th>เวลา</th><th>ผู้ดูแล</th><th>การกระทำ</th><th>ผู้ใช้</th><th>รายละเอียด</th></tr></thead><tbody>`
+      + rows.map(r => `<tr><td class="mono" style="white-space:nowrap">${A.esc(when(r.at))}</td><td>${A.esc(r.byName)}</td>
+          <td>${A.esc(ALOG_N[r.action] || r.action)}</td><td>${A.esc(r.targetName || r.targetEmail || '—')}</td><td>${A.esc(r.detail || '')}</td></tr>`).join('')
+      + `</tbody></table></div>` : '<p class="hint">ยังไม่มีบันทึก</p>';
+  } catch (e) { host.innerHTML = `<p class="hint">อ่านไม่ได้: ${A.esc(e.code || e.message)}</p>`; }
+}
+
 /* ── แก้ไขผู้ใช้ ───────────────────────────────────────────
    เขียนสามที่เหมือนตอนสร้างบัญชี — users/{uid} · staffDirectory · publicDirectory
    ถ้าเขียนแค่ users/{uid} คนนั้นจะยังโผล่ในตัวเลือกผู้รับฟอร์มด้วยชื่อเก่า
@@ -679,7 +713,13 @@ function editUser(uid){
         aria-pressed="${u.active !== false}">ใช้งานอยู่</button></div>
       <p class="hint">ปิดใช้งานแล้วยังล็อกอินได้ แต่หายจากตัวเลือกผู้รับฟอร์ม
         — ปิดบัญชีจริงต้องทำที่ Firebase Console</p></div>
+    <div class="fk-f"><label>รหัสผ่าน</label>
+      <p class="hint">ไม่มีใครดูรหัสผ่านได้ รวมถึงผู้ดูแล — ระบบเก็บแบบเข้ารหัสทางเดียว ·
+        กรณีลืมหรืออยากตั้งใหม่ ส่งลิงก์ให้เจ้าตัวตั้งรหัสใหม่เองทางอีเมล (ลิงก์ใช้ได้ครั้งเดียว มีอายุจำกัด)</p>
+      ${u.email ? `<button type="button" class="fb" id="ePw">ส่งลิงก์ตั้งรหัสผ่านใหม่ไปที่ ${A.esc(u.email)}</button>`
+                : '<p class="hint">บัญชีนี้ไม่มีอีเมล</p>'}</div>
     <div class="msg" id="eMsg"></div>`;
+  adminLog('view', u, '');
   document.getElementById('udf').innerHTML =
     `<button class="fb" value="cancel">ยกเลิก</button>
      <button class="fb" id="eSave" style="background:var(--navy-900);color:#fff;border-color:var(--navy-900)">บันทึก</button>`;
@@ -687,6 +727,17 @@ function editUser(uid){
   document.getElementById('eCert').value = u.cert || '';
   chips(document.getElementById('eRoles'), ROLE_KEYS, R, RN);
   chips(document.getElementById('ePos'), POS_KEYS, P, k => k + ' · ' + POS_N[k]);
+  const pw = document.getElementById('ePw');
+  if (pw) pw.addEventListener('click', async e => {
+    e.preventDefault();
+    if (!confirm('ส่งลิงก์ตั้งรหัสผ่านใหม่ไปที่ ' + u.email + ' ?\nรหัสเดิมยังใช้ได้จนกว่าเจ้าตัวจะตั้งรหัสใหม่')) return;
+    pw.disabled = true;
+    try {
+      await firebase.auth().sendPasswordResetEmail(u.email);
+      await adminLog('pwreset', u, 'ส่งไปที่ ' + u.email);
+      pw.textContent = 'ส่งลิงก์แล้ว ✓ — ให้เจ้าตัวเช็กอีเมล (รวมถึงโฟลเดอร์สแปม)';
+    } catch (err) { pw.disabled = false; alert('ส่งไม่สำเร็จ: ' + (A.authError ? A.authError(err) : (err.code || err.message))); }
+  });
   const act = document.getElementById('eAct');
   act.addEventListener('click', e => { e.preventDefault();
     act.setAttribute('aria-pressed', act.getAttribute('aria-pressed') !== 'true'); });
@@ -718,8 +769,16 @@ function editUser(uid){
       if (P.size && active) plist.push({ id: uid, name, position: cert, recv: [...P] });
       await pref.set({ list: plist }, { merge: true });
     } catch (err) { msg('บันทึกไม่สำเร็จ: ' + (err.code || err.message), 'bad'); return; }
+    const ch = [];
+    if ((u.name || '') !== name) ch.push('ชื่อ ' + (u.name || '—') + ' → ' + name);
+    if ((u.cert || '') !== cert) ch.push('ตำแหน่ง(ข้อความ) ' + (u.cert || '—') + ' → ' + (cert || '—'));
+    if (String((u.roles || []).slice().sort()) !== String([...R].sort())) ch.push('บทบาท ' + ((u.roles || []).join(',') || '—') + ' → ' + [...R].join(','));
+    if (String((u.positions || []).slice().sort()) !== String([...P].sort())) ch.push('ตำแหน่ง ' + ((u.positions || []).join(',') || '—') + ' → ' + ([...P].join(',') || '—'));
+    if ((u.active !== false) !== active) ch.push(active ? 'เปิดใช้งาน' : 'ปิดใช้งาน');
+    await adminLog('edit', Object.assign({}, u, { name }), ch.join(' · ') || 'ไม่มีการเปลี่ยนแปลง');
     Object.assign(u, { name, cert, roles: [...R], positions: [...P], active });
     log('users/' + uid + ' — แก้ไขแล้ว · ' + name + ' · ' + [...R].join(', '), 'green-600');
+    paintAdminLog();
     document.getElementById('udlg').close();
     paintUsers(); dir();
   });
@@ -803,6 +862,7 @@ async function addStaff(){
 
   try {
     await saveProfile(uid, email, v('nName'), v('nCert'), [...NROLES], [...NPOS]);
+    await adminLog('create', { uid, name: v('nName'), email }, 'บทบาท ' + [...NROLES].join(',') + (NPOS.size ? ' · ตำแหน่ง ' + [...NPOS].join(',') : '')); paintAdminLog();
   } catch (e) {
     btn.disabled = false;
     msg('สร้างบัญชีแล้วแต่บันทึกโปรไฟล์ไม่สำเร็จ: ' + (e.code || e.message), 'bad');
@@ -1012,7 +1072,7 @@ async function boot(){
   chips(document.getElementById('pos'), POS_KEYS, POS, k => k + ' · ' + POS_N[k]);
   chips(document.getElementById('nRoles'), ROLE_KEYS, NROLES, RN);
   chips(document.getElementById('nPos'), POS_KEYS, NPOS, k => k + ' · ' + POS_N[k]);
-  check(); dir();
+  check(); dir(); if (A.isAdmin()) paintAdminLog();
   // เปิดแท็บตามที่อยู่ใน URL ถ้ามี — กลับมาหน้าเดิมได้หลังรีเฟรช
   tab((location.hash || '#users').slice(1));
 }
@@ -1210,6 +1270,9 @@ function editDir(x, isNew){
         const sl = ((sd.exists && sd.data().list) || []).map(v => v.id === x.id ? Object.assign({}, v, { positions: [...R] }) : v);
         await sref.set({ list: sl }, { merge: true });
       }
+      await adminLog(isNew ? 'dirAdd' : 'dirEdit', { uid: x.id, name }, 'รับฟอร์มของ ' + ([...R].join(',') || '—')
+        + ((u && sync && sync.checked) ? ' · ปรับตำแหน่งในโปรไฟล์ให้ตรงกัน' : ''));
+      paintAdminLog();
       log((isNew ? 'เพิ่ม ' : 'แก้ ') + name + ' ในรายชื่อผู้รับฟอร์มแล้ว', 'green-600');
       box.innerHTML = ''; dir(); check(); paintUsers();
     } catch (e) { alert('บันทึกไม่สำเร็จ: ' + (e.code || e.message)); }
@@ -1220,8 +1283,10 @@ async function removeFromDir(id){
   if (!confirm('เอาคนนี้ออกจากรายชื่อผู้รับฟอร์ม?')) return;
   const ref = A.db.collection('publicDirectory').doc('instructors');
   const d = await ref.get();
+  const gone = ((d.exists && d.data().list) || []).find(x => x.id === id) || {};
   const list = ((d.exists && d.data().list) || []).filter(x => x.id !== id);
   await ref.set({ list, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+  await adminLog('dirRemove', { uid: id, name: gone.name || '' }, ''); paintAdminLog();
   log('เอาออกจากรายชื่อแล้ว', 'green-600'); dir(); check();
 }
 

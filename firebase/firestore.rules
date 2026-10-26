@@ -92,6 +92,14 @@ service cloud.firestore {
     // ── รายชื่อผู้รับฟอร์ม สำหรับตัวเลือกฝั่งนักเรียน ────────
     // อ่านได้ทั้งโลก → ใส่ได้แค่ ชื่อ + ตำแหน่ง + recv
     // ห้ามมีอีเมลหรือเบอร์โทรเด็ดขาด (seed.mjs ตรวจให้แล้ว)
+    // บันทึกการกระทำของผู้ดูแล — เพิ่มได้อย่างเดียว แก้/ลบไม่ได้ ผู้ดูแลเท่านั้นที่เขียนและอ่าน
+    match /adminLog/{id} {
+      allow read:   if admin();
+      allow create: if admin() && request.resource.data.byUid == request.auth.uid
+                    && request.resource.data.at == request.time;
+      allow update, delete: if false;
+    }
+
     match /publicDirectory/{doc} {
       allow read:  if true;
       allow write: if admin();
