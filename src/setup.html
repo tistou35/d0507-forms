@@ -248,7 +248,10 @@ section[data-pane].off{display:none}
       <section data-pane="users">
         <div class="sh"><h2>รายชื่อผู้รับฟอร์ม</h2><span class="en">Recipient directory</span>
           <span class="rt">อ่านได้ทั้งโลก — มีแค่ชื่อ ตำแหน่ง และประเภทฟอร์มที่รับ</span></div>
-        <div class="card"><div id="dirGap"></div><div id="dirWarn"></div><div id="dir">—</div></div>
+        <div class="card"><div id="dirGap"></div><div id="dirWarn"></div><div id="dir">—</div>
+          <div id="dirEdit"></div>
+          <div class="acts" style="margin-top:12px"><select id="dirAddSel" style="min-height:36px;border-radius:8px;border:1px solid var(--border-med);padding:0 10px"></select>
+            <button class="fb" id="dirAdd">+ เพิ่มเข้ารายชื่อ</button></div></div>
       </section>
 
       <section data-pane="users">
@@ -1012,12 +1015,24 @@ async function dir(){
     const list = (d.exists && d.data().list) || [];
     document.getElementById('dir').innerHTML = list.length
       ? `<div class="twrap"><table class="reg"><thead><tr><th>ชื่อ</th><th>ตำแหน่ง</th><th>รับฟอร์ม</th><th></th></tr></thead><tbody>` +
-        list.map(x => `<tr><td class="nm">${A.esc(x.name)}</td><td>${A.esc(x.role || '—')}</td>
+        list.map(x => `<tr><td class="nm">${A.esc(x.name)}</td><td>${A.esc(x.role || x.position || '—')}</td>
           <td class="c">${A.esc((x.recv || []).join(' · ') || '—')}</td>
-          <td><button class="fb" data-rm="${A.esc(x.id)}">เอาออก</button></td></tr>`).join('') +
+          <td style="white-space:nowrap"><button class="fb" data-ed="${A.esc(x.id)}">แก้ไข</button>
+            <button class="fb" data-rm="${A.esc(x.id)}">เอาออก</button></td></tr>`).join('') +
         `</tbody></table></div>`
       : '<p class="hint">ยังไม่มีใครในรายชื่อ — บันทึกโปรไฟล์ของคุณเพื่อเพิ่มตัวเองเป็นคนแรก</p>';
     document.querySelectorAll('[data-rm]').forEach(b => b.addEventListener('click', () => removeFromDir(b.dataset.rm)));
+    document.querySelectorAll('[data-ed]').forEach(b => b.addEventListener('click', () => editDir(list.find(x => x.id === b.dataset.ed))));
+    // เพิ่มรายคน — เจ้าหน้าที่ที่ยังไม่อยู่ในรายชื่อ
+    const inList = new Set(list.map(x => x.id));
+    const cand = USERS.filter(u => u.active !== false && !inList.has(u.uid) && (u.roles || []).some(r => r !== 'stu'))
+                      .sort((a, b) => String(a.name).localeCompare(String(b.name)));
+    document.getElementById('dirAddSel').innerHTML = '<option value="">— เลือกเจ้าหน้าที่ —</option>'
+      + cand.map(u => `<option value="${A.esc(u.uid)}">${A.esc(u.name || u.email)}</option>`).join('');
+    document.getElementById('dirAdd').onclick = () => {
+      const u = USERS.find(x => x.uid === document.getElementById('dirAddSel').value);
+      if (u) editDir({ id: u.uid, name: u.name || '', role: u.cert || '', recv: [...(u.positions || [])] }, true);
+    };
 
     /* คนที่มีตำแหน่งแต่ไม่อยู่ในรายชื่อ = ส่งฟอร์มถึงเขาไม่ได้ ทั้งที่ระบบรู้ว่าเขารับได้
        เกิดได้เมื่อโปรไฟล์ถูกแก้จากที่อื่น หรือรายชื่อถูกเขียนทับ (firebase/seed.mjs เคยทำ)
@@ -1070,6 +1085,50 @@ async function syncDir(miss){
     log('เพิ่มเข้ารายชื่อผู้รับฟอร์มแล้ว ' + miss.length + ' คน', 'green-600');
     dir(); check();
   } catch(e){ alert('เพิ่มไม่สำเร็จ: ' + (e.code || e.message)); }
+}
+
+/* แก้รายชื่อผู้รับฟอร์มรายคน — ผู้ดูแลระบบเท่านั้น (publicDirectory เขียนได้เฉพาะ admin)
+   เอกสารนี้อ่านได้ทั้งโลก จึงมีแค่ ชื่อ · ตำแหน่ง · ประเภทฟอร์มที่รับ ห้ามอีเมลหรือเบอร์โทร
+   "รับฟอร์มของตำแหน่ง" คือกองรอที่คนนี้กดรับงานได้ — เลือกให้ตำแหน่งในโปรไฟล์ตรงกันได้ในคราวเดียว
+   (ตำแหน่งในโปรไฟล์ใช้เลือกผู้ลงนามบันทึกข้อความ และคัดว่าใครเห็นตารางบันทึก) */
+function editDir(x, isNew){
+  if (!x) return;
+  const R = new Set(x.recv || []), u = USERS.find(v => v.uid === x.id);
+  const box = document.getElementById('dirEdit');
+  box.innerHTML = `<div class="card" style="margin-top:12px;border-color:var(--navy-900)">
+    <h3>${isNew ? 'เพิ่มเข้ารายชื่อผู้รับฟอร์ม' : 'แก้รายชื่อผู้รับฟอร์ม'} — ${A.esc(x.name || '')}</h3>
+    <div class="fk-f"><label for="deName">ชื่อที่แสดงให้ผู้ส่งเลือก</label><input id="deName" type="text" value="${A.esc(x.name || '')}"></div>
+    <div class="fk-f"><label for="deRole">ตำแหน่ง (ข้อความ)</label><input id="deRole" type="text" value="${A.esc(x.role || x.position || '')}" placeholder="เช่น Chief Flight Instructor"></div>
+    <div class="fk-f"><label>รับฟอร์มของตำแหน่ง</label><div class="fk-opts" id="deRecv"></div></div>
+    ${u ? `<label class="ck" style="display:flex;gap:8px;align-items:center;font-size:13.5px;margin:8px 0">
+      <input type="checkbox" id="deSync" ${String((u.positions||[]).slice().sort())===String([...R].sort())?'':'checked'}>
+      ปรับตำแหน่งในโปรไฟล์ของ ${A.esc(u.name || '')} ให้ตรงกันด้วย <span class="hint">(ตอนนี้: ${A.esc((u.positions||[]).join(', ') || 'ไม่มี')})</span></label>` : ''}
+    <div class="acts"><button class="big pri" id="deSave">บันทึก</button><button class="big sec" id="deCancel">ยกเลิก</button></div></div>`;
+  chips(document.getElementById('deRecv'), POS_KEYS, R, k => k + ' · ' + POS_N[k]);
+  box.scrollIntoView({ block: 'nearest' });
+  document.getElementById('deCancel').onclick = () => { box.innerHTML = ''; };
+  document.getElementById('deSave').onclick = async () => {
+    const name = document.getElementById('deName').value.trim(), role = document.getElementById('deRole').value.trim();
+    if (!name) { alert('ใส่ชื่อก่อน'); return; }
+    if (!R.size && !confirm('ไม่ได้เลือกตำแหน่งที่รับฟอร์มเลย — คนนี้จะกดรับงานจากกองรอไม่ได้ บันทึกต่อไหม?')) return;
+    const ref = A.db.collection('publicDirectory').doc('instructors');
+    try {
+      const d = await ref.get();
+      const list = ((d.exists && d.data().list) || []).filter(v => v.id !== x.id);
+      list.push({ id: x.id, name, role, position: role, recv: [...R] });
+      await ref.set({ list, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+      const sync = document.getElementById('deSync');
+      if (u && sync && sync.checked) {
+        await A.db.collection('users').doc(x.id).set({ positions: [...R] }, { merge: true });
+        u.positions = [...R];
+        const sref = A.db.collection('staffDirectory').doc('current'), sd = await sref.get();
+        const sl = ((sd.exists && sd.data().list) || []).map(v => v.id === x.id ? Object.assign({}, v, { positions: [...R] }) : v);
+        await sref.set({ list: sl }, { merge: true });
+      }
+      log((isNew ? 'เพิ่ม ' : 'แก้ ') + name + ' ในรายชื่อผู้รับฟอร์มแล้ว', 'green-600');
+      box.innerHTML = ''; dir(); check(); paintUsers();
+    } catch (e) { alert('บันทึกไม่สำเร็จ: ' + (e.code || e.message)); }
+  };
 }
 
 async function removeFromDir(id){
