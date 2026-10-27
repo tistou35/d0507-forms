@@ -258,8 +258,10 @@ async function loadRecords(){
       A.db.collection('submissions').where('formCode', '==', F.abbr).get(),
       A.db.collection('tasks').where('formCode', '==', F.abbr).get(),
     ]);
+    // records.sort = ช่องวันที่ในใบ (เช่นวันที่บิน) เรียงใหม่ไปเก่า · วันเดียวกันหรือไม่มีค่า เรียงตามเวลาส่ง
+    const sk = REC.sort, dv = r => String(((r.data || {})[sk]) || '');
     RECS = s.docs.map(d => Object.assign({ id: d.id }, d.data()))
-      .sort((a, b) => recMs(b.submittedAt) - recMs(a.submittedAt));
+      .sort((a, b) => (sk && dv(b).localeCompare(dv(a))) || recMs(b.submittedAt) - recMs(a.submittedAt));
     RTASK = {};
     t.docs.forEach(d => { const v = d.data();
       if (v.state === 'open' || v.state === 'pool') RTASK[v.subId] = v; });
@@ -297,7 +299,7 @@ function paintRecords(){
     ? `<div class="empty">${esc(A.L(RECS.length ? {th:'ไม่มีใบที่ตรงกับที่ค้นหา',en:'No records match'}
                                              : {th:'ยังไม่มีใบที่ส่งเข้ามา',en:'No records yet'}))}</div>`
     : `<div class="twrap"><table><thead><tr>
-        <th>${esc(A.L({th:'ส่งเมื่อ',en:'Submitted'}))}</th>
+        ${REC.hideSubmitted ? '' : `<th>${esc(A.L({th:'ส่งเมื่อ',en:'Submitted'}))}</th>`}
         ${cols.map((c, i) => `<th${i > 1 && i < cols.length - 1 ? ' class="hide-s"' : ''}>${esc(A.L(c.label) || c.k)}</th>`).join('')}
         <th>${esc(A.L({th:'สถานะ',en:'Status'}))}</th><th></th></tr></thead><tbody>${
         shown.map(r => {
@@ -306,8 +308,8 @@ function paintRecords(){
             ? (tk.state === 'open' ? (tk.assigneeName || '') : A.L({th:'กองรอ ',en:'Pool '}) + (tk.pool || ''))
             : A.L({th:'ยังไม่มีผู้รับ',en:'No one assigned'});
           return `<tr tabindex="0" data-open="${esc(r.id)}">
-            <td class="mono">${esc(new Date(recMs(r.submittedAt)).toLocaleDateString(A.lang === 'en' ? 'en-GB' : 'th-TH',
-                {day:'2-digit',month:'short',year:'2-digit'}))}</td>
+            ${REC.hideSubmitted ? '' : `<td class="mono">${esc(new Date(recMs(r.submittedAt)).toLocaleDateString(A.lang === 'en' ? 'en-GB' : 'th-TH',
+                {day:'2-digit',month:'short',year:'2-digit'}))}</td>`}
             ${cols.map((c, i) => `<td${i > 1 && i < cols.length - 1 ? ' class="hide-s"' : ''}>${esc(recVal(c, c.computed ? (r.computed || {})[c.k] : d[c.k]))}</td>`).join('')}
             <td><span class="st ${st.k}">${esc(A.L(st.n))}</span>${who ? `<span class="who">${esc(who)}</span>` : ''}</td>
             <td class="go">${esc(A.L({th:'เปิด',en:'Open'}))} →</td></tr>`;

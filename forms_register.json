@@ -1148,7 +1148,16 @@
      "ops",
      "ins"
     ],
+    "sort": "evalDate",
+    "hideSubmitted": true,
     "cols": [
+     {
+      "k": "evalDate",
+      "h": {
+       "th": "วันที่บิน",
+       "en": "Flight date"
+      }
+     },
      "picFirst",
      "picLast",
      "aircraftReg",

@@ -515,6 +515,13 @@ def main():
                     c['opt'] = {str(o['v']): o.get('n') for o in x['opt']}
                 cols.append(c)
             fpub['records'] = {'pos': rd.get('pos', []), 'roles': rd.get('roles', []), 'cols': cols}
+            # sort = ช่องวันที่ที่ใช้เรียงแทนเวลาส่ง (เช่นวันที่บิน) · hideSubmitted = ไม่แสดงคอลัมน์ "ส่งเมื่อ"
+            if rd.get('sort'):
+                if rd['sort'] not in fl:
+                    sys.exit("%s: records.sort อ้าง '%s' ที่ไม่มีในนิยามฟอร์ม" % (f['abbr'], rd['sort']))
+                fpub['records']['sort'] = rd['sort']
+            if rd.get('hideSubmitted'):
+                fpub['records']['hideSubmitted'] = True
         fpub['prev'] = [x['abbr'] for x in reg['forms'] if f['abbr'] in (x.get('next') or [])]
         if not fpub['prev']:
             del fpub['prev']
