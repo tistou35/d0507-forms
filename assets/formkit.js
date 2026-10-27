@@ -141,6 +141,10 @@
     this.lang = opts.lang || (global.D0507 && global.D0507.lang) || 'th';
     this.upload = opts.upload || null;      // ฟังก์ชันอัปโหลดไฟล์แนบ มาจากหน้าที่เรียก
     this.data = opts.data || {};
+    /* ข้อมูลของ "ตัวใบ" ที่ไม่ได้เป็นคำตอบ เช่น formRev = Rev ที่ใบนี้ถูกส่งมา
+       ใช้ใน showIf ได้ แต่ไม่ปนเข้า data จึงไม่ถูกบันทึกกลับตอนอนุมัติ
+       (FRAE Rev 01 เปลี่ยนข้อในส่วนที่ 2 — ใบเก่าต้องแสดงข้อชุดเดิมที่ถูกถามจริง) */
+    this.meta = opts.meta || {};
     this.party = opts.party || null;          // party ที่ผู้ใช้ปัจจุบันกรอกได้
     this.readonly = !!opts.readonly;
     this.onChange = opts.onChange || function () {};
@@ -231,7 +235,7 @@
   }
 
   FormKit.prototype.ctx = function () {
-    const c = Object.assign({}, this.data, this.computed());
+    const c = Object.assign({}, this.meta, this.data, this.computed());
     const self = this;
     // เกรดที่ยังไม่ได้ให้ ไม่นับว่าต่ำกว่าเกณฑ์ — ไม่งั้นฟอร์มเปล่าจะขึ้นว่าไม่ผ่านทันที
     const below = (n, starOnly) => Object.keys(self.fields).some(k => {

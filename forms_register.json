@@ -1090,13 +1090,13 @@
   },
   {
    "doc": "D-0507-FRAE-001",
-   "code": "IM-DRM-304-A",
+   "code": "IM-DRM-304-B",
    "abbr": "FRAE",
    "t": "Flight Risk Assessment and Evaluation",
    "th": "การประเมินความเสี่ยงก่อนทำการบิน",
    "iss": "01",
-   "rev": "00",
-   "eff": "07 JUL 2022",
+   "rev": "01",
+   "eff": "27 OCT 2026",
    "own": "IM",
    "lef": [
     "OMA",
@@ -1134,7 +1134,7 @@
     "preflight"
    ],
    "blank": "blank/FRAE.pdf",
-   "tpl": "1iglI6fZuJjDp1AixRf2OIEokGbRnhT4RZFeIVtn6kCE",
+   "tpl": "1oGTzwxPmwZqlozEejailkP6gw2y66JKKvYg9tcL0K1Y",
    "edit": "12my_RbjqOTRE9qkYUBh1AlopHApkRLG1YFAoGhOpl2E",
    "records": {
     "pos": [

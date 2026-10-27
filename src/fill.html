@@ -578,7 +578,10 @@ async function send(){
     const u=firebase.auth().currentUser;
     const ref=A.db.collection('submissions').doc();
     const d=new Date(), p2=n=>String(n).padStart(2,'0');
-    const trk=`${F.abbr}-${d.getFullYear()}${p2(d.getMonth()+1)}${p2(d.getDate())}-${ref.id.slice(0,4).toUpperCase()}`;
+    /* ?test=1 — ใบทดสอบของผู้ดูแลหรือบัญชีทดสอบ: เลขที่ขึ้นต้น TEST- เพื่อให้ dropTest เก็บกวาด
+       ชีตและ PDF ได้ (ตัวส่งออกยอมลบเฉพาะเลขที่มีคำว่า TEST) — คนทั่วไปใส่พารามิเตอร์นี้ก็ไม่มีผล */
+    const tst = new URLSearchParams(location.search).get('test')==='1' && (A.isAdmin() || (A.profile&&A.profile.test===true));
+    const trk=`${tst?'TEST-':''}${F.abbr}-${d.getFullYear()}${p2(d.getMonth()+1)}${p2(d.getDate())}-${ref.id.slice(0,4).toUpperCase()}`;
     const ctx=FK.ctx();
     const steps=(DEF.route||[]).filter(r=>FormKit.evalCond(r.onlyIf,ctx));
     const done=steps.length<=1;

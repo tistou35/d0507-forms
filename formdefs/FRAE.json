@@ -1,10 +1,10 @@
 {
  "code": "FRAE",
  "doc": "D-0507-FRAE-001",
- "control": "IM-DRM-304-A",
+ "control": "IM-DRM-304-B",
  "issue": "01",
- "rev": "00",
- "eff": "07 JUL 2022",
+ "rev": "01",
+ "eff": "27 OCT 2026",
  "title": {
   "th": "การประเมินความเสี่ยงก่อนทำการบิน",
   "en": "Flight Risk Assessment and Evaluation (FRAE)"
@@ -20,8 +20,8 @@
    },
    {
     "k": "T2",
-    "th": "ปัจจัยมนุษย์",
-    "en": "Human factor"
+    "th": "ปัจจัยมนุษย์ / ความพร้อม",
+    "en": "Human factor / Readiness"
    },
    {
     "k": "T3",
@@ -376,11 +376,93 @@
    "k": "S2",
    "tab": "T2",
    "title": {
-    "th": "ส่วนที่ 2 — ปัจจัยมนุษย์",
-    "en": "Section 2 — Human factor"
+    "th": "ส่วนที่ 2 — ปัจจัยมนุษย์ / ความพร้อมส่วนบุคคล",
+    "en": "Section 2 — Human factor / Personal readiness"
    },
    "party": "pic",
    "fields": [
+    {
+     "k": "s2Currency",
+     "type": "check",
+     "score": 3,
+     "label": {
+      "th": "ไม่ current หรือขาดประสบการณ์บินล่าสุดสำหรับเที่ยวบินนี้หรือไม่",
+      "en": "Are you not current or lacking recent flying experience for the planned flight?"
+     },
+     "showIf": "formRev != 00"
+    },
+    {
+     "k": "s2FatigueDuty",
+     "type": "check",
+     "score": 3,
+     "label": {
+      "th": "เหนื่อยล้า พักผ่อนไม่พอ หรือได้รับผลจากวันทำงานหรือช่วงปฏิบัติหน้าที่ที่หนักหรือไม่",
+      "en": "Are you fatigued, inadequately rested, or affected by a demanding workday or duty period?"
+     },
+     "showIf": "formRev != 00"
+    },
+    {
+     "k": "s2IllnessMedication",
+     "type": "check",
+     "score": 3,
+     "label": {
+      "th": "เจ็บป่วย มีอาการ หรือใช้ยาที่อาจกระทบการบินหรือไม่",
+      "en": "Are you ill, experiencing symptoms, or taking medication that may affect flight performance?"
+     },
+     "showIf": "formRev != 00",
+     "hint": {
+      "en": "Do not enter diagnosis, medication names or private details — only whether the risk exists.",
+      "th": "ไม่ต้องระบุชื่อโรค ชื่อยา หรือเรื่องส่วนตัว — ตอบแค่ว่ามีความเสี่ยงข้อนี้หรือไม่"
+     }
+    },
+    {
+     "k": "s2Alcohol",
+     "type": "check",
+     "score": 100,
+     "label": {
+      "th": "ดื่มแอลกอฮอล์ภายในช่วงเวลาที่ห้าม หรือยังมีฤทธิ์ตกค้างอยู่หรือไม่",
+      "en": "Have you consumed alcohol within the prohibited period, or are any residual effects present?"
+     },
+     "showIf": "formRev != 00"
+    },
+    {
+     "k": "s2Stress",
+     "type": "check",
+     "score": 3,
+     "label": {
+      "th": "มีความเครียด ความกดดันทางอารมณ์ หรือเรื่องส่วนตัวที่มีนัยสำคัญหรือไม่",
+      "en": "Are you experiencing significant stress, emotional strain, or personal concerns?"
+     },
+     "showIf": "formRev != 00",
+     "hint": {
+      "en": "Do not enter diagnosis, medication names or private details — only whether the risk exists.",
+      "th": "ไม่ต้องระบุชื่อโรค ชื่อยา หรือเรื่องส่วนตัว — ตอบแค่ว่ามีความเสี่ยงข้อนี้หรือไม่"
+     }
+    },
+    {
+     "k": "s2AccumulatedStress",
+     "type": "check",
+     "score": 3,
+     "label": {
+      "th": "มีการเปลี่ยนแปลงในชีวิตหรือเหตุการณ์ตึงเครียดหลายเรื่องสะสมในช่วงนี้หรือไม่",
+      "en": "Have multiple significant life changes or stressful events accumulated recently?"
+     },
+     "showIf": "formRev != 00",
+     "hint": {
+      "en": "Awareness prompt only — no score table or threshold of its own.",
+      "th": "เป็นข้อเตือนให้ตระหนักเท่านั้น ไม่มีตารางคะแนนหรือเกณฑ์ของตัวเอง"
+     }
+    },
+    {
+     "k": "s2FoodHydration",
+     "type": "check",
+     "score": 1,
+     "label": {
+      "th": "กินอาหารหรือดื่มน้ำไม่เพียงพอสำหรับเที่ยวบินนี้หรือไม่",
+      "en": "Have you had inadequate food or hydration for the planned flight?"
+     },
+     "showIf": "formRev != 00"
+    },
     {
      "k": "s2NotCurrent",
      "type": "check",
@@ -388,7 +470,9 @@
      "label": {
       "th": "ไม่ current ตามเกณฑ์ 90 วัน",
       "en": "Not 90-day current"
-     }
+     },
+     "showIf": "formRev == 00",
+     "legacy": "Rev 00"
     },
     {
      "k": "s2Fatigue",
@@ -397,7 +481,9 @@
      "label": {
       "th": "ล้าหรือพักผ่อนไม่พอ",
       "en": "Fatigue or inadequate rest"
-     }
+     },
+     "showIf": "formRev == 00",
+     "legacy": "Rev 00"
     },
     {
      "k": "s2AfterWork",
@@ -406,7 +492,9 @@
      "label": {
       "th": "บินต่อทันทีหลังเลิกงาน",
       "en": "Going to fly immediately after workday"
-     }
+     },
+     "showIf": "formRev == 00",
+     "legacy": "Rev 00"
     },
     {
      "k": "s2Illness",
@@ -415,7 +503,9 @@
      "label": {
       "th": "เจ็บป่วย เป็นหวัด ไข้หวัดใหญ่",
       "en": "Illness, cold, flu"
-     }
+     },
+     "showIf": "formRev == 00",
+     "legacy": "Rev 00"
     },
     {
      "k": "s2Personal",
@@ -424,7 +514,9 @@
      "label": {
       "th": "มีปัญหาความสัมพันธ์ส่วนตัว",
       "en": "Personal relationship issue"
-     }
+     },
+     "showIf": "formRev == 00",
+     "legacy": "Rev 00"
     },
     {
      "k": "s2Business",
@@ -433,7 +525,9 @@
      "label": {
       "th": "มีปัญหาเรื่องงานหรือธุรกิจ",
       "en": "Business issue"
-     }
+     },
+     "showIf": "formRev == 00",
+     "legacy": "Rev 00"
     },
     {
      "k": "s2Hunger",
@@ -442,9 +536,15 @@
      "label": {
       "th": "อดอาหารหรือกินน้อยกว่าปกติ",
       "en": "Starving or eating less food"
-     }
+     },
+     "showIf": "formRev == 00",
+     "legacy": "Rev 00"
     }
-   ]
+   ],
+   "desc": {
+    "th": "พิจารณาตาม IMSAFE และความเครียดสะสมจากการเปลี่ยนแปลงในชีวิต เมื่อประเมินความพร้อมของตนเอง",
+    "en": "Consider IMSAFE and accumulated life-change stress when assessing personal readiness."
+   }
   },
   {
    "k": "S3",
@@ -838,8 +938,8 @@
       "en": "Mitigation"
      },
      "hint": {
-      "th": "บังคับกรอกเมื่อคะแนนตั้งแต่ 5 ขึ้นไป — ระบุว่าจะลดความเสี่ยงข้อใดอย่างไร",
-      "en": "Required once the score reaches 5 — state which risks you are reducing and how."
+      "th": "บังคับกรอกเมื่อคะแนนตั้งแต่ 5 ขึ้นไป — ระบุสิ่งที่ทำเพื่อลดความเสี่ยง เช่น พักผ่อนก่อนบิน เลื่อนเวลาออก เปลี่ยนเป็นภาคพื้น เปลี่ยนจากบินเดี่ยวเป็นบินคู่ ปรึกษา FI/HT ยกเลิกเที่ยวบิน — ไม่ต้องระบุรายละเอียดส่วนตัว",
+      "en": "Required once the score reaches 5 — record the operational action taken, e.g. rested before flight, delayed departure, changed to ground instruction, changed from solo to dual, consulted FI / HT, flight cancelled. Do not record private details."
      }
     },
     {

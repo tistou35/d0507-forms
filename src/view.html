@@ -157,7 +157,7 @@ async function load(){
     return;
   }
   // ใช้ docSpec ตัวเดียวกับที่ส่งไปทำ PDF — หน้าจอกับกระดาษจึงเป็นเนื้อหาชุดเดียวกัน
-  const FK=new FormKit(DEF,{readonly:true,lang:A.lang,data:S.data||{}});
+  const FK=new FormKit(DEF,{readonly:true,lang:A.lang,data:S.data||{},meta:{formRev:S.rev||'00'}});
   const spec=FK.docSpec();
   document.getElementById('doc').innerHTML=`<div class="doc">`+
     spec.sections.map(sec=>`<h3>${esc(sec.title)}</h3>`+sec.rows.map(r=>

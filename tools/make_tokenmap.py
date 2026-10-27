@@ -187,6 +187,9 @@ def build(abbr, verbose=False):
     fields = []
     for s in d.get('sections', []):
         for f in s.get('fields', []):
+            # ช่องของฉบับก่อน (legacy) ไม่อยู่บนกระดาษฉบับนี้แล้ว — มีไว้ให้ใบเก่าเปิดดูได้เท่านั้น
+            if f.get('legacy'):
+                continue
             f = dict(f, _ap=(s.get('party') == apParty and apParty))
             fields.append(f)
     cells, lines = docx_parts(dp)

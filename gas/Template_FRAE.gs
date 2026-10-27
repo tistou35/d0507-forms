@@ -6,7 +6,7 @@
  *   · ช่องติ๊กผูกกับ key ใน formdefs/FRAE.json ตั้งแต่ตอนสร้าง ไม่มีทางใส่ผิดช่อง
  *   · สร้างใหม่ได้ทุกเมื่อเมื่อฟอร์มออก revision ใหม่ ไม่ต้องไล่แก้มือทีละช่อง
  *
- * เลย์เอาต์ตาม D-0507-FRAE-001 Issue 01/Rev 00 (07 JUL 2022)
+ * เลย์เอาต์ตาม D-0507-FRAE-001 Issue 01/Rev 01 (27 OCT 2026)
  * คะแนนในวงเล็บคือน้ำหนักจริงจากเอกสาร ตรงกับ formdefs/FRAE.json
  */
 
@@ -14,7 +14,7 @@ var FRAE = {
   code: 'FRAE',
   doc: 'D-0507-FRAE-001',
   issue: '01',
-  rev: '00',
+  rev: '01',
   titleEn: 'FLIGHT RISK ASSESSMENT AND EVALUATION',
   titleTh: 'การประเมินความเสี่ยงก่อนทำการบิน',
 
@@ -34,14 +34,17 @@ var FRAE = {
         ['1st', '1st', 0], ['2nd', '2nd', 1], ['3rd', '3rd', 2], ['gt3', 'More than 3rd', 2] ] },
     ]},
 
-    { n: '2', t: 'HUMAN FACTOR', rows: [
-      ['s2NotCurrent', 'Not 90-day current', 3],
-      ['s2Fatigue',    'Fatigue or inadequate rest', 3],
-      ['s2AfterWork',  'Going to fly immediately after workday', 1],
-      ['s2Illness',    'Illness, cold, flu', 3],
-      ['s2Personal',   'Personal relationship issue', 3],
-      ['s2Business',   'Business issue', 3],
-      ['s2Hunger',     'Starving or eating less food', 1],
+    // Rev 01 (27 OCT 2026) — IMSAFE และความเครียดสะสม (LCU awareness) ตาม CAAT PEL Circular 2026/C006
+    // ข้อชุด Rev 00 (s2NotCurrent … s2Hunger) ยังอยู่ใน formdefs เพื่อเปิดดูใบเก่า แต่ไม่อยู่บนกระดาษแล้ว
+    { n: '2', t: 'HUMAN FACTOR / PERSONAL READINESS',
+      note: 'Consider IMSAFE and accumulated life-change stress when assessing personal readiness.', rows: [
+      ['s2Currency',          'Are you not current or lacking recent flying experience for the planned flight?', 3],
+      ['s2FatigueDuty',       'Are you fatigued, inadequately rested, or affected by a demanding workday or duty period?', 3],
+      ['s2IllnessMedication', 'Are you ill, experiencing symptoms, or taking medication that may affect flight performance?', 3],
+      ['s2Alcohol',           'Have you consumed alcohol within the prohibited period, or are any residual effects present?', 100],
+      ['s2Stress',            'Are you experiencing significant stress, emotional strain, or personal concerns?', 3],
+      ['s2AccumulatedStress', 'Have multiple significant life changes or stressful events accumulated recently?', 3],
+      ['s2FoodHydration',     'Have you had inadequate food or hydration for the planned flight?', 1],
     ]},
 
     { n: '3', t: 'DEPARTURE', rows: [
@@ -161,6 +164,10 @@ function info_(b) {
 function section_(b, s) {
   var p = b.appendParagraph('SECTION ' + s.n + '  —  ' + s.t);
   p.setAttributes(attr_({ SZ: 10, C: '#FFFFFF', BOLD: true, SPACE_BEFORE: 6, SPACE_AFTER: 0, BG: NAVY }));
+  if (s.note) {     // แนวทางเท่านั้น ไม่ใช่ข้อให้คะแนน
+    p = b.appendParagraph(s.note);
+    p.setAttributes(attr_({ SZ: 8.5, C: GREY, ITALIC: true, SPACE_BEFORE: 2, SPACE_AFTER: 2 }));
+  }
 
   var rows = s.rows.map(function (r) {
     if (r.sel) {
@@ -245,7 +252,8 @@ function attr_(o) {
   if (o.SZ !== undefined)   a[D.FONT_SIZE] = o.SZ;
   if (o.C)                  a[D.FOREGROUND_COLOR] = o.C;
   if (o.BOLD !== undefined) a[D.BOLD] = o.BOLD;
-  if (o.ALIGN)              a[D.HORIZONTAL_ALIGNMENT] = o.ALIGN;
+  if (o.ITALIC !== undefined) a[D.ITALIC] = o.ITALIC;
+  if (o.ALIGN)             a[D.HORIZONTAL_ALIGNMENT] = o.ALIGN;
   if (o.SPACE_BEFORE !== undefined) a[D.SPACING_BEFORE] = o.SPACE_BEFORE;
   if (o.SPACE_AFTER !== undefined)  a[D.SPACING_AFTER] = o.SPACE_AFTER;
   a[D.LINE_SPACING] = 1.15;

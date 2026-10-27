@@ -1159,13 +1159,42 @@ var TOKEN_MAP = {
   "FRAE": {
     "abbr": "FRAE",
     "docx": "D-0507-FRAE-001.docx",
-    "control": "IM-DRM-304-A",
-    "orderWarn": [],
+    "control": "IM-DRM-304-B",
+    "orderWarn": [
+      "ช่องที่ 9: เอกสารว่า \"(5)\" · token คือ {{k_s1Sigmet}}",
+      "ช่องที่ 10: เอกสารว่า \"(100)\" · token คือ {{k_s1Thunder}}",
+      "ช่องที่ 11: เอกสารว่า \"(100)\" · token คือ {{k_s1Freezing}}",
+      "ช่องที่ 12: เอกสารว่า \"(2)\" · token คือ {{k_s1Autopilot}}",
+      "ช่องที่ 13: เอกสารว่า \"(1)\" · token คือ {{k_s1AfterMx}}",
+      "ช่องที่ 22: เอกสารว่า \"(3)\" · token คือ {{k_s2Currency}}",
+      "ช่องที่ 23: เอกสารว่า \"(3)\" · token คือ {{k_s2FatigueDuty}}",
+      "ช่องที่ 24: เอกสารว่า \"(3)\" · token คือ {{k_s2IllnessMedication}}",
+      "ช่องที่ 25: เอกสารว่า \"(100)\" · token คือ {{k_s2Alcohol}}",
+      "ช่องที่ 26: เอกสารว่า \"(3)\" · token คือ {{k_s2Stress}}",
+      "ช่องที่ 27: เอกสารว่า \"(3)\" · token คือ {{k_s2AccumulatedStress}}",
+      "ช่องที่ 28: เอกสารว่า \"(1)\" · token คือ {{k_s2FoodHydration}}",
+      "ช่องที่ 29: เอกสารว่า \"(3)\" · token คือ {{k_s3Wind}}",
+      "ช่องที่ 30: เอกสารว่า \"(3)\" · token คือ {{k_s3Crosswind}}",
+      "ช่องที่ 31: เอกสารว่า \"(2)\" · token คือ {{k_s3Night}}",
+      "ช่องที่ 32: เอกสารว่า \"(1)\" · token คือ {{k_s3Precip}}",
+      "ช่องที่ 33: เอกสารว่า \"(1)\" · token คือ {{k_s3MaxWeight}}",
+      "ช่องที่ 34: เอกสารว่า \"(1)\" · token คือ {{k_s3Terrain}}",
+      "ช่องที่ 41: เอกสารว่า \"(5)\" · token คือ {{k_s4Water}}",
+      "ช่องที่ 42: เอกสารว่า \"(5)\" · token คือ {{k_s4Mountain}}",
+      "ช่องที่ 43: เอกสารว่า \"(2)\" · token คือ {{k_s4NightIMC}}",
+      "ช่องที่ 44: เอกสารว่า \"(1)\" · token คือ {{k_s4LowPressure}}",
+      "ช่องที่ 46: เอกสารว่า \"(3)\" · token คือ {{k_s5Crosswind}}",
+      "ช่องที่ 47: เอกสารว่า \"(1)\" · token คือ {{k_s5Night}}",
+      "ช่องที่ 48: เอกสารว่า \"(1)\" · token คือ {{k_s5Precip}}",
+      "ช่องที่ 49: เอกสารว่า \"(1)\" · token คือ {{k_s5Terrain}}",
+      "ช่องที่ 50: เอกสารว่า \"(5)\" · token คือ {{k_s5Windshear}}",
+      "ช่องที่ 51: เอกสารว่า \"(1)\" · token คือ {{k_s5Temp}}",
+      "ช่องที่ 52: เอกสารว่า \"(1)\" · token คือ {{k_s5Spread}}",
+      "ช่องที่ 53: เอกสารว่า \"(1)\" · token คือ {{k_s5Unfamiliar}}",
+      "ช่องที่ 54: เอกสารว่า \"(1)\" · token คือ {{k_s5NoTower}}",
+      "ช่องที่ 55: เอกสารว่า \"(1)\" · token คือ {{k_s5NoRadar}}"
+    ],
     "byLabel": [
-      {
-        "label": "PIC Name — First Name",
-        "tok": "{{picFirst}}"
-      },
       {
         "label": "Last Name",
         "tok": "{{picLast}}"
@@ -1173,21 +1202,19 @@ var TOKEN_MAP = {
       {
         "label": "Date (Evaluation Risk)",
         "tok": "{{evalDate}}"
+      },
+      {
+        "label": "PIC Name — First Name",
+        "tok": "{{picFirst}}"
+      },
+      {
+        "label": "TOTAL RISK SCORE",
+        "tok": "{{score}}"
       }
     ],
     "byLine": [],
     "byCell": [],
     "boxes": [
-      {
-        "tok": "{{k_role_PIC}}",
-        "label": "PIC — pilot in command",
-        "ord": "PIC — pilot in command"
-      },
-      {
-        "tok": "{{k_role_Student}}",
-        "label": "Student — student pilot",
-        "ord": "Student — student pilot"
-      },
       {
         "tok": "{{k_aircraftReg_HS-VVD}}",
         "label": "HS-VVD",
@@ -1294,39 +1321,39 @@ var TOKEN_MAP = {
         "ord": "More than 3rd"
       },
       {
-        "tok": "{{k_s2NotCurrent}}",
-        "label": "Not 90-day current",
-        "item": "Not 90-day current"
+        "tok": "{{k_s2Currency}}",
+        "label": "Are you not current or lacking recent flying experience for the planned flight?",
+        "item": "Are you not current or lacking recent flying experience for the planned flight?"
       },
       {
-        "tok": "{{k_s2Fatigue}}",
-        "label": "Fatigue or inadequate rest",
-        "item": "Fatigue or inadequate rest"
+        "tok": "{{k_s2FatigueDuty}}",
+        "label": "Are you fatigued, inadequately rested, or affected by a demanding workday or duty period?",
+        "item": "Are you fatigued, inadequately rested, or affected by a demanding workday or duty period?"
       },
       {
-        "tok": "{{k_s2AfterWork}}",
-        "label": "Going to fly immediately after workday",
-        "item": "Going to fly immediately after workday"
+        "tok": "{{k_s2IllnessMedication}}",
+        "label": "Are you ill, experiencing symptoms, or taking medication that may affect flight performance?",
+        "item": "Are you ill, experiencing symptoms, or taking medication that may affect flight performance?"
       },
       {
-        "tok": "{{k_s2Illness}}",
-        "label": "Illness, cold, flu",
-        "item": "Illness, cold, flu"
+        "tok": "{{k_s2Alcohol}}",
+        "label": "Have you consumed alcohol within the prohibited period, or are any residual effects present?",
+        "item": "Have you consumed alcohol within the prohibited period, or are any residual effects present?"
       },
       {
-        "tok": "{{k_s2Personal}}",
-        "label": "Personal relationship issue",
-        "item": "Personal relationship issue"
+        "tok": "{{k_s2Stress}}",
+        "label": "Are you experiencing significant stress, emotional strain, or personal concerns?",
+        "item": "Are you experiencing significant stress, emotional strain, or personal concerns?"
       },
       {
-        "tok": "{{k_s2Business}}",
-        "label": "Business issue",
-        "item": "Business issue"
+        "tok": "{{k_s2AccumulatedStress}}",
+        "label": "Have multiple significant life changes or stressful events accumulated recently?",
+        "item": "Have multiple significant life changes or stressful events accumulated recently?"
       },
       {
-        "tok": "{{k_s2Hunger}}",
-        "label": "Starving or eating less food",
-        "item": "Starving or eating less food"
+        "tok": "{{k_s2FoodHydration}}",
+        "label": "Have you had inadequate food or hydration for the planned flight?",
+        "item": "Have you had inadequate food or hydration for the planned flight?"
       },
       {
         "tok": "{{k_s3Wind}}",
@@ -1553,11 +1580,12 @@ var TOKEN_MAP = {
       },
       {
         "tok": "{{sig_picSign}}",
-        "label": "PIC / Student signature",
-        "labelTh": "ลายเซ็น PIC / นักเรียน",
+        "label": "Pilot signature (PIC)",
+        "labelTh": "ลายเซ็นนักบิน (PIC)",
         "sign": true
       }
-    ]
+    ],
+    "strip": []
   },
   "FTR": {
     "abbr": "FTR",

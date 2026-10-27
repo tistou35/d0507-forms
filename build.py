@@ -89,7 +89,8 @@ def load_defs():
             # ตัดค่าคงที่ในเครื่องหมายคำพูดทิ้งก่อน มิฉะนั้น 'GO' จะถูกนับเป็นชื่อฟิลด์
             bare = re.sub(r"'[^']*'|\"[^\"]*\"", ' ', expr or '')
             for tok in re.findall(r'\b([a-zA-Z_]\w*)\b', bare):
-                if tok in ('true', 'false', 'anyStarBelow', 'anyBelow', 'countBelow', 'filled', 'score', 'has'):
+                # formRev = Rev ที่ใบถูกส่งมา (หัวใบ ส่งเข้า FormKit ทาง meta) ไม่ใช่ฟิลด์ในฟอร์ม
+                if tok in ('true', 'false', 'anyStarBelow', 'anyBelow', 'countBelow', 'filled', 'score', 'has', 'formRev'):
                     continue
                 if tok not in keys and tok not in {c2.get('k') for c2 in d.get('compute', [])}:
                     errs.append(f"{name}: เงื่อนไขอ้าง '{tok}' ที่ไม่ใช่ฟิลด์หรือค่าคำนวณ")

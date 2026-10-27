@@ -208,6 +208,9 @@ def check(abbr):
         for k, f in fields.items():
             if 'score' not in f:
                 continue
+            # ข้อของฉบับก่อนหน้า (legacy) อยู่ในนิยามเพื่อเปิดดูใบเก่าเท่านั้น ไม่อยู่บนกระดาษฉบับปัจจุบัน
+            if f.get('legacy'):
+                continue
             hit = (('k_' + k) in toks
                    or any(t.startswith('k_' + k + '_') for t in toks)
                    or k in quoted)
