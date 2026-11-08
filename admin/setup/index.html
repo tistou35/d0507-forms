@@ -253,6 +253,7 @@ section[data-pane].off{display:none}
           <input id="uQ" type="search" placeholder="ค้นหาชื่อ · อีเมล · ตำแหน่ง">
           <span class="cnt" id="uCnt"></span>
         </div>
+        <div id="uOrph"></div>
         <div id="uList">—</div>
       </section>
 
@@ -585,6 +586,43 @@ async function users(force){
     document.getElementById('uRel').addEventListener('click', () => users(true));
   }
   paintUsers();
+  orphans();
+}
+
+/* บัญชีที่เข้าสู่ระบบได้แต่ยังไม่มีโปรไฟล์ — รายชื่อด้านล่างอ่านจาก users/* จึงไม่เห็นคนกลุ่มนี้
+   เพิ่มแล้วได้บทบาทนักเรียนก่อน และเปิดหน้าต่างแก้ไขให้กำหนดบทบาทจริงต่อทันที */
+async function orphans(){
+  const host = document.getElementById('uOrph');
+  if (!A.isAdmin()) { host.innerHTML = ''; return; }
+  const r = await A.gas('listAccts', {}, { timeout: 60000 });
+  if (!r.ok) { host.innerHTML = `<p class="hint">ตรวจบัญชีที่ยังไม่มีโปรไฟล์ไม่ได้: ${A.esc(r.error)}</p>`; return; }
+  const have = new Set(USERS.map(u => u.uid)), L = r.result.filter(a => !have.has(a.uid));
+  if (!L.length) { host.innerHTML = ''; return; }
+  const when = t => t ? new Date(t).toLocaleDateString('th-TH', { day:'2-digit', month:'short', year:'2-digit' }) : '—';
+  host.innerHTML = `<div class="fk-gate warn" style="margin-bottom:10px"><span>
+      <b>เข้าสู่ระบบแล้วแต่ยังไม่อยู่ในรายชื่อ ${L.length} บัญชี</b> — กดเพิ่มแล้วกำหนดบทบาทได้เลย
+      ถ้าเป็นคนเดียวกับผู้ใช้ที่มีอยู่แล้ว ให้เปิดคนนั้นแล้วใช้ "รวมบัญชี" แทน</span></div>` + L.map(a => `
+    <div class="urow">
+      <div class="av2">${A.esc((a.name || a.email || '?').slice(0,2).toUpperCase())}</div>
+      <div><div class="nm">${A.esc(a.name || '(ไม่มีชื่อ)')}</div>
+        <div class="em">${A.esc(a.email)} · ${A.esc(a.prov.join(', '))} · เข้าล่าสุด ${A.esc(when(a.last))}</div></div>
+      <button type="button" class="fb" data-orph="${A.esc(a.uid)}">เพิ่มเข้ารายชื่อ</button>
+    </div>`).join('');
+  host.querySelectorAll('[data-orph]').forEach(b => b.onclick = async () => {
+    const a = L.find(x => x.uid === b.dataset.orph), ref = A.db.collection('users').doc(a.uid);
+    b.disabled = true; b.textContent = 'กำลังเพิ่ม…';
+    try {
+      // เจ้าตัวอาจเปิดเว็บพอดีและมีโปรไฟล์แล้ว — ห้ามทับ
+      await A.db.runTransaction(async t => {
+        if ((await t.get(ref)).exists) return;
+        t.set(ref, { email: a.email, name: a.name, roles: ['stu'], active: true,
+                     createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+      });
+    } catch (e) { b.disabled = false; b.textContent = 'เพิ่มไม่สำเร็จ: ' + (e.code || e.message); return; }
+    await adminLog('create', { uid: a.uid, name: a.name, email: a.email }, 'เพิ่มบัญชีที่เข้าสู่ระบบแล้วเข้ารายชื่อ');
+    await users(true);
+    editUser(a.uid);
+  });
 }
 
 /* ใบที่คนนี้เห็นรวมทุกบทบาทที่ถือ — ซ้ำกันนับครั้งเดียว

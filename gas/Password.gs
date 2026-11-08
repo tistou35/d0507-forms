@@ -117,6 +117,28 @@ function mergeAccount_(body, who) {
   return info;
 }
 
+/* รายชื่อบัญชีที่เข้าสู่ระบบได้ — หน้าตั้งค่าระบบเอาไปเทียบกับ users/* หาคนที่ยังไม่มีโปรไฟล์
+   โปรไฟล์เกิดเมื่อเจ้าตัวเปิดเว็บ คนที่เข้าครั้งเดียวแล้วไม่กลับมาจึงไม่มีวันขึ้นรายชื่อถ้าไม่ดูจากฝั่งนี้
+   คืนเฉพาะช่องที่ต้องแสดง — accounts:query ส่งแฮชรหัสผ่านมาด้วย ห้ามส่งต่อถึงเบราว์เซอร์ */
+function listAccounts_(body, who) {
+  var admins = {};
+  try { admins = fsGet_('config/admins', body.idToken); } catch (e) { throw new Error('ตรวจสิทธิ์ผู้ดูแลไม่ได้: ' + e.message); }
+  if ((admins.uids || []).indexOf(who.uid) < 0) throw new Error('ต้องเป็นผู้ดูแลระบบ');
+  var out = [], size = 500;
+  for (var offset = 0; ; offset += size) {
+    var r = acctCall_('accounts:query', { returnUserInfo: true, limit: String(size), offset: String(offset) });
+    if (r.code !== 200) throw new Error('อ่านรายชื่อบัญชีไม่สำเร็จ (' + r.code + '): ' + r.why);
+    var page = r.json.userInfo || [];
+    page.forEach(function (u) {
+      var prov = (u.providerUserInfo || []).map(function (x) { return x.providerId; });
+      if (prov.length) out.push({ uid: u.localId, email: u.email || '', name: u.displayName || '', prov: prov,
+                                  last: Number(u.lastLoginAt || 0), disabled: !!u.disabled });
+    });
+    if (page.length < size) break;
+  }
+  return out;
+}
+
 function acctCall_(method, payload) {
   var res = UrlFetchApp.fetch('https://identitytoolkit.googleapis.com/v1/projects/' + cfg_('FIREBASE_PROJECT') + '/' + method, {
     method: 'post', contentType: 'application/json', muteHttpExceptions: true,
