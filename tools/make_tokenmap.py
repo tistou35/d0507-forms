@@ -230,6 +230,11 @@ def build(abbr, verbose=False):
             lb = (f.get('label') or {}).get('en') or ''
             boxes.append({'tok': '{{k_%s}}' % f['k'], 'label': lb, 'item': lb})
             continue
+        # ตัวเลือกที่มีไว้เติมตารางให้ (seedInto) เป็นตัวช่วยบนจอ ไม่ได้อยู่บนกระดาษ
+        # EFC "หลักสูตรที่รายงานผล" มีเก้าตัวเลือก ถ้านับเป็นช่องติ๊ก จำนวนจะเกิน ☐ ในกระดาษ
+        # แล้วตัววางจะไม่ติ๊กสักช่องทั้งใบ
+        if f.get('seedInto'):
+            continue
         if f.get('type') in ('select', 'multi') and f.get('opt'):
             for o in f['opt']:
                 nm = (o.get('n') or {}).get('en') or o['v']
@@ -392,11 +397,17 @@ def build(abbr, verbose=False):
                '\n'.join(x if isinstance(x, str) else ' '.join(map(str, x)) for x in lines)
     already = set(re.findall(r'\{\{[A-Za-z0-9_]+\}\}', all_text))
     if already:
-        by_label = [b for b in by_label if b['tok'] not in already]
+        # ป้ายที่ระบุเองใน overrides คงไว้ แม้ token จะมีในเอกสารแล้ว — เป็นการวางที่ที่สองโดยตั้งใจ
+        # (EFC พิมพ์ชื่อหลักสูตรทั้งช่อง Course Attended และหัวตารางรายวิชา ซึ่งมี {{course}} อยู่แล้ว)
+        mine = set((ov.get('labels') or {}).keys())
+        by_label = [b for b in by_label if b['tok'] not in already or b['label'] in mine]
         by_cell = [b for b in by_cell if b['tok'] not in already]
         by_line = [b for b in by_line if b['tok'] not in already]
         boxes = [b for b in boxes if b['tok'] not in already]
         unmatched = [u for u in unmatched if u['tok'] not in already]
+        # ตารางที่แถวแรกเขียน token ไว้ในเอกสารแล้ว ({{s7_1_subject}}) ตัวสร้างแม่แบบขยายแถวเอง
+        # ไม่ต้องส่งโครงตารางไปให้หาหัวคอลัมน์ซ้ำ ซึ่งหาไม่เจอแล้วโยนทุกช่องไปกองท้ายเอกสาร
+        tables = [t for t in tables if not any(a.startswith('{{%s_' % t['k']) for a in already)]
 
     # ลำดับช่องติ๊กต้องตรงกับกระดาษ ไม่ใช่แค่จำนวนเท่ากัน
     # boxesPartial: กระดาษมี ☐ มากกว่าที่ฟอร์มใช้ และ ☐ ที่เหลือไม่มีใครติ๊กแล้ว
