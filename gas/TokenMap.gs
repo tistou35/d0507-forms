@@ -1060,6 +1060,14 @@ var TOKEN_MAP = {
       {
         "label": "Percentile",
         "tok": "{{pct}}"
+      },
+      {
+        "label": "Reporter / Evaluator Name:",
+        "tok": "{{htName}} — {{htPos}}"
+      },
+      {
+        "label": "Signature:",
+        "tok": "{{sig_htSign}}"
       }
     ],
     "byLine": [],
@@ -1134,22 +1142,10 @@ var TOKEN_MAP = {
         "sign": false
       },
       {
-        "tok": "{{htName}}",
-        "label": "Head of Training name",
-        "labelTh": "ชื่อหัวหน้าครูฝึก",
-        "sign": false
-      },
-      {
         "tok": "{{htDate}}",
         "label": "Date",
         "labelTh": "วันที่",
         "sign": false
-      },
-      {
-        "tok": "{{sig_htSign}}",
-        "label": "Head of Training signature",
-        "labelTh": "ลายเซ็นหัวหน้าครูฝึก",
-        "sign": true
       }
     ],
     "strip": [

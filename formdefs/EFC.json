@@ -34,8 +34,8 @@
   {
    "k": "ht",
    "n": {
-    "th": "หัวหน้าครูฝึก",
-    "en": "Head of Training"
+    "th": "ผู้รายงาน / ผู้ประเมิน",
+    "en": "Reporter / Evaluator"
    },
    "auth": "role:mgt"
   }
@@ -901,12 +901,31 @@
      "k": "htName",
      "type": "text",
      "label": {
-      "th": "ชื่อหัวหน้าครูฝึก",
-      "en": "Head of Training name"
+      "th": "ชื่อผู้รายงาน / ผู้ประเมิน",
+      "en": "Reporter / Evaluator name"
      },
      "req": true,
      "half": true,
-     "self": true
+     "self": true,
+     "hint": {
+      "th": "เติมจากชื่อในบัญชีที่เข้าสู่ระบบ — หัวหน้าครูฝึกหรือครูผู้รายงานผลก็ได้",
+      "en": "Filled from the signed-in account — the Head of Training or the instructor reporting the result"
+     }
+    },
+    {
+     "k": "htPos",
+     "type": "text",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "ตำแหน่ง / หน้าที่",
+      "en": "Position / role"
+     },
+     "ph": "Head of Training",
+     "hint": {
+      "th": "เช่น Head of Training · Chief Flight Instructor · Flight Instructor · Theoretical Knowledge Instructor",
+      "en": "e.g. Head of Training · Chief Flight Instructor · Flight Instructor · Theoretical Knowledge Instructor"
+     }
     },
     {
      "k": "htDate",
@@ -924,8 +943,8 @@
      "type": "sign",
      "req": true,
      "label": {
-      "th": "ลายเซ็นหัวหน้าครูฝึก",
-      "en": "Head of Training signature"
+      "th": "ลายเซ็นผู้รายงาน / ผู้ประเมิน",
+      "en": "Reporter / Evaluator signature"
      }
     }
    ]
