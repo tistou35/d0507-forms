@@ -115,6 +115,7 @@ section[data-pane].off{display:none}
     <div id="body" class="hide">
       <div class="stabs" role="tablist">
         <button role="tab" data-tab="users"  aria-selected="true">ผู้ใช้งาน<span id="tabN">—</span></button>
+        <button role="tab" data-tab="pending" aria-selected="false">งานค้าง</button>
         <button role="tab" data-tab="roles"  aria-selected="false">บทบาทและฟอร์ม</button>
         <button role="tab" data-tab="me"     aria-selected="false">โปรไฟล์ของฉัน</button>
         <button role="tab" data-tab="system" aria-selected="false">ระบบและทะเบียน</button>
@@ -191,6 +192,17 @@ section[data-pane].off{display:none}
         <div id="uList">—</div>
       </section>
 
+
+      <section data-pane="pending">
+        <div class="sh"><h2>งานที่ค้างอนุมัติ</h2><span class="en">Awaiting approval</span>
+          <span class="rt"><button type="button" class="fb" id="pRel">โหลดใหม่</button></span></div>
+        <p class="hint" style="margin-bottom:12px">นับวันตั้งแต่งานมาถึงผู้รับคนปัจจุบัน เรียงจากค้างนานสุด ·
+          รวมใบที่รออนุมัติและบันทึกข้อความที่รอลงนาม ไม่รวมการรับทราบหนังสือเวียน ·
+          โยกงานให้คนอื่นหรือปิดใบได้ที่ <a href="@@BASE@@admin/subs/">ใบที่ส่งเข้ามา</a></p>
+        <div class="tiles" id="pTiles"></div>
+        <div id="pWho" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px"></div>
+        <div id="pList">—</div>
+      </section>
 
       <section data-pane="roles">
         <div class="sh"><h2>บทบาทไหนเห็นฟอร์มอะไร</h2><span class="en">Forms visible per role</span>
@@ -471,9 +483,93 @@ function tab(name){
   try { history.replaceState(null, '', '#' + name); } catch(e){}
   if (name === 'users') users();
   if (name === 'roles') roleForms();
+  if (name === 'pending') pending();
 }
 document.querySelectorAll('.stabs button').forEach(b =>
   b.addEventListener('click', () => tab(b.dataset.tab)));
+
+/* ── งานค้าง ───────────────────────────────────────────────
+   อ่านจากงานที่ยังเปิดอยู่จริง ไม่ใช่เดาจากนิยามฟอร์ม เหมือนหน้าใบที่ส่งเข้ามา
+   ใบที่รออนุมัติแต่ไม่มีงานให้ใครเลยต้องขึ้นด้วย เพราะเป็นกลุ่มที่ไม่มีใครเห็นในคิวของตัวเอง
+   เฉพาะผู้ดูแลระบบ — เห็นใบของทุกฝ่ายรวมถึงรายงานนิรภัยโดยสมัครใจ */
+const P_LATE = 7;
+let PROWS = null, PTILE = 'all', PWHO = '';
+const pMs = v => { try { return v && v.toMillis ? v.toMillis() : (v ? new Date(v).getTime() : 0); } catch (e) { return 0; } };
+const pDays = t => t ? Math.max(0, Math.floor((Date.now() - t) / 864e5)) : 0;
+async function pending(){
+  const list = document.getElementById('pList');
+  const rel = document.getElementById('pRel');
+  if (!rel.dataset.wired) { rel.dataset.wired = '1'; rel.addEventListener('click', pending); }
+  if (!A.isAdmin()) { list.innerHTML = '<p class="hint">เฉพาะผู้ดูแลระบบ</p>'; return; }
+  list.innerHTML = '<p class="hint">กำลังโหลด…</p>';
+  try {
+    const [t, s, m, d] = await Promise.all([
+      A.db.collection('tasks').where('state', 'in', ['open', 'pool']).get(),
+      A.db.collection('submissions').where('status', '==', 'pending').get(),
+      A.db.collection('memos').where('status', 'in', ['submitted', 'proposed']).get(),
+      A.db.collection('publicDirectory').doc('instructors').get(),
+    ]);
+    const dirL = (d.exists && d.data().list) || [];
+    const subs = {}, mems = {}, has = {};
+    s.docs.forEach(x => { subs[x.id] = x.data(); });
+    m.docs.forEach(x => { mems[x.id] = x.data(); });
+    const nameOf = c => { const f = (A.reg.forms || []).find(x => x.abbr === c); return f ? A.nm(f) : c; };
+    const R = [];
+    t.docs.forEach(x => {
+      const v = x.data();
+      if (v.kind === 'ack') return;
+      has[v.memoId || v.subId] = true;
+      const isMemo = v.app === 'memo', src = isMemo ? mems[v.memoId] : subs[v.subId];
+      const open = v.state === 'open', claim = open ? [] : dirL.filter(p => (p.recv || []).includes(v.pool)).map(p => p.name);
+      R.push({ code: v.formCode || '', name: isMemo ? (v.title || '') : nameOf(v.formCode), tracking: v.tracking || '',
+        kind: open ? 'open' : (claim.length ? 'pool' : 'none'),
+        who: open ? (v.assigneeName || 'ผู้รับที่ระบุตัว') : 'กองรอ ' + (v.pool || '—'), claim,
+        from: v.fromName || '', since: pMs(v.createdAt),
+        started: src ? pMs(isMemo ? src.createdAt : src.submittedAt) : 0, closed: !src,
+        href: isMemo ? '@@BASE@@memo/?id=' + encodeURIComponent(v.memoId) : '@@BASE@@view/?id=' + encodeURIComponent(v.subId) });
+    });
+    Object.keys(subs).filter(id => !has[id]).forEach(id => { const v = subs[id], at = pMs(v.submittedAt);
+      R.push({ code: v.formCode || '', name: nameOf(v.formCode), tracking: v.tracking || '', kind: 'none', who: 'ไม่มีผู้รับ', claim: [],
+        from: v.submitterName || '', since: at, started: at, closed: false, href: '@@BASE@@view/?id=' + encodeURIComponent(id) }); });
+    Object.keys(mems).filter(id => !has[id]).forEach(id => { const v = mems[id], at = pMs(v.createdAt);
+      R.push({ code: 'MEMO-' + (v.type || ''), name: v.subject || '', tracking: v.number || '', kind: 'none', who: 'ไม่มีผู้รับ', claim: [],
+        from: v.createdByName || '', since: at, started: at, closed: false, href: '@@BASE@@memo/?id=' + encodeURIComponent(id) }); });
+    PROWS = R.sort((a, b) => a.since - b.since);
+    if (PWHO && !PROWS.some(r => r.who === PWHO)) PWHO = '';
+  } catch (e) { list.innerHTML = `<p class="hint">อ่านไม่ได้: ${A.esc(e.code || e.message)}</p>`; return; }
+  paintPending();
+}
+function paintPending(){
+  const esc = A.esc, R = PROWS || [], late = r => pDays(r.since) > P_LATE;
+  const t = [['all', R.length, 'งานค้างทั้งหมด', ''],
+             ['late', R.filter(late).length, 'ค้างเกิน ' + P_LATE + ' วัน', 'warn'],
+             ['none', R.filter(r => r.kind === 'none').length, 'ไม่มีคนรับ', 'bad']];
+  document.getElementById('pTiles').innerHTML = t.map(([k, n, label, cls]) =>
+    `<button type="button" class="tile2 ${n ? cls : ''}" data-p="${k}" aria-pressed="${PTILE === k}"><b>${n}</b><span>${esc(label)}</span></button>`).join('');
+  document.querySelectorAll('#pTiles [data-p]').forEach(b => b.onclick = () => {
+    PTILE = PTILE === b.dataset.p ? 'all' : b.dataset.p; paintPending(); });
+  const groups = {};
+  R.forEach(r => { const g = groups[r.who] = groups[r.who] || { n: 0, max: 0 }; g.n++; g.max = Math.max(g.max, pDays(r.since)); });
+  const holders = Object.keys(groups).sort((a, b) => groups[b].max - groups[a].max);
+  document.getElementById('pWho').innerHTML = holders.map((w, i) =>
+    `<button type="button" class="fk-opt" data-w="${i}" aria-pressed="${PWHO === w}">${esc(w)} · ${groups[w].n} งาน · นานสุด ${groups[w].max} วัน</button>`).join('');
+  document.querySelectorAll('#pWho [data-w]').forEach(b => b.onclick = () => {
+    const w = holders[+b.dataset.w]; PWHO = PWHO === w ? '' : w; paintPending(); });
+  const L = R.filter(r => (PTILE === 'all' || (PTILE === 'late' ? late(r) : r.kind === 'none')) && (!PWHO || r.who === PWHO));
+  const when = t => t ? new Date(t).toLocaleDateString('th-TH', { day:'2-digit', month:'short', year:'2-digit' }) : '—';
+  document.getElementById('pList').innerHTML = L.length ? L.map(r => { const d = pDays(r.since); return `
+    <div class="urow">
+      <div class="av2" style="background:var(--${r.kind === 'none' || d > P_LATE ? 'red-600' : 'navy-900'})" title="ค้าง ${d} วัน">${d}</div>
+      <div><div class="nm">${esc(r.code)} · ${esc(r.name)}${r.closed ? ' <span class="tag">ใบจบแล้วแต่งานยังเปิด</span>' : ''}</div>
+        <div class="em">${esc(r.tracking)}</div>
+        <div style="font-size:13px;margin-top:4px">ค้างที่ <b${r.kind === 'none' ? ' style="color:var(--red-600)"' : ''}>${esc(r.who)}</b>
+          ${r.kind === 'pool' ? ' · รับได้: ' + esc(r.claim.join(' · ')) : ''}
+          ${r.kind === 'none' && r.who !== 'ไม่มีผู้รับ' ? ' · ยังไม่มีผู้ถือตำแหน่งนี้' : ''}
+          · ${d ? 'ค้าง ' + d + ' วัน' : 'มาถึงวันนี้'}${r.from ? ' · จาก ' + esc(r.from) : ''}
+          · ส่ง ${esc(when(r.started || r.since))}</div></div>
+      <a class="fb" href="${esc(r.href)}" target="_blank" rel="noopener">เปิด ↗</a>
+    </div>`; }).join('') : `<p class="hint">${R.length ? 'ไม่มีงานที่ตรงกับตัวกรอง' : 'ไม่มีงานค้าง'}</p>`;
+}
 
 /* ── รายชื่อผู้ใช้ ─────────────────────────────────────────
    อ่าน users/* ได้ทั้งหมดตาม rules (staff อ่านได้) แต่แก้ได้เฉพาะผู้ดูแลระบบ
