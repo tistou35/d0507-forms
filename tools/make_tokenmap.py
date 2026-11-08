@@ -166,6 +166,58 @@ def docx_parts(path):
     return cells, lines
 
 
+def table_rows(path, f):
+    """จำนวนแถวของตารางแถวซ้ำที่ส่งให้ตัววาง
+
+    หลักคือเท่าที่กระดาษพิมพ์ไว้ ไม่เกินที่ฟอร์มยอมให้กรอก (max) และไม่น้อยกว่า
+    จำนวนแถวที่ขึ้นมารอตอนเปิดฟอร์ม (rows) — แถวที่ขึ้นมารอคนกรอกเป็นปกติ
+    ถ้ากระดาษมีไม่พอ ต้องไปโผล่ในรายการ "กระดาษมีไม่พอ" ท้ายเอกสาร ไม่ใช่หายเงียบ
+      MRF sheet  rows 8 · max 40 · กระดาษ 22 แถว -> 22
+      DRC docs   rows 8 · max 20 · กระดาษ  8 แถว -> 8
+      MOC regs   rows 3 · max 10 · กระดาษ  2 แถว -> 3
+    หาตารางในกระดาษแบบเดียวกับ findTableByHead_ ใน ImportTemplate.gs (หัวคอลัมน์ต้อง
+    อยู่ในสามแถวแรกของตาราง) — ถ้าตัววางหาไม่เจอ token ทุกแถวไปกองท้ายเอกสารอยู่แล้ว
+    จึงใช้ rows ไม่ใช่ max ไม่งั้นรายการวางมือบวมเป็นหลายสิบบรรทัด (MOC เป็นตารางเดียวทั้งใบ)
+    """
+    lo = f.get('rows') or 1
+    hi = f.get('max') or lo
+    n = docx_table_rows(path, [(c.get('label') or {}).get('en') or c['k']
+                               for c in f.get('cols') or []])
+    if n is None:
+        return lo
+    return max(lo, min(hi, n))
+
+
+def docx_table_rows(path, heads):
+    """แถวข้อมูลในตารางของกระดาษที่หัวคอลัมน์ตรงกับ heads — None ถ้าหาไม่เจอ
+
+    นับเหมือนตัววาง: แถวที่มีข้อความจริงตั้งแต่สองช่องขึ้นไปในคอลัมน์ที่จับคู่ไว้
+    เป็นแถวตัวอย่างหรือแถวรวม (MRF: Example · EQ · TOTAL) ไม่นับ
+    """
+    import docx
+    nm = lambda s: re.sub(r'[^a-z0-9]+', ' ', str(s or '').lower()).strip()
+    want = [nm(h) for h in heads]
+    for t in docx.Document(path).tables:
+        rows = t.rows
+        for r in range(min(len(rows), 3)):
+            hs = [nm(c.text) for c in rows[r].cells]
+            idx = []
+            for w in want:
+                k = next((k for k, h in enumerate(hs)
+                          if h and (h == w or h.startswith(w) or w.startswith(h))), None)
+                idx.append(k)
+            if None in idx or len(set(idx)) != len(idx) or len(rows) <= r + 1:
+                continue
+            n = 0
+            for row in rows[r + 1:]:
+                cs = row.cells
+                busy = sum(1 for k in idx if k < len(cs)
+                           and not re.match(r'^[_.\s/\-:]*$', cs[k].text.strip()))
+                if busy < 2: n += 1
+            return n
+    return None
+
+
 def field_anchor(f):
     """ข้อความที่ใช้ค้นหาในเอกสาร — ชนิดช่องบอกใบ้ได้ว่าป้ายในกระดาษน่าจะเขียนว่าอะไร"""
     lab = (f.get('label') or {}).get('en') or ''
@@ -213,7 +265,10 @@ def build(abbr, verbose=False):
         return True
 
     for f in fields:
-        if f.get('type') == 'static':
+        # static = ข้อความอธิบาย · scan = ปุ่มถ่ายรูปบัตรแล้วกรอกให้ (PWR) — ไม่ใช่ช่องเก็บข้อมูล
+        # ไม่เข้าใบที่ส่งและไม่ขึ้นใน PDF ถ้าปล่อยให้จับคู่ ปุ่มสแกนของผู้โดยสารจะไปแย่งป้าย
+        # "ID / Passport No." ของช่องเลขบัตรจริง แล้วเลขบัตรตกไปท้ายเอกสาร
+        if f.get('type') in ('static', 'scan'):
             continue
         tok = '{{sig_%s}}' % f['k'] if f.get('type') == 'sign' else '{{%s}}' % f['k']
 
@@ -235,7 +290,10 @@ def build(abbr, verbose=False):
         # แล้วตัววางจะไม่ติ๊กสักช่องทั้งใบ
         if f.get('seedInto'):
             continue
-        if f.get('type') in ('select', 'multi') and f.get('opt'):
+        # select แบบเมนูดึงลง ("menu": true) กระดาษเป็นช่องเขียนค่า ไม่ใช่ ☐ ให้ติ๊กทีละตัวเลือก
+        # DRC เลขสำเนา 01–99 ถ้านับเป็นช่องติ๊ก ได้ 101 ช่องขณะที่กระดาษมี 2 ช่อง
+        # ตัววางจะไม่ติ๊กสักช่องทั้งใบ — ให้ไปจับคู่ป้ายเหมือนช่องข้อความ ({{copyNo}} = ค่าที่เลือก)
+        if f.get('type') in ('select', 'multi') and f.get('opt') and not f.get('menu'):
             for o in f['opt']:
                 nm = (o.get('n') or {}).get('en') or o['v']
                 boxes.append({'tok': '{{k_%s_%s}}' % (f['k'], o['v']),
@@ -268,7 +326,7 @@ def build(abbr, verbose=False):
                 # กระดาษพิมพ์แถวไว้เท่าไร ก็ต้องมี token เท่านั้น — ใช้จำนวนแถวสูงสุด
                 # ที่ฟอร์มยอมให้กรอก ไม่ใช่จำนวนแถวที่ขึ้นมารอตอนเปิดฟอร์ม
                 # (MRF ขึ้นมา 8 แถวแต่กรอกได้ถึง 40 · กระดาษพิมพ์ไว้ 22 แถว)
-                'rows': f.get('max') or f.get('rows') or 1,
+                'rows': table_rows(dp, f),
                 'label': (f.get('label') or {}).get('en') or f['k'],
                 'cols': [{'k': c['k'],
                           'head': (c.get('label') or {}).get('en') or c['k']}
@@ -358,6 +416,23 @@ def build(abbr, verbose=False):
                               'label': (lb.get('en') if isinstance(lb, dict) else lb) or tok,
                               'labelTh': (lb.get('th') if isinstance(lb, dict) else '') or ''})
 
+    # approval: บังคับให้ไปอยู่ในบล็อก APPROVAL ที่ต่อท้ายเอกสาร (คู่กับ manual ที่บังคับไป ADDITIONAL)
+    # ปกติบล็อกนี้มาจากฝ่ายของขั้นที่ 2 ใน route — ใช้เมื่อแม่แบบที่ใช้อยู่จริงวางไว้ตรงนั้น
+    # แต่ route ปัจจุบันไม่ได้บอกแล้ว (DRC เหลือขั้นเดียว ลายเซ็นผู้รับจึงตกไป ADDITIONAL)
+    for tok in (ov.get('approval') or []):
+        rec = next((u for u in unmatched if u['tok'] == tok), None)
+        unmatched = [u for u in unmatched if u['tok'] != tok]
+        by_label = [b for b in by_label if b['tok'] != tok]
+        by_cell = [b for b in by_cell if b['tok'] != tok]
+        by_line = [b for b in by_line if b['tok'] != tok]
+        if rec is None:
+            src = next((f for f in fields if tok in ('{{%s}}' % f['k'], '{{sig_%s}}' % f['k'])), None) or {}
+            lb = src.get('label') or {}
+            rec = {'tok': tok, 'label': lb.get('en') or tok, 'labelTh': lb.get('th') or '',
+                   'sign': src.get('type') == 'sign'}
+        if not any(a['tok'] == tok for a in approval):
+            approval.append(rec)
+
     # skipTables: กระดาษไม่ได้วางตารางนั้นเป็นคอลัมน์แยกแล้ว
     # EFC รวมชื่อวิชากับผลไว้คอลัมน์เดียว ({{s7_N_shown}}) ตามที่เอกสารฉบับแก้ไขทำ
     # ถ้าไม่กัน ตัวสร้างจะพยายามหาหัวคอลัมน์ที่ไม่มีแล้ว แล้วโยน token ทั้งชุด
@@ -429,7 +504,7 @@ def build(abbr, verbose=False):
                 order_warn.append('ช่องที่ %d: เอกสารว่า "%s" · token คือ %s'
                                   % (i + 1, docl[i][:44], b['tok']))
 
-    return {
+    out = {
         'abbr': abbr,
         'docx': 'D-0507-%s-001.docx' % abbr,
         # เลขกำกับที่คาดว่าจะเจอในเอกสาร — ImportTemplate ใช้ตรวจว่าหยิบฉบับถูก
@@ -447,9 +522,13 @@ def build(abbr, verbose=False):
         'boxesInDocx': n_box_docx,
         'approval': approval,
         'manual': unmatched,
-        # ข้อความในต้นฉบับที่ต้องตัดออกจากเอกสารที่ระบบออก (regex) — ImportTemplate.gs ทำตอนสร้างแม่แบบ
-        'strip': list(ov.get('strip') or []),
-    }, unmatched, lines
+    }
+    # ข้อความในต้นฉบับที่ต้องตัดออกจากเอกสารที่ระบบออก (regex) — ImportTemplate.gs ทำตอนสร้างแม่แบบ
+    # ใส่เฉพาะใบที่มี ImportTemplate อ่านแบบ (map.strip || []) อยู่แล้ว
+    # ใส่ "strip": [] ทุกใบทำให้รันทุกใบครั้งเดียว TokenMap.gs เปลี่ยน 17 ใบทั้งที่ไม่มีอะไรต่าง
+    if ov.get('strip'):
+        out['strip'] = list(ov['strip'])
+    return out, unmatched, lines
 
 
 def main():
@@ -491,15 +570,21 @@ def main():
     # ทั้งที่หัวไฟล์นี้เองบอกให้ใช้แบบ  make_tokenmap.py VSR HIF  ได้
     # ตัวส่งออกอ่าน TOKEN_MAP ตัวนี้ ใบที่หายจึงพังด้วยข้อความ
     # "ไม่มี X ใน TokenMap.gs" และรู้ตัวตอนมีคนกดส่งใบจริงเท่านั้น
-    if argv and os.path.exists(out):
+    if os.path.exists(out):
         try:
             src = open(out, encoding='utf-8').read()
             i = src.index('var TOKEN_MAP = ') + len('var TOKEN_MAP = ')
             keep = json.loads(src[i:src.rindex(';')])
         except Exception as e:
-            sys.exit('อ่าน TokenMap.gs เดิมไม่ได้ (%s)\n'
-                     'รันแบบไม่ระบุใบเพื่อสร้างใหม่ทั้งไฟล์' % e)
+            if argv:
+                sys.exit('อ่าน TokenMap.gs เดิมไม่ได้ (%s)\n'
+                         'รันแบบไม่ระบุใบเพื่อสร้างใหม่ทั้งไฟล์' % e)
+            keep = {}      # รันทุกใบ อ่านของเดิมไม่ได้ก็สร้างใหม่ทั้งไฟล์ (ใบที่ไม่มีนิยามฟอร์มจะหาย)
+            report.append('⚠️ อ่าน TokenMap.gs เดิมไม่ได้ (%s) — สร้างใหม่ทั้งไฟล์' % e)
         # ใบที่สั่งทำแล้วสร้างไม่สำเร็จ ต้องหายไปจริง ไม่ใช่ค้างของเก่าไว้
+        # ยกเว้นตอนรันทุกใบ: ใบที่ไม่มีนิยามฟอร์ม (RTR — แม่แบบวาง token ไว้เองใน .docx)
+        # ไม่ได้อยู่ในรายการที่สั่งตั้งแต่แรก ต้องคงไว้เหมือนตอนสั่งทำทีละใบ
+        # ไม่งั้นรันทุกใบครั้งเดียว แผนที่ของ RTR หายเงียบ ๆ
         for a in [x for x in codes if x not in maps]:
             keep.pop(a, None)
         untouched = len([a for a in keep if a not in codes])

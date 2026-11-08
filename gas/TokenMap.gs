@@ -1580,8 +1580,7 @@ var TOKEN_MAP = {
         "labelTh": "ลายเซ็นนักบิน (PIC)",
         "sign": true
       }
-    ],
-    "strip": []
+    ]
   },
   "FTR": {
     "abbr": "FTR",
