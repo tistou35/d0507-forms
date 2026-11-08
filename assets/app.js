@@ -75,6 +75,8 @@
           if (d.exists) {
             A.profile = d.data();
             if (Array.isArray(A.profile.roles)) A.roles = A.profile.roles;
+          } else {
+            await A.ensureProfile();
           }
         } catch (e) { /* ยังไม่มี users/{uid} หรือ rule ไม่อนุญาต */ }
       }
@@ -895,13 +897,19 @@
      ไม่งั้นจะล็อกอินได้แต่ไม่มีบทบาท กรอกฟอร์มได้แต่ไม่มีใครเห็นว่าเป็นใครในทะเบียน */
   A.ensureProfile = async function () {
     if (!A.user || A.profile) return A.profile;
+    const ref = A.db.collection('users').doc(A.user.uid);
+    const data = { email: A.user.email || '', name: A.user.displayName || '', roles: ['stu'], active: true };
     try {
-      await A.db.collection('users').doc(A.user.uid).set({
-        email: A.user.email || '', name: A.user.displayName || '', roles: ['stu'],
-        active: true, createdAt: firebase.firestore.FieldValue.serverTimestamp(), self: true,
+      /* transaction อ่านจากเซิร์ฟเวอร์เสมอ — get() ธรรมดาอาจตอบจากแคชในเครื่องว่าไม่มีโปรไฟล์
+         ทั้งที่ผู้ดูแลตั้งบทบาทให้แล้ว ถ้า set ทับไปตรง ๆ บทบาทเจ้าหน้าที่จะกลายเป็นนักเรียน */
+      const got = await A.db.runTransaction(async t => {
+        const s = await t.get(ref);
+        if (s.exists) return s.data();
+        t.set(ref, Object.assign({ createdAt: firebase.firestore.FieldValue.serverTimestamp(), self: true }, data));
+        return data;
       });
-      A.profile = { email: A.user.email || '', name: A.user.displayName || '', roles: ['stu'], active: true };
-      A.roles = ['stu'];
+      A.profile = got;
+      if (Array.isArray(got.roles)) A.roles = got.roles;
     } catch (e) { console.warn('[profile] สร้างโปรไฟล์ไม่สำเร็จ', e); }
     return A.profile;
   };
