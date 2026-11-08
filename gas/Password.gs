@@ -47,6 +47,112 @@ function setTempPw_(body, who) {
   return { set: true, logged: logged };
 }
 
+/**
+ * รวมบัญชี — คนเดียวกันมีบัญชีอีเมลของระบบ และเข้าด้วย Google อีกอีเมลหนึ่ง จึงได้สองบัญชี
+ * ผูก Google นั้นเข้ากับบัญชีที่ใช้อยู่ เข้าด้วย Google ครั้งถัดไปจะได้ uid เดิม บทบาท ลายเซ็น และงานครบ
+ *
+ * ไม่ย้ายบันทึกข้อมูล เพราะใบที่ส่งแล้วและหนังสือที่ลงนามแล้วเป็นบันทึกควบคุม ห้ามเปลี่ยนชื่อผู้ทำย้อนหลัง
+ * จึงรวมได้เฉพาะบัญชี Google ที่ยังไม่มีอะไรในระบบ และเป็นแค่บทบาทนักเรียนที่ระบบตั้งให้เอง
+ * Firebase ให้หนึ่ง Google ผูกได้บัญชีเดียว ต้องลบบัญชีเดิมก่อนจึงผูกได้
+ *
+ * body.dry = true ตรวจอย่างเดียว ไม่แก้อะไร
+ */
+function mergeAccount_(body, who) {
+  var keepUid = String(body.keepUid || '');
+  var email = String(body.email || '').trim().toLowerCase();
+  if (!/^[A-Za-z0-9_-]{6,128}$/.test(keepUid)) throw new Error('uid ไม่ถูกต้อง');
+  if (!/^[^@\s]+@[^@\s]+$/.test(email)) throw new Error('อีเมลไม่ถูกต้อง');
+
+  var admins = {};
+  try { admins = fsGet_('config/admins', body.idToken); } catch (e) { throw new Error('ตรวจสิทธิ์ผู้ดูแลไม่ได้: ' + e.message); }
+  var adminUids = admins.uids || [];
+  if (adminUids.indexOf(who.uid) < 0) throw new Error('ต้องเป็นผู้ดูแลระบบ');
+
+  var keep = acctLookup_({ localId: [keepUid] });
+  if (!keep) throw new Error('ไม่พบบัญชีปลายทาง');
+  var drop = acctLookup_({ email: [email] });
+  if (!drop) throw new Error('ไม่พบบัญชีของ ' + email + ' — เจ้าตัวต้องเข้าสู่ระบบด้วย Google นี้หนึ่งครั้งก่อน');
+
+  var provs = drop.providerUserInfo || [];
+  var g = provs.filter(function (x) { return x.providerId === 'google.com'; })[0];
+  var profile = null;
+  try { profile = fsGet_('users/' + drop.localId, body.idToken); }
+  catch (e) { if (e.message.indexOf('ไม่พบ') !== 0) throw e; }
+  var roles = (profile && profile.roles) || [];
+
+  var blocks = [];
+  if (drop.localId === keepUid) blocks.push('เป็นบัญชีเดียวกันอยู่แล้ว');
+  if (drop.localId === who.uid) blocks.push('เป็นบัญชีที่คุณกำลังใช้งานอยู่');
+  if (adminUids.indexOf(drop.localId) >= 0) blocks.push('บัญชีนี้เป็นผู้ดูแลระบบ');
+  if (!g || provs.length !== 1) blocks.push('รวมได้เฉพาะบัญชีที่เข้าด้วย Google อย่างเดียว');
+  if ((keep.providerUserInfo || []).some(function (x) { return x.providerId === 'google.com'; }))
+    blocks.push('บัญชีปลายทางผูก Google อื่นไว้แล้ว');
+  if (roles.some(function (r) { return r !== 'stu'; })) blocks.push('บัญชีนี้มีบทบาทเจ้าหน้าที่: ' + roles.join(', '));
+  acctRefs_(drop.localId, body.idToken).forEach(function (n) { blocks.push('มีบันทึกในระบบแล้ว: ' + n); });
+
+  var info = { keepEmail: keep.email || '', keepUid: keepUid, dropEmail: drop.email || email, dropUid: drop.localId,
+               dropName: drop.displayName || (profile && profile.name) || '', blocks: blocks, merged: false };
+  if (body.dry) return info;
+  if (blocks.length) throw new Error('รวมไม่ได้ — ' + blocks.join(' · '));
+
+  var del = acctCall_('accounts:delete', { localId: drop.localId });
+  if (del.code !== 200) throw new Error('ลบบัญชีเดิมไม่สำเร็จ (' + del.code + '): ' + del.why);
+  var link = acctCall_('accounts:update', { localId: keepUid, linkProviderUserInfo: {
+    providerId: 'google.com', rawId: g.rawId, email: g.email || drop.email || email,
+    displayName: g.displayName || '', photoUrl: g.photoUrl || '' } });
+  if (link.code !== 200)
+    throw new Error('ลบบัญชี Google เดิมแล้วแต่ผูกไม่สำเร็จ (' + link.code + '): ' + link.why + ' — ให้เจ้าตัวเข้าด้วย Google อีกครั้งแล้วรวมใหม่');
+
+  if (profile) UrlFetchApp.fetch('https://firestore.googleapis.com/v1/projects/' + cfg_('FIREBASE_PROJECT') +
+    '/databases/(default)/documents/users/' + drop.localId,
+    { method: 'delete', headers: { Authorization: 'Bearer ' + body.idToken }, muteHttpExceptions: true });
+
+  info.merged = true; info.logged = true;
+  try {
+    fsCreate_('adminLog', body.idToken, {
+      action: 'merge', targetUid: keepUid, targetName: String(body.targetName || ''), targetEmail: keep.email || '',
+      detail: 'ผูก Google ' + (drop.email || email) + ' เข้ากับบัญชีนี้ · ลบบัญชีเดิม ' + drop.localId,
+      byUid: who.uid, byName: String(body.byName || who.email) });
+  } catch (e) { info.logged = false; }
+  return info;
+}
+
+function acctCall_(method, payload) {
+  var res = UrlFetchApp.fetch('https://identitytoolkit.googleapis.com/v1/projects/' + cfg_('FIREBASE_PROJECT') + '/' + method, {
+    method: 'post', contentType: 'application/json', muteHttpExceptions: true,
+    headers: adminHeaders_(), payload: JSON.stringify(payload) });
+  var why = '', json = {};
+  try { json = JSON.parse(res.getContentText()); why = (json.error && json.error.message) || ''; } catch (e) { why = res.getContentText().slice(0, 300); }
+  return { code: res.getResponseCode(), json: json, why: why };
+}
+
+function acctLookup_(q) {
+  var r = acctCall_('accounts:lookup', q);
+  if (r.code !== 200) throw new Error('ค้นบัญชีไม่สำเร็จ (' + r.code + '): ' + r.why);
+  return (r.json.users || [])[0] || null;
+}
+
+/* บัญชีนี้มีอะไรอยู่ในระบบบ้าง — คืนชื่อรายการที่พบ ถามทีละอย่างหยุดที่แถวแรก */
+function acctRefs_(uid, idToken) {
+  var url = 'https://firestore.googleapis.com/v1/projects/' + cfg_('FIREBASE_PROJECT') + '/databases/(default)/documents:runQuery';
+  return [
+    ['submissions', 'submitterUid', 'EQUAL', 'ใบที่ส่ง'],
+    ['tasks', 'assigneeUid', 'EQUAL', 'งานที่ได้รับ'],
+    ['memos', 'createdBy', 'EQUAL', 'บันทึกข้อความที่จัดทำ'],
+    ['memos', 'beneficiaryUid', 'EQUAL', 'หนังสือแต่งตั้ง'],
+    ['memos', 'signers.proposer.uid', 'EQUAL', 'บันทึกข้อความที่เป็นผู้เสนอ'],
+    ['memos', 'signers.endorser.uid', 'EQUAL', 'บันทึกข้อความที่เป็นผู้สั่งการ'],
+    ['memos', 'recipientUids', 'ARRAY_CONTAINS', 'หนังสือเวียนที่ต้องรับทราบ']
+  ].filter(function (q) {
+    var res = UrlFetchApp.fetch(url, { method: 'post', contentType: 'application/json', muteHttpExceptions: true,
+      headers: { Authorization: 'Bearer ' + idToken },
+      payload: JSON.stringify({ structuredQuery: { from: [{ collectionId: q[0] }], limit: 1,
+        where: { fieldFilter: { field: { fieldPath: q[1] }, op: q[2], value: { stringValue: uid } } } } }) });
+    if (res.getResponseCode() !== 200) throw new Error('ตรวจ ' + q[3] + ' ไม่ได้ (' + res.getResponseCode() + ')');
+    return JSON.parse(res.getContentText()).some(function (r) { return r.document; });
+  }).map(function (q) { return q[3]; });
+}
+
 /* เพิ่มเอกสารใหม่ใน Firestore ด้วย token ของผู้เรียก · ช่อง at = เวลาเซิร์ฟเวอร์ */
 function fsCreate_(coll, idToken, data) {
   var base = 'projects/' + cfg_('FIREBASE_PROJECT') + '/databases/(default)/documents';

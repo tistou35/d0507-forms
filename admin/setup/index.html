@@ -673,7 +673,7 @@ async function adminLog(action, target, detail){
   } catch (e) { console.warn('adminLog', e); }
 }
 const ALOG_N = { view:'เปิดดูข้อมูลผู้ใช้', edit:'แก้ข้อมูลผู้ใช้', create:'เพิ่มผู้ใช้', pwreset:'ส่งลิงก์ตั้งรหัสผ่านใหม่',
-                 pwtemp:'ตั้งรหัสผ่านชั่วคราว', dirEdit:'แก้รายชื่อผู้รับฟอร์ม', dirAdd:'เพิ่มเข้ารายชื่อผู้รับฟอร์ม', dirRemove:'เอาออกจากรายชื่อผู้รับฟอร์ม' };
+                 pwtemp:'ตั้งรหัสผ่านชั่วคราว', merge:'รวมบัญชี', dirEdit:'แก้รายชื่อผู้รับฟอร์ม', dirAdd:'เพิ่มเข้ารายชื่อผู้รับฟอร์ม', dirRemove:'เอาออกจากรายชื่อผู้รับฟอร์ม' };
 async function paintAdminLog(){
   const host = document.getElementById('alog'); if (!host) return;
   try {
@@ -726,6 +726,13 @@ function editUser(uid){
           <button type="button" class="fb" id="eTmpGen">สุ่มใหม่</button>
           <button type="button" class="fb" id="eTmpSet">ตั้งรหัสชั่วคราวนี้</button></div>
         <div class="hint" id="eTmpMsg"></div></div>` : ''}</div>
+    <div class="fk-f"><label for="eMg">รวมบัญชี</label>
+      <p class="hint">คนเดียวกันมีสองบัญชี — ผูกบัญชี Google อีกอีเมลหนึ่งเข้ากับบัญชีนี้ เข้าด้วย Google นั้นแล้วจะได้บทบาท ลายเซ็น และงานของบัญชีนี้ ·
+        รวมได้เฉพาะบัญชี Google ที่เคยเข้าสู่ระบบแล้วและยังไม่มีบันทึกในระบบ · ยืนยันกับเจ้าตัวก่อนว่าเป็นคนเดียวกันจริง</p>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <input id="eMg" type="email" autocomplete="off" spellcheck="false" placeholder="อีเมล Google" style="max-width:260px">
+        <button type="button" class="fb" id="eMgChk">ตรวจสอบ</button></div>
+      <div class="hint" id="eMgMsg" style="margin-top:6px"></div></div>
     <div class="msg" id="eMsg"></div>`;
   adminLog('view', u, '');
   document.getElementById('udf').innerHTML =
@@ -758,6 +765,30 @@ function editUser(uid){
       paintAdminLog();
     };
   }
+  const mgBody = email => ({ keepUid: uid, email, targetName: u.name || '', byName: A.myName() || '' });
+  document.getElementById('eMgChk').onclick = async e => {
+    e.preventDefault();
+    const m = document.getElementById('eMgMsg'), email = document.getElementById('eMg').value.trim();
+    if (!email) { m.textContent = 'ยังไม่ได้กรอกอีเมล'; return; }
+    e.target.disabled = true; m.textContent = 'กำลังตรวจสอบ…';
+    const r = await A.gas('mergeAcct', Object.assign(mgBody(email), { dry: true }), { timeout: 60000 });
+    e.target.disabled = false;
+    if (!r.ok) { m.textContent = 'ตรวจไม่สำเร็จ: ' + r.error; return; }
+    const x = r.result, head = A.esc(x.dropEmail) + (x.dropName ? ' (' + A.esc(x.dropName) + ')' : '');
+    if (x.blocks.length) { m.innerHTML = head + ' — <b style="color:var(--red-600)">รวมไม่ได้</b>: ' + x.blocks.map(A.esc).join(' · '); return; }
+    m.innerHTML = head + ' — รวมได้ <button type="button" class="fb" id="eMgDo">รวมเข้าบัญชีนี้</button>';
+    document.getElementById('eMgDo').onclick = async ev => {
+      ev.preventDefault();
+      if (!confirm('ผูก Google ' + x.dropEmail + ' เข้ากับบัญชีของ ' + (u.name || u.email) +
+                   ' ?\nผู้ที่เข้าด้วย Google นี้จะได้สิทธิ์ทั้งหมดของบัญชีนี้ และบัญชีเดิมจะถูกลบ')) return;
+      ev.target.disabled = true; m.textContent = 'กำลังรวมบัญชี…';
+      const d = await A.gas('mergeAcct', mgBody(email), { timeout: 60000 });
+      if (!d.ok) { m.textContent = 'รวมไม่สำเร็จ: ' + d.error; return; }
+      m.innerHTML = '<b style="color:var(--green-600)">รวมแล้ว</b> — ให้เจ้าตัวออกจากระบบแล้วเข้าใหม่ด้วย Google ' + A.esc(x.dropEmail)
+        + (d.result.logged === false ? ' · ⚠️ บันทึก log ไม่สำเร็จ' : '');
+      paintAdminLog();
+    };
+  };
   const pw = document.getElementById('ePw');
   if (pw) pw.addEventListener('click', async e => {
     e.preventDefault();
