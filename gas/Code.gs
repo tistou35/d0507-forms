@@ -153,6 +153,12 @@ function doPost(e) {
       return json_({ ok: true, result: listAccounts_(body, who) });
     }
 
+    /* แจ้งเตือน LINE (ดู Line.gs) — ผู้ดูแลระบบเท่านั้น ตรวจใน lineAdmin_ */
+    if (body.action === 'line') {
+      if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบเจ้าหน้าที่ก่อน');
+      return json_({ ok: true, result: lineAdmin_(body, who) });
+    }
+
     if (body.action === 'mergeAcct') {
       if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบเจ้าหน้าที่ก่อน');
       return json_({ ok: true, result: mergeAccount_(body, who) });

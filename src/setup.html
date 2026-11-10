@@ -55,6 +55,31 @@ details.h summary::before{content:'▸ ';font-size:10px}
 details.h[open] summary::before{content:'▾ '}
 details.h .hint{margin-top:6px}
 
+/* แจ้งเตือน LINE */
+.lnst{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-bottom:14px}
+.lnst>div{background:var(--surface);border:1px solid var(--border-light);border-radius:10px;padding:12px 14px}
+.lnst b{display:block;font-size:15px} .lnst span{display:block;font-size:12px;color:var(--g-500);margin-top:3px}
+.lnst .ok b{color:var(--green-700,#15803d)} .lnst .no b{color:var(--amber-600)}
+.lnrow{display:grid;grid-template-columns:22px minmax(0,1.1fr) minmax(0,1.4fr) auto;gap:10px;align-items:center;
+  padding:8px 0;border-bottom:1px solid var(--border-light)}
+.lnrow .nm{font-size:13.5px;font-weight:600} .lnrow .sub2{font-size:11.5px;color:var(--g-500)}
+.lnrow input[type=text]{font-family:var(--font-mono);font-size:12px;width:100%;padding:6px 8px;
+  border:1px solid var(--border-light);border-radius:6px}
+.lnrow input.bad{border-color:var(--red-600)} .lnrow input.imp{background:#fffbe6}
+@media(max-width:640px){.lnrow{grid-template-columns:22px 1fr}.lnrow>input[type=text],.lnrow>.fb{grid-column:2}}
+.lntpl{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-bottom:12px}
+.lntpl textarea{width:100%;min-height:92px;font-family:var(--font-mono);font-size:12px;padding:8px;
+  border:1px solid var(--border-light);border-radius:6px}
+.lntpl pre{white-space:pre-wrap;font-size:12px;background:var(--g-50,#f7f7f7);border-radius:6px;padding:8px;margin:0}
+@media(max-width:640px){.lntpl{grid-template-columns:1fr}}
+.lnchips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 12px}
+.lnchips code{font-size:11.5px;background:var(--g-100);border-radius:5px;padding:2px 6px;cursor:pointer}
+.lnlog{font-size:12px;border-collapse:collapse;width:100%}
+.lnlog td{border-bottom:1px solid var(--border-light);padding:6px 6px;vertical-align:top}
+.lnlog .y{color:var(--green-700,#15803d);font-weight:700} .lnlog .n{color:var(--g-500)}
+.lnbar{position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--border-light);
+  padding:10px 0;display:flex;gap:10px;align-items:center;justify-content:flex-end;margin-top:10px}
+
 /* แถวผู้ใช้ */
 .urow{display:grid;grid-template-columns:38px 1fr auto;gap:14px;align-items:center;
   background:var(--surface);border:1px solid var(--border-light);border-radius:10px;
@@ -116,6 +141,7 @@ section[data-pane].off{display:none}
       <div class="stabs" role="tablist">
         <button role="tab" data-tab="users"  aria-selected="true">ผู้ใช้งาน<span id="tabN">—</span></button>
         <button role="tab" data-tab="pending" aria-selected="false">งานค้าง</button>
+        <button role="tab" data-tab="line" aria-selected="false">แจ้งเตือน LINE</button>
         <button role="tab" data-tab="roles"  aria-selected="false">บทบาทและฟอร์ม</button>
         <button role="tab" data-tab="me"     aria-selected="false">โปรไฟล์ของฉัน</button>
         <button role="tab" data-tab="system" aria-selected="false">ระบบและทะเบียน</button>
@@ -202,6 +228,54 @@ section[data-pane].off{display:none}
         <div class="tiles" id="pTiles"></div>
         <div id="pWho" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px"></div>
         <div id="pList">—</div>
+      </section>
+
+      <section data-pane="line">
+        <div class="sh"><h2>แจ้งเตือนผ่าน LINE</h2><span class="en">LINE notifications</span>
+          <span class="rt"><button type="button" class="fb" id="lnRel">โหลดใหม่</button></span></div>
+        <p class="hint" style="margin-bottom:12px">เมื่อมีงานใหม่ส่งถึงใคร (ใบรออนุมัติ · บันทึกข้อความรอลงนาม · หนังสือเวียนรอรับทราบ)
+          ระบบส่งข้อความหาคนนั้นทาง LINE Official Account ของโรงเรียน ทีละคน ไม่ใช่กลุ่ม — แต่ละคนได้เฉพาะงานของตัวเอง ·
+          งานในกองรอส่งถึงทุกคนที่ถือตำแหน่งนั้นในรายชื่อผู้รับฟอร์ม · ตัวตั้งเวลาของตัวส่งออกตรวจงานใหม่ทุก 1 นาที
+          ไม่ขึ้นกับว่าใบถูกส่งจากเครื่องไหน · ยังไม่ใส่ token หรือยังไม่เปิดส่งจริง = ไม่มีอะไรออกจากระบบ
+          แต่ทุกข้อความที่ "จะส่ง" ลงบันทึกด้านล่างพร้อมเหตุผล</p>
+        <div class="lnst" id="lnSt"><div><b>—</b><span>กำลังตรวจ…</span></div></div>
+        <details class="fold" id="lnTokBox"><summary>Channel access token <em>เก็บที่ตัวส่งออกเท่านั้น ไม่มีทางอ่านกลับ</em></summary>
+          <div class="in">
+            <p class="hint">คัดลอกจาก LINE Developers › Messaging API › Channel access token (long-lived) แล้ววางที่นี่
+              ระบบตรวจกับ LINE ก่อนบันทึก ถ้า LINE ไม่รับจะไม่บันทึก · ใช้ channel เดียวกับ D0507 Dispatch
+              LINE user ID ที่ Dispatch เก็บไว้จึงใช้ได้เลย (user ID ของ LINE ผูกกับ provider)</p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+              <input type="password" id="lnTok" autocomplete="off" placeholder="วาง token ที่นี่" style="flex:1;min-width:220px;padding:8px;border:1px solid var(--border-light);border-radius:6px">
+              <button type="button" class="fb" id="lnTokSave">บันทึก token</button>
+              <button type="button" class="fb" id="lnTokClr">ลบ token</button>
+            </div>
+            <div id="lnTokMsg" class="hint" style="margin-top:6px"></div>
+          </div></details>
+        <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin:4px 0 14px">
+          <label style="display:flex;gap:7px;align-items:center;font-weight:600"><input type="checkbox" id="lnOn"> ส่งจริง</label>
+          <span class="hint">ปิดไว้ = บันทึกอย่างเดียว (ทดลอง) · เปิดเมื่อใส่ token และตรวจรายชื่อแล้ว</span>
+        </div>
+
+        <div class="sh"><h3 style="margin:0">ผู้รับ</h3><span class="en" id="lnPN">—</span>
+          <span class="rt"><input type="search" id="lnQ" placeholder="ค้นหาชื่อ" style="padding:6px 8px;border:1px solid var(--border-light);border-radius:6px">
+            <label class="hint" style="display:flex;gap:5px;align-items:center"><input type="checkbox" id="lnStu"> แสดงนักเรียน</label>
+            <button type="button" class="fb" id="lnImp">นำ LINE ID จาก Dispatch</button></span></div>
+        <p class="hint">LINE user ID ขึ้นต้นด้วย U ตามด้วยตัวอักษร 32 ตัว อ่านได้จากฝั่งบัญชี Official Account
+          หลังเจ้าตัวเพิ่มเพื่อนแล้ว (เจ้าตัวหาเองในโทรศัพท์ไม่ได้) · ปุ่มทดสอบส่งข้อความหาคนนั้นคนเดียว</p>
+        <div id="lnImpMsg" class="hint" style="margin:6px 0"></div>
+        <div id="lnPeople">—</div>
+
+        <div class="sh" style="margin-top:18px"><h3 style="margin:0">ส่งเมื่อ · ข้อความ</h3><span class="en">Events &amp; messages</span></div>
+        <p class="hint">คำในวงเล็บเหลี่ยมถูกแทนด้วยข้อมูลของงานตอนส่ง ที่เหลือส่งตามที่พิมพ์ · ช่องขวาคือตัวอย่าง</p>
+        <div class="lnchips" id="lnChips"></div>
+        <div id="lnTpl"></div>
+
+        <div class="lnbar"><span class="hint" id="lnDirty"></span>
+          <button type="button" class="fb" id="lnRun">ตรวจงานใหม่ตอนนี้</button>
+          <button type="button" class="big pri" id="lnSave">บันทึกการตั้งค่า</button></div>
+
+        <div class="sh" style="margin-top:18px"><h3 style="margin:0">บันทึกการแจ้งเตือน</h3><span class="en">ล่าสุด 100 รายการ</span></div>
+        <div id="lnLog">—</div>
       </section>
 
       <section data-pane="roles">
@@ -484,9 +558,239 @@ function tab(name){
   if (name === 'users') users();
   if (name === 'roles') roleForms();
   if (name === 'pending') pending();
+  if (name === 'line') line();
 }
 document.querySelectorAll('.stabs button').forEach(b =>
   b.addEventListener('click', () => tab(b.dataset.tab)));
+
+/* ── แจ้งเตือน LINE ────────────────────────────────────────
+   ค่าตั้งและ LINE user ID อยู่ที่ lineConfig/settings (ผู้ดูแลเท่านั้น) ตัวส่งออกอ่านจากที่เดียวกัน
+   token อยู่ที่ตัวส่งออก หน้านี้ส่งไปได้แต่อ่านกลับไม่ได้ · ดู gas/Line.gs */
+const LN_EV = [
+  ['task', 'งานใหม่ส่งถึงฉัน', 'ใบรออนุมัติ / บันทึกข้อความรอลงนาม ที่ระบุตัวผู้รับ'],
+  ['pool', 'งานใหม่ในกองรอ', 'ส่งถึงทุกคนที่ถือตำแหน่งนั้นในรายชื่อผู้รับฟอร์ม'],
+  ['ack',  'หนังสือเวียนรอรับทราบ', 'ส่งถึงผู้ที่อยู่ในรายชื่อต้องรับทราบ'],
+];
+const LN_DEF = {
+  task: 'D-0507 · งานใหม่รอคุณ\n[เรื่อง]\nเลขที่ [เลขที่] · จาก [จาก]\n[ลิงก์]',
+  pool: 'D-0507 · งานใหม่ในกองรอ [กองรอ]\n[เรื่อง]\nเลขที่ [เลขที่] · จาก [จาก]\nกดรับงาน: [ลิงก์]',
+  ack:  'D-0507 · หนังสือเวียนรอรับทราบ\n[เรื่อง]\nเลขที่ [เลขที่]\n[ลิงก์]',
+};
+const LN_PH = { '[เรื่อง]':'FRAE — Flight Risk Assessment', '[ฟอร์ม]':'FRAE', '[เลขที่]':'FRAE-20261111-0001',
+  '[จาก]':'Atcha C.', '[กองรอ]':'FI', '[หมายเหตุ]':'', '[ลิงก์]':'https://tistou35.github.io/d0507-forms/approve/?t=…' };
+const LN_ID = /^U[0-9a-f]{32}$/;
+let LN = null, LNDIRTY = 0, LNIMP = {};
+const lnRender = (t, ev) => Object.keys(LN_PH).reduce((o, k) => o.split(k).join(k === '[ลิงก์]' && ev === 'pool' ? 'https://tistou35.github.io/d0507-forms/queue/' : LN_PH[k]), String(t || '')).trim();
+const lnDirty = () => { LNDIRTY++; document.getElementById('lnDirty').textContent = 'ยังไม่ได้บันทึก'; };
+
+/* ชื่อเดียวกันไหม — ตัดวงเล็บ ตัวพิมพ์ เครื่องหมาย แล้วเทียบเป็นคำ · ตัวย่อได้เฉพาะ 1–2 ตัวอักษร (แบบ Dispatch) */
+const lnTok = v => String(v || '').replace(/\([^)]*\)/g, ' ').toLowerCase().replace(/[^a-z฀-๿0-9\s]/g, ' ').split(/\s+/).filter(Boolean);
+function lnSame(a, b){
+  const L = lnTok(a), R = lnTok(b); if (!L.length || !R.length) return false;
+  if (L.join(' ') === R.join(' ')) return true;
+  const pr = (x, y) => x === y || (x.length <= 2 && y.startsWith(x)) || (y.length <= 2 && x.startsWith(y));
+  const fit = (f, t) => f.every(x => t.some(y => pr(x, y)));
+  return fit(L, R) && fit(R, L) && L.some(x => R.includes(x));
+}
+
+async function line(){
+  const rel = document.getElementById('lnRel');
+  if (!rel.dataset.wired){
+    rel.dataset.wired = '1';
+    rel.addEventListener('click', () => { LN = null; line(); });
+    document.getElementById('lnQ').addEventListener('input', lnPaintPeople);
+    document.getElementById('lnStu').addEventListener('change', lnPaintPeople);
+    document.getElementById('lnOn').addEventListener('change', e => { LN.enabled = e.target.checked; lnDirty(); });
+    document.getElementById('lnSave').addEventListener('click', lnSave);
+    document.getElementById('lnRun').addEventListener('click', lnRun);
+    document.getElementById('lnImp').addEventListener('click', lnImport);
+    document.getElementById('lnTokSave').addEventListener('click', () => lnToken(false));
+    document.getElementById('lnTokClr').addEventListener('click', () => lnToken(true));
+  }
+  if (!A.isAdmin()) { document.getElementById('lnPeople').innerHTML = '<p class="hint">เฉพาะผู้ดูแลระบบ</p>'; return; }
+  lnStatus();
+  if (!USERS.length) { try { const s = await A.db.collection('users').get(); USERS = s.docs.map(d => Object.assign({ uid: d.id }, d.data())); } catch(e){} }
+  if (!LN){
+    try {
+      const d = await A.db.collection('lineConfig').doc('settings').get();
+      const v = d.exists ? d.data() : {};
+      LN = { enabled: v.enabled === true, events: Object.assign({ task:true, pool:true, ack:true }, v.events || {}),
+             templates: Object.assign({}, LN_DEF, v.templates || {}), people: v.people || {} };
+    } catch(e){ document.getElementById('lnPeople').innerHTML = `<p class="hint">อ่านค่าตั้งไม่ได้: ${A.esc(e.code || e.message)}</p>`; return; }
+    LNDIRTY = 0; LNIMP = {}; document.getElementById('lnDirty').textContent = '';
+  }
+  document.getElementById('lnOn').checked = LN.enabled;
+  lnPaintPeople(); lnPaintTpl(); lnLog();
+}
+
+async function lnStatus(){
+  const box = document.getElementById('lnSt');
+  try {
+    const r = await A.gas('line', { op: 'status' }, { timeout: 60000 });
+    const last = r.last || {};
+    const at = last.at ? new Date(last.at).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' }) : '';
+    box.innerHTML =
+      `<div class="${r.tokenSet && !(r.bot && r.bot.error) ? 'ok' : 'no'}"><b>${r.tokenSet ? (r.bot && r.bot.error ? 'token ใช้ไม่ได้' : 'ตั้ง token แล้ว') : 'ยังไม่มี token'}</b>
+         <span>${r.tokenSet ? A.esc(r.bot && (r.bot.error || (r.bot.name + ' ' + r.bot.id)) || '') : 'ไม่มีข้อความออกจากระบบจนกว่าจะตั้ง'}</span></div>
+       <div class="${r.trigger ? 'ok' : 'no'}"><b>${r.trigger ? 'ตัวตั้งเวลาทำงานอยู่' : 'ตัวตั้งเวลาปิดอยู่'}</b>
+         <span>${r.trigger ? 'ตรวจงานใหม่ทุก 1 นาที' : 'ยังไม่ตรวจงานใหม่'} · <a href="#" id="lnTrg">${r.trigger ? 'ปิด' : 'เปิด'}</a></span></div>
+       <div><b>${at || '—'}</b><span>ตรวจล่าสุด${last.error ? ' · ผิดพลาด: ' + A.esc(last.error) : last.at ? ` · งาน ${last.tasks || 0} · ส่ง ${last.sent || 0} · ไม่ได้ส่ง ${last.dry || 0}` : ''}</span></div>`;
+    document.getElementById('lnTrg').onclick = async ev => {
+      ev.preventDefault();
+      try { await A.gas('line', { op: 'trigger', on: !r.trigger }, { timeout: 60000 }); } catch(e){ alert(e.message); }
+      lnStatus();
+    };
+    document.getElementById('lnTokBox').open = !r.tokenSet;
+    document.getElementById('lnImp').disabled = !r.importable;
+  } catch(e){ box.innerHTML = `<div class="no"><b>ตรวจสถานะไม่ได้</b><span>${A.esc(e.message)}</span></div>`; }
+}
+
+function lnPaintPeople(){
+  const host = document.getElementById('lnPeople'); if (!LN) return;
+  const q = document.getElementById('lnQ').value.trim().toLowerCase();
+  const stu = document.getElementById('lnStu').checked;
+  const staff = u => (u.roles || []).some(r => r !== 'stu');
+  let L = USERS.filter(u => !u.disabled && !u.test && (stu || staff(u) || (LN.people[u.uid] || {}).line));
+  if (q) L = L.filter(u => [u.name, u.email].join(' ').toLowerCase().includes(q));
+  L.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'th'));
+  const has = USERS.filter(u => LN_ID.test((LN.people[u.uid] || {}).line || '') && (LN.people[u.uid] || {}).on !== false).length;
+  document.getElementById('lnPN').textContent = `ส่งถึงได้ ${has} คน`;
+  host.innerHTML = L.map(u => {
+    const p = LN.people[u.uid] || {}, v = p.line || '';
+    const roles = (u.roles || []).map(r => A.L(A.ROLE_N[r]) || r).join(' · ');
+    return `<div class="lnrow" data-u="${A.esc(u.uid)}">
+      <input type="checkbox" data-on ${p.on === false ? '' : 'checked'} title="ส่งถึงคนนี้">
+      <div><div class="nm">${A.esc(u.name || u.email || u.uid)}</div><div class="sub2">${A.esc(roles || '—')}${(u.positions || []).length ? ' · ' + A.esc(u.positions.join(' · ')) : ''}</div></div>
+      <input type="text" data-line value="${A.esc(v)}" placeholder="Uxxxxxxxx… — LINE user ID" class="${v && !LN_ID.test(v) ? 'bad' : ''} ${LNIMP[u.uid] ? 'imp' : ''}" spellcheck="false">
+      <button type="button" class="fb" data-test ${LN_ID.test(v) ? '' : 'disabled'}>ทดสอบ</button></div>`;
+  }).join('') || '<p class="hint">ไม่พบผู้ใช้</p>';
+  host.querySelectorAll('.lnrow').forEach(row => {
+    const uid = row.dataset.u, u = USERS.find(x => x.uid === uid) || {};
+    const put = () => { const p = LN.people[uid] || (LN.people[uid] = {}); p.name = u.name || ''; return p; };
+    row.querySelector('[data-on]').addEventListener('change', e => { put().on = e.target.checked; lnDirty(); });
+    const inp = row.querySelector('[data-line]');
+    inp.addEventListener('input', () => {
+      const v = inp.value.trim(); put().line = v; delete LNIMP[uid];
+      inp.classList.toggle('bad', !!v && !LN_ID.test(v)); inp.classList.remove('imp');
+      row.querySelector('[data-test]').disabled = !LN_ID.test(v); lnDirty();
+    });
+    row.querySelector('[data-test]').addEventListener('click', async e => {
+      const b = e.target, v = inp.value.trim();
+      if (!confirm(`ส่งข้อความทดสอบถึง ${u.name || uid} ทาง LINE ตอนนี้?`)) return;
+      b.disabled = true; b.textContent = 'กำลังส่ง…';
+      try {
+        const r = await A.gas('line', { op: 'test', line: v, uid, name: u.name || '',
+          text: 'ทดสอบการแจ้งเตือนจาก D-0507 Forms\nถึง ' + (u.name || '') + ' — ถ้าได้รับข้อความนี้ แปลว่า LINE ID ถูกต้อง' }, { timeout: 60000 });
+        b.textContent = r.ok ? 'ส่งแล้ว ✓' : 'ไม่ได้ส่ง'; if (!r.ok) alert(r.reason);
+      } catch(err){ b.textContent = 'ไม่ได้ส่ง'; alert(err.message); }
+      setTimeout(() => { b.textContent = 'ทดสอบ'; b.disabled = false; }, 4000); lnLog();
+    });
+  });
+}
+
+function lnPaintTpl(){
+  document.getElementById('lnChips').innerHTML = Object.keys(LN_PH).map(k => `<code title="คลิกเพื่อแทรก">${A.esc(k)}</code>`).join('');
+  let focus = null;
+  const host = document.getElementById('lnTpl');
+  host.innerHTML = LN_EV.map(([k, t, d]) => `
+    <label style="display:flex;gap:7px;align-items:center;font-weight:600;margin:10px 0 4px">
+      <input type="checkbox" data-ev="${k}" ${LN.events[k] ? 'checked' : ''}> ${A.esc(t)} <span class="hint" style="font-weight:400">${A.esc(d)}</span></label>
+    <div class="lntpl"><textarea data-tpl="${k}">${A.esc(LN.templates[k] || '')}</textarea><pre data-pv="${k}">${A.esc(lnRender(LN.templates[k], k))}</pre></div>
+    <div style="margin:-6px 0 6px"><button type="button" class="fb" data-reset="${k}">ใช้ข้อความตั้งต้น</button></div>`).join('');
+  host.querySelectorAll('[data-ev]').forEach(c => c.addEventListener('change', () => { LN.events[c.dataset.ev] = c.checked; lnDirty(); }));
+  host.querySelectorAll('[data-tpl]').forEach(ta => {
+    ta.addEventListener('focus', () => { focus = ta; });
+    ta.addEventListener('input', () => { LN.templates[ta.dataset.tpl] = ta.value;
+      host.querySelector(`[data-pv="${ta.dataset.tpl}"]`).textContent = lnRender(ta.value, ta.dataset.tpl); lnDirty(); });
+  });
+  host.querySelectorAll('[data-reset]').forEach(b => b.addEventListener('click', () => {
+    const k = b.dataset.reset, ta = host.querySelector(`[data-tpl="${k}"]`);
+    ta.value = LN_DEF[k]; ta.dispatchEvent(new Event('input')); }));
+  document.querySelectorAll('#lnChips code').forEach(c => c.addEventListener('mousedown', e => {
+    e.preventDefault(); const ta = focus || host.querySelector('[data-tpl]');
+    const a = ta.selectionStart, z = ta.selectionEnd;
+    ta.value = ta.value.slice(0, a) + c.textContent + ta.value.slice(z);
+    ta.selectionStart = ta.selectionEnd = a + c.textContent.length; ta.focus(); ta.dispatchEvent(new Event('input'));
+  }));
+}
+
+async function lnSave(){
+  const bad = Object.entries(LN.people).filter(([, p]) => p.line && !LN_ID.test(p.line));
+  if (bad.length) { alert('LINE user ID ไม่ถูกรูปแบบ ' + bad.length + ' แถว (กรอบแดง) — แก้หรือลบก่อนบันทึก'); return; }
+  const people = {};
+  Object.entries(LN.people).forEach(([uid, p]) => { if (p.line || p.on === false) people[uid] = { line: p.line || '', on: p.on !== false, name: p.name || '' }; });
+  const b = document.getElementById('lnSave'); b.disabled = true;
+  try {
+    await A.db.collection('lineConfig').doc('settings').set({ enabled: !!LN.enabled, events: LN.events, templates: LN.templates,
+      people, updatedAt: firebase.firestore.FieldValue.serverTimestamp(), updatedBy: A.user.uid });
+    adminLog('line', null, `ส่งจริง ${LN.enabled ? 'เปิด' : 'ปิด'} · มี LINE ID ${Object.values(people).filter(p => p.line).length} คน`);
+    LNDIRTY = 0; LNIMP = {}; document.getElementById('lnDirty').textContent = 'บันทึกแล้ว';
+    lnPaintPeople();
+  } catch(e){ alert('บันทึกไม่สำเร็จ: ' + (e.code || e.message)); }
+  b.disabled = false;
+}
+
+async function lnRun(){
+  const b = document.getElementById('lnRun'); b.disabled = true; b.textContent = 'กำลังตรวจ…';
+  try { const r = await A.gas('line', { op: 'run' }, { timeout: 120000 });
+        b.textContent = r.skipped ? r.skipped : `งาน ${r.tasks || 0} · ส่ง ${r.sent || 0} · ไม่ได้ส่ง ${r.dry || 0}`; }
+  catch(e){ b.textContent = 'ตรวจไม่สำเร็จ'; alert(e.message); }
+  setTimeout(() => { b.textContent = 'ตรวจงานใหม่ตอนนี้'; b.disabled = false; }, 5000);
+  lnStatus(); lnLog();
+}
+
+/* นำ LINE ID จาก Dispatch — จับคู่ตามชื่อ เติมเฉพาะช่องที่ยังว่าง ไม่บันทึกจนกว่าผู้ดูแลกดบันทึก */
+async function lnImport(){
+  const msg = document.getElementById('lnImpMsg'); msg.textContent = 'กำลังอ่านรายชื่อจาก Dispatch…';
+  try {
+    const r = await A.gas('line', { op: 'import' }, { timeout: 60000 });
+    let filled = 0, same = 0; const miss = [], clash = [];
+    const byName = {};
+    r.people.forEach(p => { (byName[p.line] = byName[p.line] || []).push(p.name); });
+    Object.keys(byName).forEach(id => {
+      const names = byName[id];
+      const hit = USERS.filter(u => !u.test && names.some(n => lnSame(u.name || '', n)));
+      if (hit.length !== 1) { (hit.length ? clash : miss).push(names[0]); return; }
+      const u = hit[0], p = LN.people[u.uid] || (LN.people[u.uid] = {});
+      if (p.line === id) { same++; return; }
+      if (p.line) { clash.push(names[0] + ' (มี ID อื่นอยู่แล้ว)'); return; }
+      p.line = id; p.name = u.name || ''; LNIMP[u.uid] = 1; filled++;
+    });
+    msg.innerHTML = `Dispatch มี ${Object.keys(byName).length} คน · เติมให้ ${filled} คน (พื้นเหลือง) · ตรงกันอยู่แล้ว ${same}` +
+      (miss.length ? ` · ไม่พบชื่อในระบบนี้: ${A.esc(miss.join(', '))}` : '') +
+      (clash.length ? ` · ต้องดูเอง: ${A.esc(clash.join(', '))}` : '') + (filled ? ' — ตรวจแล้วกดบันทึก' : '');
+    if (filled) lnDirty();
+    lnPaintPeople();
+  } catch(e){ msg.textContent = 'นำเข้าไม่สำเร็จ: ' + e.message; }
+}
+
+async function lnToken(clear){
+  const inp = document.getElementById('lnTok'), m = document.getElementById('lnTokMsg');
+  if (clear && !confirm('ลบ token ออกจากตัวส่งออก? หลังลบจะไม่มีข้อความออกจากระบบ')) return;
+  if (!clear && !inp.value.trim()) { m.textContent = 'ยังไม่ได้วาง token'; return; }
+  m.textContent = clear ? 'กำลังลบ…' : 'กำลังตรวจกับ LINE…';
+  try {
+    const r = await A.gas('line', clear ? { op: 'token', clear: true } : { op: 'token', token: inp.value.trim() }, { timeout: 60000 });
+    inp.value = '';
+    m.textContent = r.tokenSet ? `บันทึกแล้ว — บัญชี ${r.bot.name} ${r.bot.id}` : 'ลบแล้ว';
+    adminLog('lineToken', null, r.tokenSet ? 'ตั้ง token (' + r.bot.name + ')' : 'ลบ token');
+  } catch(e){ m.textContent = e.message; }
+  lnStatus();
+}
+
+async function lnLog(){
+  const host = document.getElementById('lnLog');
+  try {
+    const s = await A.db.collection('lineLog').orderBy('at', 'desc').limit(100).get();
+    const EV = { task: 'ส่งถึง', pool: 'กองรอ', ack: 'รับทราบ', test: 'ทดสอบ' };
+    host.innerHTML = s.empty ? '<p class="hint">ยังไม่มีบันทึก</p>' : `<table class="lnlog">` + s.docs.map(d => {
+      const v = d.data(), at = v.at && v.at.toDate ? v.at.toDate().toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' }) : '';
+      return `<tr><td style="white-space:nowrap">${A.esc(at)}</td><td>${A.esc(EV[v.event] || v.event || '')}</td>
+        <td>${A.esc(v.toName || '—')}</td><td class="${v.sent ? 'y' : 'n'}">${v.sent ? 'ส่งแล้ว' : 'ไม่ได้ส่ง'}</td>
+        <td><div style="white-space:pre-wrap">${A.esc(v.text || '')}</div>${v.reason ? `<div class="hint">${A.esc(v.reason)}</div>` : ''}</td></tr>`;
+    }).join('') + '</table>';
+  } catch(e){ host.innerHTML = `<p class="hint">อ่านบันทึกไม่ได้: ${A.esc(e.code || e.message)}</p>`; }
+}
 
 /* ── งานค้าง ───────────────────────────────────────────────
    อ่านจากงานที่ยังเปิดอยู่จริง ไม่ใช่เดาจากนิยามฟอร์ม เหมือนหน้าใบที่ส่งเข้ามา
@@ -722,7 +1026,8 @@ async function adminLog(action, target, detail){
   } catch (e) { console.warn('adminLog', e); }
 }
 const ALOG_N = { view:'เปิดดูข้อมูลผู้ใช้', edit:'แก้ข้อมูลผู้ใช้', create:'เพิ่มผู้ใช้', pwreset:'ส่งลิงก์ตั้งรหัสผ่านใหม่',
-                 pwtemp:'ตั้งรหัสผ่านชั่วคราว', merge:'รวมบัญชี', dirEdit:'แก้รายชื่อผู้รับฟอร์ม', dirAdd:'เพิ่มเข้ารายชื่อผู้รับฟอร์ม', dirRemove:'เอาออกจากรายชื่อผู้รับฟอร์ม' };
+                 pwtemp:'ตั้งรหัสผ่านชั่วคราว', merge:'รวมบัญชี', dirEdit:'แก้รายชื่อผู้รับฟอร์ม', dirAdd:'เพิ่มเข้ารายชื่อผู้รับฟอร์ม', dirRemove:'เอาออกจากรายชื่อผู้รับฟอร์ม',
+                 line:'แก้การแจ้งเตือน LINE', lineToken:'LINE token' };
 async function paintAdminLog(){
   const host = document.getElementById('alog'); if (!host) return;
   try {
