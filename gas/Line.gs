@@ -24,7 +24,11 @@
  *   Script Properties     LINE_CHANNEL_ACCESS_TOKEN · LINE_WATERMARK · LINE_SENT · LINE_LAST
  */
 
-var LINE_PUSH = 'https://api.line.me/v2/bot/message/push';
+/* ที่ส่ง push — ตั้งทับได้ด้วย Script Property LINE_MESSAGING_API_PUSH_URL เหมือน Dispatch (LINE เคยย้าย endpoint) */
+function linePushUrl_() {
+  return PropertiesService.getScriptProperties().getProperty('LINE_MESSAGING_API_PUSH_URL')
+    || 'https://api.line.me/v2/bot/message/push';
+}
 var LINE_OVERLAP_MS = 3 * 60 * 1000;   // อ่านย้อนเผื่อเวลาเครื่องคลาด แล้วกันซ้ำด้วย LINE_SENT
 
 var LINE_DEFAULTS = {
@@ -144,7 +148,7 @@ function linePush_(to, text) {
   var token = lineToken_();
   if (!token) return { ok: false, reason: 'ยังไม่ได้ตั้ง LINE_CHANNEL_ACCESS_TOKEN' };
   try {
-    var res = UrlFetchApp.fetch(LINE_PUSH, { method: 'post', contentType: 'application/json', muteHttpExceptions: true,
+    var res = UrlFetchApp.fetch(linePushUrl_(), { method: 'post', contentType: 'application/json', muteHttpExceptions: true,
       headers: { Authorization: 'Bearer ' + token },
       payload: JSON.stringify({ to: to, messages: [{ type: 'text', text: text }] }) });
     var c = res.getResponseCode();
