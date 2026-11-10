@@ -174,7 +174,10 @@ function lineTick() {
     var seen = JSON.parse(P.getProperty('LINE_SENT') || '[]');
     var fresh = rows.filter(function (t) { return seen.indexOf(t.id) < 0; });
     if (fresh.length) {
-      var S = lineSettings_(), token = !!lineToken_(), dir = null;
+      var S = lineSettings_(), token = !!lineToken_(), dir = null, prof = {};
+      // LINE ID ที่เจ้าตัวกรอกเองในโปรไฟล์ (staffDirectory) ใช้เมื่อผู้ดูแลยังไม่ได้ใส่ให้
+      try { ((lineGet_('staffDirectory/current') || {}).list || []).forEach(function (x) {
+        if (/^U[0-9a-f]{32}$/i.test(x.lineUserId || '')) prof[x.id] = x.lineUserId; }); } catch (e) {}
       fresh.forEach(function (t) {
         seen.push(t.id);
         if (t.state !== 'open' && t.state !== 'pool') return;   // ปิดไปแล้วก่อนถึงรอบตรวจ
@@ -190,7 +193,8 @@ function lineTick() {
         }
         who.forEach(function (w) {
           if (w.uid && w.uid === t.fromUid) return;          // งานที่ส่งถึงตัวเอง ไม่ต้องบอก
-          var p = S.people[w.uid] || {};
+          var p = Object.assign({}, S.people[w.uid] || {});
+          if (!p.line && prof[w.uid]) p.line = prof[w.uid];
           var why = !S.enabled ? 'ปิดการส่งจริงอยู่ (ทดลอง — บันทึกอย่างเดียว)'
             : !S.events[ev] ? 'ปิดการแจ้งเตือนประเภทนี้ไว้'
             : !p.line ? 'ยังไม่มี LINE user ID ของคนนี้'

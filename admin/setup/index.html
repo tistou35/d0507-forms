@@ -66,7 +66,7 @@ details.h .hint{margin-top:6px}
 .lnrow input[type=text]{font-family:var(--font-mono);font-size:12px;width:100%;padding:6px 8px;
   border:1px solid var(--border-light);border-radius:6px}
 .lnrow input.bad{border-color:var(--red-600)} .lnrow input.imp{background:#fffbe6}
-@media(max-width:640px){.lnrow{grid-template-columns:22px 1fr}.lnrow>input[type=text],.lnrow>.fb{grid-column:2}}
+@media(max-width:640px){.lnrow{grid-template-columns:22px 1fr}.lnrow>div:nth-child(3),.lnrow>.fb{grid-column:2}}
 .lntpl{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-bottom:12px}
 .lntpl textarea{width:100%;min-height:92px;font-family:var(--font-mono);font-size:12px;padding:8px;
   border:1px solid var(--border-light);border-radius:6px}
@@ -210,7 +210,7 @@ section[data-pane].off{display:none}
       <div class="stabs" role="tablist">
         <button role="tab" data-tab="users"  aria-selected="true">ผู้ใช้งาน<span id="tabN">—</span></button>
         <button role="tab" data-tab="pending" aria-selected="false">งานค้าง</button>
-        <button role="tab" data-tab="line" aria-selected="false">แจ้งเตือน LINE</button>
+        <button role="tab" data-tab="notification" aria-selected="false">Notification<span id="lnTabN">LINE</span></button>
         <button role="tab" data-tab="roles"  aria-selected="false">บทบาทและฟอร์ม</button>
         <button role="tab" data-tab="me"     aria-selected="false">โปรไฟล์ของฉัน</button>
         <button role="tab" data-tab="system" aria-selected="false">ระบบและทะเบียน</button>
@@ -299,8 +299,8 @@ section[data-pane].off{display:none}
         <div id="pList">—</div>
       </section>
 
-      <section data-pane="line">
-        <div class="sh"><h2>แจ้งเตือนผ่าน LINE</h2><span class="en">LINE notifications</span>
+      <section data-pane="notification">
+        <div class="sh"><h2>การแจ้งเตือน</h2><span class="en">Notification · LINE</span>
           <span class="rt"><button type="button" class="fb" id="lnRel">โหลดใหม่</button></span></div>
         <p class="hint" style="margin-bottom:12px">เมื่อมีงานใหม่ส่งถึงใคร (ใบรออนุมัติ · บันทึกข้อความรอลงนาม · หนังสือเวียนรอรับทราบ)
           ระบบส่งข้อความหาคนนั้นทาง LINE Official Account ของโรงเรียน ทีละคน ไม่ใช่กลุ่ม — แต่ละคนได้เฉพาะงานของตัวเอง ·
@@ -330,7 +330,8 @@ section[data-pane].off{display:none}
             <label class="hint" style="display:flex;gap:5px;align-items:center"><input type="checkbox" id="lnStu"> แสดงนักเรียน</label>
             <button type="button" class="fb" id="lnImp">นำ LINE ID จาก Dispatch</button></span></div>
         <p class="hint">LINE user ID ขึ้นต้นด้วย U ตามด้วยตัวอักษร 32 ตัว อ่านได้จากฝั่งบัญชี Official Account
-          หลังเจ้าตัวเพิ่มเพื่อนแล้ว (เจ้าตัวหาเองในโทรศัพท์ไม่ได้) · ปุ่มทดสอบส่งข้อความหาคนนั้นคนเดียว</p>
+          หลังเจ้าตัวเพิ่มเพื่อนแล้ว (เจ้าตัวหาเองในโทรศัพท์ไม่ได้) · เจ้าหน้าที่กรอกเองได้ที่แท็บโปรไฟล์ของฉัน
+          ระบบใช้ค่านั้นเมื่อช่องนี้ว่าง · ปุ่มทดสอบส่งข้อความหาคนนั้นคนเดียว</p>
         <div id="lnImpMsg" class="hint" style="margin:6px 0"></div>
         <div id="lnPeople">—</div>
 
@@ -646,7 +647,7 @@ function tab(name){
   if (name === 'users') users();
   if (name === 'roles') roleForms();
   if (name === 'pending') pending();
-  if (name === 'line') line();
+  if (name === 'notification') line();
 }
 document.querySelectorAll('.stabs button').forEach(b =>
   b.addEventListener('click', () => tab(b.dataset.tab)));
@@ -667,7 +668,7 @@ const LN_DEF = {
 const LN_PH = { '[เรื่อง]':'FRAE — Flight Risk Assessment', '[ฟอร์ม]':'FRAE', '[เลขที่]':'FRAE-20261111-0001',
   '[จาก]':'Atcha C.', '[กองรอ]':'FI', '[หมายเหตุ]':'', '[ลิงก์]':'https://tistou35.github.io/d0507-forms/approve/?t=…' };
 const LN_ID = /^U[0-9a-f]{32}$/;
-let LN = null, LNDIRTY = 0, LNIMP = {};
+let LN = null, LNDIRTY = 0, LNIMP = {}, LNPROF = {};
 const lnRender = (t, ev) => Object.keys(LN_PH).reduce((o, k) => o.split(k).join(k === '[ลิงก์]' && ev === 'pool' ? 'https://tistou35.github.io/d0507-forms/queue/' : LN_PH[k]), String(t || '')).trim();
 const lnDirty = () => { LNDIRTY++; document.getElementById('lnDirty').textContent = 'ยังไม่ได้บันทึก'; };
 
@@ -706,6 +707,8 @@ async function line(){
              templates: Object.assign({}, LN_DEF, v.templates || {}), people: v.people || {} };
     } catch(e){ document.getElementById('lnPeople').innerHTML = `<p class="hint">อ่านค่าตั้งไม่ได้: ${A.esc(e.code || e.message)}</p>`; return; }
     LNDIRTY = 0; LNIMP = {}; document.getElementById('lnDirty').textContent = '';
+    try { const d = await A.db.collection('staffDirectory').doc('current').get();
+          LNPROF = {}; ((d.exists && d.data().list) || []).forEach(x => { if (LN_ID.test(x.lineUserId || '')) LNPROF[x.id] = x.lineUserId; }); } catch(e){}
   }
   document.getElementById('lnOn').checked = LN.enabled;
   lnPaintPeople(); lnPaintTpl(); lnLog();
@@ -741,7 +744,8 @@ function lnPaintPeople(){
   let L = USERS.filter(u => !u.disabled && !u.test && (stu || staff(u) || (LN.people[u.uid] || {}).line));
   if (q) L = L.filter(u => [u.name, u.email].join(' ').toLowerCase().includes(q));
   L.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'th'));
-  const has = USERS.filter(u => LN_ID.test((LN.people[u.uid] || {}).line || '') && (LN.people[u.uid] || {}).on !== false).length;
+  const eff = uid => (LN.people[uid] || {}).line || LNPROF[uid] || '';
+  const has = USERS.filter(u => LN_ID.test(eff(u.uid)) && (LN.people[u.uid] || {}).on !== false).length;
   document.getElementById('lnPN').textContent = `ส่งถึงได้ ${has} คน`;
   host.innerHTML = L.map(u => {
     const p = LN.people[u.uid] || {}, v = p.line || '';
@@ -749,8 +753,9 @@ function lnPaintPeople(){
     return `<div class="lnrow" data-u="${A.esc(u.uid)}">
       <input type="checkbox" data-on ${p.on === false ? '' : 'checked'} title="ส่งถึงคนนี้">
       <div><div class="nm">${A.esc(u.name || u.email || u.uid)}</div><div class="sub2">${A.esc(roles || '—')}${(u.positions || []).length ? ' · ' + A.esc(u.positions.join(' · ')) : ''}</div></div>
-      <input type="text" data-line value="${A.esc(v)}" placeholder="Uxxxxxxxx… — LINE user ID" class="${v && !LN_ID.test(v) ? 'bad' : ''} ${LNIMP[u.uid] ? 'imp' : ''}" spellcheck="false">
-      <button type="button" class="fb" data-test ${LN_ID.test(v) ? '' : 'disabled'}>ทดสอบ</button></div>`;
+      <div><input type="text" data-line value="${A.esc(v)}" placeholder="${LNPROF[u.uid] ? A.esc(LNPROF[u.uid]) : 'Uxxxxxxxx… — LINE user ID'}" class="${v && !LN_ID.test(v) ? 'bad' : ''} ${LNIMP[u.uid] ? 'imp' : ''}" spellcheck="false">
+        ${LNPROF[u.uid] && !v ? '<div class="sub2">ใช้ ID ที่เจ้าตัวกรอกในโปรไฟล์ — ใส่ช่องนี้เพื่อใช้ค่าอื่นแทน</div>' : ''}</div>
+      <button type="button" class="fb" data-test ${LN_ID.test(eff(u.uid)) ? '' : 'disabled'}>ทดสอบ</button></div>`;
   }).join('') || '<p class="hint">ไม่พบผู้ใช้</p>';
   host.querySelectorAll('.lnrow').forEach(row => {
     const uid = row.dataset.u, u = USERS.find(x => x.uid === uid) || {};
@@ -760,10 +765,10 @@ function lnPaintPeople(){
     inp.addEventListener('input', () => {
       const v = inp.value.trim(); put().line = v; delete LNIMP[uid];
       inp.classList.toggle('bad', !!v && !LN_ID.test(v)); inp.classList.remove('imp');
-      row.querySelector('[data-test]').disabled = !LN_ID.test(v); lnDirty();
+      row.querySelector('[data-test]').disabled = !LN_ID.test(v || LNPROF[uid] || ''); lnDirty();
     });
     row.querySelector('[data-test]').addEventListener('click', async e => {
-      const b = e.target, v = inp.value.trim();
+      const b = e.target, v = inp.value.trim() || LNPROF[uid] || '';
       if (!confirm(`ส่งข้อความทดสอบถึง ${u.name || uid} ทาง LINE ตอนนี้?`)) return;
       b.disabled = true; b.textContent = 'กำลังส่ง…';
       try {
@@ -1578,7 +1583,7 @@ async function boot(){
   chips(document.getElementById('nPos'), POS_KEYS, NPOS, k => k + ' · ' + POS_N[k]);
   check(); dir(); if (A.isAdmin()) paintAdminLog();
   // เปิดแท็บตามที่อยู่ใน URL ถ้ามี — กลับมาหน้าเดิมได้หลังรีเฟรช
-  tab((location.hash || '#users').slice(1));
+  tab(({ line: 'notification', notify: 'notification' })[(location.hash || '#users').slice(1)] || (location.hash || '#users').slice(1));
 }
 
 /* รายชื่อผู้ดูแลระบบ — ตราบใดที่ config/admins ยังไม่มี เจ้าหน้าที่ทุกคนเป็น admin ชั่วคราว
