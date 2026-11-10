@@ -233,10 +233,9 @@ section[data-pane].off{display:none}
       <section data-pane="notification">
         <div class="sh"><h2>การแจ้งเตือน</h2><span class="en">Notification · LINE</span>
           <span class="rt"><button type="button" class="fb" id="lnRel">โหลดใหม่</button></span></div>
-        <p class="hint" style="margin-bottom:12px">เมื่อมีงานใหม่ส่งถึงใคร (ใบรออนุมัติ · บันทึกข้อความรอลงนาม · หนังสือเวียนรอรับทราบ)
-          ระบบส่งข้อความหาคนนั้นทาง LINE Official Account ของโรงเรียน ทีละคน ไม่ใช่กลุ่ม — แต่ละคนได้เฉพาะงานของตัวเอง ·
-          งานในกองรอส่งถึงทุกคนที่ถือตำแหน่งนั้นในรายชื่อผู้รับฟอร์ม · ตัวตั้งเวลาของตัวส่งออกตรวจงานใหม่ทุก 1 นาที
-          ไม่ขึ้นกับว่าใบถูกส่งจากเครื่องไหน · ยังไม่ใส่ token หรือยังไม่เปิดส่งจริง = ไม่มีอะไรออกจากระบบ
+        <p class="hint" style="margin-bottom:12px">ระบบส่งข้อความทาง LINE Official Account ของโรงเรียน ทีละคน ไม่ใช่กลุ่ม —
+          แต่ละคนได้เฉพาะเรื่องของตัวเอง (งานที่ส่งถึง ผลของใบที่ส่ง งานค้าง ฯลฯ ดูรายการด้านล่าง) ·
+          ตัวตั้งเวลาของตัวส่งออกตรวจเรื่องใหม่ทุก 1 นาที และส่งรอบเช้าตอน 08:00 ไม่ขึ้นกับว่าใบถูกส่งจากเครื่องไหน · ยังไม่ใส่ token หรือยังไม่เปิดส่งจริง = ไม่มีอะไรออกจากระบบ
           แต่ทุกข้อความที่ "จะส่ง" ลงบันทึกด้านล่างพร้อมเหตุผล</p>
         <div class="lnst" id="lnSt"><div><b>—</b><span>กำลังตรวจ…</span></div></div>
         <details class="fold" id="lnTokBox"><summary>Channel access token <em>เก็บที่ตัวส่งออกเท่านั้น ไม่มีทางอ่านกลับ</em></summary>
@@ -266,13 +265,15 @@ section[data-pane].off{display:none}
         <div id="lnImpMsg" class="hint" style="margin:6px 0"></div>
         <div id="lnPeople">—</div>
 
-        <div class="sh" style="margin-top:18px"><h3 style="margin:0">ส่งเมื่อ · ข้อความ</h3><span class="en">Events &amp; messages</span></div>
-        <p class="hint">คำในวงเล็บเหลี่ยมถูกแทนด้วยข้อมูลของงานตอนส่ง ที่เหลือส่งตามที่พิมพ์ · ช่องขวาคือตัวอย่าง</p>
+        <div class="sh" style="margin-top:18px"><h3 style="margin:0">เรื่องที่แจ้งเตือน</h3><span class="en">Events &amp; messages</span></div>
+        <p class="hint">ติ๊กเพื่อเปิด/ปิดแต่ละเรื่อง · กดชื่อเรื่องเพื่อแก้ข้อความ — คำในวงเล็บเหลี่ยมถูกแทนด้วยข้อมูลจริงตอนส่ง
+          ที่เหลือส่งตามที่พิมพ์ · ช่องขวาคือตัวอย่าง · เรื่องที่ "ทันที" ตรวจทุก 1 นาที ส่วนเรื่องรายวันส่งตอน 08:00</p>
         <div class="lnchips" id="lnChips"></div>
         <div id="lnTpl"></div>
 
         <div class="lnbar"><span class="hint" id="lnDirty"></span>
-          <button type="button" class="fb" id="lnRun">ตรวจงานใหม่ตอนนี้</button>
+          <button type="button" class="fb" id="lnRun">ตรวจเรื่องใหม่ตอนนี้</button>
+          <button type="button" class="fb" id="lnDay">ส่งรอบเช้าตอนนี้</button>
           <button type="button" class="big pri" id="lnSave">บันทึกการตั้งค่า</button></div>
 
         <div class="sh" style="margin-top:18px"><h3 style="margin:0">บันทึกการแจ้งเตือน</h3><span class="en">ล่าสุด 100 รายการ</span></div>
@@ -567,21 +568,58 @@ document.querySelectorAll('.stabs button').forEach(b =>
 /* ── แจ้งเตือน LINE ────────────────────────────────────────
    ค่าตั้งและ LINE user ID อยู่ที่ lineConfig/settings (ผู้ดูแลเท่านั้น) ตัวส่งออกอ่านจากที่เดียวกัน
    token อยู่ที่ตัวส่งออก หน้านี้ส่งไปได้แต่อ่านกลับไม่ได้ · ดู gas/Line.gs */
+/* [key, ชื่อ, ส่งถึงใคร, กลุ่ม, ตัวอย่างค่าแทนที่] — ข้อความตั้งต้นต้องตรงกับ LINE_DEFAULTS ใน gas/Line.gs */
+const LN_U = 'https://tistou35.github.io/d0507-forms/';
 const LN_EV = [
-  ['task', 'งานใหม่ส่งถึงฉัน', 'ใบรออนุมัติ / บันทึกข้อความรอลงนาม ที่ระบุตัวผู้รับ'],
-  ['pool', 'งานใหม่ในกองรอ', 'ส่งถึงทุกคนที่ถือตำแหน่งนั้นในรายชื่อผู้รับฟอร์ม'],
-  ['ack',  'หนังสือเวียนรอรับทราบ', 'ส่งถึงผู้ที่อยู่ในรายชื่อต้องรับทราบ'],
+  ['task',    'งานใหม่ส่งถึงฉัน', 'ผู้รับที่ระบุตัว — ใบรออนุมัติ · บันทึกข้อความรอลงนาม · กรรมการ · ACM รับทราบ', 'ทันที',
+    { '[เรื่อง]':'FRAE — Flight Risk Assessment', '[ฟอร์ม]':'FRAE', '[เลขที่]':'FRAE-20261111-0001', '[จาก]':'Atcha C.', '[หมายเหตุ]':'', '[ลิงก์]':LN_U+'approve/?t=…' }],
+  ['pool',    'งานใหม่ในกองรอ', 'ทุกคนที่ถือตำแหน่งนั้น', 'ทันที',
+    { '[เรื่อง]':'ASF — Authorisation for Solo Flight', '[ฟอร์ม]':'ASF', '[เลขที่]':'ASF-20261111-0002', '[จาก]':'Student A', '[กองรอ]':'FI', '[ลิงก์]':LN_U+'queue/' }],
+  ['ack',     'หนังสือเวียนรอรับทราบ', 'ผู้ที่อยู่ในรายชื่อต้องรับทราบ', 'ทันที',
+    { '[เรื่อง]':'Safety Notice — Bird activity', '[เลขที่]':'D0507-MEMO-2569/0021 (SAF)', '[จาก]':'Karin D.', '[ลิงก์]':LN_U+'memo/?id=…' }],
+  ['result',  'ผลของใบที่ฉันส่ง', 'ผู้ส่ง — อนุมัติ · ไม่อนุมัติ · ปิดโดยผู้ดูแล (ใบที่ผู้ส่งปิดเองตอนส่งไม่ต้องบอก)', 'ทันที',
+    { '[ผล]':'อนุมัติแล้ว', '[เรื่อง]':'ASF — Authorisation for Solo Flight', '[ฟอร์ม]':'ASF', '[เลขที่]':'ASF-20261111-0002', '[โดย]':'Jirawat K.', '[หมายเหตุ]':'', '[ลิงก์]':LN_U+'view/?id=…' }],
+  ['frae',    'FRAE ความเสี่ยงสูง', 'CFI และผู้ดูแล — เมื่อ NO-GO หรือคะแนนถึงเกณฑ์', 'ทันที',
+    { '[ตัดสินใจ]':'GO', '[คะแนน]':'14', '[นักบิน]':'Thapphawut W.', '[ทะเบียน]':'HS-VVD', '[วันที่]':'11 NOV 2026', '[เลขที่]':'FRAE-20261111-0003', '[ลิงก์]':LN_U+'view/?id=…' }],
+  ['safety',  'รายงานนิรภัยเข้ามา (VSR · HIF)', 'SM และผู้ดูแล — ไม่มีชื่อผู้รายงานในข้อความ', 'ทันที',
+    { '[ฟอร์ม]':'VSR รายงานนิรภัยโดยสมัครใจ', '[เลขที่]':'VSR-20261111-0001', '[ลิงก์]':LN_U+'view/?id=…' }],
+  ['nobody',  'งานเข้ากองรอที่ไม่มีใครรับได้', 'ผู้ดูแล', 'ทันที',
+    { '[เรื่อง]':'HIF — Hazard Identification', '[เลขที่]':'HIF-20261111-0001', '[จาก]':'Student A', '[กองรอ]':'SM', '[ลิงก์]':LN_U+'admin/subs/' }],
+  ['signup',  'ผู้ใช้ใหม่สมัครเข้ามา', 'ผู้ดูแล — บัญชีที่สมัครเองและยังเป็นบทบาทนักเรียน', 'ทันที',
+    { '[ชื่อ]':'Somchai P.', '[อีเมล]':'somchai@example.com', '[ลิงก์]':LN_U+'admin/setup/#users' }],
+  ['memoNo',  'บันทึกข้อความไม่อนุมัติ', 'ผู้จัดทำและผู้เสนอ', 'ทันที',
+    { '[เรื่อง]':'Request for approval — passenger flight', '[เลขที่]':'D0507-MEMO-2569/0030 (APR)', '[โดย]':'Akom C.', '[หมายเหตุ]':'สั่งการ: เลื่อนไปเดือนหน้า', '[ลิงก์]':LN_U+'memo/?id=…' }],
+  ['overdue', 'งานค้างเกินกำหนด', 'คนที่งานค้างอยู่ — รวมเป็นข้อความเดียวต่อคน', 'ทุกเช้า 08:00',
+    { '[จำนวน]':'2', '[รายการ]':'• FRAE (FRAE-20261105-0001) — 6 วัน\n• APR: ขออนุมัติผู้โดยสาร (D0507-MEMO-2569/0028) — 4 วัน', '[ลิงก์]':LN_U+'queue/' }],
+  ['weekly',  'สรุปงานค้างประจำสัปดาห์', 'ผู้ดูแลและ CMM', 'วันจันทร์ 08:00',
+    { '[รายการ]':'งานเปิดอยู่ 9 · ในกองรอ 3 · ไม่มีผู้รับ 1 · ค้างเกิน 7 วัน 2\nค้างนานสุด:\n• HIF — กองรอ SM · 12 วัน', '[ลิงก์]':LN_U+'admin/setup/#pending' }],
+  ['expiry',  'หนังสือแต่งตั้งใกล้หมดอายุ', 'ผู้ได้รับแต่งตั้งและ HT — 30 และ 7 วันก่อนหมด', 'ทุกเช้า 08:00',
+    { '[เลขที่]':'D0507-MEMO-2569/0003 (AUTH)', '[เหลือ]':'30', '[วันหมดอายุ]':'10 DEC 2026', '[ชื่อ]':'Jirawat Kaewbua', '[เรื่อง]':'Authorisation to act as Flight Instructor', '[ลิงก์]':LN_U+'memo/?id=…' }],
+  ['ackDue',  'หนังสือเวียนยังไม่รับทราบเมื่อครบกำหนด', 'คนที่ยังไม่รับทราบ — วันครบกำหนดและอีก 3 วัน (เฉพาะที่ให้รับทราบในระบบฟอร์ม)', 'ทุกเช้า 08:00',
+    { '[เรื่อง]':'Safety Notice — Bird activity', '[เลขที่]':'D0507-MEMO-2569/0021 (SAF)', '[วันที่]':'18 NOV 2026', '[ลิงก์]':LN_U+'queue/' }],
 ];
 const LN_DEF = {
-  task: 'D-0507 · งานใหม่รอคุณ\n[เรื่อง]\nเลขที่ [เลขที่] · จาก [จาก]\n[ลิงก์]',
-  pool: 'D-0507 · งานใหม่ในกองรอ [กองรอ]\n[เรื่อง]\nเลขที่ [เลขที่] · จาก [จาก]\nกดรับงาน: [ลิงก์]',
-  ack:  'D-0507 · หนังสือเวียนรอรับทราบ\n[เรื่อง]\nเลขที่ [เลขที่]\n[ลิงก์]',
+  task:    'D-0507 · งานใหม่รอคุณ\n[เรื่อง]\nเลขที่ [เลขที่] · จาก [จาก]\n[ลิงก์]',
+  pool:    'D-0507 · งานใหม่ในกองรอ [กองรอ]\n[เรื่อง]\nเลขที่ [เลขที่] · จาก [จาก]\nกดรับงาน: [ลิงก์]',
+  ack:     'D-0507 · หนังสือเวียนรอรับทราบ\n[เรื่อง]\nเลขที่ [เลขที่]\n[ลิงก์]',
+  nobody:  'D-0507 · ⚠ งานเข้ากองรอ [กองรอ] แต่ไม่มีใครถือตำแหน่งนี้\n[เรื่อง]\nเลขที่ [เลขที่] · จาก [จาก]\nโยกงานได้ที่: [ลิงก์]',
+  result:  'D-0507 · ใบของคุณ[ผล]\n[เรื่อง]\nเลขที่ [เลขที่] · โดย [โดย]\n[หมายเหตุ]\n[ลิงก์]',
+  frae:    'D-0507 · ⚠ FRAE [ตัดสินใจ] · คะแนนความเสี่ยง [คะแนน]\n[นักบิน] · [ทะเบียน] · [วันที่]\nเลขที่ [เลขที่]\n[ลิงก์]',
+  safety:  'D-0507 · รายงานนิรภัยใหม่ — [ฟอร์ม]\nเลขที่ [เลขที่]\n[ลิงก์]',
+  signup:  'D-0507 · ผู้ใช้ใหม่สมัครเข้ามา ยังเป็นบทบาทนักเรียน\n[ชื่อ] · [อีเมล]\nกำหนดบทบาทได้ที่: [ลิงก์]',
+  memoNo:  'D-0507 · บันทึกข้อความไม่อนุมัติ\n[เรื่อง]\nเลขที่ [เลขที่] · โดย [โดย]\n[หมายเหตุ]\n[ลิงก์]',
+  overdue: 'D-0507 · งานค้างของคุณ [จำนวน] รายการ\n[รายการ]\n[ลิงก์]',
+  weekly:  'D-0507 · สรุปงานค้างประจำสัปดาห์\n[รายการ]\n[ลิงก์]',
+  expiry:  'D-0507 · หนังสือ [เลขที่] จะหมดอายุใน [เหลือ] วัน ([วันหมดอายุ])\n[ชื่อ] — [เรื่อง]\n[ลิงก์]',
+  ackDue:  'D-0507 · หนังสือเวียนยังไม่ได้รับทราบ (ครบกำหนด [วันที่])\n[เรื่อง]\nเลขที่ [เลขที่]\n[ลิงก์]',
 };
-const LN_PH = { '[เรื่อง]':'FRAE — Flight Risk Assessment', '[ฟอร์ม]':'FRAE', '[เลขที่]':'FRAE-20261111-0001',
-  '[จาก]':'Atcha C.', '[กองรอ]':'FI', '[หมายเหตุ]':'', '[ลิงก์]':'https://tistou35.github.io/d0507-forms/approve/?t=…' };
+const LN_SAMPLE = Object.fromEntries(LN_EV.map(e => [e[0], e[4]]));
 const LN_ID = /^U[0-9a-f]{32}$/;
 let LN = null, LNDIRTY = 0, LNIMP = {}, LNPROF = {};
-const lnRender = (t, ev) => Object.keys(LN_PH).reduce((o, k) => o.split(k).join(k === '[ลิงก์]' && ev === 'pool' ? 'https://tistou35.github.io/d0507-forms/queue/' : LN_PH[k]), String(t || '')).trim();
+const lnRender = (t, ev) => { const f = LN_SAMPLE[ev] || {};
+  return String(t || '').split('\n').map(l => { const had = Object.keys(f).some(k => l.includes(k));
+    const o = Object.keys(f).reduce((x, k) => x.split(k).join(f[k]), l); return had && !o.trim() ? null : o; })
+    .filter(l => l !== null).join('\n').replace(/\n{3,}/g, '\n\n').trim(); };
 const lnDirty = () => { LNDIRTY++; document.getElementById('lnDirty').textContent = 'ยังไม่ได้บันทึก'; };
 
 /* ชื่อเดียวกันไหม — ตัดวงเล็บ ตัวพิมพ์ เครื่องหมาย แล้วเทียบเป็นคำ · ตัวย่อได้เฉพาะ 1–2 ตัวอักษร (แบบ Dispatch) */
@@ -604,6 +642,7 @@ async function line(){
     document.getElementById('lnOn').addEventListener('change', e => { LN.enabled = e.target.checked; lnDirty(); });
     document.getElementById('lnSave').addEventListener('click', lnSave);
     document.getElementById('lnRun').addEventListener('click', lnRun);
+    document.getElementById('lnDay').addEventListener('click', lnDay);
     document.getElementById('lnImp').addEventListener('click', lnImport);
     document.getElementById('lnTokSave').addEventListener('click', () => lnToken(false));
     document.getElementById('lnTokClr').addEventListener('click', () => lnToken(true));
@@ -615,7 +654,8 @@ async function line(){
     try {
       const d = await A.db.collection('lineConfig').doc('settings').get();
       const v = d.exists ? d.data() : {};
-      LN = { enabled: v.enabled === true, events: Object.assign({ task:true, pool:true, ack:true }, v.events || {}),
+      LN = { enabled: v.enabled === true, overdueDays: Number(v.overdueDays) || 3, fraeScore: Number(v.fraeScore) || 10,
+             events: Object.assign(Object.fromEntries(LN_EV.map(e => [e[0], true])), v.events || {}),
              templates: Object.assign({}, LN_DEF, v.templates || {}), people: v.people || {} };
     } catch(e){ document.getElementById('lnPeople').innerHTML = `<p class="hint">อ่านค่าตั้งไม่ได้: ${A.esc(e.code || e.message)}</p>`; return; }
     LNDIRTY = 0; LNIMP = {}; document.getElementById('lnDirty').textContent = '';
@@ -636,11 +676,12 @@ async function lnStatus(){
       `<div class="${r.tokenSet && !(r.bot && r.bot.error) ? 'ok' : 'no'}"><b>${r.tokenSet ? (r.bot && r.bot.error ? 'token ใช้ไม่ได้' : 'ตั้ง token แล้ว') : 'ยังไม่มี token'}</b>
          <span>${r.tokenSet ? A.esc(r.bot && (r.bot.error || (r.bot.name + ' ' + r.bot.id)) || '') : 'ไม่มีข้อความออกจากระบบจนกว่าจะตั้ง'}</span></div>
        <div class="${r.trigger ? 'ok' : 'no'}"><b>${r.trigger ? 'ตัวตั้งเวลาทำงานอยู่' : 'ตัวตั้งเวลาปิดอยู่'}</b>
-         <span>${r.trigger ? 'ตรวจงานใหม่ทุก 1 นาที' : 'ยังไม่ตรวจงานใหม่'} · <a href="#" id="lnTrg">${r.trigger ? 'ปิด' : 'เปิด'}</a></span></div>
-       <div><b>${at || '—'}</b><span>ตรวจล่าสุด${last.error ? ' · ผิดพลาด: ' + A.esc(last.error) : last.at ? ` · งาน ${last.tasks || 0} · ส่ง ${last.sent || 0} · ไม่ได้ส่ง ${last.dry || 0}` : ''}</span></div>`;
+         <span>${r.trigger ? 'ตรวจทุก 1 นาที · รอบเช้า 08:00' : (r.tick ? 'ยังไม่มีรอบเช้า — กดปิดแล้วเปิดใหม่' : 'ยังไม่ตรวจเรื่องใหม่')} · <a href="#" id="lnTrg">${r.tick ? 'ปิด' : 'เปิด'}</a></span></div>
+       <div><b>${at || '—'}</b><span>ตรวจล่าสุด${last.error ? ' · ผิดพลาด: ' + A.esc(last.error) : last.at ? ` · เรื่อง ${last.events ?? last.tasks ?? 0} · ส่ง ${last.sent || 0} · ไม่ได้ส่ง ${last.dry || 0}` : ''}</span></div>
+       <div><b>${r.lastDaily && r.lastDaily.at ? new Date(r.lastDaily.at).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' }) : '—'}</b><span>รอบเช้าล่าสุด${r.lastDaily && r.lastDaily.error ? ' · ผิดพลาด: ' + A.esc(r.lastDaily.error) : r.lastDaily ? ` · ส่ง ${r.lastDaily.sent || 0} · ไม่ได้ส่ง ${r.lastDaily.dry || 0}` : ''}</span></div>`;
     document.getElementById('lnTrg').onclick = async ev => {
       ev.preventDefault();
-      try { await A.gas('line', { op: 'trigger', on: !r.trigger }, { timeout: 60000 }); } catch(e){ alert(e.message); }
+      try { await A.gas('line', { op: 'trigger', on: !r.tick }, { timeout: 60000 }); } catch(e){ alert(e.message); }
       lnStatus();
     };
     document.getElementById('lnTokBox').open = !r.tokenSet;
@@ -694,25 +735,30 @@ function lnPaintPeople(){
 }
 
 function lnPaintTpl(){
-  document.getElementById('lnChips').innerHTML = Object.keys(LN_PH).map(k => `<code title="คลิกเพื่อแทรก">${A.esc(k)}</code>`).join('');
-  let focus = null;
+  document.getElementById('lnChips').innerHTML = '';
   const host = document.getElementById('lnTpl');
-  host.innerHTML = LN_EV.map(([k, t, d]) => `
-    <label style="display:flex;gap:7px;align-items:center;font-weight:600;margin:10px 0 4px">
-      <input type="checkbox" data-ev="${k}" ${LN.events[k] ? 'checked' : ''}> ${A.esc(t)} <span class="hint" style="font-weight:400">${A.esc(d)}</span></label>
-    <div class="lntpl"><textarea data-tpl="${k}">${A.esc(LN.templates[k] || '')}</textarea><pre data-pv="${k}">${A.esc(lnRender(LN.templates[k], k))}</pre></div>
-    <div style="margin:-6px 0 6px"><button type="button" class="fb" data-reset="${k}">ใช้ข้อความตั้งต้น</button></div>`).join('');
+  const extra = k => k === 'overdue' ? `<label class="hint" style="font-weight:400">ค้างตั้งแต่ <input type="number" min="1" max="60" data-num="overdueDays" value="${LN.overdueDays}" style="width:56px"> วัน</label>`
+    : k === 'frae' ? `<label class="hint" style="font-weight:400">คะแนนตั้งแต่ <input type="number" min="1" max="200" data-num="fraeScore" value="${LN.fraeScore}" style="width:56px"> (HIGH RISK = 10 · EXTREME = 30) หรือ NO-GO</label>` : '';
+  let grp = '';
+  host.innerHTML = LN_EV.map(([k, t, d, g, f]) => {
+    const head = g !== grp ? `<div class="sh" style="margin:16px 0 2px"><h4 style="margin:0">${A.esc(g)}</h4></div>` : ''; grp = g;
+    return head + `
+    <details class="fold" style="margin-bottom:8px" data-k="${k}"><summary>
+      <input type="checkbox" data-ev="${k}" ${LN.events[k] ? 'checked' : ''} onclick="event.stopPropagation()"> ${A.esc(t)} <em>${A.esc(d)}</em></summary>
+      <div class="in">${extra(k)}
+        <div class="lnchips">${Object.keys(f).map(x => `<code title="คลิกเพื่อแทรก" data-ins="${k}">${A.esc(x)}</code>`).join('')}</div>
+        <div class="lntpl"><textarea data-tpl="${k}">${A.esc(LN.templates[k] || '')}</textarea><pre data-pv="${k}">${A.esc(lnRender(LN.templates[k], k))}</pre></div>
+        <button type="button" class="fb" data-reset="${k}">ใช้ข้อความตั้งต้น</button></div></details>`;
+  }).join('');
   host.querySelectorAll('[data-ev]').forEach(c => c.addEventListener('change', () => { LN.events[c.dataset.ev] = c.checked; lnDirty(); }));
-  host.querySelectorAll('[data-tpl]').forEach(ta => {
-    ta.addEventListener('focus', () => { focus = ta; });
-    ta.addEventListener('input', () => { LN.templates[ta.dataset.tpl] = ta.value;
-      host.querySelector(`[data-pv="${ta.dataset.tpl}"]`).textContent = lnRender(ta.value, ta.dataset.tpl); lnDirty(); });
-  });
+  host.querySelectorAll('[data-num]').forEach(n => n.addEventListener('input', () => { LN[n.dataset.num] = Math.max(1, Number(n.value) || 1); lnDirty(); }));
+  host.querySelectorAll('[data-tpl]').forEach(ta => ta.addEventListener('input', () => { LN.templates[ta.dataset.tpl] = ta.value;
+    host.querySelector(`[data-pv="${ta.dataset.tpl}"]`).textContent = lnRender(ta.value, ta.dataset.tpl); lnDirty(); }));
   host.querySelectorAll('[data-reset]').forEach(b => b.addEventListener('click', () => {
     const k = b.dataset.reset, ta = host.querySelector(`[data-tpl="${k}"]`);
     ta.value = LN_DEF[k]; ta.dispatchEvent(new Event('input')); }));
-  document.querySelectorAll('#lnChips code').forEach(c => c.addEventListener('mousedown', e => {
-    e.preventDefault(); const ta = focus || host.querySelector('[data-tpl]');
+  host.querySelectorAll('[data-ins]').forEach(c => c.addEventListener('mousedown', e => {
+    e.preventDefault(); const ta = host.querySelector(`[data-tpl="${c.dataset.ins}"]`);
     const a = ta.selectionStart, z = ta.selectionEnd;
     ta.value = ta.value.slice(0, a) + c.textContent + ta.value.slice(z);
     ta.selectionStart = ta.selectionEnd = a + c.textContent.length; ta.focus(); ta.dispatchEvent(new Event('input'));
@@ -727,6 +773,7 @@ async function lnSave(){
   const b = document.getElementById('lnSave'); b.disabled = true;
   try {
     await A.db.collection('lineConfig').doc('settings').set({ enabled: !!LN.enabled, events: LN.events, templates: LN.templates,
+      overdueDays: LN.overdueDays, fraeScore: LN.fraeScore,
       people, updatedAt: firebase.firestore.FieldValue.serverTimestamp(), updatedBy: A.user.uid });
     adminLog('line', null, `ส่งจริง ${LN.enabled ? 'เปิด' : 'ปิด'} · มี LINE ID ${Object.values(people).filter(p => p.line).length} คน`);
     LNDIRTY = 0; LNIMP = {}; document.getElementById('lnDirty').textContent = 'บันทึกแล้ว';
@@ -738,9 +785,19 @@ async function lnSave(){
 async function lnRun(){
   const b = document.getElementById('lnRun'); b.disabled = true; b.textContent = 'กำลังตรวจ…';
   try { const r = await A.gas('line', { op: 'run' }, { timeout: 120000 });
-        b.textContent = r.skipped ? r.skipped : `งาน ${r.tasks || 0} · ส่ง ${r.sent || 0} · ไม่ได้ส่ง ${r.dry || 0}`; }
+        b.textContent = r.skipped ? r.skipped : r.error ? 'ผิดพลาด' : `เรื่อง ${r.events || 0} · ส่ง ${r.sent || 0} · ไม่ได้ส่ง ${r.dry || 0}`; if (r.error) alert(r.error); }
   catch(e){ b.textContent = 'ตรวจไม่สำเร็จ'; alert(e.message); }
-  setTimeout(() => { b.textContent = 'ตรวจงานใหม่ตอนนี้'; b.disabled = false; }, 5000);
+  setTimeout(() => { b.textContent = 'ตรวจเรื่องใหม่ตอนนี้'; b.disabled = false; }, 5000);
+  lnStatus(); lnLog();
+}
+/* รอบเช้า — งานค้าง · สรุปรายสัปดาห์ (สั่งจากปุ่มส่งด้วยแม้ไม่ใช่วันจันทร์) · หนังสือใกล้หมดอายุ · หนังสือเวียนครบกำหนด */
+async function lnDay(){
+  if (!confirm('ส่งรอบเช้าตอนนี้? รวมสรุปรายสัปดาห์ด้วย — ถ้าเปิดส่งจริงอยู่ ทุกคนที่มีงานค้างจะได้ข้อความ')) return;
+  const b = document.getElementById('lnDay'); b.disabled = true; b.textContent = 'กำลังส่ง…';
+  try { const r = await A.gas('line', { op: 'daily' }, { timeout: 300000 });
+        b.textContent = r.skipped ? r.skipped : r.error ? 'ผิดพลาด' : `เรื่อง ${r.events || 0} · ส่ง ${r.sent || 0} · ไม่ได้ส่ง ${r.dry || 0}`; if (r.error) alert(r.error); }
+  catch(e){ b.textContent = 'ไม่สำเร็จ'; alert(e.message); }
+  setTimeout(() => { b.textContent = 'ส่งรอบเช้าตอนนี้'; b.disabled = false; }, 6000);
   lnStatus(); lnLog();
 }
 
@@ -787,7 +844,7 @@ async function lnLog(){
   const host = document.getElementById('lnLog');
   try {
     const s = await A.db.collection('lineLog').orderBy('at', 'desc').limit(100).get();
-    const EV = { task: 'ส่งถึง', pool: 'กองรอ', ack: 'รับทราบ', test: 'ทดสอบ' };
+    const EV = Object.assign(Object.fromEntries(LN_EV.map(e => [e[0], e[1]])), { test: 'ทดสอบ' });
     host.innerHTML = s.empty ? '<p class="hint">ยังไม่มีบันทึก</p>' : `<table class="lnlog">` + s.docs.map(d => {
       const v = d.data(), at = v.at && v.at.toDate ? v.at.toDate().toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' }) : '';
       return `<tr><td style="white-space:nowrap">${A.esc(at)}</td><td>${A.esc(EV[v.event] || v.event || '')}</td>
