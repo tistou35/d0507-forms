@@ -1,0 +1,342 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ลงเวลาเรียน — D-0507 Flight Training</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="@@BASE@@assets/app.css">
+<style>
+.dtabs{display:flex;gap:8px;margin:14px 0 4px;flex-wrap:wrap}
+.dtabs button{padding:8px 15px;border-radius:9px;border:1px solid var(--border-light);
+  background:var(--surface);font-size:13.5px;cursor:pointer;color:var(--fg-2)}
+.dtabs button[aria-selected="true"]{background:var(--navy-900);color:#fff;border-color:var(--navy-900)}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px 14px}
+.g label{display:block;font-size:13px;font-weight:600}
+.g .full{grid-column:1/-1}
+.g input,.g select{width:100%;margin-top:4px;min-height:40px;padding:0 11px;border-radius:8px;
+  border:1px solid var(--border-med);background:var(--surface);font-size:14px;font-family:inherit}
+.g input[readonly]{background:var(--g-50);color:var(--g-600)}
+.rq{color:var(--red-600)}
+.msg{font-size:12.5px;color:var(--g-500)} .msg.bad{color:var(--red-600)} .msg.ok{color:var(--green-600)}
+.hide{display:none!important}
+.twrap{overflow-x:auto;border:1px solid var(--border-light);border-radius:10px;background:var(--surface)}
+table.ml{width:100%;border-collapse:collapse;font-size:13.5px}
+table.ml th{text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--g-500);
+  padding:9px 12px;border-bottom:1px solid var(--border-light);white-space:nowrap;background:var(--g-50)}
+table.ml td{padding:8px 12px;border-bottom:1px solid var(--g-100);vertical-align:middle}
+table.ml tr:last-child td{border-bottom:0}
+table.ml tbody tr.go{cursor:pointer} table.ml tbody tr.go:hover{background:var(--sky-100)}
+table.ml tr.x td{color:var(--g-500);text-decoration:line-through}
+.mono{font-family:var(--font-mono);font-size:11.5px;white-space:nowrap}
+.st{display:inline-flex;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;white-space:nowrap}
+.st.open{background:var(--green-100);color:var(--green-600)} .st.closed{background:var(--g-100);color:var(--g-600)}
+.sig img{max-height:30px;max-width:120px}
+.empty{padding:16px;border:1px dashed var(--border-med);border-radius:10px;color:var(--g-500);font-size:13.5px}
+/* ── คาบเรียน ── */
+.ses{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start}
+@media(max-width:860px){ .ses{grid-template-columns:1fr} }
+.qrbox{text-align:center}
+.qrbox #qr{display:inline-block;padding:12px;background:#fff;border-radius:10px;border:1px solid var(--border-light)}
+.qrbox #qr img,.qrbox #qr canvas{display:block;width:240px;height:240px}
+.qrbox .cnt{font-size:34px;font-weight:700;font-family:var(--font-display);margin-top:10px}
+.det{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px 16px;margin-bottom:14px}
+.det div span{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--g-500)}
+.det div b{font-size:14px}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.pad{border:1px dashed var(--border-med);border-radius:8px;background:#fff;touch-action:none;width:100%;max-width:420px;height:150px}
+/* เต็มจอ — ให้ทั้งห้องสแกนได้จากโปรเจกเตอร์ */
+#full{position:fixed;inset:0;background:#fff;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px;text-align:center}
+#full .qr2 img,#full .qr2 canvas{width:min(70vh,80vw);height:min(70vh,80vw)}
+#full h2{font-size:24px;font-family:var(--font-display)} #full p{color:var(--g-600)}
+#full .n{font-size:42px;font-weight:700}
+</style>
+</head><body>
+@@TOPBAR@@
+<div class="body">
+@@RAIL@@
+  <main class="main">
+    <div class="greet">
+      <div><p class="eyebrow"><span>บันทึกการเข้าเรียน</span> · <span>ATTENDANCE RECORD · ARF</span></p>
+        <h1>ลงเวลาเรียน</h1>
+        <p class="sub">ครูเปิดคาบแล้วแสดง QR ให้ผู้เข้าเรียนสแกนตอนจบคาบ (TM 1.2.2) · ปิดคาบแล้วลงนามรับรอง ระบบออกใบสรุปเป็น PDF</p></div>
+    </div>
+    <div id="gate"></div>
+    <div class="dtabs hide" role="tablist" id="tabs">
+      <button role="tab" data-tab="new" aria-selected="true">เปิดคาบใหม่</button>
+      <button role="tab" data-tab="list" aria-selected="false">คาบเรียน</button>
+    </div>
+
+    <!-- ── เปิดคาบใหม่ ── -->
+    <section id="pnew" class="card hide">
+      <h3>ข้อมูลคาบเรียน</h3>
+      <p class="hint" style="margin:-6px 0 12px">ผู้เข้าเรียนเห็นข้อมูลนี้บนใบของตัวเองแต่แก้ไม่ได้ · ครูผู้สอนคือบัญชีที่เปิดคาบ</p>
+      <div class="g">
+        <label>หลักสูตร <span class="rq">*</span><input id="course" list="dlCourse" autocomplete="off"></label>
+        <label>วิชา / บทเรียน <span class="rq">*</span><input id="subject" list="dlSubject" autocomplete="off"></label>
+        <label class="full">หัวข้อ / เนื้อหาที่สอน<input id="topic" autocomplete="off"></label>
+        <label>วันที่เรียน <span class="rq">*</span><input id="sesDate" type="date"></label>
+        <label>เริ่มเรียน<input id="sesStart" type="time"></label>
+        <label>เลิกเรียน<input id="sesEnd" type="time"></label>
+        <label>ชั่วโมงเรียน<input id="hours" type="number" min="0" step="0.25"></label>
+        <label>รูปแบบการสอน <span class="rq">*</span><select id="mode">
+          <option value="classroom">ห้องเรียน · Classroom</option>
+          <option value="video">วิดีโอคอล · Video call</option>
+          <option value="elearning">E-learning</option></select></label>
+        <label>สถานที่ / ช่องทาง<input id="location" placeholder="เช่น ห้องเรียน 1 · Zoom" autocomplete="off"></label>
+        <label>ครูผู้สอน<input id="insName" readonly></label>
+        <label>ตำแหน่งครูผู้สอน<input id="insPos" autocomplete="off"></label>
+      </div>
+      <datalist id="dlCourse"></datalist><datalist id="dlSubject"></datalist>
+      <div class="acts"><button class="obtn" id="open">เปิดคาบและแสดง QR</button><span class="msg" id="nMsg"></span></div>
+    </section>
+
+    <!-- ── รายการคาบ ── -->
+    <section id="plist" class="hide"><div id="lst">—</div></section>
+
+    <!-- ── คาบเรียนที่เลือก ── -->
+    <section id="pses" class="hide"><div id="sesBody"></div></section>
+  </main>
+</div>
+@@BOTNAV@@
+<div id="full" class="hide"></div>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="@@BASE@@assets/app.js"></script>
+<script>D0507.GAS_URL='@@GASURL@@';</script>
+<script>
+"use strict";
+const A = D0507, REG = @@REG@@, $ = id => document.getElementById(id), esc = s => A.esc(s);
+A.reg = REG;
+/* ตัวเลือกช่วยพิมพ์ — มาจากค่าที่ใช้จริงใน Jotform "D0507 record" (IM-ARF-301-A) และหลักสูตรใน TrainHub
+   ยังพิมพ์ค่าอื่นได้ · วิชา PPL ใช้รหัสตามที่ Jotform เคยบันทึก (020 · 030 · 060 · 090) */
+const COURSES = ['PPL Ground School','PPL','CPL','IR','Operation / procedure','Quality','Teaching Procedure',
+  'Newcomer','Staff Training','Safety Management Manual','D-0507 Flight Instructor Standardisation Programme',
+  'D-0507 Theoretical Knowledge Instructor Programme','D-0507 Maintenance Personnel Training','Cessna T206H Familiarization'];
+const SUBJECTS = ['010 Air Law','020 Aircraft General Knowledge','030 Flight Performance and Planning',
+  '040 Human Performance and Limitations','050 Meteorology','060 Navigation','070 Operational Procedures',
+  '080 Principles of Flight','090 Communications','Document control process','Flight plan submission procedure',
+  'Instructor training guide — digital tools for teaching','SOP','Orientation'];
+const MODE = { classroom:'ห้องเรียน', video:'วิดีโอคอล', elearning:'E-learning' };
+const TYPE = { STUDENT:'นักเรียน', STAFF:'เจ้าหน้าที่', OTHER:'อื่น ๆ' };
+const POSN = { FI:'Flight Instructor', CFI:'Chief Flight Instructor', TKI:'Theoretical Knowledge Instructor',
+  CTKI:'Chief Theoretical Knowledge Instructor', HT:'Head of Training' };
+const Q = new URLSearchParams(location.search);
+let UNSUB = null, ROWS = [], SES = null, SID = '';
+
+A.initAuth(@@FBCFG@@, boot);
+boot();
+
+const ms = v => { try { return v && v.toMillis ? v.toMillis() : (v ? new Date(v).getTime() : 0); } catch (e) { return 0; } };
+const hm = t => t ? new Date(t).toLocaleTimeString('th-TH', { hour:'2-digit', minute:'2-digit' }) : '';
+const dmy = v => v ? new Date(v + 'T00:00:00').toLocaleDateString('th-TH', { day:'2-digit', month:'short', year:'2-digit' }) : '—';
+const fillUrl = id => new URL('@@BASE@@fill/?c=ARF&s=' + encodeURIComponent(id), location.href).href;
+
+function boot(){
+  const gate = $('gate');
+  if (!A.isStaff()){
+    ['tabs','pnew','plist','pses'].forEach(k => $(k).classList.add('hide'));
+    gate.innerHTML = A.signedIn()
+      ? `<div class="card"><p>ผู้เข้าเรียน — <b>สแกน QR ที่ครูผู้สอนแสดงตอนจบคาบ</b> แล้วลงชื่อในหน้าที่เปิดขึ้นมา</p></div>`
+      : `<div class="card"><p>หน้านี้สำหรับครูผู้สอนเปิดคาบเรียน —
+          <a href="@@BASE@@staff-login/?next=${encodeURIComponent(location.pathname + location.search)}">เข้าสู่ระบบ</a></p></div>`;
+    return;
+  }
+  gate.innerHTML = '';
+  $('tabs').classList.remove('hide');
+  $('dlCourse').innerHTML = COURSES.map(c => `<option value="${esc(c)}">`).join('');
+  $('dlSubject').innerHTML = SUBJECTS.map(c => `<option value="${esc(c)}">`).join('');
+  if (!$('sesDate').value) $('sesDate').value = new Date(Date.now() + 7 * 3600e3).toISOString().slice(0, 10);
+  $('insName').value = A.myName() || '';
+  const pos = ((A.profile && A.profile.positions) || []).find(p => POSN[p]);
+  if (!$('insPos').value && pos) $('insPos').value = POSN[pos];
+  document.querySelectorAll('#tabs [data-tab]').forEach(b => b.onclick = () => show(b.dataset.tab));
+  ['sesStart','sesEnd'].forEach(k => $(k).onchange = autoHours);
+  $('open').onclick = openSession;
+  if (Q.get('id')) session(Q.get('id')); else show('new');
+}
+function show(t){
+  document.querySelectorAll('#tabs [data-tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t));
+  $('pnew').classList.toggle('hide', t !== 'new');
+  $('plist').classList.toggle('hide', t !== 'list');
+  $('pses').classList.add('hide');
+  if (UNSUB) { UNSUB(); UNSUB = null; }
+  if (Q.get('id')) history.replaceState(null, '', location.pathname);
+  if (t === 'list') list();
+}
+function autoHours(){
+  const a = $('sesStart').value, b = $('sesEnd').value;
+  if (!a || !b) return;
+  const m = (+b.slice(0,2) * 60 + +b.slice(3)) - (+a.slice(0,2) * 60 + +a.slice(3));
+  if (m > 0) $('hours').value = Math.round(m / 15) / 4;
+}
+
+async function openSession(){
+  const v = k => $(k).value.trim(), say = (t, c) => { $('nMsg').className = 'msg ' + (c || ''); $('nMsg').textContent = t; };
+  if (!v('course') || !v('subject') || !v('sesDate')) { say('กรอกหลักสูตร วิชา และวันที่เรียนก่อน', 'bad'); return; }
+  $('open').disabled = true; say('กำลังเปิดคาบ…');
+  try {
+    const ref = await A.db.collection('attSessions').add({
+      course: v('course'), subject: v('subject'), topic: v('topic'), sesDate: v('sesDate'),
+      sesStart: v('sesStart'), sesEnd: v('sesEnd'), hours: v('hours') ? Number(v('hours')) : '',
+      mode: $('mode').value, location: v('location'), insName: v('insName') || A.myName() || A.user.email,
+      insPos: v('insPos'), insUid: A.user.uid, status: 'open',
+      test: Q.get('test') === '1' && (A.isAdmin() || (A.profile && A.profile.test === true)),
+      createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+    say('');
+    ['topic','sesStart','sesEnd','hours'].forEach(k => $(k).value = '');
+    session(ref.id);
+  } catch (e) { say('เปิดคาบไม่สำเร็จ: ' + (e.code || e.message), 'bad'); }
+  $('open').disabled = false;
+}
+
+/* ── รายการคาบ — ของฉัน · ผู้ดูแลระบบเห็นทุกคาบ ── */
+async function list(){
+  $('lst').innerHTML = '<p class="hint">กำลังโหลด…</p>';
+  try {
+    const col = A.db.collection('attSessions');
+    const s = await (A.isAdmin() ? col.orderBy('createdAt', 'desc').limit(200) : col.where('insUid', '==', A.user.uid)).get();
+    const L = s.docs.map(d => Object.assign({ id: d.id }, d.data()))
+      .sort((a, b) => (b.sesDate || '').localeCompare(a.sesDate || '') || ms(b.createdAt) - ms(a.createdAt));
+    $('lst').innerHTML = L.length ? `<div class="twrap"><table class="ml"><thead><tr><th>วันที่</th><th>หลักสูตร · วิชา</th>
+      <th>ครูผู้สอน</th><th>ผู้ลงชื่อ</th><th>สถานะ</th><th></th></tr></thead><tbody>${L.map(x => `
+      <tr class="go" data-id="${esc(x.id)}"><td class="mono">${esc(dmy(x.sesDate))}</td>
+        <td>${esc(x.course)} · ${esc(x.subject)}${x.test ? ' <b style="color:var(--red-600)">TEST</b>' : ''}</td><td>${esc(x.insName)}</td>
+        <td>${x.status === 'closed' ? esc(String(x.count || 0)) : '—'}</td>
+        <td><span class="st ${esc(x.status)}">${x.status === 'open' ? 'เปิดอยู่' : 'ปิดแล้ว'}</span></td>
+        <td>${x.pdf && x.pdf.url ? `<a href="${esc(x.pdf.url)}" target="_blank" rel="noopener">PDF ↗</a>` : ''}</td></tr>`).join('')}
+      </tbody></table></div>` : '<div class="empty">ยังไม่มีคาบเรียน</div>';
+    document.querySelectorAll('#lst tr.go').forEach(tr => tr.onclick = e => { if (e.target.tagName !== 'A') session(tr.dataset.id); });
+  } catch (e) { $('lst').innerHTML = `<p class="hint">อ่านไม่ได้: ${esc(e.code || e.message)}</p>`; }
+}
+
+/* ── คาบเรียน: QR · ผู้ลงชื่อแบบสด · ปิดคาบ ── */
+async function session(id){
+  SID = id;
+  history.replaceState(null, '', location.pathname + '?id=' + encodeURIComponent(id));
+  ['pnew','plist'].forEach(k => $(k).classList.add('hide'));
+  document.querySelectorAll('#tabs [data-tab]').forEach(b => b.setAttribute('aria-selected', 'false'));
+  $('pses').classList.remove('hide');
+  $('sesBody').innerHTML = '<p class="hint">กำลังโหลด…</p>';
+  try {
+    const s = await A.db.collection('attSessions').doc(id).get();
+    if (!s.exists) { $('sesBody').innerHTML = '<div class="empty">ไม่พบคาบเรียนนี้</div>'; return; }
+    SES = Object.assign({ id }, s.data());
+  } catch (e) { $('sesBody').innerHTML = `<p class="hint">อ่านไม่ได้: ${esc(e.code || e.message)}</p>`; return; }
+  const mine = SES.insUid === A.user.uid || A.isAdmin(), open = SES.status === 'open';
+  $('sesBody').innerHTML = `<div class="ses">
+    <div class="card">
+      <h3>${esc(SES.course)} · ${esc(SES.subject)} <span class="st ${esc(SES.status)}">${open ? 'เปิดอยู่' : 'ปิดแล้ว'}</span></h3>
+      <div class="det">
+        <div><span>วันที่</span><b>${esc(dmy(SES.sesDate))}</b></div>
+        <div><span>เวลา</span><b>${esc((SES.sesStart || '—') + ' – ' + (SES.sesEnd || '—'))}${SES.hours ? ' · ' + esc(SES.hours) + ' ชม.' : ''}</b></div>
+        <div><span>รูปแบบ</span><b>${esc(MODE[SES.mode] || SES.mode)}</b></div>
+        <div><span>ครูผู้สอน</span><b>${esc(SES.insName)}</b></div>
+        ${SES.topic ? `<div style="grid-column:1/-1"><span>หัวข้อ</span><b>${esc(SES.topic)}</b></div>` : ''}
+      </div>
+      <h3 style="margin-top:6px">ผู้ลงชื่อ</h3>
+      <p class="hint" style="margin:-6px 0 8px">${open ? 'ขึ้นทันทีที่มีคนลงชื่อ · เอาเครื่องหมายถูกออกจากคนที่ไม่ได้อยู่ในคาบจริง ก่อนปิดคาบ' : 'คาบนี้ปิดแล้ว — รายชื่อไม่เปลี่ยนอีก'}</p>
+      <div id="roster"><p class="hint">กำลังโหลด…</p></div>
+      <div id="closeBox"></div>
+    </div>
+    <div class="card qrbox">
+      ${open ? `<div id="qr"></div>
+        <p class="hint" style="margin-top:8px">สแกนแล้วเข้าสู่ระบบ ยืนยัน และลงชื่อ</p>
+        <div class="acts" style="justify-content:center">
+          <button class="fb" id="bFull">เต็มจอ</button><button class="fb" id="bCopy">คัดลอกลิงก์</button></div>`
+        : `<p class="hint">คาบปิดแล้ว QR ใช้ไม่ได้</p>`}
+      <div class="cnt" id="cnt">0</div><div class="hint">คนลงชื่อแล้ว</div>
+      <div class="acts" style="justify-content:center" id="pdfBox"></div>
+    </div></div>`;
+  if (open) {
+    new QRCode($('qr'), { text: fillUrl(id), width: 480, height: 480, correctLevel: QRCode.CorrectLevel.M });
+    $('bCopy').onclick = async () => { try { await navigator.clipboard.writeText(fillUrl(id)); $('bCopy').textContent = 'คัดลอกแล้ว ✓'; } catch (e) { prompt('คัดลอกลิงก์นี้', fillUrl(id)); } };
+    $('bFull').onclick = full;
+  }
+  paintPdf();
+  if (UNSUB) UNSUB();
+  UNSUB = A.db.collection('submissions').where('sessionId', '==', id).onSnapshot(q => {
+    ROWS = q.docs.map(d => Object.assign({ id: d.id }, d.data())).sort((a, b) => ms(a.submittedAt) - ms(b.submittedAt));
+    roster(mine && open);
+  }, e => { $('roster').innerHTML = `<p class="hint">อ่านไม่ได้: ${esc(e.code || e.message)}</p>`; });
+  if (mine && open) closeBox();
+}
+function roster(editable){
+  const ex = new Set((SES.excluded || []).map(x => x.uid));
+  const keep = ROWS.filter(r => !ex.has(r.submitterUid));
+  $('cnt').textContent = keep.length;
+  const f = $('full'); if (!f.classList.contains('hide')) { const n = f.querySelector('.n'); if (n) n.textContent = keep.length + ' คน'; }
+  $('roster').innerHTML = ROWS.length ? `<div class="twrap"><table class="ml"><thead><tr>${editable ? '<th>อยู่จริง</th>' : ''}
+    <th>#</th><th>ชื่อ</th><th>เป็น</th><th>เวลา</th><th>ลายเซ็น</th></tr></thead><tbody>${ROWS.map((r, i) => { const d = r.data || {};
+      return `<tr${ex.has(r.submitterUid) ? ' class="x"' : ''}>${editable ? `<td><input type="checkbox" data-u="${esc(r.submitterUid)}" checked></td>` : ''}
+      <td>${i + 1}</td><td>${esc(d.attName || r.submitterName)}</td><td>${esc(TYPE[d.attType] || d.attType || '')}</td>
+      <td class="mono">${esc(hm(ms(r.submittedAt)))}</td><td class="sig">${/^data:image\//.test(d.attSign || '') ? `<img src="${esc(d.attSign)}" alt="">` : ''}</td></tr>`; }).join('')}
+    </tbody></table></div>` : '<div class="empty">ยังไม่มีใครลงชื่อ</div>';
+}
+
+/* ปิดคาบ — ลายเซ็นที่บันทึกไว้ (signatures/<uid> ของตัวเอง) หรือเซ็นใหม่ · หลังปิดลงชื่อไม่ได้ และรายชื่อไม่เปลี่ยน */
+async function closeBox(){
+  let saved = null;
+  try { const s = await A.db.collection('signatures').doc(A.user.uid).get(); saved = s.exists ? s.data().png : null; } catch (e) {}
+  $('closeBox').innerHTML = `<h3 style="margin-top:18px">ปิดคาบและลงนามรับรอง</h3>
+    <p class="hint" style="margin:-6px 0 8px">I certify that the persons listed above attended this session in full, except any entry marked as not certified.</p>
+    ${saved ? `<label style="display:flex;gap:8px;align-items:center;font-size:13.5px"><input type="checkbox" id="useSaved" checked> ใช้ลายเซ็นที่บันทึกไว้
+      <img src="${esc(saved)}" alt="" style="max-height:36px"></label>` : ''}
+    <div id="padWrap"${saved ? ' class="hide"' : ''}><canvas class="pad" id="pad" width="840" height="300"></canvas>
+      <div><button class="fb" id="padClr" type="button">ล้าง</button></div></div>
+    <div class="acts"><button class="obtn" id="bClose">ปิดคาบและออกใบสรุป</button><span class="msg" id="cMsg"></span></div>`;
+  const pad = makePad($('pad'), $('padClr'));
+  if (saved) $('useSaved').onchange = e => $('padWrap').classList.toggle('hide', e.target.checked);
+  $('bClose').onclick = async () => {
+    const say = (t, c) => { $('cMsg').className = 'msg ' + (c || ''); $('cMsg').textContent = t; };
+    const sig = saved && $('useSaved').checked ? saved : (pad.dirty() ? pad.png() : null);
+    if (!sig) { say('ยังไม่ได้ลงนาม', 'bad'); return; }
+    const off = [...document.querySelectorAll('#roster [data-u]')].filter(c => !c.checked).map(c => c.dataset.u);
+    const kept = ROWS.filter(r => !off.includes(r.submitterUid)).length;
+    if (!confirm(`ปิดคาบนี้และรับรองผู้เข้าเรียน ${kept} คน?` + (off.length ? `\nไม่รับรอง ${off.length} คน` : '') + '\nหลังปิดแล้วลงชื่อเพิ่มไม่ได้ และแก้รายชื่อไม่ได้')) return;
+    $('bClose').disabled = true; say('กำลังปิดคาบ…');
+    try {
+      await A.db.collection('attSessions').doc(SID).update({
+        status: 'closed', closedAt: firebase.firestore.FieldValue.serverTimestamp(), closedByName: A.myName() || A.user.email,
+        insSign: sig, count: kept,
+        excluded: ROWS.filter(r => off.includes(r.submitterUid)).map(r => ({ uid: r.submitterUid, name: (r.data || {}).attName || r.submitterName || '' })) });
+    } catch (e) { $('bClose').disabled = false; say('ปิดไม่สำเร็จ: ' + (e.code || e.message), 'bad'); return; }
+    say('ปิดแล้ว — กำลังออกใบสรุป PDF…');
+    await makePdf();
+    session(SID);
+  };
+}
+async function makePdf(){
+  const r = await A.gas('attPdf', { sessionId: SID }, { timeout: 90000 });
+  if (!r.ok) { alert('ออกใบสรุป PDF ไม่สำเร็จ: ' + r.error + '\nกด "ออกใบสรุป PDF" อีกครั้งได้'); return; }
+  try { await A.db.collection('attSessions').doc(SID).update({ pdf: { id: r.result.id, url: r.result.url, name: r.result.name } }); } catch (e) {}
+}
+function paintPdf(){
+  const box = $('pdfBox'); if (!box) return;
+  const mine = SES.insUid === A.user.uid || A.isAdmin();
+  box.innerHTML = SES.status !== 'closed' ? ''
+    : (SES.pdf && SES.pdf.url ? `<a class="fb" href="${esc(SES.pdf.url)}" target="_blank" rel="noopener">ใบสรุป PDF ↗</a>` : '')
+      + (mine ? `<button class="fb" id="bPdf">${SES.pdf ? 'ออกใบสรุปใหม่' : 'ออกใบสรุป PDF'}</button>` : '');
+  const b = $('bPdf'); if (b) b.onclick = async () => { b.disabled = true; b.textContent = 'กำลังออก…'; await makePdf(); session(SID); };
+}
+function full(){
+  const f = $('full');
+  f.innerHTML = `<h2>${esc(SES.course)} · ${esc(SES.subject)}</h2><div class="qr2" id="qr2"></div>
+    <p>สแกนเพื่อลงชื่อเข้าเรียน · Scan to sign attendance</p><div class="n">${esc($('cnt').textContent)} คน</div>
+    <button class="fb" id="bExit">ปิดเต็มจอ</button>`;
+  new QRCode($('qr2'), { text: fillUrl(SID), width: 720, height: 720, correctLevel: QRCode.CorrectLevel.M });
+  f.classList.remove('hide');
+  $('bExit').onclick = () => f.classList.add('hide');
+}
+/* แผ่นลงนาม — เส้นดำบนพื้นโปร่ง ส่งออกเป็น PNG (แบบเดียวกับหน้าบันทึกข้อความ) */
+function makePad(cv, clr){
+  const x = cv.getContext('2d'); x.lineWidth = 3.2; x.lineCap = 'round'; x.lineJoin = 'round'; x.strokeStyle = '#111';
+  let on = false, dirty = false;
+  const pt = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * cv.width / r.width, (e.clientY - r.top) * cv.height / r.height]; };
+  cv.addEventListener('pointerdown', e => { on = true; cv.setPointerCapture(e.pointerId); const [a, b] = pt(e); x.beginPath(); x.moveTo(a, b); });
+  cv.addEventListener('pointermove', e => { if (!on) return; const [a, b] = pt(e); x.lineTo(a, b); x.stroke(); dirty = true; });
+  cv.addEventListener('pointerup', () => { on = false; });
+  if (clr) clr.addEventListener('click', () => { x.clearRect(0, 0, cv.width, cv.height); dirty = false; });
+  return { dirty: () => dirty, png: () => cv.toDataURL('image/png') };
+}
+</script>
+</body></html>

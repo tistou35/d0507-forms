@@ -280,6 +280,83 @@
    "edit": "136d01uNGHI-w2naJfY9rsL0IAOVZ1z9qqmEHwcDroig"
   },
   {
+   "doc": "D-0507-ARF-001",
+   "code": "IM-ARF-301-B",
+   "abbr": "ARF",
+   "t": "Attendance Record",
+   "th": "บันทึกการเข้าเรียน",
+   "iss": "01",
+   "rev": "01",
+   "eff": "10 NOV 2026",
+   "own": "IM",
+   "lef": [
+    "TM"
+   ],
+   "jot": "93281549887475",
+   "docx": "D-0507-ARF-001.docx",
+   "st": "ok",
+   "chain": "training",
+   "r": {
+    "ins": "เปิดคาบเรียนและแสดง QR ให้ผู้เข้าเรียนลงชื่อตอนจบคาบ แล้วปิดคาบพร้อมลงนามรับรอง",
+    "stu": "สแกน QR ของครูผู้สอนแล้วลงชื่อเข้าเรียนเมื่อจบคาบ",
+    "mgt": "ตรวจการเข้าเรียนครบตามเกณฑ์ (เช่น ภาคพื้น PPL ไม่น้อยกว่า 80%)"
+   },
+   "with": [
+    "ครูผู้สอน",
+    "ผู้เข้าเรียน"
+   ],
+   "sys": "here",
+   "public": false,
+   "unlisted": true,
+   "kw": [
+    "ลงเวลา",
+    "เข้าเรียน",
+    "เช็กชื่อ",
+    "attendance",
+    "qr",
+    "arf"
+   ],
+   "note": "ฉบับแก้ไข 01 (10 NOV 2026) — แทน Jotform \"D0507 record\" (IM-ARF-301-A · 1,045 ใบ · ล่าสุด 03 MAR 2026) ซึ่งไม่มีครูผู้สอนและคาบเรียน · ฉบับนี้เป็นใบของคาบเรียน ครูเปิดคาบที่หน้า att/ แล้วแสดง QR ตาม TM 1.2.2",
+   "admin": {
+    "url": "att/",
+    "n": {
+     "th": "เปิดคาบเรียน · QR",
+     "en": "Open session · QR"
+    }
+   },
+   "records": {
+    "roles": [
+     "ins",
+     "mgt"
+    ],
+    "pos": [
+     "FI",
+     "CFI",
+     "CTKI",
+     "TKI",
+     "HT",
+     "ACM"
+    ],
+    "sort": "sesDate",
+    "cols": [
+     {
+      "k": "sesDate",
+      "h": {
+       "th": "วันที่เรียน",
+       "en": "Date"
+      }
+     },
+     "course",
+     "subject",
+     "attName",
+     "attType",
+     "insName"
+    ]
+   },
+   "edit": "1qRTbrnKOOQspFvxWUSgbKt12h1SGbtmAV0RKkcgmrkc",
+   "blank": "blank/ARF.pdf"
+  },
+  {
    "doc": "D-0507-ASF-001",
    "code": "IM-ASF-003-A",
    "abbr": "ASF",

@@ -159,6 +159,22 @@ service cloud.firestore {
        ในเอกสารนี้มีแต่ชื่อเอกสารที่แจกและชื่อผู้แจกจ่าย ไม่มีชื่อหรืออีเมล
        ของผู้รับ — รายชื่อผู้รับเกิดจากใบที่แต่ละคนส่งเข้ามาเอง
        ลบไม่ได้: ใบรับที่ลงนามแล้วอ้างถึงเอกสารนี้เป็นหลักฐานว่าแจกอะไรไป */
+    /* ── คาบเรียน (ARF · TM 1.2.2) ───────────────────────────
+       ครูเปิดคาบแล้วแสดง QR ผู้เข้าเรียนสแกนตอนจบคาบ
+       ผู้ที่ล็อกอินแล้วอ่านได้ (หน้าลงชื่อต้องเห็นข้อมูลคาบ) · เจ้าหน้าที่สร้างได้ในชื่อตัวเอง
+       คาบที่ปิดแล้วแก้เนื้อหาไม่ได้ — เหลือแค่ผูก PDF ใบสรุปที่ออกหลังปิด · ลบไม่ได้ */
+    match /attSessions/{sesId} {
+      allow read:   if signedIn();
+      allow create: if staff() && request.resource.data.insUid == request.auth.uid
+                    && request.resource.data.status == 'open'
+                    && request.resource.data.createdAt == request.time;
+      allow update: if staff() && (resource.data.insUid == request.auth.uid || admin())
+                    && request.resource.data.insUid == resource.data.insUid
+                    && (resource.data.status == 'open'
+                        || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['pdf']));
+      allow delete: if false;
+    }
+
     match /distributions/{distId} {
       allow read:           if true;
       allow create, update: if staff();
@@ -209,6 +225,24 @@ service cloud.firestore {
           && d.keys().size() <= 22;
     }
 
+    /* ── ลงชื่อเข้าเรียน (ARF) ─────────────────────────────────
+       ต้องอ้างคาบที่ยังเปิดอยู่ · เป็นใบของคนที่ส่งเอง · id ของใบ = <คาบ>_<uid>
+       จึงลงได้คนละครั้งต่อคาบ (สร้างซ้ำ = แก้ใบเดิม ซึ่งผู้ใช้ทั่วไปทำไม่ได้)
+       เวลาลงชื่อคือเวลาเซิร์ฟเวอร์ ย้อนไม่ได้ */
+    function newAttendOk(subId) {
+      let d = request.resource.data;
+      return d.formCode == 'ARF'
+          && d.status == 'complete'
+          && d.submitterUid == request.auth.uid
+          && d.submittedAt == request.time
+          && d.sessionId is string && d.sessionId.size() > 0
+          && subId == d.sessionId + '_' + request.auth.uid
+          && exists(/databases/$(database)/documents/attSessions/$(d.sessionId))
+          && get(/databases/$(database)/documents/attSessions/$(d.sessionId)).data.status == 'open'
+          && d.tracking is string && d.tracking.size() <= 60
+          && d.keys().size() <= 22;
+    }
+
     /* ── ใบที่จบตั้งแต่ขั้นตอนแรก ─────────────────────────────
        บางใบไม่มีใครต้องอนุมัติต่อ ระบบจึงปิดใบให้ทันทีที่กดส่ง (status 'complete')
        ซึ่งเข้า newSubmissionOk() ไม่ได้ เพราะนั่นบังคับ 'pending'
@@ -245,7 +279,9 @@ service cloud.firestore {
       /* คนกรอกคือทุกคนที่ล็อกอิน — นักเรียนที่มีบัญชี หรือ anonymous สำหรับใบที่
          คนกรอกไม่ใช่คนในระบบ (PWR ผู้โดยสาร · VSR รายงานนิรภัยไม่ระบุตัว)
          เงื่อนไขที่กันของเสียคือ newSubmissionOk() ไม่ใช่วิธีล็อกอิน */
-      allow create: if staff() || (signedIn() && (newSubmissionOk() || newReceiptOk() || newSoloOk()));
+      // ARF ทุกคนรวมเจ้าหน้าที่ที่มาเข้าอบรมต้องผ่าน newAttendOk — ไม่งั้นเจ้าหน้าที่ลงชื่อคาบที่ปิดแล้วได้
+      allow create: if (staff() && request.resource.data.formCode != 'ARF')
+                    || (signedIn() && (newSubmissionOk() || newReceiptOk() || newSoloOk() || newAttendOk(subId)));
       allow read:   if staff() || (signedIn() && resource.data.submitterUid == request.auth.uid);
       allow update: if staff();
       allow delete: if false;

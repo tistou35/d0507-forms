@@ -449,6 +449,7 @@ def main():
         ('cl.html',          'cl/index.html',                  '../',   'pubs'),
         ('flow.html',        'flow/index.html',                '../',   'all'),
         ('drc.html',         'admin/drc/index.html',           '../../','drc'),
+        ('att.html',         'att/index.html',                 '../',   'att'),
         ('memo.html',        'memo/index.html',                '../',   'memo'),
     ]
     VER = asset_versions()

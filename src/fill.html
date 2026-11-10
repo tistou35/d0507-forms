@@ -151,6 +151,53 @@ const DIST_ID=(function(){
 })();
 let DIST=null, DIST_TRIED=false;
 
+/* ?s=<id ของ attSessions> — คาบเรียนที่ครูเปิดไว้ (ARF · TM 1.2.2)
+   ผู้เข้าเรียนสแกน QR ตอนจบคาบ ข้อมูลคาบมาจากระบบ ไม่ได้อยู่ในลิงก์ แก้ไม่ได้
+   คาบที่ปิดแล้วลงชื่อไม่ได้ (firestore.rules บังคับซ้ำ) และหนึ่งคนลงได้ครั้งเดียวต่อคาบ
+   เก็บลง sessionStorage เพราะคนที่ต้องวนไปล็อกอินก่อนต้องกลับมาที่คาบเดิม */
+const SKEY='d0507.ses.'+(new URLSearchParams(location.search).get('c')||'');
+const SES_ID=(function(){
+  const q=new URLSearchParams(location.search).get('s');
+  if(q){ try{ sessionStorage.setItem(SKEY,q); }catch(e){} return q; }
+  try{ return sessionStorage.getItem(SKEY)||''; }catch(e){ return ''; }
+})();
+let SES=null, SES_TRIED=false, SES_MINE=null;
+async function loadSes(){
+  if(!SES_ID||!A.signedIn()) return;
+  try{
+    const s=await A.db.collection('attSessions').doc(SES_ID).get();
+    SES=s.exists?s.data():null;
+  }catch(e){ console.warn('[fill] อ่านคาบเรียนไม่ได้',e); SES=null; }
+  // ลงชื่อไปแล้วหรือยัง — ใบของคาบนี้มี id = <คาบ>_<uid> · นักเรียนอ่านได้เฉพาะใบตัวเอง
+  // ถ้ายังไม่มี rules จะตอบว่าไม่มีสิทธิ์ (อ่านเอกสารที่ไม่มีอยู่) จึงถือว่ายังไม่ได้ลงชื่อ
+  try{
+    const m=await A.db.collection('submissions').doc(SES_ID+'_'+A.user.uid).get();
+    SES_MINE=m.exists?Object.assign({id:m.id},m.data()):null;
+  }catch(e){ SES_MINE=null; }
+  SES_TRIED=true;
+}
+function sesSeed(){
+  if(!SES) return {};
+  const o={};
+  ['course','subject','topic','sesDate','mode','sesStart','sesEnd','hours','location','insName','insPos']
+    .forEach(k=>{ if(SES[k]!==undefined && SES[k]!=='') o[k]=SES[k]; });
+  return o;
+}
+/* ARF เปิดได้จาก QR ของคาบที่ยังเปิดอยู่เท่านั้น — คืนข้อความที่ต้องแสดงแทนฟอร์ม หรือ '' ถ้ากรอกได้ */
+function sesGate(){
+  if(F.abbr!=='ARF') return '';
+  const L=A.L, esc=A.esc;
+  if(!SES_ID) return `<b>${esc(L({th:'ลงชื่อเข้าเรียนจาก QR ของครูผู้สอน',en:'Sign in from the instructor’s QR code'}))}</b><br>${
+    esc(L({th:'ใบนี้ไม่ได้เปิดจากหน้านี้โดยตรง — สแกน QR ที่ครูแสดงตอนจบคาบ',en:'This form is not opened directly — scan the QR code the instructor shows at the end of the session.'}))}`;
+  if(!SES_TRIED) return esc(A.t('loading'));
+  if(!SES) return `<b>${esc(L({th:'ไม่พบคาบเรียนนี้',en:'Session not found'}))}</b>`;
+  if(SES_MINE) return `<b>${esc(L({th:'คุณลงชื่อคาบนี้แล้ว',en:'You have already signed for this session'}))}</b> · ${esc(SES.course||'')} · ${esc(SES.subject||'')}<br>
+    <a href="@@BASE@@view/?id=${encodeURIComponent(SES_MINE.id)}">${esc(L({th:'ดูใบของฉัน',en:'View my record'}))}</a>`;
+  if(SES.status!=='open') return `<b>${esc(L({th:'คาบเรียนนี้ปิดแล้ว',en:'This session is closed'}))}</b> · ${esc(SES.course||'')} · ${esc(SES.subject||'')}<br>${
+    esc(L({th:'ลงชื่อไม่ได้แล้ว — ติดต่อครูผู้สอน',en:'Signing is no longer possible — contact the instructor.'}))}`;
+  return '';
+}
+
 /* ?rv=<id ของ revisions> — DRF ที่เปิดมาจากปุ่ม "แก้ต้นฉบับ → ออกฉบับใหม่"
    ผูกคำขอแก้ไขเข้ากับฉบับร่างที่สร้างไว้ ผู้อนุมัติจึงเปิดดูฉบับร่างจากใบได้
    และพออนุมัติ ระบบรู้ว่าต้องเลื่อนฉบับร่างไหนขึ้นเป็นต้นฉบับ
@@ -198,7 +245,7 @@ function distSeed(){
   return o;
 }
 
-A.initAuth(@@FBCFG@@, async ()=>{ await findInFull(); await loadDist(); boot(); loadRev(); });
+A.initAuth(@@FBCFG@@, async ()=>{ await findInFull(); await loadDist(); await loadSes(); boot(); loadRev(); });
 loadDist().then(boot);
 boot();
 // เปลี่ยนภาษาแล้ว render ใหม่ทั้งใบ — ข้อมูลที่กรอกไว้อยู่ใน FK.data ไม่หาย
@@ -236,6 +283,12 @@ function boot(){
     A.authGate(document.getElementById('form'));
     return;
   }
+  const sg=sesGate();
+  if(sg){
+    document.getElementById('foot').innerHTML='';
+    document.getElementById('form').innerHTML=`<div class="fk-gate info" style="margin-top:18px"><span>${sg}</span></div>`;
+    return;
+  }
   if(!DEF){
     document.getElementById('form').innerHTML=`<div class="draftbar" style="margin-top:18px">
       <b>${A.esc(A.t('noDefTitle'))}</b><br>
@@ -249,14 +302,14 @@ function boot(){
   /* boot แรกใช้ค่าที่ส่งมาทาง ?p= ถ้ามี แล้วทับด้วยร่างที่ค้างในเครื่อง
      นักบินกรอกบนเครื่องแล้วปิดแท็บ ลงมากรอกต่อได้ ค่าที่พิมพ์ไว้ต้องยังอยู่
      ร่างมาทีหลังเพราะเป็นสิ่งที่คนนี้พิมพ์เอง สำคัญกว่าค่าตั้งต้นจากลิงก์ */
-  let keep = FK ? FK.data : Object.assign(distSeed(), prefill());
+  let keep = FK ? FK.data : Object.assign(distSeed(), prefill(), sesSeed());
   /* boot รอบแรกวิ่งก่อนใบแจกจ่ายมาถึงเสมอ (อ่านจาก Firestore ซึ่งเป็น async)
      พอมาถึงแล้ว boot รอบสองจะเข้าทาง FK.data ซึ่งไม่มีค่าพวกนี้ — ต้องเทใส่ตรงนี้
      ทับได้เลย เพราะเป็นช่องของผู้แจกจ่าย ผู้รับแก้ไม่ได้อยู่แล้ว */
-  if (FK) Object.assign(keep, distSeed());
+  if (FK) Object.assign(keep, distSeed(), sesSeed());
   if (!FK) {
     const d = A.draftLoad(code);
-    if (d) { keep = Object.assign({}, keep, d.data); DRAFT_AT = d.at; }
+    if (d) { keep = Object.assign({}, keep, d.data, sesSeed()); DRAFT_AT = d.at; }
   }
   selfFill(keep);
   FK=new FormKit(DEF,{party:partyOf(),lang:A.lang,data:keep,
@@ -527,7 +580,7 @@ function review(){
      เกณฑ์จริงอยู่ที่ firestore.rules (newSoloOk / newReceiptOk) และ A.canSelfClose
      สะท้อนกฎเดียวกัน หน้าจอกับเซิร์ฟเวอร์จะได้ไม่ขัดกัน */
   const needs=needsApproval(), mustPick=pickAtSend();
-  const canClose=A.canSelfClose(F.abbr, FK.data, {anon:F.anon, distId:DIST_ID});
+  const canClose=A.canSelfClose(F.abbr, FK.data, {anon:F.anon, distId:DIST_ID, sessionId:SES_ID});
   if(!canClose && !needs){
     modal(A.t('needLoginTitle'), A.t('needLoginSub'),
       `<p class="fk-static">${A.esc(A.t('needLoginBody'))}</p>`,
@@ -576,12 +629,17 @@ async function send(){
       await firebase.auth().signInAnonymously();
     }
     const u=firebase.auth().currentUser;
-    const ref=A.db.collection('submissions').doc();
+    // ARF: หนึ่งคนหนึ่งใบต่อคาบ — id ตายตัว ลงชื่อซ้ำจะชนกับใบเดิม (rules ยอมเฉพาะการสร้าง)
+    const isAtt=F.abbr==='ARF' && SES_ID;
+    const ref=isAtt ? A.db.collection('submissions').doc(SES_ID+'_'+u.uid) : A.db.collection('submissions').doc();
     const d=new Date(), p2=n=>String(n).padStart(2,'0');
     /* ?test=1 — ใบทดสอบของผู้ดูแลหรือบัญชีทดสอบ: เลขที่ขึ้นต้น TEST- เพื่อให้ dropTest เก็บกวาด
        ชีตและ PDF ได้ (ตัวส่งออกยอมลบเฉพาะเลขที่มีคำว่า TEST) — คนทั่วไปใส่พารามิเตอร์นี้ก็ไม่มีผล */
     const tst = new URLSearchParams(location.search).get('test')==='1' && (A.isAdmin() || (A.profile&&A.profile.test===true));
-    const trk=`${tst?'TEST-':''}${F.abbr}-${d.getFullYear()}${p2(d.getMonth()+1)}${p2(d.getDate())}-${ref.id.slice(0,4).toUpperCase()}`;
+    // ท้ายเลขที่มาจาก id ของใบ — แต่ ARF ขึ้นต้นด้วย id ของคาบ ทุกคนในคาบจะได้เลขเดียวกัน
+    // แล้วชีตตัดแถวที่เลขซ้ำทิ้ง จึงสุ่มใหม่ให้ ARF
+    const rid=isAtt ? A.db.collection('submissions').doc().id : ref.id;
+    const trk=`${tst?'TEST-':''}${F.abbr}-${d.getFullYear()}${p2(d.getMonth()+1)}${p2(d.getDate())}-${rid.slice(0,4).toUpperCase()}`;
     const ctx=FK.ctx();
     const steps=(DEF.route||[]).filter(r=>FormKit.evalCond(r.onlyIf,ctx));
     const done=steps.length<=1;
@@ -611,6 +669,7 @@ async function send(){
     const link=extLink();
     if(link){ sub.extRef=link.extRef; sub.extSystem=link.extSystem; }
     if(DIST_ID) sub.distId=DIST_ID;
+    if(isAtt) sub.sessionId=SES_ID;
     if(REV_ID && F.abbr==='DRF') sub.revId=REV_ID;
     await ref.set(sub);
     /* ฉบับร่างรู้แล้วว่ามีคำขอ — ปุ่มแก้ต้นฉบับจะขึ้นว่ารออนุมัติ ไม่ใช่ให้กรอกคำขอซ้ำ */
@@ -624,6 +683,7 @@ async function send(){
     }
     // ลบสายทิ้งเมื่อผูกกับใบเรียบร้อยแล้ว ไม่งั้นค้างไปโผล่ในใบถัดไปของแท็บเดียวกัน
     if(link){ try{ sessionStorage.removeItem(RKEY); }catch(e){} }
+    if(isAtt){ try{ sessionStorage.removeItem(SKEY); }catch(e){} }
 
     // งานในคิวของผู้อนุมัติ — ถ้าไม่สร้าง ใบจะค้างเป็น pending โดยไม่มีใครเห็น
     if(!done){
@@ -661,7 +721,8 @@ async function send(){
     // ส่งไปกับการส่งออกเท่านั้น ไม่เก็บลง Firestore — ประกอบใหม่จากนิยามฟอร์มได้เสมอ
     // และ rules นับคีย์ของใบไว้ที่ 22
     if(done) ex=await A.exportSubmission(Object.assign({},sub,{
-      submittedAt:d.toISOString(), render:FK.docSpec(), computedLabels:cLabels()}));
+      submittedAt:d.toISOString(), render:FK.docSpec(), computedLabels:cLabels(),
+      noPdf:!!(DEF.export && DEF.export.pdf===false)}));
 
     /* แจ้งกลับทันทีที่ลงนามเสร็จ ไม่รอผลอนุมัติ
        ต้นทางถามคำถามเดียวคือ "คนนี้ลงนามหรือยัง" การอนุมัติของหัวหน้าครูฝึก

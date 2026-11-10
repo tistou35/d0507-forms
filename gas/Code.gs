@@ -142,6 +142,12 @@ function doPost(e) {
       return json_({ ok: true, result: setTempPw_(body, who) });
     }
 
+    /* ใบสรุปการเข้าเรียนของคาบที่ปิดแล้ว (ดู Attendance.gs) */
+    if (body.action === 'attPdf') {
+      if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบเจ้าหน้าที่ก่อน');
+      return json_({ ok: true, result: attPdf_(body, who) });
+    }
+
     if (body.action === 'listAccts') {
       if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบเจ้าหน้าที่ก่อน');
       return json_({ ok: true, result: listAccounts_(body, who) });
@@ -407,7 +413,8 @@ function exportSubmission_(s, who) {
   var headers = alignHeaders_(r.sh, base.concat(extra));
 
   // ── 2. PDF ──
-  var pdf = makePdf_(folder, abbr, s);
+  // noPdf — ใบที่ลงแค่แถวในชีต (ARF ลงชื่อเข้าเรียนรายคน · เอกสารของคาบคือใบสรุปตอนปิดคาบ)
+  var pdf = s.noPdf ? null : makePdf_(folder, abbr, s);
 
   var byKey = {
     'เลขที่': s.tracking,

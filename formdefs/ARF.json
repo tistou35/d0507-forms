@@ -1,0 +1,260 @@
+{
+ "code": "ARF",
+ "doc": "D-0507-ARF-001",
+ "control": "IM-ARF-301-B",
+ "issue": "01",
+ "rev": "01",
+ "eff": "10 NOV 2026",
+ "title": {
+  "th": "บันทึกการเข้าเรียน",
+  "en": "Attendance Record"
+ },
+ "retain": "TM 1.2.2",
+ "_why": "ผู้เข้าเรียนหนึ่งคนต่อหนึ่งใบ เข้าจาก QR ของคาบเรียน (fill/?c=ARF&s=<attSessions id>) ข้อมูลคาบมาจากที่ครูเปิดคาบไว้ ผู้เข้าเรียนแก้ไม่ได้ ใบสรุปทั้งคาบพร้อมลายเซ็นครูออกจากหน้า att/ ตอนปิดคาบ",
+ "parties": [
+  {
+   "k": "ins",
+   "n": {
+    "th": "ครูผู้สอน",
+    "en": "Instructor"
+   },
+   "auth": "role:ins"
+  },
+  {
+   "k": "att",
+   "n": {
+    "th": "ผู้เข้าเรียน",
+    "en": "Attendee"
+   },
+   "auth": "public"
+  }
+ ],
+ "sections": [
+  {
+   "k": "S",
+   "party": "ins",
+   "title": {
+    "th": "คาบเรียน",
+    "en": "Session"
+   },
+   "showLocked": true,
+   "note": {
+    "th": "ครูผู้สอนกรอกตอนเปิดคาบ — ผู้เข้าเรียนเห็นได้แต่แก้ไม่ได้",
+    "en": "Entered by the instructor when the session was opened — visible but not editable"
+   },
+   "fields": [
+    {
+     "k": "course",
+     "type": "text",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "หลักสูตร",
+      "en": "Course"
+     }
+    },
+    {
+     "k": "subject",
+     "type": "text",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "วิชา / บทเรียน",
+      "en": "Subject / Lesson"
+     }
+    },
+    {
+     "k": "topic",
+     "type": "text",
+     "label": {
+      "th": "หัวข้อ / เนื้อหาที่สอน",
+      "en": "Topic / Content covered"
+     }
+    },
+    {
+     "k": "sesDate",
+     "type": "date",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "วันที่เรียน",
+      "en": "Date"
+     }
+    },
+    {
+     "k": "mode",
+     "type": "select",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "รูปแบบการสอน",
+      "en": "Delivery"
+     },
+     "opt": [
+      {
+       "v": "classroom",
+       "n": {
+        "th": "ห้องเรียน",
+        "en": "Classroom"
+       }
+      },
+      {
+       "v": "video",
+       "n": {
+        "th": "วิดีโอคอล",
+        "en": "Video call"
+       }
+      },
+      {
+       "v": "elearning",
+       "n": {
+        "th": "E-learning",
+        "en": "E-learning"
+       }
+      }
+     ]
+    },
+    {
+     "k": "sesStart",
+     "type": "time",
+     "half": true,
+     "label": {
+      "th": "เริ่มเรียน",
+      "en": "Time from"
+     }
+    },
+    {
+     "k": "sesEnd",
+     "type": "time",
+     "half": true,
+     "label": {
+      "th": "เลิกเรียน",
+      "en": "Time to"
+     }
+    },
+    {
+     "k": "hours",
+     "type": "number",
+     "half": true,
+     "label": {
+      "th": "ชั่วโมงเรียน",
+      "en": "Duration (hrs)"
+     }
+    },
+    {
+     "k": "location",
+     "type": "text",
+     "half": true,
+     "label": {
+      "th": "สถานที่ / ช่องทาง",
+      "en": "Location / Platform"
+     }
+    },
+    {
+     "k": "insName",
+     "type": "text",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "ครูผู้สอน",
+      "en": "Instructor"
+     }
+    },
+    {
+     "k": "insPos",
+     "type": "text",
+     "half": true,
+     "label": {
+      "th": "ตำแหน่งครูผู้สอน",
+      "en": "Instructor position"
+     }
+    }
+   ]
+  },
+  {
+   "k": "A",
+   "party": "att",
+   "title": {
+    "th": "ผู้เข้าเรียน",
+    "en": "Attendee"
+   },
+   "fields": [
+    {
+     "k": "attType",
+     "type": "select",
+     "req": true,
+     "label": {
+      "th": "คุณเป็น",
+      "en": "You are"
+     },
+     "opt": [
+      {
+       "v": "STUDENT",
+       "n": {
+        "th": "นักเรียน",
+        "en": "Student"
+       }
+      },
+      {
+       "v": "STAFF",
+       "n": {
+        "th": "เจ้าหน้าที่",
+        "en": "Staff"
+       }
+      },
+      {
+       "v": "OTHER",
+       "n": {
+        "th": "อื่น ๆ",
+        "en": "Other"
+       }
+      }
+     ]
+    },
+    {
+     "k": "attName",
+     "type": "text",
+     "req": true,
+     "self": true,
+     "label": {
+      "th": "ชื่อ–นามสกุลผู้เข้าเรียน",
+      "en": "Attendee name"
+     },
+     "hint": {
+      "th": "เติมจากชื่อในบัญชีที่เข้าสู่ระบบ",
+      "en": "Filled from the signed-in account"
+     }
+    },
+    {
+     "k": "attDecl",
+     "type": "static",
+     "text": {
+      "th": "ข้าพเจ้าเข้าเรียนคาบนี้ครบตามเวลา และลงชื่อเมื่อจบคาบเรียน · เวลาที่ลงชื่อบันทึกจากเวลาของเซิร์ฟเวอร์",
+      "en": "I attended this session in full and am signing at its end. The time of signing is recorded from the server clock."
+     }
+    },
+    {
+     "k": "attSign",
+     "type": "sign",
+     "req": true,
+     "label": {
+      "th": "ลายเซ็นผู้เข้าเรียน",
+      "en": "Attendee signature"
+     }
+    }
+   ]
+  }
+ ],
+ "route": [
+  {
+   "step": 1,
+   "party": "att",
+   "sign": true
+  }
+ ],
+ "export": {
+  "docx": "D-0507-ARF-001.docx",
+  "pdf": false,
+  "_why_pdf": "ลงชื่อรายคนลงแถวในชีต (เป็นบันทึกการเข้าเรียน) แต่ไม่ทำ PDF รายคน — นักเรียนยี่สิบคนสแกนพร้อมกันตอนจบคาบจะได้ PDF ยี่สิบแฟ้มที่มีแถวเดียว เอกสารของคาบคือใบสรุปที่ออกตอนครูปิดคาบ"
+ }
+}

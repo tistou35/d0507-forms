@@ -411,6 +411,7 @@
     navAudit:   { th: 'งานตรวจสอบ', en: 'Audit' },
     navDrc:     { th: 'แจกจ่ายเอกสาร', en: 'Distribution · DRC' },
     navMemo:    { th: 'บันทึกข้อความ', en: 'Internal memo' },
+    navAtt:     { th: 'ลงเวลาเรียน', en: 'Attendance · QR' },
     auditNote:  { th: 'Audit ↗ login แยก', en: 'งานตรวจสอบ ↗ แยก login' },
     searchPh:   { th: 'ค้นหาฟอร์ม', en: 'Search forms' },
     thisSystem: { th: 'ระบบนี้', en: 'This system' },
@@ -751,6 +752,7 @@
     if (A.isStaff()) return true;                       // เจ้าหน้าที่ปิดใบของตัวเองได้อยู่แล้ว
     if (o.anon) return true;                            // PWR ผู้โดยสาร · VSR ผู้รายงาน
     if (abbr === 'DRC' && o.distId) return true;        // ใบรับเอกสารจากประกาศที่มีอยู่จริง
+    if (abbr === 'ARF' && o.sessionId) return true;     // ลงชื่อเข้าเรียนจาก QR ของคาบที่เปิดอยู่
     if (A.SOLO_FORMS.indexOf(abbr) >= 0) return true;
     if (abbr === 'FRAE' && data.role === 'PIC') return true;
     return false;
