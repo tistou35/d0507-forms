@@ -105,7 +105,9 @@ function memoPdf_(body) {
   }
   para('______________________________', { after: 0 });
   para(P.name || '', { bold: true, after: 0 });
-  para(P.title || '', { after: 4 });
+  para(P.title || '', { after: 0 });
+  // วันที่อยู่ในบล็อกลายเซ็นเอง ไม่ใช่แค่ในหัวหนังสือ — เหมือนบล็อกสั่งการที่มีวันที่ของผู้สั่งการ
+  para('Date: ' + issueLong, { after: 4 });
   para('Proposed and signed electronically on ' + signedAt + ' in the D-0507 Forms system. ' +
        'The date of issue is the time of this signature and cannot be altered.', { size: 8, color: '#555555', after: 0 });
 

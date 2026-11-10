@@ -355,24 +355,61 @@ async function listMemos(){
     <div id="list"><div class="empty">กำลังโหลด…</div></div>`;
   try{ MEMOS=(await A.db.collection('memos').get()).docs.map(d=>Object.assign({id:d.id},d.data())); }
   catch(e){ $('list').innerHTML=`<div class="empty">อ่านไม่ได้: ${esc(e.code||e.message)}</div>`; return; }
-  MEMOS.sort((a,b)=>((b.issuedAt&&b.issuedAt.seconds)||(b.createdAt&&b.createdAt.seconds)||0)-((a.issuedAt&&a.issuedAt.seconds)||(a.createdAt&&a.createdAt.seconds)||0));
-  const today=bkkToday();
   const shown=MEMOS.filter(m=>!m.test || A.isAdmin());
   const mine=shown.filter(m=>m.status==='issued' && (m.recipientUids||[]).includes(A.user.uid));
   if(mine.length){ const acked=new Set(); await Promise.all(mine.map(async m=>{ try{ if((await A.db.collection('memos').doc(m.id).collection('acks').doc(A.user.uid).get()).exists) acked.add(m.id); }catch(e){} }));
     const todo=mine.filter(m=>!acked.has(m.id));
     if(todo.length) $('myack').innerHTML=`<div class="fk-gate warn"><span><b>หนังสือเวียนที่รอคุณรับทราบ ${todo.length} ฉบับ:</b> ${todo.map(m=>`<a href="?id=${esc(m.id)}">${esc(m.number)}</a>`).join(' · ')}</span></div>`; }
-  const sg=m=>{ const s=m.signers||{}; return m.mode==='paper' ? esc((m.paper&&m.paper.proposerName)||'')+' → '+esc((m.paper&&m.paper.endorserName)||'')
-    : esc((s.proposer&&s.proposer.name)||'—')+' → '+esc((s.endorser&&s.endorser.name)||'—'); };
-  $('list').innerHTML = !shown.length ? '<div class="empty">ยังไม่มีบันทึกข้อความ</div>' :
-    `<div class="twrap"><table class="ml"><thead><tr><th>เลขที่</th><th>วันที่ออก</th><th>ประเภท</th><th>เรื่อง</th><th>เสนอ → สั่งการ</th><th>มีผล</th><th>หมดอายุ</th><th>สถานะ</th></tr></thead><tbody>${
-      shown.map(m=>{ const st = (m.status==='issued' && m.expiresOn && m.expiresOn<today) ? 'expired' : m.status;
-        const issued = m.mode==='paper' ? long(m.paper&&m.paper.date) : long(tsDate(m.issuedAt));
+  LIST=shown;
+  const tlist=[...new Set(shown.map(m=>m.type))].sort();
+  $('list').innerHTML=`<div class="mbar noprint">
+      <input id="lq" type="search" placeholder="ค้นหาเลขที่ · เรื่อง · ผู้เสนอ · ผู้สั่งการ">
+      <select id="ls" title="เรียงตาม">
+        <option value="date-desc">วันที่ในเอกสาร — ใหม่ไปเก่า</option><option value="date-asc">วันที่ในเอกสาร — เก่าไปใหม่</option>
+        <option value="no-desc">เลขที่ — มากไปน้อย</option><option value="no-asc">เลขที่ — น้อยไปมาก</option></select>
+      <select id="lt"><option value="">ทุกประเภท</option>${tlist.map(t=>`<option value="${esc(t)}">${esc(t)}</option>`).join('')}</select>
+      <select id="lst"><option value="">ทุกสถานะ</option><option value="open">ยังไม่ออก (ร่าง · รอลงนาม)</option>${
+        Object.keys(STATUS).map(k=>`<option value="${esc(k)}">${esc(STATUS[k])}</option>`).join('')}</select>
+      <span class="hint" id="lcnt"></span></div><div id="ltab"></div>`;
+  let pref={}; try{ pref=JSON.parse(localStorage.getItem('d0507.memo.list')||'{}'); }catch(e){}
+  if(pref.s) $('ls').value=pref.s; if(pref.t && tlist.includes(pref.t)) $('lt').value=pref.t; if(pref.st) $('lst').value=pref.st;
+  ['lq','ls','lt','lst'].forEach(k=>$(k).addEventListener(k==='lq'?'input':'change',()=>{
+    try{ localStorage.setItem('d0507.memo.list',JSON.stringify({s:$('ls').value,t:$('lt').value,st:$('lst').value})); }catch(e){}
+    paintList(); }));
+  paintList();
+}
+/* วันที่ในเอกสาร = วันที่ออกที่พิมพ์บนหนังสือ (เวลาที่ผู้เสนอลงนาม) หรือวันที่บนกระดาษของฉบับที่ลงทะเบียน
+   ไม่ใช่วันที่สร้างในระบบ — ร่างที่จัดทำวันนี้ของหนังสือที่ลงวันที่เดือนก่อนต้องไม่ขึ้นมาก่อน */
+const docDate=m=>m.mode==='paper' ? ((m.paper&&m.paper.date)||'') : tsDate(m.issuedAt);
+/* เลขที่ D0507-MEMO-<ปี พ.ศ.>/<ลำดับ> (<ประเภท>) — เรียงตามปีแล้วลำดับ · เลขของฉบับกระดาษเรียงตามตัวอักษรต่อท้าย */
+const noKey=m=>{ const x=/MEMO-(\d{4})\/(\d+)/.exec(m.number||''); return x ? '1'+x[1]+String(+x[2]).padStart(6,'0') : (m.number ? '0'+m.number : ''); };
+let LIST=[];
+function paintList(){
+  const q=($('lq').value||'').trim().toLowerCase(), so=$('ls').value, ty=$('lt').value, st0=$('lst').value, today=bkkToday();
+  const stOf=m=>(m.status==='issued' && m.expiresOn && m.expiresOn<today) ? 'expired' : m.status;
+  const open=m=>['draft','submitted','returned'].includes(m.status);
+  const sg=m=>{ const s=m.signers||{}; return m.mode==='paper' ? [(m.paper&&m.paper.proposerName)||'',(m.paper&&m.paper.endorserName)||'']
+    : [(s.proposer&&s.proposer.name)||'—',(s.endorser&&s.endorser.name)||'—']; };
+  let L=LIST.filter(m=>(!ty||m.type===ty) && (!st0 || (st0==='open'?open(m):stOf(m)===st0))
+    && (!q || [m.number,m.subject,m.type,m.createdByName].concat(sg(m)).join(' ').toLowerCase().includes(q)));
+  const cs=(a,b)=>(a<b?-1:a>b?1:0), dir=so.endsWith('asc')?1:-1, byNo=so.startsWith('no');
+  const cAt=m=>(m.createdAt&&m.createdAt.seconds)||0;
+  L.sort((a,b)=>{
+    // ฉบับที่ยังไม่ออกไม่มีทั้งเลขและวันที่ในเอกสาร — ขึ้นก่อนเสมอ เพราะเป็นงานที่ยังต้องมีคนทำต่อ
+    const ka=byNo?noKey(a):docDate(a), kb=byNo?noKey(b):docDate(b);
+    if(!ka||!kb) return (!ka&&!kb) ? cAt(b)-cAt(a) : (!ka?-1:1);
+    return dir*(cs(ka,kb) || (byNo?0:cs(noKey(a),noKey(b))));
+  });
+  $('lcnt').textContent=L.length===LIST.length?LIST.length+' ฉบับ':L.length+' จาก '+LIST.length+' ฉบับ';
+  $('ltab').innerHTML = !LIST.length ? '<div class="empty">ยังไม่มีบันทึกข้อความ</div>' : !L.length ? '<div class="empty">ไม่มีฉบับที่ตรงกับที่เลือก</div>' :
+    `<div class="twrap"><table class="ml"><thead><tr><th>เลขที่</th><th>วันที่ในเอกสาร</th><th>ประเภท</th><th>เรื่อง</th><th>เสนอ → สั่งการ</th><th>มีผล</th><th>หมดอายุ</th><th>สถานะ</th></tr></thead><tbody>${
+      L.map(m=>{ const st=stOf(m), p=sg(m);
         return `<tr data-id="${esc(m.id)}"><td class="mono">${esc(m.number||'— (ยังไม่ออกเลข)')}${m.test?' <b style="color:var(--red-600)">TEST</b>':''}</td>
-        <td class="mono">${esc(issued)}</td><td>${esc(m.type)}</td><td>${esc(m.subject||'')}</td><td>${sg(m)}</td>
+        <td class="mono">${esc(long(docDate(m))||'—')}</td><td>${esc(m.type)}</td><td>${esc(m.subject||'')}${
+          open(m)&&m.createdByName?`<div class="hint">จัดทำโดย ${esc(m.createdByName)}</div>`:''}</td><td>${esc(p[0])} → ${esc(p[1])}</td>
         <td class="mono">${esc(long(m.effectiveFrom))}</td><td class="mono">${esc(long(m.expiresOn))}</td>
         <td><span class="st ${esc(st)}">${esc(STATUS[st]||st)}</span>${m.ackChannel==='aerofbo'&&m.status==='issued'?(m.aerofbo?' <span class="st issued">AeroFBO ✓</span>':' <span class="st proposed">รอส่ง AeroFBO</span>'):''}</td></tr>`; }).join('')}</tbody></table></div>`;
-  document.querySelectorAll('[data-id]').forEach(tr=>tr.addEventListener('click',()=>{ location.href='?id='+encodeURIComponent(tr.dataset.id); }));
+  document.querySelectorAll('#ltab [data-id]').forEach(tr=>tr.addEventListener('click',()=>{ location.href='?id='+encodeURIComponent(tr.dataset.id); }));
 }
 
 /* ════════════════ สร้าง / แก้ร่าง ════════════════ */
@@ -384,7 +421,10 @@ async function editMemo(id){
   const s=await A.db.collection('memos').doc(id).get();
   if(!s.exists){ $('app').innerHTML='<div class="empty">ไม่พบร่างนี้</div>'; return; }
   const m=Object.assign({id:s.id},s.data());
-  if(!['draft','returned'].includes(m.status)){ location.href='?id='+encodeURIComponent(id); return; }
+  const me=A.user.uid, isP=m.signers&&m.signers.proposer&&m.signers.proposer.uid===me;
+  /* รอผู้เสนอลงนาม — ผู้เสนอ (หรือผู้จัดทำ) แก้ได้ก่อนลงนาม · firestore.rules ยอมอยู่แล้ว ห้ามแตะเฉพาะคีย์ลายเซ็น */
+  const ok = ['draft','returned'].includes(m.status) || (m.status==='submitted' && (isP || m.createdBy===me || A.isAdmin()));
+  if(!ok){ location.href='?id='+encodeURIComponent(id); return; }
   formMemo(m.type, m);
 }
 function formMemo(type, existing){
@@ -412,6 +452,9 @@ function formMemo(type, existing){
       <div class="hint">ภาษาอังกฤษ — พิมพ์ลงในกล่อง ISSUED RETROSPECTIVELY ของ PDF</div></div>` : '';
   $('app').innerHTML=`<div class="card"><div class="mf">${fieldHtml}${calcHtml}${retroHtml}
       <div class="sect">ผู้ลงนาม · รูปแบบ</div>
+      <div class="full hint" style="margin-top:-4px">ผู้จัดทำ: <b>${esc((existing&&existing.createdByName)||A.myName()||A.user.email)}</b> ·
+        จัดทำให้คนอื่นเป็นผู้เสนอได้ — เลือกชื่อเขาในช่องผู้เสนอ แล้วกด "ส่งให้ผู้เสนอลงนาม" งานจะขึ้นในงานของฉันของผู้เสนอ
+        ให้ตรวจ แก้ และลงนามเสนอ (ผู้เสนอเป็นผู้ออกเลขและวันที่ออก ผู้จัดทำไม่ได้ลงนาม)</div>
       <div><label for="s_proposer">ผู้เสนอ (ลงนามคนแรก — ออกเลขและวันที่ออก) <span style="color:var(--red-500)">*</span></label>
         <select id="s_proposer" data-k="s"><option value="">—</option>${opts}</select>
         <select id="s_proposer_pos" data-k="s" style="margin-top:6px" title="ลงนามในตำแหน่ง"></select><div class="hint" id="s_proposer_h"></div></div>
@@ -430,8 +473,8 @@ function formMemo(type, existing){
       </div>
       <div id="chk" style="margin-top:14px"></div>
       <h3 style="margin-top:18px">ตัวอย่างหนังสือ</h3><div id="pv"></div>
-      <div class="acts2"><button class="big sec" id="save">บันทึกร่าง</button>
-        <button class="big pri" id="submit">ส่งให้ผู้เสนอลงนาม</button>
+      <div class="acts2"><button class="big sec" id="save"${existing&&existing.status==='submitted'?' hidden':''}>บันทึกร่าง</button>
+        <button class="big pri" id="submit">${existing&&existing.status==='submitted'?'บันทึกการแก้ไข':'ส่งให้ผู้เสนอลงนาม'}</button>
         ${A.isAdmin()&&!existing?'<label class="ck" style="font-size:13px"><input type="checkbox" id="isTest"> ฉบับทดสอบ (ใช้เลขชุด TEST ไม่กินเลขจริง)</label>':''}
         <a class="big sec" href="${existing?'?id='+esc(existing.id):'./'}">ยกเลิก</a></div><div id="msg"></div></div>`;
   // เติมค่าเดิมเมื่อแก้ร่าง
@@ -591,7 +634,9 @@ function draftModel(type){
 async function saveMemo(type, submit){
   CHK=await checks(type); paintChecks();
   if(submit && CHK.errors.length){ $('msg').innerHTML='<div class="fk-gate stop"><span>ยังส่งไม่ได้ — แก้ข้อที่แดงก่อน</span></div>'; return; }
-  const t=textOf(type), me=A.myName()||A.user.email, act=submit?(EDIT?'resubmit':'submit'):'draft';
+  const amend = !!(EDIT && EDIT.status==='submitted');
+  if(amend) submit=true;
+  const t=textOf(type), me=A.myName()||A.user.email, act=amend?'amend':submit?(EDIT?'resubmit':'submit'):'draft';
   const blank={uid:'',name:'',pos:'',title:''};
   const data=Object.assign(t, { type, status: submit?'submitted':'draft',
     fields: JSON.parse(JSON.stringify(F)), effectiveFrom:F.effectiveFrom||'', expiresOn:F.expiresOn||'',
@@ -614,7 +659,11 @@ async function saveMemo(type, submit){
         chain:[{action:act, byUid:A.user.uid, byName:me, at:bkkToday()}] }));
     }
     await ref.collection('events').add({action:act, byUid:A.user.uid, byName:me, at:now()});
-    if(submit) await taskFor(ref.id, data, 'proposer');
+    if(amend){
+      // ผู้เสนอคนเดิมมีงานเปิดอยู่แล้ว — สร้างอีกจะขึ้นสองงานในคิว · เปลี่ยนผู้เสนอ = ปิดงานเดิมแล้วส่งให้คนใหม่
+      const was=(EDIT.signers&&EDIT.signers.proposer&&EDIT.signers.proposer.uid)||'';
+      if(was!==data.signers.proposer.uid){ await closeTasks(ref.id,{note:'เปลี่ยนผู้เสนอ'}); await taskFor(ref.id, data, 'proposer'); }
+    } else if(submit) await taskFor(ref.id, data, 'proposer');
     location.href='?id='+encodeURIComponent(ref.id);
   }catch(e){ $('save').disabled=$('submit').disabled=false;
     $('msg').innerHTML=`<div class="fk-gate stop"><span>บันทึกไม่สำเร็จ: ${esc(e.code||e.message)}</span></div>`; }
@@ -661,7 +710,7 @@ function letterHtml(m){
     ${r.validity?`<div class="val"><b>${esc(r.validity)}</b></div>`:''}
     ${r.note?`<div class="note">${esc(r.note)}</div>`:''}
     <div class="sig">${numbered && m.proposerSig ? `<img src="${esc(m.proposerSig)}" alt="">` : '<div style="height:64px"></div>'}
-      <div class="ln">${esc(p.name||'')}<br>${esc(p.title||'')}</div>
+      <div class="ln">${esc(p.name||'')}<br>${esc(p.title||'')}<br>Date: ${esc(numbered?long(tsDate(m.issuedAt)):'____________')}</div>
       ${numbered?`<div class="stamp">Proposed and signed electronically on ${esc(tsFull(m.issuedAt))}.</div>`:''}</div>
     ${m.endorsementImg?`<div class="endo"><img src="${esc(m.endorsementImg)}" alt=""><div class="stamp">หน้าจอนี้จัดหน้าโดยประมาณ — ใน PDF บล็อกนี้อยู่ตรงตำแหน่งที่ผู้สั่งการวางไว้</div></div>`:''}
     ${m.status==='proposed'?'<div class="stamp" style="color:#b45309;margin-top:14px">Awaiting endorsement</div>':''}
@@ -684,6 +733,7 @@ async function viewMemo(id){
   if(M.status==='proposed' && isE) acts.push('endorse');
   if(['issued','declined'].includes(M.status) && isE && !M.endorsementImg) acts.push('endoImg');
   if(['draft','returned'].includes(M.status) && (isOwner||A.isAdmin())) acts.push('edit');
+  if(M.status==='submitted' && (isP||isOwner||A.isAdmin())) acts.push('amend');
   if(['draft','submitted','returned'].includes(M.status) && (isOwner||A.isAdmin())) acts.push('cancel');
   if(['proposed','issued'].includes(M.status) && A.isAdmin()) acts.push('cancel');
   if(!S.proposer && M.signer) acts.push('legacy');
@@ -738,16 +788,22 @@ async function saveMySig(png){
 function paintActions(acts){
   const box=$('actbox'); let h='';
   if(acts.includes('legacy')) h+=`<div class="fk-gate warn"><span>ร่างนี้บันทึกไว้ก่อนมีผู้ลงนามสองคน — กด "แก้ร่าง" เพื่อเลือกผู้เสนอและผู้สั่งการ แล้วส่งใหม่</span></div>`;
+  const by=M.createdBy!==((M.signers||{}).proposer||{}).uid && M.createdByName ? M.createdByName : '';
+  if(acts.includes('propose') && by) h+=`<div class="fk-gate info" style="margin-bottom:12px"><span><b>${esc(by)}</b> จัดทำหนังสือฉบับนี้ให้คุณเป็นผู้เสนอ —
+      ตรวจเนื้อหาก่อนลงนาม แก้ไขเองได้ หรือตีกลับให้ผู้จัดทำแก้</span></div>`;
+  else if(by && ['draft','submitted','returned'].includes(M.status)) h+=`<div class="hint" style="margin-bottom:10px">จัดทำโดย ${esc(by)}</div>`;
   if(acts.includes('propose')) h+=`<div class="card" style="margin-bottom:16px"><h3>ลงนามเสนอ</h3>
       <p class="hint">ลงนามแล้วระบบออกเลขที่ถัดไป และล็อกวันที่ออกเป็นเวลานี้ทันที แก้ภายหลังไม่ได้ จากนั้นส่งต่อให้ ${esc(M.signers.endorser.name)} รับทราบ/สั่งการ</p>
       ${sigPicker('ps')}
       <div class="acts2"><button class="big pri" id="doPropose">ลงนามเสนอและออกเลข</button>
+        ${acts.includes('amend')?`<a class="big sec" href="?edit=${esc(M.id)}">แก้ไขเนื้อหาก่อนลงนาม</a>`:''}
         <button class="big sec" id="doReturn">ตีกลับให้ผู้จัดทำ</button></div><div id="amsg"></div></div>`;
   if(acts.includes('endorse')) h+=endorsePanelHtml();
   if(acts.includes('endoImg')) h+=`<div class="card" style="margin-bottom:16px"><h3>บล็อกสั่งการยังไม่ถูกสร้าง</h3>
       <p class="hint">การสั่งการบันทึกแล้ว แต่ภาพบล็อกที่วางบนกระดาษยังไม่ได้บันทึก กดเพื่อสร้างจากข้อมูลที่บันทึกไว้</p>
       <button class="big pri" id="doEndoImg">สร้างบล็อกสั่งการและ PDF</button><div id="amsg"></div></div>`;
   if(acts.includes('edit')) h+=`<div class="acts2"><a class="big pri" href="?edit=${esc(M.id)}">แก้ร่าง / ส่งให้ผู้เสนอ</a></div>`;
+  if(acts.includes('amend') && !acts.includes('propose')) h+=`<div class="acts2" style="margin-bottom:12px"><a class="big sec" href="?edit=${esc(M.id)}">แก้ไขเนื้อหาก่อนลงนาม</a></div>`;
   if(acts.includes('cancel')) h+=`<div class="acts2"><button class="big sec" id="doCancel">ยกเลิกฉบับนี้</button></div>`;
   box.innerHTML=h;
   if($('doPropose')){ const SP=bindSigPicker('ps'); $('doPropose').addEventListener('click',()=>propose(SP)); }
@@ -849,7 +905,7 @@ async function circulate(){
 async function paintHistory(){
   try{
     const ev=(await MREF.collection('events').get()).docs.map(d=>d.data()).sort((a,b)=>((a.at&&a.at.seconds)||0)-((b.at&&b.at.seconds)||0));
-    const N={aerofbo:'ส่งเข้า AeroFBO Bulletin',ack:'รับทราบ',draft:'บันทึกร่าง',submit:'ส่งให้ผู้เสนอ',resubmit:'แก้และส่งอีกครั้ง',return:'ตีกลับ',propose:'ผู้เสนอลงนาม · ออกเลข',
+    const N={aerofbo:'ส่งเข้า AeroFBO Bulletin',ack:'รับทราบ',draft:'บันทึกร่าง',submit:'ส่งให้ผู้เสนอ',resubmit:'แก้และส่งอีกครั้ง',amend:'แก้ไขก่อนลงนาม',return:'ตีกลับ',propose:'ผู้เสนอลงนาม · ออกเลข',
              endorse:'ผู้สั่งการลงนาม',cancel:'ยกเลิก',pdf:'สร้าง PDF',supersede:'ถูกแทน',record:'ลงทะเบียนฉบับกระดาษ'};
     $('hist').innerHTML=`<h3>ประวัติ</h3><div class="twrap"><table class="ml"><tbody>${ev.map(e=>`<tr><td class="mono">${esc(tsFull(e.at))}</td><td>${esc(N[e.action]||e.action)}</td><td>${esc(e.byName||'')}</td><td>${esc(e.note||'')}</td></tr>`).join('')}</tbody></table></div>`;
   }catch(e){}
