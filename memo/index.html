@@ -55,6 +55,13 @@ table.ml tr:last-child td{border-bottom:0}
 .letter .stamp{font-size:11px;color:#555;margin-top:6px}
 .letter .draftmark{color:#b91c1c;font-weight:700;text-align:center;letter-spacing:.2em;margin-bottom:8px}
 .letter .endo{margin-top:22px}
+.letter .dirs{margin-top:22px} .letter .dirs h4{font-size:12.5px;letter-spacing:.04em;margin-bottom:6px}
+.letter .dirs .dg{display:grid;grid-template-columns:1fr 1fr;gap:14px 24px}
+.letter .dirs img{height:40px;max-width:150px;display:block} .letter .dirs .sp{height:40px}
+.letter .dirs .ln{border-top:1px solid #333;padding-top:4px;font-size:12.5px;width:230px}
+.dirrow{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1.2fr) minmax(0,1fr) 150px 38px;gap:6px;margin-bottom:6px}
+.dirrow input,.dirrow select{min-height:38px}
+@media(max-width:760px){ .dirrow{grid-template-columns:1fr} }
 .letter .endo img{max-width:100%;display:block}
 .acts2{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0;align-items:center}
 .pad{border:1px dashed var(--border-med);border-radius:8px;background:#fff;touch-action:none;width:100%;max-width:420px;height:150px}
@@ -430,6 +437,7 @@ async function editMemo(id){
 function formMemo(type, existing){
   const cfg=MT[type]; if(!cfg){ $('app').innerHTML='<div class="empty">ไม่รู้จักประเภทนี้</div>'; return; }
   EDIT=existing; F={};
+  DIRS=JSON.parse(JSON.stringify((existing&&existing.directors)||[]));
   SIG_TOUCHED={proposer:!!(existing&&existing.signers), endorser:!!(existing&&existing.signers)};
   $('h1').textContent=(existing?'แก้ร่าง — ':'สร้าง — ')+A.L(cfg.title);
   const opts=userOpts();
@@ -461,6 +469,13 @@ function formMemo(type, existing){
       <div><label for="s_endorser">ผู้รับทราบ / สั่งการ (ลงนามคนที่สอง) <span style="color:var(--red-500)">*</span></label>
         <select id="s_endorser" data-k="s"><option value="">—</option>${opts}</select>
         <select id="s_endorser_pos" data-k="s" style="margin-top:6px" title="ลงนามในตำแหน่ง"></select><div class="hint" id="s_endorser_h"></div></div>
+      <div class="full" id="dirBox" hidden>
+        <label>กรรมการบริษัทผู้ลงนามร่วม <span class="hint">(ไม่บังคับ · ใส่ได้หลายคน)</span></label>
+        <div class="hint" style="margin-bottom:8px">ผู้สั่งการลงนามในตำแหน่ง Accountable Manager — ใส่กรรมการที่ต้องลงนามอนุมัติร่วมได้ ·
+          <b>ลงนามในระบบ</b>: ได้งานในคิวหลังผู้เสนอลงนาม และ ACM สั่งการอนุมัติได้เมื่อกรรมการลงนามครบ (ต้องมีบัญชีเจ้าหน้าที่) ·
+          <b>ลงนามบนกระดาษ</b>: PDF พิมพ์ชื่อพร้อมช่องว่างให้เซ็นด้วยมือ (กรรมการภายนอกที่ไม่มีบัญชี)</div>
+        <div id="dirList"></div>
+        <button type="button" class="fb" id="dirAdd">+ เพิ่มกรรมการ</button></div>
       ${cfg.circular?`<div class="sect">หนังสือเวียน — ผู้ต้องรับทราบ</div>
       <div class="full">${cfg.circular==='optional'?'<label class="ck" style="margin-bottom:8px"><input type="checkbox" id="r_on" data-k="s"> เวียนให้รับทราบ</label>':''}
         <div id="r_chbox" style="margin-bottom:10px"><label for="r_ch">ส่งและเก็บการรับทราบที่</label>
@@ -496,6 +511,8 @@ function formMemo(type, existing){
     $('r_add').addEventListener('change',e=>{ const v=e.target.value; if(v){ RCP.extra.push(v); RCP.excl=RCP.excl.filter(x=>x!==v); e.target.value=''; paintRcp(); } });
     if($('r_on')) $('r_on').addEventListener('change',paintRcp);
   }
+  $('dirAdd').addEventListener('click',()=>{ DIRS.push({uid:'',name:'',title:'Director',mode:'system'}); paintDirs(type); });
+  paintDirs(type);
   readForm(type, true);
   if(existing && existing.signers){
     if(existing.signers.proposer&&existing.signers.proposer.uid) $('s_proposer').value=existing.signers.proposer.uid;
@@ -545,6 +562,7 @@ function readForm(type, fieldsChanged){
     const c=(cfg.signers||{})[r]||{};
     $('s_'+r+'_h').textContent = d[r] ? ('ค่าตั้งต้นตามตำแหน่ง '+d[r].pos+(c.conflictPosition&&d[r].pos!==c.position?' (ใช้ตำแหน่งสำรองเพราะคนในตำแหน่ง '+c.position+' ลงนามไม่ได้)':'')+(d[r].uid?'':' — ยังไม่มีผู้ถือตำแหน่งนี้ เลือกเองได้')) : '';
   });
+  if($('dirBox')) $('dirBox').hidden=!acmEndorser();
   if(MT[type].circular) paintRcp(true);
   checks(type).then(r=>{ CHK=r; paintChecks(); $('pv').innerHTML = letterHtml(draftModel(type)); });
 }
@@ -559,6 +577,37 @@ function paintRcp(noRead){
   $('r_list').innerHTML = on ? list.map(u=>`<span class="chip">${esc(u.name)} <button type="button" data-x="${esc(u.uid)}" aria-label="ตัดออก">×</button></span>`).join('') : '';
   $('r_list').querySelectorAll('[data-x]').forEach(b=>b.addEventListener('click',()=>{ RCP.excl.push(b.dataset.x); RCP.extra=RCP.extra.filter(x=>x!==b.dataset.x); paintRcp(); }));
   if(!noRead) readForm(type,false);
+}
+/* ── กรรมการบริษัทผู้ลงนามร่วม ──────────────────────────────
+   เปิดเมื่อผู้สั่งการลงนามในตำแหน่ง ACM · ลงนามในระบบต้องเป็นบัญชีเจ้าหน้าที่ (firestore.rules อ่านบันทึกได้เฉพาะเจ้าหน้าที่)
+   ลงนามบนกระดาษใช้กับกรรมการที่ไม่มีบัญชี — PDF พิมพ์ชื่อพร้อมช่องว่าง */
+let DIRS=[];
+const acmEndorser=()=>{ const e=$('s_endorser')&&$('s_endorser').value?signerOf('endorser'):null; return !!(e&&e.pos==='ACM'); };
+const dirCands=()=>USERS.filter(u=>(u.roles||[]).some(r=>STAFF_ROLES.includes(r))).sort((a,b)=>String(a.name).localeCompare(String(b.name)));
+function dirsOut(){
+  if(!acmEndorser()) return [];
+  return DIRS.filter(d=>(d.name||'').trim()).map(d=>({uid:d.uid||'', name:d.name.trim(), title:(d.title||'').trim()||'Director',
+    mode:d.uid&&d.mode==='system'?'system':'paper'}));
+}
+function paintDirs(type){
+  const box=$('dirList'); if(!box) return;
+  box.innerHTML=DIRS.map((d,i)=>`<div class="dirrow">
+    <select data-di="${i}" data-f="uid"><option value="">— เลือกจากรายชื่อ —</option>${dirCands().map(u=>`<option value="${esc(u.uid)}"${d.uid===u.uid?' selected':''}>${esc(u.name||u.email)}</option>`).join('')}
+      <option value="__free"${!d.uid&&d.free?' selected':''}>ไม่มีในรายชื่อ — พิมพ์ชื่อเอง</option></select>
+    <input data-di="${i}" data-f="name" placeholder="ชื่อ–นามสกุล" value="${esc(d.name||'')}"${d.uid?' readonly':''}>
+    <input data-di="${i}" data-f="title" placeholder="ตำแหน่ง เช่น Director" value="${esc(d.title||'')}">
+    <select data-di="${i}" data-f="mode"><option value="system"${d.mode==='system'&&d.uid?' selected':''}${d.uid?'':' disabled'}>ลงนามในระบบ</option>
+      <option value="paper"${d.mode==='paper'||!d.uid?' selected':''}>ลงนามบนกระดาษ</option></select>
+    <button type="button" class="fb" data-dx="${i}" aria-label="ตัดออก">×</button></div>`).join('');
+  box.querySelectorAll('[data-di]').forEach(el=>el.addEventListener('change',()=>{
+    const d=DIRS[+el.dataset.di], f=el.dataset.f;
+    if(f==='uid'){ if(el.value==='__free'){ d.uid=''; d.free=true; d.name=''; d.mode='paper'; }
+      else if(el.value){ const u=userById(el.value); d.uid=u.uid; d.free=false; d.name=u.name||u.email; d.mode='system'; }
+      else { d.uid=''; d.free=false; d.name=''; } paintDirs(type); }
+    else d[f]=el.value;
+    readForm(type,false); }));
+  box.querySelectorAll('[data-di][data-f="name"],[data-di][data-f="title"]').forEach(el=>el.addEventListener('input',()=>{ DIRS[+el.dataset.di][el.dataset.f]=el.value; }));
+  box.querySelectorAll('[data-dx]').forEach(b=>b.addEventListener('click',()=>{ DIRS.splice(+b.dataset.dx,1); paintDirs(type); readForm(type,false); }));
 }
 function signerOf(role){
   const uid=$('s_'+role).value; if(!uid) return null;
@@ -583,6 +632,13 @@ async function checks(type){
   if(!p) errors.push('ยังไม่ได้เลือกผู้เสนอ');
   if(!e) errors.push('ยังไม่ได้เลือกผู้รับทราบ / สั่งการ');
   if(p&&e&&p.uid===e.uid) errors.push('ผู้เสนอกับผู้สั่งการต้องเป็นคนละคน');
+  if(acmEndorser()){
+    if(DIRS.some(d=>!(d.name||'').trim())) errors.push('กรรมการบางแถวยังไม่มีชื่อ — ใส่ชื่อหรือกด × ตัดแถวออก');
+    const ds=dirsOut(), seen=new Set();
+    ds.forEach(d=>{ const k=d.uid||'name:'+norm(d.name);
+      if(seen.has(k)) errors.push('กรรมการซ้ำ: '+d.name); seen.add(k);
+      if(d.uid && ((p&&d.uid===p.uid)||(e&&d.uid===e.uid))) errors.push(d.name+' เป็นผู้เสนอหรือผู้สั่งการอยู่แล้ว — ไม่ต้องใส่เป็นกรรมการซ้ำ'); });
+  }
   if(cfg.circular && circOn(type) && !viaAero() && !recipientsOf({proposer:p,endorser:e}).length) errors.push('หนังสือเวียนยังไม่มีผู้ต้องรับทราบ');
   if(ben&&p&&samePerson(p,ben)) errors.push('ผู้เสนอเป็นผู้ได้รับประโยชน์จากหนังสือฉบับนี้');
   if(ben&&e&&samePerson(e,ben)) errors.push('ผู้สั่งการเป็นผู้ได้รับประโยชน์จากหนังสือฉบับนี้');
@@ -629,7 +685,7 @@ function draftModel(type){
   const t=textOf(type);
   return Object.assign(t, { type, status:'draft', fields:F, effectiveFrom:F.effectiveFrom||'', expiresOn:F.expiresOn||'',
     beneficiaryName:F.beneficiary?F.beneficiary.name:'', font:$('s_font').value,
-    signers:{proposer:signerOf('proposer'), endorser:signerOf('endorser')} });
+    signers:{proposer:signerOf('proposer'), endorser:signerOf('endorser')}, directors:dirsOut() });
 }
 async function saveMemo(type, submit){
   CHK=await checks(type); paintChecks();
@@ -644,6 +700,7 @@ async function saveMemo(type, submit){
     beneficiaryName:(F.beneficiary&&F.beneficiary.name)||'',
     signers:{ proposer:signerOf('proposer')||blank, endorser:signerOf('endorser')||blank },
     font:$('s_font').value, supersedes: CHK.supersedes||null });
+  data.directors=dirsOut(); data.directorUids=data.directors.filter(d=>d.mode==='system').map(d=>d.uid);
   const cf=MT[type].circular, con=!!(cf && circOn(type)), aero=con&&viaAero(), rl=con&&!aero?recipientsOf(data.signers):[];
   Object.assign(data,{ circular:con, ackChannel:con?(aero?'aerofbo':'forms'):'', recipients:rl, recipientUids:rl.map(x=>x.uid), recipientSel:cf?JSON.parse(JSON.stringify(RCP)):null });
   $('save').disabled=$('submit').disabled=true;
@@ -712,6 +769,9 @@ function letterHtml(m){
     <div class="sig">${numbered && m.proposerSig ? `<img src="${esc(m.proposerSig)}" alt="">` : '<div style="height:64px"></div>'}
       <div class="ln">${esc(p.name||'')}<br>${esc(p.title||'')}<br>Date: ${esc(numbered?long(tsDate(m.issuedAt)):'____________')}</div>
       ${numbered?`<div class="stamp">Proposed and signed electronically on ${esc(tsFull(m.issuedAt))}.</div>`:''}</div>
+    ${(m.directors||[]).length?`<div class="dirs"><h4>BOARD OF DIRECTORS</h4><div class="dg">${m.directors.map(d=>{ const g=d.uid&&(m.dsigs||{})[d.uid];
+      return `<div>${g&&g.sig?`<img src="${esc(g.sig)}" alt="">`:'<div class="sp"></div>'}<div class="ln"><b>${esc(d.name)}</b><br>${esc(d.title||'Director')}<br>Date: ${
+        esc(g&&g.at?long(tsDate(g.at)):'____________')}</div><div class="stamp">${g?'Signed electronically':d.mode==='paper'?'Sign by hand on the printed copy':'Awaiting signature in the system'}</div></div>`; }).join('')}</div></div>`:''}
     ${m.endorsementImg?`<div class="endo"><img src="${esc(m.endorsementImg)}" alt=""><div class="stamp">หน้าจอนี้จัดหน้าโดยประมาณ — ใน PDF บล็อกนี้อยู่ตรงตำแหน่งที่ผู้สั่งการวางไว้</div></div>`:''}
     ${m.status==='proposed'?'<div class="stamp" style="color:#b45309;margin-top:14px">Awaiting endorsement</div>':''}
   </div>`;
@@ -730,7 +790,9 @@ async function viewMemo(id){
   const me=A.user.uid, S=M.signers||{}, isP=S.proposer&&S.proposer.uid===me, isE=S.endorser&&S.endorser.uid===me, isOwner=M.createdBy===me;
   const acts=[];
   if(M.status==='submitted' && isP) acts.push('propose');
-  if(M.status==='proposed' && isE) acts.push('endorse');
+  const dPend=dirPending(M), isD=(M.directorUids||[]).includes(me) && !(M.dsigs||{})[me];
+  if(M.status==='proposed' && isD) acts.push('dsign');
+  if(M.status==='proposed' && isE) acts.push(dPend.length?'endoWait':'endorse');
   if(['issued','declined'].includes(M.status) && isE && !M.endorsementImg) acts.push('endoImg');
   if(['draft','returned'].includes(M.status) && (isOwner||A.isAdmin())) acts.push('edit');
   if(M.status==='submitted' && (isP||isOwner||A.isAdmin())) acts.push('amend');
@@ -798,6 +860,12 @@ function paintActions(acts){
       <div class="acts2"><button class="big pri" id="doPropose">ลงนามเสนอและออกเลข</button>
         ${acts.includes('amend')?`<a class="big sec" href="?edit=${esc(M.id)}">แก้ไขเนื้อหาก่อนลงนาม</a>`:''}
         <button class="big sec" id="doReturn">ตีกลับให้ผู้จัดทำ</button></div><div id="amsg"></div></div>`;
+  if(acts.includes('dsign')) h+=`<div class="card" style="margin-bottom:16px"><h3>ลงนามในฐานะกรรมการ</h3>
+      <p class="hint">ลงนามอนุมัติร่วมกับ ${esc(M.signers.endorser.name)} (Accountable Manager) · วันที่ลงนามคือเวลานี้ แก้ภายหลังไม่ได้</p>
+      ${sigPicker('ds')}<div class="acts2"><button class="big pri" id="doDsign">ลงนาม</button></div><div id="amsg"></div></div>`;
+  const dPend=dirPending(M);
+  if(acts.includes('endoWait')) h+=`<div class="fk-gate warn" style="margin-bottom:16px"><span><b>รอกรรมการลงนามในระบบ ${(M.directorUids||[]).length-dPend.length}/${(M.directorUids||[]).length}</b> —
+      ยังไม่ได้ลงนาม: ${dPend.map(d=>esc(d.name)).join(' · ')} · สั่งการได้เมื่อกรรมการลงนามครบ</span></div>`;
   if(acts.includes('endorse')) h+=endorsePanelHtml();
   if(acts.includes('endoImg')) h+=`<div class="card" style="margin-bottom:16px"><h3>บล็อกสั่งการยังไม่ถูกสร้าง</h3>
       <p class="hint">การสั่งการบันทึกแล้ว แต่ภาพบล็อกที่วางบนกระดาษยังไม่ได้บันทึก กดเพื่อสร้างจากข้อมูลที่บันทึกไว้</p>
@@ -811,6 +879,7 @@ function paintActions(acts){
   if($('doCancel')) $('doCancel').addEventListener('click',()=>simple('cancel'));
   if($('doEndoImg')) $('doEndoImg').addEventListener('click',finishEndorsement);
   if(acts.includes('endorse')) bindEndorse();
+  if(acts.includes('dsign')){ const DSP=bindSigPicker('ds'); $('doDsign').addEventListener('click',()=>dsign(DSP)); }
 }
 /* ── การรับทราบ ── acks/<uid> เขียนได้เฉพาะเจ้าตัว ครั้งเดียว เวลาเซิร์ฟเวอร์ */
 async function paintAcks(){
@@ -905,7 +974,7 @@ async function circulate(){
 async function paintHistory(){
   try{
     const ev=(await MREF.collection('events').get()).docs.map(d=>d.data()).sort((a,b)=>((a.at&&a.at.seconds)||0)-((b.at&&b.at.seconds)||0));
-    const N={aerofbo:'ส่งเข้า AeroFBO Bulletin',ack:'รับทราบ',draft:'บันทึกร่าง',submit:'ส่งให้ผู้เสนอ',resubmit:'แก้และส่งอีกครั้ง',amend:'แก้ไขก่อนลงนาม',return:'ตีกลับ',propose:'ผู้เสนอลงนาม · ออกเลข',
+    const N={aerofbo:'ส่งเข้า AeroFBO Bulletin',ack:'รับทราบ',draft:'บันทึกร่าง',submit:'ส่งให้ผู้เสนอ',resubmit:'แก้และส่งอีกครั้ง',amend:'แก้ไขก่อนลงนาม',dsign:'กรรมการลงนาม',return:'ตีกลับ',propose:'ผู้เสนอลงนาม · ออกเลข',
              endorse:'ผู้สั่งการลงนาม',cancel:'ยกเลิก',pdf:'สร้าง PDF',supersede:'ถูกแทน',record:'ลงทะเบียนฉบับกระดาษ'};
     $('hist').innerHTML=`<h3>ประวัติ</h3><div class="twrap"><table class="ml"><tbody>${ev.map(e=>`<tr><td class="mono">${esc(tsFull(e.at))}</td><td>${esc(N[e.action]||e.action)}</td><td>${esc(e.byName||'')}</td><td>${esc(e.note||'')}</td></tr>`).join('')}</tbody></table></div>`;
   }catch(e){}
@@ -949,8 +1018,31 @@ async function propose(SP){
   try{ await MREF.collection('events').add({action:'propose', byUid:A.user.uid, byName:me, note:number, at:now()}); }catch(e){}
   await closeTasks(M.id, {tracking:number});
   try{ await taskFor(M.id, Object.assign({}, M, {number}), 'endorser'); }catch(e){}
+  for(const d of (M.directors||[]).filter(x=>x.mode==='system'&&x.uid)){
+    try{ await A.db.collection('tasks').add({ app:'memo', kind:'dsign', memoId:M.id, subId:'', formCode:'MEMO-'+M.type,
+      title:'ลงนามในฐานะกรรมการ: '+M.subject, tracking:number, assigneeUid:d.uid, assigneeName:d.name, state:'open', step:2,
+      fromUid:A.user.uid, fromName:me, createdAt:now() }); }catch(e){}
+  }
   await viewMemo(M.id);
   await makePdf(false);   // ฉบับรอสั่งการ — ผู้สั่งการใช้เป็นพื้นหลังตอนวางบล็อก
+}
+
+/* ── กรรมการลงนามร่วม ── ช่องของตัวเองครั้งเดียว เวลาเซิร์ฟเวอร์ · ปิดเฉพาะงานของตัวเอง */
+const dirPending=m=>(m.directors||[]).filter(d=>d.mode==='system' && d.uid && !(m.dsigs||{})[d.uid]);
+async function dsign(DSP){
+  const sig=DSP.get(); if(!sig){ say('ยังไม่ได้ลงลายมือชื่อ',true); return; }
+  if(!confirm('ลงนามในฐานะกรรมการตอนนี้? บันทึกแล้วแก้ไม่ได้')) return;
+  $('doDsign').disabled=true; say('กำลังบันทึก…');
+  try{ await DSP.keep(sig); }catch(e){}
+  const me=A.myName()||A.user.email, d=(M.directors||[]).find(x=>x.uid===A.user.uid)||{};
+  try{
+    await MREF.update({ ['dsigs.'+A.user.uid]:{ sig, name:d.name||me, title:d.title||'', at:now() },
+      chain:arrU({action:'dsign', byUid:A.user.uid, byName:me, at:bkkToday()}) });
+  }catch(e){ $('doDsign').disabled=false; say('ลงนามไม่สำเร็จ: '+(e.code||e.message),true); return; }
+  try{ await MREF.collection('events').add({action:'dsign', byUid:A.user.uid, byName:me, at:now()}); }catch(e){}
+  try{ const ts=await A.db.collection('tasks').where('memoId','==',M.id).get();
+       for(const t of ts.docs){ const v=t.data(); if(v.state==='open' && v.kind==='dsign' && v.assigneeUid===A.user.uid) await t.ref.update({state:'done', closedAt:now()}); } }catch(e){}
+  await viewMemo(M.id);
 }
 
 /* ════════════════ ผู้รับทราบ / สั่งการ ════════════════

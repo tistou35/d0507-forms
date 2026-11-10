@@ -333,11 +333,12 @@ service cloud.firestore {
               'body', 'fields', 'effectiveFrom', 'expiresOn', 'beneficiaryUid', 'test',
               'render', 'beneficiaryName', 'purpose', 'font', 'proposerSig',
               'endorsement', 'endorsedAt', 'endorsementImg', 'mode', 'paper', 'transcribedAt',
-              'circular', 'recipients', 'recipientUids', 'recipientSel', 'ackChannel'];
+              'circular', 'recipients', 'recipientUids', 'recipientSel', 'ackChannel',
+              'directors', 'directorUids', 'dsigs'];
     }
     function memoSignKeys() {
       return ['number', 'seq', 'year', 'counter', 'issuedAt', 'proposerSig',
-              'endorsement', 'endorsedAt', 'endorsementImg', 'transcribedAt', 'paper', 'mode'];
+              'endorsement', 'endorsedAt', 'endorsementImg', 'transcribedAt', 'paper', 'mode', 'dsigs'];
     }
     function memoCounterPath(d) {
       return /databases/$(database)/documents/counters/$(d.counter);
@@ -389,8 +390,20 @@ service cloud.firestore {
           && request.resource.data.number is string && request.resource.data.number.size() > 0
           && memoSeqOk(request.resource.data))
         ||
-        // ผู้รับทราบ/สั่งการลงนาม
+        // กรรมการบริษัทลงนามร่วม (ผู้สั่งการเป็น ACM) — หลังผู้เสนอลงนาม ก่อนผู้สั่งการ
+        // ลงได้เฉพาะช่องของตัวเอง ครั้งเดียว เวลาเซิร์ฟเวอร์ และต้องอยู่ในรายชื่อที่ตรึงไว้ตอนผู้เสนอลงนาม
+        (resource.data.status == 'proposed' && request.resource.data.status == 'proposed'
+          && request.auth.uid in resource.data.get('directorUids', [])
+          && !(request.auth.uid in resource.data.get('dsigs', {}))
+          && memoChanged().hasOnly(['dsigs', 'chain'])
+          && request.resource.data.dsigs.diff(resource.data.get('dsigs', {})).affectedKeys().hasOnly([request.auth.uid])
+          && request.resource.data.dsigs[request.auth.uid].at == request.time
+          && request.resource.data.dsigs[request.auth.uid].sig is string)
+        ||
+        // ผู้รับทราบ/สั่งการลงนาม — อนุมัติได้เมื่อกรรมการที่ลงนามในระบบลงครบแล้ว (ไม่อนุมัติได้ทุกเมื่อ)
         (resource.data.status == 'proposed' && request.resource.data.status in ['issued', 'declined']
+          && (request.resource.data.status == 'declined'
+              || resource.data.get('dsigs', {}).size() >= resource.data.get('directorUids', []).size())
           && request.auth.uid == resource.data.signers.endorser.uid
           && request.auth.uid != resource.data.beneficiaryUid
           && memoChanged().hasOnly(['status', 'endorsement', 'endorsedAt', 'chain'])

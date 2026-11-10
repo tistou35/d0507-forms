@@ -111,6 +111,44 @@ function memoPdf_(body) {
   para('Proposed and signed electronically on ' + signedAt + ' in the D-0507 Forms system. ' +
        'The date of issue is the time of this signature and cannot be altered.', { size: 8, color: '#555555', after: 0 });
 
+  // กรรมการบริษัทผู้ลงนามร่วม — เมื่อผู้สั่งการลงนามในตำแหน่ง ACM
+  // ลงนามในระบบ: ภาพลายเซ็นกับวันที่จากเวลาเซิร์ฟเวอร์ · ลงนามบนกระดาษ: ช่องว่างให้เซ็นด้วยมือ
+  // ช่องลายเซ็นสูงเท่ากันทุกช่องทั้งฉบับรอสั่งการและฉบับสมบูรณ์ — ไม่งั้นเนื้อหาเลื่อน
+  // แล้วบล็อกสั่งการที่ ACM วางไว้บนหน้า 1 จะไม่ตรงกับที่ลากไว้
+  var D = m.directors || [], DS = m.dsigs || {};
+  if (D.length) {
+    para('', { after: 2 });
+    para('BOARD OF DIRECTORS', { bold: true, size: 9.5, after: 4 });
+    var cells = [];
+    for (var di = 0; di < D.length; di += 2) cells.push([' ', di + 1 < D.length ? ' ' : ' ']);
+    var dt = b.appendTable(cells);
+    dt.setBorderWidth(0);
+    D.forEach(function (d, k) {
+      var c = dt.getRow(Math.floor(k / 2)).getCell(k % 2), sg = d.uid ? DS[d.uid] : null;
+      c.setPaddingTop(2).setPaddingBottom(8).setPaddingLeft(0).setPaddingRight(10);
+      var p0 = c.getChild(0).asParagraph();
+      var src = sg && /^data:image\/png;base64,/.test(sg.sig || '') ? pngBlob_(sg.sig) : pngBlob_(MEMO_BLANK_PNG);
+      var im = p0.appendInlineImage(src), iw = im.getWidth() || 1, ih = im.getHeight() || 1;
+      var hh = 40, ww = Math.min(150, Math.round(hh * iw / ih));
+      im.setHeight(hh).setWidth(sg ? ww : 150);
+      var line = function (t, o) {
+        o = o || {};
+        var q = c.appendParagraph(t);
+        q.setFontFamily(F).setFontSize(o.size || 9.5).setBold(!!o.bold).setSpacingAfter(0).setSpacingBefore(0)
+         .setForegroundColor(o.color || '#000000');
+        return q;
+      };
+      line('______________________________');
+      line(d.name || '', { bold: true });
+      line(d.title || 'Director');
+      line('Date: ' + (sg && sg.at ? Utilities.formatDate(new Date(sg.at), tz, 'dd MMM yyyy').toUpperCase() : '____________'));
+      line(sg ? 'Signed electronically on ' + Utilities.formatDate(new Date(sg.at), tz, 'dd MMM yyyy HH:mm').toUpperCase() + ' (UTC+7)'
+              : d.mode === 'paper' ? 'Sign by hand on the printed copy' : 'Awaiting signature in the D-0507 Forms system',
+           { size: 7.5, color: sg ? '#555555' : '#B45309' });
+    });
+    if (D.length % 2) dt.getRow(dt.getNumRows() - 1).getCell(1).editAsText().setText(' ');
+  }
+
   // ผู้รับทราบ/สั่งการ
   var en = m.endorsement || {};
   if (stage === 'proposed') {
@@ -164,6 +202,9 @@ function memoPdfBytes_(body) {
   if (f.isTrashed()) throw new Error('ไฟล์ PDF ถูกย้ายลงถังขยะแล้ว');
   return { name: f.getName(), bytes: Utilities.base64Encode(f.getBlob().getBytes()) };
 }
+
+/* ช่องลายเซ็นว่าง — PNG โปร่งใส 1×1 ขยายเป็นขนาดช่อง ให้สูงเท่ากับช่องที่มีลายเซ็น */
+var MEMO_BLANK_PNG = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
 function pngBlob_(dataUrl) {
   return Utilities.newBlob(Utilities.base64Decode(String(dataUrl).split(',')[1]), 'image/png', 'img.png');
