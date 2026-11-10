@@ -63,6 +63,7 @@ function memoPdf_(body) {
 
   var who = function (x) { return [x.title, x.name].filter(function (v) { return v; }).join(' — '); };
   var rows = [['No.', m.number], ['Date of issue', issueLong], ['From', who(P)], ['To', who(E)]];
+  if (m.board && m.acm) rows.push(['For action', 'Accountable Manager — ' + (m.acm.name || '')]);
   if (r.cc) rows.push(['CC', r.cc]);
   rows.push(['Subject', m.subject || '']);
   rows.push(['Purpose', r.purpose || '']);
@@ -118,7 +119,7 @@ function memoPdf_(body) {
   var D = m.directors || [], DS = m.dsigs || {};
   if (D.length) {
     para('', { after: 2 });
-    para('BOARD OF DIRECTORS', { bold: true, size: 9.5, after: 4 });
+    para(m.board ? 'APPROVED BY THE BOARD OF DIRECTORS' : 'BOARD OF DIRECTORS', { bold: true, size: 9.5, after: 4 });
     var cells = [];
     for (var di = 0; di < D.length; di += 2) cells.push([' ', di + 1 < D.length ? ' ' : ' ']);
     var dt = b.appendTable(cells);
@@ -149,9 +150,28 @@ function memoPdf_(body) {
     if (D.length % 2) dt.getRow(dt.getNumRows() - 1).getCell(1).editAsText().setText(' ');
   }
 
+  // ACM รับทราบคำสั่งของกรรมการ — ลำดับสุดท้าย ไม่ใช่การอนุมัติ · ช่องสูงคงที่เหมือนช่องกรรมการ
+  if (m.board && m.acm) {
+    var K = m.acmAck || null;
+    para('', { after: 2 });
+    para('ACKNOWLEDGED — RECEIVED FOR ACTION', { bold: true, size: 9.5, after: 4 });
+    var kim = b.appendParagraph(' ').setSpacingAfter(0)
+      .appendInlineImage(pngBlob_(K && /^data:image\/png;base64,/.test(K.sig || '') ? K.sig : MEMO_BLANK_PNG));
+    var kw = kim.getWidth() || 1, kh = kim.getHeight() || 1;
+    kim.setHeight(40).setWidth(K ? Math.min(150, Math.round(40 * kw / kh)) : 150);
+    para('______________________________', { after: 0, size: 9.5 });
+    para(m.acm.name || '', { bold: true, after: 0, size: 9.5 });
+    para('Accountable Manager', { after: 0, size: 9.5 });
+    para('Date: ' + (K && K.at ? Utilities.formatDate(new Date(K.at), tz, 'dd MMM yyyy').toUpperCase() : '____________'), { after: 0, size: 9.5 });
+    para(K ? 'Acknowledged electronically on ' + Utilities.formatDate(new Date(K.at), tz, 'dd MMM yyyy HH:mm').toUpperCase() + ' (UTC+7)'
+           : 'Awaiting acknowledgement after the Board has signed', { size: 7.5, color: K ? '#555555' : '#B45309', after: 0 });
+  }
+
   // ผู้รับทราบ/สั่งการ
   var en = m.endorsement || {};
-  if (stage === 'proposed') {
+  if (m.board) {
+    // โหมดกรรมการไม่มีบล็อกสั่งการ — สถานะอยู่ในบล็อกกรรมการและบล็อกรับทราบแล้ว
+  } else if (stage === 'proposed') {
     para('Awaiting endorsement by ' + who(E) + '.', { size: 8, color: '#B45309', after: 0 });
   } else if (m.endorsementImg && /^data:image\/png;base64,/.test(m.endorsementImg)) {
     // ภาพลอยเหนือข้อความ ผูกกับย่อหน้าแรกของหน้า 1 (ซึ่งเริ่มที่ขอบบนและขอบซ้ายพอดี)
@@ -220,6 +240,9 @@ function memoShare_(body) {
   if (!m.pdf || !m.pdf.id) throw new Error('ยังไม่มี PDF ฉบับสมบูรณ์');
   var file = DriveApp.getFileById(m.pdf.id);
   var S = m.signers || {}, uids = [m.createdBy, S.proposer && S.proposer.uid, S.endorser && S.endorser.uid];
+  // กรรมการลงนามแทนผู้สั่งการ — แชร์ให้กรรมการที่ลงนามในระบบและ ACM ผู้รับทราบด้วย
+  (m.directorUids || []).forEach(function (u) { uids.push(u); });
+  if (m.acm && m.acm.uid) uids.push(m.acm.uid);
   try { (fsGet_('config/admins', body.idToken).uids || []).forEach(function (u) { uids.push(u); }); } catch (e) {}
   var seen = {}, shared = [], skipped = [];
   uids.filter(function (u) { return u && !seen[u] && (seen[u] = true); }).forEach(function (u) {

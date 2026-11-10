@@ -334,11 +334,11 @@ service cloud.firestore {
               'render', 'beneficiaryName', 'purpose', 'font', 'proposerSig',
               'endorsement', 'endorsedAt', 'endorsementImg', 'mode', 'paper', 'transcribedAt',
               'circular', 'recipients', 'recipientUids', 'recipientSel', 'ackChannel',
-              'directors', 'directorUids', 'dsigs'];
+              'directors', 'directorUids', 'dsigs', 'board', 'acm', 'acmAck', 'boardAt'];
     }
     function memoSignKeys() {
       return ['number', 'seq', 'year', 'counter', 'issuedAt', 'proposerSig',
-              'endorsement', 'endorsedAt', 'endorsementImg', 'transcribedAt', 'paper', 'mode', 'dsigs'];
+              'endorsement', 'endorsedAt', 'endorsementImg', 'transcribedAt', 'paper', 'mode', 'dsigs', 'acmAck', 'boardAt'];
     }
     function memoCounterPath(d) {
       return /databases/$(database)/documents/counters/$(d.counter);
@@ -390,9 +390,10 @@ service cloud.firestore {
           && request.resource.data.number is string && request.resource.data.number.size() > 0
           && memoSeqOk(request.resource.data))
         ||
-        // กรรมการบริษัทลงนามร่วม (ผู้สั่งการเป็น ACM) — หลังผู้เสนอลงนาม ก่อนผู้สั่งการ
-        // ลงได้เฉพาะช่องของตัวเอง ครั้งเดียว เวลาเซิร์ฟเวอร์ และต้องอยู่ในรายชื่อที่ตรึงไว้ตอนผู้เสนอลงนาม
+        // โหมดกรรมการบริษัท (board) — ผู้เสนอ → กรรมการลงนามอนุมัติ → หนังสือออก → ACM ลงนามรับทราบ
+        // กรรมการลงได้เฉพาะช่องของตัวเอง ครั้งเดียว เวลาเซิร์ฟเวอร์ และต้องอยู่ในรายชื่อที่ตรึงไว้ตอนผู้เสนอลงนาม
         (resource.data.status == 'proposed' && request.resource.data.status == 'proposed'
+          && resource.data.get('board', false) == true
           && request.auth.uid in resource.data.get('directorUids', [])
           && !(request.auth.uid in resource.data.get('dsigs', {}))
           && memoChanged().hasOnly(['dsigs', 'chain'])
@@ -400,7 +401,25 @@ service cloud.firestore {
           && request.resource.data.dsigs[request.auth.uid].at == request.time
           && request.resource.data.dsigs[request.auth.uid].sig is string)
         ||
-        // ผู้รับทราบ/สั่งการลงนาม — อนุมัติได้เมื่อกรรมการที่ลงนามในระบบลงครบแล้ว (ไม่อนุมัติได้ทุกเมื่อ)
+        // กรรมการลงนามครบ = หนังสือออก · ผู้ที่เกี่ยวข้องกดได้ แต่ระบบยอมเฉพาะเมื่อกรรมการในระบบลงครบแล้ว
+        (resource.data.status == 'proposed' && request.resource.data.status == 'issued'
+          && resource.data.get('board', false) == true
+          && resource.data.get('dsigs', {}).size() >= resource.data.get('directorUids', []).size()
+          && (request.auth.uid in resource.data.get('directorUids', [])
+              || request.auth.uid == resource.data.signers.proposer.uid || admin())
+          && memoChanged().hasOnly(['status', 'boardAt', 'chain'])
+          && request.resource.data.boardAt == request.time)
+        ||
+        // ACM ลงนามรับทราบคำสั่งของกรรมการ — หลังหนังสือออก ครั้งเดียว เวลาเซิร์ฟเวอร์ เจ้าตัวเท่านั้น
+        (resource.data.status == 'issued' && request.resource.data.status == 'issued'
+          && resource.data.get('board', false) == true
+          && request.auth.uid == resource.data.acm.uid
+          && !('acmAck' in resource.data)
+          && memoChanged().hasOnly(['acmAck', 'chain'])
+          && request.resource.data.acmAck.at == request.time
+          && request.resource.data.acmAck.sig is string)
+        ||
+        // ผู้รับทราบ/สั่งการลงนาม (โหมดปกติ)
         (resource.data.status == 'proposed' && request.resource.data.status in ['issued', 'declined']
           && (request.resource.data.status == 'declined'
               || resource.data.get('dsigs', {}).size() >= resource.data.get('directorUids', []).size())

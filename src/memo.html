@@ -299,6 +299,9 @@ async function listMemos(){
 }
 /* วันที่ในเอกสาร = วันที่ออกที่พิมพ์บนหนังสือ (เวลาที่ผู้เสนอลงนาม) หรือวันที่บนกระดาษของฉบับที่ลงทะเบียน
    ไม่ใช่วันที่สร้างในระบบ — ร่างที่จัดทำวันนี้ของหนังสือที่ลงวันที่เดือนก่อนต้องไม่ขึ้นมาก่อน */
+/* โหมดกรรมการ — รอกรรมการลงนาม แทนรอผู้สั่งการ · ออกแล้วแต่ ACM ยังไม่รับทราบ */
+const stLabel=(m,st)=>m.board&&st==='proposed' ? 'รอกรรมการลงนาม'
+  : m.board&&st==='issued'&&!m.acmAck ? 'ออกแล้ว · รอ ACM รับทราบ' : (STATUS[st]||st);
 const docDate=m=>m.mode==='paper' ? ((m.paper&&m.paper.date)||'') : tsDate(m.issuedAt);
 /* เลขที่ D0507-MEMO-<ปี พ.ศ.>/<ลำดับ> (<ประเภท>) — เรียงตามปีแล้วลำดับ · เลขของฉบับกระดาษเรียงตามตัวอักษรต่อท้าย */
 const noKey=m=>{ const x=/MEMO-(\d{4})\/(\d+)/.exec(m.number||''); return x ? '1'+x[1]+String(+x[2]).padStart(6,'0') : (m.number ? '0'+m.number : ''); };
@@ -327,7 +330,7 @@ function paintList(){
         <td class="mono">${esc(long(docDate(m))||'—')}</td><td>${esc(m.type)}</td><td>${esc(m.subject||'')}${
           open(m)&&m.createdByName?`<div class="hint">จัดทำโดย ${esc(m.createdByName)}</div>`:''}</td><td>${esc(p[0])} → ${esc(p[1])}</td>
         <td class="mono">${esc(long(m.effectiveFrom))}</td><td class="mono">${esc(long(m.expiresOn))}</td>
-        <td><span class="st ${esc(st)}">${esc(STATUS[st]||st)}</span>${m.ackChannel==='aerofbo'&&m.status==='issued'?(m.aerofbo?' <span class="st issued">AeroFBO ✓</span>':' <span class="st proposed">รอส่ง AeroFBO</span>'):''}</td></tr>`; }).join('')}</tbody></table></div>`;
+        <td><span class="st ${esc(st)}">${esc(stLabel(m,st))}</span>${m.ackChannel==='aerofbo'&&m.status==='issued'?(m.aerofbo?' <span class="st issued">AeroFBO ✓</span>':' <span class="st proposed">รอส่ง AeroFBO</span>'):''}</td></tr>`; }).join('')}</tbody></table></div>`;
   document.querySelectorAll('#ltab [data-id]').forEach(tr=>tr.addEventListener('click',()=>{ location.href='?id='+encodeURIComponent(tr.dataset.id); }));
 }
 
@@ -379,15 +382,16 @@ function formMemo(type, existing){
         <select id="s_proposer" data-k="s"><option value="">—</option>${opts}</select>
         <select id="s_proposer_pos" data-k="s" style="margin-top:6px" title="ลงนามในตำแหน่ง"></select><div class="hint" id="s_proposer_h"></div></div>
       <div><label for="s_endorser">ผู้รับทราบ / สั่งการ (ลงนามคนที่สอง) <span style="color:var(--red-500)">*</span></label>
-        <select id="s_endorser" data-k="s"><option value="">—</option>${opts}</select>
+        <select id="s_endorser" data-k="s"><option value="">—</option><option value="__board">★ กรรมการบริษัท — ลงนามอนุมัติหลายคน</option>${opts}</select>
         <select id="s_endorser_pos" data-k="s" style="margin-top:6px" title="ลงนามในตำแหน่ง"></select><div class="hint" id="s_endorser_h"></div></div>
       <div class="full" id="dirBox" hidden>
-        <label>กรรมการบริษัทผู้ลงนามร่วม <span class="hint">(ไม่บังคับ · ใส่ได้หลายคน)</span></label>
-        <div class="hint" style="margin-bottom:8px">ผู้สั่งการลงนามในตำแหน่ง Accountable Manager — ใส่กรรมการที่ต้องลงนามอนุมัติร่วมได้ ·
-          <b>ลงนามในระบบ</b>: ได้งานในคิวหลังผู้เสนอลงนาม และ ACM สั่งการอนุมัติได้เมื่อกรรมการลงนามครบ (ต้องมีบัญชีเจ้าหน้าที่) ·
-          <b>ลงนามบนกระดาษ</b>: PDF พิมพ์ชื่อพร้อมช่องว่างให้เซ็นด้วยมือ (กรรมการภายนอกที่ไม่มีบัญชี)</div>
+        <label>กรรมการบริษัทผู้ลงนามอนุมัติ <span style="color:var(--red-500)">*</span> <span class="hint">(ใส่ได้หลายคน)</span></label>
+        <div class="hint" style="margin-bottom:8px">หลังผู้เสนอลงนาม กรรมการลงนามอนุมัติให้ Accountable Manager ปฏิบัติ · ลงนามครบแล้วหนังสือออก และ ACM ลงนามรับทราบเป็นลำดับสุดท้าย ·
+          <b>ลงนามในระบบ</b>: ได้งานในคิว (ต้องมีบัญชีเจ้าหน้าที่) · <b>ลงนามบนกระดาษ</b>: PDF พิมพ์ชื่อพร้อมช่องว่างให้เซ็นด้วยมือ (กรรมการที่ไม่มีบัญชี)</div>
         <div id="dirList"></div>
-        <button type="button" class="fb" id="dirAdd">+ เพิ่มกรรมการ</button></div>
+        <button type="button" class="fb" id="dirAdd">+ เพิ่มกรรมการ</button>
+        <div style="margin-top:12px;max-width:420px"><label for="d_acm">ผู้รับทราบและปฏิบัติ (Accountable Manager) <span style="color:var(--red-500)">*</span></label>
+          <select id="d_acm" data-k="s"><option value="">—</option>${opts}</select></div></div>
       ${cfg.circular?`<div class="sect">หนังสือเวียน — ผู้ต้องรับทราบ</div>
       <div class="full">${cfg.circular==='optional'?'<label class="ck" style="margin-bottom:8px"><input type="checkbox" id="r_on" data-k="s"> เวียนให้รับทราบ</label>':''}
         <div id="r_chbox" style="margin-bottom:10px"><label for="r_ch">ส่งและเก็บการรับทราบที่</label>
@@ -429,6 +433,7 @@ function formMemo(type, existing){
   if(existing && existing.signers){
     if(existing.signers.proposer&&existing.signers.proposer.uid) $('s_proposer').value=existing.signers.proposer.uid;
     if(existing.signers.endorser&&existing.signers.endorser.uid) $('s_endorser').value=existing.signers.endorser.uid;
+    if(existing.board){ $('s_endorser').value='__board'; if(existing.acm&&existing.acm.uid) $('d_acm').value=existing.acm.uid; }
     readForm(type, false);
     ['proposer','endorser'].forEach(r=>{ const sp=existing.signers[r]; if(sp&&sp.pos&&$('s_'+r+'_pos')) $('s_'+r+'_pos').value=sp.pos; });
     readForm(type, false);
@@ -474,7 +479,8 @@ function readForm(type, fieldsChanged){
     const c=(cfg.signers||{})[r]||{};
     $('s_'+r+'_h').textContent = d[r] ? ('ค่าตั้งต้นตามตำแหน่ง '+d[r].pos+(c.conflictPosition&&d[r].pos!==c.position?' (ใช้ตำแหน่งสำรองเพราะคนในตำแหน่ง '+c.position+' ลงนามไม่ได้)':'')+(d[r].uid?'':' — ยังไม่มีผู้ถือตำแหน่งนี้ เลือกเองได้')) : '';
   });
-  if($('dirBox')) $('dirBox').hidden=!acmEndorser();
+  if($('dirBox')){ $('dirBox').hidden=!boardMode();
+    if(boardMode() && !$('d_acm').value){ const h=holders('ACM'); if(h.length===1) $('d_acm').value=h[0].uid; } }
   if(MT[type].circular) paintRcp(true);
   checks(type).then(r=>{ CHK=r; paintChecks(); $('pv').innerHTML = letterHtml(draftModel(type)); });
 }
@@ -494,10 +500,13 @@ function paintRcp(noRead){
    เปิดเมื่อผู้สั่งการลงนามในตำแหน่ง ACM · ลงนามในระบบต้องเป็นบัญชีเจ้าหน้าที่ (firestore.rules อ่านบันทึกได้เฉพาะเจ้าหน้าที่)
    ลงนามบนกระดาษใช้กับกรรมการที่ไม่มีบัญชี — PDF พิมพ์ชื่อพร้อมช่องว่าง */
 let DIRS=[];
-const acmEndorser=()=>{ const e=$('s_endorser')&&$('s_endorser').value?signerOf('endorser'):null; return !!(e&&e.pos==='ACM'); };
+const boardMode=()=>!!($('s_endorser') && $('s_endorser').value==='__board');
+const BOARD={uid:'', name:'Board of Directors', pos:'BOARD', title:''};
+function acmOut(){ if(!boardMode()) return null; const u=$('d_acm')&&$('d_acm').value?userById($('d_acm').value):null;
+  return u?{uid:u.uid, name:u.name||u.email, title:'Accountable Manager'}:null; }
 const dirCands=()=>USERS.filter(u=>(u.roles||[]).some(r=>STAFF_ROLES.includes(r))).sort((a,b)=>String(a.name).localeCompare(String(b.name)));
 function dirsOut(){
-  if(!acmEndorser()) return [];
+  if(!boardMode()) return [];
   return DIRS.filter(d=>(d.name||'').trim()).map(d=>({uid:d.uid||'', name:d.name.trim(), title:(d.title||'').trim()||'Director',
     mode:d.uid&&d.mode==='system'?'system':'paper'}));
 }
@@ -523,6 +532,7 @@ function paintDirs(type){
 }
 function signerOf(role){
   const uid=$('s_'+role).value; if(!uid) return null;
+  if(uid==='__board') return Object.assign({}, BOARD);
   const u=userById(uid), d=defaultSigners(EDIT?EDIT.type:Q.get('new'),F)[role]||{};
   const chosen=$('s_'+role+'_pos')&&$('s_'+role+'_pos').value;
   const pt=posTitle(u, chosen||d.pos);
@@ -544,12 +554,15 @@ async function checks(type){
   if(!p) errors.push('ยังไม่ได้เลือกผู้เสนอ');
   if(!e) errors.push('ยังไม่ได้เลือกผู้รับทราบ / สั่งการ');
   if(p&&e&&p.uid===e.uid) errors.push('ผู้เสนอกับผู้สั่งการต้องเป็นคนละคน');
-  if(acmEndorser()){
+  if(boardMode()){
     if(DIRS.some(d=>!(d.name||'').trim())) errors.push('กรรมการบางแถวยังไม่มีชื่อ — ใส่ชื่อหรือกด × ตัดแถวออก');
-    const ds=dirsOut(), seen=new Set();
+    const ds=dirsOut(), seen=new Set(), acm=acmOut();
+    if(!ds.length) errors.push('ยังไม่ได้ใส่กรรมการผู้ลงนาม');
+    if(!acm) errors.push('ยังไม่ได้เลือกผู้รับทราบ (Accountable Manager)');
     ds.forEach(d=>{ const k=d.uid||'name:'+norm(d.name);
       if(seen.has(k)) errors.push('กรรมการซ้ำ: '+d.name); seen.add(k);
-      if(d.uid && ((p&&d.uid===p.uid)||(e&&d.uid===e.uid))) errors.push(d.name+' เป็นผู้เสนอหรือผู้สั่งการอยู่แล้ว — ไม่ต้องใส่เป็นกรรมการซ้ำ'); });
+      if(d.uid && p && d.uid===p.uid) warns.push(d.name+' เป็นทั้งผู้เสนอและกรรมการผู้อนุมัติ');
+      if(d.uid && acm && d.uid===acm.uid) warns.push(d.name+' เป็นทั้งกรรมการผู้อนุมัติและผู้รับคำสั่ง (ACM)'); });
   }
   if(cfg.circular && circOn(type) && !viaAero() && !recipientsOf({proposer:p,endorser:e}).length) errors.push('หนังสือเวียนยังไม่มีผู้ต้องรับทราบ');
   if(ben&&p&&samePerson(p,ben)) errors.push('ผู้เสนอเป็นผู้ได้รับประโยชน์จากหนังสือฉบับนี้');
@@ -597,7 +610,7 @@ function draftModel(type){
   const t=textOf(type);
   return Object.assign(t, { type, status:'draft', fields:F, effectiveFrom:F.effectiveFrom||'', expiresOn:F.expiresOn||'',
     beneficiaryName:F.beneficiary?F.beneficiary.name:'', font:$('s_font').value,
-    signers:{proposer:signerOf('proposer'), endorser:signerOf('endorser')}, directors:dirsOut() });
+    signers:{proposer:signerOf('proposer'), endorser:signerOf('endorser')}, directors:dirsOut(), board:boardMode(), acm:acmOut() });
 }
 async function saveMemo(type, submit){
   CHK=await checks(type); paintChecks();
@@ -612,6 +625,7 @@ async function saveMemo(type, submit){
     beneficiaryName:(F.beneficiary&&F.beneficiary.name)||'',
     signers:{ proposer:signerOf('proposer')||blank, endorser:signerOf('endorser')||blank },
     font:$('s_font').value, supersedes: CHK.supersedes||null });
+  data.board=boardMode(); data.acm=acmOut();
   data.directors=dirsOut(); data.directorUids=data.directors.filter(d=>d.mode==='system').map(d=>d.uid);
   const cf=MT[type].circular, con=!!(cf && circOn(type)), aero=con&&viaAero(), rl=con&&!aero?recipientsOf(data.signers):[];
   Object.assign(data,{ circular:con, ackChannel:con?(aero?'aerofbo':'forms'):'', recipients:rl, recipientUids:rl.map(x=>x.uid), recipientSel:cf?JSON.parse(JSON.stringify(RCP)):null });
@@ -668,6 +682,7 @@ function letterHtml(m){
       <tr><td class="k">Date of issue</td><td>${esc(numbered?long(tsDate(m.issuedAt)):'(date of the proposer\'s signature)')}</td></tr>
       <tr><td class="k">From</td><td>${esc(who(p))}</td></tr>
       <tr><td class="k">To</td><td>${esc(who(e))}</td></tr>
+      ${m.board&&m.acm?`<tr><td class="k">For action</td><td>Accountable Manager — ${esc(m.acm.name)}</td></tr>`:''}
       ${r.cc?`<tr><td class="k">CC</td><td>${esc(r.cc)}</td></tr>`:''}
       <tr><td class="k">Subject</td><td><b>${esc(m.subject||'')}</b></td></tr>
       <tr><td class="k">Purpose</td><td>${esc(r.purpose||'')}</td></tr>
@@ -681,9 +696,11 @@ function letterHtml(m){
     <div class="sig">${numbered && m.proposerSig ? `<img src="${esc(m.proposerSig)}" alt="">` : '<div style="height:64px"></div>'}
       <div class="ln">${esc(p.name||'')}<br>${esc(p.title||'')}<br>Date: ${esc(numbered?long(tsDate(m.issuedAt)):'____________')}</div>
       ${numbered?`<div class="stamp">Proposed and signed electronically on ${esc(tsFull(m.issuedAt))}.</div>`:''}</div>
-    ${(m.directors||[]).length?`<div class="dirs"><h4>BOARD OF DIRECTORS</h4><div class="dg">${m.directors.map(d=>{ const g=d.uid&&(m.dsigs||{})[d.uid];
+    ${(m.directors||[]).length?`<div class="dirs"><h4>${m.board?'APPROVED BY THE BOARD OF DIRECTORS':'BOARD OF DIRECTORS'}</h4><div class="dg">${m.directors.map(d=>{ const g=d.uid&&(m.dsigs||{})[d.uid];
       return `<div>${g&&g.sig?`<img src="${esc(g.sig)}" alt="">`:'<div class="sp"></div>'}<div class="ln"><b>${esc(d.name)}</b><br>${esc(d.title||'Director')}<br>Date: ${
         esc(g&&g.at?long(tsDate(g.at)):'____________')}</div><div class="stamp">${g?'Signed electronically':d.mode==='paper'?'Sign by hand on the printed copy':'Awaiting signature in the system'}</div></div>`; }).join('')}</div></div>`:''}
+    ${m.board&&m.acm?`<div class="dirs"><h4>ACKNOWLEDGED — RECEIVED FOR ACTION</h4>${m.acmAck&&m.acmAck.sig?`<img src="${esc(m.acmAck.sig)}" alt="">`:'<div class="sp"></div>'}
+      <div class="ln"><b>${esc(m.acm.name)}</b><br>Accountable Manager<br>Date: ${esc(m.acmAck&&m.acmAck.at?long(tsDate(m.acmAck.at)):'____________')}</div></div>`:''}
     ${m.endorsementImg?`<div class="endo"><img src="${esc(m.endorsementImg)}" alt=""><div class="stamp">หน้าจอนี้จัดหน้าโดยประมาณ — ใน PDF บล็อกนี้อยู่ตรงตำแหน่งที่ผู้สั่งการวางไว้</div></div>`:''}
     ${m.status==='proposed'?'<div class="stamp" style="color:#b45309;margin-top:14px">Awaiting endorsement</div>':''}
   </div>`;
@@ -698,13 +715,14 @@ async function viewMemo(id){
   M=Object.assign({id:s.id},s.data());
   if(M.mode==='paper') return viewPaper();
   $('h1').textContent = M.number || 'ร่างบันทึกข้อความ';
-  $('sub').textContent = A.L((MT[M.type]||{}).title||{}) + ' · ' + (STATUS[M.status]||M.status);
+  $('sub').textContent = A.L((MT[M.type]||{}).title||{}) + ' · ' + stLabel(M, M.status);
   const me=A.user.uid, S=M.signers||{}, isP=S.proposer&&S.proposer.uid===me, isE=S.endorser&&S.endorser.uid===me, isOwner=M.createdBy===me;
   const acts=[];
   if(M.status==='submitted' && isP) acts.push('propose');
   const dPend=dirPending(M), isD=(M.directorUids||[]).includes(me) && !(M.dsigs||{})[me];
   if(M.status==='proposed' && isD) acts.push('dsign');
-  if(M.status==='proposed' && isE) acts.push(dPend.length?'endoWait':'endorse');
+  if(M.status==='proposed' && isE && !M.board) acts.push('endorse');
+  if(M.status==='issued' && M.board && M.acm && M.acm.uid===me && !M.acmAck) acts.push('acmack');
   if(['issued','declined'].includes(M.status) && isE && !M.endorsementImg) acts.push('endoImg');
   if(['draft','returned'].includes(M.status) && (isOwner||A.isAdmin())) acts.push('edit');
   if(M.status==='submitted' && (isP||isOwner||A.isAdmin())) acts.push('amend');
@@ -767,17 +785,22 @@ function paintActions(acts){
       ตรวจเนื้อหาก่อนลงนาม แก้ไขเองได้ หรือตีกลับให้ผู้จัดทำแก้</span></div>`;
   else if(by && ['draft','submitted','returned'].includes(M.status)) h+=`<div class="hint" style="margin-bottom:10px">จัดทำโดย ${esc(by)}</div>`;
   if(acts.includes('propose')) h+=`<div class="card" style="margin-bottom:16px"><h3>ลงนามเสนอ</h3>
-      <p class="hint">ลงนามแล้วระบบออกเลขที่ถัดไป และล็อกวันที่ออกเป็นเวลานี้ทันที แก้ภายหลังไม่ได้ จากนั้นส่งต่อให้ ${esc(M.signers.endorser.name)} รับทราบ/สั่งการ</p>
+      <p class="hint">ลงนามแล้วระบบออกเลขที่ถัดไป และล็อกวันที่ออกเป็นเวลานี้ทันที แก้ภายหลังไม่ได้ จากนั้นส่งต่อให้ ${M.board?'กรรมการบริษัทลงนามอนุมัติ แล้ว '+esc((M.acm||{}).name||'ACM')+' รับทราบ':esc(M.signers.endorser.name)+' รับทราบ/สั่งการ'}</p>
       ${sigPicker('ps')}
       <div class="acts2"><button class="big pri" id="doPropose">ลงนามเสนอและออกเลข</button>
         ${acts.includes('amend')?`<a class="big sec" href="?edit=${esc(M.id)}">แก้ไขเนื้อหาก่อนลงนาม</a>`:''}
         <button class="big sec" id="doReturn">ตีกลับให้ผู้จัดทำ</button></div><div id="amsg"></div></div>`;
   if(acts.includes('dsign')) h+=`<div class="card" style="margin-bottom:16px"><h3>ลงนามในฐานะกรรมการ</h3>
-      <p class="hint">ลงนามอนุมัติร่วมกับ ${esc(M.signers.endorser.name)} (Accountable Manager) · วันที่ลงนามคือเวลานี้ แก้ภายหลังไม่ได้</p>
+      <p class="hint">ลงนามอนุมัติให้ ${esc((M.acm||{}).name||'Accountable Manager')} (Accountable Manager) ปฏิบัติ · วันที่ลงนามคือเวลานี้ แก้ภายหลังไม่ได้ ·
+        ลงนามครบทุกคนแล้วหนังสือออกทันที</p>
       ${sigPicker('ds')}<div class="acts2"><button class="big pri" id="doDsign">ลงนาม</button></div><div id="amsg"></div></div>`;
   const dPend=dirPending(M);
-  if(acts.includes('endoWait')) h+=`<div class="fk-gate warn" style="margin-bottom:16px"><span><b>รอกรรมการลงนามในระบบ ${(M.directorUids||[]).length-dPend.length}/${(M.directorUids||[]).length}</b> —
-      ยังไม่ได้ลงนาม: ${dPend.map(d=>esc(d.name)).join(' · ')} · สั่งการได้เมื่อกรรมการลงนามครบ</span></div>`;
+  if(M.board && M.status==='proposed') h+=`<div class="fk-gate warn" style="margin-bottom:16px"><span><b>รอกรรมการลงนามในระบบ ${(M.directorUids||[]).length-dPend.length}/${(M.directorUids||[]).length}</b>${
+      dPend.length?' — ยังไม่ได้ลงนาม: '+dPend.map(d=>esc(d.name)).join(' · '):''} · ลงนามครบแล้วหนังสือออก และส่งให้ ${esc((M.acm||{}).name||'ACM')} รับทราบ</span></div>`;
+  if(acts.includes('acmack')) h+=`<div class="card" style="margin-bottom:16px"><h3>ลงนามรับทราบคำสั่งของกรรมการบริษัท</h3>
+      <p class="hint">รับทราบว่าได้รับคำสั่งและจะปฏิบัติตาม — เป็นการรับทราบ ไม่ใช่การอนุมัติ · วันที่คือเวลานี้ แก้ภายหลังไม่ได้</p>
+      ${sigPicker('ak')}<div class="acts2"><button class="big pri" id="doAck2">ลงนามรับทราบ</button></div><div id="amsg"></div></div>`;
+  if(M.board && M.status==='issued' && !M.acmAck && !acts.includes('acmack')) h+=`<div class="hint" style="margin-bottom:12px">รอ ${esc((M.acm||{}).name||'ACM')} ลงนามรับทราบ</div>`;
   if(acts.includes('endorse')) h+=endorsePanelHtml();
   if(acts.includes('endoImg')) h+=`<div class="card" style="margin-bottom:16px"><h3>บล็อกสั่งการยังไม่ถูกสร้าง</h3>
       <p class="hint">การสั่งการบันทึกแล้ว แต่ภาพบล็อกที่วางบนกระดาษยังไม่ได้บันทึก กดเพื่อสร้างจากข้อมูลที่บันทึกไว้</p>
@@ -792,6 +815,7 @@ function paintActions(acts){
   if($('doEndoImg')) $('doEndoImg').addEventListener('click',finishEndorsement);
   if(acts.includes('endorse')) bindEndorse();
   if(acts.includes('dsign')){ const DSP=bindSigPicker('ds'); $('doDsign').addEventListener('click',()=>dsign(DSP)); }
+  if(acts.includes('acmack')){ const AKP=bindSigPicker('ak'); $('doAck2').addEventListener('click',()=>acmAck(AKP)); }
 }
 /* ── การรับทราบ ── acks/<uid> เขียนได้เฉพาะเจ้าตัว ครั้งเดียว เวลาเซิร์ฟเวอร์ */
 async function paintAcks(){
@@ -886,7 +910,7 @@ async function circulate(){
 async function paintHistory(){
   try{
     const ev=(await MREF.collection('events').get()).docs.map(d=>d.data()).sort((a,b)=>((a.at&&a.at.seconds)||0)-((b.at&&b.at.seconds)||0));
-    const N={aerofbo:'ส่งเข้า AeroFBO Bulletin',ack:'รับทราบ',draft:'บันทึกร่าง',submit:'ส่งให้ผู้เสนอ',resubmit:'แก้และส่งอีกครั้ง',amend:'แก้ไขก่อนลงนาม',dsign:'กรรมการลงนาม',return:'ตีกลับ',propose:'ผู้เสนอลงนาม · ออกเลข',
+    const N={aerofbo:'ส่งเข้า AeroFBO Bulletin',ack:'รับทราบ',draft:'บันทึกร่าง',submit:'ส่งให้ผู้เสนอ',resubmit:'แก้และส่งอีกครั้ง',amend:'แก้ไขก่อนลงนาม',dsign:'กรรมการลงนาม',board:'กรรมการลงนามครบ · ออกหนังสือ',acmack:'ACM ลงนามรับทราบ',return:'ตีกลับ',propose:'ผู้เสนอลงนาม · ออกเลข',
              endorse:'ผู้สั่งการลงนาม',cancel:'ยกเลิก',pdf:'สร้าง PDF',supersede:'ถูกแทน',record:'ลงทะเบียนฉบับกระดาษ'};
     $('hist').innerHTML=`<h3>ประวัติ</h3><div class="twrap"><table class="ml"><tbody>${ev.map(e=>`<tr><td class="mono">${esc(tsFull(e.at))}</td><td>${esc(N[e.action]||e.action)}</td><td>${esc(e.byName||'')}</td><td>${esc(e.note||'')}</td></tr>`).join('')}</tbody></table></div>`;
   }catch(e){}
@@ -929,7 +953,7 @@ async function propose(SP){
   }catch(e){ $('doPropose').disabled=false; say('ออกเลขไม่สำเร็จ: '+(e.code||e.message),true); return; }
   try{ await MREF.collection('events').add({action:'propose', byUid:A.user.uid, byName:me, note:number, at:now()}); }catch(e){}
   await closeTasks(M.id, {tracking:number});
-  try{ await taskFor(M.id, Object.assign({}, M, {number}), 'endorser'); }catch(e){}
+  if(!M.board){ try{ await taskFor(M.id, Object.assign({}, M, {number}), 'endorser'); }catch(e){} }
   for(const d of (M.directors||[]).filter(x=>x.mode==='system'&&x.uid)){
     try{ await A.db.collection('tasks').add({ app:'memo', kind:'dsign', memoId:M.id, subId:'', formCode:'MEMO-'+M.type,
       title:'ลงนามในฐานะกรรมการ: '+M.subject, tracking:number, assigneeUid:d.uid, assigneeName:d.name, state:'open', step:2,
@@ -937,6 +961,7 @@ async function propose(SP){
   }
   await viewMemo(M.id);
   await makePdf(false);   // ฉบับรอสั่งการ — ผู้สั่งการใช้เป็นพื้นหลังตอนวางบล็อก
+  if(M.board && !dirPending(M).length) await completeBoard();
 }
 
 /* ── กรรมการลงนามร่วม ── ช่องของตัวเองครั้งเดียว เวลาเซิร์ฟเวอร์ · ปิดเฉพาะงานของตัวเอง */
@@ -954,7 +979,48 @@ async function dsign(DSP){
   try{ await MREF.collection('events').add({action:'dsign', byUid:A.user.uid, byName:me, at:now()}); }catch(e){}
   try{ const ts=await A.db.collection('tasks').where('memoId','==',M.id).get();
        for(const t of ts.docs){ const v=t.data(); if(v.state==='open' && v.kind==='dsign' && v.assigneeUid===A.user.uid) await t.ref.update({state:'done', closedAt:now()}); } }catch(e){}
+  const s2=await MREF.get(); M=Object.assign({id:s2.id},s2.data());
+  if(M.board && !dirPending(M).length) return completeBoard();
   await viewMemo(M.id);
+}
+/* กรรมการลงนามครบ = หนังสือออก (status issued · boardAt เวลาเซิร์ฟเวอร์) แล้วส่งให้ ACM รับทราบ
+   firestore.rules ยอมเฉพาะเมื่อกรรมการที่ลงนามในระบบลงครบแล้ว */
+async function completeBoard(){
+  const s=await MREF.get(); M=Object.assign({id:s.id},s.data());
+  if(M.status!=='proposed' || !M.board || dirPending(M).length) return viewMemo(M.id);
+  const me=A.myName()||A.user.email;
+  say('กรรมการลงนามครบ — กำลังออกหนังสือ…');
+  try{ await MREF.update({ status:'issued', boardAt:now(), chain:arrU({action:'board', byUid:A.user.uid, byName:me, at:bkkToday()}) }); }
+  catch(e){ say('ออกหนังสือไม่สำเร็จ: '+(e.code||e.message),true); return; }
+  try{ await MREF.collection('events').add({action:'board', byUid:A.user.uid, byName:me, at:now()}); }catch(e){}
+  await closeTasks(M.id);
+  if(M.acm && M.acm.uid){ try{ await A.db.collection('tasks').add({ app:'memo', kind:'acmack', memoId:M.id, subId:'', formCode:'MEMO-'+M.type,
+      title:'รับทราบคำสั่งกรรมการ: '+M.subject, tracking:M.number, assigneeUid:M.acm.uid, assigneeName:M.acm.name, state:'open', step:3,
+      fromUid:A.user.uid, fromName:me, createdAt:now() }); }catch(e){} }
+  const s2=await MREF.get(); M=Object.assign({id:s2.id},s2.data());
+  await circulate();
+  if(M.supersedes&&M.supersedes.id){
+    try{ await A.db.collection('memos').doc(M.supersedes.id).update({status:'superseded', supersededBy:M.number});
+         await A.db.collection('memos').doc(M.supersedes.id).collection('events').add({action:'supersede', byUid:A.user.uid, byName:me, note:M.number, at:now()}); }catch(e){}
+  }
+  await viewMemo(M.id);
+  await makePdf(false);
+}
+async function acmAck(AKP){
+  const sig=AKP.get(); if(!sig){ say('ยังไม่ได้ลงลายมือชื่อ',true); return; }
+  if(!confirm('ลงนามรับทราบตอนนี้? บันทึกแล้วแก้ไม่ได้')) return;
+  $('doAck2').disabled=true; say('กำลังบันทึก…');
+  try{ await AKP.keep(sig); }catch(e){}
+  const me=A.myName()||A.user.email;
+  try{ await MREF.update({ acmAck:{ uid:A.user.uid, name:(M.acm||{}).name||me, title:'Accountable Manager', sig, at:now() },
+      chain:arrU({action:'acmack', byUid:A.user.uid, byName:me, at:bkkToday()}) }); }
+  catch(e){ $('doAck2').disabled=false; say('บันทึกไม่สำเร็จ: '+(e.code||e.message),true); return; }
+  try{ await MREF.collection('events').add({action:'acmack', byUid:A.user.uid, byName:me, at:now()}); }catch(e){}
+  try{ const ts=await A.db.collection('tasks').where('memoId','==',M.id).get();
+       for(const t of ts.docs){ const v=t.data(); if(v.state==='open' && v.kind==='acmack' && v.assigneeUid===A.user.uid) await t.ref.update({state:'done', closedAt:now()}); } }catch(e){}
+  const s2=await MREF.get(); M=Object.assign({id:s2.id},s2.data());
+  await viewMemo(M.id);
+  await makePdf(false);   // ฉบับสมบูรณ์ใหม่ที่มีลายเซ็นรับทราบของ ACM
 }
 
 /* ════════════════ ผู้รับทราบ / สั่งการ ════════════════
