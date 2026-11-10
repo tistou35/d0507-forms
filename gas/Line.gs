@@ -30,7 +30,9 @@
  * ที่เก็บ
  *   lineConfig/settings   ค่าตั้ง + LINE user ID รายคน (ผู้ดูแลอ่าน/เขียนเท่านั้น)
  *   lineLog/<id>          บันทึกทุกข้อความ ส่งแล้วหรือไม่ได้ส่ง (ผู้ดูแลอ่านได้ ไม่มีใครแก้)
- *   Script Properties     LINE_CHANNEL_ACCESS_TOKEN · LINE_WM_<สาย> · LINE_SENT · LINE_DONE · LINE_LAST
+ *   Script Properties     LINE_CHANNEL_ACCESS_TOKEN · LINE_WATERMARK (เปิดระบบแล้ว) · LINE_LAST · LINE_DAILY_*
+ *                         LINE_ST_<สาย>#n/#0.. สถานะของแต่ละสาย · LINE_DONE#n/#0.. เรื่องรายวันที่ส่งแล้ว
+ *                         (แบ่งเป็นท่อนละไม่เกิน 8,000 ตัวอักษร — Script Property หนึ่งค่ารับได้ 9 KB)
  */
 
 /* ที่ส่ง push — ตั้งทับได้ด้วย Script Property LINE_MESSAGING_API_PUSH_URL เหมือน Dispatch (LINE เคยย้าย endpoint) */
@@ -38,7 +40,12 @@ function linePushUrl_() {
   return PropertiesService.getScriptProperties().getProperty('LINE_MESSAGING_API_PUSH_URL')
     || 'https://api.line.me/v2/bot/message/push';
 }
-var LINE_OVERLAP_MS = 3 * 60 * 1000;   // อ่านย้อนเผื่อเวลา commit คลาด แล้วกันซ้ำด้วย LINE_SENT
+var LINE_OVERLAP_MS = 3 * 60 * 1000;   // อ่านย้อนเผื่อเอกสารที่ commit ช้า กันซ้ำด้วยรายการ ids ของสาย
+var LINE_PAGE = 100;                    // เอกสารต่อหน้าของ runQuery
+var LINE_MAX_PAGES = 10;                // ต่อสายต่อรอบ — เกินนี้ค้าง cursor ไว้ทำต่อรอบหน้า ไม่ตกหล่น
+var LINE_IDS_CAP = 300;                 // ids ในช่วงย้อนที่จำไว้กันซ้ำ เกินนี้ตัดเก่าทิ้งแล้วยกพื้น (lo) ขึ้น
+var LINE_LATE_PAGES = Math.ceil(LINE_IDS_CAP / LINE_PAGE) + 1;
+var LINE_CHUNK = 8000;                  // ตัวอักษรต่อท่อน (ASCII) · ขีดจำกัด 9 KB ต่อค่า
 var LINE_ID_RE = /^U[0-9a-f]{32}$/i;
 
 var LINE_DEFAULTS = {
@@ -94,27 +101,70 @@ function lineList_(path) {   // เอกสารทั้งหมดในค
   } while (tok);
   return out;
 }
-/* runQuery แบบง่าย — where เป็นรายการ [field, op, value] ต่อกันด้วย AND */
-function lineQuery_(coll, where, order, limit) {
-  var enc = function (v) {
-    if (Array.isArray(v)) return { arrayValue: { values: v.map(enc) } };
-    if (v && v.ts) return { timestampValue: v.ts };
-    return typeof v === 'boolean' ? { booleanValue: v } : { stringValue: String(v) };
-  };
-  var f = (where || []).map(function (w) { return { fieldFilter: { field: { fieldPath: w[0] }, op: w[1], value: enc(w[2]) } }; });
-  var q = { from: [{ collectionId: coll }] };
+/* runQuery — where เป็นรายการ [field, op, value] ต่อกันด้วย AND
+   เรียง field แล้วตามด้วย __name__ เสมอ เวลาเท่ากันจึงมีลำดับตายตัว ใช้เป็น cursor ได้
+   field = null → เรียงตาม __name__ อย่างเดียว (ไม่ต้องมี composite index เมื่อมีตัวกรองช่องอื่น)
+   after = [ค่า field, ชื่อเอกสารเต็ม] หรือ [ชื่อเอกสารเต็ม] เมื่อ field = null — เริ่มหลังเอกสารนั้น */
+function lineEncV_(v) {
+  if (Array.isArray(v)) return { arrayValue: { values: v.map(lineEncV_) } };
+  if (v && v.ts) return { timestampValue: v.ts };
+  return typeof v === 'boolean' ? { booleanValue: v } : { stringValue: String(v) };
+}
+function lineQueryPage_(coll, where, field, after, limit) {
+  var f = (where || []).map(function (w) { return { fieldFilter: { field: { fieldPath: w[0] }, op: w[1], value: lineEncV_(w[2]) } }; });
+  var q = { from: [{ collectionId: coll }], limit: limit || LINE_PAGE };
   if (f.length === 1) q.where = f[0];
   if (f.length > 1) q.where = { compositeFilter: { op: 'AND', filters: f } };
-  if (order) q.orderBy = [{ field: { fieldPath: order }, direction: 'ASCENDING' }];
-  if (limit) q.limit = limit;
+  q.orderBy = (field ? [{ field: { fieldPath: field }, direction: 'ASCENDING' }] : [])
+    .concat([{ field: { fieldPath: '__name__' }, direction: 'ASCENDING' }]);
+  if (after) q.startAt = { before: false, values: field
+    ? [{ timestampValue: after[0] }, { referenceValue: after[1] }] : [{ referenceValue: after[0] }] };
   var res = UrlFetchApp.fetch('https://firestore.googleapis.com/v1/' + lineDb_() + ':runQuery', {
     method: 'post', contentType: 'application/json', muteHttpExceptions: true, headers: adminHeaders_(),
     payload: JSON.stringify({ structuredQuery: q }) });
   if (res.getResponseCode() !== 200) throw new Error('อ่าน ' + coll + ' ไม่ได้ (' + res.getResponseCode() + '): ' + res.getContentText().slice(0, 200));
   return JSON.parse(res.getContentText()).filter(function (r) { return r.document; }).map(function (r) {
-    var o = fsFields_(r.document.fields || {}); o.id = r.document.name.split('/').pop(); return o;
+    var o = fsFields_(r.document.fields || {}); o.id = r.document.name.split('/').pop(); o._name = r.document.name; return o;
   });
 }
+/* อ่านทีละหน้าจนหมดหรือครบ maxPages · more = ยังมีเหลือ */
+function lineQueryAll_(coll, where, field, after, maxPages) {
+  var out = [], cur = after || null, pages = 0;
+  while (true) {
+    var rows = lineQueryPage_(coll, where, field, cur, LINE_PAGE);
+    out = out.concat(rows); pages++;
+    if (rows.length < LINE_PAGE) return { rows: out, more: false };
+    if (maxPages && pages >= maxPages) return { rows: out, more: true };
+    var last = rows[rows.length - 1];
+    cur = field ? [last[field], last._name] : [last._name];
+  }
+}
+function lineQuery_(coll, where) { return lineQueryAll_(coll, where, null, null, 0).rows; }
+
+/* ค่าเวลาจาก Firestore เป็นมิลลิวินาที (ใช้ตัดช่วงย้อน ไม่ได้ใช้เป็น cursor — cursor ใช้สตริงเดิมทุกตัวอักษร) */
+function lineMs_(ts) { var t = new Date(ts).getTime(); return isNaN(t) ? 0 : t; }
+
+/* Script Property ที่ยาวเกิน 9 KB — แบ่งเป็นท่อน เขียนพร้อมกันด้วย setProperties */
+function linePropGet_(P, key) {
+  var n = Number(P.getProperty(key + '#n') || 0);
+  var raw = '';
+  if (n) { for (var i = 0; i < n; i++) raw += P.getProperty(key + '#' + i) || ''; }
+  else raw = P.getProperty(key) || '';
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch (e) { return null; }
+}
+function linePropSet_(P, key, obj) {
+  var s = JSON.stringify(obj), parts = [];
+  for (var i = 0; i < s.length; i += LINE_CHUNK) parts.push(s.slice(i, i + LINE_CHUNK));
+  if (!parts.length) parts.push('');
+  var old = Number(P.getProperty(key + '#n') || 0), m = {};
+  parts.forEach(function (p, i) { m[key + '#' + i] = p; });
+  m[key + '#n'] = String(parts.length);
+  P.setProperties(m);
+  for (var j = parts.length; j < old; j++) P.deleteProperty(key + '#' + j);
+  if (P.getProperty(key) !== null) P.deleteProperty(key);
+}
+
 function lineEnc_(v) {
   if (v === null || v === undefined) return { nullValue: null };
   if (typeof v === 'boolean') return { booleanValue: v };
@@ -234,23 +284,51 @@ function lineSend_(ctx, ev, who, fields, ref, skipUid) {
 }
 
 /* ── สายเหตุการณ์ ─────────────────────────────────────────────
-   แต่ละสายมีจุดที่ตรวจแล้ว (LINE_WM_<k>) ของตัวเอง ไม่มี = เพิ่งเปิดสายนี้ เริ่มนับจาก "ตอนนี้"
-   ไม่ไล่ของเก่า · กันซ้ำด้วย LINE_SENT (k:id) */
-function lineStream_(P, seen, k, coll, field, fn, extraWhere) {
-  var key = 'LINE_WM_' + k, wm = P.getProperty(key);
-  if (!wm) { P.setProperty(key, new Date().toISOString()); return; }
-  var since = new Date(new Date(wm).getTime() - LINE_OVERLAP_MS).toISOString();
-  var rows = lineQuery_(coll, [[field, 'GREATER_THAN', { ts: since }]].concat(extraWhere || []), field, 100);
-  rows.forEach(function (r) {
-    var id = k + ':' + r.id;
-    if (seen.indexOf(id) >= 0) return;
-    seen.push(id);
-    try { fn(r); } catch (e) { Logger.log('line ' + id + ': ' + e); }
-  });
-  if (rows.length) {
-    var last = rows[rows.length - 1][field];
-    if (last && new Date(last).getTime() > new Date(wm).getTime()) P.setProperty(key, last);
+   สถานะของแต่ละสาย (LINE_ST_<k>) = { ts, name, ids, lo }
+     ts · name   cursor — เอกสารล่าสุดที่ทำแล้ว ตามลำดับ (field, __name__) · เวลาเท่ากันก็ไม่ตกหล่น
+     ids         [[id, ms]] ของเอกสารที่ทำแล้วในช่วงย้อน LINE_OVERLAP_MS กันทำซ้ำ
+     lo          พื้นของช่วงย้อน (ms) — ยกขึ้นเมื่อ ids เกิน LINE_IDS_CAP ของที่ต่ำกว่านั้นถือว่าทำแล้ว
+   ① ช่วงย้อน [max(ts − ย้อน, lo), ts] — เอกสารที่ commit ช้ากว่าที่อ่านไปแล้ว ทำเฉพาะที่ไม่อยู่ใน ids
+   ② ไปข้างหน้า หลัง cursor ทีละหน้า สูงสุด LINE_MAX_PAGES หน้า เกินนี้ cursor ค้างไว้ รอบหน้าทำต่อ
+   ไม่มีสถานะ = เพิ่งเปิดสายนี้ เริ่มนับจาก "ตอนนี้" ไม่ไล่ของเก่า */
+function lineStateGet_(P, k) {
+  var st = linePropGet_(P, 'LINE_ST_' + k);
+  if (st) return st;
+  // ย้ายจากรูปแบบเดิม (LINE_WM_<k> + LINE_SENT) — ids เดิมไม่มีเวลา ใช้เวลาของจุดที่ตรวจแล้วแทน
+  var wm = P.getProperty('LINE_WM_' + k) || (k === 'task' ? P.getProperty('LINE_WATERMARK') : '');
+  if (!wm) return null;
+  var old = []; try { old = JSON.parse(P.getProperty('LINE_SENT') || '[]'); } catch (e) {}
+  var ms = lineMs_(wm);
+  return { ts: wm, name: '', lo: 0, ids: old.map(function (x) { return x.indexOf(':') < 0 ? 'task:' + x : x; })
+    .filter(function (x) { return x.indexOf(k + ':') === 0; }).map(function (x) { return [x.slice(k.length + 1), ms]; }) };
+}
+function lineStream_(P, k, coll, field, fn) {
+  var st = lineStateGet_(P, k);
+  if (!st) { linePropSet_(P, 'LINE_ST_' + k, { ts: new Date().toISOString(), name: '', ids: [], lo: 0 }); return { init: true, n: 0 }; }
+  var seen = {}, n = 0;
+  st.ids.forEach(function (x) { seen[x[0]] = 1; });
+  var take = function (r) {
+    if (seen[r.id]) return;
+    seen[r.id] = 1; st.ids.push([r.id, lineMs_(r[field])]); n++;
+    try { fn(r); } catch (e) { Logger.log('line ' + k + ':' + r.id + ': ' + e); }
+  };
+  // ① ช่วงย้อน
+  var low = Math.max(lineMs_(st.ts) - LINE_OVERLAP_MS, st.lo || 0);
+  lineQueryAll_(coll, [[field, 'GREATER_THAN_OR_EQUAL', { ts: new Date(low).toISOString() }],
+                       [field, 'LESS_THAN_OR_EQUAL', { ts: st.ts }]], field, null, LINE_LATE_PAGES).rows.forEach(take);
+  // ② ไปข้างหน้า
+  var fw = lineQueryAll_(coll, [[field, 'GREATER_THAN_OR_EQUAL', { ts: st.ts }]], field,
+                         st.name ? [st.ts, st.name] : null, LINE_MAX_PAGES);
+  fw.rows.forEach(function (r) { take(r); if (r[field]) { st.ts = r[field]; st.name = r._name; } });
+  // ③ ids เก็บเฉพาะในช่วงย้อน ไม่เกิน cap — ตัดของเก่าแล้วยกพื้นขึ้นเหนือของที่ตัด
+  var cut = lineMs_(st.ts) - LINE_OVERLAP_MS;
+  st.ids = st.ids.filter(function (x) { return x[1] >= cut; }).sort(function (a, b) { return a[1] - b[1]; });
+  if (st.ids.length > LINE_IDS_CAP) {
+    var drop = st.ids.splice(0, st.ids.length - LINE_IDS_CAP);
+    st.lo = Math.max(st.lo || 0, drop[drop.length - 1][1] + 1);
   }
+  linePropSet_(P, 'LINE_ST_' + k, st);
+  return { n: n, more: fw.more };
 }
 
 function lineOnTask_(ctx, t) {
@@ -330,18 +408,21 @@ function lineTick() {
   var sum = { at: new Date().toISOString() };
   try {
     if (!P.getProperty('LINE_WATERMARK')) return { skipped: 'ยังไม่ได้เปิดระบบ' };
-    // สายงาน (tasks) ใช้ LINE_WATERMARK เดิม สายอื่นใช้ LINE_WM_<k>
-    if (!P.getProperty('LINE_WM_task')) P.setProperty('LINE_WM_task', P.getProperty('LINE_WATERMARK'));
-    var seen = JSON.parse(P.getProperty('LINE_SENT') || '[]').map(function (x) { return x.indexOf(':') < 0 ? 'task:' + x : x; });
-    var get = function () { return ctx || (ctx = lineCtx_()); };
-    lineStream_(P, seen, 'task',  'tasks',       'createdAt',   function (t) { lineOnTask_(get(), t); });
-    lineStream_(P, seen, 'sub',   'submissions', 'submittedAt', function (s) { lineOnSubmitted_(get(), s); });
-    lineStream_(P, seen, 'close', 'submissions', 'closedAt',    function (s) { lineOnClosed_(get(), s); });
-    lineStream_(P, seen, 'user',  'users',       'createdAt',   function (u) { lineOnUser_(get(), u); });
-    lineStream_(P, seen, 'memo',  'memos',       'endorsedAt',  function (m) { lineOnMemo_(get(), m); });
-    P.setProperty('LINE_WATERMARK', P.getProperty('LINE_WM_task'));
-    P.setProperty('LINE_SENT', JSON.stringify(seen.slice(-600)));
+    var get = function () { return ctx || (ctx = lineCtx_()); }, more = false;
+    [['task',  'tasks',       'createdAt',   function (t) { lineOnTask_(get(), t); }],
+     ['sub',   'submissions', 'submittedAt', function (s) { lineOnSubmitted_(get(), s); }],
+     ['close', 'submissions', 'closedAt',    function (s) { lineOnClosed_(get(), s); }],
+     ['user',  'users',       'createdAt',   function (u) { lineOnUser_(get(), u); }],
+     ['memo',  'memos',       'endorsedAt',  function (m) { lineOnMemo_(get(), m); }]].forEach(function (x) {
+      if (lineStream_(P, x[0], x[1], x[2], x[3]).more) more = true;
+    });
+    // ย้ายรูปแบบเดิมเสร็จแล้ว ลบของเก่าที่อาจยาวเกิน 9 KB ทิ้ง
+    ['LINE_SENT', 'LINE_WM_task', 'LINE_WM_sub', 'LINE_WM_close', 'LINE_WM_user', 'LINE_WM_memo'].forEach(function (k) {
+      if (P.getProperty(k) !== null) P.deleteProperty(k); });
+    var tst = linePropGet_(P, 'LINE_ST_task');
+    if (tst && tst.ts) P.setProperty('LINE_WATERMARK', tst.ts);
     if (ctx) Object.assign(sum, ctx.sum); else Object.assign(sum, { events: 0, sent: 0, dry: 0 });
+    if (more) sum.more = true;
     P.setProperty('LINE_LAST', JSON.stringify(sum));
     return sum;
   } catch (e) {
@@ -364,12 +445,14 @@ function lineDaily(force) {
   try {
     if (!force && P.getProperty('LINE_DAILY_DAY') === today) return { skipped: 'วันนี้ส่งไปแล้ว' };
     var ctx = lineCtx_(), S = ctx.S, base = linePortal_();
-    var done = JSON.parse(P.getProperty('LINE_DONE') || '[]');
+    var done = linePropGet_(P, 'LINE_DONE');
+    if (!Array.isArray(done)) { try { done = JSON.parse(P.getProperty('LINE_DONE') || '[]'); } catch (e) { done = []; } }
+    var live = {};   // หนังสือที่ยังต้องจำว่าส่งแล้ว — ใช้ตัด LINE_DONE ไม่ให้โตไม่สิ้นสุด
     var ms = function (v) { return v ? new Date(v).getTime() : 0; };
     var age = function (v) { return Math.max(0, Math.floor((Date.now() - ms(v)) / 864e5)); };
 
     // ① งานค้างเกิน N วัน — รวมเป็นข้อความเดียวต่อคน
-    var open = lineQuery_('tasks', [['state', 'IN', ['open', 'pool']]], null, 1000).filter(function (t) { return t.kind !== 'ack' && !t.test; });
+    var open = lineQuery_('tasks', [['state', 'IN', ['open', 'pool']]]).filter(function (t) { return t.kind !== 'ack' && !t.test; });
     var mine = {};
     open.forEach(function (t) {
       if (t.state !== 'open' || !t.assigneeUid || age(t.createdAt) < S.overdueDays) return;
@@ -397,8 +480,9 @@ function lineDaily(force) {
     }
 
     // ③ หนังสือแต่งตั้ง/มอบหมายใกล้หมดอายุ — 30 และ 7 วันก่อน ครั้งเดียวต่อเกณฑ์
-    lineQuery_('memos', [['status', 'EQUAL', 'issued']], null, 1000).forEach(function (m) {
+    lineQuery_('memos', [['status', 'EQUAL', 'issued']]).forEach(function (m) {
       if (m.test) return;
+      live[m.id] = 1;
       var left = m.expiresOn ? lineDaysTo_(m.expiresOn) : -1;
       if (m.expiresOn) [30, 7].forEach(function (th) {
         var key = 'x:' + m.id + ':' + th;
@@ -428,7 +512,8 @@ function lineDaily(force) {
       }
     });
 
-    P.setProperty('LINE_DONE', JSON.stringify(done.slice(-800)));
+    // จำเฉพาะของหนังสือที่ยัง issued อยู่ — หมดอายุ/ถูกแทนแล้วไม่ต้องจำ · แบ่งท่อนเมื่อยาวเกิน 8,000 ตัวอักษร
+    linePropSet_(P, 'LINE_DONE', done.filter(function (x) { return live[String(x).split(':')[1]]; }));
     if (!force) P.setProperty('LINE_DAILY_DAY', today);
     Object.assign(sum, ctx.sum);
     P.setProperty('LINE_DAILY_LAST', JSON.stringify(sum));
