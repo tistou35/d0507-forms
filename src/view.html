@@ -127,9 +127,12 @@ async function load(){
         <div><span>${esc(A.t('trackingNo'))}</span><b>${esc(S.tracking||'—')}</b></div>
         <div><span>${esc(A.t('docCode'))}</span><b>${esc(F.doc||S.doc||'—')}</b></div>
         <div><span>${esc(A.t('issueRev'))}</span><b>${esc((S.issue||F.iss||'')+' / '+(S.rev||F.rev||''))}</b></div>
-        <div><span>${esc(A.t('submittedBy'))}</span><b>${esc(S.submitterName||'—')}</b></div>
+        <div><span>${esc(A.t('submittedBy'))}</span><b>${esc(S.submitterName||'—')}${
+          S.guest?' · '+esc(L({th:'ไม่ได้เข้าสู่ระบบ',en:'not signed in'})):''}</b></div>
         <div><span>${esc(L({th:'วันที่ส่ง',en:'Submitted'}))}</span><b>${esc(dt(S.submittedAt)||'—')}</b></div>
       </div></div>
+    ${S.selfReported?`<div class="fk-gate warn" style="margin:12px 0 0"><span>${esc(L({th:'ใบนี้กรอกเองโดยไม่ผ่าน QR ของคาบเรียน — ข้อมูลคาบมาจากผู้เข้าเรียน และไม่มีครูผู้สอนรับรองรายชื่อ',
+      en:'Self-reported without a session QR — session details come from the attendee and are not certified by the instructor.'}))}</span></div>`:''}
     <div class="vbar noprint">
       <span class="st ${st.cls}">${esc(L(st.label))}</span>
       <span class="sp"></span>

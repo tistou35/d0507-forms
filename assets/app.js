@@ -752,7 +752,7 @@
     if (A.isStaff()) return true;                       // เจ้าหน้าที่ปิดใบของตัวเองได้อยู่แล้ว
     if (o.anon) return true;                            // PWR ผู้โดยสาร · VSR ผู้รายงาน
     if (abbr === 'DRC' && o.distId) return true;        // ใบรับเอกสารจากประกาศที่มีอยู่จริง
-    if (abbr === 'ARF' && o.sessionId) return true;     // ลงชื่อเข้าเรียนจาก QR ของคาบที่เปิดอยู่
+    if (abbr === 'ARF') return true;                    // ลงชื่อเข้าเรียน — จาก QR ของคาบ (newAttendOk) หรือกรอกเองทั้งใบ (newAttendSelfOk)
     if (A.SOLO_FORMS.indexOf(abbr) >= 0) return true;
     if (abbr === 'FRAE' && data.role === 'PIC') return true;
     return false;

@@ -47,6 +47,7 @@ table.ml tr.x td{color:var(--g-500);text-decoration:line-through}
 #full .qr2 img,#full .qr2 canvas{width:min(70vh,80vw);height:min(70vh,80vw)}
 #full h2{font-size:24px;font-family:var(--font-display)} #full p{color:var(--g-600)}
 #full .n{font-size:42px;font-weight:700}
+.gtag{display:inline-block;font-size:10.5px;font-weight:600;color:#9a6700;background:#fff4d6;border:1px solid #f0d28a;border-radius:99px;padding:0 7px;margin-left:5px;vertical-align:1px}
 </style>
 </head><body>
 @@TOPBAR@@
@@ -268,7 +269,7 @@ function roster(editable){
   $('roster').innerHTML = ROWS.length ? `<div class="twrap"><table class="ml"><thead><tr>${editable ? '<th>อยู่จริง</th>' : ''}
     <th>#</th><th>ชื่อ</th><th>เป็น</th><th>เวลา</th><th>ลายเซ็น</th></tr></thead><tbody>${ROWS.map((r, i) => { const d = r.data || {};
       return `<tr${ex.has(r.submitterUid) ? ' class="x"' : ''}>${editable ? `<td><input type="checkbox" data-u="${esc(r.submitterUid)}" checked></td>` : ''}
-      <td>${i + 1}</td><td>${esc(d.attName || r.submitterName)}</td><td>${esc(TYPE[d.attType] || d.attType || '')}</td>
+      <td>${i + 1}</td><td>${esc(d.attName || r.submitterName)}${r.guest ? ' <span class="gtag" title="ไม่ได้เข้าสู่ระบบ — ชื่อพิมพ์เอง ตรวจว่าอยู่ในห้องจริง">ไม่ได้เข้าสู่ระบบ</span>' : ''}</td><td>${esc(TYPE[d.attType] || d.attType || '')}</td>
       <td class="mono">${esc(hm(ms(r.submittedAt)))}</td><td class="sig">${/^data:image\//.test(d.attSign || '') ? `<img src="${esc(d.attSign)}" alt="">` : ''}</td></tr>`; }).join('')}
     </tbody></table></div>` : '<div class="empty">ยังไม่มีใครลงชื่อ</div>';
 }

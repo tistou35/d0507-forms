@@ -247,10 +247,30 @@ service cloud.firestore {
           && d.submittedAt == request.time
           && d.sessionId is string && d.sessionId.size() > 0
           && subId == d.sessionId + '_' + request.auth.uid
+          && !d.get('selfReported', false)
           && exists(/databases/$(database)/documents/attSessions/$(d.sessionId))
           && get(/databases/$(database)/documents/attSessions/$(d.sessionId)).data.status == 'open'
           && d.tracking is string && d.tracking.size() <= 60
+          && guestOk(d)
           && d.keys().size() <= 22;
+    }
+    /* ARF ที่ไม่ได้มาจาก QR ของคาบ — ผู้เข้าเรียนกรอกเองทั้งใบ ติดป้าย selfReported
+       ไม่มีครูรับรอง จึงห้ามมี sessionId (ไม่งั้นจะปลอมเป็นใบของคาบที่ปิดไปแล้วได้) */
+    function newAttendSelfOk() {
+      let d = request.resource.data;
+      return d.formCode == 'ARF'
+          && d.status == 'complete'
+          && d.submitterUid == request.auth.uid
+          && d.submittedAt == request.time
+          && !('sessionId' in d)
+          && d.get('selfReported', false) == true
+          && d.tracking is string && d.tracking.size() <= 60
+          && guestOk(d)
+          && d.keys().size() <= 22;
+    }
+    /* ป้าย guest ต้องตรงกับวิธีล็อกอินจริง — บัญชีจริงอ้างว่าเป็น guest ไม่ได้ และกลับกัน */
+    function guestOk(d) {
+      return d.get('guest', false) == (request.auth.token.firebase.sign_in_provider == 'anonymous');
     }
 
     /* ── ใบที่จบตั้งแต่ขั้นตอนแรก ─────────────────────────────
@@ -291,7 +311,7 @@ service cloud.firestore {
          เงื่อนไขที่กันของเสียคือ newSubmissionOk() ไม่ใช่วิธีล็อกอิน */
       // ARF ทุกคนรวมเจ้าหน้าที่ที่มาเข้าอบรมต้องผ่าน newAttendOk — ไม่งั้นเจ้าหน้าที่ลงชื่อคาบที่ปิดแล้วได้
       allow create: if (staff() && request.resource.data.formCode != 'ARF')
-                    || (signedIn() && (newSubmissionOk() || newReceiptOk() || newSoloOk() || newAttendOk(subId)));
+                    || (signedIn() && (newSubmissionOk() || newReceiptOk() || newSoloOk() || newAttendOk(subId) || newAttendSelfOk()));
       allow read:   if staff() || (signedIn() && resource.data.submitterUid == request.auth.uid);
       allow update: if staff();
       allow delete: if false;

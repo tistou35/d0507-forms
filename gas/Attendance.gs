@@ -65,6 +65,7 @@ function attHtml_(ses, rows) {
     var d = r.data || {}, x = out[r.submitterUid];
     if (!x) kept++;
     return '<tr' + (x ? ' class="x"' : '') + '><td class="c">' + (i + 1) + '</td><td>' + esc(d.attName || r.submitterName) +
+      (r.guest ? '<div class="gn">ลงชื่อโดยไม่เข้าสู่ระบบ · Signed without an account</div>' : '') +
       (x ? '<div class="xn">ครูไม่รับรอง · Not certified by instructor</div>' : '') + '</td>' +
       '<td class="c">' + esc(TYPE[d.attType] || d.attType || '') + '</td><td class="c">' + esc(hm(r.submittedAt)) +
       '</td><td class="s">' + img(d.attSign) + '</td></tr>';
@@ -83,6 +84,7 @@ function attHtml_(ses, rows) {
     'td.l,th{background:#f5f5f5;color:#777;font-size:7.5pt;font-weight:bold;text-align:left}' +
     'td.c{text-align:center}td.s{height:30px;text-align:center}td.s img{max-height:28px;max-width:100%}' +
     'tr.x td{color:#999;text-decoration:line-through}.xn{text-decoration:none;color:#b42318;font-size:7pt}' +
+    '.gn{color:#9a6700;font-size:7pt}' +
     '.decl{background:#D6E4F7;color:#555;font-style:italic;padding:6px 8px;margin-top:6px}' +
     '.cert{page-break-inside:avoid}.cert td.s{height:46px}.cert td.s img{max-height:44px}' +
     '.ft{margin-top:12px;color:#777;font-size:6.5pt;border-top:1px solid #ddd;padding-top:4px}' +
