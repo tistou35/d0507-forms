@@ -83,6 +83,11 @@ function paint(){
   document.getElementById('sub').textContent =
     A.lang === 'en' ? (F.th || '') : (F.t || '');
 
+  if (flow.ref) {
+    host.innerHTML = `<div class="note"><b>เอกสารอ้างอิง — ไม่มีผังงาน</b><br>
+      ${A.esc(flow.desc || 'ใบนี้เป็นเอกสารอ้างอิงหรือเช็กลิสต์ที่เปิดอ่านและพิมพ์ไปใช้ ไม่มีการส่งต่อหรืออนุมัติ')}</div>`;
+    return;
+  }
   if (!flow.steps.length) {
     host.innerHTML = `<div class="warn"><b>ยังไม่ได้กำหนดผังงานของใบนี้</b><br>
       สายงาน "${A.esc(F.chain || '—')}" ยังไม่มีขั้นตอนตั้งต้นใน workflows.json</div>`;
@@ -91,6 +96,7 @@ function paint(){
 
   const badge = flow.src === 'route'
     ? '<span class="tag ok">ตรงกับที่ระบบเดินจริง</span>'
+    : flow.srcRef ? '<span class="tag warn">ถอดจากคู่มือ — ยังไม่ได้ผูกกับระบบ</span>'
     : '<span class="tag warn">ค่าตั้งต้นตามสายงาน</span>';
   const conf = flow.confirmed
     ? '<span class="tag ok">ยืนยันแล้ว</span>'
@@ -98,7 +104,7 @@ function paint(){
 
   host.innerHTML = `
     ${flow.confirmed ? '' : `<div class="draft"><b>ผังนี้เป็นค่าที่ตั้งให้ก่อน</b> —
-      กำหนดจากสายงาน "${A.esc(F.chain || '')}" เพื่อให้มีอะไรให้อ่านและแก้ต่อ
+      ${flow.srcRef ? 'ถอดจากคู่มือ/ช่องลงนามบนกระดาษ (ดูที่มาด้านล่าง)' : `กำหนดจากสายงาน "${A.esc(F.chain || '')}" เพื่อให้มีอะไรให้อ่านและแก้ต่อ`}
       ยังไม่ได้ผ่านการยืนยันจากผู้รับผิดชอบ · แก้ที่ <span class="mono">workflows.json</span>
       แล้วตั้ง <span class="mono">confirmed: true</span></div>`}
     <div class="meta">${badge} ${conf}
@@ -106,6 +112,7 @@ function paint(){
       ${(F.lef||[]).map(m=>`<span class="tag">${A.esc(m)}</span>`).join('')}
       <span class="tag">รวม ${flow.total || '—'} วันทำการ</span></div>
     ${flow.desc ? `<p class="desc">${A.esc(flow.desc)}</p>` : ''}
+    ${flow.srcRef ? `<p class="hint" style="margin-top:6px">ที่มา: ${A.esc(flow.srcRef)}</p>` : ''}
     <div class="wrap" style="margin-top:18px">
       <div class="chart">${Flow.svg(flow)}</div>
       <div>

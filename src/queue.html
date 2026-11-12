@@ -55,8 +55,7 @@
 <script>
 "use strict";
 const REG=@@REG@@, A=D0507;
-document.querySelectorAll('[data-cnt="forms"]').forEach(e=>e.textContent=REG.forms.length);
-A.reg = REG;
+A.reg = REG; A.paintFormCount();
 A.initAuth(@@FBCFG@@, load);
 A.onLang.push(() => load());
 

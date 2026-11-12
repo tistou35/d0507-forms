@@ -115,8 +115,7 @@ dialog#act textarea{width:100%;min-height:74px;border:1px solid var(--border-med
 "use strict";
 const REG=@@REG@@, A=D0507;
 const esc=A.esc, L=o=>A.L(o), $=id=>document.getElementById(id);
-document.querySelectorAll('[data-cnt="forms"]').forEach(e=>e.textContent=REG.forms.length);
-A.reg = REG;
+A.reg = REG; A.paintFormCount();
 
 let ROWS=[], TASKS={}, DIR=[], TILE='all';
 const LIMIT=400;      // ดึงมาชุดเดียวแล้วกรองในเครื่อง — ไม่ต้องทำ index ผสมใน Firestore

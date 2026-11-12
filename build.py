@@ -350,10 +350,15 @@ def asset_versions():
     return out
 
 
+FORMCOUNT = {'fill': 0, 'pub': 0}
+
+
 def emit(src_name, outpath, base, active, subs, ver=None):
     t = open(os.path.join(SRC, src_name), encoding='utf-8').read()
     rail, bot, top = partials(active, base)
     t = t.replace('@@RAIL@@', rail).replace('@@BOTNAV@@', bot).replace('@@TOPBAR@@', top)
+    # ตัวเลขบนเมนู "คลังฟอร์ม" สำหรับหน้าที่ไม่ได้ฝังทะเบียน — นิยามเดียวกับ A.formCount ใน app.js
+    t = t.replace('@@NFILL@@', str(FORMCOUNT['fill'])).replace('@@NPUB@@', str(FORMCOUNT['pub']))
     for k, v in subs.items():
         t = t.replace(k, v)
     t = t.replace('@@BASE@@', base)
@@ -371,6 +376,8 @@ def emit(src_name, outpath, base, active, subs, ver=None):
 
 def main():
     reg = json.load(open(os.path.join(HERE, 'forms_register.json'), encoding='utf-8'))
+    FORMCOUNT['fill'] = len([f for f in reg['forms'] if f.get('kind') != 'ref'])
+    FORMCOUNT['pub'] = len([f for f in reg['forms'] if f.get('kind') != 'ref' and f.get('public')])
     defs, errs = load_defs()
     if errs:
         sys.exit('นิยามฟอร์มไม่ผ่านการตรวจ:\n  - ' + '\n  - '.join(errs))

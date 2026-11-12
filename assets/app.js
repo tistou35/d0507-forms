@@ -96,6 +96,7 @@
       A.signInBy = '';
       if (A.user) { try { A.signInBy = (await A.user.getIdTokenResult()).signInProvider || ''; } catch (e) {} }
       A.paintAuth();
+      A.paintFormCount();
       A.queueCount();
       if (A.user && A.profile && A.profile.mustChangePw && A.signInBy === 'password') A.pwDialog(true);
       if (onChange) onChange(A.user, A.roles);
@@ -303,6 +304,19 @@
   };
   /* ใบที่บทบาทนี้เห็น (ไม่รวมเอกสารอ้างอิงซึ่งไม่ใช่ใบให้กรอก) */
   A.formsFor = (reg, role) => (reg.forms || []).filter(f => f.kind !== 'ref' && A.seesForm(f, role));
+  /* ตัวเลขบนเมนู "คลังฟอร์ม" — นิยามเดียวทุกหน้า
+     ใบให้กรอก (ไม่รวมเอกสารอ้างอิง/เช็กลิสต์ kind: ref) ที่คนนี้เห็นในคลังฟอร์ม
+     เจ้าหน้าที่ = ทุกใบในทะเบียน · ไม่ได้เข้าสู่ระบบหรือนักเรียน = ใบที่ตั้ง public
+     เดิมแต่ละหน้านับเอง (บางหน้ารวมเอกสารอ้างอิง บางหน้าใช้จำนวนใน LEF) ตัวเลขจึงเปลี่ยนไปมาตามหน้า */
+  A.fillForms = reg => ((reg || A.reg || (typeof REG !== 'undefined' ? REG : null) || {}).forms || []).filter(f => f.kind !== 'ref');
+  A.formCount = () => A.fillForms().filter(f => A.isStaff() || f.public).length;
+  A.paintFormCount = function () {
+    const has = !!A.reg || typeof REG !== 'undefined';
+    const n = has ? A.formCount() : null;
+    // หน้าที่ไม่ได้ฝังทะเบียน ใช้ตัวเลขที่ build เขียนไว้บนป้าย (data-fill / data-pub)
+    document.querySelectorAll('[data-cnt="forms"]').forEach(e => {
+      e.textContent = n !== null ? n : (A.isStaff() ? e.dataset.fill : e.dataset.pub) || e.textContent; });
+  };
 
   /* ใครเปิดดูบันทึกที่ส่งเข้ามาของใบนี้ได้ (records ในทะเบียน)
      ผ่านอย่างใดอย่างหนึ่ง — บทบาทในระบบ (roles) หรือตำแหน่งในองค์กร (pos)

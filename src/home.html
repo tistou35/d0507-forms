@@ -75,8 +75,7 @@
 const REG = @@REG@@;
 const A = D0507;
 document.getElementById('today').textContent = A.today();
-document.querySelectorAll('[data-cnt="forms"]').forEach(
-  e => e.textContent = REG.forms.filter(f => f.kind !== 'ref').length);
+A.reg = A.reg || REG; A.paintFormCount();
 
 /* ตัวอย่างคำค้น — ต้องมีทั้งสองภาษา ไม่งั้นกดปุ่ม EN แล้วยังเป็นไทยอยู่
    และคำค้นภาษาอังกฤษต้องตรงกับ kw ในทะเบียน ไม่งั้นกดแล้วไม่เจออะไรเลย */

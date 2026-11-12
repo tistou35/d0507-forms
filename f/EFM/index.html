@@ -2,7 +2,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>แบบประเมินความคืบหน้า — D-0507 Flight Training</title>
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="../../assets/app.css?v=5c6ac7cf">
+<link rel="stylesheet" href="../../assets/app.css?v=ab3a804f">
 <style>
 /* ตารางบันทึกที่ส่งเข้ามาของใบนี้ — กดแถวเพื่อเปิดดูรายละเอียด */
 #recs .rbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:2px 0 12px}
@@ -61,7 +61,7 @@
     <span><span class="t" data-t="navHome">หน้าหลัก</span><span class="en" data-t2="navHome">Home</span></span></a>
   <a class="nav on" data-nav="all" href="../../all/">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg>
-    <span><span class="t" data-t="navAll">คลังฟอร์ม</span><span class="en" data-t2="navAll">All forms</span></span><span class="pill gry" data-cnt="forms">—</span></a>
+    <span><span class="t" data-t="navAll">คลังฟอร์ม</span><span class="en" data-t2="navAll">All forms</span></span><span class="pill gry" data-cnt="forms" data-fill="40" data-pub="9">9</span></a>
   <a class="nav useronly" data-nav="queue" href="../../queue/">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l4 4L14 8"/><path d="M10 13l4 4L22 8"/></svg>
     <span><span class="t" data-t="navQueue">งานของฉัน</span><span class="en" data-t2="navQueue">My queue</span></span><span class="pill amb" data-cnt="queue">0</span></a>
@@ -171,7 +171,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="../../assets/app.js?v=305f3506"></script>
+<script src="../../assets/app.js?v=d71ac884"></script>
 <script>D0507.GAS_URL='https://script.google.com/macros/s/AKfycby7rFFVxd92wPImX4m8pv8nHqTrK3Iq0O32A34844DAg1rP8N3RfgKEyGvAUkQu-NXd/exec';</script>
 <script>
 "use strict";
@@ -185,7 +185,6 @@ const CHAIN_N = {
   doccontrol:{th:'ควบคุมเอกสาร',en:'Document control'}, admin:{th:'ธุรการ / บุคคล',en:'Admin / HR'},
   audit:{th:'งานตรวจสอบ',en:'Audit'}, ops:{th:'ปฏิบัติการบิน',en:'Flight operations'}};
 
-document.querySelectorAll('[data-cnt="forms"]').forEach(e=>e.textContent=REG.lefcount.total||'');
 document.getElementById('th').textContent = A.nm(F);
 document.getElementById('en').textContent = F.t;
 

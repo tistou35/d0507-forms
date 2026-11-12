@@ -165,7 +165,7 @@ let SES=null, SES_TRIED=false, SES_MINE=null;
 /* ARF ลงชื่อได้โดยไม่เข้าสู่ระบบ — ผู้เข้าเรียนเลือกเองที่หน้าแรกของใบ
    (เข้าสู่ระบบ = ชื่อมาจากบัญชี · ไม่เข้าสู่ระบบ = พิมพ์ชื่อเอง ใบติดป้าย guest ครูเห็นในรายชื่อ)
    ใช้ anonymous auth ของ Firebase — ได้ uid ประจำแท็บ ใช้กันลงชื่อซ้ำในคาบเดียวกันจากแท็บเดิม */
-const GKEY='d0507.arf.guest';
+const GKEY='d0507.guest.'+(new URLSearchParams(location.search).get('c')||'');
 let GUEST=(function(){ try{ return sessionStorage.getItem(GKEY)==='1'; }catch(e){ return false; } })();
 const authUser=()=>firebase.auth().currentUser;
 async function loadSes(){
@@ -256,19 +256,23 @@ boot();
 // เปลี่ยนภาษาแล้ว render ใหม่ทั้งใบ — ข้อมูลที่กรอกไว้อยู่ใน FK.data ไม่หาย
 A.onLang.push(()=>{ if(FK) FK.lang=A.lang; boot(); });
 
-/* ── ARF: เข้าสู่ระบบ หรือ ลงชื่อโดยไม่เข้าสู่ระบบ ───────────────── */
+/* ── เข้าสู่ระบบ หรือ กรอกโดยไม่เข้าสู่ระบบ (ARF และใบที่ตั้ง public) ───────── */
+function loginOptional(){ return !!F && !F.anon && (F.abbr==='ARF' || F.public===true); }
 function arfChoose(el){
-  const L=A.L, esc=A.esc;
-  const ses = SES_ID ? L({th:'สแกน QR ของคาบเรียนแล้ว — ข้อมูลคาบครูกรอกไว้ให้แล้ว',en:'Session QR scanned — the instructor has filled in the session details.'})
+  const L=A.L, esc=A.esc, arf=F.abbr==='ARF';
+  const ses = !arf ? L({th:'ใบนี้กรอกได้ทั้งแบบเข้าสู่ระบบและไม่เข้าสู่ระบบ',en:'You can fill this form with or without signing in.'})
+            : SES_ID ? L({th:'สแกน QR ของคาบเรียนแล้ว — ข้อมูลคาบครูกรอกไว้ให้แล้ว',en:'Session QR scanned — the instructor has filled in the session details.'})
                      : L({th:'ไม่ได้มาจาก QR ของคาบ — กรอกข้อมูลการเรียนเองทั้งใบ แล้วลงนามส่ง',en:'Not from a session QR — fill in the session details yourself, then sign and submit.'});
   el.innerHTML=`<div class="note" style="max-width:560px;margin-top:18px">
-    <b style="font-size:16px">${esc(L({th:'ลงชื่อเข้าเรียน',en:'Sign the attendance record'}))}</b>
+    <b style="font-size:16px">${esc(arf?L({th:'ลงชื่อเข้าเรียน',en:'Sign the attendance record'}):A.nm(F))}</b>
     <p style="margin:8px 0 14px;font-size:13.5px;color:var(--fg-2);line-height:1.6">${esc(ses)}</p>
     <div class="acts" style="flex-wrap:wrap">
       <button class="big pri" type="button" id="arf-in">${esc(L({th:'เข้าสู่ระบบ',en:'Sign in'}))}</button>
-      <button class="big sec" type="button" id="arf-guest">${esc(L({th:'ลงชื่อโดยไม่เข้าสู่ระบบ',en:'Continue without signing in'}))}</button></div>
-    <p class="hint" style="margin-top:10px">${esc(L({th:'เข้าสู่ระบบ: ชื่อเติมจากบัญชี และกลับมาดูใบของตัวเองได้ · ไม่เข้าสู่ระบบ: พิมพ์ชื่อเอง ใบติดป้ายว่าไม่ได้เข้าสู่ระบบ และครูผู้สอนเป็นผู้ยืนยันรายชื่อ',
-      en:'Signed in: your name comes from your account and you can view your record later. Without signing in: type your name; the record is marked as not signed in and the instructor confirms the list.'}))}</p>
+      <button class="big sec" type="button" id="arf-guest">${esc(arf?L({th:'ลงชื่อโดยไม่เข้าสู่ระบบ',en:'Continue without signing in'}):L({th:'กรอกโดยไม่เข้าสู่ระบบ',en:'Continue without signing in'}))}</button></div>
+    <p class="hint" style="margin-top:10px">${esc(arf?L({th:'เข้าสู่ระบบ: ชื่อเติมจากบัญชี และกลับมาดูใบของตัวเองได้ · ไม่เข้าสู่ระบบ: พิมพ์ชื่อเอง ใบติดป้ายว่าไม่ได้เข้าสู่ระบบ และครูผู้สอนเป็นผู้ยืนยันรายชื่อ',
+      en:'Signed in: your name comes from your account and you can view your record later. Without signing in: type your name; the record is marked as not signed in and the instructor confirms the list.'})
+      :L({th:'เข้าสู่ระบบ: ชื่อเติมจากบัญชีให้ และกลับมาดูสถานะใบได้ที่งานของฉัน · ไม่เข้าสู่ระบบ: พิมพ์ชื่อเอง ใบติดป้ายว่าไม่ได้เข้าสู่ระบบ และกลับมาดูใบย้อนหลังไม่ได้',
+          en:'Signed in: your name is filled in and you can follow the form in My queue. Without signing in: type your name; the form is marked as not signed in and you cannot reopen it later.'}))}</p>
     <p id="arf-err" style="color:var(--red-600);font-size:13px;margin-top:8px" hidden></p></div>`;
   document.getElementById('arf-in').onclick=()=>A.authGate(el,{why:L({th:'ชื่อในใบลงเวลาจะมาจากบัญชีของคุณ',en:'Your name on the record comes from your account.'})});
   document.getElementById('arf-guest').onclick=async e=>{
@@ -318,12 +322,15 @@ function boot(){
        PWR ผู้โดยสารเป็นคนนอก ไม่มีบัญชี บังคับล็อกอินแล้วเซ็นไม่ได้เลย
        VSR รายงานนิรภัยโดยสมัครใจ ต้องรายงานได้โดยไม่ต้องเปิดเผยตัว (ICAO Doc 9859)
            ใบนี้จึงไม่เติมชื่อให้อัตโนมัติด้วย แม้คนกรอกจะล็อกอินอยู่ */
-  if(F.abbr==='ARF' && !A.signedIn() && !(GUEST && authUser())){
+  /* ใบที่หน้าแรกบอกว่าใช้ได้โดยไม่ต้องเข้าสู่ระบบ (ธง public — APF · APP · EFM · FRAE · GSP · SDF · SEF)
+     และ ARF: ไม่บังคับ ให้เลือกเองว่าจะเข้าสู่ระบบ (ชื่อเติมให้) หรือกรอกโดยไม่เข้าสู่ระบบ
+     PWR · VSR (ธง anon) เปิดเข้าใบทันทีเหมือนเดิม — คนกรอกไม่ใช่คนในระบบ / ต้องไม่ระบุตัว */
+  if(loginOptional() && !A.signedIn() && !(GUEST && authUser())){
     document.getElementById('foot').innerHTML='';
     arfChoose(document.getElementById('form'));
     return;
   }
-  if(!F.anon && F.abbr!=='ARF' && !A.signedIn()){
+  if(!F.anon && !loginOptional() && !A.signedIn()){
     document.getElementById('foot').innerHTML='';
     A.authGate(document.getElementById('form'));
     return;
@@ -379,6 +386,15 @@ function boot(){
    (เช่นใบประเมินความเสี่ยงย้อนหลัง) จะถูกทับด้วยชื่อคนที่เปิดลิงก์
 
    ใบที่ตั้ง anon ไว้ไม่เติมให้ — VSR ต้องรายงานโดยไม่เปิดเผยตัวได้ */
+/* ชื่อผู้กรอกจากช่อง self ของฝ่ายตัวเอง — ใช้เป็นชื่อผู้ส่งเมื่อไม่ได้เข้าสู่ระบบ */
+function selfName(){
+  if(!DEF||!FK) return '';
+  const mine=partyOf(); let first='', last='', full='';
+  (DEF.sections||[]).forEach(sec=>{ if(sec.party && sec.party!==mine) return;
+    (sec.fields||[]).forEach(f=>{ const v=String(FK.data[f.k]||'').trim(); if(!f.self||!v) return;
+      if(f.self==='first') first=first||v; else if(f.self==='last') last=last||v; else full=full||v; }); });
+  return full || [first,last].filter(Boolean).join(' ');
+}
 function selfFill(data){
   if(!A.signedIn() || F.anon || !DEF) return;
   const me=A.myName(); if(!me) return;
@@ -527,15 +543,21 @@ function partyOf(){
 }
 function renderFoot(){
   if(!FK) return;
-  const miss=FK.validate(), stop=FK.blocked();
+  /* เปิดแท็บไหนก่อนก็ได้ ช่องบังคับไม่กันการเดินไปแท็บถัดไป — มาตรวจรวมที่นี่ก่อนส่ง
+     ปุ่มส่งกดได้เสมอ (ยกเว้นเงื่อนไขหยุดของใบ เช่น NO-GO) กดแล้วถ้ายังขาด จะพาไปช่องแรกที่ขาด */
+  const groups=FK.missingByTab(), nmiss=groups.reduce((a,g)=>a+g.miss.length,0), stop=FK.blocked();
   document.getElementById('foot').innerHTML=`
-    ${miss.length?`<div class="warn" style="margin-bottom:14px">${A.esc(A.t('incomplete'))}:
-      ${A.esc(miss.map(m=>m.label).join(' · '))}</div>`:''}
-    <div class="acts"><button class="big ${miss.length||stop?'off':'pri'}"
-      ${miss.length||stop?'disabled':''} id="send">${A.esc(A.t('send'))}</button>
+    ${nmiss?`<div class="warn" style="margin-bottom:14px"><b>${A.esc(A.t('incomplete'))} · ${nmiss}</b>
+      ${groups.map(g=>`<div style="margin-top:6px">${g.k?`<a href="#" data-jump="${A.esc(g.k)}"><b>${A.esc(g.n)}</b></a>: `:''}${
+        A.esc(g.miss.map(m=>m.label).join(' · '))}</div>`).join('')}</div>`:''}
+    <div class="acts"><button class="big ${stop?'off':'pri'}" ${stop?'disabled':''} id="send">${A.esc(A.t('send'))}</button>
       <a class="big sec" href="${A.formUrl(F)}">${A.esc(A.t('cancel'))}</a></div>`;
+  document.querySelectorAll('#foot [data-jump]').forEach(a=>a.addEventListener('click',e=>{
+    e.preventDefault(); FK.showMissing(a.dataset.jump); renderFoot(); }));
   const b=document.getElementById('send');
-  if(b && !b.disabled) b.addEventListener('click', e=>{ e.preventDefault(); review(); });
+  if(b && !b.disabled) b.addEventListener('click', e=>{ e.preventDefault();
+    if(FK.missingByTab().length){ FK.showMissing(); renderFoot(); return; }
+    review(); });
 }
 
 /* ── ตรวจทานก่อนส่ง ────────────────────────────────────────
@@ -675,7 +697,7 @@ async function send(){
     /* ใบทั่วไปต้องล็อกอินมาก่อนถึงจะเห็นฟอร์ม (ดูประตูใน boot)
        เหลือ anonymous ไว้ให้เฉพาะใบที่คนกรอกไม่ใช่คนในระบบ */
     if(!firebase.auth().currentUser){
-      if(!F.anon && F.abbr!=='ARF') throw new Error(A.L({th:'ต้องเข้าสู่ระบบก่อนส่งใบ',en:'Sign in before submitting'}));
+      if(!F.anon && !loginOptional()) throw new Error(A.L({th:'ต้องเข้าสู่ระบบก่อนส่งใบ',en:'Sign in before submitting'}));
       await firebase.auth().signInAnonymously();
     }
     const u=firebase.auth().currentUser;
@@ -706,7 +728,7 @@ async function send(){
       assigneeUid: PICK||'',
       // ใบที่ยังไม่มีผู้รับต้องบอกว่าใครมีสิทธิ์รับไปอนุมัติ ไม่งั้นตกหล่นไม่มีใครรับผิดชอบ
       assignTo: (!PICK && st ? (approval().position || st.pool || F.assignTo || '') : ''),
-      submitterUid:u.uid, submitterName:FK.data.picFirst?`${FK.data.picFirst} ${FK.data.picLast||''}`.trim():F.abbr==='ARF'&&FK.data.attName?FK.data.attName:(A.myName()||u.displayName||''),
+      submitterUid:u.uid, submitterName:FK.data.picFirst?`${FK.data.picFirst} ${FK.data.picLast||''}`.trim():(A.myName()||selfName()||u.displayName||''),
       submitterEmail:u.email||'',
       submittedAt:firebase.firestore.FieldValue.serverTimestamp(),
       computed:FK.computed(),
@@ -720,10 +742,8 @@ async function send(){
     if(link){ sub.extRef=link.extRef; sub.extSystem=link.extSystem; }
     if(DIST_ID) sub.distId=DIST_ID;
     if(isAtt) sub.sessionId=SES_ID;
-    if(F.abbr==='ARF'){
-      if(u.isAnonymous) sub.guest=true;           // ไม่ได้เข้าสู่ระบบ — ชื่อพิมพ์เอง (rules ตรวจกับวิธีล็อกอินจริง)
-      if(!isAtt) sub.selfReported=true;            // ไม่ผ่าน QR ของคาบ — ไม่มีครูรับรอง
-    }
+    if(u.isAnonymous && F.abbr!=='VSR') sub.guest=true;   // ไม่ได้เข้าสู่ระบบ — ชื่อพิมพ์เอง (ARF: rules ตรวจกับวิธีล็อกอินจริง)
+    if(F.abbr==='ARF' && !isAtt) sub.selfReported=true;  // ไม่ผ่าน QR ของคาบ — ไม่มีครูรับรอง
     if(REV_ID && F.abbr==='DRF') sub.revId=REV_ID;
     await ref.set(sub);
     /* ฉบับร่างรู้แล้วว่ามีคำขอ — ปุ่มแก้ต้นฉบับจะขึ้นว่ารออนุมัติ ไม่ใช่ให้กรอกคำขอซ้ำ */
@@ -738,7 +758,7 @@ async function send(){
     // ลบสายทิ้งเมื่อผูกกับใบเรียบร้อยแล้ว ไม่งั้นค้างไปโผล่ในใบถัดไปของแท็บเดียวกัน
     if(link){ try{ sessionStorage.removeItem(RKEY); }catch(e){} }
     if(isAtt){ try{ sessionStorage.removeItem(SKEY); }catch(e){} }
-    if(F.abbr==='ARF'){ try{ sessionStorage.removeItem(GKEY); }catch(e){} }
+    try{ sessionStorage.removeItem(GKEY); }catch(e){}
 
     // งานในคิวของผู้อนุมัติ — ถ้าไม่สร้าง ใบจะค้างเป็น pending โดยไม่มีใครเห็น
     if(!done){

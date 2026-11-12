@@ -40,9 +40,7 @@
 const REG = @@REG@@;
 const A = D0507;
 let GROUP='all', SYS='all', ST='all', VIEW='card';
-document.querySelectorAll('[data-cnt="forms"]').forEach(
-  e=>e.textContent=REG.forms.filter(f=>f.kind!=='ref' && (A.isStaff()||f.public)).length);
-A.reg = REG;
+A.reg = REG; A.paintFormCount();
 A.initAuth(@@FBCFG@@, () => { chips(); paint(); });
 // เปลี่ยนภาษาแล้ววาดใหม่ทั้งหน้า
 A.onLang.push(() => { chips(); paint(); });
@@ -87,7 +85,10 @@ function list(){
 }
 function paint(){
   const L = list();
-  document.getElementById('hd').textContent = A.L(A.T.allFormsN)(L.length);
+  // หัวนับเฉพาะใบให้กรอก ตรงกับตัวเลขบนเมนู — เอกสารอ้างอิงที่อยู่ในรายการบอกแยก
+  const nRef = L.filter(f=>f.kind==='ref').length;
+  document.getElementById('hd').textContent = A.L(A.T.allFormsN)(L.length - nRef) +
+    (nRef ? A.L({th:' · เอกสารอ้างอิง ' + nRef, en:' · ' + nRef + ' reference document' + (nRef>1?'s':'')}) : '');
   document.getElementById('q').placeholder = A.t('searchAll');
   document.getElementById('view').textContent =
     A.t('viewAs') + ': ' + A.t(VIEW==='card'?'viewCard':'viewTable');

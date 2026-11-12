@@ -17,9 +17,10 @@
 
   /* ตำแหน่งย่อ -> ชื่อเต็ม ใช้ทั้งในผังและตาราง */
   F.POS = {
-    ACM: 'Accountable Manager', HT: 'หัวหน้าครูการบิน', CMM: 'ผู้จัดการติดตามการปฏิบัติตาม',
-    SM: 'ผู้จัดการนิรภัย', CFI: 'หัวหน้าครูการบินภาคอากาศ', FI: 'ครูการบิน',
-    FIE: 'ผู้ตรวจสอบครูการบิน', TKI: 'ครูภาคทฤษฎี', ME: 'ช่างอากาศยาน',
+    ACM: 'Accountable Manager', HT: 'หัวหน้าครูฝึก (Head of Training)', CMM: 'ผู้จัดการติดตามการปฏิบัติตาม',
+    SM: 'ผู้จัดการนิรภัย', CFI: 'หัวหน้าครูการบิน', CTKI: 'หัวหน้าครูภาคทฤษฎี', FI: 'ครูการบิน',
+    FIE: 'ผู้ตรวจสอบครูการบิน', TKI: 'ครูภาคทฤษฎี', ME: 'ช่างอากาศยาน', MM: 'ผู้จัดการฝ่ายซ่อมบำรุง',
+    LAE: 'ช่างผู้มีใบอนุญาต (ลงนาม CRS)', AME: 'ช่างอากาศยาน',
     CAMO: 'ผู้มีอำนาจปล่อยอากาศยาน', OPS: 'ฝ่ายปฏิบัติการ', AD: 'ฝ่ายธุรการ',
     PIC: 'ผู้ควบคุมอากาศยาน',
   };
@@ -37,6 +38,9 @@
     const route = (def && def.route) || [];
 
     let steps, src, confirmed;
+    // เอกสารอ้างอิง / เช็กลิสต์ — ไม่มีการส่งต่อ ไม่แสดงผังของสายงานแทน
+    if (own.ref || (form.kind === 'ref' && !own.steps && !route.length))
+      return { steps: [], src: 'ref', confirmed: true, ref: true, desc: own.desc || '', srcRef: own.src || '', total: 0 };
     if (route.length) {
       src = 'route';
       steps = route.map((r, i) => {
@@ -66,6 +70,7 @@
     return {
       steps, src, confirmed,
       desc: own.desc || chain.desc || '',
+      srcRef: own.src || '',
       total: steps.reduce((t, s) => t + (Number(s.days) || 0), 0),
     };
   };

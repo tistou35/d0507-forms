@@ -42,8 +42,8 @@
     stIdle:     { th: 'ยังไม่ได้กรอก', en: 'Not started' },
     badFormat:  { th: 'รูปแบบไม่ตรงตัวอย่าง', en: 'Format does not match the example' },
     limit:      { th: 'เพดาน', en: 'limit' },
-    fillFirst:  { th: n => 'กรอกช่องบังคับในหน้านี้ให้ครบก่อน — เหลืออีก ' + n + ' ช่อง (ที่ทำเครื่องหมายไว้)',
-                  en: n => 'Complete the required fields on this page first — ' + n + ' left (marked below)' },
+    fillFirst:  { th: n => 'ยังมีช่องบังคับที่ต้องกรอกก่อนส่ง ' + n + ' ช่อง — ทำเครื่องหมายไว้ ดูตัวเลขสีแดงบนหัวแท็บ',
+                  en: n => n + ' required field(s) still empty before you can submit — marked; see the red counts on the tabs' },
   };
   const T = (k, lang, arg) => {
     const v = L(UI[k], lang);
@@ -496,6 +496,27 @@
     return true;
   };
 
+  /* ช่องบังคับที่ยังว่าง จัดตามแท็บ — [{k, n, miss:[{k,label}]}] ใช้บอกผู้กรอกตอนกดส่ง */
+  FormKit.prototype.missingByTab = function () {
+    const tabs = this.tabs();
+    if (!tabs) { const m = this.validate(); return m.length ? [{ k: '', n: '', miss: m }] : []; }
+    return tabs.map(t => ({ k: t.k, n: t.n, miss: this.validate(t.secs) })).filter(t => t.miss.length);
+  };
+  /* กดส่งแล้วยังมีช่องบังคับว่าง — ทำเครื่องหมายทุกช่อง เปิดแท็บแรกที่ขาด เลื่อนไปช่องแรก */
+  FormKit.prototype.showMissing = function (tabKey) {
+    const groups = this.missingByTab();
+    this.flagged = [].concat.apply([], groups.map(g => g.miss.map(m => m.k)));
+    if (!this.flagged.length) { this.flagged = null; return 0; }
+    const g = (tabKey && groups.find(x => x.k === tabKey)) || groups[0];
+    if (g.k) this.tab = g.k;
+    if (this._el) {
+      this.render(this._el);
+      const bad = this._el.querySelector('.fk-f.bad, .fk-row.bad');
+      if (bad) bad.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
+    return this.flagged.length;
+  };
+
   FormKit.prototype.tabs = function (ctx) {
     const defs = (this.def.ui && this.def.ui.tabs) || [];
     if (!defs.length) return null;
@@ -515,7 +536,8 @@
       // สถานะที่หัวแท็บต้องบอกให้ตรง ไม่ใช่เขียวไว้ก่อน
       //   miss    ยังมีช่องบังคับว่าง        · warn  ตอบแล้วและมีคะแนน
       //   done    ตอบแล้วแต่ไม่มีคะแนน       · idle  ยังไม่ได้แตะเลย
-      const st = miss ? 'miss' : !ans ? 'idle' : sc ? 'warn' : 'done';
+      // miss เป็นสีแดงเฉพาะหลังกดส่งแล้ว (flagged) — ก่อนหน้านั้นเป็น todo สีเทา เพราะเปิดแท็บไหนก่อนก็ได้
+      const st = miss ? (this.flagged ? 'miss' : 'todo') : !ans ? 'idle' : sc ? 'warn' : 'done';
       return { k: t.k, n: L(t, this.lang), secs: secs,
                score: sc, miss: miss, ans: ans, tot: tot, st: st };
     }).filter(t => t.secs.length);
@@ -945,6 +967,7 @@
   FormKit.prototype.bind = function (el) {
     const self = this;
     const rerender = () => self.render(el);
+    self._el = el;
 
     el.querySelectorAll('input[data-k],textarea[data-k]').forEach(i => {
       const f = self.fields[i.dataset.k] || {};
@@ -1132,18 +1155,13 @@
       const list = self.tabs();
       const from = list.findIndex(t => t.k === self.tab);
       const to   = list.findIndex(t => t.k === k);
-      // ถอยหลังหรือกลับที่เดิมได้เสมอ — บล็อกเฉพาะการเดินหน้าข้ามช่องบังคับ
-      if (to > from && from >= 0) {
-        const miss = self.validate(list[from].secs);
-        if (miss.length) {
-          self.flagged = miss.map(m => m.k);
-          rerender();
-          const bad = el.querySelector('.fk-f.bad, .fk-row.bad');
-          if (bad) bad.scrollIntoView({ block: 'center', behavior: 'smooth' });
-          return;
-        }
+      // เปิดแท็บไหนก็ได้ตามลำดับที่สะดวก — ช่องบังคับตรวจรวมครั้งเดียวตอนกดส่ง (showMissing)
+      // ถ้าเคยกดส่งแล้วมีช่องค้าง เครื่องหมายแดงยังอยู่เฉพาะช่องที่ยังว่าง
+      if (self.flagged) {
+        const still = self.validate().map(m => m.k);
+        self.flagged = self.flagged.filter(x => still.indexOf(x) >= 0);
+        if (!self.flagged.length) self.flagged = null;
       }
-      self.flagged = null;
       self.tab = k;
       rerender();
       const sel = el.querySelector('.fk-tab[aria-selected="true"]');

@@ -250,8 +250,9 @@ function render(){
   document.getElementById('list').innerHTML = rows ||
     '<p class="note">ไม่มีฟอร์มที่ตรงเงื่อนไข</p>';
   document.getElementById('cnt').textContent =
-    shown === REG.forms.length ? REG.forms.length + ' ใบ'
-                               : shown + ' จาก ' + REG.forms.length + ' ใบ';
+    (shown === REG.forms.length ? REG.forms.length + ' ใบ'
+                                : shown + ' จาก ' + REG.forms.length + ' ใบ') +
+    ' (ใบให้กรอก ' + A.fillForms(REG).length + ' · เอกสารอ้างอิง ' + (REG.forms.length - A.fillForms(REG).length) + ')';
 
   document.querySelectorAll('[data-hist]').forEach(b => b.onclick = () => history(b.dataset.hist));
   document.querySelectorAll('[data-pub]').forEach(b => b.onclick = () => publishDlg(b.dataset.pub));

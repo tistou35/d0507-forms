@@ -71,8 +71,7 @@ function fillPickers(){
   dep.dataset.wired='1';
   [dep,man].forEach(el=>el.addEventListener('change',rows));
 }
-document.querySelectorAll('[data-cnt="forms"]').forEach(e=>e.textContent=REG.forms.length);
-A.reg = REG;
+A.reg = REG; A.paintFormCount();
 A.initAuth(@@FBCFG@@, paint); paint();
 // เปลี่ยนภาษาแล้ววาดใหม่ทั้งหน้า
 A.onLang.push(() => paint());
@@ -134,7 +133,8 @@ function rows(){
   else if(man)          L=L.filter(f=>(f.lef||[]).includes(man));
   if(q) L=L.filter(f=>[f.doc,f.code,f.t,f.th,f.abbr].join(' ').toLowerCase().includes(q));
   document.getElementById('cnt').textContent =
-    L.length===REG.forms.length ? REG.forms.length+' ใบ' : L.length+' จาก '+REG.forms.length+' ใบ';
+    (L.length===REG.forms.length ? REG.forms.length+' ใบ' : L.length+' จาก '+REG.forms.length+' ใบ') +
+    ' (ใบให้กรอก '+A.fillForms(REG).length+' · เอกสารอ้างอิง '+(REG.forms.length-A.fillForms(REG).length)+')';
   document.getElementById('tb').innerHTML = L.map(f=>{
     const st=REG.status[f.st]||{}, s=A.sysOf(REG,f);
     /* ฟอร์มเปล่าเปิดตรงจากทะเบียนได้ ไม่ต้องเข้าไปหน้าเอกสารก่อน
