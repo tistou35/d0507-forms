@@ -206,9 +206,10 @@ function lineCtx_() {
 }
 /* ผู้ถือตำแหน่ง — รายชื่อผู้รับฟอร์ม (recv) และตำแหน่งในโปรไฟล์ (positions) */
 function lineHolders_(ctx, pos) {
-  var m = {};
-  ctx.pd.forEach(function (p) { if ((p.recv || []).indexOf(pos) >= 0) m[p.id] = p.name || ''; });
-  ctx.sd.forEach(function (p) { if ((p.positions || []).indexOf(pos) >= 0 && p.active !== false) m[p.id] = m[p.id] || p.name || ''; });
+  var m = {}, want = String(pos || '').split('/').map(function (x) { return x.trim(); }).filter(String);   // "CFI/HT" = ใครก็ได้ในสองตำแหน่ง
+  var has = function (arr) { return want.some(function (w) { return (arr || []).indexOf(w) >= 0; }); };
+  ctx.pd.forEach(function (p) { if (has(p.recv)) m[p.id] = p.name || ''; });
+  ctx.sd.forEach(function (p) { if (has(p.positions) && p.active !== false) m[p.id] = m[p.id] || p.name || ''; });
   return Object.keys(m).map(function (u) { return { uid: u, name: m[u] }; });
 }
 function lineAdmins_(ctx) { return ctx.admins.map(function (u) { return { uid: u, name: ctx.names[u] || 'ผู้ดูแลระบบ' }; }); }
