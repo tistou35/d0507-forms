@@ -222,6 +222,8 @@ function doPost(e) {
       if (!yf.hasNext()) throw new Error('ยังไม่มีแม่แบบของใบนี้');
       var ycopy = yf.next().makeCopy('tplTry-tmp', subFolder_(String(body.abbr || '')));
       var ydoc = DocumentApp.openById(ycopy.getId()), yb = ydoc.getBody();
+      // sigs: { key: data URL } — วางรูปลายเซ็นด้วยตัวเดียวกับตอนออกเอกสารจริง ดูตำแหน่งรูปได้โดยไม่ต้องส่งใบ
+      if (body.sigs) signatures_(yb, body.sigs);
       var hit = {};
       Object.keys(body.values || {}).forEach(function (k) {
         var before = yb.getText().indexOf('{{' + k + '}}') >= 0;
@@ -639,8 +641,21 @@ function signatures_(b, data) {
     var r = b.findText(tok);
     while (r) {
       var el = r.getElement().asText();
-      el.deleteText(r.getStartOffset(), r.getEndOffsetInclusive());
-      var img = el.getParent().asParagraph().insertInlineImage(0, blob);
+      var s0 = r.getStartOffset(), e0 = r.getEndOffsetInclusive(), full = el.getText();
+      var img;
+      if (s0 === 0 && e0 === full.length - 1) {
+        // token อยู่เดี่ยว ๆ ในย่อหน้า — ทางเดิม
+        el.deleteText(s0, e0);
+        img = el.getParent().asParagraph().insertInlineImage(0, blob);
+      } else {
+        /* มีป้ายอยู่หน้า token ในย่อหน้าเดียวกัน ("Instructor Signature:  {{sig_insSign}}")
+           ทางเดิมวางรูปไว้ต้นย่อหน้า รูปจึงไปอยู่หน้าป้าย — วางตรงตำแหน่ง token แทน */
+        var rest = full.slice(e0 + 1);
+        el.deleteText(s0, full.length - 1);
+        var par = el.getParent(), at = par.getChildIndex(el);
+        img = par.insertInlineImage(at + 1, blob);
+        if (rest) par.insertText(at + 2, rest);
+      }
       /* กว้าง 110pt — เดิม 150 ทำให้แถวลายเซ็นของใบที่มีสามช่อง (MRF) สูงจนถูกตัดข้ามหน้า
          รูปไปอยู่คนละหน้ากับชื่อผู้ลงนาม ซึ่งอ่านแล้วแยกไม่ออกว่าใครเซ็นอันไหน */
       var w = 110, h = img.getHeight() * w / img.getWidth();

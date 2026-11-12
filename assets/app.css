@@ -543,6 +543,25 @@ footer{text-align:center;color:var(--g-400);font-size:12px;padding:22px}
 .fk-tbl input:hover:not(:disabled){border-color:var(--g-200)}
 .fk-tbl input:focus{border-color:var(--sky-500);background:var(--bg-card);outline:none}
 .fk-tbl .fk-trm{width:32px}
+/* ตารางสีในแถว (MOC) — ช่องเล็กพอให้ 5×5 อยู่ในเซลล์เดียว
+   สีตาม Risk Tolerability Matrix ของ OMM: เขียวเข้ม/เขียวอ่อน = ยอมรับได้ · เหลือง = ยอมรับได้ภายใต้เงื่อนไข · แดง/แดงเข้ม = ยอมรับไม่ได้ */
+.fk-tbl.has-rk{min-width:680px}
+.fk-tbl .fk-trk-h{text-align:center;width:190px}
+.fk-tbl .fk-trk-td{padding:6px 4px;vertical-align:top}
+.fk-trk table{border-collapse:separate;border-spacing:2px;margin:0 auto}
+.fk-trk th{font-size:10px;font-weight:700;color:var(--g-500);padding:0 2px;text-align:center;cursor:help}
+.fk-trk td{border:0;padding:0}
+.fk-trk .rm{width:26px;height:21px;border-radius:4px;border:1px solid rgba(0,0,0,.1);cursor:pointer;padding:0;display:block}
+.fk-trk .rm:hover:not(:disabled){transform:scale(1.12)}
+.fk-trk .rm:disabled{cursor:default}
+.z-g2{background:#00B050}.z-g1{background:#92D050}.z-y{background:#FFFF00}.z-r{background:#FF0000}.z-r2{background:#C00000}
+.fk-trk .rm.on{outline:3px solid var(--navy-900);outline-offset:1px}
+.fk-trk-out{display:inline-block;font-size:11.5px;line-height:1.35;text-align:center;margin:4px 0 0;padding:3px 7px;border-radius:5px}
+.fk-trk .fk-trk-out{display:block}
+.fk-trk-out.z-r,.fk-trk-out.z-r2{color:#fff}
+.fk-trk-out.none{color:var(--g-400)}
+.fk-trk-max{font-size:13px;margin:6px 0 0}
+
 .fk-tbl .fk-trm button{padding:2px 8px;line-height:1.4;color:var(--g-400)}
 .fk-tbl .fk-trm button:hover{color:var(--red-500)}
 

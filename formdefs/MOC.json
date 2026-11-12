@@ -287,7 +287,7 @@
        "type": "text",
        "w": "12%",
        "label": {
-        "th": "โอกาสเกิด",
+        "th": "โอกาสเกิด (1–5)",
         "en": "Likelihood"
        }
       },
@@ -296,7 +296,7 @@
        "type": "text",
        "w": "12%",
        "label": {
-        "th": "ความรุนแรง",
+        "th": "ความรุนแรง (A–E)",
         "en": "Severity"
        }
       },
@@ -318,7 +318,173 @@
         "en": "Mitigation measure"
        }
       }
-     ]
+     ],
+     "risk": {
+      "_src": "OMM 2026 V3 — SMS · Tolerability · Risk Tolerability Matrix (Probability × Severity) · red = unacceptable, yellow = tolerable, green = acceptable",
+      "rowKey": "likelihood",
+      "colKey": "severity",
+      "level": "level",
+      "head": {
+       "th": "ความเสี่ยง — กดช่องสี (โอกาส × ความรุนแรง)",
+       "en": "Risk — click a colour (likelihood × severity)"
+      },
+      "pick": {
+       "th": "ยังไม่ได้เลือก",
+       "en": "Not assessed"
+      },
+      "overall": {
+       "th": "ระดับสูงสุดในตาราง:",
+       "en": "Highest in table:"
+      },
+      "rows": [
+       {
+        "v": "5",
+        "n": {
+         "th": "บ่อยครั้ง (Frequent)",
+         "en": "Frequent"
+        }
+       },
+       {
+        "v": "4",
+        "n": {
+         "th": "เป็นครั้งคราว (Occasional)",
+         "en": "Occasional"
+        }
+       },
+       {
+        "v": "3",
+        "n": {
+         "th": "ไม่น่าเกิดแต่เป็นไปได้ (Remote)",
+         "en": "Remote"
+        }
+       },
+       {
+        "v": "2",
+        "n": {
+         "th": "ไม่น่าจะเกิด (Improbable)",
+         "en": "Improbable"
+        }
+       },
+       {
+        "v": "1",
+        "n": {
+         "th": "แทบเป็นไปไม่ได้ (Extremely improbable)",
+         "en": "Extremely improbable"
+        }
+       }
+      ],
+      "cols": [
+       {
+        "v": "A",
+        "n": {
+         "th": "เล็กน้อยมาก (Negligible)",
+         "en": "Negligible"
+        }
+       },
+       {
+        "v": "B",
+        "n": {
+         "th": "เล็กน้อย (Minor)",
+         "en": "Minor"
+        }
+       },
+       {
+        "v": "C",
+        "n": {
+         "th": "สำคัญ (Major)",
+         "en": "Major"
+        }
+       },
+       {
+        "v": "D",
+        "n": {
+         "th": "อันตราย (Hazardous)",
+         "en": "Hazardous"
+        }
+       },
+       {
+        "v": "E",
+        "n": {
+         "th": "หายนะ (Catastrophic)",
+         "en": "Catastrophic"
+        }
+       }
+      ],
+      "cells": {
+       "5": [
+        "y",
+        "r",
+        "r",
+        "r2",
+        "r2"
+       ],
+       "4": [
+        "g1",
+        "y",
+        "r",
+        "r",
+        "r2"
+       ],
+       "3": [
+        "g1",
+        "g1",
+        "y",
+        "r",
+        "r"
+       ],
+       "2": [
+        "g2",
+        "g1",
+        "g1",
+        "y",
+        "y"
+       ],
+       "1": [
+        "g2",
+        "g2",
+        "g2",
+        "g1",
+        "g1"
+       ]
+      },
+      "zones": {
+       "g2": {
+        "cls": "g2",
+        "n": {
+         "th": "ยอมรับได้",
+         "en": "Acceptable"
+        }
+       },
+       "g1": {
+        "cls": "g1",
+        "n": {
+         "th": "ยอมรับได้",
+         "en": "Acceptable"
+        }
+       },
+       "y": {
+        "cls": "y",
+        "n": {
+         "th": "ยอมรับได้เมื่อมีมาตรการลดความเสี่ยง",
+         "en": "Tolerable"
+        }
+       },
+       "r": {
+        "cls": "r",
+        "n": {
+         "th": "ยอมรับไม่ได้",
+         "en": "Unacceptable"
+        }
+       },
+       "r2": {
+        "cls": "r2",
+        "n": {
+         "th": "ยอมรับไม่ได้",
+         "en": "Unacceptable"
+        }
+       }
+      }
+     }
     },
     {
      "k": "overallRisk",
@@ -359,7 +525,11 @@
       }
      ]
     }
-   ]
+   ],
+   "desc": {
+    "th": "กดช่องสีในแต่ละแถว — แถวคือโอกาสเกิด 1 แทบเป็นไปไม่ได้ → 5 บ่อยครั้ง · คอลัมน์คือความรุนแรง A เล็กน้อยมาก → E หายนะ · ตาม Risk Tolerability Matrix ใน OMM (แดง = ยอมรับไม่ได้ · เหลือง = ต้องมีมาตรการ · เขียว = ยอมรับได้)",
+    "en": "Click a colour in each row — rows are likelihood 1 extremely improbable → 5 frequent; columns are severity A negligible → E catastrophic. Per the OMM Risk Tolerability Matrix."
+   }
   },
   {
    "k": "4",
@@ -665,8 +835,8 @@
      "k": "cmmComment",
      "type": "textarea",
      "label": {
-      "th": "ความเห็น",
-      "en": "Comment"
+      "th": "ความเห็นผู้ทบทวนเนื้อหา/การปฏิบัติตาม (CMM)",
+      "en": "Content / compliance review comment (CMM)"
      }
     },
     {
@@ -764,8 +934,8 @@
      "k": "acmComment",
      "type": "textarea",
      "label": {
-      "th": "ความเห็น",
-      "en": "Comment"
+      "th": "ความเห็นผู้จัดการฝ่ายรับผิดชอบ",
+      "en": "Accountable Manager comment"
      }
     },
     {

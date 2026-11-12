@@ -280,10 +280,6 @@ var TOKEN_MAP = {
       {
         "label": "Instructor Email / Line ID",
         "tok": "{{insContact}}"
-      },
-      {
-        "label": "Instructor Signature:",
-        "tok": "{{sig_insSign}}"
       }
     ],
     "byLine": [],
@@ -312,6 +308,11 @@ var TOKEN_MAP = {
         "cell": "Aircraft Reg.:  HS-___",
         "head": "Aircraft Reg.:  ",
         "tok": "{{acReg}}"
+      },
+      {
+        "cell": "Instructor Signature:",
+        "head": "Instructor Signature:  ",
+        "tok": "{{sig_insSign}}"
       }
     ],
     "boxes": [
@@ -2434,7 +2435,7 @@ var TOKEN_MAP = {
     "tables": [
       {
         "k": "hazards",
-        "rows": 3,
+        "rows": 15,
         "label": "Identified hazards / risks",
         "cols": [
           {
@@ -2457,11 +2458,12 @@ var TOKEN_MAP = {
             "k": "mitigation",
             "head": "Mitigation measure"
           }
-        ]
+        ],
+        "grow": true
       },
       {
         "k": "regs",
-        "rows": 3,
+        "rows": 10,
         "label": "Applicable regulations / standards",
         "cols": [
           {
@@ -2476,11 +2478,12 @@ var TOKEN_MAP = {
             "k": "action",
             "head": "Compliance action required"
           }
-        ]
+        ],
+        "grow": true
       },
       {
         "k": "docsAffected",
-        "rows": 4,
+        "rows": 20,
         "label": "Document list",
         "cols": [
           {
@@ -2495,11 +2498,12 @@ var TOKEN_MAP = {
             "k": "action",
             "head": "Action required"
           }
-        ]
+        ],
+        "grow": true
       },
       {
         "k": "plan",
-        "rows": 5,
+        "rows": 20,
         "label": "Action steps",
         "cols": [
           {
@@ -2518,55 +2522,20 @@ var TOKEN_MAP = {
             "k": "status",
             "head": "Status"
           }
-        ]
+        ],
+        "grow": true
       }
     ],
     "boxesInDocx": 16,
     "approval": [
       {
-        "tok": "{{cmmName}}",
-        "label": "Reviewer name",
-        "labelTh": "ชื่อผู้ทบทวน",
-        "sign": false
-      },
-      {
-        "tok": "{{cmmDate}}",
-        "label": "Date reviewed",
-        "labelTh": "วันที่ทบทวน",
-        "sign": false
-      },
-      {
         "tok": "{{cmmComment}}",
-        "label": "Comment",
-        "labelTh": "ความเห็น",
+        "label": "Content / compliance review comment (CMM)",
+        "labelTh": "ความเห็นผู้ทบทวนเนื้อหา/การปฏิบัติตาม (CMM)",
         "sign": false
-      },
-      {
-        "tok": "{{sig_cmmSign}}",
-        "label": "Reviewer signature",
-        "labelTh": "ลายเซ็นผู้ทบทวน",
-        "sign": true
       }
     ],
     "manual": [
-      {
-        "tok": "{{sig_subSign}}",
-        "label": "Submitter signature",
-        "labelTh": "ลายเซ็นผู้เสนอ",
-        "sign": true
-      },
-      {
-        "tok": "{{smName}}",
-        "label": "Safety Manager name",
-        "labelTh": "ชื่อผู้จัดการนิรภัย",
-        "sign": false
-      },
-      {
-        "tok": "{{smDate}}",
-        "label": "Date reviewed",
-        "labelTh": "วันที่ทบทวน",
-        "sign": false
-      },
       {
         "tok": "{{smComment}}",
         "label": "Safety comment",
@@ -2574,34 +2543,44 @@ var TOKEN_MAP = {
         "sign": false
       },
       {
-        "tok": "{{sig_smSign}}",
-        "label": "Safety Manager signature",
-        "labelTh": "ลายเซ็นผู้จัดการนิรภัย",
-        "sign": true
-      },
-      {
-        "tok": "{{acmName}}",
-        "label": "Accountable Manager name",
-        "labelTh": "ชื่อผู้จัดการฝ่ายรับผิดชอบ",
-        "sign": false
-      },
-      {
-        "tok": "{{acmDate}}",
-        "label": "Date approved",
-        "labelTh": "วันที่อนุมัติ",
-        "sign": false
-      },
-      {
         "tok": "{{acmComment}}",
-        "label": "Comment",
-        "labelTh": "ความเห็น",
+        "label": "Accountable Manager comment",
+        "labelTh": "ความเห็นผู้จัดการฝ่ายรับผิดชอบ",
         "sign": false
+      }
+    ],
+    "rowFill": [
+      {
+        "label": "Prepared by",
+        "toks": [
+          "{{subBy}}",
+          "{{sig_subSign}}",
+          "{{subDate}}"
+        ]
       },
       {
-        "tok": "{{sig_acmSign}}",
-        "label": "Accountable Manager signature",
-        "labelTh": "ลายเซ็นผู้จัดการฝ่ายรับผิดชอบ",
-        "sign": true
+        "label": "Reviewed by (Content / Compliance)",
+        "toks": [
+          "{{cmmName}}",
+          "{{sig_cmmSign}}",
+          "{{cmmDate}}"
+        ]
+      },
+      {
+        "label": "Reviewed by (Safety)",
+        "toks": [
+          "{{smName}}",
+          "{{sig_smSign}}",
+          "{{smDate}}"
+        ]
+      },
+      {
+        "label": "Approved by (Accountable Manager)",
+        "toks": [
+          "{{acmName}}",
+          "{{sig_acmSign}}",
+          "{{acmDate}}"
+        ]
       }
     ]
   },
@@ -2820,18 +2799,6 @@ var TOKEN_MAP = {
       {
         "label": "Venue / Airfield / Training Area",
         "tok": "{{venue}}"
-      },
-      {
-        "label": "Conductor Remarks / Areas for Improvement:",
-        "tok": "{{remarks}}"
-      },
-      {
-        "label": "Follow-up Action Required:",
-        "tok": "{{followup}}"
-      },
-      {
-        "label": "Re-check Due Date (if applicable):",
-        "tok": "{{recheckDue}}"
       }
     ],
     "byLine": [
@@ -2839,24 +2806,40 @@ var TOKEN_MAP = {
         "label": "No       Date notified to HT",
         "und": 15,
         "tok": "{{htNotified}}"
-      },
-      {
-        "label": "Date",
-        "und": 28,
-        "tok": "{{conDate}}"
-      },
-      {
-        "label": "Date",
-        "und": 28,
-        "tok": "{{fiAckDate}}"
-      },
-      {
-        "label": "Date",
-        "und": 28,
-        "tok": "{{htDate}}"
       }
     ],
-    "byCell": [],
+    "byCell": [
+      {
+        "cell": "Conductor Remarks / Areas for Improvement:",
+        "head": "Conductor Remarks / Areas for Improvement:\n",
+        "tok": "{{remarks}}"
+      },
+      {
+        "cell": "Follow-up Action Required:",
+        "head": "Follow-up Action Required:\n",
+        "tok": "{{followup}}"
+      },
+      {
+        "cell": "Re-check Due Date (if applicable):",
+        "head": "Re-check Due Date (if applicable):\n",
+        "tok": "{{recheckDue}}"
+      },
+      {
+        "cell": "Flight Instructor (FI)\nSignature:    ____________________________\nName (Print): ____________________________\nDate:         ____________________________",
+        "head": "Flight Instructor (FI)\nSignature:    ",
+        "tok": "{{sig_fiSign}}\nName (Print): {{fiAckName}}\nDate:         {{fiAckDate}}"
+      },
+      {
+        "cell": "Conductor (HT / CFI/CTKI)\nSignature:    ____________________________\nName (Print): ____________________________\nDate:         ____________________________",
+        "head": "Conductor (HT / CFI/CTKI)\nSignature:    ",
+        "tok": "{{sig_conSign}}\nName (Print): {{conName}}\nDate:         {{conDate}}"
+      },
+      {
+        "cell": "Head of Training (HT)\nSignature:    ____________________________\nName (Print): ____________________________\nDate:         ____________________________",
+        "head": "Head of Training (HT)\nSignature:    ",
+        "tok": "{{sig_htSign}}\nName (Print): {{htName}}\nDate:         {{htDate}}"
+      }
+    ],
     "boxes": [
       {
         "tok": "{{k_tier_t1annual}}",
@@ -3077,46 +3060,8 @@ var TOKEN_MAP = {
     "boxesPartial": false,
     "tables": [],
     "boxesInDocx": 50,
-    "approval": [
-      {
-        "tok": "{{fiAckName}}",
-        "label": "Flight Instructor name",
-        "labelTh": "ชื่อครูการบิน",
-        "sign": false
-      },
-      {
-        "tok": "{{sig_fiSign}}",
-        "label": "Flight Instructor signature",
-        "labelTh": "ลายเซ็นครูการบิน",
-        "sign": true
-      }
-    ],
-    "manual": [
-      {
-        "tok": "{{conName}}",
-        "label": "Conductor name",
-        "labelTh": "ชื่อผู้ตรวจ",
-        "sign": false
-      },
-      {
-        "tok": "{{sig_conSign}}",
-        "label": "Conductor signature",
-        "labelTh": "ลายเซ็นผู้ตรวจ",
-        "sign": true
-      },
-      {
-        "tok": "{{htName}}",
-        "label": "Head of Training name",
-        "labelTh": "ชื่อหัวหน้าครูฝึก",
-        "sign": false
-      },
-      {
-        "tok": "{{sig_htSign}}",
-        "label": "Head of Training signature",
-        "labelTh": "ลายเซ็นหัวหน้าครูฝึก",
-        "sign": true
-      }
-    ]
+    "approval": [],
+    "manual": []
   },
   "PCR-TKI": {
     "abbr": "PCR-TKI",
@@ -3162,21 +3107,6 @@ var TOKEN_MAP = {
         "label": "No       Date notified to HT",
         "und": 15,
         "tok": "{{htNotified}}"
-      },
-      {
-        "label": "Date",
-        "und": 28,
-        "tok": "{{conDate}}"
-      },
-      {
-        "label": "Date",
-        "und": 28,
-        "tok": "{{tkiAckDate}}"
-      },
-      {
-        "label": "Date",
-        "und": 28,
-        "tok": "{{htDate}}"
       }
     ],
     "byCell": [
@@ -3194,6 +3124,21 @@ var TOKEN_MAP = {
         "cell": "Re-check Due Date (if applicable):",
         "head": "Re-check Due Date (if applicable):\n",
         "tok": "{{recheckDue}}"
+      },
+      {
+        "cell": "Theoretical Knowledge Instructor (TKI)\nSignature:    ____________________________\nName (Print): ____________________________\nDate:         ____________________________",
+        "head": "Theoretical Knowledge Instructor (TKI)\nSignature:    ",
+        "tok": "{{sig_tkiSign}}\nName (Print): {{tkiAckName}}\nDate:         {{tkiAckDate}}"
+      },
+      {
+        "cell": "Conductor (HT / CFI/CTKI)\nSignature:    ____________________________\nName (Print): ____________________________\nDate:         ____________________________",
+        "head": "Conductor (HT / CFI/CTKI)\nSignature:    ",
+        "tok": "{{sig_conSign}}\nName (Print): {{conName}}\nDate:         {{conDate}}"
+      },
+      {
+        "cell": "Head of Training (HT)\nSignature:    ____________________________\nName (Print): ____________________________\nDate:         ____________________________",
+        "head": "Head of Training (HT)\nSignature:    ",
+        "tok": "{{sig_htSign}}\nName (Print): {{htName}}\nDate:         {{htDate}}"
       }
     ],
     "boxes": [
@@ -3376,46 +3321,8 @@ var TOKEN_MAP = {
     "boxesPartial": false,
     "tables": [],
     "boxesInDocx": 41,
-    "approval": [
-      {
-        "tok": "{{tkiAckName}}",
-        "label": "Instructor name",
-        "labelTh": "ชื่อครูภาคทฤษฎี",
-        "sign": false
-      },
-      {
-        "tok": "{{sig_tkiSign}}",
-        "label": "Instructor signature",
-        "labelTh": "ลายเซ็นครูภาคทฤษฎี",
-        "sign": true
-      }
-    ],
-    "manual": [
-      {
-        "tok": "{{conName}}",
-        "label": "Conductor name",
-        "labelTh": "ชื่อผู้ตรวจ",
-        "sign": false
-      },
-      {
-        "tok": "{{sig_conSign}}",
-        "label": "Conductor signature",
-        "labelTh": "ลายเซ็นผู้ตรวจ",
-        "sign": true
-      },
-      {
-        "tok": "{{htName}}",
-        "label": "Head of Training name",
-        "labelTh": "ชื่อหัวหน้าครูฝึก",
-        "sign": false
-      },
-      {
-        "tok": "{{sig_htSign}}",
-        "label": "Head of Training signature",
-        "labelTh": "ลายเซ็นหัวหน้าครูฝึก",
-        "sign": true
-      }
-    ]
+    "approval": [],
+    "manual": []
   },
   "PWR": {
     "abbr": "PWR",

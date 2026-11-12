@@ -188,6 +188,16 @@ def table_rows(path, f):
     return max(lo, min(hi, n))
 
 
+def uniq_cells(row, raw=False):
+    """ช่องของแถวตามที่ Google Docs เห็น — python-docx คืนเซลล์ที่ผสานซ้ำหลายครั้ง"""
+    out, prev = [], None
+    for c in row.cells:
+        if c._tc is prev: continue
+        prev = c._tc
+        out.append(c.text if raw else re.sub(r'[^a-z0-9]+', ' ', str(c.text or '').lower()).strip())
+    return out
+
+
 def docx_table_rows(path, heads):
     """แถวข้อมูลในตารางของกระดาษที่หัวคอลัมน์ตรงกับ heads — None ถ้าหาไม่เจอ
 
@@ -199,20 +209,28 @@ def docx_table_rows(path, heads):
     want = [nm(h) for h in heads]
     for t in docx.Document(path).tables:
         rows = t.rows
-        for r in range(min(len(rows), 3)):
-            hs = [nm(c.text) for c in rows[r].cells]
-            idx = []
+        # ทุกแถว ไม่ใช่แค่สามแถวแรก — ตรงกับ findTableByHead_ ใน ImportTemplate.gs
+        for r in range(len(rows)):
+            hs = uniq_cells(rows[r])
+            used, idx = set(), []
             for w in want:
-                k = next((k for k, h in enumerate(hs)
-                          if h and (h == w or h.startswith(w) or w.startswith(h))), None)
+                k = next((k for k, h in enumerate(hs) if k not in used
+                          and h and (h == w or h.startswith(w) or w.startswith(h))), None)
+                if k is not None: used.add(k)
                 idx.append(k)
+            for j, w in enumerate(want):
+                if idx[j] is None and len(w) >= 4:
+                    k = next((k for k, h in enumerate(hs) if k not in used
+                              and h and (' ' + w + ' ') in (' ' + h + ' ')), None)
+                    if k is not None: used.add(k); idx[j] = k
             if None in idx or len(set(idx)) != len(idx) or len(rows) <= r + 1:
                 continue
             n = 0
             for row in rows[r + 1:]:
-                cs = row.cells
+                cs = uniq_cells(row, raw=True)
+                if len(cs) != len(hs): break
                 busy = sum(1 for k in idx if k < len(cs)
-                           and not re.match(r'^[_.\s/\-:]*$', cs[k].text.strip()))
+                           and not re.match(r'^[_.\s/\-:]*$', cs[k].strip()))
                 if busy < 2: n += 1
             return n
     return None
@@ -397,7 +415,13 @@ def build(abbr, verbose=False):
         if head is None: head = cell_head(cell) or ''
         by_cell = [b for b in by_cell if b['tok'] != tok and b['cell'] != cell]
         by_cell.append({'cell': cell, 'head': head, 'tok': tok})
-        unmatched = [u for u in unmatched if u['tok'] != tok]
+        # tok อาจรวมหลาย token ในเซลล์เดียว (ช่องลงนามของ PCR: ลายเซ็น · ชื่อ · วันที่)
+        # ทุกตัวที่อยู่ในนั้นต้องหลุดจากที่อื่นทั้งหมด ไม่งั้นวางซ้ำสองที่
+        inner = set(re.findall(r'\{\{[^}]+\}\}', tok))
+        unmatched = [u for u in unmatched if u['tok'] != tok and u['tok'] not in inner]
+        approval = [a for a in approval if a['tok'] not in inner]
+        by_line = [b for b in by_line if b['tok'] not in inner]
+        # byLabel ตัดเฉพาะที่ตรงทั้งก้อน — ชื่อที่ซ้ำในเซลล์ลงนามยังต้องอยู่ที่ป้ายเดิมด้วย (MRF Employee's Name)
         # token เดียวกันต้องไม่ค้างอยู่ใน byLabel ด้วย ไม่งั้นตัวสร้างแม่แบบพยายามวางสองที่
         # อันหลังจะรายงานว่าวางไม่ได้ ทั้งที่ค่าไปอยู่ในช่องเดิมที่เราตั้งใจจะเลี่ยง
         by_label = [b for b in by_label if b['tok'] != tok]
@@ -432,6 +456,23 @@ def build(abbr, verbose=False):
                    'sign': src.get('type') == 'sign'}
         if not any(a['tok'] == tok for a in approval):
             approval.append(rec)
+
+    # rowFill: แถวลงนามของกระดาษ ป้ายช่องแรก ค่าเรียงไปทางขวา (MOC SECTION 8 — Name & Position | Signature | Date)
+    # token ที่วางตรงนี้ไม่ต้องต่อท้ายเอกสารในบล็อก APPROVAL / ADDITIONAL อีก
+    row_fill = []
+    for lab, toks in (ov.get('rowFill') or {}).items():
+        row_fill.append({'label': lab, 'toks': list(toks)})
+        for tok in toks:
+            if not tok: continue
+            unmatched = [u for u in unmatched if u['tok'] != tok]
+            approval = [a for a in approval if a['tok'] != tok]
+            # byLabel ไม่ตัด — ชื่อและวันที่ของผู้เสนอวางที่ SECTION 1 ด้วยตามกระดาษ
+    # tableRows: จำนวนแถวที่ให้แม่แบบมีจริง — กระดาษพิมพ์ไว้น้อยกว่า ตัววางเพิ่มแถวให้ (grow)
+    for t in tables:
+        n = (ov.get('tableRows') or {}).get(t['k'])
+        if n:
+            t['rows'] = n
+            t['grow'] = True
 
     # skipTables: กระดาษไม่ได้วางตารางนั้นเป็นคอลัมน์แยกแล้ว
     # EFC รวมชื่อวิชากับผลไว้คอลัมน์เดียว ({{s7_N_shown}}) ตามที่เอกสารฉบับแก้ไขทำ
@@ -528,6 +569,8 @@ def build(abbr, verbose=False):
     # ใส่ "strip": [] ทุกใบทำให้รันทุกใบครั้งเดียว TokenMap.gs เปลี่ยน 17 ใบทั้งที่ไม่มีอะไรต่าง
     if ov.get('strip'):
         out['strip'] = list(ov['strip'])
+    if row_fill:
+        out['rowFill'] = row_fill
     return out, unmatched, lines
 
 

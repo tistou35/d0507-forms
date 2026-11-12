@@ -779,9 +779,60 @@
       case 'table': {
         const cols = f.cols || [];
         const rows = tableRows(f, v, ro);
-        const head = cols.map(c =>
-          `<th${c.w ? ` style="width:${esc(c.w)}"` : ''}>${esc(L(c.label, this.lang))}</th>`).join('');
+        /* risk = ตารางสีในแถว — กดช่องสีช่องเดียวได้ทั้งโอกาส ความรุนแรง และระดับ
+           ใช้กับตารางอันตรายหลายรายการ (MOC) ที่ riskmatrix ตัวเดียวทั้งใบใช้ไม่ได้
+           สามคอลัมน์ยังเก็บแยกกันเหมือนเดิม PDF จึงลงช่องของกระดาษได้ตามเดิม
+           แกนและสีมาจากนิยามฟอร์มทั้งหมด (MOC ใช้ Risk Tolerability Matrix ของ OMM)
+             rows  แกนตั้ง บนลงล่าง  [{v, n}]   → เก็บใน rowKey
+             cols  แกนนอน ซ้ายไปขวา [{v, n}]   → เก็บใน colKey
+             cells { rowV: [zone…] }            zones { zone: { n, cls } } → level */
+        const rk = f.risk || null;
+        const rkCols = rk ? [rk.rowKey, rk.colKey, rk.level] : [];
+        const rkFirst = rk ? cols.map(c => c.k).find(k => rkCols.indexOf(k) >= 0) : null;
+        const head = cols.map(c => {
+          if (rk && c.k === rkFirst)
+            return `<th colspan="3" class="fk-trk-h">${esc(L(rk.head, this.lang) || '')}</th>`;
+          if (rkCols.indexOf(c.k) >= 0) return '';
+          return `<th${c.w ? ` style="width:${esc(c.w)}"` : ''}>${esc(L(c.label, this.lang))}</th>`;
+        }).join('');
+        const rkZone = (rv, cv) => {
+          const ci = (rk.cols || []).findIndex(c => String(c.v) === String(cv));
+          return ci < 0 ? '' : ((rk.cells || {})[String(rv)] || [])[ci] || '';
+        };
+        const rkCell = (row, ri) => {
+          const vr = row[rk.rowKey], vc = row[rk.colKey];
+          let g = `<div class="fk-trk"><table><thead><tr><th></th>`
+            + (rk.cols || []).map(c => `<th title="${esc(L(c.n, this.lang) || '')}">${esc(c.v)}</th>`).join('')
+            + `</tr></thead><tbody>`;
+          (rk.rows || []).forEach(r => {
+            g += `<tr><th title="${esc(L(r.n, this.lang) || '')}">${esc(r.v)}</th>`;
+            (rk.cols || []).forEach(c => {
+              const z = rkZone(r.v, c.v), zn = (rk.zones || {})[z] || {};
+              const on = String(vr) === String(r.v) && String(vc) === String(c.v);
+              g += `<td><button type="button" class="rm z-${esc(zn.cls || z)}${on ? ' on' : ''}"
+                data-trk="${esc(f.k)}" data-tr="${ri}" data-r="${esc(r.v)}" data-c="${esc(c.v)}"
+                title="${esc(r.v + c.v + ' · ' + (L(r.n, this.lang) || '') + ' × ' + (L(c.n, this.lang) || '') + ' · ' + (L(zn.n, this.lang) || ''))}"
+                aria-label="${esc(r.v + c.v)}" aria-pressed="${on}"${ro ? ' disabled' : ''}></button></td>`;
+            });
+            g += '</tr>';
+          });
+          g += `</tbody></table>`;
+          const z = rkZone(vr, vc), zn = (rk.zones || {})[z];
+          if (zn) {
+            const rn = (rk.rows || []).find(r => String(r.v) === String(vr)) || {};
+            const cn = (rk.cols || []).find(c => String(c.v) === String(vc)) || {};
+            g += `<p class="fk-trk-out z-${esc(zn.cls || z)}"><b>${esc(String(vr) + vc)}</b> · ${
+              esc(L(rn.n, this.lang) || '')} × ${esc(L(cn.n, this.lang) || '')}<br><b>${esc(L(zn.n, this.lang))}</b></p>`;
+          } else if (vr || vc || row[rk.level]) {
+            g += `<p class="fk-trk-out">${esc([vr, vc, row[rk.level]].filter(Boolean).join(' · '))}</p>`;
+          } else {
+            g += `<p class="fk-trk-out none">${esc(L(rk.pick, this.lang) || '')}</p>`;
+          }
+          return `<td colspan="3" class="fk-trk-td">${g}</div></td>`;
+        };
         const body_ = rows.map((row, ri) => `<tr>${cols.map(c => {
+          if (rk && c.k === rkFirst) return rkCell(row, ri);
+          if (rkCols.indexOf(c.k) >= 0) return '';
           const cv = row[c.k] == null ? '' : row[c.k];
           const t = ['number', 'date', 'time'].includes(c.type) ? c.type : 'text';
           return `<td><input type="${t}" data-tk="${esc(f.k)}" data-tr="${ri}" data-tc="${esc(c.k)}"
@@ -789,8 +840,20 @@
         }).join('')}${ro ? '' : `<td class="fk-trm"><button type="button" class="fb sm"
             data-tdel="${esc(f.k)}" data-tr="${ri}"
             aria-label="${esc(T('rowDel', this.lang))} ${ri + 1}">×</button></td>`}</tr>`).join('');
-        body = `<div class="fk-tw"><table class="fk-tbl"><thead><tr>${head}${ro ? '' : '<th></th>'}</tr></thead>
-          <tbody>${body_}</tbody></table></div>`
+        let top = '';
+        if (rk && rk.overall) {
+          /* ระดับสูงสุดในตาราง — บอกไว้ใต้ตาราง ไม่ไปเลือก "ผลโดยรวม" แทนคนกรอก */
+          const order = Object.keys(rk.zones || {});
+          let best = -1;
+          rows.forEach(r => { const i = order.indexOf(rkZone(r[rk.rowKey], r[rk.colKey])); if (i > best) best = i; });
+          if (best >= 0) {
+            const zn = rk.zones[order[best]];
+            top = `<p class="fk-trk-max">${esc(L(rk.overall, this.lang))} <span class="fk-trk-out z-${
+              esc(zn.cls || order[best])}"><b>${esc(L(zn.n, this.lang))}</b></span></p>`;
+          }
+        }
+        body = `<div class="fk-tw"><table class="fk-tbl${rk ? ' has-rk' : ''}"><thead><tr>${head}${ro ? '' : '<th></th>'}</tr></thead>
+          <tbody>${body_}</tbody></table></div>` + top
           + (ro || (f.max && rows.length >= f.max) ? '' :
             `<button type="button" class="fb sm" data-tadd="${esc(f.k)}">+ ${esc(T('rowAdd', this.lang))}</button>`);
         break;
@@ -1066,6 +1129,26 @@
         self.set(kx, same ? '' : Number(b.dataset.x));
         self.set(ky, same ? '' : Number(b.dataset.y));
         rerender();
+      }));
+
+    /* ตารางสีในแถวของตาราง — ตั้งโอกาส ความรุนแรง และระดับ (ชื่ออังกฤษ ลงกระดาษได้ตรง)
+       ของแถวนั้นพร้อมกัน กดช่องเดิมซ้ำคือล้าง */
+    el.querySelectorAll('button[data-trk]').forEach(b =>
+      b.addEventListener('click', () => {
+        const k = b.dataset.trk, ri = Number(b.dataset.tr);
+        const f = self.fields[k] || {}, rk = f.risk;
+        if (!rk) return;
+        const arr = tableRows(f, self.data[k]).map(r => Object.assign({}, r));
+        const row = arr[ri] || (arr[ri] = {});
+        const same = String(row[rk.rowKey]) === b.dataset.r && String(row[rk.colKey]) === b.dataset.c;
+        const ci = (rk.cols || []).findIndex(c => String(c.v) === b.dataset.c);
+        const z = ((rk.cells || {})[b.dataset.r] || [])[ci] || '';
+        row[rk.rowKey] = same ? '' : b.dataset.r;
+        row[rk.colKey] = same ? '' : b.dataset.c;
+        // ช่องระดับเก็บรหัสช่องของตาราง (4C) อย่างเดียว — ลงช่อง Risk Level ของกระดาษ
+        // ระดับการยอมรับได้ดูจากรหัสในตาราง OMM ได้เสมอ หน้าจอแสดงสีและชื่อระดับให้เอง
+        row[rk.level] = same ? '' : b.dataset.r + b.dataset.c;
+        self.set(k, arr); rerender();
       }));
 
     // ตารางแถวซ้ำ — เขียนค่าลงช่องโดยไม่ rerender ระหว่างพิมพ์ กัน focus หลุดเหมือน mask

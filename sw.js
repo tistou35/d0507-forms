@@ -5,16 +5,16 @@
 
    หน้า HTML ใช้เครือข่ายก่อนแล้วค่อยตกมาที่แคช — จะได้ไม่ค้างรุ่นเก่าเมื่อออนไลน์
    asset ใช้แคชก่อนเพราะติด ?v= อยู่แล้ว เปลี่ยนเนื้อไฟล์เมื่อไร URL เปลี่ยนตาม */
-const CACHE = 'd0507-a02b97d5ba';
+const CACHE = 'd0507-796571d076';
 const FILES = [
   "fill/",
   "cl/",
   "pubs/",
   "all/",
   "",
-  "assets/app.css?v=ab3a804f",
+  "assets/app.css?v=a976eb66",
   "assets/app.js?v=8fcffc00",
-  "assets/formkit.js?v=65c32d98"
+  "assets/formkit.js?v=baecbe03"
 ];
 
 self.addEventListener('install', e => {

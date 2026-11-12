@@ -11,7 +11,9 @@
   "ตรวจจำนวน ☐ จริงได้ด้วย: python3 tools/make_tokenmap.py <ABBR>",
   "cells   เซลล์ที่มีป้าย+ตัวยึดตำแหน่งในตัวเอง -> { tok, head } · head คือข้อความที่เก็บไว้หน้า token",
   "manual  token ที่บังคับให้ต่อท้ายเอกสารในบล็อก ADDITIONAL ไม่ต้องจับคู่กับป้าย",
-  "approval token ที่บังคับให้อยู่ในบล็อก APPROVAL ท้ายเอกสาร (ปกติมาจากฝ่ายของขั้นที่ 2 ใน route)"
+  "approval token ที่บังคับให้อยู่ในบล็อก APPROVAL ท้ายเอกสาร (ปกติมาจากฝ่ายของขั้นที่ 2 ใน route)",
+  "rowFill  แถวลงนาม { ป้ายช่องแรก: [token ช่องที่ 2, ช่องที่ 3, …] } — \"\" = เว้นช่องนั้น",
+  "tableRows { ตาราง: จำนวนแถว } — กระดาษมีแถวน้อยกว่า ตัววางเพิ่มแถวให้ (แถวที่ไม่ได้กรอกถูกลบตอนออกเอกสาร)"
  ],
  "PWR": {
   "_why": "กระดาษมี ☐ สองช่อง — ผู้โดยสารเป็นผู้เยาว์ กับความยินยอมของผู้ปกครอง ส่วนข้อตกลง 4 ข้อเป็นความเรียง ไม่มีช่องติ๊ก การลงนามถือเป็นการยอมรับอยู่แล้ว · ป้าย \"Signature:\" และ \"Name (Print):\" มีอยู่สามชุด (ผู้ปกครอง ผู้โดยสาร หัวหน้าครูฝึก) ตัวจับคู่แยกไม่ออกว่าชุดไหนของใคร จึงวาง token ลงในเอกสารเองแทน · ช่อง Age ไม่ใช่ฟิลด์ให้กรอกแล้ว เป็นค่าที่คำนวณจากวันเกิด ตัวสร้างแผนที่เดินจากรายการฟิลด์จึงไม่เห็น ต้องผูกป้ายเอง",
@@ -58,8 +60,13 @@
    "Aircraft Reg.:  HS-___": {
     "tok": "{{acReg}}",
     "head": "Aircraft Reg.:  "
+   },
+   "Instructor Signature:": {
+    "tok": "{{sig_insSign}}",
+    "head": "Instructor Signature:  "
    }
-  }
+  },
+  "_sigWhy": "ช่อง Instructor Signature: บนกระดาษมีแต่ป้าย ไม่มีเส้นว่าง ตัวจับคู่จึงไม่เห็นว่าเป็นช่องกรอก — ลายเซ็นครูวางต่อท้ายป้ายในเซลล์เดียวกัน"
  },
  "APF": {
   "_why": "คำรับรองในกระดาษเป็นความเรียง ไม่มีช่องติ๊ก — การลงนามคือการรับรอง ระบบทำเป็น checkbox เพื่อบังคับให้อ่านก่อนส่ง",
@@ -446,9 +453,22 @@
    "Re-check Due Date (if applicable):": {
     "tok": "{{recheckDue}}",
     "head": "Re-check Due Date (if applicable):\n"
+   },
+   "Theoretical Knowledge Instructor (TKI)\nSignature:    ____________________________\nName (Print): ____________________________\nDate:         ____________________________": {
+    "head": "Theoretical Knowledge Instructor (TKI)\nSignature:    ",
+    "tok": "{{sig_tkiSign}}\nName (Print): {{tkiAckName}}\nDate:         {{tkiAckDate}}"
+   },
+   "Conductor (HT / CFI/CTKI)\nSignature:    ____________________________\nName (Print): ____________________________\nDate:         ____________________________": {
+    "head": "Conductor (HT / CFI/CTKI)\nSignature:    ",
+    "tok": "{{sig_conSign}}\nName (Print): {{conName}}\nDate:         {{conDate}}"
+   },
+   "Head of Training (HT)\nSignature:    ____________________________\nName (Print): ____________________________\nDate:         ____________________________": {
+    "head": "Head of Training (HT)\nSignature:    ",
+    "tok": "{{sig_htSign}}\nName (Print): {{htName}}\nDate:         {{htDate}}"
    }
   },
-  "_why_cells": "ช่องบรรยายสามช่องเป็นเซลล์เดียวที่มีป้ายแล้วเว้นบรรทัดว่างไว้เขียน ไม่มีเซลล์ว่างแยก"
+  "_why_cells": "ช่องบรรยายสามช่องเป็นเซลล์เดียวที่มีป้ายแล้วเว้นบรรทัดว่างไว้เขียน ไม่มีเซลล์ว่างแยก",
+  "_why_sig": "SECTION D มีสามช่อง แต่ละช่องมี Signature · Name (Print) · Date อยู่ในเซลล์เดียว — วางทั้งเซลล์ เดิมชื่อกับลายเซ็นตกไปบล็อกท้ายเอกสาร และวันที่สามช่องลงตามลำดับที่เจอในกระดาษ วันที่ของผู้ตรวจจึงไปอยู่ช่องของครู"
  },
  "FRAE": {
   "_why": "ช่องติ๊กวางตามลำดับ ☐ บนกระดาษ ต้องมีจำนวนเท่ากันพอดี ไม่งั้นไม่วางเลยสักช่อง — PDF ของ FRAE จึงไม่มีช่องไหนถูกติ๊ก (พบตอนออก Rev 01 · 27 OCT 2026) · กระดาษไม่มีช่อง PIC/Student (ผู้ทำการประเมิน) และไม่มี HS-BSC ในรายการทะเบียนอากาศยาน จึงข้ามสามช่องนี้ ค่ายังเก็บในใบและตารางบันทึกตามปกติ · ป้าย PIC Name — First Name ผูกเองเพราะป้ายในนิยามฟอร์มเปลี่ยนตามผู้ประเมิน (labelIf) ตัวจับคู่จึงหาไม่เจอ",
@@ -462,5 +482,66 @@
    "TOTAL RISK SCORE": "{{score}}"
   },
   "_why_score": "คะแนนรวมเป็นค่าคำนวณ ไม่ใช่ช่องในนิยามฟอร์ม ตัวจับคู่จึงไม่เคยวาง — PDF ของ FRAE ไม่เคยพิมพ์คะแนนรวมเลย (พบตอนออก Rev 01 · 27 OCT 2026)"
+ },
+ "MOC": {
+  "_note": "กระดาษ MOC เป็นตารางเดียวทั้งใบ · SECTION 8 มีแถวลงนามครบสี่ฝ่าย (Role | Name & Position | Signature | Date) · ตารางความเสี่ยงใช้ Risk Tolerability Matrix ของ OMM — ค่าที่ลงช่องคือ 1–5 · A–E · รหัสช่อง เช่น 4C",
+  "rowFill": {
+   "Prepared by": [
+    "{{subBy}}",
+    "{{sig_subSign}}",
+    "{{subDate}}"
+   ],
+   "Reviewed by (Content / Compliance)": [
+    "{{cmmName}}",
+    "{{sig_cmmSign}}",
+    "{{cmmDate}}"
+   ],
+   "Reviewed by (Safety)": [
+    "{{smName}}",
+    "{{sig_smSign}}",
+    "{{smDate}}"
+   ],
+   "Approved by (Accountable Manager)": [
+    "{{acmName}}",
+    "{{sig_acmSign}}",
+    "{{acmDate}}"
+   ]
+  },
+  "tableRows": {
+   "hazards": 15,
+   "regs": 10,
+   "docsAffected": 20,
+   "plan": 20
+  }
+ },
+ "PCR-FI": {
+  "cells": {
+   "Conductor Remarks / Areas for Improvement:": {
+    "tok": "{{remarks}}",
+    "head": "Conductor Remarks / Areas for Improvement:\n"
+   },
+   "Follow-up Action Required:": {
+    "tok": "{{followup}}",
+    "head": "Follow-up Action Required:\n"
+   },
+   "Re-check Due Date (if applicable):": {
+    "tok": "{{recheckDue}}",
+    "head": "Re-check Due Date (if applicable):\n"
+   },
+   "Flight Instructor (FI)\nSignature:    ____________________________\nName (Print): ____________________________\nDate:         ____________________________": {
+    "head": "Flight Instructor (FI)\nSignature:    ",
+    "tok": "{{sig_fiSign}}\nName (Print): {{fiAckName}}\nDate:         {{fiAckDate}}"
+   },
+   "Conductor (HT / CFI/CTKI)\nSignature:    ____________________________\nName (Print): ____________________________\nDate:         ____________________________": {
+    "head": "Conductor (HT / CFI/CTKI)\nSignature:    ",
+    "tok": "{{sig_conSign}}\nName (Print): {{conName}}\nDate:         {{conDate}}"
+   },
+   "Head of Training (HT)\nSignature:    ____________________________\nName (Print): ____________________________\nDate:         ____________________________": {
+    "head": "Head of Training (HT)\nSignature:    ",
+    "tok": "{{sig_htSign}}\nName (Print): {{htName}}\nDate:         {{htDate}}"
+   }
+  },
+  "_why_cells": "ช่องบรรยายสามช่องเป็นเซลล์เดียวที่มีป้ายแล้วเว้นบรรทัดว่างไว้เขียน ไม่มีเซลล์ว่างแยก",
+  "_why_sig": "SECTION D มีสามช่อง แต่ละช่องมี Signature · Name (Print) · Date อยู่ในเซลล์เดียว — วางทั้งเซลล์ เดิมชื่อกับลายเซ็นตกไปบล็อกท้ายเอกสาร และวันที่สามช่องลงตามลำดับที่เจอในกระดาษ วันที่ของผู้ตรวจจึงไปอยู่ช่องของครู"
  }
 }

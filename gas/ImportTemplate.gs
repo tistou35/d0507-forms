@@ -167,6 +167,23 @@ function fillTokens_(doc, map) {
     placed++;
   });
 
+  // 1c) แถวลงนามของกระดาษ: "Prepared by | ชื่อ | ลายเซ็น | วันที่" — ป้ายอยู่ช่องแรก
+  //     token เรียงตามช่องทางขวาของป้าย ใช้กับตารางลงนามที่ทุกฝ่ายอยู่คนละแถว (MOC SECTION 8)
+  //     เทียบป้ายแบบตัดเว้นวรรคและเครื่องหมาย เพราะในกระดาษขึ้นบรรทัดใหม่กลางป้าย
+  (map.rowFill || []).forEach(function (it) {
+    var pos = findCellNorm_(body, it.label, usedCells);
+    if (!pos) { it.toks.forEach(function (t) { if (t) left.push(t + '  ← ' + it.label); }); return; }
+    usedCells[pos.key] = true;
+    var row = pos.tbl.getRow(pos.r), live = liveCells_(row), at = live.indexOf(pos.c);
+    it.toks.forEach(function (t, j) {
+      if (!t) return;
+      var ci = live[at + 1 + j];
+      if (ci == null) { left.push(t + '  ← ' + it.label + ' (ช่องไม่พอ)'); return; }
+      row.getCell(ci).setText(t);
+      placed++;
+    });
+  });
+
   // 2) "ป้าย: ______" -> แทนเส้นประ คงความยาวบรรทัดไว้ให้ใกล้เคียงเดิม
   (map.byLine || []).forEach(function (ln) {
     var pat = escRe_(ln.label) + '\\s*[:：]?\\s*_{3,}';
@@ -219,8 +236,11 @@ function fillTokens_(doc, map) {
        ถ้านับแถวนั้นเป็นแถวข้อมูลด้วย ทุกแถวจะเลื่อนไปหนึ่ง แถวแรกที่คนกรอกหายไปจากใบ
        เงียบ ๆ (เจอจริงตอนเปิด PDF ของ MRF ดู — รายการวันที่ 3 ก.ย. หายทั้งแถว) */
     var n = hit.tbl.getNumRows() - hit.headRow - 1, di = 0;
+    var width = liveCells_(hit.tbl.getRow(hit.headRow)).length, lastRowIdx = -1;
     for (var i = 0; i < n && di < t.rows; i++) {
       var row = hit.tbl.getRow(hit.headRow + 1 + i);
+      /* แถวที่จำนวนช่องไม่เท่าหัวตาราง คือจบตารางย่อยแล้ว (หัว SECTION ถัดไป ฯลฯ) */
+      if (liveCells_(row).length !== width) break;
       /* แถวตัวอย่างที่กระดาษพิมพ์ไว้ให้ดูเป็นแบบ (MRF มี Example และ EQ) ต้องข้ามทั้งแถว
          ไม่ใช่แค่ไม่ทับช่องที่มีข้อความ — ถ้าแอบวาง token ลงช่องที่ยังว่างของแถวนั้น
          เลขแถวจะเลื่อนไปหนึ่ง แล้วรายการแรกที่คนกรอกจะหายไปจากใบเงียบ ๆ
@@ -232,7 +252,11 @@ function fillTokens_(doc, map) {
         var cur = row.getCell(ci).getText().trim();
         if (cur && !/^[_\.\s\/\-:]*$/.test(cur)) busy++;
       });
+      /* ตารางที่ต่อแถวเอง (grow) อยู่กลางตารางใหญ่ — แถวแรกที่มีข้อความหลังแถวข้อมูล
+         คือจบตารางย่อยแล้ว ถ้าเดินต่อจะไปวาง token ลงช่องว่างของ SECTION ถัดไป */
+      if (t.grow && di > 0 && busy >= 1) break;
       if (busy >= 2) continue;
+      lastRowIdx = hit.headRow + 1 + i;
       t.cols.forEach(function (c, j) {
         var ci = hit.colIdx[j];
         if (ci == null || ci >= row.getNumCells()) return;
@@ -242,6 +266,24 @@ function fillTokens_(doc, map) {
         placed++;
       });
       di++;
+    }
+    /* กระดาษพิมพ์แถวไว้น้อยกว่าที่ฟอร์มให้กรอก — เพิ่มแถวต่อจากแถวสุดท้ายที่วาง
+       คัดลอกแถวเดิมทั้งแถว (ขนาดและเส้นขอบเหมือนกัน) แล้วเปลี่ยนเลขแถวใน token
+       แถวที่ไม่มีใครกรอกถูก dropEmptyRows_ ลบตอนออกเอกสาร ใบจริงจึงไม่มีแถวว่างเกิน */
+    if (di < t.rows && t.grow && lastRowIdx >= 0) {
+      var tpl = hit.tbl.getRow(lastRowIdx);
+      for (var g = di + 1; g <= t.rows; g++) {
+        lastRowIdx++;
+        var nr = hit.tbl.insertTableRow(lastRowIdx, tpl.copy());
+        nr.editAsText().replaceText('\\{\\{' + t.k + '_' + di + '_', '{{' + t.k + '_' + g + '_');
+        // ช่องที่ไม่ใช่ของตาราง (เลขลำดับ "5" ของ MOC SECTION 7) ล้างทิ้ง —
+        // ถ้าคัดลอกเลขไปด้วย แถวที่ไม่มีใครกรอกจะไม่ว่าง และ dropEmptyRows_ ลบไม่ได้
+        liveCells_(nr).forEach(function (cc) {
+          if (hit.colIdx.indexOf(cc) < 0) nr.getCell(cc).setText('');
+        });
+        placed += t.cols.length;
+      }
+      di = t.rows;
     }
     for (var r2 = di + 1; r2 <= t.rows; r2++)
       t.cols.forEach(function (c) {
@@ -278,16 +320,12 @@ function findTableByHead_(body, cols) {
     var ch = body.getChild(i);
     if (ch.getType() !== DocumentApp.ElementType.TABLE) continue;
     var tbl = ch.asTable();
-    for (var r = 0; r < Math.min(tbl.getNumRows(), 3); r++) {
-      var row = tbl.getRow(r), heads = [];
-      for (var c = 0; c < row.getNumCells(); c++) heads.push(norm(row.getCell(c).getText()));
-      var idx = cols.map(function (col) {
-        var want = norm(col.head);
-        for (var k = 0; k < heads.length; k++)
-          if (heads[k] && (heads[k] === want || heads[k].indexOf(want) === 0 || want.indexOf(heads[k]) === 0))
-            return k;
-        return null;
-      });
+    /* ค้นทุกแถว ไม่ใช่แค่สามแถวแรก — กระดาษบางใบเป็นตารางเดียวทั้งหน้า (MOC มี 51 แถว)
+       หัวตารางย่อยของแต่ละ SECTION จึงอยู่กลางตาราง ของเดิมจึงไม่เคยเจอ */
+    for (var r = 0; r < tbl.getNumRows(); r++) {
+      var row = tbl.getRow(r), heads = [], live = liveCells_(row);
+      live.forEach(function (c) { heads.push(norm(row.getCell(c).getText())); });
+      var idx = headIdx_(heads, cols, norm).map(function (k) { return k == null ? null : live[k]; });
       if (idx.every(function (x) { return x != null; })
           && new Set(idx).size === idx.length
           && tbl.getNumRows() > r + 1)
@@ -295,6 +333,30 @@ function findTableByHead_(body, cols) {
     }
   }
   return null;
+}
+
+/* จับคู่หัวคอลัมน์ — ตรงหรือขึ้นต้นเหมือนกันก่อน ไม่เจอค่อยยอมรับแบบ "มีอยู่ในหัว"
+   ("Identified Hazard / Risk" มี "hazard risk" อยู่ข้างใน) · แบบหลังใช้เฉพาะคอลัมน์ที่
+   แบบแรกหาไม่เจอ และต้องไม่ชนคอลัมน์ที่จองไปแล้ว */
+function headIdx_(heads, cols, norm) {
+  var used = {};
+  var idx = cols.map(function (col) {
+    var want = norm(col.head);
+    for (var k = 0; k < heads.length; k++)
+      if (heads[k] && !used[k] && (heads[k] === want || heads[k].indexOf(want) === 0 || want.indexOf(heads[k]) === 0)) {
+        used[k] = 1; return k;
+      }
+    return null;
+  });
+  return idx.map(function (k, j) {
+    if (k != null) return k;
+    var want = norm(cols[j].head);
+    for (var h = 0; h < heads.length; h++)
+      if (heads[h] && !used[h] && want.length >= 4 && (' ' + heads[h] + ' ').indexOf(' ' + want + ' ') >= 0) {
+        used[h] = 1; return h;
+      }
+    return null;
+  });
 }
 
 /**
@@ -354,8 +416,9 @@ function findCellByText_(body, text, skip) {
  */
 function nextCell_(pos) {
   var cand = [];
-  var row = pos.tbl.getRow(pos.r);
-  if (pos.c + 1 < row.getNumCells()) cand.push(row.getCell(pos.c + 1));
+  var row = pos.tbl.getRow(pos.r), live = liveCells_(row);
+  var rc = live[live.indexOf(pos.c) + 1];
+  if (rc != null) cand.push(row.getCell(rc));
   if (pos.r + 1 < pos.tbl.getNumRows()) {
     var nx = pos.tbl.getRow(pos.r + 1);
     if (nx.getNumCells() > pos.c) cand.push(nx.getCell(pos.c));
@@ -372,6 +435,40 @@ function nextCell_(pos) {
     if (/_{3,}/.test(u) && u.replace(/[_\s]/g, '').length <= 12) return cand[j];
   }
   return null;
+}
+
+/** หาเซลล์ที่ข้อความตรงกันเมื่อตัดทุกอย่างที่ไม่ใช่ตัวอักษร/ตัวเลข ("Reviewed by\n(Safety)") */
+function findCellNorm_(body, text, skip) {
+  var nm = function (x) { return String(x || '').toLowerCase().replace(/[^a-z0-9]+/g, ''); };
+  var want = nm(text);
+  for (var i = 0; i < body.getNumChildren(); i++) {
+    var ch = body.getChild(i);
+    if (ch.getType() !== DocumentApp.ElementType.TABLE) continue;
+    var tbl = ch.asTable();
+    for (var r = 0; r < tbl.getNumRows(); r++) {
+      var row = tbl.getRow(r);
+      for (var c = 0; c < row.getNumCells(); c++) {
+        if (nm(row.getCell(c).getText()) !== want) continue;
+        var key = i + ':' + r + ':' + c;
+        if (skip && skip[key]) continue;
+        return { tbl: tbl, r: r, c: c, key: key };
+      }
+    }
+  }
+  return null;
+}
+
+/* ช่องที่มองเห็นจริงของแถว — เอกสารที่มีเซลล์ผสาน (MOC หลังแก้กริด 17 คอลัมน์)
+   DocumentApp คืนเซลล์ที่ถูกผสานทิ้งด้วย (getColSpan() = 0) ถ้านับรวม token จะไปลง
+   เซลล์ที่มองไม่เห็นและหายจากเอกสาร — คืนดัชนีจริงของเซลล์ที่มองเห็นเรียงซ้ายไปขวา */
+function liveCells_(row) {
+  var out = [];
+  for (var c = 0; c < row.getNumCells(); c++) {
+    var span = 1;
+    try { span = row.getCell(c).getColSpan(); } catch (e) {}
+    if (span !== 0) out.push(c);
+  }
+  return out;
 }
 
 function escRe_(s) { return String(s).replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&'); }
