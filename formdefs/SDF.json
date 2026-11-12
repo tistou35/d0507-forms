@@ -53,8 +53,8 @@
   {
    "k": "app",
    "n": {
-    "th": "ผู้อนุมัติ",
-    "en": "Approver"
+    "th": "ผู้ตรวจ (FI ผู้อนุญาต / CFI)",
+    "en": "Reviewer (authorising FI / CFI)"
    },
    "auth": "role:mgt"
   }
@@ -525,6 +525,20 @@
    "step": 2,
    "party": "app",
    "sign": true,
+   "assignedBy": "submitter",
+   "canDelegate": true,
+   "notify": [
+    "line",
+    "email"
+   ],
+   "slaDays": 1,
+   "pool": "FI",
+   "onlyIf": "youAre != 'instructor'"
+  },
+  {
+   "step": 3,
+   "party": "app",
+   "sign": true,
    "assignedBy": "later",
    "canDelegate": true,
    "notify": [
@@ -532,12 +546,14 @@
     "email"
    ],
    "slaDays": 1,
-   "pool": "HT"
+   "pool": "CFI",
+   "onlyIf": "youAre == 'instructor'"
   }
  ],
  "export": {
   "docx": "D-0507-SDF-001.docx",
   "lockUntilComplete": true,
   "map": {}
- }
+ },
+ "_why_route": "OMA A.13 (p.A-51/55) · A.14 (p.A-64): นักเรียนให้ FI ผู้อนุญาตตรวจก่อนบรีฟ · ครู part-time ให้ CFI ตรวจก่อนอนุญาต"
 }

@@ -633,10 +633,23 @@
     return A.APPROVALS;
   };
   /* คืนกติกาอนุมัติของฟอร์มหนึ่งใบ — def ใช้เป็นค่าสำรองเมื่อยังไม่ได้ตั้งใน config */
-  A.approvalOf = function (abbr, def, regEntry) {
+  /* ตำแหน่งที่รับงานได้ — pool อาจระบุหลายตำแหน่งคั่นด้วย / เช่น "CFI/HT"
+     (ASF: initial solo ให้ CFI หรือ HT อนุญาต ตาม OMA A.4.2) */
+  A.poolList = pool => String(pool || '').split('/').map(s => s.trim()).filter(Boolean);
+  A.poolHas = (recv, pool) => A.poolList(pool).some(p => (recv || []).indexOf(p) >= 0);
+  /* ขั้นถัดไปของใบ — ข้ามขั้นที่ onlyIf ไม่ผ่านกับคำตอบปัจจุบัน
+     afterStep = เลข step ของขั้นที่เพิ่งเสร็จ (ขั้นแรกคือ route[0].step หรือ 1) */
+  A.nextStep = function (def, ctx, afterStep) {
+    const ev = (window.FormKit && FormKit.evalCond) || (() => true);
+    return (def && def.route || []).map((r, i) => Object.assign({ step: i + 1 }, r))
+      .filter(r => r.step > afterStep && ev(r.onlyIf, ctx || {}))
+      .sort((a, b) => a.step - b.step)[0] || null;
+  };
+  A.approvalOf = function (abbr, def, regEntry, ctx) {
     const cfg = (A.APPROVALS || {})[abbr];
     if (cfg) return cfg;
-    const step = def && (def.route || [])[1];
+    const step = ctx ? A.nextStep(def, ctx, (def.route && def.route[0] && def.route[0].step) || 1)
+                     : def && (def.route || [])[1];
     if (!step) return { mode: 'none', position: '' };
     return {
       mode: step.assignedBy === 'submitter' ? 'pick' : 'pool',
@@ -758,7 +771,7 @@
      เสมอ — หน้าจอที่ห้ามในสิ่งที่เซิร์ฟเวอร์ยอม ทำให้คนกรอกจนจบแล้วส่งไม่ได้
      (เกิดกับ PWR ของผู้โดยสาร) ส่วนหน้าจอที่ยอมในสิ่งที่เซิร์ฟเวอร์ห้าม
      จะไปตายตอนเขียนลงฐานข้อมูล ซึ่งคนกรอกอ่านไม่ออกว่าเพราะอะไร */
-  A.SOLO_FORMS = ['PWR', 'EFC', 'BCK'];
+  A.SOLO_FORMS = ['BCK'];
   /** abbr = ตัวย่อฟอร์ม · data = คำตอบปัจจุบัน · o.anon = ธง anon ในทะเบียน
       o.distId = ใบนี้มาจากประกาศแจกจ่าย (DRC) */
   A.canSelfClose = function (abbr, data, o) {
@@ -769,6 +782,7 @@
     if (abbr === 'ARF') return true;                    // ลงชื่อเข้าเรียน — จาก QR ของคาบ (newAttendOk) หรือกรอกเองทั้งใบ (newAttendSelfOk)
     if (A.SOLO_FORMS.indexOf(abbr) >= 0) return true;
     if (abbr === 'FRAE' && data.role === 'PIC') return true;
+    if (abbr === 'ASF' && data.soloType && data.soloType !== 'initial') return true;
     return false;
   };
 

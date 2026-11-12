@@ -155,6 +155,110 @@ var TOKEN_MAP = {
       }
     ]
   },
+  "ARF": {
+    "abbr": "ARF",
+    "docx": "D-0507-ARF-001.docx",
+    "control": "IM-ARF-301-B",
+    "orderWarn": [],
+    "byLabel": [
+      {
+        "label": "Course:",
+        "tok": "{{course}}"
+      },
+      {
+        "label": "Subject / Lesson:",
+        "tok": "{{subject}}"
+      },
+      {
+        "label": "Topic / Content covered:",
+        "tok": "{{topic}}"
+      },
+      {
+        "label": "Date:",
+        "tok": "{{sesDate}}"
+      },
+      {
+        "label": "Time",
+        "tok": "{{sesEnd}}"
+      },
+      {
+        "label": "Location / Platform:",
+        "tok": "{{location}}"
+      },
+      {
+        "label": "Instructor Position:",
+        "tok": "{{insPos}}"
+      },
+      {
+        "label": "Attendee Name",
+        "tok": "{{attName}}"
+      }
+    ],
+    "byLine": [],
+    "byCell": [],
+    "boxes": [
+      {
+        "tok": "{{k_mode_classroom}}",
+        "label": "Classroom",
+        "ord": "Classroom"
+      },
+      {
+        "tok": "{{k_mode_video}}",
+        "label": "Video call",
+        "ord": "Video call"
+      },
+      {
+        "tok": "{{k_mode_elearning}}",
+        "label": "E-learning",
+        "ord": "E-learning"
+      },
+      {
+        "tok": "{{k_attType_STUDENT}}",
+        "label": "Student",
+        "ord": "Student"
+      },
+      {
+        "tok": "{{k_attType_STAFF}}",
+        "label": "Staff",
+        "ord": "Staff"
+      },
+      {
+        "tok": "{{k_attType_OTHER}}",
+        "label": "Other",
+        "ord": "Other"
+      }
+    ],
+    "boxesPartial": false,
+    "tables": [],
+    "boxesInDocx": 3,
+    "approval": [],
+    "manual": [
+      {
+        "tok": "{{sesStart}}",
+        "label": "Time from",
+        "labelTh": "เริ่มเรียน",
+        "sign": false
+      },
+      {
+        "tok": "{{hours}}",
+        "label": "Duration (hrs)",
+        "labelTh": "ชั่วโมงเรียน",
+        "sign": false
+      },
+      {
+        "tok": "{{insName}}",
+        "label": "Instructor",
+        "labelTh": "ครูผู้สอน",
+        "sign": false
+      },
+      {
+        "tok": "{{sig_attSign}}",
+        "label": "Attendee signature",
+        "labelTh": "ลายเซ็นผู้เข้าเรียน",
+        "sign": true
+      }
+    ]
+  },
   "ASF": {
     "abbr": "ASF",
     "docx": "D-0507-ASF-001.docx",
@@ -311,14 +415,14 @@ var TOKEN_MAP = {
     "approval": [
       {
         "tok": "{{htName}}",
-        "label": "Head of Training name",
-        "labelTh": "ชื่อหัวหน้าครูฝึก",
+        "label": "Authorising CFI / HT name",
+        "labelTh": "ชื่อผู้อนุญาต (CFI / HT)",
         "sign": false
       },
       {
         "tok": "{{htDate}}",
-        "label": "Date approved",
-        "labelTh": "วันที่อนุมัติ",
+        "label": "Date authorised",
+        "labelTh": "วันที่อนุญาต",
         "sign": false
       },
       {
@@ -329,8 +433,8 @@ var TOKEN_MAP = {
       },
       {
         "tok": "{{sig_htSign}}",
-        "label": "Head of Training signature",
-        "labelTh": "ลายเซ็นหัวหน้าครูฝึก",
+        "label": "Authoriser signature",
+        "labelTh": "ลายเซ็นผู้อนุญาต",
         "sign": true
       }
     ],
@@ -721,6 +825,56 @@ var TOKEN_MAP = {
     "boxesInDocx": 15,
     "approval": [
       {
+        "tok": "{{htName}}",
+        "label": "Chairman (HT) name",
+        "labelTh": "ชื่อประธาน (HT)",
+        "sign": false
+      },
+      {
+        "tok": "{{htDate}}",
+        "label": "Date",
+        "labelTh": "วันที่",
+        "sign": false
+      },
+      {
+        "tok": "{{htComment}}",
+        "label": "Decision / comment",
+        "labelTh": "มติ / ความเห็น",
+        "sign": false
+      },
+      {
+        "tok": "{{sig_htSign}}",
+        "label": "Chairman signature",
+        "labelTh": "ลายเซ็นประธาน",
+        "sign": true
+      }
+    ],
+    "manual": [
+      {
+        "tok": "{{subType}}",
+        "label": "Subject is",
+        "labelTh": "ผู้ถูกพิจารณาเป็น",
+        "sign": false
+      },
+      {
+        "tok": "{{infOther}}",
+        "label": "Other — specify",
+        "labelTh": "ระบุประเภทอื่น",
+        "sign": false
+      },
+      {
+        "tok": "{{actOther}}",
+        "label": "Other — specify",
+        "labelTh": "ระบุโทษอื่น",
+        "sign": false
+      },
+      {
+        "tok": "{{sig_mgrSign}}",
+        "label": "Issuing manager signature",
+        "labelTh": "ลายเซ็นผู้ออกคำสั่ง",
+        "sign": true
+      },
+      {
         "tok": "{{acmName}}",
         "label": "Accountable Manager name",
         "labelTh": "ชื่อผู้จัดการฝ่ายรับผิดชอบ",
@@ -742,26 +896,6 @@ var TOKEN_MAP = {
         "tok": "{{sig_acmSign}}",
         "label": "Accountable Manager signature",
         "labelTh": "ลายเซ็นผู้จัดการฝ่ายรับผิดชอบ",
-        "sign": true
-      }
-    ],
-    "manual": [
-      {
-        "tok": "{{infOther}}",
-        "label": "Other — specify",
-        "labelTh": "ระบุประเภทอื่น",
-        "sign": false
-      },
-      {
-        "tok": "{{actOther}}",
-        "label": "Other — specify",
-        "labelTh": "ระบุโทษอื่น",
-        "sign": false
-      },
-      {
-        "tok": "{{sig_mgrSign}}",
-        "label": "Issuing manager signature",
-        "labelTh": "ลายเซ็นผู้ออกคำสั่ง",
         "sign": true
       }
     ]
@@ -1012,6 +1146,24 @@ var TOKEN_MAP = {
         "label": "Requester signature",
         "labelTh": "ลายเซ็นผู้ขอแก้ไข",
         "sign": true
+      },
+      {
+        "tok": "{{acmDate}}",
+        "label": "Date approved",
+        "labelTh": "วันที่อนุมัติ",
+        "sign": false
+      },
+      {
+        "tok": "{{acmComment}}",
+        "label": "Comment",
+        "labelTh": "ความเห็น",
+        "sign": false
+      },
+      {
+        "tok": "{{sig_acmSign}}",
+        "label": "Approver signature",
+        "labelTh": "ลายเซ็นผู้อนุมัติ",
+        "sign": true
       }
     ]
   },
@@ -1127,7 +1279,38 @@ var TOKEN_MAP = {
     "boxesPartial": false,
     "tables": [],
     "boxesInDocx": 10,
-    "approval": [],
+    "approval": [
+      {
+        "tok": "{{apvDecision}}",
+        "label": "Decision",
+        "labelTh": "ผลการพิจารณา",
+        "sign": false
+      },
+      {
+        "tok": "{{apvName}}",
+        "label": "Approver name",
+        "labelTh": "ชื่อผู้อนุมัติ",
+        "sign": false
+      },
+      {
+        "tok": "{{apvDate}}",
+        "label": "Date",
+        "labelTh": "วันที่",
+        "sign": false
+      },
+      {
+        "tok": "{{apvComment}}",
+        "label": "Comment",
+        "labelTh": "ความเห็น",
+        "sign": false
+      },
+      {
+        "tok": "{{sig_apvSign}}",
+        "label": "Approver signature",
+        "labelTh": "ลายเซ็นผู้อนุมัติ",
+        "sign": true
+      }
+    ],
     "manual": [
       {
         "tok": "{{htComment}}",
@@ -2079,7 +2262,32 @@ var TOKEN_MAP = {
         "sign": true
       }
     ],
-    "manual": []
+    "manual": [
+      {
+        "tok": "{{acmName}}",
+        "label": "Accountable Manager name",
+        "labelTh": "ชื่อผู้จัดการฝ่ายรับผิดชอบ",
+        "sign": false
+      },
+      {
+        "tok": "{{acmDate}}",
+        "label": "Date",
+        "labelTh": "วันที่",
+        "sign": false
+      },
+      {
+        "tok": "{{acmComment}}",
+        "label": "Comment",
+        "labelTh": "ความเห็น",
+        "sign": false
+      },
+      {
+        "tok": "{{sig_acmSign}}",
+        "label": "Signature",
+        "labelTh": "ลายเซ็น",
+        "sign": true
+      }
+    ]
   },
   "MOC": {
     "abbr": "MOC",
@@ -2316,6 +2524,38 @@ var TOKEN_MAP = {
     "boxesInDocx": 16,
     "approval": [
       {
+        "tok": "{{cmmName}}",
+        "label": "Reviewer name",
+        "labelTh": "ชื่อผู้ทบทวน",
+        "sign": false
+      },
+      {
+        "tok": "{{cmmDate}}",
+        "label": "Date reviewed",
+        "labelTh": "วันที่ทบทวน",
+        "sign": false
+      },
+      {
+        "tok": "{{cmmComment}}",
+        "label": "Comment",
+        "labelTh": "ความเห็น",
+        "sign": false
+      },
+      {
+        "tok": "{{sig_cmmSign}}",
+        "label": "Reviewer signature",
+        "labelTh": "ลายเซ็นผู้ทบทวน",
+        "sign": true
+      }
+    ],
+    "manual": [
+      {
+        "tok": "{{sig_subSign}}",
+        "label": "Submitter signature",
+        "labelTh": "ลายเซ็นผู้เสนอ",
+        "sign": true
+      },
+      {
         "tok": "{{smName}}",
         "label": "Safety Manager name",
         "labelTh": "ชื่อผู้จัดการนิรภัย",
@@ -2337,14 +2577,6 @@ var TOKEN_MAP = {
         "tok": "{{sig_smSign}}",
         "label": "Safety Manager signature",
         "labelTh": "ลายเซ็นผู้จัดการนิรภัย",
-        "sign": true
-      }
-    ],
-    "manual": [
-      {
-        "tok": "{{sig_subSign}}",
-        "label": "Submitter signature",
-        "labelTh": "ลายเซ็นผู้เสนอ",
         "sign": true
       },
       {
@@ -2617,6 +2849,11 @@ var TOKEN_MAP = {
         "label": "Date",
         "und": 28,
         "tok": "{{fiAckDate}}"
+      },
+      {
+        "label": "Date",
+        "und": 28,
+        "tok": "{{htDate}}"
       }
     ],
     "byCell": [],
@@ -2866,6 +3103,18 @@ var TOKEN_MAP = {
         "label": "Conductor signature",
         "labelTh": "ลายเซ็นผู้ตรวจ",
         "sign": true
+      },
+      {
+        "tok": "{{htName}}",
+        "label": "Head of Training name",
+        "labelTh": "ชื่อหัวหน้าครูฝึก",
+        "sign": false
+      },
+      {
+        "tok": "{{sig_htSign}}",
+        "label": "Head of Training signature",
+        "labelTh": "ลายเซ็นหัวหน้าครูฝึก",
+        "sign": true
       }
     ]
   },
@@ -2923,6 +3172,11 @@ var TOKEN_MAP = {
         "label": "Date",
         "und": 28,
         "tok": "{{tkiAckDate}}"
+      },
+      {
+        "label": "Date",
+        "und": 28,
+        "tok": "{{htDate}}"
       }
     ],
     "byCell": [
@@ -3148,6 +3402,18 @@ var TOKEN_MAP = {
         "label": "Conductor signature",
         "labelTh": "ลายเซ็นผู้ตรวจ",
         "sign": true
+      },
+      {
+        "tok": "{{htName}}",
+        "label": "Head of Training name",
+        "labelTh": "ชื่อหัวหน้าครูฝึก",
+        "sign": false
+      },
+      {
+        "tok": "{{sig_htSign}}",
+        "label": "Head of Training signature",
+        "labelTh": "ลายเซ็นหัวหน้าครูฝึก",
+        "sign": true
       }
     ]
   },
@@ -3220,7 +3486,26 @@ var TOKEN_MAP = {
     "boxesPartial": false,
     "tables": [],
     "boxesInDocx": 2,
-    "approval": [],
+    "approval": [
+      {
+        "tok": "{{htName}}",
+        "label": "Head of Training name",
+        "labelTh": "ชื่อหัวหน้าครูฝึก",
+        "sign": false
+      },
+      {
+        "tok": "{{htDate}}",
+        "label": "Date approved",
+        "labelTh": "วันที่อนุมัติ",
+        "sign": false
+      },
+      {
+        "tok": "{{sig_htSign}}",
+        "label": "Head of Training signature",
+        "labelTh": "ลายเซ็นหัวหน้าครูฝึก",
+        "sign": true
+      }
+    ],
     "manual": []
   },
   "RTR": {

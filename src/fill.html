@@ -116,7 +116,7 @@ function needsApproval(){ return !!nextStep(); }
    assignedBy 'submitter' = ผู้ส่งเลือกเอง (FRAE — นักเรียนเลือกครู)
    assignedBy 'later'     = ส่งไปก่อน ระบบจับคู่ทีหลัง (SDF — เข้ากองรอผู้มีสิทธิ์รับ) */
 /* กติกาอนุมัติมาจาก config/approvals (admin ตั้ง) ตกกลับไปใช้ค่าในนิยามฟอร์มถ้ายังไม่ได้ตั้ง */
-function approval(){ return A.approvalOf(F.abbr, DEF, F); }
+function approval(){ return A.approvalOf(F.abbr, DEF, F, FK ? FK.ctx() : null); }
 function pickAtSend(){ return !!nextStep() && approval().mode==='pick'; }
 
 /* รายชื่อครูที่รับฟอร์มประเภทนี้ — อ่านได้ทั้งโลก มีแค่ชื่อกับตำแหน่ง ไม่มีอีเมล */
@@ -125,7 +125,7 @@ async function loadDir(){
     await A.loadApprovals();
     const d=await A.db.collection('publicDirectory').doc('instructors').get();
     const want=approval().position || F.assignTo;
-    DIR=((d.exists&&d.data().list)||[]).filter(x=>!want||(x.recv||[]).includes(want));
+    DIR=((d.exists&&d.data().list)||[]).filter(x=>!want||A.poolHas(x.recv,want));
   }catch(e){ DIR=[]; }
 }
 A.reg = REG;
@@ -724,7 +724,7 @@ async function send(){
       doc:F.doc||'', issue:F.iss||'', rev:F.rev||'', defRev:DEF.defRev||0,
       title:F.th||F.t||F.abbr,
       status: done?'complete':'pending',
-      step: done?steps.length:2,
+      step: done?steps.length:((st&&st.step)||2),
       assigneeUid: PICK||'',
       // ใบที่ยังไม่มีผู้รับต้องบอกว่าใครมีสิทธิ์รับไปอนุมัติ ไม่งั้นตกหล่นไม่มีใครรับผิดชอบ
       assignTo: (!PICK && st ? (approval().position || st.pool || F.assignTo || '') : ''),
@@ -769,7 +769,7 @@ async function send(){
         // ยังไม่มีผู้รับ = อยู่ในกองรอ ให้ผู้มีสิทธิ์ตามบทบาทมากดรับ
         state: PICK?'open':'pool',
         pool: PICK?'':(approval().position||(st&&st.pool)||F.assignTo||''),
-        step:2,
+        step:(st&&st.step)||2,
         fromUid:u.uid, fromName:sub.submitterName,
         createdAt:firebase.firestore.FieldValue.serverTimestamp(),
       });

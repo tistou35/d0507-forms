@@ -46,6 +46,14 @@
     "en": "Compliance Monitoring Manager"
    },
    "auth": "role:mgt"
+  },
+  {
+   "k": "acm",
+   "n": {
+    "th": "ผู้จัดการฝ่ายรับผิดชอบ",
+    "en": "Accountable Manager"
+   },
+   "auth": "role:mgt"
   }
  ],
  "sections": [
@@ -304,8 +312,8 @@
    "party": "qm",
    "hideOthers": true,
    "title": {
-    "th": "การทบทวนและอนุมัติ",
-    "en": "Review and approval"
+    "th": "การทบทวน (CMM)",
+    "en": "Review (CMM)"
    },
    "fields": [
     {
@@ -326,16 +334,6 @@
      "label": {
       "th": "วันที่ทบทวน",
       "en": "Date reviewed"
-     }
-    },
-    {
-     "k": "approvedBy",
-     "type": "text",
-     "req": true,
-     "half": true,
-     "label": {
-      "th": "ผู้อนุมัติ",
-      "en": "Approved by"
      }
     },
     {
@@ -366,6 +364,55 @@
      }
     }
    ]
+  },
+  {
+   "k": "E",
+   "party": "acm",
+   "hideOthers": true,
+   "title": {
+    "th": "อนุมัติโดยผู้จัดการฝ่ายรับผิดชอบ",
+    "en": "Approval — Accountable Manager"
+   },
+   "fields": [
+    {
+     "k": "approvedBy",
+     "type": "text",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "ผู้อนุมัติ",
+      "en": "Approved by"
+     }
+    },
+    {
+     "k": "acmDate",
+     "type": "date",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "วันที่อนุมัติ",
+      "en": "Date approved"
+     }
+    },
+    {
+     "k": "acmComment",
+     "type": "textarea",
+     "label": {
+      "th": "ความเห็น",
+      "en": "Comment"
+     }
+    },
+    {
+     "k": "acmSign",
+     "type": "sign",
+     "req": true,
+     "label": {
+      "th": "ลายเซ็นผู้อนุมัติ",
+      "en": "Approver signature"
+     }
+    }
+   ],
+   "tab": "T3"
   }
  ],
  "gates": [
@@ -395,11 +442,21 @@
    "assignedBy": "later",
    "pool": "CMM",
    "canDelegate": true,
-   "slaDays": 7
+   "slaDays": 10
+  },
+  {
+   "step": 3,
+   "party": "acm",
+   "sign": true,
+   "assignedBy": "later",
+   "pool": "ACM",
+   "canDelegate": true,
+   "slaDays": 14
   }
  ],
  "export": {
   "docx": "D-0507-DRF-001.docx",
   "lockUntilComplete": true
- }
+ },
+ "_why_route": "OMM 0.10.3 (p.0-24): CMM ทบทวนภายใน 10 วันทำการและเสนอ แล้ว ACM อนุมัติหรือไม่อนุมัติ"
 }

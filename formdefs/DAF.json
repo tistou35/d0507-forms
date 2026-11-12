@@ -46,6 +46,14 @@
     "en": "Accountable Manager"
    },
    "auth": "role:mgt"
+  },
+  {
+   "k": "ht",
+   "n": {
+    "th": "ประธานคณะกรรมการวินัย (HT)",
+    "en": "Discipline Board chairman (HT)"
+   },
+   "auth": "role:mgt"
   }
  ],
  "sections": [
@@ -62,6 +70,33 @@
     "en": "CONFIDENTIAL disciplinary record. Access restricted to authorised personnel only."
    },
    "fields": [
+    {
+     "k": "subType",
+     "type": "select",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "ผู้ถูกพิจารณาเป็น",
+      "en": "Subject is"
+     },
+     "opt": [
+      {
+       "v": "student",
+       "n": {
+        "th": "นักเรียน",
+        "en": "Student"
+       }
+      },
+      {
+       "v": "staff",
+       "n": {
+        "th": "พนักงาน / ครู",
+        "en": "Staff / instructor"
+       }
+      }
+     ],
+     "menu": true
+    },
     {
      "k": "subName",
      "type": "text",
@@ -475,6 +510,55 @@
      }
     }
    ]
+  },
+  {
+   "k": "E2",
+   "party": "ht",
+   "hideOthers": true,
+   "title": {
+    "th": "มติคณะกรรมการวินัย (HT ประธาน)",
+    "en": "School Discipline Board decision (HT chairman)"
+   },
+   "fields": [
+    {
+     "k": "htName",
+     "type": "text",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "ชื่อประธาน (HT)",
+      "en": "Chairman (HT) name"
+     }
+    },
+    {
+     "k": "htDate",
+     "type": "date",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "วันที่",
+      "en": "Date"
+     }
+    },
+    {
+     "k": "htComment",
+     "type": "textarea",
+     "label": {
+      "th": "มติ / ความเห็น",
+      "en": "Decision / comment"
+     }
+    },
+    {
+     "k": "htSign",
+     "type": "sign",
+     "req": true,
+     "label": {
+      "th": "ลายเซ็นประธาน",
+      "en": "Chairman signature"
+     }
+    }
+   ],
+   "tab": "T3"
   }
  ],
  "gates": [
@@ -499,16 +583,28 @@
   },
   {
    "step": 2,
+   "party": "ht",
+   "sign": true,
+   "assignedBy": "later",
+   "pool": "HT",
+   "canDelegate": true,
+   "slaDays": 5,
+   "onlyIf": "subType == 'student'"
+  },
+  {
+   "step": 3,
    "party": "acm",
    "sign": true,
    "assignedBy": "later",
    "pool": "ACM",
    "canDelegate": true,
-   "slaDays": 5
+   "slaDays": 5,
+   "onlyIf": "subType != 'student'"
   }
  ],
  "export": {
   "docx": "D-0507-DAF-001.docx",
   "lockUntilComplete": true
- }
+ },
+ "_why_route": "OMA A.3.1 (p.A-15) · TM 1.5.11: วินัยนักเรียนพิจารณาโดย School Discipline Board มี HT เป็นประธาน · พนักงานคงไว้ที่ ACM (คู่มือไม่ได้กำหนด)"
 }

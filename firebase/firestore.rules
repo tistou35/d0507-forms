@@ -289,7 +289,8 @@ service cloud.firestore {
          DRC  มีกติกาของตัวเองอยู่แล้ว (newReceiptOk — ต้องอ้างประกาศที่มีจริง)
 
        ใบต้องเป็นของคนที่ส่งเอง และเวลาส่งใช้เวลาเซิร์ฟเวอร์ ปลอมย้อนหลังไม่ได้ */
-    function soloForms() { return ['PWR', 'EFC', 'BCK']; }
+    // PWR และ EFC มีขั้นอนุมัติแล้วตามคู่มือ (OMA A.8.2 · TM 1.5.12) จึงไม่อยู่ในรายการนี้อีก
+    function soloForms() { return ['BCK']; }
     function newSoloOk() {
       let d = request.resource.data;
       return d.status == 'complete'
@@ -299,7 +300,9 @@ service cloud.firestore {
           && d.tracking  is string && d.tracking.size() <= 60
           && d.keys().size() <= 22
           && (d.formCode in soloForms()
-              || (d.formCode == 'FRAE' && d.data.role == 'PIC'));
+              || (d.formCode == 'FRAE' && d.data.role == 'PIC')
+              // ASF: FI ผู้อนุญาตลงนามแล้วจบ ยกเว้นบินเดี่ยวครั้งแรกต้องให้ CFI/HT อนุญาต (OMA A.4.2)
+              || (d.formCode == 'ASF' && d.data.soloType != 'initial'));
     }
 
     match /submissions/{subId} {

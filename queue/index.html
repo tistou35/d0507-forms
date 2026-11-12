@@ -131,7 +131,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="../assets/app.js?v=d71ac884"></script>
+<script src="../assets/app.js?v=8fcffc00"></script>
 <script>D0507.GAS_URL='https://script.google.com/macros/s/AKfycby7rFFVxd92wPImX4m8pv8nHqTrK3Iq0O32A34844DAg1rP8N3RfgKEyGvAUkQu-NXd/exec';</script>
 <script>
 "use strict";
@@ -253,7 +253,7 @@ async function loadPool(){
   let P=[];
   try{
     const ps=await A.db.collection('tasks').where('state','==','pool').get();
-    P=ps.docs.map(d=>Object.assign({id:d.id},d.data())).filter(t=>!t.pool||recv.includes(t.pool));
+    P=ps.docs.map(d=>Object.assign({id:d.id},d.data())).filter(t=>!t.pool||A.poolHas(recv,t.pool));
   }catch(e){ return; }
   if(!P.length) return;
   $('pool').innerHTML=head(A.t('poolTitle'),'Unassigned',P.length)+

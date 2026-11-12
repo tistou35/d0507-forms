@@ -886,7 +886,7 @@ async function pending(){
       if (v.kind === 'ack') return;
       has[v.memoId || v.subId] = true;
       const isMemo = v.app === 'memo', src = isMemo ? mems[v.memoId] : subs[v.subId];
-      const open = v.state === 'open', claim = open ? [] : dirL.filter(p => (p.recv || []).includes(v.pool)).map(p => p.name);
+      const open = v.state === 'open', claim = open ? [] : dirL.filter(p => A.poolHas(p.recv, v.pool)).map(p => p.name);
       R.push({ code: v.formCode || '', name: isMemo ? (v.title || '') : nameOf(v.formCode), tracking: v.tracking || '',
         kind: open ? 'open' : (claim.length ? 'pool' : 'none'),
         who: open ? (v.assigneeName || 'ผู้รับที่ระบุตัว') : 'กองรอ ' + (v.pool || '—'), claim,

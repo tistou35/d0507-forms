@@ -46,6 +46,14 @@
     "en": "Flight Instructor"
    },
    "auth": "role:ins"
+  },
+  {
+   "k": "ht",
+   "n": {
+    "th": "หัวหน้าครูฝึก",
+    "en": "Head of Training"
+   },
+   "auth": "role:mgt"
   }
  ],
  "sections": [
@@ -528,6 +536,47 @@
      }
     }
    ]
+  },
+  {
+   "k": "F",
+   "party": "ht",
+   "hideOthers": true,
+   "title": {
+    "th": "รับรองโดยหัวหน้าครูฝึก",
+    "en": "Head of Training endorsement"
+   },
+   "fields": [
+    {
+     "k": "htName",
+     "type": "text",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "ชื่อหัวหน้าครูฝึก",
+      "en": "Head of Training name"
+     }
+    },
+    {
+     "k": "htDate",
+     "type": "date",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "วันที่",
+      "en": "Date"
+     }
+    },
+    {
+     "k": "htSign",
+     "type": "sign",
+     "req": true,
+     "label": {
+      "th": "ลายเซ็นหัวหน้าครูฝึก",
+      "en": "Head of Training signature"
+     }
+    }
+   ],
+   "tab": "T3"
   }
  ],
  "compute": [
@@ -613,10 +662,20 @@
    "sign": true,
    "assignedBy": "submitter",
    "slaDays": 2
+  },
+  {
+   "step": 3,
+   "party": "ht",
+   "sign": true,
+   "assignedBy": "later",
+   "pool": "HT",
+   "canDelegate": true,
+   "slaDays": 2
   }
  ],
  "export": {
   "docx": "D-0507-PCR-FI-001.docx",
   "lockUntilComplete": true
- }
+ },
+ "_why_route": "OMA D.2.9 (p.D-33): สามลายเซ็น (ครู + ผู้ตรวจ + HT)"
 }

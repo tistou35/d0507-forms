@@ -38,6 +38,14 @@
     "en": "Reporter / Evaluator"
    },
    "auth": "role:mgt"
+  },
+  {
+   "k": "apv",
+   "n": {
+    "th": "ผู้อนุมัติ (CTKI / CFI)",
+    "en": "Approver (CTKI / CFI)"
+   },
+   "auth": "role:mgt"
   }
  ],
  "sections": [
@@ -948,6 +956,82 @@
      }
     }
    ]
+  },
+  {
+   "k": "APV",
+   "party": "apv",
+   "hideOthers": true,
+   "title": {
+    "th": "การอนุมัติผล (CTKI ภาคพื้น / CFI ภาคอากาศ)",
+    "en": "Approval (CTKI ground / CFI flight)"
+   },
+   "fields": [
+    {
+     "k": "apvDecision",
+     "type": "select",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "ผลการพิจารณา",
+      "en": "Decision"
+     },
+     "opt": [
+      {
+       "v": "approved",
+       "n": {
+        "th": "อนุมัติ",
+        "en": "Approved"
+       }
+      },
+      {
+       "v": "deny",
+       "n": {
+        "th": "ไม่อนุมัติ",
+        "en": "Deny"
+       }
+      }
+     ],
+     "menu": true
+    },
+    {
+     "k": "apvName",
+     "type": "text",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "ชื่อผู้อนุมัติ",
+      "en": "Approver name"
+     }
+    },
+    {
+     "k": "apvDate",
+     "type": "date",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "วันที่",
+      "en": "Date"
+     }
+    },
+    {
+     "k": "apvComment",
+     "type": "textarea",
+     "label": {
+      "th": "ความเห็น",
+      "en": "Comment"
+     }
+    },
+    {
+     "k": "apvSign",
+     "type": "sign",
+     "req": true,
+     "label": {
+      "th": "ลายเซ็นผู้อนุมัติ",
+      "en": "Approver signature"
+     }
+    }
+   ],
+   "tab": "T3"
   }
  ],
  "compute": [
@@ -981,6 +1065,26 @@
    "step": 1,
    "party": "ht",
    "sign": true
+  },
+  {
+   "step": 2,
+   "party": "apv",
+   "sign": true,
+   "assignedBy": "later",
+   "pool": "CTKI",
+   "canDelegate": true,
+   "slaDays": 3,
+   "onlyIf": "courseType == 'ground'"
+  },
+  {
+   "step": 3,
+   "party": "apv",
+   "sign": true,
+   "assignedBy": "later",
+   "pool": "CFI",
+   "canDelegate": true,
+   "slaDays": 3,
+   "onlyIf": "courseType == 'flight'"
   }
  ],
  "export": {
@@ -1015,5 +1119,6 @@
    "pct",
    "result"
   ]
- }
+ },
+ "_why_route": "TM 1.5.12 (p.1-59/60): รายงานส่ง CTKI (ภาคพื้น) หรือ CFI (ภาคอากาศ) เพื่อ Approved / Deny"
 }

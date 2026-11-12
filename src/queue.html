@@ -165,7 +165,7 @@ async function loadPool(){
   let P=[];
   try{
     const ps=await A.db.collection('tasks').where('state','==','pool').get();
-    P=ps.docs.map(d=>Object.assign({id:d.id},d.data())).filter(t=>!t.pool||recv.includes(t.pool));
+    P=ps.docs.map(d=>Object.assign({id:d.id},d.data())).filter(t=>!t.pool||A.poolHas(recv,t.pool));
   }catch(e){ return; }
   if(!P.length) return;
   $('pool').innerHTML=head(A.t('poolTitle'),'Unassigned',P.length)+

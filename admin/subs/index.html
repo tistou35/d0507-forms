@@ -190,7 +190,7 @@ dialog#act textarea{width:100%;min-height:74px;border:1px solid var(--border-med
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="../../assets/app.js?v=d71ac884"></script>
+<script src="../../assets/app.js?v=8fcffc00"></script>
 <script>D0507.GAS_URL='https://script.google.com/macros/s/AKfycby7rFFVxd92wPImX4m8pv8nHqTrK3Iq0O32A34844DAg1rP8N3RfgKEyGvAUkQu-NXd/exec';</script>
 <script>
 "use strict";
@@ -297,7 +297,7 @@ function nextOf(r){
     return {t, html:`<b>${esc(t.assigneeName||L({th:'ผู้รับที่ระบุตัว',en:'Named assignee'}))}</b>
       <span> · ${esc(L({th:'รอดำเนินการ',en:'awaiting action'}))}</span>`};
   if(t && t.state==='pool'){
-    const who=DIR.filter(x=>(x.recv||[]).includes(t.pool)).map(x=>x.name);
+    const who=DIR.filter(x=>A.poolHas(x.recv,t.pool)).map(x=>x.name);
     return {t, html:`<b>${esc(L({th:'กองรอ',en:'Pool'}))} · ${esc(t.pool||'—')}</b>
       <span> · ${who.length ? esc(L({th:'รับได้: ',en:'can claim: '}))+esc(who.join(' · '))
         : '<b style="color:var(--red-600)">'+esc(L({th:'ยังไม่มีใครรับตำแหน่งนี้',en:'nobody holds this position'}))+'</b>'}</span>`};

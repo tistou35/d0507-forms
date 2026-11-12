@@ -57,6 +57,14 @@
     "en": "Safety Manager"
    },
    "auth": "role:mgt"
+  },
+  {
+   "k": "acm",
+   "n": {
+    "th": "ผู้จัดการฝ่ายรับผิดชอบ",
+    "en": "Accountable Manager"
+   },
+   "auth": "role:mgt"
   }
  ],
  "sections": [
@@ -572,6 +580,55 @@
      }
     }
    ]
+  },
+  {
+   "k": "F",
+   "party": "acm",
+   "hideOthers": true,
+   "title": {
+    "th": "รับรองการยอมรับความเสี่ยงโดยผู้จัดการฝ่ายรับผิดชอบ",
+    "en": "Risk acceptance — Accountable Manager endorsement"
+   },
+   "fields": [
+    {
+     "k": "acmName",
+     "type": "text",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "ชื่อผู้จัดการฝ่ายรับผิดชอบ",
+      "en": "Accountable Manager name"
+     }
+    },
+    {
+     "k": "acmDate",
+     "type": "date",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "วันที่",
+      "en": "Date"
+     }
+    },
+    {
+     "k": "acmComment",
+     "type": "textarea",
+     "label": {
+      "th": "ความเห็น",
+      "en": "Comment"
+     }
+    },
+    {
+     "k": "acmSign",
+     "type": "sign",
+     "req": true,
+     "label": {
+      "th": "ลายเซ็น",
+      "en": "Signature"
+     }
+    }
+   ],
+   "tab": "T4"
   }
  ],
  "compute": [
@@ -689,10 +746,21 @@
    "pool": "SM",
    "canDelegate": true,
    "slaDays": 2
+  },
+  {
+   "step": 3,
+   "party": "acm",
+   "sign": true,
+   "assignedBy": "later",
+   "pool": "ACM",
+   "canDelegate": true,
+   "slaDays": 7,
+   "onlyIf": "riskLevel != 'L' && residualOk == 'yes'"
   }
  ],
  "export": {
   "docx": "D-0507-HIF-001.docx",
   "lockUntilComplete": true
- }
+ },
+ "_why_route": "OMM ส่วนที่ 4 (p.4-25, 4-48): รายงานถึง SM · ยอมรับความเสี่ยงที่ไม่ใช่ระดับต่ำต้องได้การรับรองจาก ACM"
 }

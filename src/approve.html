@@ -47,7 +47,7 @@ dialog .df{padding:14px 22px;border-top:1px solid var(--g-100);display:flex;gap:
 const REG=@@REG@@, DEFS=@@DEFS@@, A=D0507;
 const qs=new URLSearchParams(location.search);
 const TASKID=qs.get('t')||'';
-let TASK=null, SUB=null, SUBREF=null, DEF=null, F=null, FK=null, DIR=[], PICK='', REV=null;
+let TASK=null, SUB=null, SUBREF=null, DEF=null, F=null, FK=null, DIR=[], PICK='', REV=null, STEPNO=2;
 
 A.reg = REG;
 A.initAuth(@@FBCFG@@, boot);
@@ -92,7 +92,7 @@ async function boot(){
       const d=await A.db.collection('publicDirectory').doc('instructors').get();
       const want=F&&F.assignTo;
       DIR=((d.exists&&d.data().list)||[])
-        .filter(x=>x.id!==A.user.uid && (!want||(x.recv||[]).includes(want)));
+        .filter(x=>x.id!==A.user.uid && (!want||A.poolHas(x.recv,want)));
     }catch(e){ DIR=[]; }
 
     /* DRF ที่เปิดจาก "แก้ต้นฉบับ → ออกฉบับใหม่" — โหลดฉบับร่างมาให้ผู้อนุมัติเปิดดู */
@@ -101,7 +101,12 @@ async function boot(){
            if(r.exists) REV=Object.assign({id:r.id},r.data()); }catch(e){}
     }
 
-    const party=(DEF.route||[])[1] ? DEF.route[1].party : (DEF.parties||[])[1]?.k;
+    /* ขั้นของงานนี้ — มาจาก task.step (เลข step ใน route) ไม่ใช่ route[1] เสมอ
+       ใบที่มีหลายขั้น (MOC · DRF · PCR) ผู้อนุมัติขั้นที่ 3 ต้องได้ส่วนของตัวเอง */
+    const CUR=(DEF.route||[]).map((r,i)=>Object.assign({step:i+1},r)).find(r=>r.step===(TASK.step||2))
+           || (DEF.route||[])[1] || {};
+    STEPNO=CUR.step||2;
+    const party=CUR.party || (DEF.parties||[])[1]?.k;
     FK=new FormKit(DEF,{party:party,lang:A.lang,data:SUB.data||{},meta:{formRev:SUB.rev||'00'},onChange:()=>paint(),
     upload:async f=>{const r=await A.gas('attach',Object.assign({code:DEF.code},f));
       return r.ok?r.result:{error:r.error};}});
@@ -172,7 +177,11 @@ function confirmApprove(){
         <span style="color:var(--g-600);flex:1">${A.esc(LL(f.label))}</span>
         <b style="text-align:right;max-width:55%">${A.esc(shown(FK.data[f.k],f))}</b></div>`).join('');
   }).join('');
-  modal(A.t('confirmApprove'), A.t('approveSub'), rows,
+  // ยังมีขั้นถัดไป = ไม่ได้บันทึกลงแฟ้มทันที แต่ส่งต่อให้ตำแหน่งของขั้นนั้น
+  const nx=A.nextStep(DEF, FK.ctx(), STEPNO);
+  modal(A.t('confirmApprove'), nx ? A.L({th:'ผ่านขั้นนี้แล้วจะส่งต่อขั้นที่ '+nx.step+' (กองรอ '+nx.pool+') — ใบยังไม่จบจนกว่าขั้นสุดท้ายอนุมัติ',
+                                         en:'Approving forwards the form to step '+nx.step+' ('+nx.pool+' pool); it is filed after the final step.'})
+                                  : A.t('approveSub'), rows,
     `<button class="fb" value="cancel">${A.esc(A.t('goBack'))}</button>
      <button class="big pri" id="okap" value="ok">${A.esc(A.t('doApprove'))}</button>`);
   document.getElementById('okap').addEventListener('click',e=>{e.preventDefault();dlg.close();doApprove();});
@@ -292,11 +301,35 @@ async function finish(status,action,note){
   try{
     const me=A.user.displayName||A.user.email;
     const stamp=new Date().toISOString().slice(0,10);
+    /* ยังมีขั้นถัดไปไหม — ตรวจกับคำตอบล่าสุด (รวมที่ผู้อนุมัติเพิ่งกรอก เช่น HIF ระดับความเสี่ยง)
+       มี = ใบยังไม่จบ ส่งต่อกองรอของขั้นนั้น · ไม่มี = อนุมัติขั้นสุดท้าย */
+    const nxt = status==='complete' ? A.nextStep(DEF, FK.ctx(), STEPNO) : null;
+    if(nxt){
+      if(!nxt.pool) throw new Error('ขั้นที่ '+nxt.step+' ยังไม่ได้กำหนดตำแหน่งผู้รับ (pool) ในนิยามฟอร์ม');
+      await SUBREF.update({
+        status:'pending', step:nxt.step, assignTo:nxt.pool, assigneeUid:'',
+        data:FK.visibleData(), computed:FK.computed(),
+        signedBy:firebase.firestore.FieldValue.arrayUnion(me),
+        chain:firebase.firestore.FieldValue.arrayUnion({
+          action:'approve', byUid:A.user.uid, byName:me, at:stamp, note:note||'', step:STEPNO }),
+      });
+      await A.db.collection('tasks').doc(TASK.id).update({ state:'done', closedAt:now(), note:note||'' });
+      await A.db.collection('tasks').add({
+        subId:TASK.subId, formCode:TASK.formCode, tracking:TASK.tracking, title:TASK.title,
+        assigneeUid:'', assigneeName:'', state:'pool', pool:nxt.pool, step:nxt.step,
+        fromUid:A.user.uid, fromName:me, createdAt:now() });
+      await log('approve', note);
+      const p=(DEF.parties||[]).find(x=>x.k===nxt.party)||{};
+      foot.innerHTML=box('info',`<b>${A.esc(A.L({th:'ผ่านขั้นนี้แล้ว — ส่งต่อขั้นถัดไป',en:'Step approved — forwarded to the next step'}))}</b><br>
+        ${A.esc(A.L({th:'ขั้นที่ ',en:'Step '}))}${nxt.step} · ${A.esc(FormKit.L(p.n,A.lang)||nxt.party)} · ${A.esc(A.L({th:'กองรอ ',en:'pool '}))}${A.esc(nxt.pool)}`)+
+        `<div class="acts"><a class="big pri" href="@@BASE@@queue/">${A.esc(A.t('backToQueue'))}</a></div>`;
+      return;
+    }
     const patch={
       status:status, data:FK.visibleData(), computed:FK.computed(),
       closedAt:now(), closedBy:me,
       chain:firebase.firestore.FieldValue.arrayUnion({
-        action:action, byUid:A.user.uid, byName:me, at:stamp, note:note||'' }),
+        action:action, byUid:A.user.uid, byName:me, at:stamp, note:note||'', step:STEPNO }),
     };
     if(status==='complete') patch.signedBy=firebase.firestore.FieldValue.arrayUnion(me);
     await SUBREF.update(patch);

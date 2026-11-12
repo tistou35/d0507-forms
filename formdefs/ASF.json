@@ -42,8 +42,8 @@
   {
    "k": "ht",
    "n": {
-    "th": "หัวหน้าครูฝึก",
-    "en": "Head of Training"
+    "th": "ผู้อนุญาต (CFI / HT)",
+    "en": "Authorising CFI / HT"
    },
    "auth": "role:mgt"
   }
@@ -398,8 +398,8 @@
    "party": "ht",
    "hideOthers": true,
    "title": {
-    "th": "หัวหน้าครูฝึกอนุมัติ",
-    "en": "Head of Training authorisation"
+    "th": "CFI / HT อนุญาต (บินเดี่ยวครั้งแรก)",
+    "en": "CFI / HT authorisation (initial solo)"
    },
    "fields": [
     {
@@ -408,8 +408,8 @@
      "req": true,
      "half": true,
      "label": {
-      "th": "ชื่อหัวหน้าครูฝึก",
-      "en": "Head of Training name"
+      "th": "ชื่อผู้อนุญาต (CFI / HT)",
+      "en": "Authorising CFI / HT name"
      }
     },
     {
@@ -418,8 +418,8 @@
      "req": true,
      "half": true,
      "label": {
-      "th": "วันที่อนุมัติ",
-      "en": "Date approved"
+      "th": "วันที่อนุญาต",
+      "en": "Date authorised"
      }
     },
     {
@@ -435,8 +435,8 @@
      "type": "sign",
      "req": true,
      "label": {
-      "th": "ลายเซ็นหัวหน้าครูฝึก",
-      "en": "Head of Training signature"
+      "th": "ลายเซ็นผู้อนุญาต",
+      "en": "Authoriser signature"
      }
     }
    ]
@@ -447,8 +447,8 @@
    "when": "soloType == 'initial'",
    "level": "info",
    "msg": {
-    "th": "บินเดี่ยวครั้งแรก — ต้องได้รับอนุมัติจากหัวหน้าครูฝึกก่อนออกบินทุกกรณี",
-    "en": "Initial solo always requires Head of Training authorisation before the flight."
+    "th": "บินเดี่ยวครั้งแรก — ต้องให้ CFI หรือ HT อนุญาตก่อนออกบิน (OMA A.4.2) ใบนี้จะส่งต่อให้ CFI/HT หลังส่ง",
+    "en": "Initial solo — must be authorised by the CFI or HT before the flight (OMA A.4.2). The form goes to CFI/HT after submission."
    }
   }
  ],
@@ -463,13 +463,15 @@
    "party": "ht",
    "sign": true,
    "assignedBy": "later",
-   "pool": "HT",
+   "pool": "CFI/HT",
    "canDelegate": true,
-   "slaDays": 1
+   "slaDays": 1,
+   "onlyIf": "soloType == 'initial'"
   }
  ],
  "export": {
   "docx": "D-0507-ASF-001.docx",
   "lockUntilComplete": true
- }
+ },
+ "_why_route": "OMA A.4.2 / A.19.7 (p.A-81) / p.A-28: FI ผู้อนุญาตลงนามในใบเป็นการอนุญาต · FI อนุญาต initial solo ไม่ได้ ต้องเป็น CFI หรือ HT · TM 1.2.3 ให้ HT ตรวจภายหลัง (ไม่ใช่ขั้นก่อนออกบิน)"
 }

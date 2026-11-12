@@ -46,6 +46,14 @@
    "auth": "public"
   },
   {
+   "k": "cmm",
+   "n": {
+    "th": "ผู้ทบทวนเนื้อหา/การปฏิบัติตาม (CMM)",
+    "en": "Content / compliance reviewer (CMM)"
+   },
+   "auth": "role:mgt"
+  },
+  {
    "k": "sm",
    "n": {
     "th": "ผู้จัดการนิรภัย",
@@ -625,6 +633,55 @@
    ]
   },
   {
+   "k": "7C",
+   "party": "cmm",
+   "hideOthers": true,
+   "title": {
+    "th": "ทบทวนเนื้อหาและการปฏิบัติตาม",
+    "en": "Content / compliance review"
+   },
+   "fields": [
+    {
+     "k": "cmmName",
+     "type": "text",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "ชื่อผู้ทบทวน",
+      "en": "Reviewer name"
+     }
+    },
+    {
+     "k": "cmmDate",
+     "type": "date",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "วันที่ทบทวน",
+      "en": "Date reviewed"
+     }
+    },
+    {
+     "k": "cmmComment",
+     "type": "textarea",
+     "label": {
+      "th": "ความเห็น",
+      "en": "Comment"
+     }
+    },
+    {
+     "k": "cmmSign",
+     "type": "sign",
+     "req": true,
+     "label": {
+      "th": "ลายเซ็นผู้ทบทวน",
+      "en": "Reviewer signature"
+     }
+    }
+   ],
+   "tab": "T4"
+  },
+  {
    "k": "8",
    "tab": "T4",
    "party": "sm",
@@ -765,6 +822,15 @@
   },
   {
    "step": 2,
+   "party": "cmm",
+   "sign": true,
+   "assignedBy": "later",
+   "pool": "CMM",
+   "canDelegate": true,
+   "slaDays": 5
+  },
+  {
+   "step": 3,
    "party": "sm",
    "sign": true,
    "assignedBy": "later",
@@ -773,7 +839,7 @@
    "slaDays": 5
   },
   {
-   "step": 3,
+   "step": 4,
    "party": "acm",
    "sign": true,
    "assignedBy": "later",
@@ -785,5 +851,6 @@
  "export": {
   "docx": "D-0507-MOC-001.docx",
   "lockUntilComplete": true
- }
+ },
+ "_why_route": "กระดาษ MOC: Prepared → Reviewed (Content/Compliance) → Reviewed (Safety) → Approved (ACM) · OMM ส่วนที่ 4 (p.4-57) · 5.2.4"
 }
