@@ -62,6 +62,14 @@ def pull():
 
 
 def push(only=None):
+    # รับได้ทั้ง "Code" และ "Code.gs" — เคยสั่ง push Code.gs แล้วไม่ตรงชื่อสักไฟล์
+    # ทุกไฟล์จึงถูกส่งของเดิมบนคลาวด์กลับขึ้นไป version ใหม่ไม่มีอะไรเปลี่ยน และไม่มีอะไรเตือน
+    if only:
+        only = [os.path.basename(n)[:-3] if n.endswith('.gs') else os.path.basename(n) for n in only]
+        local = {os.path.basename(p)[:-3] for p in glob.glob(os.path.join(GAS, '*.gs'))}
+        bad = [n for n in only if n not in local]
+        if bad:
+            sys.exit('ไม่มีไฟล์ในเครื่อง: ' + ', '.join(bad) + ' — ไม่ได้ส่งอะไรขึ้นไป')
     remote = {f['name']: f for f in api('GET', SCRIPT_ID + '/content')['files']}
 
     files = []
