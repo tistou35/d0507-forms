@@ -74,6 +74,9 @@ table.ml tr:last-child td{border-bottom:0}
 .stage canvas.pg{display:block;max-width:100%;height:auto}
 .stage .blk{position:absolute;cursor:move;outline:2px dashed #2563eb;outline-offset:2px;background:rgba(255,255,255,.55)}
 .stage .blk img{display:block;width:100%;height:auto;pointer-events:none}
+.pgnav{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0 0 8px}
+.pgnav button{padding:4px 12px;border:1px solid var(--border-med);border-radius:6px;background:#fff;cursor:pointer;font:inherit;font-size:13px}
+.pgnav button[aria-pressed="true"]{background:#1e3a8a;border-color:#1e3a8a;color:#fff}
 .endogrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:20px;align-items:start}
 @media(max-width:900px){ .endogrid{grid-template-columns:1fr} }
 /* ── การ์ดประเภท · ผู้รับ ── */
@@ -1116,7 +1119,7 @@ async function acmAck(AKP){
    ผู้สั่งการวางบล็อกบนหน้า 1 ของ PDF ฉบับรอสั่งการ ลากย้ายได้ ปรับความกว้างได้
    ตำแหน่งเก็บเป็นพอยต์จากมุมซ้ายบนของหน้า A4 ตัวส่งออกวางภาพที่ตำแหน่งเดียวกัน */
 const PAGE={w:595.28,h:841.89};
-let ENDO={x:null,y:null,w:250,h:0,img:null,scale:1}, ESP=null;
+let ENDO={x:null,y:null,w:250,h:0,img:null,scale:1,page:1}, ESP=null, PDFDOC=null;
 function endorsePanelHtml(){
   const acts=((MT[M.type].signers||{}).endorser||{}).actions||['ACKNOWLEDGED','APPROVED','FOR ACTION','NOT APPROVED'];
   return `<div class="card" style="margin-bottom:16px"><h3>รับทราบ / สั่งการ</h3>
@@ -1130,6 +1133,7 @@ function endorsePanelHtml(){
       <div class="acts2"><button class="big pri" id="doEndorse">ลงนามสั่งการ</button></div><div id="amsg"></div>
     </div>
     <div><div class="hint" style="margin-bottom:6px">ลากกรอบสีน้ำเงินไปวางในที่ว่างบนหน้ากระดาษ — ตำแหน่งนี้คือตำแหน่งใน PDF</div>
+      <div class="pgnav" id="pgnav" hidden></div>
       <div class="stage" id="stage"><canvas class="pg" id="pg"></canvas><div class="blk" id="blk"><img id="blkimg" alt=""></div></div>
       <div class="hint" id="stagemsg">กำลังโหลดหน้ากระดาษ…</div></div></div></div>`;
 }
@@ -1235,7 +1239,8 @@ async function showPdfPages(){
   }catch(e){ box.innerHTML=keep+`<div class="hint noprint">แสดง PDF ไม่ได้ (${esc(e.message||e)}) — หน้าจอนี้เป็นฉบับจัดหน้าโดยประมาณ ตำแหน่งบล็อกสั่งการที่ถูกต้องอยู่ใน PDF</div>`; }
 }
 
-/* หน้า 1 ของ PDF ฉบับรอสั่งการ — เรนเดอร์ด้วย pdf.js เป็นพื้นหลังให้เห็นที่ว่างจริง */
+/* PDF ฉบับรอสั่งการ — เรนเดอร์ด้วย pdf.js เป็นพื้นหลังให้เห็นที่ว่างจริง
+   หนังสือหลายหน้าเลือกหน้าที่จะวางบล็อกได้ ค่าตั้งต้นคือหน้าสุดท้าย (ที่อยู่ของช่องลงนามผู้เสนอ) */
 async function loadPage(){
   const msg=$('stagemsg');
   try{
@@ -1244,19 +1249,51 @@ async function loadPage(){
     let r=await A.gas('memoPdfBytes',{memoId:M.id},{timeout:60000});
     if(!r.ok){ msg.textContent='ยังไม่มี PDF ฉบับรอสั่งการ — กำลังสร้าง…'; await makePdf(false,true); r=await A.gas('memoPdfBytes',{memoId:M.id},{timeout:60000}); }
     if(!r.ok) throw new Error(r.error);
-    const bytes=Uint8Array.from(atob(r.result.bytes),c=>c.charCodeAt(0));
-    const doc=await pdfjsLib.getDocument({data:bytes}).promise, pg=await doc.getPage(1);
-    const vp1=pg.getViewport({scale:1}); PAGE.w=vp1.width; PAGE.h=vp1.height;
-    const cssW=Math.min(620, $('stage').parentElement.clientWidth-2); ENDO.scale=cssW/PAGE.w;
-    const vp=pg.getViewport({scale:ENDO.scale*2}), cv=$('pg');
-    cv.width=vp.width; cv.height=vp.height; cv.style.width=cssW+'px'; cv.style.height=(PAGE.h*ENDO.scale)+'px';
-    await pg.render({canvasContext:cv.getContext('2d'), viewport:vp}).promise;
-    // ขนาดที่เห็นจริงอาจเล็กกว่าที่ตั้ง (max-width:100%) — วัดใหม่ทุกครั้งที่หน้าจอเปลี่ยน
-    const remeasure=()=>{ const w=cv.getBoundingClientRect().width; if(w){ ENDO.scale=w/PAGE.w; placeBlock(); } };
-    remeasure(); window.addEventListener('resize',remeasure);
-    msg.textContent = doc.numPages>1 ? 'หนังสือมี '+doc.numPages+' หน้า — บล็อกวางได้บนหน้า 1 เท่านั้น' : '';
-    placeBlock();
-  }catch(e){ msg.textContent='โหลดหน้ากระดาษไม่ได้: '+(e.message||e)+' — ยังลงนามได้ บล็อกจะวางที่มุมขวาล่างของหน้า 1'; ENDO.scale=0.9; placeBlock(); }
+    PDFDOC=await pdfjsLib.getDocument({data:Uint8Array.from(atob(r.result.bytes),c=>c.charCodeAt(0))}).promise;
+    const n=PDFDOC.numPages, nav=$('pgnav');
+    if(n>1){
+      nav.hidden=false;
+      nav.innerHTML='<span class="hint" style="margin:0">วางบล็อกบนหน้า</span>'
+        +Array.from({length:n},(_,i)=>`<button type="button" data-pg="${i+1}">${i+1}</button>`).join('');
+      nav.querySelectorAll('[data-pg]').forEach(bt=>bt.onclick=()=>showStagePage(+bt.dataset.pg));
+    }
+    await showStagePage(n);
+    window.addEventListener('resize',()=>{ const w=$('pg').getBoundingClientRect().width; if(w){ ENDO.scale=w/PAGE.w; placeBlock(); } });
+  }catch(e){ msg.textContent='โหลดหน้ากระดาษไม่ได้: '+(e.message||e)+' — ยังลงนามได้ บล็อกจะวางที่มุมขวาล่างของหน้า 1'; ENDO.page=1; ENDO.scale=0.9; placeBlock(); }
+}
+async function showStagePage(no){
+  const pg=await PDFDOC.getPage(no), cv=$('pg');
+  const vp1=pg.getViewport({scale:1}); PAGE.w=vp1.width; PAGE.h=vp1.height;
+  const cssW=Math.min(620, $('stage').parentElement.clientWidth-2); ENDO.scale=cssW/PAGE.w;
+  const vp=pg.getViewport({scale:ENDO.scale*2});
+  cv.width=vp.width; cv.height=vp.height; cv.style.width=cssW+'px'; cv.style.height=(PAGE.h*ENDO.scale)+'px';
+  await pg.render({canvasContext:cv.getContext('2d'), viewport:vp}).promise;
+  const w=cv.getBoundingClientRect().width; if(w) ENDO.scale=w/PAGE.w;
+  ENDO.page=no;
+  document.querySelectorAll('#pgnav [data-pg]').forEach(bt=>bt.setAttribute('aria-pressed', String(+bt.dataset.pg===no)));
+  $('stagemsg').textContent = PDFDOC.numPages>1 ? 'หน้า '+no+' จาก '+PDFDOC.numPages+' — บล็อกจะอยู่บนหน้านี้ใน PDF' : '';
+  placeBlock();
+}
+/* บรรทัดตัวหนังสือของหน้า — ใช้ให้ตัวส่งออกหาย่อหน้าที่เริ่มบนหน้านั้นเพื่อผูกบล็อก
+   Google Docs ไม่บอกว่าย่อหน้าไหนอยู่หน้าไหน ภาพลอยผูกกับย่อหน้า จึงต้องบอกจากหน้า PDF จริง
+   base = ระยะเส้นฐานจากขอบบน (pt) · size = ขนาดตัวอักษร · before = จำนวนตัวอักษรที่มาก่อนบรรทัดนี้ทั้งเล่ม */
+const normT=t=>String(t||'').toLowerCase().replace(/[^\p{L}\p{N}]+/gu,'');
+async function pageLines(no){
+  const pg=await PDFDOC.getPage(no), H=pg.getViewport({scale:1}).height, tc=await pg.getTextContent();
+  const rows=[];
+  tc.items.forEach(it=>{ if(!it.str||!it.str.trim()) return;
+    const base=H-it.transform[5], x=it.transform[4], size=Math.abs(it.transform[3])||10;
+    let r=rows.find(r=>Math.abs(r.base-base)<1.2);
+    if(!r){ r={base,size,parts:[]}; rows.push(r); }
+    r.parts.push({x,s:it.str}); r.size=Math.max(r.size,size); });
+  rows.sort((a,b)=>a.base-b.base);
+  return rows.map(r=>({ t:r.parts.sort((a,b)=>a.x-b.x).map(p=>p.s).join(' ').replace(/\s+/g,' ').trim(),
+    base:Math.round(r.base*10)/10, size:Math.round(r.size*10)/10 }));
+}
+async function anchorLines(no){
+  let before=0;
+  for(let i=1;i<no;i++) (await pageLines(i)).forEach(l=>before+=normT(l.t).length);
+  return (await pageLines(no)).slice(0,40).map(l=>{ const o={t:l.t.slice(0,80), base:l.base, size:l.size, before}; before+=normT(l.t).length; return o; });
 }
 function loadScript(src){ return new Promise((ok,no)=>{ if(document.querySelector(`script[src="${src}"]`)) return ok();
   const s=document.createElement('script'); s.src=src; s.onload=ok; s.onerror=()=>no(new Error('โหลด '+src+' ไม่ได้')); document.head.appendChild(s); }); }
@@ -1278,7 +1315,11 @@ async function endorse(){
   try{ await ESP.keep(sig); }catch(e){}
   const me=A.myName()||A.user.email;
   const endorsement={ action, text:$('e_text').value.trim(), font:$('e_font').value, sig,
-    x:Math.round(ENDO.x*10)/10, y:Math.round(ENDO.y*10)/10, w:ENDO.w, page:1 };
+    x:Math.round(ENDO.x*10)/10, y:Math.round(ENDO.y*10)/10, w:ENDO.w, page:ENDO.page||1 };
+  if(endorsement.page>1){
+    try{ endorsement.lines=await anchorLines(endorsement.page); }
+    catch(e){ say('อ่านตัวหนังสือของหน้า '+endorsement.page+' ไม่ได้ — ยังไม่ได้บันทึก ลองโหลดหน้าใหม่ ('+(e.message||e)+')',true); $('doEndorse').disabled=false; return; }
+  }
   try{
     await A.db.runTransaction(async tx=>{
       const m=await tx.get(MREF);

@@ -176,11 +176,28 @@ function memoPdf_(body) {
   } else if (m.endorsementImg && /^data:image\/png;base64,/.test(m.endorsementImg)) {
     // ภาพลอยเหนือข้อความ ผูกกับย่อหน้าแรกของหน้า 1 (ซึ่งเริ่มที่ขอบบนและขอบซ้ายพอดี)
     var bw = Number(en.w) || 250, bh = Number(m.endorsementH) || 120;
-    var pi = anchor.addPositionedImage(pngBlob_(m.endorsementImg));
-    // ขนาดภาพใน Docs เป็นพิกเซล (1 px = 0.75 pt) ส่วนตำแหน่งเป็นพอยต์ — แปลงให้กว้างเท่าที่ลากไว้จริง
-    pi.setWidth(Math.round(bw / 0.75)).setHeight(Math.round(bh / 0.75))
-      .setLeftOffset((Number(en.x) || 0) - MEMO_PAGE.left).setTopOffset((Number(en.y) || 0) - MEMO_PAGE.top)
-      .setLayout(DocumentApp.PositionedLayout.ABOVE_TEXT);
+    var host = anchor, topOff = (Number(en.y) || 0) - MEMO_PAGE.top;
+    /* หน้า 2 ขึ้นไป — ภาพลอยผูกกับย่อหน้าและอยู่หน้าเดียวกับย่อหน้านั้น
+       หน้าเว็บส่งบรรทัดของหน้านั้นจาก PDF ฉบับรอสั่งการมา (ข้อความ · เส้นฐาน · ขนาด · ตัวอักษรก่อนหน้า)
+       ที่นี่หาย่อหน้าที่ขึ้นต้นด้วยบรรทัดนั้น แล้ววัดระยะจากขอบบนของย่อหน้า
+       ฉบับสมบูรณ์จัดหน้าเหมือนฉบับรอสั่งการ (ต่างกันแค่บรรทัด Awaiting endorsement ท้ายสุด) */
+    if ((Number(en.page) || 1) > 1) {
+      var hit = memoAnchor_(b, en.lines || [], Number(en.y) || 0);
+      if (hit) { host = hit.el; topOff = (Number(en.y) || 0) - hit.top; }
+      else host = null;
+    }
+    if (host) {
+      var pi = host.addPositionedImage(pngBlob_(m.endorsementImg));
+      // ขนาดภาพใน Docs เป็นพิกเซล (1 px = 0.75 pt) ส่วนตำแหน่งเป็นพอยต์ — แปลงให้กว้างเท่าที่ลากไว้จริง
+      pi.setWidth(Math.round(bw / 0.75)).setHeight(Math.round(bh / 0.75))
+        .setLeftOffset((Number(en.x) || 0) - MEMO_PAGE.left).setTopOffset(topOff)
+        .setLayout(DocumentApp.PositionedLayout.ABOVE_TEXT);
+    } else {
+      // หาย่อหน้าบนหน้านั้นไม่เจอ — ต่อท้ายเป็นภาพในบรรทัด ไม่ทิ้งบล็อกสั่งการ และไม่ย้ายไปหน้า 1
+      para('', { after: 4 });
+      var ip = b.appendParagraph('').appendInlineImage(pngBlob_(m.endorsementImg));
+      ip.setWidth(Math.round(bw / 0.75)).setHeight(Math.round(bh / 0.75));
+    }
   } else if (m.endorsedAt) {
     // ยังไม่มีภาพบล็อก — พิมพ์เป็นข้อความต่อท้ายแทน ข้อมูลครบเท่ากัน
     var ed = Utilities.formatDate(new Date(m.endorsedAt), tz, 'dd MMM yyyy HH:mm').toUpperCase() + ' (UTC+7)';
@@ -285,4 +302,42 @@ function fsVal_(v) {
   if ('mapValue' in v) return fsFields_(v.mapValue.fields || {});
   if ('arrayValue' in v) return (v.arrayValue.values || []).map(fsVal_);
   return null;
+}
+
+
+/**
+ * ย่อหน้าที่ใช้ผูกบล็อกสั่งการบนหน้า 2 ขึ้นไป
+ * lines  บรรทัดของหน้านั้นจาก PDF ฉบับรอสั่งการ [{ t, base, size, before }]
+ *        base = เส้นฐานจากขอบบน (pt) · before = จำนวนตัวอักษร (ตัด space/เครื่องหมาย) ที่มาก่อนบรรทัดนี้ทั้งเล่ม
+ * ย่อหน้าต้องขึ้นต้นด้วยข้อความของบรรทัดนั้น (บรรทัดที่ต่อจากหน้าก่อนจึงไม่ถูกเลือก) และอยู่ใกล้
+ * ตำแหน่ง before ที่สุด — ข้อความซ้ำอย่าง "Date:" จึงไม่ไปจับย่อหน้าผิดตัว
+ * เลือกบรรทัดสุดท้ายที่อยู่เหนือบล็อก ระยะจากย่อหน้าถึงบล็อกจึงเป็นบวก
+ * ขอบบนของย่อหน้า = เส้นฐาน − 0.938 × ขนาดตัวอักษร (วัดจาก PDF จริง: 13 pt → 12.19 · 9 pt → 8.46)
+ */
+function memoAnchor_(b, lines, y) {
+  var nm = function (t) { return String(t || '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ''); };
+  var paras = [], off = 0;
+  for (var i = 0; i < b.getNumChildren(); i++) {
+    var ch = b.getChild(i), ty = ch.getType(), txt = nm(ch.getText ? ch.getText() : '');
+    if (ty === DocumentApp.ElementType.PARAGRAPH || ty === DocumentApp.ElementType.LIST_ITEM)
+      paras.push({ el: ty === DocumentApp.ElementType.PARAGRAPH ? ch.asParagraph() : ch.asListItem(), t: txt, off: off });
+    off += txt.length;
+  }
+  var found = [];
+  (lines || []).forEach(function (l) {
+    var t = nm(l.t);
+    if (t.length < 3) return;
+    var best = null;
+    paras.forEach(function (p) {
+      if (p.t.indexOf(t) !== 0) return;
+      var d = Math.abs(p.off - (Number(l.before) || 0));
+      if (!best || d < best.d) best = { p: p, d: d };
+    });
+    if (best && best.d <= Math.max(40, t.length)) {
+      found.push({ el: best.p.el, top: (Number(l.base) || 0) - 0.938 * (Number(l.size) || 10) });
+    }
+  });
+  if (!found.length) return null;
+  var above = found.filter(function (f) { return f.top <= y + 1; });
+  return above.length ? above[above.length - 1] : found[0];
 }
