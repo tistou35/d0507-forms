@@ -28,6 +28,8 @@ function cfg_(k) {
 function doPost(e) {
   try {
     var body = JSON.parse(e.postData.contents);
+    /* PIN ชั่วคราวของ Audit Portal — token มาจากโปรเจกต์ d0507-audit ตรวจในตัวเอง (AuditPin.gs) */
+    if (body.action === 'auditTempPin') return json_({ ok: true, result: auditTempPin_(body) });
     var who = verifyToken_(body.idToken);          // ตรวจว่า token มาจากโปรเจกต์เราจริง
 
     /* งานดึงแผนภูมิ AIP — เจ้าหน้าที่ที่ล็อกอินแล้วเท่านั้น
