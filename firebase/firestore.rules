@@ -368,11 +368,13 @@ service cloud.firestore {
               'endorsement', 'endorsedAt', 'endorsementImg', 'mode', 'paper', 'transcribedAt',
               'circular', 'recipients', 'recipientUids', 'recipientSel', 'ackChannel',
               'directors', 'directorUids', 'dsigs', 'board', 'acm', 'acmAck', 'boardAt',
-              'usigners', 'usignerUids', 'usigs', 'cur', 'src', 'numbering', 'docNumber', 'completedAt'];
+              'usigners', 'usignerUids', 'usigs', 'cur', 'src', 'numbering', 'docNumber', 'completedAt',
+              'dateLater', 'docDate', 'proposedAt', 'signedAt'];
     }
     function memoSignKeys() {
       return ['number', 'seq', 'year', 'counter', 'issuedAt', 'proposerSig',
-              'endorsement', 'endorsedAt', 'endorsementImg', 'transcribedAt', 'paper', 'mode', 'dsigs', 'acmAck', 'boardAt'];
+              'endorsement', 'endorsedAt', 'endorsementImg', 'transcribedAt', 'paper', 'mode', 'dsigs', 'acmAck', 'boardAt',
+              'docDate', 'proposedAt', 'signedAt'];
     }
     function memoCounterPath(d) {
       return /databases/$(database)/documents/counters/$(d.counter);
@@ -380,6 +382,40 @@ service cloud.firestore {
     function memoSeqOk(d) {
       return d.seq == (exists(memoCounterPath(d)) ? get(memoCounterPath(d)).data.next : 1)
           && getAfter(memoCounterPath(d)).data.next == d.seq + 1;
+    }
+    /* วันที่ของเลขแต่ละเลขต้องไม่ถอยหลัง — ตัวนับเก็บ lastYmd (YYYYMMDD) ของเลขล่าสุด
+       ออกเลขทันที: lastYmd = วันนี้ (เวลาไทย ผ่อนได้ ±15 นาทีรอบเที่ยงคืนเผื่อนาฬิกาเครื่อง)
+       ออกเลขภายหลัง: lastYmd = วันที่ของหนังสือที่เลือก */
+    function bkkYmd(t) {
+      let b = t + duration.value(7, 'h');
+      return b.year() * 10000 + b.month() * 100 + b.day();
+    }
+    function memoPrevYmd(d) {
+      return exists(memoCounterPath(d)) ? get(memoCounterPath(d)).data.get('lastYmd', 0) : 0;
+    }
+    function memoNowYmdOk(d) {
+      let y = getAfter(memoCounterPath(d)).data.get('lastYmd', 0);
+      return y >= memoPrevYmd(d)
+          && (y == bkkYmd(request.time) || y == bkkYmd(request.time - duration.value(15, 'm'))
+              || y == bkkYmd(request.time + duration.value(15, 'm')));
+    }
+    /* ออกเลขและลงวันที่ภายหลัง — status signed → issued
+       วันที่ของหนังสือ: ไม่ก่อนวันที่ลงนามครบ · ไม่ก่อนวันที่ของเลขก่อนหน้า · ไม่เกินวันนี้
+       ผู้จัดทำหรือผู้ดูแลเท่านั้น · issuedAt = เวลาเซิร์ฟเวอร์ที่ออกเลข */
+    function memoLaterIssueOk(signedAtTs) {
+      let d = request.resource.data;
+      let y = d.docDate is string && d.docDate.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$') ? int(d.docDate.replace('-', '')) : 0;
+      return (request.auth.uid == resource.data.createdBy || admin())
+          && d.status == 'issued'
+          && memoChanged().hasOnly(['status', 'number', 'seq', 'year', 'counter', 'issuedAt', 'docDate', 'chain'])
+          && d.issuedAt == request.time
+          && d.number is string && d.number.size() > 0
+          && y > 0
+          && y <= bkkYmd(request.time + duration.value(15, 'm'))
+          && y >= bkkYmd(signedAtTs)
+          && y >= memoPrevYmd(d)
+          && getAfter(memoCounterPath(d)).data.lastYmd == y
+          && memoSeqOk(d);
     }
     /* เอกสารอัปโหลด (mode: upload) — PDF จากนอกระบบ ลงนามตามลำดับที่ผู้จัดทำกำหนด
          draft → routing          ผู้จัดทำส่ง · ยังไม่มีลายเซ็น (usigs ว่าง · cur = 0)
@@ -406,7 +442,8 @@ service cloud.firestore {
           && n[k].at == request.time
           && n[k].img is string && n[k].img.size() > 100
           && request.resource.data.cur == resource.data.cur + 1
-          && request.resource.data.status == (request.resource.data.cur == resource.data.usigners.size() ? 'issued' : 'routing')
+          && request.resource.data.status == (request.resource.data.cur == resource.data.usigners.size()
+                ? (resource.data.get('numbering', '') == 'later' ? 'signed' : 'issued') : 'routing')
           && (request.resource.data.status == 'routing' || request.resource.data.completedAt == request.time);
     }
     function memoChanged() {
@@ -469,7 +506,13 @@ service cloud.firestore {
           && upSigOk()
           && request.resource.data.issuedAt == request.time
           && request.resource.data.number is string && request.resource.data.number.size() > 0
-          && memoSeqOk(request.resource.data))
+          && memoSeqOk(request.resource.data)
+          && memoNowYmdOk(request.resource.data))
+        ||
+        // เอกสารอัปโหลดแบบออกเลขภายหลัง — ลงนามครบแล้ว ผู้จัดทำออกเลขและลงวันที่ (ช่วงวันที่ตรวจที่ memoLaterIssueOk)
+        (resource.data.get('mode', '') == 'upload' && resource.data.status == 'signed'
+          && resource.data.get('numbering', '') == 'later'
+          && memoLaterIssueOk(resource.data.completedAt))
         ||
         // ผู้ลงนามคนที่ถึงคิวไม่ลงนาม — ต้องมีเหตุผล · จบที่นี่
         (resource.data.get('mode', '') == 'upload' && resource.data.status == 'routing'
@@ -493,13 +536,30 @@ service cloud.firestore {
         ||
         // ผู้เสนอลงนาม — ออกเลขและวันที่ออก
         (resource.data.status == 'submitted' && request.resource.data.status == 'proposed'
+          && !resource.data.get('dateLater', false)
           && request.auth.uid == resource.data.signers.proposer.uid
           && request.auth.uid != resource.data.beneficiaryUid
           && memoChanged().hasOnly(['status', 'number', 'seq', 'year', 'counter', 'issuedAt', 'proposerSig', 'chain'])
           && request.resource.data.issuedAt == request.time
           && request.resource.data.proposerSig is string && request.resource.data.proposerSig.size() > 0
           && request.resource.data.number is string && request.resource.data.number.size() > 0
-          && memoSeqOk(request.resource.data))
+          && memoSeqOk(request.resource.data)
+          && memoNowYmdOk(request.resource.data))
+        ||
+        // ผู้เสนอลงนาม แบบออกเลขและลงวันที่ภายหลัง — ไม่ออกเลข · proposedAt = เวลาเซิร์ฟเวอร์ · ใช้กับโหมดกรรมการไม่ได้
+        (resource.data.status == 'submitted' && request.resource.data.status == 'proposed'
+          && resource.data.get('dateLater', false) == true
+          && resource.data.get('board', false) != true
+          && request.auth.uid == resource.data.signers.proposer.uid
+          && request.auth.uid != resource.data.beneficiaryUid
+          && memoChanged().hasOnly(['status', 'proposerSig', 'proposedAt', 'chain'])
+          && request.resource.data.proposedAt == request.time
+          && request.resource.data.proposerSig is string && request.resource.data.proposerSig.size() > 0)
+        ||
+        // บันทึกข้อความแบบออกเลขภายหลัง — ลงนามครบแล้ว ผู้จัดทำออกเลขและลงวันที่
+        (resource.data.get('mode', '') != 'upload' && resource.data.status == 'signed'
+          && resource.data.get('dateLater', false) == true
+          && memoLaterIssueOk(resource.data.signedAt))
         ||
         // โหมดกรรมการบริษัท (board) — ผู้เสนอ → กรรมการลงนามอนุมัติ → หนังสือออก → ACM ลงนามรับทราบ
         // กรรมการลงได้เฉพาะช่องของตัวเอง ครั้งเดียว เวลาเซิร์ฟเวอร์ และต้องอยู่ในรายชื่อที่ตรึงไว้ตอนผู้เสนอลงนาม
@@ -531,23 +591,28 @@ service cloud.firestore {
           && request.resource.data.acmAck.sig is string)
         ||
         // ผู้รับทราบ/สั่งการลงนาม (โหมดปกติ)
-        (resource.data.status == 'proposed' && request.resource.data.status in ['issued', 'declined']
+        // ออกเลขภายหลัง (dateLater): ลงนามแล้วเป็น signed + signedAt = เวลาเซิร์ฟเวอร์ ไม่ใช่ issued
+        (resource.data.status == 'proposed'
+          && (resource.data.get('dateLater', false) == true
+              ? (request.resource.data.status == 'declined'
+                 || (request.resource.data.status == 'signed' && request.resource.data.signedAt == request.time))
+              : (request.resource.data.status in ['issued', 'declined'] && !memoChanged().hasAny(['signedAt'])))
           && (request.resource.data.status == 'declined'
               || resource.data.get('dsigs', {}).size() >= resource.data.get('directorUids', []).size())
           && request.auth.uid == resource.data.signers.endorser.uid
           && request.auth.uid != resource.data.beneficiaryUid
-          && memoChanged().hasOnly(['status', 'endorsement', 'endorsedAt', 'chain'])
+          && memoChanged().hasOnly(['status', 'endorsement', 'endorsedAt', 'signedAt', 'chain'])
           && request.resource.data.endorsedAt == request.time
           && request.resource.data.endorsement.sig is string)
         ||
         // ภาพบล็อกสั่งการ — ผู้สั่งการเขียนได้ครั้งเดียว หลังลงนาม (วาดจาก endorsedAt ของเซิร์ฟเวอร์)
-        (resource.data.status in ['issued', 'declined'] && request.resource.data.status == resource.data.status
+        (resource.data.status in ['issued', 'declined', 'signed'] && request.resource.data.status == resource.data.status
           && request.auth.uid == resource.data.signers.endorser.uid
           && !('endorsementImg' in resource.data)
           && memoChanged().hasOnly(['endorsementImg', 'endorsementH']))
         ||
         // หลังออก — ล็อกเนื้อหา · แก้ได้แค่ PDF ที่แนบ · ยกเลิกโดยผู้ดูแล · ถูกแทนโดยฉบับใหม่
-        (resource.data.status in ['proposed', 'issued', 'declined', 'superseded', 'expired', 'cancelled', 'recorded']
+        (resource.data.status in ['proposed', 'signed', 'issued', 'declined', 'superseded', 'expired', 'cancelled', 'recorded']
           && !memoChanged().hasAny(memoFixedKeys())
           && (request.resource.data.status == resource.data.status
               || (request.resource.data.status == 'cancelled' && admin())

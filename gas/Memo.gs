@@ -22,19 +22,28 @@ function memoPdf_(body) {
   var finalSt = ['issued', 'declined', 'superseded', 'expired'];
   if (m.status !== 'proposed' && finalSt.indexOf(m.status) < 0)
     throw new Error('ยังไม่มีผู้เสนอลงนาม (สถานะ ' + m.status + ')');
-  if (!m.number || !m.issuedAt) throw new Error('หนังสือไม่มีเลขที่หรือวันที่ออก');
+  /* ออกเลขและลงวันที่ภายหลัง (dateLater) — ฉบับรอสั่งการยังไม่มีเลข · ฉบับสมบูรณ์ทำหลังออกเลขเท่านั้น
+     วันที่ของหนังสือ = docDate ที่ผู้จัดทำเลือกตอนออกเลข (firestore.rules ตรวจช่วงแล้ว)
+     บล็อกลายเซ็นไม่พิมพ์วันที่ทั้งสองฉบับ — จัดหน้าเหมือนกัน บล็อกสั่งการจึงไม่เลื่อน */
+  var later = !!m.dateLater;
+  if (later && m.status === 'signed') throw new Error('ลงนามครบแล้ว รอออกเลขและลงวันที่ — PDF ฉบับสมบูรณ์ทำหลังออกเลข');
+  if (!later && (!m.number || !m.issuedAt)) throw new Error('หนังสือไม่มีเลขที่หรือวันที่ออก');
+  if (later && m.status !== 'proposed' && (!m.number || !m.docDate)) throw new Error('หนังสือยังไม่ได้ออกเลขและลงวันที่');
   var stage = m.status === 'proposed' ? 'proposed' : 'final';
   var r = m.render || {}, S = m.signers || {}, P = S.proposer || {}, E = S.endorser || {};
 
   var tz = 'Asia/Bangkok';
-  var issued = new Date(m.issuedAt);
-  var issueLong = Utilities.formatDate(issued, tz, 'dd MMM yyyy').toUpperCase();
-  var issueYmd = Utilities.formatDate(issued, tz, 'yyyy-MM-dd');
+  var issued = m.issuedAt ? new Date(m.issuedAt) : new Date();
+  var MONS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  var dd = later && /^\d{4}-\d{2}-\d{2}$/.test(m.docDate || '') ? m.docDate : '';
+  var issueLong = later ? (dd ? dd.slice(8, 10) + ' ' + MONS[+dd.slice(5, 7) - 1] + ' ' + dd.slice(0, 4) : '(dated on issue)')
+                        : Utilities.formatDate(issued, tz, 'dd MMM yyyy').toUpperCase();
+  var issueYmd = later ? (dd || Utilities.formatDate(new Date(), tz, 'yyyy-MM-dd')) : Utilities.formatDate(issued, tz, 'yyyy-MM-dd');
   var signedAt = Utilities.formatDate(issued, tz, 'dd MMM yyyy HH:mm').toUpperCase() + ' (UTC+7)';
   // วันมีผลก่อนวันที่ออก = ออกหนังสือยืนยันย้อนหลัง · ตัดสินที่นี่จากวันที่ลงนามจริง
   var retro = m.effectiveFrom && m.effectiveFrom < issueYmd ? (r.retro || '') : '';
 
-  var name = String(m.number).replace(/[\/\\]/g, '_') + (stage === 'proposed' ? ' (awaiting endorsement)' : '');
+  var name = (m.number ? String(m.number).replace(/[\/\\]/g, '_') : 'MEMO-' + id + ' (unnumbered)') + (stage === 'proposed' ? ' (awaiting endorsement)' : '');
   var doc = DocumentApp.create(name);
   var b = doc.getBody();
   b.setPageWidth(MEMO_PAGE.w).setPageHeight(MEMO_PAGE.h)
@@ -62,7 +71,7 @@ function memoPdf_(body) {
   para('INTERNAL MEMORANDUM', { bold: true, center: true, size: 15, after: 10 });
 
   var who = function (x) { return [x.title, x.name].filter(function (v) { return v; }).join(' — '); };
-  var rows = [['No.', m.number], ['Date of issue', issueLong], ['From', who(P)], ['To', who(E)]];
+  var rows = [['No.', m.number || '(assigned on issue)'], ['Date of issue', issueLong], ['From', who(P)], ['To', who(E)]];
   if (m.board && m.acm) rows.push(['For action', 'Accountable Manager — ' + (m.acm.name || '')]);
   if (r.cc) rows.push(['CC', r.cc]);
   rows.push(['Subject', m.subject || '']);
@@ -108,9 +117,14 @@ function memoPdf_(body) {
   para(P.name || '', { bold: true, after: 0 });
   para(P.title || '', { after: 0 });
   // วันที่อยู่ในบล็อกลายเซ็นเอง ไม่ใช่แค่ในหัวหนังสือ — เหมือนบล็อกสั่งการที่มีวันที่ของผู้สั่งการ
-  para('Date: ' + issueLong, { after: 4 });
-  para('Proposed and signed electronically on ' + signedAt + ' in the D-0507 Forms system. ' +
-       'The date of issue is the time of this signature and cannot be altered.', { size: 8, color: '#555555', after: 0 });
+  if (later) {
+    para('Signed electronically in the D-0507 Forms system. The number and date of issue are assigned when ' +
+         'the memorandum is issued; signature times are kept in the system record.', { size: 8, color: '#555555', after: 0 });
+  } else {
+    para('Date: ' + issueLong, { after: 4 });
+    para('Proposed and signed electronically on ' + signedAt + ' in the D-0507 Forms system. ' +
+         'The date of issue is the time of this signature and cannot be altered.', { size: 8, color: '#555555', after: 0 });
+  }
 
   // กรรมการบริษัทผู้ลงนามร่วม — เมื่อผู้สั่งการลงนามในตำแหน่ง ACM
   // ลงนามในระบบ: ภาพลายเซ็นกับวันที่จากเวลาเซิร์ฟเวอร์ · ลงนามบนกระดาษ: ช่องว่างให้เซ็นด้วยมือ
@@ -220,8 +234,8 @@ function memoPdf_(body) {
   if (body.bytes) res.bytes = Utilities.base64Encode(out.getBlob().getBytes());
   if (body.discard && m.test) {
     // ฉบับทดสอบ: ทิ้งทุกไฟล์ของเลขนี้ในโฟลเดอร์ TEST (รวมฉบับรอสั่งการ) — ใช้ได้กับ test เท่านั้น
-    var base = String(m.number).replace(/[\/\\]/g, '_'), all = folder.getFiles(), n = 0;
-    while (all.hasNext()) { var f = all.next(); if (f.getName().indexOf(base) === 0) { f.setTrashed(true); n++; } }
+    var base = m.number ? String(m.number).replace(/[\/\\]/g, '_') : '\u0000', all = folder.getFiles(), n = 0, ub = 'MEMO-' + id + ' ';
+    while (all.hasNext()) { var f = all.next(), fn = f.getName(); if (fn.indexOf(base) === 0 || fn.indexOf(ub) === 0) { f.setTrashed(true); n++; } }
     res.discarded = n;
   }
   return res;
