@@ -367,6 +367,10 @@ def emit(src_name, outpath, base, active, subs, ver=None):
     left = sorted(set(re.findall(r'@@[A-Z_]+@@', t)))
     if left:
         sys.exit('placeholder ยังเหลือใน %s: %s' % (src_name, left))
+    # รหัสรุ่นของหน้า = hash ของเนื้อหน้า — app.js เทียบกับหน้าบนเซิร์ฟเวอร์เมื่อกลับมาที่แท็บ
+    # หน้าที่เปิดค้างไว้ก่อนอัปเดตจะขึ้นแถบบอกให้โหลดใหม่ (เคยเกิด: หน้ารุ่นเก่าลงนามหนังสือที่ใช้กติกาใหม่ไม่ได้)
+    pid = hashlib.sha1(t.encode('utf-8')).hexdigest()[:12]
+    t = t.replace('<head>', '<head>\n<meta name="d0507-build" content="%s">' % pid, 1)
     d = os.path.dirname(outpath)
     if d:
         os.makedirs(d, exist_ok=True)

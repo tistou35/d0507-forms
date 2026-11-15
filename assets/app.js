@@ -224,6 +224,45 @@
     document.body.appendChild(t);
     setTimeout(() => t.classList.add('out'), 6500); setTimeout(() => t.remove(), 7000);
   };
+  /* มือถือ — แถบบนเหลือแค่รูปย่อชื่อ กดแล้วเปิดเมนู: ชื่อ บทบาท เปลี่ยนรหัสผ่าน ออกจากระบบ
+     จอกว้างไม่ทำอะไร (ปุ่มรหัสผ่านและออกจากระบบอยู่บนแถบแล้ว) */
+  A.acctMenu = function () {
+    if (window.innerWidth > 720 || !A.user) return;
+    let p = document.getElementById('d0507-amenu');
+    if (p) { p.remove(); return; }
+    p = document.createElement('div'); p.id = 'd0507-amenu'; p.className = 'npanel';
+    const pw = (A.user.providerData || []).some(x => x.providerId === 'password');
+    p.innerHTML = `<div class="nh"><b>${A.esc(A.myName())}</b></div>
+      <div class="ni" style="cursor:default"><span>${A.esc(A.roles.length ? A.roleNames().join(' · ') : A.t('noRole'))}</span></div>
+      ${pw ? `<a class="ni" href="#" id="amPw"><b>${A.esc(A.L({ th: 'เปลี่ยนรหัสผ่าน', en: 'Change password' }))}</b></a>` : ''}
+      <a class="ni" href="#" id="amOut"><b>${A.esc(A.t('signOut'))}</b></a>`;
+    document.body.appendChild(p);
+    if (pw) p.querySelector('#amPw').onclick = e => { e.preventDefault(); p.remove(); A.pwDialog(false); };
+    p.querySelector('#amOut').onclick = e => { e.preventDefault(); p.remove(); A.logout(); };
+    setTimeout(() => document.addEventListener('click', function off(e) {
+      if (!p.contains(e.target) && !(e.target.closest && e.target.closest('.acct.me'))) { p.remove(); document.removeEventListener('click', off); }
+    }), 0);
+  };
+  /* หน้าเปิดค้างไว้นานแล้วมีรุ่นใหม่ขึ้นเว็บ — บอกให้โหลดใหม่
+     ตรวจเมื่อกลับมาที่แท็บ (ไม่ถี่กว่า 2 นาที) เทียบรหัสรุ่นในหน้ากับหน้าบนเซิร์ฟเวอร์ */
+  A.buildCheck = async function () {
+    const mine = document.querySelector('meta[name="d0507-build"]');
+    if (!mine || document.getElementById('d0507-stale')) return;
+    if (A._bcAt && Date.now() - A._bcAt < 120000) return;
+    A._bcAt = Date.now();
+    try {
+      const t = await (await fetch(location.pathname + '?bc=' + Date.now(), { cache: 'no-store' })).text();
+      const m = /<meta name="d0507-build" content="([0-9a-f]+)">/.exec(t);
+      if (!m || m[1] === mine.content) return;
+      const b = document.createElement('div'); b.id = 'd0507-stale'; b.className = 'stalebar';
+      b.innerHTML = `<span>${A.esc(A.L({ th: 'มีระบบรุ่นใหม่ — โหลดหน้านี้ใหม่ก่อนลงนามหรือส่งใบ', en: 'A newer version is available — reload before signing or submitting' }))}</span>
+        <button type="button" onclick="location.reload()">${A.esc(A.L({ th: 'โหลดใหม่', en: 'Reload' }))}</button>`;
+      document.body.prepend(b);
+    } catch (e) { /* ออฟไลน์ — ไม่ต้องบอก */ }
+  };
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') A.buildCheck(); });
+  setInterval(() => { if (document.visibilityState === 'visible') A.buildCheck(); }, 600000);
+
   A.notifyRead = function (id) {
     return A.db.collection('notifications').doc(id).update({ read: true, readAt: firebase.firestore.FieldValue.serverTimestamp() }).catch(() => {});
   };
@@ -313,13 +352,13 @@
              onclick="D0507.notifyPanel()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
              stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
              <path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="b" id="d0507-bellN" style="display:none"></span></button>
-           <span class="acct"><span class="av">${A.esc((A.myName() || '?').slice(0, 2).toUpperCase())}</span>
+           <span class="acct me" onclick="D0507.acctMenu()"><span class="av">${A.esc((A.myName() || '?').slice(0, 2).toUpperCase())}</span>
              <span class="who"><b>${A.esc(A.myName())}</b>
              <span>${A.roles.length ? A.esc(A.roleNames().join(' · ')) : A.esc(A.t('noRole'))}</span></span></span>
            ${(A.user.providerData || []).some(p => p.providerId === 'password')
-             ? `<a class="acct" href="#" onclick="D0507.pwDialog(false);return false" style="padding:0 12px">
+             ? `<a class="acct pw" href="#" onclick="D0507.pwDialog(false);return false" style="padding:0 12px">
                   <span class="who"><b>${A.esc(A.L({ th: 'รหัสผ่าน', en: 'Password' }))}</b><span>${A.esc(A.L({ th: 'เปลี่ยน', en: 'Change' }))}</span></span></a>` : ''}
-           <a class="acct" href="#" onclick="D0507.logout();return false" style="padding:0 16px">
+           <a class="acct out" href="#" onclick="D0507.logout();return false" style="padding:0 16px">
              <span class="who"><b>${A.esc(A.t('signOut'))}</b><span>${A.esc(A.t('signOutSub'))}</span></span></a>`
         : `<a class="acct" href="${base}staff-login/?next=${
              encodeURIComponent(location.pathname + location.search)}" style="padding:0 16px">

@@ -765,6 +765,8 @@ async function viewMemo(id){
     ${M.status==='returned'&&M.returnNote?`<div class="fk-gate stop noprint"><span><b>ตีกลับ:</b> ${esc(M.returnNote)}</span></div>`:''}
     ${M.cancelNote?`<div class="fk-gate warn noprint"><span><b>ยกเลิก:</b> ${esc(M.cancelNote)}</span></div>`:''}
     ${M.supersededBy?`<div class="fk-gate warn noprint"><span>ถูกแทนด้วย ${esc(M.supersededBy)}</span></div>`:''}
+    <div class="noprint" id="sgbox"></div>
+    ${M.number&&oldSuggest(M).length?`<div class="fk-gate warn noprint"><span>เลขที่เคยแนะนำไว้ก่อนออกเลข: ${esc(oldSuggest(M).join(' / '))} — เลขจริง ${esc(M.number)} · ถ้าอ้างเลขเดิมไว้ที่ใด ให้ลบหรือแก้เอง</span></div>`:''}
     <div class="noprint" id="actbox"></div>
     <div class="noprint" id="pmsg"></div>
     ${acts.includes('endorse')?'':`<div id="letterbox">${letterHtml(M)}</div>`}
@@ -776,6 +778,7 @@ async function viewMemo(id){
   paintFile();
   if(M.circular) paintAcks();
   paintActions(acts);
+  paintSuggest($('sgbox'));
   paintHistory();
 }
 const say=(t,bad)=>{ const e=$('amsg')||$('pmsg'); if(e) e.innerHTML=`<div class="fk-gate ${bad?'stop':'info'}" style="margin-top:10px"><span>${esc(t)}</span></div>`; };
@@ -958,6 +961,39 @@ function makePad(cv, clr){
   return o;
 }
 
+/* ── เลขที่ที่น่าจะได้ ──
+   ก่อนออกเลข บอกเลขถัดไปของตัวนับ (ยังไม่จอง) ให้ผู้เกี่ยวข้องใช้อ้างล่วงหน้าได้
+   ถ้ามีฉบับอื่นออกเลขก่อน เลขจริงจะเลื่อน — ตอนออกเลข ระบบเทียบกับเลขที่แนะนำไว้ล่าสุด (suggestedNo)
+   ถ้าไม่ตรง แจ้งผู้จัดทำและผู้เสนอ ให้ลบหรือแก้เลขที่อ้างไว้ในเอกสารอื่นเอง */
+const needsNo=m=>!m.number && (m.mode==='upload' ? ['memo','later'].includes(m.numbering) && ['draft','routing','signed'].includes(m.status)
+  : ['draft','submitted','returned','proposed','signed'].includes(m.status));
+async function suggestNo(m){
+  const yearBE=+bkkToday().slice(0,4)+543, ctr=m.test?'memo-test':'memo-'+yearBE;
+  let next=1; try{ const c=await A.db.collection('counters').doc(ctr).get(); next=c.exists?c.data().next:1; }catch(e){ return ''; }
+  return (m.test?'TEST-':'')+'D0507-MEMO-'+yearBE+'/'+String(next).padStart(4,'0')+' ('+m.type+')';
+}
+async function paintSuggest(box){
+  if(!box || !M || !needsNo(M)) return;
+  const sg=await suggestNo(M); if(!sg) return;
+  box.innerHTML=`<div class="fk-gate info" style="margin-bottom:12px"><span>เลขที่ที่น่าจะได้: <b class="mono">${esc(sg)}</b>
+    <button type="button" class="fb" id="sgCopy" style="margin-left:8px">คัดลอก</button><br>
+    <span class="hint" style="margin:0">ยังไม่ได้จอง — เลขจริงออกตอน${M.dateLater||M.numbering==='later'?'กดออกเลขและลงวันที่':M.mode==='upload'?'ผู้ลงนามคนแรกลงนาม':'ผู้เสนอลงนาม'}
+      ถ้ามีหนังสือฉบับอื่นออกเลขก่อน เลขจะเลื่อน และระบบจะแจ้งเตือน ให้ลบหรือแก้เลขนี้ในที่ที่อ้างไว้เอง</span></span></div>`;
+  $('sgCopy').onclick=()=>{ try{ navigator.clipboard.writeText(sg); $('sgCopy').textContent='คัดลอกแล้ว'; }catch(e){} };
+  // จำเลขที่แนะนำล่าสุดไว้ในหนังสือ — ใช้เทียบตอนออกเลข (เขียนไม่ได้ก็ไม่เป็นไร เช่นเอกสารอัปโหลดระหว่างลงนาม)
+  // จำทุกเลขที่เคยแนะนำ — คนที่เห็นเลขเก่าไปแล้วอาจใช้เลขนั้นไปแล้ว
+  if(!(M.suggestedNos||[]).includes(sg)){ try{ await MREF.update({suggestedNos:firebase.firestore.FieldValue.arrayUnion(sg)}); M.suggestedNos=(M.suggestedNos||[]).concat(sg); }catch(e){} }
+}
+/* ออกเลขแล้ว — เลขจริงไม่ตรงกับที่แนะนำไว้ แจ้งผู้จัดทำและผู้เสนอ (และบอกบนจอคนที่กด) */
+const oldSuggest=m=>(m.suggestedNos||[]).filter(x=>x!==m.number);
+async function checkSuggested(m, number){
+  const old=(m.suggestedNos||[]).filter(x=>x!==number);
+  if(!number || !old.length) return;
+  const msg='เลขที่จริงคือ '+number+' ไม่ใช่ '+old.join(' / ')+' ที่เคยแนะนำไว้ — ถ้าอ้างเลขนั้นไว้ในเอกสารใด ให้ลบหรือแก้เอง';
+  await mNotify('⚠ เลขที่ไม่ตรงกับที่แนะนำไว้: '+number, null, (m.subject||'')+' — '+msg);
+  setTimeout(()=>{ try{ alert(msg); }catch(e){} }, 300);
+}
+
 /* แจ้งเตือนในแอป — ผู้จัดทำและผู้เสนอเห็นที่กระดิ่งทันทีที่อีกฝ่ายลงนาม (ตัวเองไม่ถูกแจ้ง) */
 function mNotify(title, uids, body){
   const m=M||{}, S=m.signers||{};
@@ -995,6 +1031,7 @@ async function propose(SP){
   try{ await MREF.collection('events').add({action:'propose', byUid:A.user.uid, byName:me, note:number, at:now()}); }catch(e){}
   await closeTasks(M.id, {tracking:number});
   mNotify('ผู้เสนอลงนามแล้ว · ออกเลข '+number, [M.createdBy]);
+  await checkSuggested(M, number);
   if(!M.board){ try{ await taskFor(M.id, Object.assign({}, M, {number}), 'endorser'); }catch(e){} }
   for(const d of (M.directors||[]).filter(x=>x.mode==='system'&&x.uid)){
     try{ await A.db.collection('tasks').add({ app:'memo', kind:'dsign', memoId:M.id, subId:'', formCode:'MEMO-'+M.type,
@@ -1090,6 +1127,7 @@ async function issueLater(){
   await closeTasks(M.id, {tracking:number});
   const s2=await MREF.get(); M=Object.assign({id:s2.id},s2.data());
   await mNotify('ออกเลขแล้ว '+number+' · ลงวันที่ '+long(pick), memoAllSigners(M).filter(u=>!(M.board&&M.acm&&u===M.acm.uid)));
+  await checkSuggested(M, number);
   if(up){ await upFinalize(false); return viewMemo(M.id); }
   if(M.board && M.acm && M.acm.uid){ try{ await A.db.collection('tasks').add({ app:'memo', kind:'acmack', memoId:M.id, subId:'', formCode:'MEMO-'+M.type,
       title:'รับทราบคำสั่งกรรมการ: '+M.subject, tracking:M.number, assigneeUid:M.acm.uid, assigneeName:M.acm.name, state:'open', step:4,
@@ -1761,7 +1799,8 @@ async function viewUpload(){
     </tbody></table>
     <h3 style="margin-top:14px">ผู้ลงนามตามลำดับ</h3><div class="twrap"><table class="ml"><tbody>${L.map(row).join('')}</tbody></table></div>
     <div id="u_verify"></div></div>
-    <div id="amsg"></div>
+    <div id="amsg"></div><div id="sgbox"></div>
+    ${M.number&&oldSuggest(M).length?`<div class="fk-gate warn"><span>เลขที่เคยแนะนำไว้ก่อนออกเลข: ${esc(oldSuggest(M).join(' / '))} — เลขจริง ${esc(M.number)} · ถ้าอ้างเลขเดิมไว้ที่ใด ให้ลบหรือแก้เอง</span></div>`:''}
     ${canIssue?'<div id="actbox" style="margin-top:16px">'+issueLaterHtml()+'</div>':M.status==='signed'?`<div class="fk-gate warn" style="margin-top:12px"><span>ลงนามครบแล้ว — รอ ${esc(M.createdByName||'ผู้จัดทำ')} ออกเลขและลงวันที่</span></div>`:''}
     ${mine?'<div id="u_signbox"></div>':''}
     <div id="letterbox" style="margin-top:18px"><div class="hint">กำลังโหลดเอกสาร…</div></div>
@@ -1771,6 +1810,7 @@ async function viewUpload(){
   if($('u_cancel')) $('u_cancel').addEventListener('click',()=>simple('cancel'));
   if($('u_final')) $('u_final').addEventListener('click',()=>upFinalize(true));
   if(canIssue) bindIssueLater();
+  paintSuggest($('sgbox'));
   paintHistory();
   if(M.status==='issued' && M.pdf && M.pdf.id) paintFile();
   let src;
@@ -1862,6 +1902,7 @@ async function upSign(){
   const s2=await MREF.get(); M=Object.assign({id:s2.id},s2.data());
   await mNotify(s.name+' ลงนามแล้ว ('+(k+1)+'/'+M.usigners.length+')'+(last?(M.status==='signed'?' — ลงนามครบ รอออกเลข':' — ลงนามครบ'):'')+(number?' · '+number:''),
     [M.createdBy].concat(M.usigners.slice(0,k).map(x=>x.uid)));
+  if(number) await checkSuggested(M, number);
   if(!last){ try{ await upTask(M.id, M, k+1); }catch(e){} }
   else if(M.status==='signed'){ try{ await A.db.collection('tasks').add({ app:'memo', kind:'mdate', memoId:M.id, subId:'', formCode:'MEMO-'+M.type,
       title:'ออกเลขและลงวันที่: '+M.subject, tracking:'(ลงนามครบ · รอออกเลข)', assigneeUid:M.createdBy, assigneeName:M.createdByName||'',
