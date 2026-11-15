@@ -647,6 +647,24 @@ service cloud.firestore {
         allow update, delete: if false;
       }
     }
+    // การแจ้งเตือนในแอป — เจ้าหน้าที่สร้างให้คนอื่นได้ในนามตัวเองเท่านั้น (fromUid = ผู้เขียน · เวลาเซิร์ฟเวอร์ · ยังไม่อ่าน)
+    // ผู้รับอ่าน ทำเครื่องหมายอ่านแล้ว และลบของตัวเองได้ · แก้หัวข้อ/ข้อความ/ผู้ส่งไม่ได้
+    match /notifications/{nid} {
+      allow read:   if signedIn() && resource.data.uid == request.auth.uid;
+      allow create: if staff()
+        && request.resource.data.keys().hasOnly(['uid', 'title', 'body', 'link', 'kind', 'ref', 'fromUid', 'fromName', 'read', 'at'])
+        && request.resource.data.uid is string && request.resource.data.uid.size() > 0
+        && request.resource.data.fromUid == request.auth.uid
+        && request.resource.data.at == request.time
+        && request.resource.data.read == false
+        && request.resource.data.title is string && request.resource.data.title.size() <= 200
+        && request.resource.data.body is string && request.resource.data.body.size() <= 500
+        && request.resource.data.link is string && request.resource.data.link.size() <= 500;
+      allow update: if signedIn() && resource.data.uid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read', 'readAt'])
+        && request.resource.data.read == true;
+      allow delete: if signedIn() && resource.data.uid == request.auth.uid;
+    }
     // ลายเซ็นที่บันทึกไว้ — ของใครของมัน ผู้ดูแลก็อ่านหรือใช้แทนไม่ได้
     match /signatures/{uid} {
       allow read, write: if signedIn() && request.auth.uid == uid && staff();

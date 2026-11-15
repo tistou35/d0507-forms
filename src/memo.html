@@ -958,6 +958,16 @@ function makePad(cv, clr){
   return o;
 }
 
+/* แจ้งเตือนในแอป — ผู้จัดทำและผู้เสนอเห็นที่กระดิ่งทันทีที่อีกฝ่ายลงนาม (ตัวเองไม่ถูกแจ้ง) */
+function mNotify(title, uids, body){
+  const m=M||{}, S=m.signers||{};
+  const who = uids || [m.createdBy, S.proposer&&S.proposer.uid];
+  return A.notify(who, { title, body: body!=null?body:(m.subject||''), kind:'memo', ref:m.id||'',
+    link: (window.BASE||'')+'memo/?id='+encodeURIComponent(m.id||'') });
+}
+const memoAllSigners=m=>[m.createdBy, (m.signers||{}).proposer&&(m.signers||{}).proposer.uid, (m.signers||{}).endorser&&(m.signers||{}).endorser.uid]
+  .concat((m.directorUids||[]), (m.usignerUids||[]), [m.acm&&m.acm.uid]);
+
 /* ── ผู้เสนอลงนาม = ออกเลข + ล็อกวันที่ออก ใน transaction เดียวกับตัวนับ
    เลขที่ = D0507-MEMO-<ปี พ.ศ.>/<ลำดับ 4 หลัก> (<ประเภท>) ลำดับเดียวทั้งองค์กรต่อปี
    ฉบับทดสอบใช้ตัวนับแยก (memo-test) และขึ้นต้นด้วย TEST- ไม่กินเลขจริง */
@@ -984,6 +994,7 @@ async function propose(SP){
   }catch(e){ $('doPropose').disabled=false; say('ออกเลขไม่สำเร็จ: '+(e.code||e.message),true); return; }
   try{ await MREF.collection('events').add({action:'propose', byUid:A.user.uid, byName:me, note:number, at:now()}); }catch(e){}
   await closeTasks(M.id, {tracking:number});
+  mNotify('ผู้เสนอลงนามแล้ว · ออกเลข '+number, [M.createdBy]);
   if(!M.board){ try{ await taskFor(M.id, Object.assign({}, M, {number}), 'endorser'); }catch(e){} }
   for(const d of (M.directors||[]).filter(x=>x.mode==='system'&&x.uid)){
     try{ await A.db.collection('tasks').add({ app:'memo', kind:'dsign', memoId:M.id, subId:'', formCode:'MEMO-'+M.type,
@@ -1011,6 +1022,7 @@ async function proposeLater(SP, sig){
   }catch(e){ $('doPropose').disabled=false; say('ลงนามไม่สำเร็จ: '+(e.code||e.message),true); return; }
   try{ await MREF.collection('events').add({action:'propose', byUid:A.user.uid, byName:me, note:'ออกเลขภายหลัง', at:now()}); }catch(e){}
   await closeTasks(M.id, {tracking:'(ออกเลขเมื่อลงนามครบ)'});
+  mNotify('ผู้เสนอลงนามแล้ว (ออกเลขเมื่อลงนามครบ)', [M.createdBy]);
   if(!M.board){ try{ await taskFor(M.id, Object.assign({}, M, {number:'(ออกเลขเมื่อลงนามครบ)'}), 'endorser'); }catch(e){} }
   for(const d of (M.board?(M.directors||[]):[]).filter(x=>x.mode==='system'&&x.uid)){
     try{ await A.db.collection('tasks').add({ app:'memo', kind:'dsign', memoId:M.id, subId:'', formCode:'MEMO-'+M.type,
@@ -1077,6 +1089,7 @@ async function issueLater(){
   try{ await MREF.collection('events').add({action:'issuelater', byUid:A.user.uid, byName:me, note:number+' · ลงวันที่ '+long(pick), at:now()}); }catch(e){}
   await closeTasks(M.id, {tracking:number});
   const s2=await MREF.get(); M=Object.assign({id:s2.id},s2.data());
+  await mNotify('ออกเลขแล้ว '+number+' · ลงวันที่ '+long(pick), memoAllSigners(M).filter(u=>!(M.board&&M.acm&&u===M.acm.uid)));
   if(up){ await upFinalize(false); return viewMemo(M.id); }
   if(M.board && M.acm && M.acm.uid){ try{ await A.db.collection('tasks').add({ app:'memo', kind:'acmack', memoId:M.id, subId:'', formCode:'MEMO-'+M.type,
       title:'รับทราบคำสั่งกรรมการ: '+M.subject, tracking:M.number, assigneeUid:M.acm.uid, assigneeName:M.acm.name, state:'open', step:4,
@@ -1106,6 +1119,8 @@ async function dsign(DSP){
   try{ const ts=await A.db.collection('tasks').where('memoId','==',M.id).get();
        for(const t of ts.docs){ const v=t.data(); if(v.state==='open' && v.kind==='dsign' && v.assigneeUid===A.user.uid) await t.ref.update({state:'done', closedAt:now()}); } }catch(e){}
   const s2=await MREF.get(); M=Object.assign({id:s2.id},s2.data());
+  const nd=(M.directorUids||[]).length;
+  await mNotify('กรรมการ '+(d.name||me)+' ลงนามแล้ว ('+(nd-dirPending(M).length)+'/'+nd+')');
   if(M.board && !dirPending(M).length) return completeBoard();
   await viewMemo(M.id);
 }
@@ -1125,6 +1140,7 @@ async function completeBoard(){
     try{ await A.db.collection('tasks').add({ app:'memo', kind:'mdate', memoId:M.id, subId:'', formCode:'MEMO-'+M.type,
       title:'ออกเลขและลงวันที่: '+M.subject, tracking:'(ลงนามครบ · รอออกเลข)', assigneeUid:M.createdBy, assigneeName:M.createdByName||'',
       state:'open', step:3, fromUid:A.user.uid, fromName:me, createdAt:now() }); }catch(e){}
+    await mNotify('กรรมการลงนามครบแล้ว — รอออกเลขและลงวันที่');
     return viewMemo(M.id);
   }
   say('กรรมการลงนามครบ — กำลังออกหนังสือ…');
@@ -1136,6 +1152,7 @@ async function completeBoard(){
       title:'รับทราบคำสั่งกรรมการ: '+M.subject, tracking:M.number, assigneeUid:M.acm.uid, assigneeName:M.acm.name, state:'open', step:3,
       fromUid:A.user.uid, fromName:me, createdAt:now() }); }catch(e){} }
   const s2=await MREF.get(); M=Object.assign({id:s2.id},s2.data());
+  await mNotify('กรรมการลงนามครบแล้ว · หนังสือออก '+(M.number||''));
   await circulate();
   if(M.supersedes&&M.supersedes.id){
     try{ await A.db.collection('memos').doc(M.supersedes.id).update({status:'superseded', supersededBy:M.number});
@@ -1156,6 +1173,7 @@ async function acmAck(AKP){
   try{ await MREF.collection('events').add({action:'acmack', byUid:A.user.uid, byName:me, at:now()}); }catch(e){}
   try{ const ts=await A.db.collection('tasks').where('memoId','==',M.id).get();
        for(const t of ts.docs){ const v=t.data(); if(v.state==='open' && v.kind==='acmack' && v.assigneeUid===A.user.uid) await t.ref.update({state:'done', closedAt:now()}); } }catch(e){}
+  await mNotify('ACM ลงนามรับทราบแล้ว · '+(M.number||''), [M.createdBy, (M.signers||{}).proposer&&M.signers.proposer.uid].concat(M.directorUids||[]));
   const s2=await MREF.get(); M=Object.assign({id:s2.id},s2.data());
   await viewMemo(M.id);
   await makePdf(false);   // ฉบับสมบูรณ์ใหม่ที่มีลายเซ็นรับทราบของ ACM
@@ -1379,6 +1397,7 @@ async function endorse(){
   }catch(e){ $('doEndorse').disabled=false; say('บันทึกไม่สำเร็จ: '+(e.code||e.message),true); return; }
   try{ await MREF.collection('events').add({action:'endorse', byUid:A.user.uid, byName:me, note:action, at:now()}); }catch(e){}
   await closeTasks(M.id);
+  await mNotify((declined?'ไม่อนุมัติ':action)+' โดย '+me+(M.dateLater&&!declined?' — รอออกเลขและลงวันที่':(M.number?' · '+M.number:'')));
   if(!declined && M.dateLater){
     // ลงนามครบ — ยังไม่ออก · ผู้จัดทำออกเลขและลงวันที่ แล้วค่อยเวียน/แทนฉบับเดิม/ทำ PDF
     try{ await A.db.collection('tasks').add({ app:'memo', kind:'mdate', memoId:M.id, subId:'', formCode:'MEMO-'+M.type,
@@ -1432,6 +1451,7 @@ async function simple(kind){
     await MREF.update(patch);
     await MREF.collection('events').add({action:kind, byUid:A.user.uid, byName:me, note, at:now()});
     await closeTasks(M.id, {note});
+    await mNotify((kind==='return'?'ตีกลับ':'ยกเลิก')+' โดย '+me, null, (M.subject||'')+' — '+note);
     await viewMemo(M.id);
   }catch(e){ say('ทำไม่สำเร็จ: '+(e.code||e.message),true); }
 }
@@ -1840,6 +1860,8 @@ async function upSign(){
   try{ await MREF.collection('events').add({action:'usign', byUid:A.user.uid, byName:me, note:s.role+(number?' · '+number:''), at:now()}); }catch(e){}
   await closeTasksFor(M.id, A.user.uid);
   const s2=await MREF.get(); M=Object.assign({id:s2.id},s2.data());
+  await mNotify(s.name+' ลงนามแล้ว ('+(k+1)+'/'+M.usigners.length+')'+(last?(M.status==='signed'?' — ลงนามครบ รอออกเลข':' — ลงนามครบ'):'')+(number?' · '+number:''),
+    [M.createdBy].concat(M.usigners.slice(0,k).map(x=>x.uid)));
   if(!last){ try{ await upTask(M.id, M, k+1); }catch(e){} }
   else if(M.status==='signed'){ try{ await A.db.collection('tasks').add({ app:'memo', kind:'mdate', memoId:M.id, subId:'', formCode:'MEMO-'+M.type,
       title:'ออกเลขและลงวันที่: '+M.subject, tracking:'(ลงนามครบ · รอออกเลข)', assigneeUid:M.createdBy, assigneeName:M.createdByName||'',
@@ -1854,7 +1876,9 @@ async function upDecline(){
   try{ await MREF.update({status:'declined', declineNote:note, declinedBy:{uid:A.user.uid, name:me}, declinedAt:now(),
          chain:arrU({action:'udecline', byUid:A.user.uid, byName:me, at:bkkToday(), note})});
        await MREF.collection('events').add({action:'udecline', byUid:A.user.uid, byName:me, note, at:now()});
-       await closeTasks(M.id, {note}); await viewMemo(M.id); }
+       await closeTasks(M.id, {note});
+       await mNotify(me+' ไม่ลงนาม', [M.createdBy].concat((M.usigners||[]).slice(0,M.cur||0).map(x=>x.uid)), (M.subject||'')+' — '+note);
+       await viewMemo(M.id); }
   catch(e){ say('บันทึกไม่สำเร็จ: '+(e.code||e.message),true); }
 }
 /* ลงนามครบ — ประกอบฉบับลงนามจากต้นฉบับ + บันทึกการลงนาม แล้วเก็บที่ MEMO/<ปี> และแชร์ให้ผู้เกี่ยวข้อง

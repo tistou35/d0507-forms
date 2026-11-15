@@ -68,6 +68,26 @@ a{color:var(--sky-600)}
 .bell{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.07);
   border:1px solid var(--border-inv);display:grid;place-items:center;position:relative;cursor:pointer}
 .bell svg{width:19px;height:19px;color:rgba(255,255,255,.8)}
+.bell{color:inherit;padding:0;flex:none}
+/* แผงการแจ้งเตือน — ลอยใต้แถบบน ชิดขวา · จอแคบเต็มความกว้าง */
+.npanel{position:fixed;top:64px;right:16px;width:min(380px,calc(100vw - 32px));max-height:calc(100vh - 88px);overflow:auto;
+  background:var(--surface,#fff);color:var(--fg-1);border:1px solid var(--border-light);border-radius:12px;
+  box-shadow:0 18px 50px rgba(15,23,42,.22);z-index:60}
+.npanel .nh{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--border-light);
+  position:sticky;top:0;background:inherit}
+.npanel .nh button{border:0;background:none;color:var(--sky-600,#0284c7);cursor:pointer;font:inherit;font-size:13px;min-height:32px}
+.npanel .ni{display:block;padding:11px 14px;border-bottom:1px solid var(--border-light);color:inherit;text-decoration:none}
+.npanel .ni:hover{background:#eef4fb}
+.npanel .ni b{display:block;font-weight:600;font-size:13.5px}
+.npanel .ni span{display:block;font-size:13px;color:var(--fg-2);margin-top:2px}
+.npanel .ni i{display:block;font-style:normal;font-size:11.5px;color:var(--g-400);margin-top:4px}
+.npanel .ni.un{background:#f0f7ff;box-shadow:inset 3px 0 0 var(--sky-500)}
+.npanel .ne{padding:22px 14px;color:var(--g-400);font-size:13.5px;text-align:center}
+.ntoast{position:fixed;right:16px;bottom:16px;max-width:min(360px,calc(100vw - 32px));z-index:70;display:block;
+  background:var(--navy-900,#0f172a);color:#fff;border-radius:10px;padding:12px 14px;text-decoration:none;
+  box-shadow:0 12px 36px rgba(0,0,0,.3);transition:opacity .4s ease,transform .4s ease}
+.ntoast b{display:block;font-size:13.5px}.ntoast span{display:block;font-size:12.5px;opacity:.8;margin-top:2px}
+.ntoast.out{opacity:0;transform:translateY(8px)}
 .bell .b{position:absolute;top:-3px;right:-3px;min-width:21px;height:21px;border-radius:99px;
   background:var(--amber-500);color:var(--navy-900);font-family:var(--font-display);font-weight:700;
   font-size:12px;display:grid;place-items:center;padding:0 5px;border:2px solid var(--navy-900)}

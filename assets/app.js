@@ -98,6 +98,7 @@
       A.paintAuth();
       A.paintFormCount();
       A.queueCount();
+      A.notifyWatch();
       if (A.user && A.profile && A.profile.mustChangePw && A.signInBy === 'password') A.pwDialog(true);
       if (onChange) onChange(A.user, A.roles);
     });
@@ -178,6 +179,78 @@
     } catch (e) { els.forEach(el => { el.textContent = '—'; el.style.display = ''; }); }
   };
 
+  /* ── การแจ้งเตือนในแอป (notifications) ──────────────────────
+     เอกสาร: { uid ผู้รับ · title · body · link · kind · ref · fromUid · fromName · at · read }
+     เขียนจากหน้าเว็บตอนเกิดเหตุ (กรรมการลงนาม · ใบอนุมัติ ฯลฯ) — firestore.rules: เจ้าหน้าที่สร้างได้
+     ในนามตัวเองเท่านั้น · ผู้รับอ่าน ทำเครื่องหมายว่าอ่านแล้ว และลบของตัวเองได้
+     ฟังแบบสด (onSnapshot) ตัวเลขบนกระดิ่งขึ้นทันทีที่มีเรื่องใหม่ ไม่ต้องโหลดหน้าใหม่
+     ค้นด้วย uid ช่องเดียวแล้วเรียงในเครื่อง — where + orderBy ต้องมี composite index */
+  A.NOTIF = [];
+  A.notify = async function (uids, n) {
+    if (!A.user) return;
+    const me = A.user.uid, seen = {};
+    const to = (uids || []).filter(u => u && u !== me && !seen[u] && (seen[u] = 1));
+    for (const uid of to) {
+      try {
+        await A.db.collection('notifications').add({ uid, title: String(n.title || '').slice(0, 200),
+          body: String(n.body || '').slice(0, 500), link: n.link ? new URL(n.link, location.href).href : '', kind: n.kind || '', ref: n.ref || '',
+          fromUid: me, fromName: A.myName() || A.user.email || '', read: false,
+          at: firebase.firestore.FieldValue.serverTimestamp() });
+      } catch (e) { console.warn('[notify]', e.code || e.message); }
+    }
+  };
+  A.notifyWatch = function () {
+    if (A._notifUnsub) { A._notifUnsub(); A._notifUnsub = null; }
+    A.NOTIF = [];
+    if (!A.user) return;
+    let first = true;
+    A._notifUnsub = A.db.collection('notifications').where('uid', '==', A.user.uid).onSnapshot(s => {
+      const ms = v => (v && v.toMillis ? v.toMillis() : Date.now());
+      const before = new Set(A.NOTIF.map(x => x.id));
+      A.NOTIF = s.docs.map(d => Object.assign({ id: d.id }, d.data())).sort((a, b) => ms(b.at) - ms(a.at));
+      const unread = A.NOTIF.filter(x => !x.read);
+      const el = document.getElementById('d0507-bellN');
+      if (el) { el.textContent = unread.length > 99 ? '99+' : unread.length; el.style.display = unread.length ? '' : 'none'; }
+      if (!first) unread.filter(x => !before.has(x.id)).slice(0, 3).forEach(x => A.notifyToast(x));
+      first = false;
+      if (document.getElementById('d0507-npanel')) A.notifyPanel(true);
+    }, e => console.warn('[notify] ฟังการแจ้งเตือนไม่ได้', e.code || e.message));
+  };
+  A.notifyToast = function (x) {
+    const t = document.createElement('a');
+    t.href = x.link || '#'; t.className = 'ntoast';
+    t.innerHTML = `<b>${A.esc(x.title)}</b>${x.body ? `<span>${A.esc(x.body)}</span>` : ''}`;
+    t.onclick = () => { A.notifyRead(x.id); };
+    document.body.appendChild(t);
+    setTimeout(() => t.classList.add('out'), 6500); setTimeout(() => t.remove(), 7000);
+  };
+  A.notifyRead = function (id) {
+    return A.db.collection('notifications').doc(id).update({ read: true, readAt: firebase.firestore.FieldValue.serverTimestamp() }).catch(() => {});
+  };
+  A.notifyPanel = function (refresh) {
+    let p = document.getElementById('d0507-npanel');
+    if (p && !refresh) { p.remove(); return; }
+    if (!p) {
+      p = document.createElement('div'); p.id = 'd0507-npanel'; p.className = 'npanel';
+      document.body.appendChild(p);
+      setTimeout(() => document.addEventListener('click', function off(e) {
+        if (!p.contains(e.target) && !(e.target.closest && e.target.closest('#d0507-bell'))) { p.remove(); document.removeEventListener('click', off); }
+      }), 0);
+    }
+    const L = A.L, esc = A.esc, list = A.NOTIF.slice(0, 30), unread = A.NOTIF.filter(x => !x.read).length;
+    const when = v => { try { const d = v.toDate(), b = new Date(d.getTime() + 7 * 3600e3), M = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+      return String(b.getUTCDate()).padStart(2, '0') + ' ' + M[b.getUTCMonth()] + ' ' + String(b.getUTCHours()).padStart(2, '0') + ':' + String(b.getUTCMinutes()).padStart(2, '0'); } catch (e) { return ''; } };
+    p.innerHTML = `<div class="nh"><b>${esc(L({ th: 'การแจ้งเตือน', en: 'Notifications' }))}</b>
+        ${unread ? `<button type="button" id="nAll">${esc(L({ th: 'อ่านทั้งหมดแล้ว', en: 'Mark all read' }))}</button>` : ''}</div>
+      ${list.length ? list.map(x => `<a class="ni${x.read ? '' : ' un'}" href="${esc(x.link || '#')}" data-n="${esc(x.id)}">
+          <b>${esc(x.title)}</b>${x.body ? `<span>${esc(x.body)}</span>` : ''}
+          <i>${esc(when(x.at))}${x.fromName ? ' · ' + esc(x.fromName) : ''}</i></a>`).join('')
+        : `<div class="ne">${esc(L({ th: 'ยังไม่มีการแจ้งเตือน', en: 'No notifications yet' }))}</div>`}`;
+    p.querySelectorAll('[data-n]').forEach(a => a.addEventListener('click', () => A.notifyRead(a.dataset.n)));
+    const all = p.querySelector('#nAll');
+    if (all) all.onclick = async () => { for (const x of A.NOTIF.filter(y => !y.read)) await A.notifyRead(x.id); };
+  };
+
   /* เปลี่ยนรหัสผ่าน — force = รหัสชั่วคราวจากผู้ดูแล ปิดไม่ได้จนกว่าจะตั้งใหม่ (หรือออกจากระบบ)
      ไม่ force = เปลี่ยนเอง ต้องใส่รหัสเดิมยืนยันตัวตนก่อน (Firebase บังคับเมื่อเข้าสู่ระบบมานาน) */
   A.pwDialog = function (force) {
@@ -236,7 +309,11 @@
          ถ้าเช็ก isStaff() ตรงนี้ นักเรียนที่ล็อกอินแล้วจะเห็นปุ่ม "เข้าสู่ระบบ" ค้างอยู่
          ทั้งที่ล็อกอินอยู่ กดแล้ววนกลับมาหน้าเดิมไม่รู้จบ */
       box.innerHTML = A.signedIn()
-        ? `<span class="acct"><span class="av">${A.esc((A.myName() || '?').slice(0, 2).toUpperCase())}</span>
+        ? `<button type="button" class="bell" id="d0507-bell" aria-label="${A.esc(A.L({ th: 'การแจ้งเตือน', en: 'Notifications' }))}"
+             onclick="D0507.notifyPanel()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
+             <path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><span class="b" id="d0507-bellN" style="display:none"></span></button>
+           <span class="acct"><span class="av">${A.esc((A.myName() || '?').slice(0, 2).toUpperCase())}</span>
              <span class="who"><b>${A.esc(A.myName())}</b>
              <span>${A.roles.length ? A.esc(A.roleNames().join(' · ')) : A.esc(A.t('noRole'))}</span></span></span>
            ${(A.user.providerData || []).some(p => p.providerId === 'password')

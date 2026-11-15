@@ -2,7 +2,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>อนุมัติเอกสาร — D-0507 Flight Training</title>
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="../assets/app.css?v=a976eb66">
+<link rel="stylesheet" href="../assets/app.css?v=6afd8982">
 <style>
 dialog{border:0;border-radius:12px;padding:0;max-width:640px;width:calc(100% - 32px);
   box-shadow:var(--sh-lg);background:var(--surface);color:var(--fg-1)}
@@ -73,7 +73,7 @@ dialog .df{padding:14px 22px;border-top:1px solid var(--g-100);display:flex;gap:
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="../assets/app.js?v=8fcffc00"></script>
+<script src="../assets/app.js?v=7fd0a107"></script>
 <script>D0507.GAS_URL='https://script.google.com/macros/s/AKfycby7rFFVxd92wPImX4m8pv8nHqTrK3Iq0O32A34844DAg1rP8N3RfgKEyGvAUkQu-NXd/exec';</script>
 <script src="../assets/formkit.js?v=baecbe03"></script>
 <script>
@@ -360,6 +360,9 @@ async function finish(status,action,note){
         assigneeUid:'', assigneeName:'', state:'pool', pool:nxt.pool, step:nxt.step,
         fromUid:A.user.uid, fromName:me, createdAt:now() });
       await log('approve', note);
+      // แจ้งผู้ส่งในแอป (กระดิ่ง) — ใบผ่านขั้นนี้แล้ว ส่งต่อขั้นถัดไป
+      A.notify([SUB.submitterUid], { title:(TASK.formCode||'')+' ผ่านขั้นที่ '+STEPNO+' แล้ว — ส่งต่อกองรอ '+nxt.pool,
+        body:(TASK.title||'')+' · '+(TASK.tracking||''), kind:'sub', ref:SUBREF.id, link:'../view/?id='+encodeURIComponent(SUBREF.id) });
       const p=(DEF.parties||[]).find(x=>x.k===nxt.party)||{};
       foot.innerHTML=box('info',`<b>${A.esc(A.L({th:'ผ่านขั้นนี้แล้ว — ส่งต่อขั้นถัดไป',en:'Step approved — forwarded to the next step'}))}</b><br>
         ${A.esc(A.L({th:'ขั้นที่ ',en:'Step '}))}${nxt.step} · ${A.esc(FormKit.L(p.n,A.lang)||nxt.party)} · ${A.esc(A.L({th:'กองรอ ',en:'pool '}))}${A.esc(nxt.pool)}`)+
@@ -376,6 +379,9 @@ async function finish(status,action,note){
     await SUBREF.update(patch);
     await A.db.collection('tasks').doc(TASK.id).update({ state:'done', closedAt:now(), note:note||'' });
     await log(action,note);
+    A.notify([SUB.submitterUid], { title:(TASK.formCode||'')+(status==='complete'?' อนุมัติแล้ว':' ไม่อนุมัติ')+' โดย '+me,
+      body:(TASK.title||'')+' · '+(TASK.tracking||'')+(note?' — '+note:''), kind:'sub', ref:SUBREF.id,
+      link:'../view/?id='+encodeURIComponent(SUBREF.id) });
 
     let ex=null;
     if(status==='complete'){
