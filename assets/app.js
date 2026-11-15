@@ -1209,7 +1209,7 @@
     if (!d.open) d.showModal();
 
     const open = await A.openRevision(o.doc);
-    const who = A.user.displayName || A.user.email;
+    const who = A.myName() || A.user.email;
     const stamp = () => firebase.firestore.FieldValue.serverTimestamp();
 
     /* ── มีฉบับร่างค้างอยู่ — ไม่ให้เปิดใหม่ และไม่ให้แก้ต้นฉบับข้าง ๆ ── */

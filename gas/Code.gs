@@ -251,6 +251,12 @@ function doPost(e) {
       return json_({ ok: true, result: { hit: hit, around: ytxt.slice(ii, ii + 200), pdf: ypdf } });
     }
 
+    // PDF ตามแบบฟอร์มควบคุมของใบที่ส่งแล้ว — อนุมัติแล้วคืนฉบับที่ออกจริง · ยังไม่จบสร้างฉบับร่างจากแม่แบบเดียวกัน
+    if (body.action === 'subPdf') {
+      if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบก่อน');
+      return json_({ ok: true, result: subPdf_(body) });
+    }
+
     if (body.action === 'checklistReport') {
       return json_({ ok: true, result: checklistReport_(body, who) });
     }
@@ -548,13 +554,49 @@ function makePdf_(folder, abbr, s) {
   var name = s.tracking + '.pdf';
   var old = folder.getFilesByName(name);
   if (old.hasNext()) return old.next();          // มีแล้ว ไม่สร้างซ้ำ
+  return folder.createFile(makePdfBlob_(folder, abbr, s, ''));
+}
 
+/**
+ * PDF ของใบที่ส่งแล้ว สำหรับเปิดดู/พิมพ์จากหน้าดูใบ
+ * อ่านใบจาก Firestore ด้วย idToken ของผู้เรียก — เปิดได้เฉพาะใบที่คนนั้นอ่านได้อยู่แล้ว (rules ตัวเดียวกับหน้าเว็บ)
+ * อนุมัติแล้ว: คืน <เลขที่>.pdf ที่ออกจริงในแฟ้มของฟอร์ม (ไม่สร้างใหม่ ไม่แก้ฉบับที่ออกแล้ว)
+ * ยังไม่จบ/ไม่อนุมัติ: สร้างจากแม่แบบเดียวกันพร้อมแถบ DRAFT บนสุด ไม่เก็บไฟล์ — ไม่ใช่เอกสารควบคุม
+ */
+function subPdf_(body) {
+  var id = String(body.subId || '');
+  if (!/^[A-Za-z0-9_-]{1,64}$/.test(id)) throw new Error('subId ไม่ถูกต้อง');
+  var s = fsGet_('submissions/' + id, body.idToken);
+  if (!s.formCode || !s.tracking) throw new Error('ใบนี้ไม่มีรหัสฟอร์มหรือเลขที่');
+  var abbr = String(s.formCode).replace(/[^A-Za-z0-9\-]/g, '');
+  var folder = subFolder_(abbr);
+  if (s.status === 'complete') {
+    var f = folder.getFilesByName(s.tracking + '.pdf');
+    if (f.hasNext()) {
+      var x = f.next();
+      return { final: true, name: x.getName(), url: x.getUrl(), bytes: Utilities.base64Encode(x.getBlob().getBytes()) };
+    }
+  }
+  var note = s.status === 'complete' ? 'COPY GENERATED ON REQUEST — the issued PDF was not found in the form folder'
+    : s.status === 'rejected' ? 'NOT APPROVED — not a controlled record'
+    : 'DRAFT — NOT YET APPROVED' + (s.step ? ' (awaiting step ' + s.step + (s.assignTo ? ' · ' + s.assignTo : '') + ')' : '') + ' — not a controlled record';
+  var blob = makePdfBlob_(folder, abbr, s, note);
+  return { final: false, name: s.tracking + ' (draft).pdf', bytes: Utilities.base64Encode(blob.getBytes()) };
+}
+
+function makePdfBlob_(folder, abbr, s, draftNote) {
+  var name = s.tracking + '.pdf';
   var tpl = folder.getFilesByName(abbr + '_TEMPLATE');
   var blob;
   if (tpl.hasNext()) {
-    var copy = tpl.next().makeCopy(s.tracking + ' (working)', folder);
+    var copy = tpl.next().makeCopy(s.tracking + (draftNote ? ' (draft view)' : ' (working)'), folder);
     var doc = DocumentApp.openById(copy.getId());
     var b = doc.getBody();
+    if (draftNote) {
+      var dp = b.insertParagraph(0, draftNote);
+      dp.setAlignment(DocumentApp.HorizontalAlignment.CENTER).setBold(true).setFontSize(10)
+        .setForegroundColor('#B91C1C').setSpacingAfter(4);
+    }
     var data = s.data || {};
     var flat = flatten_(data);
     // ค่าคำนวณทุกตัว ไม่ใช่แค่ score — SDF ใช้ t7 / t28 / t365 ในแม่แบบ
@@ -569,6 +611,8 @@ function makePdf_(folder, abbr, s) {
       score: (s.computed && s.computed.score) || 0,
       delegatedFrom: s.delegatedFrom || '',
     });
+    // MOC — ช่อง MoC Reference Number ว่างเมื่อผู้จัดทำไม่ได้ตั้งเลขเอง ใช้เลขที่ของระบบแทน (เลขเดียวกับที่ทะเบียนใช้อ้าง)
+    if (abbr === 'MOC' && !String(all.mocRef || '').trim()) all.mocRef = s.tracking;
     // ลายเซ็นต้องทำก่อนล้าง token ที่เหลือ มิฉะนั้น {{sig_…}} จะถูกลบไปก่อน
     signatures_(b, data);
 
@@ -596,10 +640,10 @@ function makePdf_(folder, abbr, s) {
     blob = copy.getAs('application/pdf').setName(name);
     copy.setTrashed(true);
   } else {
-    blob = Utilities.newBlob(fallbackHtml_(abbr, s), 'text/html', 'x.html')
-      .getAs('application/pdf').setName(name);
+    blob = Utilities.newBlob((draftNote ? '<p style="color:#B91C1C;font-weight:bold;text-align:center">' + draftNote + '</p>' : '') +
+      fallbackHtml_(abbr, s), 'text/html', 'x.html').getAs('application/pdf').setName(name);
   }
-  return folder.createFile(blob);
+  return blob;
 }
 
 /**

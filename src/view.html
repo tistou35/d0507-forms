@@ -137,10 +137,29 @@ async function load(){
       <span class="st ${st.cls}">${esc(L(st.label))}</span>
       <span class="sp"></span>
       <span id="act"></span>
-      <button class="fb" id="prt">${esc(L({th:'พิมพ์',en:'Print'}))}</button>
+      <button class="fb" id="vpdf">${esc(L({th:'PDF ตามแบบฟอร์ม',en:'PDF (form layout)'}))}</button>
+      <button class="fb" id="prt">${esc(L({th:'พิมพ์หน้านี้',en:'Print this page'}))}</button>
       <a class="fb" href="@@BASE@@queue/">${esc(L({th:'← งานของฉัน',en:'← My queue'}))}</a>
     </div>`;
   document.getElementById('prt').onclick=()=>window.print();
+  /* PDF ตามแบบฟอร์มควบคุม — ฉบับที่ออกจริงเมื่ออนุมัติแล้ว ฉบับร่าง (มีแถบ DRAFT) เมื่อยังไม่จบ
+     เปิดหน้าต่างไว้ก่อนรอผล ไม่งั้นเบราว์เซอร์บล็อก pop-up ที่เปิดหลัง await */
+  document.getElementById('vpdf').onclick=async()=>{
+    const b=document.getElementById('vpdf'), w=window.open('','_blank');
+    b.disabled=true; b.textContent=L({th:'กำลังสร้าง PDF… (อาจถึงนาที)',en:'Building PDF… (up to a minute)'});
+    if(w) w.document.write('<p style="font:16px sans-serif;padding:24px">'+esc(L({th:'กำลังสร้าง PDF…',en:'Building PDF…'}))+'</p>');
+    const r=await A.gas('subPdf',{subId:S.id},{timeout:150000});
+    b.disabled=false; b.textContent=L({th:'PDF ตามแบบฟอร์ม',en:'PDF (form layout)'});
+    if(!r.ok){ if(w) w.close(); alert(L({th:'สร้าง PDF ไม่สำเร็จ: ',en:'Could not build the PDF: '})+r.error); return; }
+    const u8=Uint8Array.from(atob(r.result.bytes),c=>c.charCodeAt(0));
+    const url=URL.createObjectURL(new Blob([u8],{type:'application/pdf'}));
+    if(w) w.location.href=url; else location.href=url;
+    // ฉบับที่ออกจริง — บอกที่เก็บใน Google Drive ด้วย (เปิดได้เฉพาะคนที่มีสิทธิ์ในไดรฟ์นั้น)
+    if(r.result.url && !document.getElementById('vdrive')){
+      const a=document.createElement('a'); a.id='vdrive'; a.className='fb'; a.target='_blank'; a.rel='noopener'; a.href=r.result.url;
+      a.textContent=L({th:'ไฟล์ใน Google Drive ↗',en:'File in Google Drive ↗'}); b.after(a);
+    }
+  };
 
   // มีงานค้างของใบนี้ที่ส่งถึงคนที่เปิดอยู่ไหม — ถ้ามี ให้ปุ่มไปหน้าอนุมัติ
   if(A.isStaff() && S.status==='pending'){

@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="th"><head>
-<meta name="d0507-build" content="ce88b17f6f6f"><meta charset="UTF-8">
+<meta name="d0507-build" content="77f53902f1fc"><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>อนุมัติเอกสาร — D-0507 Flight Training</title>
 <meta name="robots" content="noindex">
@@ -74,7 +74,7 @@ dialog .df{padding:14px 22px;border-top:1px solid var(--g-100);display:flex;gap:
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="../assets/app.js?v=565533f3"></script>
+<script src="../assets/app.js?v=580209db"></script>
 <script>D0507.GAS_URL='https://script.google.com/macros/s/AKfycby7rFFVxd92wPImX4m8pv8nHqTrK3Iq0O32A34844DAg1rP8N3RfgKEyGvAUkQu-NXd/exec';</script>
 <script src="../assets/formkit.js?v=baecbe03"></script>
 <script>
@@ -156,7 +156,7 @@ async function boot(){
     (DEF.sections||[]).forEach(s=>{ if(s.party!==party) return;
       (s.fields||[]).forEach(f=>{
         if(FK.data[f.k]!==undefined&&FK.data[f.k]!=='') return;
-        if(/name$/i.test(f.k)) FK.data[f.k]=A.user.displayName||A.user.email;
+        if(/name$/i.test(f.k)) FK.data[f.k]=A.myName()||A.user.email;   // ชื่อในโปรไฟล์ (ผู้ดูแลตั้งให้ตรงเอกสาร) ไม่ใช่ชื่อบัญชี Google
         if(f.type==='date') FK.data[f.k]=new Date().toISOString().slice(0,10);
       });
     });
@@ -294,7 +294,7 @@ async function doDelegate(note){
   foot.innerHTML=`<div class="note">${A.esc(A.t('working'))}</div>`;
   try{
     const who=DIR.find(x=>x.id===PICK)||{};
-    const me=A.user.displayName||A.user.email;
+    const me=A.myName()||A.user.email;
     const stamp=new Date().toISOString().slice(0,10);
     await A.db.collection('tasks').doc(TASK.id).update({ state:'delegated', closedAt:now(), note:note||'' });
     await A.db.collection('tasks').add({
@@ -331,7 +331,7 @@ const now=()=>firebase.firestore.FieldValue.serverTimestamp();
 async function log(action,note){
   try{
     await SUBREF.collection('events').add({
-      action:action, byUid:A.user.uid, byName:A.user.displayName||A.user.email,
+      action:action, byUid:A.user.uid, byName:A.myName()||A.user.email,
       note:note||'', at:now(),
     });
   }catch(e){ /* log ล้มเหลวไม่ควรทำให้การอนุมัติล้มตาม */ }
@@ -341,7 +341,7 @@ async function finish(status,action,note){
   const foot=document.getElementById('foot');
   foot.innerHTML=`<div class="note">${A.esc(A.t('working'))}</div>`;
   try{
-    const me=A.user.displayName||A.user.email;
+    const me=A.myName()||A.user.email;
     const stamp=new Date().toISOString().slice(0,10);
     /* ยังมีขั้นถัดไปไหม — ตรวจกับคำตอบล่าสุด (รวมที่ผู้อนุมัติเพิ่งกรอก เช่น HIF ระดับความเสี่ยง)
        มี = ใบยังไม่จบ ส่งต่อกองรอของขั้นนั้น · ไม่มี = อนุมัติขั้นสุดท้าย */

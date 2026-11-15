@@ -114,7 +114,7 @@ async function boot(){
     (DEF.sections||[]).forEach(s=>{ if(s.party!==party) return;
       (s.fields||[]).forEach(f=>{
         if(FK.data[f.k]!==undefined&&FK.data[f.k]!=='') return;
-        if(/name$/i.test(f.k)) FK.data[f.k]=A.user.displayName||A.user.email;
+        if(/name$/i.test(f.k)) FK.data[f.k]=A.myName()||A.user.email;   // ชื่อในโปรไฟล์ (ผู้ดูแลตั้งให้ตรงเอกสาร) ไม่ใช่ชื่อบัญชี Google
         if(f.type==='date') FK.data[f.k]=new Date().toISOString().slice(0,10);
       });
     });
@@ -252,7 +252,7 @@ async function doDelegate(note){
   foot.innerHTML=`<div class="note">${A.esc(A.t('working'))}</div>`;
   try{
     const who=DIR.find(x=>x.id===PICK)||{};
-    const me=A.user.displayName||A.user.email;
+    const me=A.myName()||A.user.email;
     const stamp=new Date().toISOString().slice(0,10);
     await A.db.collection('tasks').doc(TASK.id).update({ state:'delegated', closedAt:now(), note:note||'' });
     await A.db.collection('tasks').add({
@@ -289,7 +289,7 @@ const now=()=>firebase.firestore.FieldValue.serverTimestamp();
 async function log(action,note){
   try{
     await SUBREF.collection('events').add({
-      action:action, byUid:A.user.uid, byName:A.user.displayName||A.user.email,
+      action:action, byUid:A.user.uid, byName:A.myName()||A.user.email,
       note:note||'', at:now(),
     });
   }catch(e){ /* log ล้มเหลวไม่ควรทำให้การอนุมัติล้มตาม */ }
@@ -299,7 +299,7 @@ async function finish(status,action,note){
   const foot=document.getElementById('foot');
   foot.innerHTML=`<div class="note">${A.esc(A.t('working'))}</div>`;
   try{
-    const me=A.user.displayName||A.user.email;
+    const me=A.myName()||A.user.email;
     const stamp=new Date().toISOString().slice(0,10);
     /* ยังมีขั้นถัดไปไหม — ตรวจกับคำตอบล่าสุด (รวมที่ผู้อนุมัติเพิ่งกรอก เช่น HIF ระดับความเสี่ยง)
        มี = ใบยังไม่จบ ส่งต่อกองรอของขั้นนั้น · ไม่มี = อนุมัติขั้นสุดท้าย */
