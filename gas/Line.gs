@@ -268,8 +268,18 @@ function lineSend_(ctx, ev, who, fields, ref, skipUid) {
     return;
   }
   who.forEach(function (w) {
-    if (skipUid && w.uid === skipUid) return;
     var p = S.people[w.uid] || {}, line = p.line || ctx.prof[w.uid] || '';
+    // คนที่ทำเรื่องนี้เองไม่ต้องแจ้งตัวเอง — แต่ลงบันทึกไว้ ไม่งั้นบันทึกว่างแล้วดูเหมือนระบบไม่ทำงาน
+    // (เคยเกิด: ส่ง MOC เข้ากองรอ CMM ที่มีผู้ถือคนเดียวคือผู้ส่งเอง บันทึกไม่มีอะไรเลย)
+    if (skipUid && w.uid === skipUid) {
+      if (S.enabled && !S.events[ev]) return;
+      ctx.sum.dry++;
+      lineLog_({ ref: ref || '', event: ev, toUid: w.uid, toName: w.name || p.name || ctx.names[w.uid] || '',
+                 sent: false, test: false, text: text,
+                 reason: who.length === 1 ? 'ไม่แจ้ง — เป็นผู้ส่งเรื่องนี้เอง และเป็นผู้รับคนเดียว (ไม่มีคนอื่นได้รับแจ้ง)'
+                                          : 'ไม่แจ้ง — เป็นผู้ส่งเรื่องนี้เอง' });
+      return;
+    }
     var why = !S.enabled ? 'ปิดการส่งจริงอยู่ (ทดลอง — บันทึกอย่างเดียว)'
       : !S.events[ev] ? 'ปิดการแจ้งเตือนประเภทนี้ไว้'
       : !line ? 'ยังไม่มี LINE user ID ของคนนี้'
@@ -341,9 +351,13 @@ function lineOnTask_(ctx, t) {
             '[ลิงก์]': ev === 'pool' ? base + 'queue/'
               : t.app === 'memo' ? base + 'memo/?id=' + encodeURIComponent(t.memoId || '')
               : base + 'approve/?t=' + encodeURIComponent(t.id) };
+  // กองรอ — ลิงก์กดรับงานพาไปหน้างานของฉัน ต่อด้วยลิงก์เปิดดูใบนั้นตรง ๆ (ข้อความที่ผู้ดูแลแก้ไว้ยังใช้ได้ ไม่ต้องเพิ่มคำแทนที่)
+  var doc = t.app === 'memo' ? base + 'memo/?id=' + encodeURIComponent(t.memoId || '')
+          : t.subId ? base + 'view/?id=' + encodeURIComponent(t.subId) : '';
   if (ev === 'pool') {
     var h = lineHolders_(ctx, t.pool);
-    if (!h.length) { f['[ลิงก์]'] = base + 'admin/subs/'; return lineSend_(ctx, 'nobody', lineAdmins_(ctx), f, 'task:' + t.id); }
+    f['[ลิงก์]'] += doc ? '\nดูใบ: ' + doc : '';
+    if (!h.length) { f['[ลิงก์]'] = base + 'admin/subs/' + (doc ? '\nดูใบ: ' + doc : ''); return lineSend_(ctx, 'nobody', lineAdmins_(ctx), f, 'task:' + t.id); }
     return lineSend_(ctx, 'pool', h, f, 'task:' + t.id, t.fromUid);
   }
   lineSend_(ctx, ev, t.assigneeUid ? [{ uid: t.assigneeUid, name: t.assigneeName || '' }] : [], f, 'task:' + t.id, t.fromUid);
