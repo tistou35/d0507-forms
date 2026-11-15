@@ -234,6 +234,8 @@ function memoPdfBytes_(body) {
   if (!/^[A-Za-z0-9_-]{1,64}$/.test(id)) throw new Error('memoId ไม่ถูกต้อง');
   var m = fsGet_('memos/' + id, body.idToken);
   var ref = m.status === 'proposed' ? m.pdfProposed : m.pdf;
+  // เอกสารอัปโหลด — ต้นฉบับที่อัปโหลด (ยังไม่มีลายเซ็น) ใช้ประกอบฉบับลงนามในเบราว์เซอร์
+  if (m.mode === 'upload' && body.which === 'src') ref = m.src;
   if (!ref || !ref.id) throw new Error('ยังไม่มี PDF');
   var f = DriveApp.getFileById(ref.id);
   if (f.isTrashed()) throw new Error('ไฟล์ PDF ถูกย้ายลงถังขยะแล้ว');
@@ -260,6 +262,8 @@ function memoShare_(body) {
   // กรรมการลงนามแทนผู้สั่งการ — แชร์ให้กรรมการที่ลงนามในระบบและ ACM ผู้รับทราบด้วย
   (m.directorUids || []).forEach(function (u) { uids.push(u); });
   if (m.acm && m.acm.uid) uids.push(m.acm.uid);
+  // เอกสารอัปโหลด — ผู้ลงนามทุกคนตามลำดับ
+  (m.usignerUids || []).forEach(function (u) { uids.push(u); });
   try { (fsGet_('config/admins', body.idToken).uids || []).forEach(function (u) { uids.push(u); }); } catch (e) {}
   var seen = {}, shared = [], skipped = [];
   uids.filter(function (u) { return u && !seen[u] && (seen[u] = true); }).forEach(function (u) {
@@ -340,4 +344,72 @@ function memoAnchor_(b, lines, y) {
   if (!found.length) return null;
   var above = found.filter(function (f) { return f.top <= y + 1; });
   return above.length ? above[above.length - 1] : found[0];
+}
+
+
+/* ══════════ เอกสารอัปโหลด (mode: upload) ══════════
+   PDF ที่จัดทำนอกระบบ แล้วเข้ามาให้ลงนามตามลำดับที่ผู้จัดทำกำหนด
+   ลายเซ็นแต่ละคน (ภาพบล็อก ตำแหน่ง หน้า เวลาเซิร์ฟเวอร์) เก็บใน Firestore ภายใต้กติกาที่บังคับลำดับ
+   ฉบับลงนาม = ต้นฉบับ + บันทึกลายเซ็นทั้งหมด ประกอบในเบราว์เซอร์ด้วย pdf-lib — ทำซ้ำได้ทุกเมื่อ
+   ที่นี่เก็บไฟล์อย่างเดียว ไม่แชร์แบบทุกคนที่มีลิงก์ (ต่างจาก attach ของฟอร์ม) */
+
+/** ผู้เรียกต้องเป็นเจ้าหน้าที่ — อ่านเอกสารที่ไม่มีอยู่จริงใน memos: เจ้าหน้าที่ได้ 404 คนอื่นได้ 403
+    (id ห้ามขึ้นต้นและลงท้ายด้วย __ — Firestore สงวนไว้ ตอบ 400 ทุกคน) */
+function memoStaff_(idToken) {
+  try { fsGet_('memos/zz-staff-probe', idToken); } catch (e) {
+    if (/^ไม่พบ/.test(String(e.message))) return true;
+    throw new Error('ต้องเป็นเจ้าหน้าที่');
+  }
+  return true;
+}
+
+function memoSha_(bytes) {
+  return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, bytes)
+    .map(function (b) { return ('0' + (b & 0xff).toString(16)).slice(-2); }).join('');
+}
+
+function memoSubFolder_(parent, name) {
+  var it = parent.getFoldersByName(name);
+  return it.hasNext() ? it.next() : parent.createFolder(name);
+}
+
+/** อัปโหลดต้นฉบับ — ตรวจว่าเป็น PDF และ hash ตรงกับที่เบราว์เซอร์คำนวณ */
+function memoSrcUp_(body) {
+  memoStaff_(body.idToken);
+  var bytes = Utilities.base64Decode(String(body.b64 || ''));
+  if (!bytes.length) throw new Error('ไม่มีไฟล์');
+  if (bytes.length > 12 * 1024 * 1024) throw new Error('ไฟล์ใหญ่เกิน 12 MB');
+  if (String.fromCharCode.apply(null, bytes.slice(0, 5).map(function (b) { return b & 0xff; })) !== '%PDF-')
+    throw new Error('ไฟล์นี้ไม่ใช่ PDF');
+  var sha = memoSha_(bytes);
+  if (body.sha256 && body.sha256 !== sha) throw new Error('ไฟล์เสียระหว่างส่ง (hash ไม่ตรง) — ลองอีกครั้ง');
+  var yearBE = Number(Utilities.formatDate(new Date(), 'Asia/Bangkok', 'yyyy')) + 543;
+  var folder = memoSubFolder_(memoFolder_(yearBE, !!body.test), 'Uploaded sources');
+  var stamp = Utilities.formatDate(new Date(), 'Asia/Bangkok', 'yyyyMMdd-HHmmss');
+  var name = String(body.name || 'document.pdf').replace(/[\\\/:*?"<>|]/g, '-').slice(0, 120);
+  var f = folder.createFile(Utilities.newBlob(bytes, 'application/pdf', stamp + ' ' + name));
+  return { id: f.getId(), url: f.getUrl(), name: name, size: bytes.length, sha256: sha };
+}
+
+/** ฉบับลงนามครบ — เก็บที่ MEMO/<ปี> ข้างฉบับอื่น · ครั้งเดียว ถ้ามีแล้วคืนของเดิม */
+function memoFinalUp_(body) {
+  var id = String(body.memoId || '');
+  if (!/^[A-Za-z0-9_-]{1,64}$/.test(id)) throw new Error('memoId ไม่ถูกต้อง');
+  var m = fsGet_('memos/' + id, body.idToken);
+  if (m.mode !== 'upload') throw new Error('ไม่ใช่เอกสารอัปโหลด');
+  if (m.status !== 'issued') throw new Error('ยังลงนามไม่ครบ (สถานะ ' + m.status + ')');
+  var bytes = Utilities.base64Decode(String(body.b64 || ''));
+  var sha = memoSha_(bytes);
+  if (body.sha256 !== sha) throw new Error('ไฟล์เสียระหว่างส่ง (hash ไม่ตรง)');
+  var yearBE = m.year || (Number(Utilities.formatDate(new Date(), 'Asia/Bangkok', 'yyyy')) + 543);
+  var folder = memoFolder_(yearBE, !!m.test);
+  var name = String(m.number || m.docNumber || ('UPLOAD ' + id)).replace(/[\/\\]/g, '_') + '.pdf';
+  var old = folder.getFilesByName(name);
+  while (old.hasNext()) {
+    var o = old.next();
+    if (memoSha_(o.getBlob().getBytes()) === sha) return { id: o.getId(), url: o.getUrl(), name: name, sha256: sha, reused: true };
+    o.setTrashed(true);
+  }
+  var f = folder.createFile(Utilities.newBlob(bytes, 'application/pdf', name));
+  return { id: f.getId(), url: f.getUrl(), name: name, sha256: sha };
 }

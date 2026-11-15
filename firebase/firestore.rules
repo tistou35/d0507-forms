@@ -367,7 +367,8 @@ service cloud.firestore {
               'render', 'beneficiaryName', 'purpose', 'font', 'proposerSig',
               'endorsement', 'endorsedAt', 'endorsementImg', 'mode', 'paper', 'transcribedAt',
               'circular', 'recipients', 'recipientUids', 'recipientSel', 'ackChannel',
-              'directors', 'directorUids', 'dsigs', 'board', 'acm', 'acmAck', 'boardAt'];
+              'directors', 'directorUids', 'dsigs', 'board', 'acm', 'acmAck', 'boardAt',
+              'usigners', 'usignerUids', 'usigs', 'cur', 'src', 'numbering', 'docNumber', 'completedAt'];
     }
     function memoSignKeys() {
       return ['number', 'seq', 'year', 'counter', 'issuedAt', 'proposerSig',
@@ -379,6 +380,34 @@ service cloud.firestore {
     function memoSeqOk(d) {
       return d.seq == (exists(memoCounterPath(d)) ? get(memoCounterPath(d)).data.next : 1)
           && getAfter(memoCounterPath(d)).data.next == d.seq + 1;
+    }
+    /* เอกสารอัปโหลด (mode: upload) — PDF จากนอกระบบ ลงนามตามลำดับที่ผู้จัดทำกำหนด
+         draft → routing          ผู้จัดทำส่ง · ยังไม่มีลายเซ็น (usigs ว่าง · cur = 0)
+         routing → routing/issued ผู้ลงนามคนที่ cur เท่านั้น เพิ่มช่องของตัวเองช่องเดียว เวลาเซิร์ฟเวอร์
+                                  คนสุดท้ายลงแล้ว = ออก (completedAt = เวลาเซิร์ฟเวอร์)
+                                  numbering = memo: คนแรกออกเลข D0507-MEMO ในธุรกรรมเดียวกับตัวนับ
+         routing → declined       ผู้ลงนามคนที่ cur ไม่ลงนาม (ต้องมีเหตุผล) — จบ แก้ต่อไม่ได้
+         routing → cancelled      ผู้จัดทำหรือผู้ดูแลยกเลิกก่อนลงนามครบ
+       ลายเซ็นที่ลงแล้วแก้หรือลบไม่ได้ · ต้นฉบับและรายชื่อผู้ลงนามล็อกตั้งแต่ส่ง */
+    // ฟิลด์ที่ร่างของเอกสารอัปโหลดห้ามมี — memoSignKeys() มี 'mode' ด้วย ใช้ตรง ๆ ไม่ได้
+    function upNoSignKeys() {
+      return ['number', 'seq', 'year', 'counter', 'issuedAt', 'proposerSig', 'endorsement', 'endorsedAt',
+              'endorsementImg', 'transcribedAt', 'paper', 'dsigs', 'acmAck', 'boardAt', 'usigs', 'completedAt'];
+    }
+    function upSigner() {
+      return request.auth.uid == resource.data.usigners[resource.data.cur].uid;
+    }
+    function upSigOk() {
+      let k = string(resource.data.cur);
+      let n = request.resource.data.usigs;
+      return n.diff(resource.data.get('usigs', {})).affectedKeys().hasOnly([k])
+          && !(k in resource.data.get('usigs', {}))
+          && n[k].uid == request.auth.uid
+          && n[k].at == request.time
+          && n[k].img is string && n[k].img.size() > 100
+          && request.resource.data.cur == resource.data.cur + 1
+          && request.resource.data.status == (request.resource.data.cur == resource.data.usigners.size() ? 'issued' : 'routing')
+          && (request.resource.data.status == 'routing' || request.resource.data.completedAt == request.time);
     }
     function memoChanged() {
       return request.resource.data.diff(resource.data).affectedKeys();
@@ -394,7 +423,15 @@ service cloud.firestore {
       allow read: if staff()
                   || (signedIn() && resource.data.beneficiaryUid == request.auth.uid);
       allow create: if staff() && request.resource.data.createdBy == request.auth.uid && (
-        (request.resource.data.status in ['draft', 'submitted']
+        (request.resource.data.get('mode', '') == 'upload'
+          && request.resource.data.status in ['draft', 'routing']
+          && request.resource.data.src.id is string && request.resource.data.src.id.size() > 0
+          && request.resource.data.usigners.size() > 0
+          && request.resource.data.cur == 0
+          && !request.resource.data.keys().hasAny(upNoSignKeys()))
+        ||
+        (request.resource.data.get('mode', '') != 'upload'
+          && request.resource.data.status in ['draft', 'submitted']
           && !request.resource.data.keys().hasAny(memoSignKeys()))
         ||
         (admin() && request.resource.data.status == 'recorded' && request.resource.data.mode == 'paper'
@@ -406,8 +443,49 @@ service cloud.firestore {
                                                     'endorsement', 'endorsedAt', 'endorsementImg']))
       );
       allow update: if staff() && (
+        // ── เอกสารอัปโหลด ──
+        // ร่าง: ผู้จัดทำแก้/ส่ง/ยกเลิก — ยังไม่มีลายเซ็น
+        (resource.data.get('mode', '') == 'upload' && resource.data.status == 'draft'
+          && request.resource.data.mode == 'upload'
+          && request.resource.data.status in ['draft', 'routing', 'cancelled']
+          && (request.auth.uid == resource.data.createdBy || admin())
+          && request.resource.data.cur == 0
+          && request.resource.data.usigners.size() > 0
+          && !memoChanged().hasAny(upNoSignKeys()))
+        ||
+        // ผู้ลงนามคนที่ถึงคิว ลงนาม (ไม่ใช่คนแรก หรือไม่ได้ให้ระบบออกเลข)
+        (resource.data.get('mode', '') == 'upload' && resource.data.status == 'routing'
+          && upSigner()
+          && !(resource.data.cur == 0 && resource.data.numbering == 'memo')
+          && memoChanged().hasOnly(['usigs', 'cur', 'status', 'completedAt', 'chain'])
+          && upSigOk())
+        ||
+        // ผู้ลงนามคนแรก + ให้ระบบออกเลข — ออกเลขและวันที่ออกในธุรกรรมเดียวกับตัวนับ
+        (resource.data.get('mode', '') == 'upload' && resource.data.status == 'routing'
+          && upSigner()
+          && resource.data.cur == 0 && resource.data.numbering == 'memo'
+          && memoChanged().hasOnly(['usigs', 'cur', 'status', 'completedAt', 'chain',
+                                    'number', 'seq', 'year', 'counter', 'issuedAt'])
+          && upSigOk()
+          && request.resource.data.issuedAt == request.time
+          && request.resource.data.number is string && request.resource.data.number.size() > 0
+          && memoSeqOk(request.resource.data))
+        ||
+        // ผู้ลงนามคนที่ถึงคิวไม่ลงนาม — ต้องมีเหตุผล · จบที่นี่
+        (resource.data.get('mode', '') == 'upload' && resource.data.status == 'routing'
+          && upSigner() && request.resource.data.status == 'declined'
+          && memoChanged().hasOnly(['status', 'declineNote', 'declinedBy', 'declinedAt', 'chain'])
+          && request.resource.data.declineNote is string && request.resource.data.declineNote.size() > 2
+          && request.resource.data.declinedAt == request.time)
+        ||
+        // ยกเลิกระหว่างรอลงนาม — ผู้จัดทำหรือผู้ดูแล
+        (resource.data.get('mode', '') == 'upload' && resource.data.status == 'routing'
+          && request.resource.data.status == 'cancelled'
+          && (request.auth.uid == resource.data.createdBy || admin())
+          && memoChanged().hasOnly(['status', 'cancelNote', 'cancelledBy', 'chain']))
+        ||
         // ก่อนออก — แก้ร่าง เสนอ ตีกลับ ยกเลิก (ยังไม่มีเลข)
-        (resource.data.status in ['draft', 'submitted', 'returned']
+        (resource.data.get('mode', '') != 'upload' && resource.data.status in ['draft', 'submitted', 'returned']
           && request.resource.data.status in ['draft', 'submitted', 'returned', 'cancelled']
           && !memoChanged().hasAny(memoSignKeys())
           && (request.auth.uid == resource.data.createdBy || admin()

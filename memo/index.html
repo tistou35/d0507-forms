@@ -74,6 +74,11 @@ table.ml tr:last-child td{border-bottom:0}
 .stage canvas.pg{display:block;max-width:100%;height:auto}
 .stage .blk{position:absolute;cursor:move;outline:2px dashed #2563eb;outline-offset:2px;background:rgba(255,255,255,.55)}
 .stage .blk img{display:block;width:100%;height:auto;pointer-events:none}
+.urow{display:grid;grid-template-columns:28px minmax(0,1.4fr) minmax(0,1fr) minmax(0,1.2fr) auto;gap:6px;align-items:center;margin-bottom:6px}
+.urow .uno{font-family:var(--font-mono);font-weight:700;text-align:center}
+.urow .uact{display:flex;gap:4px}
+@media (max-width:720px){ .urow{grid-template-columns:28px 1fr} .urow>select,.urow>input,.urow .uact{grid-column:2} }
+.ustate{display:grid;gap:8px}
 .pgnav{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0 0 8px}
 .pgnav button{padding:4px 12px;border:1px solid var(--border-med);border-radius:6px;background:#fff;cursor:pointer;font:inherit;font-size:13px}
 .pgnav button[aria-pressed="true"]{background:#1e3a8a;border-color:#1e3a8a;color:#fff}
@@ -257,6 +262,8 @@ async function boot(){
   if(Q.get('edit')) return editMemo(Q.get('edit'));
   if(Q.get('new')) return formMemo(Q.get('new'), null);
   if(Q.get('paper')!==null && A.isAdmin()) return paperForm();
+  if(Q.get('upload')!==null) return uploadForm(null);
+  if(Q.get('uedit')) return uploadForm(Q.get('uedit'));
   if(Q.get('sig')!==null) return mySignature();
   return listMemos();
 }
@@ -359,7 +366,7 @@ async function listMemos(){
   $('app').innerHTML=`<h3 style="margin-bottom:8px">สร้างบันทึกข้อความ</h3><div class="tgrid noprint">${types.map(t=>`<a class="tcard" href="?new=${esc(t.code)}">
         <span class="tc">${esc(t.code)}${t.circular==='always'?' <i>เวียน</i>':t.circular==='optional'?' <i class="o">เวียนได้</i>':''}</span>
         <b>${esc(A.L(t.title))}</b><span class="td">${esc(A.L(t.desc||{}))}</span></a>`).join('')}</div>
-    <div class="acts2 noprint">${A.isAdmin()?'<a class="big sec" href="?paper">+ ลงทะเบียนฉบับกระดาษที่ลงนามแล้ว</a>':''}
+    <div class="acts2 noprint"><a class="big pri" href="?upload">+ อัปโหลดเอกสาร PDF</a>${A.isAdmin()?'<a class="big sec" href="?paper">+ ลงทะเบียนฉบับที่ลงนามแล้ว</a>':''}
       <a class="big sec" href="?sig">ลายเซ็นของฉัน${MYSIG?' ✓':''}</a></div>
     <div id="myack"></div>
     <div id="list"><div class="empty">กำลังโหลด…</div></div>`;
@@ -393,15 +400,16 @@ async function listMemos(){
 /* โหมดกรรมการ — รอกรรมการลงนาม แทนรอผู้สั่งการ · ออกแล้วแต่ ACM ยังไม่รับทราบ */
 const stLabel=(m,st)=>m.board&&st==='proposed' ? 'รอกรรมการลงนาม'
   : m.board&&st==='issued'&&!m.acmAck ? 'ออกแล้ว · รอ ACM รับทราบ' : (STATUS[st]||st);
-const docDate=m=>m.mode==='paper' ? ((m.paper&&m.paper.date)||'') : tsDate(m.issuedAt);
+const docDate=m=>m.mode==='paper' ? ((m.paper&&m.paper.date)||'') : m.mode==='upload' ? (tsDate(m.issuedAt)||m.docDate||tsDate(m.completedAt)) : tsDate(m.issuedAt);
 /* เลขที่ D0507-MEMO-<ปี พ.ศ.>/<ลำดับ> (<ประเภท>) — เรียงตามปีแล้วลำดับ · เลขของฉบับกระดาษเรียงตามตัวอักษรต่อท้าย */
 const noKey=m=>{ const x=/MEMO-(\d{4})\/(\d+)/.exec(m.number||''); return x ? '1'+x[1]+String(+x[2]).padStart(6,'0') : (m.number ? '0'+m.number : ''); };
 let LIST=[];
 function paintList(){
   const q=($('lq').value||'').trim().toLowerCase(), so=$('ls').value, ty=$('lt').value, st0=$('lst').value, today=bkkToday();
   const stOf=m=>(m.status==='issued' && m.expiresOn && m.expiresOn<today) ? 'expired' : m.status;
-  const open=m=>['draft','submitted','returned'].includes(m.status);
-  const sg=m=>{ const s=m.signers||{}; return m.mode==='paper' ? [(m.paper&&m.paper.proposerName)||'',(m.paper&&m.paper.endorserName)||'']
+  const open=m=>['draft','submitted','returned','routing'].includes(m.status);
+  const sg=m=>{ const s=m.signers||{}, u=m.usigners||[]; if(m.mode==='upload') return [(u[0]&&u[0].name)||'—', u.length>1?u[u.length-1].name:'—'];
+    return m.mode==='paper' ? [(m.paper&&m.paper.proposerName)||'',(m.paper&&m.paper.endorserName)||'']
     : [(s.proposer&&s.proposer.name)||'—',(s.endorser&&s.endorser.name)||'—']; };
   let L=LIST.filter(m=>(!ty||m.type===ty) && (!st0 || (st0==='open'?open(m):stOf(m)===st0))
     && (!q || [m.number,m.subject,m.type,m.createdByName].concat(sg(m)).join(' ').toLowerCase().includes(q)));
@@ -417,7 +425,7 @@ function paintList(){
   $('ltab').innerHTML = !LIST.length ? '<div class="empty">ยังไม่มีบันทึกข้อความ</div>' : !L.length ? '<div class="empty">ไม่มีฉบับที่ตรงกับที่เลือก</div>' :
     `<div class="twrap"><table class="ml"><thead><tr><th>เลขที่</th><th>วันที่ในเอกสาร</th><th>ประเภท</th><th>เรื่อง</th><th>เสนอ → สั่งการ</th><th>มีผล</th><th>หมดอายุ</th><th>สถานะ</th></tr></thead><tbody>${
       L.map(m=>{ const st=stOf(m), p=sg(m);
-        return `<tr data-id="${esc(m.id)}"><td class="mono">${esc(m.number||'— (ยังไม่ออกเลข)')}${m.test?' <b style="color:var(--red-600)">TEST</b>':''}</td>
+        return `<tr data-id="${esc(m.id)}"><td class="mono">${esc(m.number||m.docNumber||'— (ยังไม่ออกเลข)')}${m.mode==='upload'?' <span class="hint">PDF</span>':''}${m.test?' <b style="color:var(--red-600)">TEST</b>':''}</td>
         <td class="mono">${esc(long(docDate(m))||'—')}</td><td>${esc(m.type)}</td><td>${esc(m.subject||'')}${
           open(m)&&m.createdByName?`<div class="hint">จัดทำโดย ${esc(m.createdByName)}</div>`:''}</td><td>${esc(p[0])} → ${esc(p[1])}</td>
         <td class="mono">${esc(long(m.effectiveFrom))}</td><td class="mono">${esc(long(m.expiresOn))}</td>
@@ -805,6 +813,7 @@ async function viewMemo(id){
   if(!s.exists){ $('app').innerHTML='<div class="empty">ไม่พบบันทึกข้อความนี้</div>'; return; }
   M=Object.assign({id:s.id},s.data());
   if(M.mode==='paper') return viewPaper();
+  if(M.mode==='upload') return viewUpload();
   $('h1').textContent = M.number || 'ร่างบันทึกข้อความ';
   $('sub').textContent = A.L((MT[M.type]||{}).title||{}) + ' · ' + stLabel(M, M.status);
   const me=A.user.uid, S=M.signers||{}, isP=S.proposer&&S.proposer.uid===me, isE=S.endorser&&S.endorser.uid===me, isOwner=M.createdBy===me;
@@ -1002,7 +1011,7 @@ async function paintHistory(){
   try{
     const ev=(await MREF.collection('events').get()).docs.map(d=>d.data()).sort((a,b)=>((a.at&&a.at.seconds)||0)-((b.at&&b.at.seconds)||0));
     const N={aerofbo:'ส่งเข้า AeroFBO Bulletin',ack:'รับทราบ',draft:'บันทึกร่าง',submit:'ส่งให้ผู้เสนอ',resubmit:'แก้และส่งอีกครั้ง',amend:'แก้ไขก่อนลงนาม',dsign:'กรรมการลงนาม',board:'กรรมการลงนามครบ · ออกหนังสือ',acmack:'ACM ลงนามรับทราบ',return:'ตีกลับ',propose:'ผู้เสนอลงนาม · ออกเลข',
-             endorse:'ผู้สั่งการลงนาม',cancel:'ยกเลิก',pdf:'สร้าง PDF',supersede:'ถูกแทน',record:'ลงทะเบียนฉบับกระดาษ'};
+             endorse:'ผู้สั่งการลงนาม',cancel:'ยกเลิก',pdf:'สร้าง PDF',supersede:'ถูกแทน',record:'ลงทะเบียนฉบับกระดาษ', usubmit:'ส่งให้ลงนามตามลำดับ', usign:'ลงนาม', udecline:'ไม่ลงนาม'};
     $('hist').innerHTML=`<h3>ประวัติ</h3><div class="twrap"><table class="ml"><tbody>${ev.map(e=>`<tr><td class="mono">${esc(tsFull(e.at))}</td><td>${esc(N[e.action]||e.action)}</td><td>${esc(e.byName||'')}</td><td>${esc(e.note||'')}</td></tr>`).join('')}</tbody></table></div>`;
   }catch(e){}
 }
@@ -1185,7 +1194,7 @@ function placeBlock(){
 function paintFile(){
   const box=$('filebox'), p=M.pdf; if(!box) return;
   if(!p||!p.url||!['issued','declined','superseded','expired'].includes(M.status)){ box.innerHTML=''; return; }
-  const sh=p.share||{}, canShare=A.isAdmin()||[M.createdBy,(M.signers||{}).proposer&&M.signers.proposer.uid,(M.signers||{}).endorser&&M.signers.endorser.uid].includes(A.user.uid);
+  const sh=p.share||{}, canShare=A.isAdmin()||[M.createdBy,(M.signers||{}).proposer&&M.signers.proposer.uid,(M.signers||{}).endorser&&M.signers.endorser.uid].concat(M.usignerUids||[]).includes(A.user.uid);
   box.innerHTML=`<div class="card"><h3>ที่เก็บไฟล์ PDF</h3>
     <table class="ml"><tbody>
       <tr><th style="width:150px">ไฟล์</th><td>${esc(sh.name||((M.number||'').replace(/\//g,'_')+'.pdf'))}</td></tr>
@@ -1470,4 +1479,343 @@ function viewPaper(){
   paintHistory();
 }
 </script>
+<script>
+/* ════════════════ เอกสารอัปโหลด (mode: upload) ════════════════
+   PDF ที่จัดทำนอกระบบ (Word ฯลฯ) เข้ามาอยู่ในทะเบียนเดียวกับบันทึกข้อความ
+     ลงนามครบแล้ว   → ลงทะเบียนเก็บอย่างเดียว (ทางเดิม ?paper — ผู้ดูแลระบบ)
+     ยังต้องลงนาม   → ผู้จัดทำเลือกผู้ลงนามตามลำดับ ระบบส่งงานให้ทีละคน
+   ลายเซ็นแต่ละคน = ภาพบล็อก (บทบาท · ลายเซ็น · ชื่อ · ตำแหน่ง) + หน้า + ตำแหน่ง + เวลาเซิร์ฟเวอร์
+   เก็บใน Firestore — กติกาบังคับลำดับ ลงได้คนละครั้ง แก้หรือลบไม่ได้
+   ฉบับลงนาม = ต้นฉบับ + บันทึกลายเซ็นทั้งหมด ประกอบในเบราว์เซอร์ด้วย pdf-lib (วันที่พิมพ์จากเวลาเซิร์ฟเวอร์)
+   ผลออกมาเหมือนเดิมทุกครั้ง จึงตรวจได้ว่า PDF ที่เก็บไว้ตรงกับบันทึกการลงนามหรือไม่ */
+const UROLES=['Prepared by','Proposed by','Reviewed by','Checked by','Recommended by','Approved by','Acknowledged by'];
+const PDFLIB_SRC='https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js';
+const PDFLIB_SRI='sha512-z8IYLHO8bTgFqj+yrPyIJnzBDf7DDhWwiEsk4sY+Oe6J2M+WQequeGS7qioI5vT6rXgVRb4K1UVQC5ER7MKzKQ==';
+STATUS.routing='รอลงนามตามลำดับ';
+function loadPdfLib(){
+  if(window.PDFLib) return Promise.resolve(window.PDFLib);
+  return new Promise((ok,no)=>{ const s=document.createElement('script'); s.src=PDFLIB_SRC; s.integrity=PDFLIB_SRI; s.crossOrigin='anonymous';
+    s.onload=()=>ok(window.PDFLib); s.onerror=()=>no(new Error('โหลด pdf-lib ไม่ได้')); document.head.appendChild(s); });
+}
+async function loadPdfJs(){
+  await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+const b64ToBytes=b=>Uint8Array.from(atob(b),c=>c.charCodeAt(0));
+function bytesToB64(u8){ let s=''; for(let i=0;i<u8.length;i+=8192) s+=String.fromCharCode.apply(null,u8.subarray(i,i+8192)); return btoa(s); }
+async function sha256(u8){ const h=await crypto.subtle.digest('SHA-256',u8); return [...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,'0')).join(''); }
+const UMON=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+/* วันที่บนเอกสาร — เวลาเซิร์ฟเวอร์ แสดงเป็นเวลาไทย (ASCII ล้วน ฟอนต์มาตรฐานของ PDF พิมพ์ได้) */
+function stampAt(ts, withTime){ const d=ts&&ts.toDate?ts.toDate():(ts?new Date(ts):null); if(!d) return '';
+  const b=new Date(d.getTime()+7*3600e3), p=n=>String(n).padStart(2,'0');
+  return p(b.getUTCDate())+' '+UMON[b.getUTCMonth()]+' '+b.getUTCFullYear()+(withTime?' '+p(b.getUTCHours())+':'+p(b.getUTCMinutes())+' (UTC+7)':''); }
+
+/* ฉบับลงนาม = ต้นฉบับ + ภาพบล็อกของผู้ลงนามที่ลงแล้ว + วันที่ + เลขที่ (ถ้าระบบออกเลข) */
+async function upCompose(m, src){
+  const {PDFDocument, StandardFonts, rgb}=await loadPdfLib();
+  const doc=await PDFDocument.load(src,{updateMetadata:false});
+  const font=await doc.embedFont(StandardFonts.Helvetica);
+  const keys=Object.keys(m.usigs||{}).map(Number).sort((a,b)=>a-b);
+  for(const k of keys){
+    const s=m.usigs[k], pg=doc.getPage((s.page||1)-1), cb=pg.getCropBox();
+    const png=await doc.embedPng(b64ToBytes(String(s.img).split(',')[1]));
+    const y0=cb.y+cb.height-s.y-s.h;
+    pg.drawImage(png,{x:cb.x+s.x, y:y0, width:s.w, height:s.h});
+    pg.drawText('Date: '+stampAt(s.at,true),{x:cb.x+s.x+8, y:y0+9, size:7.5, font, color:rgb(.27,.27,.27)});
+  }
+  if(m.number && m.numbering==='memo'){
+    const p=doc.getPage(0), cb=p.getCropBox(), t=m.number+'  ·  Issued '+stampAt(m.issuedAt), w=font.widthOfTextAtSize(t,8);
+    p.drawText(t,{x:cb.x+cb.width-36-w, y:cb.y+cb.height-22, size:8, font, color:rgb(.1,.1,.1)});
+  }
+  return await doc.save({useObjectStreams:false});
+}
+async function upSrcBytes(){
+  const r=await A.gas('memoPdfBytes',{memoId:M.id, which:'src'},{timeout:90000});
+  if(!r.ok) throw new Error(r.error); return b64ToBytes(r.result.bytes);
+}
+async function renderPdfInto(box, bytes, note){
+  await loadPdfJs();
+  const doc=await pdfjsLib.getDocument({data:bytes.slice()}).promise;
+  box.innerHTML=note?`<div class="hint noprint" style="margin-bottom:6px">${esc(note)}</div>`:'';
+  const w=Math.min(820, box.clientWidth||820);
+  for(let i=1;i<=doc.numPages;i++){
+    const pg=await doc.getPage(i), vp1=pg.getViewport({scale:1}), vp=pg.getViewport({scale:(w/vp1.width)*2});
+    const cv=document.createElement('canvas'); cv.width=vp.width; cv.height=vp.height;
+    cv.style.cssText='display:block;width:100%;max-width:'+w+'px;height:auto;border:1px solid var(--border-light);box-shadow:0 2px 10px rgba(0,0,0,.06);margin-bottom:12px;background:#fff';
+    box.appendChild(cv); await pg.render({canvasContext:cv.getContext('2d'), viewport:vp}).promise;
+  }
+}
+
+/* ── ฟอร์มอัปโหลด / แก้ร่าง ── */
+let UP={file:null, bytes:null, sha:'', pages:0, signers:[]};
+async function uploadForm(editId){
+  let ex=null;
+  if(editId){ const s=await A.db.collection('memos').doc(editId).get(); if(!s.exists){ $('app').innerHTML='<div class="empty">ไม่พบ</div>'; return; }
+    ex=Object.assign({id:s.id},s.data()); if(ex.mode!=='upload'||ex.status!=='draft'){ location.href='?id='+editId; return; } }
+  $('h1').textContent= ex ? 'แก้ร่าง — เอกสารอัปโหลด' : 'อัปโหลดเอกสาร PDF';
+  UP={file:null, bytes:null, sha:'', pages:0, signers: ex ? ex.usigners.map(x=>Object.assign({},x)) : []};
+  const types=Object.values(MT).sort((a,b)=>(a.order||99)-(b.order||99));
+  $('app').innerHTML=`<div class="card">
+    ${ex?'':`<div class="ustate"><label class="ck"><input type="radio" name="u_st" value="sign" checked> <b>ต้องลงนาม</b> — ส่งให้ผู้ลงนามในระบบตามลำดับ</label>
+      <label class="ck"><input type="radio" name="u_st" value="done"> <b>ลงนามครบแล้ว</b> — ลงทะเบียนเก็บอย่างเดียว ไม่ต้องทำอะไรต่อ</label></div>
+      <div id="u_done" class="fk-gate info" style="margin-top:10px;display:none"><span>เอกสารที่ลงนามครบแล้วลงทะเบียนพร้อมสแกน/PDF ใช้เลขที่และวันที่ตามเอกสาร
+        ${A.isAdmin()?' — <a href="?paper"><b>ไปที่ลงทะเบียนเอกสารที่ลงนามแล้ว →</b></a>':' — ผู้ดูแลระบบเป็นผู้ลงทะเบียน ส่งไฟล์ให้ผู้ควบคุมเอกสาร'}</span></div>`}
+    <div id="u_sign"><div class="mf" style="margin-top:12px">
+      <div><label for="u_type">ประเภท</label><select id="u_type">${types.map(t=>`<option value="${esc(t.code)}"${t.code===((ex&&ex.type)||'GEN')?' selected':''}>${esc(t.code)} — ${esc(A.L(t.title))}</option>`).join('')}</select></div>
+      <div><label for="u_file">ไฟล์ PDF ${ex?'(เลือกใหม่ถ้าจะเปลี่ยน)':'<span style="color:var(--red-500)">*</span>'}</label><input type="file" id="u_file" accept="application/pdf">
+        <div class="hint" id="u_finfo">${ex?esc(ex.src.name+' · '+(ex.src.pages||'?')+' หน้า'):'ไม่เกิน 10 MB · ไฟล์ที่ล็อกรหัสผ่านใช้ไม่ได้'}</div></div>
+      <div class="full"><label for="u_subj">เรื่อง <span style="color:var(--red-500)">*</span></label><input type="text" id="u_subj" value="${esc((ex&&ex.subject)||'')}"></div>
+      <div class="full"><label>เลขที่</label>
+        <label class="ck"><input type="radio" name="u_no" value="memo"${!ex||ex.numbering==='memo'?' checked':''}> ให้ระบบออกเลข D0507-MEMO เมื่อผู้ลงนามคนแรกลงนาม — พิมพ์เลขที่และวันที่ออกที่มุมขวาบนของหน้า 1</label>
+        <label class="ck"><input type="radio" name="u_no" value="own"${ex&&ex.numbering==='own'?' checked':''}> เอกสารมีเลขที่ของตัวเองแล้ว</label>
+        <div id="u_ownbox" class="mf" style="margin-top:6px"><div><label for="u_own">เลขที่ตามเอกสาร</label><input type="text" id="u_own" value="${esc((ex&&ex.docNumber)||'')}"></div>
+          <div><label for="u_date">วันที่ตามเอกสาร</label><input type="date" id="u_date" value="${esc((ex&&ex.docDate)||'')}"></div></div></div>
+    </div>
+    <h3 style="margin-top:18px">ผู้ลงนาม — ตามลำดับ</h3>
+    <p class="hint">ระบบส่งงานให้ทีละคนจากบนลงล่าง คนถัดไปเห็นงานเมื่อคนก่อนหน้าลงนามแล้ว · ผู้ลงนามต้องมีบัญชีในระบบ</p>
+    <div id="u_rows"></div>
+    <div class="acts2"><button class="fb" type="button" id="u_add">+ เพิ่มผู้ลงนาม</button></div>
+    <div class="acts2" style="margin-top:16px"><button class="big sec" id="u_draft">บันทึกร่าง</button><button class="big pri" id="u_send">ส่งให้ลงนาม</button>
+      <a class="big sec" href="${ex?'?id='+esc(ex.id):'./'}">ยกเลิก</a></div><div id="amsg"></div></div></div>`;
+  if(!ex){ document.querySelectorAll('[name="u_st"]').forEach(r=>r.addEventListener('change',()=>{
+    const d=document.querySelector('[name="u_st"]:checked').value==='done'; $('u_done').style.display=d?'':'none'; $('u_sign').style.display=d?'none':''; })); }
+  const syncNo=()=>{ $('u_ownbox').style.display=document.querySelector('[name="u_no"]:checked').value==='own'?'':'none'; };
+  document.querySelectorAll('[name="u_no"]').forEach(r=>r.addEventListener('change',syncNo)); syncNo();
+  $('u_file').addEventListener('change',upPickFile);
+  $('u_add').addEventListener('click',()=>{ upReadRows(); UP.signers.push({uid:'',name:'',title:'',role:UP.signers.length?'Approved by':'Proposed by'}); upRows(); });
+  $('u_draft').addEventListener('click',()=>upSave(ex,false));
+  $('u_send').addEventListener('click',()=>upSave(ex,true));
+  if(!UP.signers.length){ const me=userById(A.user.uid); UP.signers.push({uid:A.user.uid, name:(me&&me.name)||A.myName()||'', title:posTitle(me).title, role:'Proposed by'}); }
+  upRows();
+}
+function upRows(){
+  const opts=USERS.slice().sort((a,b)=>String(a.name).localeCompare(String(b.name)));
+  $('u_rows').innerHTML=UP.signers.map((s,i)=>`<div class="urow" data-i="${i}">
+    <span class="uno">${i+1}</span>
+    <select data-f="uid"><option value="">— เลือกผู้ลงนาม —</option>${opts.map(u=>`<option value="${esc(u.uid)}"${u.uid===s.uid?' selected':''}>${esc(u.name||u.email)}${(u.positions||[]).length?' · '+esc(u.positions.join(',')):''}</option>`).join('')}</select>
+    <select data-f="role">${UROLES.concat(UROLES.includes(s.role)?[]:[s.role]).map(r=>`<option${r===s.role?' selected':''}>${esc(r)}</option>`).join('')}</select>
+    <input data-f="title" placeholder="ตำแหน่งที่พิมพ์ใต้ชื่อ" value="${esc(s.title||'')}">
+    <span class="uact"><button class="fb sm" type="button" data-mv="-1" ${i?'':'disabled'} aria-label="เลื่อนขึ้น">↑</button><button class="fb sm" type="button" data-mv="1" ${i<UP.signers.length-1?'':'disabled'} aria-label="เลื่อนลง">↓</button><button class="fb sm" type="button" data-del aria-label="เอาออก">✕</button></span></div>`).join('')
+    || '<div class="empty">ยังไม่มีผู้ลงนาม</div>';
+  document.querySelectorAll('.urow').forEach(r=>{ const i=+r.dataset.i;
+    r.querySelector('[data-f="uid"]').addEventListener('change',e=>{ upReadRows(); const u=userById(e.target.value);
+      UP.signers[i].name=u?u.name:''; UP.signers[i].title=u?posTitle(u).title:''; upRows(); });
+    r.querySelectorAll('[data-mv]').forEach(b=>b.addEventListener('click',()=>{ upReadRows(); const j=i+(+b.dataset.mv);
+      [UP.signers[i],UP.signers[j]]=[UP.signers[j],UP.signers[i]]; upRows(); }));
+    r.querySelector('[data-del]').addEventListener('click',()=>{ upReadRows(); UP.signers.splice(i,1); upRows(); }); });
+}
+function upReadRows(){
+  document.querySelectorAll('.urow').forEach(r=>{ const s=UP.signers[+r.dataset.i]; if(!s) return;
+    s.uid=r.querySelector('[data-f="uid"]').value; s.role=r.querySelector('[data-f="role"]').value; s.title=r.querySelector('[data-f="title"]').value.trim();
+    const u=userById(s.uid); s.name=u?(u.name||u.email):''; });
+}
+async function upPickFile(){
+  const f=$('u_file').files[0]; UP.file=null; UP.bytes=null; if(!f) return;
+  const info=$('u_finfo'); info.textContent='กำลังตรวจไฟล์…';
+  if(f.size>10*1024*1024){ info.textContent='ไฟล์ใหญ่เกิน 10 MB'; return; }
+  try{
+    const u8=new Uint8Array(await f.arrayBuffer());
+    const {PDFDocument}=await loadPdfLib();
+    const d=await PDFDocument.load(u8,{updateMetadata:false});   // ไฟล์ที่ล็อกรหัสผ่านจะล้มที่นี่
+    const rot=d.getPages().map((p,i)=>p.getRotation().angle%360?i+1:0).filter(Boolean);
+    UP.file=f; UP.bytes=u8; UP.pages=d.getPageCount(); UP.sha=await sha256(u8);
+    info.textContent='✓ '+f.name+' · '+UP.pages+' หน้า · '+Math.round(f.size/1024)+' KB'+(rot.length?' · ⚠ หน้า '+rot.join(', ')+' ถูกหมุน วางลายเซ็นบนหน้านั้นไม่ได้':'');
+  }catch(e){ info.textContent='เปิดไฟล์นี้ไม่ได้ ('+(e.message||e)+') — ถ้าล็อกรหัสผ่านไว้ ให้บันทึกเป็น PDF ใหม่โดยไม่ล็อก'; }
+}
+async function upSave(ex, send){
+  upReadRows();
+  const subj=$('u_subj').value.trim(), numbering=document.querySelector('[name="u_no"]:checked').value;
+  const sg=UP.signers.filter(s=>s.uid);
+  const miss=[[ex||UP.bytes,'ไฟล์ PDF'],[subj,'เรื่อง'],[sg.length,'ผู้ลงนามอย่างน้อยหนึ่งคน']].filter(x=>!x[0]).map(x=>x[1]);
+  if(numbering==='own' && !$('u_own').value.trim()) miss.push('เลขที่ตามเอกสาร');
+  if(miss.length){ say('ยังไม่ได้กรอก: '+miss.join(' · '),true); return; }
+  if(sg.length!==UP.signers.length){ say('มีแถวผู้ลงนามที่ยังไม่ได้เลือกชื่อ — เลือกหรือเอาแถวนั้นออก',true); return; }
+  if(new Set(sg.map(s=>s.uid)).size!==sg.length){ say('มีผู้ลงนามซ้ำกัน',true); return; }
+  if(numbering==='own' && /^(TEST-)?D0507-MEMO-/i.test($('u_own').value.trim())){ say('เลขชุด D0507-MEMO ออกได้เฉพาะระบบ — เลือก "ให้ระบบออกเลข" แทน',true); return; }
+  if(send && !confirm('ส่งให้ '+sg[0].name+' ลงนามเป็นคนแรก? หลังส่งแล้วแก้ไฟล์และรายชื่อผู้ลงนามไม่ได้')) return;
+  $('u_draft').disabled=$('u_send').disabled=true;
+  const me=A.myName()||A.user.email;
+  try{
+    let src=ex?ex.src:null;
+    if(UP.bytes){ say('กำลังอัปโหลดไฟล์…');
+      const r=await A.gas('memoSrcUp',{b64:bytesToB64(UP.bytes), name:UP.file.name, sha256:UP.sha},{timeout:180000});
+      if(!r.ok) throw new Error(r.error);
+      src={id:r.result.id, url:r.result.url, name:r.result.name, size:r.result.size, sha256:r.result.sha256, pages:UP.pages}; }
+    const data={ mode:'upload', type:$('u_type').value, subject:subj, src, numbering,
+      docNumber: numbering==='own'?$('u_own').value.trim():'', docDate: numbering==='own'?$('u_date').value:'',
+      usigners:sg.map(s=>({uid:s.uid, name:s.name, title:s.title, role:s.role})), usignerUids:sg.map(s=>s.uid), cur:0,
+      status: send?'routing':'draft' };
+    let ref;
+    if(ex){ ref=A.db.collection('memos').doc(ex.id); await ref.update(Object.assign(data,{chain:arrU({action:send?'submit':'draft', byUid:A.user.uid, byName:me, at:bkkToday()})})); }
+    else ref=await A.db.collection('memos').add(Object.assign(data,{ createdBy:A.user.uid, createdByName:me, createdAt:now(), test:false,
+      chain:[{action:send?'submit':'draft', byUid:A.user.uid, byName:me, at:bkkToday()}] }));
+    await ref.collection('events').add({action:send?'usubmit':'draft', byUid:A.user.uid, byName:me, note:src.name, at:now()});
+    if(send) await upTask(ref.id, Object.assign({},data), 0);
+    location.href='?id='+encodeURIComponent(ref.id);
+  }catch(e){ $('u_draft').disabled=$('u_send').disabled=false; say('บันทึกไม่สำเร็จ: '+(e.code||e.message),true); }
+}
+async function upTask(id, m, i){
+  const s=m.usigners[i];
+  await A.db.collection('tasks').add({ app:'memo', kind:'usign', memoId:id, subId:'', formCode:'MEMO-'+m.type,
+    title:'ลงนาม ('+(i+1)+'/'+m.usigners.length+' · '+s.role+'): '+m.subject, tracking:m.number||m.docNumber||'(เอกสารอัปโหลด)',
+    assigneeUid:s.uid, assigneeName:s.name, state:'open', step:i+1,
+    fromUid:A.user.uid, fromName:A.myName()||A.user.email, createdAt:now() });
+}
+
+/* ── ดู / ลงนาม ── */
+async function viewUpload(){
+  const me=A.user.uid, L=M.usigners||[], cur=M.cur||0, mine=M.status==='routing' && L[cur] && L[cur].uid===me;
+  const isOwner=M.createdBy===me;
+  $('h1').textContent=M.number||M.docNumber||M.subject||'เอกสารอัปโหลด';
+  $('sub').textContent='เอกสารอัปโหลด · '+A.L((MT[M.type]||{}).title||{})+' · '+(STATUS[M.status]||M.status);
+  const row=(s,i)=>{ const g=(M.usigs||{})[i];
+    const st = g ? `<span class="st issued">ลงนามแล้ว</span> <span class="mono">${esc(tsFull(g.at))}</span>`
+      : M.status==='routing'&&i===cur ? '<span class="st proposed">ถึงคิว</span>'
+      : M.status==='declined'&&i===cur ? '<span class="st declined">ไม่ลงนาม</span>' : '<span class="hint">รอ</span>';
+    return `<tr><td class="mono">${i+1}</td><td>${esc(s.role)}</td><td>${esc(s.name)}<div class="hint">${esc(s.title||'')}</div></td><td>${st}</td></tr>`; };
+  const acts=[];
+  if(M.status==='draft' && (isOwner||A.isAdmin())) acts.push(`<a class="big sec" href="?uedit=${esc(M.id)}">แก้ร่าง</a>`,'<button class="big pri" id="u_go">ส่งให้ลงนาม</button>');
+  if(['draft','routing'].includes(M.status) && (isOwner||A.isAdmin())) acts.push('<button class="big sec" id="u_cancel">ยกเลิก</button>');
+  if(M.status==='issued' && M.pdf&&M.pdf.url) acts.unshift(`<a class="big pri" href="${esc(M.pdf.url)}" target="_blank" rel="noopener">PDF ฉบับลงนาม ↗</a>`);
+  if(M.status==='issued' && !(M.pdf&&M.pdf.id)) acts.push('<button class="big pri" id="u_final">สร้าง PDF ฉบับลงนาม</button>');
+  $('app').innerHTML=`<div class="acts2 noprint"><a class="big sec" href="./">← รายการ</a>${acts.join('')}</div>
+    ${M.status==='declined'?`<div class="fk-gate stop"><span><b>ไม่ลงนาม</b> โดย ${esc((M.declinedBy||{}).name||'')}: ${esc(M.declineNote||'')}</span></div>`:''}
+    ${M.cancelNote?`<div class="fk-gate warn"><span><b>ยกเลิก:</b> ${esc(M.cancelNote)}</span></div>`:''}
+    <div class="card"><table class="ml"><tbody>
+      <tr><th style="width:170px">เลขที่</th><td class="mono">${esc(M.number||M.docNumber||(M.numbering==='memo'?'ออกเลขเมื่อผู้ลงนามคนแรกลงนาม':'—'))}${M.number&&M.issuedAt?' · ออก '+esc(long(tsDate(M.issuedAt))):''}${M.docDate?' · '+esc(long(M.docDate)):''}</td></tr>
+      <tr><th>เรื่อง</th><td>${esc(M.subject)}</td></tr>
+      <tr><th>ต้นฉบับ</th><td>${esc((M.src||{}).name||'')} · ${esc(String((M.src||{}).pages||'?'))} หน้า<div class="hint mono" style="word-break:break-all">SHA-256 ${esc((M.src||{}).sha256||'')}</div></td></tr>
+      <tr><th>จัดทำโดย</th><td>${esc(M.createdByName||'')}</td></tr>
+      ${M.completedAt?`<tr><th>ลงนามครบ</th><td>${esc(tsFull(M.completedAt))}</td></tr>`:''}
+    </tbody></table>
+    <h3 style="margin-top:14px">ผู้ลงนามตามลำดับ</h3><div class="twrap"><table class="ml"><tbody>${L.map(row).join('')}</tbody></table></div>
+    <div id="u_verify"></div></div>
+    <div id="amsg"></div>
+    ${mine?'<div id="u_signbox"></div>':''}
+    <div id="letterbox" style="margin-top:18px"><div class="hint">กำลังโหลดเอกสาร…</div></div>
+    <div class="noprint" id="filebox" style="margin-top:18px"></div>
+    <div class="noprint" id="hist" style="margin-top:18px"></div>`;
+  if($('u_go')) $('u_go').addEventListener('click',upSubmitDraft);
+  if($('u_cancel')) $('u_cancel').addEventListener('click',()=>simple('cancel'));
+  if($('u_final')) $('u_final').addEventListener('click',()=>upFinalize(true));
+  paintHistory();
+  if(M.status==='issued' && M.pdf && M.pdf.id) paintFile();
+  let src;
+  try{ src=await upSrcBytes(); }catch(e){ $('letterbox').innerHTML=`<div class="empty">เปิดต้นฉบับไม่ได้: ${esc(e.message||e)}</div>`; return; }
+  let cur8; try{ cur8=await upCompose(M, src); }catch(e){ $('letterbox').innerHTML=`<div class="empty">ประกอบเอกสารไม่ได้: ${esc(e.message||e)}</div>`; return; }
+  if(M.status==='issued' && M.pdf && M.pdf.sha256){
+    const h=await sha256(cur8), okv=h===M.pdf.sha256;
+    $('u_verify').innerHTML=`<div class="fk-gate ${okv?'info':'stop'}" style="margin-top:12px"><span>${okv
+      ?'✓ PDF ฉบับลงนามที่เก็บไว้ตรงกับต้นฉบับและบันทึกการลงนามทุกคน (ตรวจซ้ำในเครื่องนี้)'
+      :'⚠ PDF ฉบับลงนามที่เก็บไว้ไม่ตรงกับที่ประกอบจากต้นฉบับและบันทึกการลงนาม — แจ้งผู้ดูแลระบบ'}</span></div>`;
+  }
+  if(mine){ $('letterbox').innerHTML=''; upSignPanel(cur8); }
+  else await renderPdfInto($('letterbox'), cur8, M.status==='issued'?'ฉบับลงนาม':'ต้นฉบับพร้อมลายเซ็นที่ลงแล้ว — ยังลงนามไม่ครบ');
+}
+async function upSubmitDraft(){
+  if(!confirm('ส่งให้ '+M.usigners[0].name+' ลงนามเป็นคนแรก? หลังส่งแล้วแก้ไฟล์และรายชื่อผู้ลงนามไม่ได้')) return;
+  const me=A.myName()||A.user.email;
+  try{ await MREF.update({status:'routing', chain:arrU({action:'submit', byUid:A.user.uid, byName:me, at:bkkToday()})});
+       await MREF.collection('events').add({action:'usubmit', byUid:A.user.uid, byName:me, note:'', at:now()});
+       await upTask(M.id, M, 0); await viewMemo(M.id); }
+  catch(e){ say('ส่งไม่สำเร็จ: '+(e.code||e.message),true); }
+}
+let USP=null;
+function upSignPanel(bytes){
+  const s=M.usigners[M.cur||0];
+  $('u_signbox').innerHTML=`<div class="card" style="margin-top:16px"><h3>ลงนาม — ลำดับที่ ${(M.cur||0)+1} จาก ${M.usigners.length} · ${esc(s.role)}</h3>
+    <div class="endogrid"><div class="mf" style="grid-template-columns:1fr">
+      <div><label for="e_font">แบบอักษรของบล็อก</label><select id="e_font">${Object.keys(FONTS).map(k=>`<option value="${k}">${esc(k)}</option>`).join('')}</select></div>
+      <div><label for="e_w">ความกว้างบล็อก <span id="e_wv">220</span> pt</label><input type="range" id="e_w" min="150" max="360" step="5" value="220" style="width:100%"></div>
+      <div><label>ลายเซ็น</label>${sigPicker('us')}</div>
+      <div class="hint">บล็อกพิมพ์ "${esc(s.role)}" · ลายเซ็น · ${esc(s.name)} · ${esc(s.title||'')} · วันที่ลงนาม (เวลาเซิร์ฟเวอร์)${M.numbering==='memo'&&!(M.cur)?' · ระบบออกเลขที่และพิมพ์ที่มุมขวาบนของหน้า 1':''}</div>
+      <div class="acts2"><button class="big pri" id="u_sign">ลงนาม</button><button class="big sec" id="u_decl">ไม่ลงนาม</button></div>
+    </div>
+    <div><div class="hint" style="margin-bottom:6px">ลากกรอบสีน้ำเงินไปวางในที่ว่างบนหน้ากระดาษ — ตำแหน่งนี้คือตำแหน่งใน PDF</div>
+      <div class="pgnav" id="pgnav" hidden></div>
+      <div class="stage" id="stage"><canvas class="pg" id="pg"></canvas><div class="blk" id="blk"><img id="blkimg" alt=""></div></div>
+      <div class="hint" id="stagemsg">กำลังโหลดหน้ากระดาษ…</div></div></div></div>`;
+  USP=bindSigPicker('us'); ENDO={x:null,y:null,w:220,h:0,img:null,scale:1,page:1};
+  const redraw=()=>upDrawBlock();
+  $('e_font').addEventListener('change',redraw);
+  $('e_w').addEventListener('input',()=>{ ENDO.w=+$('e_w').value; $('e_wv').textContent=ENDO.w; redraw(); });
+  USP.pad.onchange=redraw;
+  $('u_sign').addEventListener('click',upSign);
+  $('u_decl').addEventListener('click',upDecline);
+  upDrawBlock(); upStage(bytes); dragBlock();
+}
+async function upStage(bytes){
+  try{ await loadPdfJs();
+    PDFDOC=await pdfjsLib.getDocument({data:bytes.slice()}).promise;
+    const n=PDFDOC.numPages, nav=$('pgnav');
+    if(n>1){ nav.hidden=false;
+      nav.innerHTML='<span class="hint" style="margin:0">วางบล็อกบนหน้า</span>'+Array.from({length:n},(_,i)=>`<button type="button" data-pg="${i+1}">${i+1}</button>`).join('');
+      nav.querySelectorAll('[data-pg]').forEach(bt=>bt.onclick=()=>showStagePage(+bt.dataset.pg)); }
+    await showStagePage(n);
+  }catch(e){ $('stagemsg').textContent='โหลดหน้ากระดาษไม่ได้: '+(e.message||e); }
+}
+async function upDrawBlock(){
+  const s=M.usigners[M.cur||0];
+  const r=await blockPng({ w:ENDO.w, font:$('e_font').value, action:s.role, text:'', sig:USP.get(), name:s.name, title:s.title, date:' ' });
+  ENDO.h=r.h; ENDO.img=r.png; $('blkimg').src=r.png; placeBlock();
+}
+async function upSign(){
+  const sig=USP.get(); if(!sig){ say('ยังไม่ได้ลงลายมือชื่อ',true); return; }
+  const pg=await PDFDOC.getPage(ENDO.page); if(pg.rotate%360){ say('หน้านี้ถูกหมุนไว้ วางลายเซ็นไม่ได้ — เลือกหน้าอื่น',true); return; }
+  await upDrawBlock();
+  const k=M.cur||0, s=M.usigners[k], last=k===M.usigners.length-1, num=M.numbering==='memo' && k===0;
+  if(!confirm('ลงนามบนหน้า '+ENDO.page+(num?' และออกเลขที่':'')+' ตอนนี้? บันทึกแล้วแก้ไม่ได้')) return;
+  $('u_sign').disabled=$('u_decl').disabled=true; say('กำลังบันทึก…');
+  try{ await USP.keep(sig); }catch(e){}
+  const me=A.myName()||A.user.email, entry={ uid:A.user.uid, name:s.name, title:s.title||'', role:s.role, img:ENDO.img,
+    page:ENDO.page, x:Math.round(ENDO.x*10)/10, y:Math.round(ENDO.y*10)/10, w:ENDO.w, h:Math.round(ENDO.h*10)/10, at:now() };
+  let number='';
+  try{
+    await A.db.runTransaction(async tx=>{
+      const m=await tx.get(MREF), d=m.data();
+      if(!m.exists || d.status!=='routing' || (d.cur||0)!==k) throw new Error('เอกสารนี้ไม่ได้รอคุณลงนามแล้ว');
+      const patch={ ['usigs.'+k]:entry, cur:k+1, status:last?'issued':'routing',
+        chain:arrU({action:'usign', byUid:A.user.uid, byName:me, at:bkkToday(), note:s.role+' ('+(k+1)+'/'+d.usigners.length+')'}) };
+      if(last) patch.completedAt=now();
+      if(num){ const yearBE=new Date(Date.now()+7*3600e3).getUTCFullYear()+543, ctr=d.test?'memo-test':'memo-'+yearBE;
+        const cref=A.db.collection('counters').doc(ctr), c=await tx.get(cref), seq=c.exists?c.data().next:1;
+        number=(d.test?'TEST-':'')+'D0507-MEMO-'+yearBE+'/'+String(seq).padStart(4,'0')+' ('+d.type+')';
+        tx.set(cref,{next:seq+1}); Object.assign(patch,{number, seq, year:yearBE, counter:ctr, issuedAt:now()}); }
+      tx.update(MREF, patch);
+    });
+  }catch(e){ $('u_sign').disabled=$('u_decl').disabled=false; say('ลงนามไม่สำเร็จ: '+(e.code||e.message),true); return; }
+  try{ await MREF.collection('events').add({action:'usign', byUid:A.user.uid, byName:me, note:s.role+(number?' · '+number:''), at:now()}); }catch(e){}
+  await closeTasksFor(M.id, A.user.uid);
+  const s2=await MREF.get(); M=Object.assign({id:s2.id},s2.data());
+  if(!last){ try{ await upTask(M.id, M, k+1); }catch(e){} }
+  else await upFinalize(false);
+  await viewMemo(M.id);
+}
+async function upDecline(){
+  const note=(prompt('เหตุผลที่ไม่ลงนาม (บังคับ) — เอกสารฉบับนี้จะจบที่นี่ ผู้จัดทำต้องอัปโหลดฉบับแก้ไขเป็นรายการใหม่')||'').trim();
+  if(note.length<3) return;
+  const me=A.myName()||A.user.email;
+  try{ await MREF.update({status:'declined', declineNote:note, declinedBy:{uid:A.user.uid, name:me}, declinedAt:now(),
+         chain:arrU({action:'udecline', byUid:A.user.uid, byName:me, at:bkkToday(), note})});
+       await MREF.collection('events').add({action:'udecline', byUid:A.user.uid, byName:me, note, at:now()});
+       await closeTasks(M.id, {note}); await viewMemo(M.id); }
+  catch(e){ say('บันทึกไม่สำเร็จ: '+(e.code||e.message),true); }
+}
+/* ลงนามครบ — ประกอบฉบับลงนามจากต้นฉบับ + บันทึกการลงนาม แล้วเก็บที่ MEMO/<ปี> และแชร์ให้ผู้เกี่ยวข้อง
+   ใครในกลุ่มผู้เกี่ยวข้องกดซ้ำได้ ถ้ารอบแรกล้ม — ผลออกมาเหมือนเดิมทุกครั้ง */
+async function upFinalize(manual){
+  say('กำลังสร้าง PDF ฉบับลงนาม…');
+  try{
+    const out=await upCompose(M, await upSrcBytes()), h=await sha256(out);
+    const r=await A.gas('memoFinalUp',{memoId:M.id, b64:bytesToB64(out), sha256:h},{timeout:180000});
+    if(!r.ok) throw new Error(r.error);
+    await MREF.update({pdf:{id:r.result.id, url:r.result.url, sha256:h, at:now()}});
+    await MREF.collection('events').add({action:'pdf', byUid:A.user.uid, byName:A.myName()||'', note:r.result.name, at:now()});
+    const s2=await MREF.get(); M=Object.assign({id:s2.id},s2.data());
+    await shareMemoPdf(false);
+    if(manual) await viewMemo(M.id);
+  }catch(e){ say('สร้าง PDF ไม่สำเร็จ: '+(e.message||e)+' — กด "สร้าง PDF ฉบับลงนาม" อีกครั้งได้',true); }
+}
+</script>
+
 </body></html>

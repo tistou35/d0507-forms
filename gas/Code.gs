@@ -174,6 +174,14 @@ function doPost(e) {
       if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบเจ้าหน้าที่ก่อน');
       return json_({ ok: true, result: memoShare_(body) });
     }
+    if (body.action === 'memoSrcUp') {
+      if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบเจ้าหน้าที่ก่อน');
+      return json_({ ok: true, result: memoSrcUp_(body) });
+    }
+    if (body.action === 'memoFinalUp') {
+      if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบเจ้าหน้าที่ก่อน');
+      return json_({ ok: true, result: memoFinalUp_(body) });
+    }
     if (body.action === 'memoPdfBytes') {
       if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบเจ้าหน้าที่ก่อน');
       return json_({ ok: true, result: memoPdfBytes_(body) });

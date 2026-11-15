@@ -178,20 +178,21 @@ async function loadMemos(){
   const me=A.user.uid, C=A.db.collection('memos'), M={};
   try{
     const qs = A.isAdmin() ? [C.get()]
-      : [C.where('createdBy','==',me).get(), C.where('signers.proposer.uid','==',me).get(), C.where('signers.endorser.uid','==',me).get()];
+      : [C.where('createdBy','==',me).get(), C.where('signers.proposer.uid','==',me).get(), C.where('signers.endorser.uid','==',me).get(), C.where('usignerUids','array-contains',me).get()];
     (await Promise.all(qs)).forEach(s=>s.docs.forEach(d=>{ M[d.id]=Object.assign({id:d.id},d.data()); }));
   }catch(e){ return; }
   const L2=Object.values(M).filter(m=>!m.test && m.mode!=='paper').sort((a,b)=>ms(b.issuedAt||b.createdAt)-ms(a.issuedAt||a.createdAt));
   if(!L2.length) return;
-  const ST={draft:'ร่าง',submitted:'รอผู้เสนอ',returned:'ตีกลับ',proposed:'รอผู้สั่งการ',issued:'ออกแล้ว',declined:'ไม่อนุมัติ',cancelled:'ยกเลิก',superseded:'ถูกแทน'};
+  const ST={routing:'รอลงนามตามลำดับ',draft:'ร่าง',submitted:'รอผู้เสนอ',returned:'ตีกลับ',proposed:'รอผู้สั่งการ',issued:'ออกแล้ว',declined:'ไม่อนุมัติ',cancelled:'ยกเลิก',superseded:'ถูกแทน'};
   const role=m=>{ const r=[], S=m.signers||{};
     if(m.createdBy===me) r.push('ผู้จัดทำ'); if(S.proposer&&S.proposer.uid===me) r.push('ผู้เสนอ'); if(S.endorser&&S.endorser.uid===me) r.push('ผู้สั่งการ');
+    (m.usigners||[]).forEach((u,i)=>{ if(u.uid===me) r.push('ผู้ลงนามลำดับที่ '+(i+1)); });
     return r.join(' · ')||'ผู้ดูแล'; };
   $('memos').innerHTML=head(L({th:'บันทึกข้อความที่เกี่ยวข้องกับฉัน',en:'Memos I am part of'}),'Internal memos',L2.length)+
     L2.map(m=>{ const p=m.pdf&&m.pdf.url, issued=['issued','declined','superseded'].includes(m.status);
       return `<div class="qrow"><div>
         <div class="t">${esc(m.subject||'')} <span class="st ${m.status==='issued'?'ok':m.status==='declined'||m.status==='cancelled'?'no':'wait'}">${esc(ST[m.status]||m.status)}</span></div>
-        <div class="m"><span class="mono">${esc(m.number||'(ยังไม่ออกเลข)')}</span> · ${esc(role(m))}
+        <div class="m"><span class="mono">${esc(m.number||m.docNumber||'(ยังไม่ออกเลข)')}</span> · ${esc(role(m))}
           ${issued&&p?`<br><a href="${esc(p)}" target="_blank" rel="noopener" style="font-size:12px;word-break:break-all">PDF ใน Google Drive: ${esc(p)}</a>`:''}</div></div>
         <div class="b"><a class="fb go" href="../memo/?id=${encodeURIComponent(m.id)}">${esc(L({th:'เปิด',en:'Open'}))} →</a>
           ${issued&&p?`<a class="fb" href="${esc(p)}" target="_blank" rel="noopener">PDF ↗</a>`:''}</div></div>`; }).join('');
