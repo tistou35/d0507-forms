@@ -89,8 +89,8 @@
       "en": "MoC reference number"
      },
      "hint": {
-      "th": "เว้นว่างได้ ฝ่ายนิรภัยจะออกเลขให้",
-      "en": "Leave blank — Safety will assign."
+      "th": "เว้นว่างได้ — ระบบใช้เลขที่ของใบ (MOC-ปปปปดดวว-XXXX) เป็นเลขอ้างอิง MoC ให้เอง ใส่เองเฉพาะเมื่อมีเลขจากทะเบียน MoC อยู่แล้ว",
+      "en": "Leave blank — the form's tracking number (MOC-YYYYMMDD-XXXX) is used as the MoC reference. Enter one only if the MoC Register already assigned a number."
      }
     },
     {
