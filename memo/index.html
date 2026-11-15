@@ -507,7 +507,7 @@ function formMemo(type, existing){
         <div class="hint" id="r_sum"></div><div class="rchips" id="r_list"></div></div></div>`:''}
       <div><label for="s_font">แบบอักษรใน PDF</label><select id="s_font" data-k="s">${Object.keys(FONTS).map(k=>`<option value="${k}">${esc(FONTS[k])}</option>`).join('')}</select></div>
       <div class="full" id="s_laterbox"><label class="ck"><input type="checkbox" id="s_later" data-k="s"> ออกเลขและลงวันที่ภายหลัง — ลงนามก่อนโดยไม่ลงวันที่ แล้วผู้จัดทำออกเลขและเลือกวันที่ของหนังสือหลังลงนามครบ</label>
-        <div class="hint">เลขที่ออกตามลำดับตอนกดออกเลข · วันที่เลือกได้ตั้งแต่วันที่ลงนามครบถึงวันนี้ และไม่ก่อนวันที่ของเลขก่อนหน้า · บล็อกลายเซ็นไม่พิมพ์วันที่ เวลาลงนามจริงเก็บไว้ในประวัติ · ใช้กับโหมดกรรมการบริษัทไม่ได้</div></div>
+        <div class="hint">เลขที่ออกตามลำดับตอนกดออกเลข · วันที่เลือกได้ตั้งแต่วันที่ลงนามครบถึงวันนี้ และไม่ก่อนวันที่ของเลขก่อนหน้า · บล็อกลายเซ็นไม่พิมพ์วันที่ เวลาลงนามจริงเก็บไว้ในประวัติ · โหมดกรรมการบริษัท: กรรมการลงนามครบแล้วจึงออกเลข แล้ว ACM รับทราบหลังหนังสือออก</div></div>
       </div>
       <div id="chk" style="margin-top:14px"></div>
       <h3 style="margin-top:18px">ตัวอย่างหนังสือ</h3><div id="pv"></div>
@@ -609,7 +609,7 @@ function paintRcp(noRead){
    ลงนามบนกระดาษใช้กับกรรมการที่ไม่มีบัญชี — PDF พิมพ์ชื่อพร้อมช่องว่าง */
 let DIRS=[];
 const boardMode=()=>!!($('s_endorser') && $('s_endorser').value==='__board');
-const laterMode=()=>!!($('s_later') && $('s_later').checked && !boardMode());
+const laterMode=()=>!!($('s_later') && $('s_later').checked);
 const BOARD={uid:'', name:'Board of Directors', pos:'BOARD', title:''};
 function acmOut(){ if(!boardMode()) return null; const u=$('d_acm')&&$('d_acm').value?userById($('d_acm').value):null;
   return u?{uid:u.uid, name:u.name||u.email, title:'Accountable Manager'}:null; }
@@ -808,7 +808,7 @@ function letterHtml(m){
       ${later?(psig?'<div class="stamp">Signed electronically in the D-0507 Forms system. Number and date of issue are assigned when the memorandum is issued.</div>':'')
         :numbered?`<div class="stamp">Proposed and signed electronically on ${esc(tsFull(m.issuedAt))}.</div>`:''}</div>
     ${(m.directors||[]).length?`<div class="dirs"><h4>${m.board?'APPROVED BY THE BOARD OF DIRECTORS':'BOARD OF DIRECTORS'}</h4><div class="dg">${m.directors.map(d=>{ const g=d.uid&&(m.dsigs||{})[d.uid];
-      return `<div>${g&&g.sig?`<img src="${esc(g.sig)}" alt="">`:'<div class="sp"></div>'}<div class="ln"><b>${esc(d.name)}</b><br>${esc(d.title||'Director')}<br>Date: ${
+      return `<div>${g&&g.sig?`<img src="${esc(g.sig)}" alt="">`:'<div class="sp"></div>'}<div class="ln"><b>${esc(d.name)}</b><br>${esc(d.title||'Director')}${later?'':'<br>Date: '+
         esc(g&&g.at?long(tsDate(g.at)):'____________')}</div><div class="stamp">${g?'Signed electronically':d.mode==='paper'?'Sign by hand on the printed copy':'Awaiting signature in the system'}</div></div>`; }).join('')}</div></div>`:''}
     ${m.board&&m.acm?`<div class="dirs"><h4>ACKNOWLEDGED — RECEIVED FOR ACTION</h4>${m.acmAck&&m.acmAck.sig?`<img src="${esc(m.acmAck.sig)}" alt="">`:'<div class="sp"></div>'}
       <div class="ln"><b>${esc(m.acm.name)}</b><br>Accountable Manager<br>Date: ${esc(m.acmAck&&m.acmAck.at?long(tsDate(m.acmAck.at)):'____________')}</div></div>`:''}
@@ -837,7 +837,7 @@ async function viewMemo(id){
   if(M.status==='proposed' && isE && !M.board) acts.push('endorse');
   if(M.status==='issued' && M.board && M.acm && M.acm.uid===me && !M.acmAck) acts.push('acmack');
   if(['issued','declined','signed'].includes(M.status) && isE && !M.endorsementImg) acts.push('endoImg');
-  if(M.status==='signed' && M.endorsementImg && (isOwner||A.isAdmin())) acts.push('issueLater');
+  if(M.status==='signed' && (M.board||M.endorsementImg) && (isOwner||A.isAdmin())) acts.push('issueLater');
   if(['draft','returned'].includes(M.status) && (isOwner||A.isAdmin())) acts.push('edit');
   if(M.status==='submitted' && (isP||isOwner||A.isAdmin())) acts.push('amend');
   if(['draft','submitted','returned'].includes(M.status) && (isOwner||A.isAdmin())) acts.push('cancel');
@@ -921,7 +921,7 @@ function paintActions(acts){
       <p class="hint">การสั่งการบันทึกแล้ว แต่ภาพบล็อกที่วางบนกระดาษยังไม่ได้บันทึก กดเพื่อสร้างจากข้อมูลที่บันทึกไว้</p>
       <button class="big pri" id="doEndoImg">สร้างบล็อกสั่งการและ PDF</button><div id="amsg"></div></div>`;
   if(acts.includes('issueLater')) h+=issueLaterHtml();
-  else if(M.status==='signed' && M.endorsementImg) h+=`<div class="fk-gate warn" style="margin-bottom:12px"><span>ลงนามครบแล้ว — รอ ${esc(M.createdByName||'ผู้จัดทำ')} ออกเลขและลงวันที่</span></div>`;
+  else if(M.status==='signed' && (M.board||M.endorsementImg)) h+=`<div class="fk-gate warn" style="margin-bottom:12px"><span>ลงนามครบแล้ว — รอ ${esc(M.createdByName||'ผู้จัดทำ')} ออกเลขและลงวันที่</span></div>`;
   if(acts.includes('edit')) h+=`<div class="acts2"><a class="big pri" href="?edit=${esc(M.id)}">แก้ร่าง / ส่งให้ผู้เสนอ</a></div>`;
   if(acts.includes('amend') && !acts.includes('propose')) h+=`<div class="acts2" style="margin-bottom:12px"><a class="big sec" href="?edit=${esc(M.id)}">แก้ไขเนื้อหาก่อนลงนาม</a></div>`;
   if(acts.includes('cancel')) h+=`<div class="acts2"><button class="big sec" id="doCancel">ยกเลิกฉบับนี้</button></div>`;
@@ -1099,9 +1099,15 @@ async function proposeLater(SP, sig){
   }catch(e){ $('doPropose').disabled=false; say('ลงนามไม่สำเร็จ: '+(e.code||e.message),true); return; }
   try{ await MREF.collection('events').add({action:'propose', byUid:A.user.uid, byName:me, note:'ออกเลขภายหลัง', at:now()}); }catch(e){}
   await closeTasks(M.id, {tracking:'(ออกเลขเมื่อลงนามครบ)'});
-  try{ await taskFor(M.id, Object.assign({}, M, {number:'(ออกเลขเมื่อลงนามครบ)'}), 'endorser'); }catch(e){}
+  if(!M.board){ try{ await taskFor(M.id, Object.assign({}, M, {number:'(ออกเลขเมื่อลงนามครบ)'}), 'endorser'); }catch(e){} }
+  for(const d of (M.board?(M.directors||[]):[]).filter(x=>x.mode==='system'&&x.uid)){
+    try{ await A.db.collection('tasks').add({ app:'memo', kind:'dsign', memoId:M.id, subId:'', formCode:'MEMO-'+M.type,
+      title:'ลงนามในฐานะกรรมการ: '+M.subject, tracking:'(ออกเลขเมื่อลงนามครบ)', assigneeUid:d.uid, assigneeName:d.name, state:'open', step:2,
+      fromUid:A.user.uid, fromName:me, createdAt:now() }); }catch(e){}
+  }
   await viewMemo(M.id);
   await makePdf(false);   // ฉบับรอสั่งการ (ยังไม่มีเลข) — ผู้สั่งการใช้เป็นพื้นหลังตอนวางบล็อก
+  if(M.board && !dirPending(M).length) await completeBoard();
 }
 
 /* ── ออกเลขและลงวันที่ภายหลัง ──
@@ -1160,6 +1166,9 @@ async function issueLater(){
   await closeTasks(M.id, {tracking:number});
   const s2=await MREF.get(); M=Object.assign({id:s2.id},s2.data());
   if(up){ await upFinalize(false); return viewMemo(M.id); }
+  if(M.board && M.acm && M.acm.uid){ try{ await A.db.collection('tasks').add({ app:'memo', kind:'acmack', memoId:M.id, subId:'', formCode:'MEMO-'+M.type,
+      title:'รับทราบคำสั่งกรรมการ: '+M.subject, tracking:M.number, assigneeUid:M.acm.uid, assigneeName:M.acm.name, state:'open', step:4,
+      fromUid:A.user.uid, fromName:me, createdAt:now() }); }catch(e){} }
   await circulate();
   if(M.supersedes&&M.supersedes.id){
     try{ await A.db.collection('memos').doc(M.supersedes.id).update({status:'superseded', supersededBy:M.number});
@@ -1194,6 +1203,18 @@ async function completeBoard(){
   const s=await MREF.get(); M=Object.assign({id:s.id},s.data());
   if(M.status!=='proposed' || !M.board || dirPending(M).length) return viewMemo(M.id);
   const me=A.myName()||A.user.email;
+  if(M.dateLater){
+    // ออกเลขภายหลัง — กรรมการลงนามครบ = signed · ผู้จัดทำออกเลขและลงวันที่ แล้ว ACM จึงได้งานรับทราบ
+    say('กรรมการลงนามครบ — รอผู้จัดทำออกเลขและลงวันที่…');
+    try{ await MREF.update({ status:'signed', boardAt:now(), signedAt:now(), chain:arrU({action:'board', byUid:A.user.uid, byName:me, at:bkkToday(), note:'รอออกเลข'}) }); }
+    catch(e){ say('บันทึกไม่สำเร็จ: '+(e.code||e.message),true); return; }
+    try{ await MREF.collection('events').add({action:'board', byUid:A.user.uid, byName:me, note:'รอออกเลข', at:now()}); }catch(e){}
+    await closeTasks(M.id);
+    try{ await A.db.collection('tasks').add({ app:'memo', kind:'mdate', memoId:M.id, subId:'', formCode:'MEMO-'+M.type,
+      title:'ออกเลขและลงวันที่: '+M.subject, tracking:'(ลงนามครบ · รอออกเลข)', assigneeUid:M.createdBy, assigneeName:M.createdByName||'',
+      state:'open', step:3, fromUid:A.user.uid, fromName:me, createdAt:now() }); }catch(e){}
+    return viewMemo(M.id);
+  }
   say('กรรมการลงนามครบ — กำลังออกหนังสือ…');
   try{ await MREF.update({ status:'issued', boardAt:now(), chain:arrU({action:'board', byUid:A.user.uid, byName:me, at:bkkToday()}) }); }
   catch(e){ say('ออกหนังสือไม่สำเร็จ: '+(e.code||e.message),true); return; }

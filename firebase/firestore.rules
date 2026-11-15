@@ -549,7 +549,6 @@ service cloud.firestore {
         // ผู้เสนอลงนาม แบบออกเลขและลงวันที่ภายหลัง — ไม่ออกเลข · proposedAt = เวลาเซิร์ฟเวอร์ · ใช้กับโหมดกรรมการไม่ได้
         (resource.data.status == 'submitted' && request.resource.data.status == 'proposed'
           && resource.data.get('dateLater', false) == true
-          && resource.data.get('board', false) != true
           && request.auth.uid == resource.data.signers.proposer.uid
           && request.auth.uid != resource.data.beneficiaryUid
           && memoChanged().hasOnly(['status', 'proposerSig', 'proposedAt', 'chain'])
@@ -579,7 +578,19 @@ service cloud.firestore {
           && (request.auth.uid in resource.data.get('directorUids', [])
               || request.auth.uid == resource.data.signers.proposer.uid || admin())
           && memoChanged().hasOnly(['status', 'boardAt', 'chain'])
-          && request.resource.data.boardAt == request.time)
+          && request.resource.data.boardAt == request.time
+          && !resource.data.get('dateLater', false))
+        ||
+        // โหมดกรรมการ + ออกเลขภายหลัง — กรรมการลงนามครบ = signed (ยังไม่ออก) · ผู้จัดทำออกเลขต่อ แล้ว ACM รับทราบหลังออก
+        (resource.data.status == 'proposed' && request.resource.data.status == 'signed'
+          && resource.data.get('board', false) == true
+          && resource.data.get('dateLater', false) == true
+          && resource.data.get('dsigs', {}).size() >= resource.data.get('directorUids', []).size()
+          && (request.auth.uid in resource.data.get('directorUids', [])
+              || request.auth.uid == resource.data.signers.proposer.uid || admin())
+          && memoChanged().hasOnly(['status', 'boardAt', 'signedAt', 'chain'])
+          && request.resource.data.boardAt == request.time
+          && request.resource.data.signedAt == request.time)
         ||
         // ACM ลงนามรับทราบคำสั่งของกรรมการ — หลังหนังสือออก ครั้งเดียว เวลาเซิร์ฟเวอร์ เจ้าตัวเท่านั้น
         (resource.data.status == 'issued' && request.resource.data.status == 'issued'

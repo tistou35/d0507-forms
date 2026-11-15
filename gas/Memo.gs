@@ -156,8 +156,10 @@ function memoPdf_(body) {
       line('______________________________');
       line(d.name || '', { bold: true });
       line(d.title || 'Director');
-      line('Date: ' + (sg && sg.at ? Utilities.formatDate(new Date(sg.at), tz, 'dd MMM yyyy').toUpperCase() : '____________'));
-      line(sg ? 'Signed electronically on ' + Utilities.formatDate(new Date(sg.at), tz, 'dd MMM yyyy HH:mm').toUpperCase() + ' (UTC+7)'
+      // ออกเลขภายหลัง — บล็อกลายเซ็นไม่พิมพ์วันที่ (ทั้งฉบับรอและฉบับสมบูรณ์ จัดหน้าเท่ากัน)
+      if (!later) line('Date: ' + (sg && sg.at ? Utilities.formatDate(new Date(sg.at), tz, 'dd MMM yyyy').toUpperCase() : '____________'));
+      line(sg ? (later ? 'Signed electronically in the D-0507 Forms system'
+                       : 'Signed electronically on ' + Utilities.formatDate(new Date(sg.at), tz, 'dd MMM yyyy HH:mm').toUpperCase() + ' (UTC+7)')
               : d.mode === 'paper' ? 'Sign by hand on the printed copy' : 'Awaiting signature in the D-0507 Forms system',
            { size: 7.5, color: sg ? '#555555' : '#B45309' });
     });
