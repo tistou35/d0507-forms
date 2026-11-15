@@ -237,7 +237,7 @@
     "apf"
    ],
    "blank": "blank/APF.pdf",
-   "tpl": "1rn_faqzQtkjsCqy9EpfGiustEfcuBnF9umGHybcvWRA",
+   "tpl": "1A1yNtPTYxgHm8s9sc6ri_DcZCdR1m3MgkPB7tA9STZ4",
    "edit": "1_PD7XSLjFpXFToDEmUMD8FYA0j2YvZM_D6jPHI62VK8"
   },
   {
@@ -395,7 +395,7 @@
    ],
    "assignTo": "FI",
    "blank": "blank/ASF.pdf",
-   "tpl": "1uY8DJHLfvBJeTS1FLwa1Dr6gBwJu8L86m_cjjQ-xGAM",
+   "tpl": "1CdRpuboP3vxjhLki6IIcQlmhWqt1COVD7NyOoBvwSlY",
    "unlisted": true,
    "edit": "1XYJnMUzvMvCRT5RwRb6PfJgmVz-43Dc7BvX-uc6K7zw",
    "records": {
@@ -515,7 +515,8 @@
     "bck"
    ],
    "blank": "blank/BCK.pdf",
-   "edit": "1IXr-zA3miBwELxnmN46FOl0qt4f0wlUeKIiKRo2TNAE"
+   "edit": "1IXr-zA3miBwELxnmN46FOl0qt4f0wlUeKIiKRo2TNAE",
+   "tpl": "1oyGjvI3ayBQpbTOdQaxPOJ6tFe8CmbGCKpWcK-n_zZM"
   },
   {
    "doc": "D-0507-CAP-001",
@@ -631,7 +632,7 @@
     "daf"
    ],
    "blank": "blank/DAF.pdf",
-   "tpl": "1ZneD6k6y7mU692SVZsYpKJuCKTYqE_HkJHhQfcbl6UU",
+   "tpl": "1lieLe_swvVv5BLZN_2vzk1aVUUlgiJKkpk7-YmYnAP0",
    "edit": "1I65_gNwUjMmHj1qo9Ok-fBOht11Rv0CC7KT6gQvmDLk"
   },
   {
@@ -671,7 +672,7 @@
     "drc"
    ],
    "blank": "blank/DRC.pdf",
-   "tpl": "1cP4Kpet0XYWVGhInoi3Ac5LEw53wsO4nJtrWSfNf4Ko",
+   "tpl": "1T58ztYbfPnDXptzYvlAxPgyAQ70vhh9-3v4AHMiWnhI",
    "admin": {
     "url": "admin/drc/",
     "n": {
@@ -722,7 +723,7 @@
     "drf"
    ],
    "blank": "blank/DRF.pdf",
-   "tpl": "1LRibEDPwiMmQAjeQmkP3gvgkhsyP5GVbTgZDCJcXA2o",
+   "tpl": "1PePmpyBRGCQOMdzBVVW0QzPJJTOuhq4YaF2cUczc5wU",
    "unlisted": true,
    "edit": "1RekprPWXxS_1TgPeTeYiHQDjCZ5QKN0M7RGVwCi9L38"
   },
@@ -843,7 +844,7 @@
    ],
    "note": "ฉบับแก้ไข 01 (20 AUG 2026) — ถอดตารางหลักสูตรการฝึกบินออกทั้งหมด และ School Standard Subjects ตามที่เจ้าของงานสั่ง · เพิ่มช่วงเวลาเรียน ชั่วโมงเรียน และตารางรายวิชาจาก TrainHub ที่เติมอัตโนมัติผ่านลิงก์ prefill · ผลการฝึกบินจะไปทำในแอปอื่น ไม่ได้บันทึกในใบนี้แล้ว · ต้นฉบับก่อนแก้เก็บไว้ที่ D-0507-EFC-001-rev00-archive.docx",
    "blank": "blank/EFC.pdf",
-   "tpl": "1dMkV4AooJAQntvLw6fypwGYerZaJCe1t3aegWbB1WSA",
+   "tpl": "1rU0s5gKaoL1olDp-QIjPhIuRs7xfg26VVVjy7U0DVeE",
    "edit": "1N3-gmOZ-M9fjJPEXdhboJcPyUQwZIn9KBPEKNleELCU"
   },
   {
@@ -1279,7 +1280,7 @@
     "ftr"
    ],
    "blank": "blank/FTR.pdf",
-   "tpl": "1iDeTikRktXxm59E8_U_1zfpxVcO5OgAS1sxcbgO3ZaY",
+   "tpl": "1SBEKUnDulYz63SNRzYzdal-yA0BK0xJFpaNyWnkCvYk",
    "blankFrom": "tpl",
    "edit": "1K6J33mOM8GfMmDObAAUwKb92qbiAkhBsHLksqpETP3Y"
   },
@@ -1425,7 +1426,7 @@
    ],
    "assignTo": "SM",
    "blank": "blank/HIF.pdf",
-   "tpl": "1jJLzzD-_v9rr1K8Fw6sqQsdH5JqRpCOj2o_EAvfpwF0",
+   "tpl": "16t81_ZoIyaOU2hl6QuCQw9vczX9_T4pj4KuwO8hTe_o",
    "unlisted": true,
    "edit": "1_foYPqDGV8aFJusQaA1TVKmgq2S0zlIyq8J_9dbpUmA"
   },
@@ -1496,7 +1497,7 @@
   },
   {
    "doc": "D-0507-MOC-001",
-   "code": "",
+   "code": "SM-MOC-304-A",
    "abbr": "MOC",
    "t": "Management of Change (MoC) Form",
    "th": "แบบบริหารการเปลี่ยนแปลง",
@@ -1527,7 +1528,7 @@
     "บริหารการเปลี่ยนแปลง"
    ],
    "blank": "blank/MOC.pdf",
-   "tpl": "1lj9ie_H1-kct5Z4sA2L1L0RKTu2glwgxYa041OFpvZc",
+   "tpl": "1w2cdtS4AFIqI0u7NaodQWbVrYybkAijeUBvGAVwYvA0",
    "unlisted": true,
    "edit": "1aZIGWtH33pAHqeGGWouQjR7a4CCrwrDQEH0XxQiL1Cg"
   },
@@ -1566,7 +1567,8 @@
     "mrf"
    ],
    "blank": "blank/MRF.pdf",
-   "edit": "1rYTVuOpIiLt-1p5uB0T2Rp7E7_BsW0mAqviUxIkEyRI"
+   "edit": "1rYTVuOpIiLt-1p5uB0T2Rp7E7_BsW0mAqviUxIkEyRI",
+   "tpl": "15zUbO3ZRdzx81L3T2wE3GFaChTL_EDXIsvrPZmcWxo8"
   },
   {
    "doc": "D-0507-MTC-001",
@@ -1857,7 +1859,7 @@
     "สมรรถนะครู"
    ],
    "blank": "blank/PCR-FI.pdf",
-   "tpl": "1G-CvnjcUcSHF5fU7PIi0vokx6WiWUyARRSbZP7O-Je8",
+   "tpl": "14jGzKabB2b4D9_cBoh0jgl2xPDj1zvD2ymmn6vlEQ_k",
    "next": [
     "RTR"
    ],
@@ -1908,7 +1910,7 @@
    ],
    "note": "ให้เกรดตาม D-0507-ECA-001 · รับค่าตั้งต้นจากเมนู Annual Eval ในระบบบันทึกการฝึกผ่านลิงก์ prefill โดยไม่ต้องแก้เอกสาร — ดู docs/ANNUAL_EVAL.md",
    "blank": "blank/PCR-TKI.pdf",
-   "tpl": "18K74IDTaS91BAe2WI_5u4ZBESqGT9kZgN0PzCxHX6Bk",
+   "tpl": "1SyrBojLhz0tVhYRA62-Kibf4h6dg7kiw89RcpIhhgXA",
    "next": [
     "RTR"
    ],
@@ -1964,7 +1966,7 @@
    ],
    "blank": "blank/PWR.pdf",
    "note": "ฉบับแก้ไข 03 (21 AUG 2026) — เพิ่มความยินยอมและลายเซ็นของผู้ปกครองเป็นของตัวเองใน SECTION B ฉบับเดิมให้ผู้ปกครองกรอกแค่ข้อมูลติดต่อแล้วเซ็นในช่องลายเซ็นผู้โดยสาร อ่านจากใบที่กรอกเสร็จจึงแยกไม่ออกว่าใครเซ็น และไม่มีหลักฐานว่าผู้ปกครองยินยอมให้ผู้เยาว์ขึ้นบิน · หน้ากรอกออนไลน์แสดงข้อความสละสิทธิ์ฉบับเต็มทั้งสี่ข้อก่อนให้ยืนยันทีละข้อ ของเดิมมีแต่บทสรุปในป้ายช่องติ๊ก ผู้โดยสารจึงไม่เคยเห็นข้อความจริงที่ตัวเองผูกพัน · ท้ายกระดาษเดิมค้างที่ Issue 01 Rev 00 / AD/PWR/301-A ขณะที่ตัวเอกสารเป็น Rev 02 / -C — เลขกำกับสองชุดบนใบเดียว แก้แล้ว · เลิกใช้ Jotform 243218657614460 · ต้นฉบับก่อนแก้อยู่ที่ D-0507-PWR-001-rev02-archive.docx",
-   "tpl": "1QObAZ3_hOD_MkE7X1ejlshrCW9v0ymwjZXp9avQKB-I",
+   "tpl": "1KTKwDhYHmiRnpKq91Gy6lE_HGqEFY_4n76nu1blz4m4",
    "edit": "1q4K91s3trvzeuZYUsAdNyeF5ovW7o9twRAb_BgPwlRA",
    "anon": true
   },
@@ -2131,7 +2133,7 @@
    ],
    "assignTo": "HT",
    "blank": "blank/SDF.pdf",
-   "tpl": "1FqiALWv4ZrDYWbWHVLCVE4_XOuUQei1ovP1Kk9Jekic",
+   "tpl": "1oP9SEfgxB6OalcSkEbH5k4lPVHhtfgBbMoQjV81HTFQ",
    "edit": "1SYm-RRJKT4oOsEqULiSsNByyeW-Xa5o0TF45z9_VlPM",
    "records": {
     "pos": [
@@ -2377,7 +2379,7 @@
    ],
    "assignTo": "SM",
    "blank": "blank/VSR.pdf",
-   "tpl": "1qTfU4JTCxvMJbrA8lKDedngn8MqdthT5zuTkr_Ma2Wo",
+   "tpl": "1NfX-pX2oB0FaV-Yzbs0GWR8NIEaQUY44vZlf9nAPbow",
    "edit": "1DArZ897V-05YxhqvdryEu7wPHZjFFw-sfAyvmjh5vE8",
    "anon": true
   }

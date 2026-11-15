@@ -2293,7 +2293,7 @@ var TOKEN_MAP = {
   "MOC": {
     "abbr": "MOC",
     "docx": "D-0507-MOC-001.docx",
-    "control": "D-0507-MOC-001",
+    "control": "SM-MOC-304-A",
     "orderWarn": [],
     "byLabel": [
       {
