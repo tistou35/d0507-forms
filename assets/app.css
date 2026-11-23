@@ -677,6 +677,12 @@ a.gf:hover{border-color:var(--navy-900);color:var(--navy-900)}
 .fk-scan-b svg{width:19px;height:19px;flex:none}
 .fk-scan-note{font-size:12px;line-height:1.55;color:var(--g-500);margin:0}
 @media print{ .fk-scan{display:none} }
+/* ดึงข้อมูลจากระบบอื่น (MRF ← Flight Logs) */
+.fk-pull-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.fk-pull-row input{min-height:44px;max-width:200px}
+.fk-pull-msg{margin-top:8px;font-size:13px;line-height:1.6}
+.fk-pull-msg ul{margin:6px 0 0 18px;padding:0}
+@media print{ .fk-pull{display:none} }
 
 /* ── คะแนนรายหัวข้อใน checklist ─────────────────────────────
    ใช้กับฟอร์มที่บันทึกทั้งคะแนนและผลผ่าน/ไม่ผ่านต่อหนึ่งวิชา (EFC)

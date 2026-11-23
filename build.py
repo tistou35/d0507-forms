@@ -51,7 +51,8 @@ PUBLIC_KEEP = ('doc', 'abbr', 't', 'th', 'sys', 'jot', 'assignTo', 'r', 'chain',
 # scan = ปุ่มถ่ายรูปเอกสารแล้วกรอกให้ ไม่ใช่ช่องเก็บข้อมูล (assets/idscan.js)
 FIELD_TYPES = {'text', 'textarea', 'date', 'time', 'number', 'email', 'tel', 'select',
                'multi', 'check', 'checklist', 'grade', 'scale', 'sign', 'static', 'table', 'file',
-               'riskmatrix', 'scan'}
+               'riskmatrix', 'scan', 'pull'}
+# pull = ปุ่มดึงข้อมูลจากระบบอื่นมาเติม (MRF ← Flight Logs) ไม่ใช่ช่องเก็บข้อมูลเหมือน scan
 
 
 def jsonjs(o):
@@ -84,7 +85,8 @@ def load_defs():
         exprs = [s.get('showIf') for s in d.get('sections', [])] \
               + [g.get('when') for g in d.get('gates', [])] \
               + [f.get('showIf') for s in d.get('sections', []) for f in s.get('fields', [])] \
-              + [f.get('reqIf') for s in d.get('sections', []) for f in s.get('fields', [])]
+              + [f.get('reqIf') for s in d.get('sections', []) for f in s.get('fields', [])] \
+              + [f.get('lockIf') for s in d.get('sections', []) for f in s.get('fields', [])]
         for expr in exprs:
             # ตัดค่าคงที่ในเครื่องหมายคำพูดทิ้งก่อน มิฉะนั้น 'GO' จะถูกนับเป็นชื่อฟิลด์
             bare = re.sub(r"'[^']*'|\"[^\"]*\"", ' ', expr or '')
@@ -92,7 +94,8 @@ def load_defs():
                 # formRev = Rev ที่ใบถูกส่งมา (หัวใบ ส่งเข้า FormKit ทาง meta) ไม่ใช่ฟิลด์ในฟอร์ม
                 if tok in ('true', 'false', 'anyStarBelow', 'anyBelow', 'countBelow', 'filled', 'score', 'has', 'formRev'):
                     continue
-                if tok not in keys and tok not in {c2.get('k') for c2 in d.get('compute', [])}:
+                # flags = ค่าที่ไม่ใช่ช่องของใบ แต่ปุ่ม pull เติมไว้ใช้ในเงื่อนไข (เช่นธงล็อกอัตราของ MRF)
+                if tok not in keys and tok not in d.get('flags', []) and tok not in {c2.get('k') for c2 in d.get('compute', [])}:
                     errs.append(f"{name}: เงื่อนไขอ้าง '{tok}' ที่ไม่ใช่ฟิลด์หรือค่าคำนวณ")
         out[c] = d
     return out, errs

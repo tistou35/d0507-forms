@@ -251,6 +251,16 @@ function doPost(e) {
       return json_({ ok: true, result: { hit: hit, around: ytxt.slice(ii, ii + 200), pdf: ypdf } });
     }
 
+    // D-0507-MRF-001 — ดึงตารางเวลาเดือนที่เลือกจาก Flight Logs ของผู้เรียกเอง (gas/Mrf.gs)
+    if (body.action === 'mrfPull') {
+      if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบก่อน');
+      return json_({ ok: true, result: mrfPull_(body, who) });
+    }
+    if (body.action === 'mrfNames') {
+      if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบก่อน');
+      return json_({ ok: true, result: mrfNames_(body, who) });
+    }
+
     // PDF ตามแบบฟอร์มควบคุมของใบที่ส่งแล้ว — อนุมัติแล้วคืนฉบับที่ออกจริง · ยังไม่จบสร้างฉบับร่างจากแม่แบบเดียวกัน
     if (body.action === 'subPdf') {
       if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบก่อน');

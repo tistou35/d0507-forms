@@ -286,7 +286,8 @@ def build(abbr, verbose=False):
         # static = ข้อความอธิบาย · scan = ปุ่มถ่ายรูปบัตรแล้วกรอกให้ (PWR) — ไม่ใช่ช่องเก็บข้อมูล
         # ไม่เข้าใบที่ส่งและไม่ขึ้นใน PDF ถ้าปล่อยให้จับคู่ ปุ่มสแกนของผู้โดยสารจะไปแย่งป้าย
         # "ID / Passport No." ของช่องเลขบัตรจริง แล้วเลขบัตรตกไปท้ายเอกสาร
-        if f.get('type') in ('static', 'scan'):
+        # pull = ปุ่มดึงข้อมูลจากระบบอื่น (MRF ← Flight Logs) ก็ไม่ใช่ช่องเก็บข้อมูลเช่นกัน
+        if f.get('type') in ('static', 'scan', 'pull'):
             continue
         tok = '{{sig_%s}}' % f['k'] if f.get('type') == 'sign' else '{{%s}}' % f['k']
 
@@ -430,12 +431,15 @@ def build(abbr, verbose=False):
     # ของจริง: EFC ช่อง "รายงานผลรายวิชาจาก TrainHub" ถูกจับไปที่ป้าย "Result"
     # ซึ่งเป็นช่องผลสอบ ถ้าช่องนั้นว่างอยู่ ชื่อไฟล์จะไปโผล่เป็นผลสอบเงียบ ๆ
     for tok in (ov.get('manual') or []):
+        # เขียนเป็น {"tok","label","labelTh"} ได้ — ใช้กับค่าคำนวณซึ่งไม่มีป้ายในนิยามฟอร์ม (MRF perDiemTotal)
+        given = tok if isinstance(tok, dict) else None
+        if given: tok = given['tok']
         by_label = [b for b in by_label if b['tok'] != tok]
         by_cell = [b for b in by_cell if b['tok'] != tok]
         by_line = [b for b in by_line if b['tok'] != tok]
         if not any(u['tok'] == tok for u in unmatched):
             src = next((f for f in fields if '{{%s}}' % f['k'] == tok), None)
-            lb = (src or {}).get('label') or {}
+            lb = (given and {'en': given.get('label'), 'th': given.get('labelTh')}) or (src or {}).get('label') or {}
             unmatched.append({'tok': tok,
                               'label': (lb.get('en') if isinstance(lb, dict) else lb) or tok,
                               'labelTh': (lb.get('th') if isinstance(lb, dict) else '') or ''})
@@ -473,6 +477,16 @@ def build(abbr, verbose=False):
         if n:
             t['rows'] = n
             t['grow'] = True
+    # tableFont: ขนาดตัวอักษร (Arial) ของช่องที่วาง token ในตาราง — setText ทิ้งฟอนต์ของกระดาษ
+    # ค่าจึงออกมาเป็น serif 10 pt ซึ่งไม่พอสำหรับคอลัมน์แคบ (MRF Type: "Training Flight" ขาดกลางคำ)
+    for t in tables:
+        fs = (ov.get('tableFont') or {}).get(t['k'])
+        if fs:
+            t['font'] = fs
+        # tableWiden: ขยายคอลัมน์หนึ่งเป็น pt ที่กำหนด โดยหักจากอีกคอลัมน์ ความกว้างรวมเท่าเดิม
+        wd = (ov.get('tableWiden') or {}).get(t['k'])
+        if wd:
+            t['widen'] = wd
 
     # skipTables: กระดาษไม่ได้วางตารางนั้นเป็นคอลัมน์แยกแล้ว
     # EFC รวมชื่อวิชากับผลไว้คอลัมน์เดียว ({{s7_N_shown}}) ตามที่เอกสารฉบับแก้ไขทำ

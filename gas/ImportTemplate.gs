@@ -263,6 +263,8 @@ function fillTokens_(doc, map) {
         var cell = row.getCell(ci), cur = cell.getText().trim();
         if (cur && !/^[_\.\s\/\-:]*$/.test(cur)) return;   // ช่องเลขลำดับ ฯลฯ อย่าไปทับ
         cell.setText('{{' + t.k + '_' + (di + 1) + '_' + c.k + '}}');
+        // setText ทิ้งฟอนต์ของกระดาษ — ตารางที่ระบุ font ใช้ Arial ขนาดนั้น (คอลัมน์แคบของ MRF)
+        if (t.font) cell.editAsText().setFontFamily('Arial').setFontSize(t.font);
         placed++;
       });
       di++;
@@ -284,6 +286,18 @@ function fillTokens_(doc, map) {
         placed += t.cols.length;
       }
       di = t.rows;
+    }
+    /* widen: {col, pt, from} — คอลัมน์ของกระดาษแคบเกินค่าจริง (MRF Type ออกแบบไว้ให้รหัส FLT/SIM
+       แต่ค่าที่ดึงจาก Flight Log คือ "Training Flight") ขยายคอลัมน์ col เป็น pt แล้วหักส่วนต่าง
+       จากคอลัมน์ from ความกว้างรวมของตารางจึงเท่าเดิม ไม่ล้นขอบกระดาษ
+       ดัชนีคอลัมน์ใช้ได้ตรง ๆ เพราะเซลล์ที่ถูกผสานยังอยู่ในแถว (colSpan 0) */
+    if (t.widen) {
+      var wi = function (k) { for (var q = 0; q < t.cols.length; q++) if (t.cols[q].k === k) return hit.colIdx[q]; return null; };
+      var ca = wi(t.widen.col), cb = wi(t.widen.from);
+      var wa = ca == null ? null : hit.tbl.getColumnWidth(ca), wb = cb == null ? null : hit.tbl.getColumnWidth(cb);
+      var dw = wa == null ? 0 : t.widen.pt - wa;
+      if (!wa || !wb || dw <= 0 || wb - dw < 40) left.push('⟦ขยายคอลัมน์ ' + t.widen.col + ' ไม่ได้⟧  ← ' + t.label + ' (กว้าง ' + wa + ' / ' + wb + ' pt)');
+      else { hit.tbl.setColumnWidth(ca, t.widen.pt); hit.tbl.setColumnWidth(cb, wb - dw); }
     }
     for (var r2 = di + 1; r2 <= t.rows; r2++)
       t.cols.forEach(function (c) {

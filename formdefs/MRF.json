@@ -40,6 +40,12 @@
    }
   ]
  },
+ "flags": [
+  "rFlt",
+  "rGnd",
+  "rAcc",
+  "rPd"
+ ],
  "parties": [
   {
    "k": "emp",
@@ -137,8 +143,25 @@
      "k": "note1",
      "type": "static",
      "text": {
-      "th": "รหัสประเภท: FLT = สอนการบิน · SIM = เครื่องฝึกบินจำลอง · GND = ภาคพื้น/บรรยาย · GS = ภาคทฤษฎี (TKI)",
-      "en": "Type codes: FLT = Flight Instruction · SIM = Simulator · GND = Ground / Briefing · GS = Ground School (TKI)"
+      "th": "ประเภท: ใช้ Flight Type ตาม Flight Log (Training Flight · General Flight) · แถวที่กรอกเอง: SIM = เครื่องฝึกบินจำลอง · GND = ภาคพื้น/บรรยาย · GS = ภาคทฤษฎี (TKI)",
+      "en": "Type: the Flight Type from the Flight Log (Training Flight · General Flight) · rows you add: SIM = simulator · GND = ground / briefing · GS = ground school (TKI)"
+     }
+    },
+    {
+     "k": "flog",
+     "type": "pull",
+     "action": "mrfPull",
+     "label": {
+      "th": "ดึงตารางเวลาจาก Flight Log",
+      "en": "Fill the timesheet from the Flight Log"
+     },
+     "button": {
+      "th": "ดึงข้อมูลเดือนนี้",
+      "en": "Fetch this month"
+     },
+     "hint": {
+      "th": "เลือกเดือนแล้วกด — ระบบหาเที่ยวบินที่ชื่อของคุณอยู่ใน Pilot 1 หรือ Pilot 2 รวมเป็นแถวละหนึ่งวัน (Flight Log ID ทุกเที่ยว · Block Time รวมของวัน) และเติมอัตรา จำนวนคืนที่พัก และ per diem ที่ผู้ดูแลตั้งไว้ · แถวภาคพื้น/SIM ที่กรอกเองไม่ถูกลบ",
+      "en": "Pick the month — flights where you are Pilot 1 or Pilot 2 become one row per day (every Flight Log ID · total block time), and the rates, accommodation nights and per diem set by the administrator are filled in. Ground / sim rows you typed are kept."
      }
     },
     {
@@ -152,8 +175,8 @@
       "en": "Work performed"
      },
      "hint": {
-      "th": "ชั่วโมงกรอกได้ทั้ง 1:30 และ 1.5 · ชั่วโมงบินใส่ช่อง \"ชม.บิน\" เฉพาะรายการประเภท FLT · กระดาษพิมพ์ไว้ 22 แถว กรอกได้ไม่เกินนั้น",
-      "en": "Hours accept 1:30 or 1.5 · flight hours count only on FLT rows · the printed form holds 22 rows"
+      "th": "วันที่ไม่ได้บินจะไม่มี Flight Log ID · ชั่วโมงกรอกได้ทั้ง 1:30 และ 1.5 · ชั่วโมงบินใส่เฉพาะแถวที่บินจริง ภาคพื้น/SIM ใส่ช่อง ชม.ภาคพื้น/SIM · กระดาษพิมพ์ไว้ 22 แถว",
+      "en": "Days without a Flight Log ID were not flown · hours accept 1:30 or 1.5 · flight hours only on flown rows, ground / sim in its own column · the printed form holds 22 rows"
      },
      "cols": [
       {
@@ -185,42 +208,12 @@
       },
       {
        "k": "type",
-       "type": "select",
+       "type": "text",
        "w": "12%",
        "label": {
         "th": "ประเภท",
         "en": "Type"
-       },
-       "opt": [
-        {
-         "v": "FLT",
-         "n": {
-          "th": "FLT",
-          "en": "FLT"
-         }
-        },
-        {
-         "v": "SIM",
-         "n": {
-          "th": "SIM",
-          "en": "SIM"
-         }
-        },
-        {
-         "v": "GND",
-         "n": {
-          "th": "GND",
-          "en": "GND"
-         }
-        },
-        {
-         "v": "GS",
-         "n": {
-          "th": "GS",
-          "en": "GS"
-         }
-        }
-       ]
+       }
       },
       {
        "k": "flt",
@@ -279,6 +272,11 @@
      "label": {
       "th": "อัตราต่อชั่วโมง (บาท)",
       "en": "Flight hourly rate (Baht/hr)"
+     },
+     "lockIf": "rFlt == true",
+     "hint": {
+      "th": "ผู้ดูแลตั้งอัตรารายคนไว้ ระบบเติมให้และแก้ไม่ได้ · ยังไม่ได้ตั้ง กรอกเอง",
+      "en": "Set per person by the administrator — filled in and locked; type it only if none is set"
      }
     },
     {
@@ -309,6 +307,11 @@
      "label": {
       "th": "อัตราต่อชั่วโมง (บาท)",
       "en": "Ground / sim rate (Baht/hr)"
+     },
+     "lockIf": "rGnd == true",
+     "hint": {
+      "th": "ผู้ดูแลตั้งอัตรารายคนไว้ ระบบเติมให้และแก้ไม่ได้ · ยังไม่ได้ตั้ง กรอกเอง",
+      "en": "Set per person by the administrator — filled in and locked; type it only if none is set"
      }
     },
     {
@@ -338,6 +341,10 @@
      "label": {
       "th": "ที่พัก (จำนวนคืน)",
       "en": "Accommodation (nights)"
+     },
+     "hint": {
+      "th": "นับจากวันที่มาทำงาน — วันหยุดคั่นไม่เกิน 2 วันถือว่าไม่ได้กลับ (ทำงาน 1 2 4 5 = 4 คืน)",
+      "en": "From working days — a break of up to 2 days counts as staying (work 1 2 4 5 = 4 nights)"
      }
     },
     {
@@ -346,8 +353,27 @@
      "half": true,
      "min": 0,
      "label": {
-      "th": "อัตราค่าที่พัก (บาท/คืน)",
-      "en": "Accommodation rate (Baht/night)"
+      "th": "อัตราเหมาค่าที่พัก (บาท/คืน)",
+      "en": "Accommodation flat rate (Baht/night)"
+     },
+     "lockIf": "rAcc == true",
+     "showIf": "rAcc == true",
+     "hint": {
+      "th": "ผู้ดูแลตั้งอัตราเหมาไว้ เบิกตามจำนวนคืน",
+      "en": "Flat rate set by the administrator — paid per night"
+     }
+    },
+    {
+     "k": "accomActual",
+     "type": "number",
+     "showIf": "rAcc != true",
+     "label": {
+      "th": "ค่าที่พักตามจริง (บาท)",
+      "en": "Accommodation — actual cost (Baht)"
+     },
+     "hint": {
+      "th": "ไม่ได้กำหนดอัตราเหมา — เบิกตามใบเสร็จ แนบหลักฐานในรายการค่าใช้จ่ายหรือส่งธุรการ",
+      "en": "No flat rate set — claim the receipted amount"
      }
     },
     {
@@ -356,6 +382,50 @@
      "text": {
       "th": "ค่าที่พักรวม {accomTotal} บาท",
       "en": "Accommodation total {accomTotal} Baht"
+     }
+    },
+    {
+     "k": "perDiemOn",
+     "type": "check",
+     "showIf": "perDiemOn == true",
+     "lockIf": "perDiemOn == true",
+     "label": {
+      "th": "มีสิทธิ์เบิก per diem (ผู้ดูแลกำหนด)",
+      "en": "Entitled to per diem (set by the administrator)"
+     }
+    },
+    {
+     "k": "perDiemDays",
+     "type": "number",
+     "step": "0.5",
+     "showIf": "perDiemOn == true",
+     "lockIf": "rPd == true",
+     "label": {
+      "th": "Per diem (วัน)",
+      "en": "Per diem (days)"
+     },
+     "hint": {
+      "th": "นับจากวันที่บิน — เริ่มงาน 1 ชม. ก่อน Engine ON ของเที่ยวแรก เลิกงาน 30 นาทีหลัง Engine OFF ของเที่ยวสุดท้าย · ช่วงทำงานตั้งแต่ 6 ชม. = 1 วัน น้อยกว่า = 0.5",
+      "en": "From flying days — duty starts 1 h before the first Engine ON and ends 30 min after the last Engine OFF · 6 h or more = 1 day, less = 0.5"
+     }
+    },
+    {
+     "k": "perDiemRate",
+     "type": "number",
+     "showIf": "perDiemOn == true",
+     "lockIf": "rPd == true",
+     "label": {
+      "th": "อัตรา per diem (บาท/วัน)",
+      "en": "Per diem rate (Baht/day)"
+     }
+    },
+    {
+     "k": "note5b",
+     "type": "static",
+     "showIf": "perDiemOn == true",
+     "text": {
+      "th": "Per diem รวม {perDiemTotal} บาท",
+      "en": "Per diem total {perDiemTotal} Baht"
      }
     },
     {
@@ -419,8 +489,8 @@
      "k": "note6",
      "type": "static",
      "text": {
-      "th": "ค่าใช้จ่ายตามรายการ {expTotal} บาท · รวมกับค่าที่พักเป็น {reimburse} บาท",
-      "en": "Listed expenses {expTotal} Baht · with accommodation {reimburse} Baht"
+      "th": "ค่าใช้จ่ายตามรายการ {expTotal} บาท · รวมกับค่าที่พักและ per diem เป็น {reimburse} บาท",
+      "en": "Listed expenses {expTotal} Baht · with accommodation and per diem {reimburse} Baht"
      }
     }
    ]
@@ -571,12 +641,6 @@
    "op": "sumCol",
    "of": "sheet",
    "col": "flt",
-   "where": {
-    "col": "type",
-    "in": [
-     "FLT"
-    ]
-   },
    "round": 2
   },
   {
@@ -603,11 +667,27 @@
    ]
   },
   {
-   "k": "accomTotal",
+   "k": "accomFlat",
    "op": "mul",
    "of": [
     "accomNights",
     "accomRate"
+   ]
+  },
+  {
+   "k": "accomTotal",
+   "op": "sum",
+   "of": [
+    "accomFlat",
+    "accomActual"
+   ]
+  },
+  {
+   "k": "perDiemTotal",
+   "op": "mul",
+   "of": [
+    "perDiemDays",
+    "perDiemRate"
    ]
   },
   {
@@ -622,7 +702,8 @@
    "op": "sum",
    "of": [
     "accomTotal",
-    "expTotal"
+    "expTotal",
+    "perDiemTotal"
    ]
   },
   {
@@ -683,5 +764,6 @@
  "export": {
   "docx": "D-0507-MRF-001.docx",
   "lockUntilComplete": true
- }
+ },
+ "_flags": "rFlt · rGnd · rAcc · rPd = อัตราที่ผู้ดูแลตั้งไว้ (payRates) ปุ่มดึงจาก Flight Log เติมแล้วล็อกช่องนั้น — ไม่ใช่ช่องของใบ ไม่ถูกบันทึกตอนส่ง"
 }

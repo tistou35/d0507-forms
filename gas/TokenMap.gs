@@ -2725,7 +2725,13 @@ var TOKEN_MAP = {
             "k": "remark",
             "head": "Remarks"
           }
-        ]
+        ],
+        "font": 8,
+        "widen": {
+          "col": "type",
+          "pt": 72,
+          "from": "remark"
+        }
       },
       {
         "k": "exp",
@@ -2764,7 +2770,31 @@ var TOKEN_MAP = {
         "sign": false
       }
     ],
-    "manual": []
+    "manual": [
+      {
+        "tok": "{{accomActual}}",
+        "label": "Accommodation — actual cost (Baht)",
+        "labelTh": "ค่าที่พักตามจริง (บาท)",
+        "sign": false
+      },
+      {
+        "tok": "{{perDiemDays}}",
+        "label": "Per diem (days)",
+        "labelTh": "Per diem (วัน)",
+        "sign": false
+      },
+      {
+        "tok": "{{perDiemRate}}",
+        "label": "Per diem rate (Baht/day)",
+        "labelTh": "อัตรา per diem (บาท/วัน)",
+        "sign": false
+      },
+      {
+        "tok": "{{perDiemTotal}}",
+        "label": "Per diem total (Baht) — included in the reimbursement total",
+        "labelTh": "Per diem รวม (บาท) — รวมอยู่ในยอดค่าใช้จ่ายที่ขอเบิก"
+      }
+    ]
   },
   "PCR-FI": {
     "abbr": "PCR-FI",

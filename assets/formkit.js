@@ -140,6 +140,8 @@
     // ไม่ได้ส่งมาก็ตามภาษาที่ผู้ใช้เลือกไว้ทั้งเว็บ
     this.lang = opts.lang || (global.D0507 && global.D0507.lang) || 'th';
     this.upload = opts.upload || null;      // ฟังก์ชันอัปโหลดไฟล์แนบ มาจากหน้าที่เรียก
+    this.pull = opts.pull || null;          // ดึงข้อมูลจากระบบอื่นมาเติม (ฟิลด์ชนิด pull) — หน้าที่เรียกเป็นคนต่อระบบ
+    this._pullMsg = {};
     this.data = opts.data || {};
     /* ข้อมูลของ "ตัวใบ" ที่ไม่ได้เป็นคำตอบ เช่น formRev = Rev ที่ใบนี้ถูกส่งมา
        ใช้ใน showIf ได้ แต่ไม่ปนเข้า data จึงไม่ถูกบันทึกกลับตอนอนุมัติ
@@ -382,7 +384,7 @@
       if (!evalCond(sec.showIf, ctx)) return;
       const rows = [];
       (sec.fields || []).forEach(f => {
-        if (f.type === 'static' || f.type === 'scan') return;
+        if (f.type === 'static' || f.type === 'scan' || f.type === 'pull') return;
         if (!evalCond(f.showIf, ctx)) return;
         const v = this.data[f.k];
 
@@ -527,7 +529,7 @@
         .filter(s => !(s.hideOthers && this.party && s.party !== this.party));
       let sc = 0, ans = 0, tot = 0;
       secs.forEach(s => (s.fields || []).forEach(f => {
-        if (f.type === 'static' || f.type === 'scan' || !evalCond(f.showIf, ctx)) return;
+        if (f.type === 'static' || f.type === 'scan' || f.type === 'pull' || !evalCond(f.showIf, ctx)) return;
         sc += fieldScore(f, this.data[f.k]);
         tot++;
         if (this.filled(f)) ans++;
@@ -591,7 +593,10 @@
 
   FormKit.prototype.field = function (f) {
     const v = this.data[f.k];
-    const ro = this.readonly || (this.party && f.__sec.party !== this.party);
+    /* lockIf — ช่องที่ค่ามาจากผู้ดูแล (อัตราค่าตอบแทนรายคนของ MRF) ผู้กรอกแก้ไม่ได้
+       ผู้ตรวจสอบในขั้นถัดไปยังเห็นค่าเดิม ไม่ได้ซ่อน */
+    const ro = this.readonly || (this.party && f.__sec.party !== this.party)
+      || !!(f.lockIf && evalCond(f.lockIf, this.ctx()));
     const dis = ro ? ' disabled' : '';
     const id = 'fk_' + f.k;
     /* ป้ายที่เปลี่ยนตามคำตอบข้ออื่น — ช่องเดียวกันแต่ความหมายต่างตามบริบท
@@ -632,6 +637,20 @@
               <circle cx="12" cy="13" r="3.2"/></svg>
             <span>${esc(lab)}</span></button>
           <p class="fk-scan-note">${esc(note)}</p></div>`;
+      }
+
+      /* ดึงข้อมูลจากระบบอื่นมาเติม — ปุ่มลัด ไม่ใช่ช่องเก็บข้อมูล (เหมือน scan)
+         เลือกเดือนแล้วกด หน้าที่เรียก (opts.pull) ต่อระบบต้นทางแล้วคืนค่าที่จะเติม
+         ผลและคำเตือนแสดงใต้ปุ่ม เพื่อให้ผู้กรอกเห็นว่าอะไรถูกเติม อะไรไม่ได้นับ */
+      case 'pull': {
+        if (ro) return '';
+        const mo = this._pullMonth || (() => { const d = new Date(); d.setMonth(d.getMonth() - 1);
+          return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); })();
+        return `<div class="fk-f fk-pull" data-fk="${esc(f.k)}">
+          <label>${esc(lab)}</label>${f.hint ? `<p class="hint">${esc(L(f.hint, this.lang))}</p>` : ''}
+          <div class="fk-pull-row"><input type="month" data-pullm="${esc(f.k)}" value="${esc(mo)}">
+            <button type="button" class="fb" data-pullb="${esc(f.k)}">${esc(L(f.button, this.lang) || (this.lang === 'en' ? 'Fetch' : 'ดึงข้อมูล'))}</button></div>
+          <div class="fk-pull-msg">${this._pullMsg[f.k] || ''}</div></div>`;
       }
 
       /* ไฟล์แนบ — ใช้เมื่อผลลัพธ์ออกมาจากระบบอื่นแล้ว ไม่ต้องกรอกซ้ำทีละหัวข้อ
@@ -1112,6 +1131,24 @@
           });
           if (n) rerender();
         } finally { b.disabled = false; }
+      }));
+
+    el.querySelectorAll('[data-pullb]').forEach(b =>
+      b.addEventListener('click', async () => {
+        if (!self.pull) return;
+        const k = b.dataset.pullb, f = self.fields[k] || {};
+        const m = el.querySelector(`[data-pullm="${k}"]`);
+        self._pullMonth = m && m.value;
+        if (!self._pullMonth) return;
+        b.disabled = true; b.textContent = self.lang === 'en' ? 'Fetching…' : 'กำลังดึงข้อมูล…';
+        try {
+          const r = await self.pull(f, self._pullMonth, self) || {};
+          Object.keys(r.set || {}).forEach(x => self.set(x, r.set[x]));
+          self._pullMsg[k] = r.html || '';
+        } catch (e) {
+          self._pullMsg[k] = `<div class="fk-gate stop"><span>${esc(e.message || e)}</span></div>`;
+        }
+        rerender();
       }));
 
     el.querySelectorAll('[data-fx]').forEach(b =>

@@ -368,7 +368,8 @@ function boot(){
   FK=new FormKit(DEF,{party:partyOf(),lang:A.lang,data:keep,
     onChange:()=>{ A.draftSave(code, FK.data); renderFoot(); },
     upload:async f=>{const r=await A.gas('attach',Object.assign({code:DEF.code},f));
-      return r.ok?r.result:{error:r.error};}});
+      return r.ok?r.result:{error:r.error};},
+    pull:(f,month,fk)=>PULL[f.action] ? PULL[f.action](f,month,fk) : null});
   FK.render(document.getElementById('form'));
   if(F.abbr==='ARF' && !SES_ID) document.getElementById('form').insertAdjacentHTML('afterbegin',
     `<div class="fk-gate warn" style="margin:18px 0 0"><span><b>${A.esc(A.L({th:'ไม่ได้สแกน QR ของคาบเรียน',en:'No session QR'}))}</b> — ${
@@ -541,6 +542,50 @@ function partyOf(){
   const first=(DEF.route||[])[0];
   return (first&&first.party) || (DEF.parties&&DEF.parties[0]||{}).k;
 }
+/* ── ดึงข้อมูลจากระบบอื่น (ฟิลด์ชนิด pull) ───────────────────
+   mrfPull — D-0507-MRF-001: เที่ยวบินของผู้เบิกในเดือนที่เลือกจาก Flight Logs (gas/Mrf.gs)
+   แถวละหนึ่งวัน · แถวที่ผู้เบิกกรอกเอง (ไม่มี Flight Log ID) เก็บไว้แล้วเรียงรวมตามวันที่
+   อัตราที่ผู้ดูแลตั้งไว้เติมแล้วล็อก (r* = ธงล็อก ไม่ใช่ช่องของใบ) ยังไม่ตั้ง = ผู้เบิกกรอกเอง */
+const PULL = {
+  mrfPull: async (f, month, fk) => {
+    if (!A.signedIn()) throw new Error(A.L({th:'ต้องเข้าสู่ระบบก่อน ระบบจึงรู้ว่าต้องหาเที่ยวบินของใคร',en:'Sign in first so the system knows whose flights to look for'}));
+    const r = await A.gas('mrfPull', {month}, {timeout:90000});
+    if (!r.ok) throw new Error(r.error);
+    const x = r.result, R = x.rates || {}, M = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    const mine = (fk.data.sheet || []).filter(o => o && !/(^|,\s*)LOG-/.test(o.detail || '')
+      && Object.keys(o).some(k => String(o[k] == null ? '' : o[k]).trim()));
+    const fromLog = (x.sheet || []).map(o => ({date:o.date, detail:o.detail, place:o.place, type:o.type, flt:o.flt, gnd:'', remark:o.remark}));
+    const rows = fromLog.concat(mine).sort((a, b) => String(a.date || '9').localeCompare(String(b.date || '9')));
+    const has = v => v !== null && v !== undefined && v !== '';
+    const set = {
+      period: M[+month.slice(5) - 1] + ' ' + month.slice(0, 4), sheet: rows,
+      rFlt: has(R.flt), rGnd: has(R.gnd), rAcc: has(R.accom), rPd: !!R.perDiem && has(R.perDiemRate),
+      accomNights: x.nights, perDiemOn: !!R.perDiem
+    };
+    if (has(R.flt)) set.fltRate = R.flt;
+    if (has(R.gnd)) set.gndRate = R.gnd;
+    if (has(R.accom)) { set.accomRate = R.accom; set.accomActual = ''; } else set.accomRate = '';
+    if (R.perDiem) { set.perDiemDays = x.perDiemDays; if (has(R.perDiemRate)) set.perDiemRate = R.perDiemRate; }
+    else { set.perDiemDays = ''; set.perDiemRate = ''; }
+    const blk = fromLog.reduce((a, o) => { const m = /^(\d+):(\d\d)$/.exec(o.flt || ''); return a + (m ? +m[1] * 60 + +m[2] : 0); }, 0);
+    const warns = (x.warns || []).slice();
+    if (rows.length > 22) warns.push(A.L({th:'มี '+rows.length+' แถว เกิน 22 แถวที่กระดาษพิมพ์ไว้',en:rows.length+' rows — the printed form holds 22'}));
+    if (!has(R.flt) || !has(R.gnd)) warns.push(A.L({th:'ผู้ดูแลยังไม่ได้ตั้งอัตรา'+(!has(R.flt)?'ค่าบิน':'')+(!has(R.flt)&&!has(R.gnd)?'และ':'')+(!has(R.gnd)?'ภาคพื้น/SIM':'')+'ของคุณ — กรอกเอง หรือแจ้งผู้ดูแล',
+                                                   en:'No administrator rate for '+[!has(R.flt)&&'flight',!has(R.gnd)&&'ground / sim'].filter(Boolean).join(' and ')+' — type it, or ask the administrator'}));
+    const e = A.esc;
+    const html = `<div class="fk-gate ${x.flights ? 'info' : 'warn'}"><span>${e(set.period)} · ${
+        x.flights ? e(A.L({th:x.flights+' เที่ยวบิน '+x.days+' วัน · Block รวม '+Math.floor(blk/60)+':'+String(blk%60).padStart(2,'0')+' ชม.',
+                          en:x.flights+' flights on '+x.days+' days · block '+Math.floor(blk/60)+':'+String(blk%60).padStart(2,'0')}))
+                  : e(A.L({th:'ไม่พบเที่ยวบินของคุณในเดือนนี้',en:'No flights of yours this month'}))}
+      ${x.flights ? '<br>'+e(A.L({th:'ที่พัก '+x.nights+' คืน (ช่วงวันที่ '+(x.stays||[]).join(', ')+')',en:'Accommodation '+x.nights+' nights (days '+(x.stays||[]).join(', ')+')'}))
+        + (R.perDiem ? ' · '+e(A.L({th:'per diem '+x.perDiemDays+' วัน',en:'per diem '+x.perDiemDays+' days'})) : '') : ''}
+      <br><span class="hint" style="margin:0">${e(A.L({th:'จับคู่ชื่อ: ',en:'Matched names: '}))}${e((x.names||[]).join(' · '))}${
+        mine.length ? ' · '+e(A.L({th:'คงแถวที่กรอกเอง '+mine.length+' แถว',en:'kept '+mine.length+' rows you typed'})) : ''}</span></span></div>`
+      + (warns.length ? `<div class="fk-gate warn" style="margin-top:8px"><span><b>${e(A.L({th:'ตรวจก่อนส่ง',en:'Check before submitting'}))}</b><ul>${warns.map(w=>'<li>'+e(w)+'</li>').join('')}</ul></span></div>` : '');
+    return { set, html };
+  }
+};
+
 function renderFoot(){
   if(!FK) return;
   /* เปิดแท็บไหนก่อนก็ได้ ช่องบังคับไม่กันการเดินไปแท็บถัดไป — มาตรวจรวมที่นี่ก่อนส่ง
