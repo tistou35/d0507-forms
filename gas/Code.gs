@@ -251,6 +251,14 @@ function doPost(e) {
       return json_({ ok: true, result: { hit: hit, around: ytxt.slice(ii, ii + 200), pdf: ypdf } });
     }
 
+    // ใบเสร็จค่าใช้จ่ายสำหรับ MRF ส่วนที่ 4 (gas/Receipt.gs) — ไฟล์ไม่เปิดแชร์ เปิดดูผ่าน rcptGet เท่านั้น
+    if (body.action === 'rcptUpload') return json_({ ok: true, result: rcptUpload_(body, who) });
+    if (body.action === 'rcptGet') {
+      if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบก่อน');
+      return json_({ ok: true, result: rcptGet_(body, who) });
+    }
+    if (body.action === 'rcptDel') return json_({ ok: true, result: rcptDel_(body, who) });
+
     // D-0507-MRF-001 — ดึงตารางเวลาเดือนที่เลือกจาก Flight Logs ของผู้เรียกเอง (gas/Mrf.gs)
     if (body.action === 'mrfPull') {
       if (who.anonymous) throw new Error('ต้องเข้าสู่ระบบก่อน');

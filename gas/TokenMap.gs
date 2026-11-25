@@ -2739,7 +2739,7 @@ var TOKEN_MAP = {
       },
       {
         "k": "exp",
-        "rows": 5,
+        "rows": 30,
         "label": "Expense detail",
         "cols": [
           {
@@ -2762,7 +2762,8 @@ var TOKEN_MAP = {
             "k": "remark",
             "head": "Remarks"
           }
-        ]
+        ],
+        "grow": true
       }
     ],
     "boxesInDocx": 0,
@@ -2800,9 +2801,25 @@ var TOKEN_MAP = {
         "sign": false
       },
       {
+        "tok": "{{rcptNote}}",
+        "label": "Receipts attached",
+        "labelTh": "รายการใบเสร็จที่แนบ",
+        "sign": false
+      },
+      {
+        "tok": "{{proxyNote}}",
+        "label": "Prepared on behalf",
+        "labelTh": "ทำใบเบิกแทน"
+      },
+      {
         "tok": "{{perDiemTotal}}",
         "label": "Per diem total (Baht) — included in the reimbursement total",
         "labelTh": "Per diem รวม (บาท) — รวมอยู่ในยอดค่าใช้จ่ายที่ขอเบิก"
+      },
+      {
+        "tok": "{{whtAmt}}",
+        "label": "Withholding tax 3% — on pay, flat accommodation and per diem only; receipted expenses are not withheld",
+        "labelTh": "ภาษีหัก ณ ที่จ่าย 3% — คิดจากค่าตอบแทน ค่าที่พักเหมาจ่าย และ per diem เท่านั้น ค่าใช้จ่ายที่มีใบเสร็จไม่หัก"
       }
     ]
   },

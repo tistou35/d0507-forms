@@ -70,9 +70,16 @@ function mrfPull_(body, who) {
   var month = String(body.month || '');
   if (!/^\d{4}-\d{2}$/.test(month)) throw new Error('เดือนไม่ถูกต้อง (ต้องเป็น YYYY-MM)');
   var tok = body.idToken;
+  /* forUid — ผู้ดูแลหรือ FA ทำใบเบิกแทนคนอื่น ตรวจสิทธิ์ที่นี่เอง ไม่พึ่งแค่ rules
+     เพราะอ่าน payRates ไม่ได้ก็ยังดึงชั่วโมงบินของคนนั้นได้อยู่ดี */
+  var target = who.uid;
+  if (body.forUid && body.forUid !== who.uid) {
+    if (!mrfProxyOk_(who, tok)) throw new Error('ทำใบเบิกแทนคนอื่นได้เฉพาะผู้ดูแลระบบหรือตำแหน่ง FA');
+    target = String(body.forUid);
+  }
   var prof = {}, rate = {}, cfg = {};
-  try { prof = fsGet_('users/' + who.uid, tok); } catch (e) {}
-  try { rate = fsGet_('payRates/' + who.uid, tok); } catch (e) {}
+  try { prof = fsGet_('users/' + target, tok); } catch (e) {}
+  try { rate = fsGet_('payRates/' + target, tok); } catch (e) {}
   try { cfg = fsGet_('config/mrf', tok); } catch (e) {}
   var C = {};
   Object.keys(MRF_DEFAULT).forEach(function (k) { C[k] = cfg[k] != null && cfg[k] !== '' ? cfg[k] : MRF_DEFAULT[k]; });
@@ -236,6 +243,18 @@ function mrfPull_(body, who) {
     rule: { preMin: C.preMin, postMin: C.postMin, fullDayHrs: C.fullDayHrs, gapDays: C.gapDays },
     warns: warns
   };
+}
+
+function mrfProxyOk_(who, tok) {
+  try {
+    var adm = fsGet_('config/admins', tok);
+    if ((adm.uids || []).indexOf(who.uid) >= 0) return true;
+  } catch (e) {}
+  try {
+    var me = fsGet_('users/' + who.uid, tok);
+    return me.active !== false && (me.positions || []).indexOf('FA') >= 0
+        && (me.roles || []).some(function (r) { return ['ins', 'mnt', 'ops', 'mgt', 'sms'].indexOf(r) >= 0; });
+  } catch (e) { return false; }
 }
 
 /* ชื่อนักบินทั้งหมดใน Flight Log พร้อมจำนวนเที่ยว — ผู้ดูแลใช้ใส่ชื่อที่สะกดต่าง (ผู้ดูแลระบบเท่านั้น) */

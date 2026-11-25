@@ -427,13 +427,13 @@ const FN  = f => f.th || f.t || f.abbr;
 const DN  = k => TH(A.DEPT[k]) || k || '—';
 /* ตำแหน่งในองค์กรตาม OMA — คนหนึ่งมีได้หลายตำแหน่ง (HT ที่เป็น FI ด้วยเป็นเรื่องปกติ)
    ต่างจาก 'บทบาท' ที่บอกว่าเห็นฟอร์มกลุ่มไหน */
-const POS_KEYS = ['ACM','HT','CMM','SM','CFI','CTKI','FI','TKI','ME','OPS','AD'];
+const POS_KEYS = ['ACM','HT','CMM','SM','CFI','CTKI','FI','TKI','ME','OPS','AD','FA'];
 const POS_N = {
   ACM:'Accountable Manager', HT:'Head of Training', CMM:'Compliance Monitoring Manager',
   SM:'Safety Manager', CFI:'Chief Flight Instructor', CTKI:'Chief Theoretical Knowledge Instructor',
   FI:'Flight Instructor',
   TKI:'Theoretical Knowledge Instructor', ME:'Maintenance Engineer',
-  OPS:'Operations / Dispatch', AD:'Administration' };
+  OPS:'Operations / Dispatch', AD:'Administration', FA:'Finance & Accounting' };
 let ROLES = new Set(), POS = new Set(), NEWREG = null;
 let NROLES = new Set(), NPOS = new Set();
 

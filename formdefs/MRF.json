@@ -38,14 +38,22 @@
     "th": "สรุปและลงนาม",
     "en": "Summary & sign"
    }
-  ]
+  ],
+  "proxy": {
+   "positions": [
+    "FA"
+   ],
+   "admin": true,
+   "_why": "ผู้ดูแลระบบหรือผู้ถือตำแหน่ง FA ทำใบเบิกแทนผู้เบิกได้ — เลือกชื่อแล้วระบบดึง Flight Log อัตรา และใบเสร็จของคนนั้น"
+  }
  },
  "flags": [
   "rFlt",
   "rGnd",
   "rAcc",
   "rPd",
-  "rLog"
+  "rLog",
+  "rRc"
  ],
  "parties": [
   {
@@ -444,10 +452,41 @@
      }
     },
     {
+     "k": "rcptPull",
+     "type": "pull",
+     "action": "rcptPull",
+     "label": {
+      "th": "ดึงใบเสร็จที่บันทึกไว้",
+      "en": "Fetch saved receipts"
+     },
+     "button": {
+      "th": "ดึงใบเสร็จของเดือนนี้",
+      "en": "Fetch this month's receipts"
+     },
+     "hint": {
+      "th": "ใบเสร็จที่บันทึกไว้ในหน้า \"ใบเสร็จของฉัน\" ระหว่างเดือน และยังไม่เคยอยู่ในใบเบิกใด · ส่งใบเบิกแล้วใบเสร็จเหล่านั้นถูกผูกกับใบนี้ ดึงเข้าใบอื่นซ้ำไม่ได้",
+      "en": "Receipts saved on the \"My receipts\" page during the month that are not on any claim yet · once this claim is submitted they are tied to it and cannot be claimed again"
+     }
+    },
+    {
+     "k": "rcptNote",
+     "type": "textarea",
+     "lockIf": "rRc == true",
+     "showIf": "rRc == true",
+     "label": {
+      "th": "รายการใบเสร็จที่แนบ",
+      "en": "Receipts attached"
+     },
+     "hint": {
+      "th": "ระบบเขียนให้ — พิมพ์ใน PDF พร้อมลิงก์ให้ผู้ตรวจเปิดดูรูปใบเสร็จ",
+      "en": "Written by the system — printed with a link for the verifier to open the receipt images"
+     }
+    },
+    {
      "k": "exp",
      "type": "table",
      "rows": 5,
-     "max": 5,
+     "max": 30,
      "label": {
       "th": "รายการค่าใช้จ่าย",
       "en": "Expense detail"
@@ -498,7 +537,11 @@
         "en": "Remarks"
        }
       }
-     ]
+     ],
+     "hint": {
+      "th": "กด \"ดึงใบเสร็จที่บันทึกไว้\" ด้านบน รายการจากใบเสร็จเติมให้ใบละหนึ่งแถว (หมายเหตุขึ้นต้น R1, R2 …) แถวที่พิมพ์เองไม่ถูกลบ · กระดาษพิมพ์ไว้ 5 แถว PDF ที่ระบบออกเพิ่มแถวให้",
+      "en": "Press \"Fetch saved receipts\" above — one row per receipt (remarks start R1, R2 …); rows you typed are kept · the paper has 5 rows, the PDF adds more"
+     }
     },
     {
      "k": "note6",
@@ -531,8 +574,8 @@
      "k": "note8",
      "type": "static",
      "text": {
-      "th": "รวมทั้งสิ้น {totalIncome} บาท · หลังหักภาษี ณ ที่จ่าย 3% ประมาณ {afterTax} บาท",
-      "en": "Total {totalIncome} Baht · approx. after 3% withholding {afterTax} Baht"
+      "th": "รวมทั้งสิ้น {totalIncome} บาท · หักภาษี ณ ที่จ่าย 3% {whtAmt} บาท (คิดจากค่าตอบแทน ค่าที่พักเหมาจ่าย และ per diem {whtBase} บาท — ค่าใช้จ่ายที่มีใบเสร็จไม่หัก) · รับสุทธิประมาณ {afterTax} บาท",
+      "en": "Total {totalIncome} Baht · 3% withholding {whtAmt} Baht (on pay, flat accommodation and per diem {whtBase} Baht — receipted expenses are not withheld) · approx. net {afterTax} Baht"
      }
     },
     {
@@ -731,12 +774,41 @@
    ]
   },
   {
-   "k": "afterTax",
+   "k": "whtBase",
+   "op": "sum",
+   "of": [
+    "fltPay",
+    "gndPay",
+    "accomFlat",
+    "perDiemTotal"
+   ],
+   "_why": "ฐานภาษีหัก ณ ที่จ่าย 3% — ค่าตอบแทน ค่าที่พักแบบเหมาจ่าย และ per diem · ค่าใช้จ่ายที่มีใบเสร็จ (ส่วนที่ 4 รายการค่าใช้จ่าย และค่าที่พักตามจริง) ไม่หัก ตามที่ผู้ควบคุมเอกสารสั่ง 25 NOV 2026"
+  },
+  {
+   "k": "whtAmt",
    "op": "mul",
    "of": [
-    "totalIncome",
-    "0.97"
+    "whtBase",
+    "0.03"
+   ],
+   "round": 2
+  },
+  {
+   "k": "whtNeg",
+   "op": "mul",
+   "of": [
+    "whtAmt",
+    "-1"
    ]
+  },
+  {
+   "k": "afterTax",
+   "op": "sum",
+   "of": [
+    "totalIncome",
+    "whtNeg"
+   ],
+   "round": 2
   },
   {
    "k": "sumFltPay",
@@ -780,5 +852,32 @@
   "docx": "D-0507-MRF-001.docx",
   "lockUntilComplete": true
  },
- "_flags": "rFlt · rGnd · rAcc · rPd = อัตราที่ผู้ดูแลตั้งไว้ (payRates) ปุ่มดึงจาก Flight Log เติมแล้วล็อกช่องนั้น — ไม่ใช่ช่องของใบ ไม่ถูกบันทึกตอนส่ง"
+ "_flags": "rFlt · rGnd · rAcc · rPd = อัตราที่ผู้ดูแลตั้งไว้ (payRates) ปุ่มดึงจาก Flight Log เติมแล้วล็อกช่องนั้น — ไม่ใช่ช่องของใบ ไม่ถูกบันทึกตอนส่ง",
+ "passthrough": [
+  {
+   "k": "forUid",
+   "from": "fill (ui.proxy)",
+   "note": "uid ของผู้เบิกตัวจริงเมื่อผู้ดูแลหรือ FA ทำใบแทน — ไม่ขึ้น PDF"
+  },
+  {
+   "k": "forName",
+   "from": "fill (ui.proxy)",
+   "note": "ชื่อผู้เบิกตัวจริง"
+  },
+  {
+   "k": "forEmail",
+   "from": "fill (ui.proxy)",
+   "note": "อีเมลผู้เบิกตัวจริง"
+  },
+  {
+   "k": "proxyNote",
+   "from": "fill (ui.proxy)",
+   "note": "Prepared on behalf of … by … — พิมพ์ในบล็อก ADDITIONAL"
+  },
+  {
+   "k": "rcptIds",
+   "from": "fill (rcptPull)",
+   "note": "id ของใบเสร็จ (receipts) ที่ดึงเข้าใบนี้ — ใช้ผูกใบเสร็จกับใบตอนส่ง ไม่ขึ้น PDF"
+  }
+ ]
 }

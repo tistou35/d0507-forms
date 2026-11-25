@@ -407,7 +407,13 @@
    "{{k_perDiemOn}}"
   ],
   "manual": [
+   {
+    "tok": "{{proxyNote}}",
+    "label": "Prepared on behalf",
+    "labelTh": "ทำใบเบิกแทน"
+   },
    "{{flogNote}}",
+   "{{rcptNote}}",
    "{{accomActual}}",
    "{{perDiemDays}}",
    "{{perDiemRate}}",
@@ -415,6 +421,11 @@
     "tok": "{{perDiemTotal}}",
     "label": "Per diem total (Baht) — included in the reimbursement total",
     "labelTh": "Per diem รวม (บาท) — รวมอยู่ในยอดค่าใช้จ่ายที่ขอเบิก"
+   },
+   {
+    "tok": "{{whtAmt}}",
+    "label": "Withholding tax 3% — on pay, flat accommodation and per diem only; receipted expenses are not withheld",
+    "labelTh": "ภาษีหัก ณ ที่จ่าย 3% — คิดจากค่าตอบแทน ค่าที่พักเหมาจ่าย และ per diem เท่านั้น ค่าใช้จ่ายที่มีใบเสร็จไม่หัก"
    }
   ],
   "_why_perdiem": "per diem และค่าที่พักตามจริงไม่มีช่องบนกระดาษ (เพิ่ม 23 NOV 2026) — พิมพ์ในบล็อก ADDITIONAL ท้ายเอกสาร ยอดรวมอยู่ใน Reimbursement / Total แล้ว · ช่อง \"มีสิทธิ์เบิก per diem\" ไม่ใช่ ☐ บนกระดาษ จึงข้าม ไม่งั้นจำนวนช่องติ๊กไม่เท่ากระดาษแล้วตัววางไม่ติ๊กสักช่อง",
@@ -432,7 +443,11 @@
     "pt": 72,
     "from": "remark"
    }
-  }
+  },
+  "tableRows": {
+   "exp": 30
+  },
+  "_why_wht": "กระดาษพิมพ์ป้าย \"Approx. Pay After Withholding Tax 3% (Total × 0.97)\" แต่ระบบคิด 3% เฉพาะส่วนที่ไม่มีใบเสร็จ (ผู้ควบคุมเอกสารสั่ง 25 NOV 2026) จึงพิมพ์ยอดภาษีและฐานที่ใช้ในบล็อก ADDITIONAL ให้ผู้ตรวจเห็นว่าตัวเลขไม่ใช่ Total × 0.97 · ป้ายบนกระดาษต้องแก้ผ่าน DRF"
  },
  "DAF": {
   "cells": {

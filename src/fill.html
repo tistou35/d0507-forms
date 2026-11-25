@@ -371,6 +371,7 @@ function boot(){
       return r.ok?r.result:{error:r.error};},
     pull:(f,month,fk,opts)=>PULL[f.action] ? PULL[f.action](f,month,fk,opts) : null});
   FK.render(document.getElementById('form'));
+  proxyBar();
   if(F.abbr==='ARF' && !SES_ID) document.getElementById('form').insertAdjacentHTML('afterbegin',
     `<div class="fk-gate warn" style="margin:18px 0 0"><span><b>${A.esc(A.L({th:'ไม่ได้สแกน QR ของคาบเรียน',en:'No session QR'}))}</b> — ${
       A.esc(A.L({th:'กรอกข้อมูลการเรียนเองทุกช่อง แล้วลงนามส่ง · ใบนี้ไม่ผ่านการรับรองรายชื่อของครูผู้สอน ถ้าครูเปิดคาบไว้ ให้สแกน QR ของคาบแทน',
@@ -546,12 +547,65 @@ function partyOf(){
    mrfPull — D-0507-MRF-001: เที่ยวบินของผู้เบิกในเดือนที่เลือกจาก Flight Logs (gas/Mrf.gs)
    แถวละหนึ่งวัน · แถวที่ผู้เบิกกรอกเอง (ไม่มี Flight Log ID) เก็บไว้แล้วเรียงรวมตามวันที่
    อัตราที่ผู้ดูแลตั้งไว้เติมแล้วล็อก (r* = ธงล็อก ไม่ใช่ช่องของใบ) ยังไม่ตั้ง = ผู้เบิกกรอกเอง */
+/* ── ทำใบแทนผู้อื่น (ui.proxy) ───────────────────────────────
+   MRF: ผู้ดูแลหรือผู้ถือตำแหน่ง FA เลือกชื่อผู้เบิก แล้วปุ่มดึงข้อมูลทุกปุ่มทำงานในนามคนนั้น
+   (Flight Log · อัตรา · ใบเสร็จ) ชื่อผู้เบิกในใบเปลี่ยนตาม ส่วนผู้ส่งใบยังเป็นคนที่กดส่ง
+   ใบเก็บ forUid ไว้ ผู้เบิกตัวจริงเปิดดูใบได้ (firestore.rules) และ PDF บอกว่าใครทำแทน */
+function canProxy(){
+  const px=DEF&&DEF.ui&&DEF.ui.proxy; if(!px||!A.signedIn()) return false;
+  return (px.admin && A.isAdmin()) || A.myPositions().some(p=>(px.positions||[]).indexOf(p)>=0);
+}
+let PROXY_USERS=null;
+async function proxyBar(){
+  if(!canProxy()) return;
+  // อยู่นอก #form — ฟอร์มวาดใหม่ทั้งก้อนทุกครั้งที่กดดึงข้อมูล แถบนี้ต้องไม่หายตาม
+  const host=document.getElementById('form');
+  let box=document.getElementById('pxbar');
+  if(!box){ box=document.createElement('div'); box.id='pxbar';
+    box.className='fk-gate info'; box.style.margin='18px 0 0';
+    host.parentNode.insertBefore(box, host); }
+  const draw=()=>{
+    const cur=FK.data.forUid||'';
+    box.innerHTML=`<span><b>${A.esc(A.L({th:'ทำใบเบิกแทน',en:'Prepare on behalf of'}))}</b>
+      <select id="pxsel" style="margin:0 8px;min-height:34px;max-width:100%">
+        <option value="">${A.esc(A.L({th:'ตัวเอง',en:'Myself'}))} — ${A.esc(A.myName())}</option>
+        ${(PROXY_USERS||[]).map(u=>`<option value="${A.esc(u.id)}"${u.id===cur?' selected':''}>${A.esc(u.name)}${u.email?' · '+A.esc(u.email):''}</option>`).join('')}
+      </select>${PROXY_USERS?'':' '+A.esc(A.L({th:'กำลังโหลดรายชื่อ…',en:'Loading…'}))}
+      <br><span class="hint" style="margin:0">${A.esc(A.L({th:'เลือกแล้วกดดึงข้อมูลใหม่ทุกปุ่ม ระบบดึง Flight Log อัตรา และใบเสร็จของคนที่เลือก · คุณเป็นผู้ส่งใบ และ PDF บันทึกว่าทำแทนใคร',
+        en:'After choosing, press every fetch button again — flights, rates and receipts come from the person chosen · you remain the submitter and the PDF records who prepared it'}))}</span></span>`;
+    box.querySelector('#pxsel').onchange=e=>{
+      const u=(PROXY_USERS||[]).find(x=>x.id===e.target.value);
+      if(u){ FK.set('forUid',u.id); FK.set('forName',u.name); FK.set('forEmail',u.email||'');
+             FK.set('empName',u.name); FK.set('empEmail',u.email||'');
+             FK.set('proxyNote','Prepared on behalf of '+u.name+' by '+A.myName()+' ('+(A.isAdmin()?'Administrator':'Finance & Accounting')+')'); }
+      else { ['forUid','forName','forEmail','proxyNote'].forEach(k=>FK.set(k,'')); FK.set('empName',A.myName()); FK.set('empEmail',(A.user&&A.user.email)||''); }
+      // ค่าที่ดึงมาก่อนหน้าเป็นของอีกคน — ล้างทิ้ง กันส่งชั่วโมงบินของคนหนึ่งในชื่ออีกคน
+      ['sheet','exp','rcptIds','rcptNote','flogNote'].forEach(k=>FK.set(k, k==='sheet'||k==='exp'||k==='rcptIds' ? [] : ''));
+      ['rLog','rRc'].forEach(k=>FK.set(k,false));
+      FK._pullMsg={};
+      FK.render(host); draw(); renderFoot();
+    };
+  };
+  draw();
+  if(!PROXY_USERS){
+    try{
+      const q=await A.db.collection('users').get();
+      PROXY_USERS=q.docs.map(d=>Object.assign({id:d.id},d.data()))
+        .filter(u=>u.active!==false && u.name && (u.roles||[]).some(r=>['ins','mnt','ops','mgt','sms'].indexOf(r)>=0) && u.id!==A.user.uid)
+        .map(u=>({id:u.id,name:u.name,email:u.email||''}))
+        .sort((a,b)=>a.name.localeCompare(b.name));
+    }catch(e){ PROXY_USERS=[]; console.warn('[fill] โหลดรายชื่อไม่ได้',e); }
+    draw();
+  }
+}
+const proxyUid=()=>(FK&&FK.data.forUid)||(A.user&&A.user.uid);
+
 const PULL = {
   mrfPull: async (f, month, fk, opts) => {
     if (!A.signedIn()) throw new Error(A.L({th:'ต้องเข้าสู่ระบบก่อน ระบบจึงรู้ว่าต้องหาเที่ยวบินของใคร',en:'Sign in first so the system knows whose flights to look for'}));
     /* ชื่อที่ผู้เบิกเคยยืนยัน/ปฏิเสธ จำไว้ในเครื่อง เดือนหน้าจะได้ไม่ถามซ้ำ (ติ๊กออกในผลลัพธ์เพื่อให้ถามใหม่)
        แถวที่เลือกไม่นับจำแยกตามเดือน — เปิดใบใหม่แล้วกดดึงซ้ำ ได้ผลเท่าเดิม */
-    const KN = 'mrf.names.' + A.user.uid, KX = 'mrf.excl.' + A.user.uid + '.' + month;
+    const tu = proxyUid(), KN = 'mrf.names.' + tu, KX = 'mrf.excl.' + tu + '.' + month;
     const rd = k => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } };
     const wr = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
     let nm = rd(KN) || {accept: [], reject: []}, ex = rd(KX);
@@ -561,6 +615,7 @@ const PULL = {
       wr(KN, nm); wr(KX, ex);
     }
     const req = {month, accept: nm.accept, reject: nm.reject};
+    if (fk.data.forUid) req.forUid = fk.data.forUid;
     if (ex) { req.decided = true; req.excl = ex; }
     const r = await A.gas('mrfPull', req, {timeout:90000});
     if (!r.ok) throw new Error(r.error);
@@ -633,6 +688,39 @@ const PULL = {
           conHtml ? `<b style="display:block;margin-top:${askHtml?10:0}px">${e(A.L({th:'ข้อมูลใน Flight Log ที่ขัดกัน — ติ๊กแถวที่ไม่ควรนับ',en:'Conflicting Flight Log entries — tick the ones that should not count'}))}</b>${conHtml}` : ''}${
           keepHtml}${reBtn}</span></div>` : '')
       + (warns.length ? `<div class="fk-gate warn" style="margin-top:8px"><span><b>${e(A.L({th:'ตรวจก่อนส่ง',en:'Check before submitting'}))}</b><ul>${warns.map(w=>'<li>'+e(w)+'</li>').join('')}</ul></span></div>` : '');
+    return { set, html };
+  },
+
+  /* ใบเสร็จที่บันทึกไว้ในเดือนนั้น (receipts · หน้า "ใบเสร็จของฉัน") ที่ยังไม่อยู่ในใบเบิกใด
+     ใบละหนึ่งแถวในตารางค่าใช้จ่าย หมายเหตุขึ้นต้น R1, R2 … แถวที่ผู้เบิกพิมพ์เองคงไว้
+     ใบเสร็จยังไม่ถูกผูกตอนดึง — ผูกตอนกดส่งใบ (submit) จึงดึงซ้ำ/ยกเลิกได้ไม่ค้าง */
+  rcptPull: async (f, month, fk) => {
+    if (!A.signedIn()) throw new Error(A.L({th:'ต้องเข้าสู่ระบบก่อน',en:'Sign in first'}));
+    const tu = proxyUid();
+    const q = await A.db.collection('receipts').where('uid','==',tu).where('month','==',month).get();
+    const all = q.docs.map(d => Object.assign({id:d.id}, d.data())).sort((a,b) => (a.date+a.vendor).localeCompare(b.date+b.vendor));
+    const free = all.filter(r => r.status === 'draft'), taken = all.filter(r => r.status !== 'draft');
+    const M = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    const dd = ymd => ymd ? ymd.slice(8) + ' ' + M[+ymd.slice(5, 7) - 1] + ' ' + ymd.slice(0, 4) : '';
+    const money = n => Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+    const typed = (fk.data.exp || []).filter(o => o && !/^R\d+ ·/.test(o.remark || '')
+      && Object.keys(o).some(k => String(o[k] == null ? '' : o[k]).trim()));
+    const rows = free.map((r, i) => ({desc: (r.vendor + ' — ' + r.desc).slice(0, 120), qty: 1, unit: r.amount, amount: r.amount,
+      remark: 'R' + (i + 1) + ' · ' + dd(r.date) + (r.docNo ? ' · ' + r.docNo : '')})).concat(typed);
+    const base = location.href.replace(/\/fill\/.*$/, '/');
+    const note = free.map((r, i) => 'R' + (i + 1) + '  ' + dd(r.date) + ' · ' + r.vendor + (r.vendorTaxId ? ' (Tax ID ' + r.vendorTaxId + ')' : '')
+        + (r.docNo ? ' · No. ' + r.docNo : '') + ' · ' + r.catName + ' · ' + money(r.amount) + ' Baht' + (r.vat === 'in7' ? ' (incl. VAT 7%)' : ''))
+      .concat(free.length ? ['Receipt images: ' + base + 'receipts/?u=' + encodeURIComponent(tu) + '&m=' + month] : []).join('\n');
+    const total = free.reduce((a, r) => a + Number(r.amount || 0), 0);
+    const set = {exp: rows, rcptIds: free.map(r => r.id), rcptNote: note, rRc: free.length > 0};
+    const e = A.esc;
+    const html = `<div class="fk-gate ${free.length ? 'info' : 'warn'}"><span>${
+        free.length ? e(A.L({th:'ใบเสร็จ '+free.length+' ใบ รวม '+money(total)+' บาท — เติมในตารางแล้ว',en:free.length+' receipts, '+money(total)+' Baht — added to the table'}))
+                    : e(A.L({th:'ไม่มีใบเสร็จที่ยังไม่ได้เบิกในเดือนนี้',en:'No unclaimed receipts this month'}))}${
+        taken.length ? '<br><span class="hint" style="margin:0">'+e(A.L({th:'ไม่นับ '+taken.length+' ใบที่อยู่ในใบเบิกอื่นแล้ว: ',en:'Left out '+taken.length+' already on another claim: '}))
+          + e(taken.map(r => r.vendor + ' ' + money(r.amount) + (r.claimTrk ? ' (' + r.claimTrk + ')' : '')).join(', ')) + '</span>' : ''}${
+        typed.length ? '<br><span class="hint" style="margin:0">'+e(A.L({th:'คงแถวที่พิมพ์เอง '+typed.length+' แถว',en:'Kept '+typed.length+' typed rows'}))+'</span>' : ''}
+        <br><a href="${e(base + 'receipts/' + (fk.data.forUid ? '?u=' + encodeURIComponent(tu) + '&m=' + month : '?m=' + month))}" target="_blank" rel="noopener">${e(A.L({th:'เปิดหน้าใบเสร็จ ↗',en:'Open receipts page ↗'}))}</a></span></div>`;
     return { set, html };
   }
 };
@@ -841,6 +929,19 @@ async function send(){
     if(u.isAnonymous && F.abbr!=='VSR') sub.guest=true;   // ไม่ได้เข้าสู่ระบบ — ชื่อพิมพ์เอง (ARF: rules ตรวจกับวิธีล็อกอินจริง)
     if(F.abbr==='ARF' && !isAtt) sub.selfReported=true;  // ไม่ผ่าน QR ของคาบ — ไม่มีครูรับรอง
     if(REV_ID && F.abbr==='DRF') sub.revId=REV_ID;
+    if(FK.data.forUid) sub.forUid=FK.data.forUid;
+    /* ใบเสร็จที่ดึงเข้าใบเบิก — ผูกกับใบนี้ก่อนบันทึกใบ ถ้าใบเสร็จใบใดถูกผูกกับใบอื่นไปแล้ว
+       (เปิดสองแท็บ หรือ FA ทำแทนพร้อมกัน) ให้หยุดตรงนี้ ไม่ส่งใบที่เบิกใบเสร็จซ้ำ
+       ถ้าบันทึกใบไม่สำเร็จหลังผูกแล้ว ใบเสร็จปลดกลับเป็นร่างได้จากหน้าใบเสร็จ (rules ตรวจว่าใบไม่มีอยู่จริง) */
+    const rids=(FK.data.rcptIds||[]).filter(Boolean);
+    if(F.abbr==='MRF' && rids.length){
+      const b=A.db.batch();
+      rids.forEach(id=>b.update(A.db.collection('receipts').doc(id),{status:'claimed',claimId:ref.id,claimTrk:trk,
+        claimedAt:firebase.firestore.FieldValue.serverTimestamp()}));
+      try{ await b.commit(); }
+      catch(e){ throw new Error(A.L({th:'ใบเสร็จบางใบถูกนำไปเบิกในใบอื่นแล้ว — กด "ดึงใบเสร็จของเดือนนี้" ใหม่ก่อนส่ง',
+                                     en:'Some receipts are already on another claim — fetch the receipts again before submitting'})); }
+    }
     await ref.set(sub);
     /* ฉบับร่างรู้แล้วว่ามีคำขอ — ปุ่มแก้ต้นฉบับจะขึ้นว่ารออนุมัติ ไม่ใช่ให้กรอกคำขอซ้ำ */
     if(sub.revId){

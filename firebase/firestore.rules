@@ -80,7 +80,9 @@ service cloud.firestore {
       let d = request.resource.data;
       return isSelf(uid)
           && d.roles == resource.data.roles
-          && d.get('active', true) == resource.data.get('active', true);
+          && d.get('active', true) == resource.data.get('active', true)
+          // ตำแหน่งให้สิทธิ์จริง (กองรองาน · FA ทำใบเบิกแทนคนอื่น) — ตั้งให้ตัวเองไม่ได้
+          && d.get('positions', []) == resource.data.get('positions', []);
     }
     match /users/{uid} {
       allow read:   if isSelf(uid) || staff();
@@ -315,7 +317,9 @@ service cloud.firestore {
       // ARF ทุกคนรวมเจ้าหน้าที่ที่มาเข้าอบรมต้องผ่าน newAttendOk — ไม่งั้นเจ้าหน้าที่ลงชื่อคาบที่ปิดแล้วได้
       allow create: if (staff() && request.resource.data.formCode != 'ARF')
                     || (signedIn() && (newSubmissionOk() || newReceiptOk() || newSoloOk() || newAttendOk(subId) || newAttendSelfOk()));
-      allow read:   if staff() || (signedIn() && resource.data.submitterUid == request.auth.uid);
+      // forUid — ใบเบิกที่ FA/ผู้ดูแลทำแทน ผู้เบิกตัวจริงเปิดดูได้
+      allow read:   if staff() || (signedIn() && (resource.data.submitterUid == request.auth.uid
+                                                 || resource.data.get('forUid', '') == request.auth.uid));
       allow update: if staff();
       allow delete: if false;
 
@@ -647,10 +651,86 @@ service cloud.firestore {
         allow update, delete: if false;
       }
     }
+    /* ใบเสร็จค่าใช้จ่ายรายใบ (D-0507-MRF-001 ส่วนที่ 4) — ผู้เบิกเก็บระหว่างเดือน แล้วดึงเข้าใบเบิกตอนสิ้นเดือน
+       draft   แก้/ลบได้โดยเจ้าของ
+       claimed ผูกกับใบเบิกแล้ว (claimId = id ของใบ) แก้ไม่ได้ ลบไม่ได้ — เป็นหลักฐานของใบเบิก
+               กลับเป็น draft ได้เมื่อใบเบิกนั้นไม่มีอยู่จริง (ส่งไม่สำเร็จ) หรือไม่อนุมัติ
+       posted  ผู้ดูแลลงใน FlowAccount แล้ว (ใบเสร็จละหนึ่งเอกสาร ค้างจ่าย) — เก็บเลขเอกสาร FlowAccount
+       อ่านได้: เจ้าของ · ผู้ดูแล · ฝ่ายปฏิบัติการ/บริหาร (ผู้ตรวจและผู้อนุมัติใบเบิก) */
+    function rcptKeys() {
+      return ['uid','ownerName','month','date','vendor','vendorTaxId','docNo','desc','catId','catName',
+              'amount','vat','note','file','status','createdAt','updatedAt',
+              'claimId','claimTrk','claimedAt','faDocId','faSerial','postedAt','postedBy','byUid','byName'];
+    }
+    // ผู้ดูแลหรือผู้ถือตำแหน่ง FA — ทำใบเบิกและบันทึกใบเสร็จแทนผู้เบิกได้
+    function faProxy() {
+      return admin() || (hasStaffRole() && get(meDoc()).data.get('positions', []).hasAny(['FA']));
+    }
+    function rcptReader() {
+      return faProxy() || (hasStaffRole() && get(meDoc()).data.get('roles', []).hasAny(['ops', 'mgt']));
+    }
+    function rcptMine() { return resource.data.uid == request.auth.uid || faProxy(); }
+    function rcptValid(d) {
+      return d.keys().hasOnly(rcptKeys())
+          && d.uid is string && d.month is string && d.month.matches('^[0-9]{4}-[0-9]{2}$')
+          && d.date is string && d.date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$') && d.date[0:7] == d.month
+          && d.vendor is string && d.vendor.size() > 0 && d.vendor.size() <= 200
+          && d.desc is string && d.desc.size() > 0 && d.desc.size() <= 300
+          && (d.amount is number) && d.amount > 0 && d.amount < 10000000
+          && d.vat in ['none', 'in7']
+          && d.catId is int && d.catName is string
+          && d.get('vendorTaxId', '') is string && d.get('vendorTaxId', '').matches('^([0-9]{10}|[0-9]{13})?$')
+          && d.get('docNo', '') is string && d.get('docNo', '').size() <= 60
+          && d.get('note', '') is string && d.get('note', '').size() <= 300
+          && d.file is map && d.file.id is string;
+    }
+    function rcptOnly(keys) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys);
+    }
+    function rcptClaimFree(claimId) {
+      return !exists(/databases/$(database)/documents/submissions/$(claimId))
+          || get(/databases/$(database)/documents/submissions/$(claimId)).data.status == 'rejected';
+    }
+    match /receipts/{id} {
+      allow read: if signedIn() && (resource.data.uid == request.auth.uid || rcptReader());
+      allow create: if signedIn() && !anon()
+                    && (request.resource.data.uid == request.auth.uid
+                        || (faProxy() && request.resource.data.byUid == request.auth.uid))
+                    && request.resource.data.status == 'draft'
+                    && request.resource.data.createdAt == request.time
+                    && rcptValid(request.resource.data);
+      allow update: if signedIn() && rcptMine()
+                    && request.resource.data.uid == resource.data.uid && (
+                       // แก้ร่าง
+                       (resource.data.status == 'draft' && request.resource.data.status == 'draft'
+                         && request.resource.data.updatedAt == request.time
+                         && request.resource.data.createdAt == resource.data.createdAt
+                         && !('claimId' in request.resource.data)
+                         && rcptValid(request.resource.data))
+                       // ผูกกับใบเบิก — แตะได้เฉพาะสี่ช่องนี้
+                    || (resource.data.status == 'draft' && request.resource.data.status == 'claimed'
+                         && rcptOnly(['status','claimId','claimTrk','claimedAt'])
+                         && request.resource.data.claimId is string && request.resource.data.claimId.size() > 5
+                         && request.resource.data.claimTrk is string
+                         && request.resource.data.claimedAt == request.time)
+                       // ปลดจากใบเบิกที่ไม่มีอยู่จริงหรือไม่อนุมัติ
+                    || (resource.data.status == 'claimed' && request.resource.data.status == 'draft'
+                         && rcptClaimFree(resource.data.claimId)
+                         && rcptOnly(['status','claimId','claimTrk','claimedAt','updatedAt'])
+                         && !('claimId' in request.resource.data)
+                         && request.resource.data.updatedAt == request.time))
+                 // ผู้ดูแลบันทึกเลขเอกสาร FlowAccount หลังลงค่าใช้จ่ายแล้ว
+                 || (admin() && resource.data.status == 'claimed' && request.resource.data.status == 'posted'
+                     && rcptOnly(['status','faDocId','faSerial','postedAt','postedBy'])
+                     && request.resource.data.faSerial is string
+                     && request.resource.data.postedBy == request.auth.uid
+                     && request.resource.data.postedAt == request.time);
+      allow delete: if signedIn() && rcptMine() && resource.data.status == 'draft';
+    }
     // อัตราค่าตอบแทนรายคน (D-0507-MRF-001) — ผู้ดูแลตั้งและแก้ · เจ้าตัวอ่านของตัวเองได้ (หน้ากรอกเติมให้)
     // คนอื่นอ่านไม่ได้ เพราะเป็นอัตราค่าจ้างรายบุคคล
     match /payRates/{uid} {
-      allow read:  if signedIn() && (request.auth.uid == uid || admin());
+      allow read:  if signedIn() && (request.auth.uid == uid || faProxy());
       allow write: if admin();
     }
     // การแจ้งเตือนในแอป — เจ้าหน้าที่สร้างให้คนอื่นได้ในนามตัวเองเท่านั้น (fromUid = ผู้เขียน · เวลาเซิร์ฟเวอร์ · ยังไม่อ่าน)

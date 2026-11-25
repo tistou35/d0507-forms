@@ -541,6 +541,7 @@
     navAudit:   { th: 'งานตรวจสอบ', en: 'Audit' },
     navDrc:     { th: 'แจกจ่ายเอกสาร', en: 'Distribution · DRC' },
     navMemo:    { th: 'บันทึกข้อความ', en: 'Internal memo' },
+    navRcpt:    { th: 'ใบเสร็จของฉัน', en: 'My receipts' },
     navAtt:     { th: 'ลงเวลาเรียน', en: 'Attendance · QR' },
     auditNote:  { th: 'Audit ↗ login แยก', en: 'งานตรวจสอบ ↗ แยก login' },
     searchPh:   { th: 'ค้นหาฟอร์ม', en: 'Search forms' },

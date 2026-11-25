@@ -465,6 +465,7 @@ def main():
         ('drc.html',         'admin/drc/index.html',           '../../','drc'),
         ('att.html',         'att/index.html',                 '../',   'att'),
         ('memo.html',        'memo/index.html',                '../',   'memo'),
+        ('receipts.html',    'receipts/index.html',            '../',   'rcpt'),
     ]
     VER = asset_versions()
     # sw.js อยู่ราก path ในนั้นจึงอ้างอิงจากตำแหน่งตัวเอง ไม่ใช่ base ของแต่ละหน้า

@@ -279,7 +279,10 @@
       /* บวก/คูณต่อจากค่าที่คำนวณไว้ก่อนหน้าได้ และใส่ตัวเลขคงที่ตรง ๆ ได้
          ใบเบิกค่าใช้จ่ายคิดเป็นทอด ๆ — ชั่วโมงจากตาราง → ค่าตอบแทน → รวมรายได้ → หักภาษี 3%
          ถ้าอ่านได้แต่ this.data ทอดที่สองเป็นต้นไปจะได้ 0 ทั้งหมดโดยไม่มีอะไรฟ้อง */
-      else if (c.op === 'sum') out[c.k] = (c.of || []).reduce((a, k) => a + val(k, out), 0);
+      else if (c.op === 'sum') {
+        out[c.k] = (c.of || []).reduce((a, k) => a + val(k, out), 0);
+        if (c.round != null) out[c.k] = Math.round(out[c.k] * Math.pow(10, c.round)) / Math.pow(10, c.round);
+      }
       else if (c.op === 'pct') out[c.k] = c.max ? Math.round((Number(out[c.of] ?? this.data[c.of]) || 0) / c.max * 100) : 0;
       else if (c.op === 'count') out[c.k] = (c.of || []).filter(k => this.data[k]).length;
       /* ค่าเดียวกันที่ต้องโผล่สองที่ในกระดาษ (ชื่อผู้โดยสารในส่วน ก และใต้ลายเซ็น)
@@ -324,8 +327,10 @@
         }, 0);
         if (c.round != null) out[c.k] = Math.round(out[c.k] * Math.pow(10, c.round)) / Math.pow(10, c.round);
       }
-      else if (c.op === 'mul')
+      else if (c.op === 'mul') {
         out[c.k] = (c.of || []).reduce((a, k) => a * val(k, out), 1);
+        if (c.round != null) out[c.k] = Math.round(out[c.k] * Math.pow(10, c.round)) / Math.pow(10, c.round);
+      }
       /* ตารางเปิดสองแกน — ใช้กับเมทริกซ์ความเสี่ยงที่ไม่ใช่ผลคูณ
          เมทริกซ์ใน HIF ถ่วงน้ำหนักความรุนแรงมากกว่าโอกาส
          คะแนน 8 เป็นได้ทั้งส้ม (รุนแรง4×โอกาส2) และเขียว (รุนแรง2×โอกาส4)

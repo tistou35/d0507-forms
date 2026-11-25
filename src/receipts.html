@@ -1,0 +1,368 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ใบเสร็จของฉัน — D-0507 Flight Training</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="@@BASE@@assets/app.css">
+<style>
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px 14px}
+.g label{display:block;font-size:13px;font-weight:600}
+.g .full{grid-column:1/-1}
+.g input,.g select{width:100%;margin-top:4px;min-height:40px;padding:0 11px;border-radius:8px;
+  border:1px solid var(--border-med);background:var(--surface);font-size:14px;font-family:inherit}
+.g input[type=checkbox]{width:auto;min-height:0;margin:0 6px 0 0}
+.rq{color:var(--red-600)}
+.msg{font-size:12.5px;color:var(--g-500)} .msg.bad{color:var(--red-600)} .msg.ok{color:var(--green-600)}
+.hide{display:none!important}
+.bar{display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin:14px 0}
+.bar label{font-size:12.5px;font-weight:600;display:block}
+.bar select,.bar input{margin-top:4px;min-height:38px;padding:0 10px;border-radius:8px;border:1px solid var(--border-med);
+  background:var(--surface);font-family:inherit;font-size:14px}
+.sum{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 12px}
+.sum div{background:var(--surface);border:1px solid var(--border-light);border-radius:10px;padding:8px 14px}
+.sum b{display:block;font-size:20px;font-family:var(--font-display)} .sum span{font-size:12px;color:var(--g-500)}
+.twrap{overflow-x:auto;border:1px solid var(--border-light);border-radius:10px;background:var(--surface)}
+table.ml{width:100%;border-collapse:collapse;font-size:13.5px}
+table.ml th{text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--g-500);
+  padding:9px 12px;border-bottom:1px solid var(--border-light);white-space:nowrap;background:var(--g-50)}
+table.ml td{padding:8px 12px;border-bottom:1px solid var(--g-100);vertical-align:middle}
+table.ml td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+table.ml tr:last-child td{border-bottom:0}
+.st{display:inline-flex;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;white-space:nowrap}
+.st.draft{background:var(--g-100);color:var(--g-600)} .st.claimed{background:var(--sky-100);color:var(--navy-900)}
+.st.posted{background:var(--green-100);color:var(--green-600)}
+.acts2{display:flex;gap:6px;flex-wrap:wrap}
+.acts2 button{font-size:12.5px;padding:4px 10px;border-radius:7px;border:1px solid var(--border-med);background:var(--surface);cursor:pointer}
+.empty{padding:16px;border:1px dashed var(--border-med);border-radius:10px;color:var(--g-500);font-size:13.5px}
+.pv{margin-top:8px;max-width:260px} .pv img{max-width:100%;border-radius:8px;border:1px solid var(--border-light)}
+#dlg{max-width:min(920px,96vw);width:96vw;border:0;border-radius:12px;padding:0}
+#dlg .hd{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border-light)}
+#dlg .bd{padding:10px;max-height:80vh;overflow:auto;text-align:center}
+#dlg .bd img{max-width:100%} #dlg .bd iframe{width:100%;height:75vh;border:0}
+</style>
+</head><body>
+@@TOPBAR@@
+<div class="body">
+@@RAIL@@
+  <main class="main">
+    <div class="greet">
+      <div><p class="eyebrow"><span>แบบเบิกค่าใช้จ่ายรายเดือน</span> · <span>D-0507-MRF-001 · SECTION 4</span></p>
+        <h1>ใบเสร็จของฉัน</h1>
+        <p class="sub">เก็บใบเสร็จทีละใบระหว่างเดือน แล้วสิ้นเดือนกด "ดึงใบเสร็จของเดือนนี้" ในใบเบิก · ใบเสร็จละหนึ่งรายการ ค่าใช้จ่ายที่มีใบเสร็จไม่ถูกหักภาษี ณ ที่จ่าย 3%</p></div>
+    </div>
+    <div id="gate"></div>
+    <div id="app" class="hide">
+      <div class="bar">
+        <label>เดือน<br><input type="month" id="month"></label>
+        <label id="whoWrap" class="hide">ของ<br><select id="who"></select></label>
+        <button type="button" class="big pri" id="addBtn">+ เพิ่มใบเสร็จ</button>
+        <a class="big sec" id="mrfLink" href="@@BASE@@fill/?c=MRF">ไปที่ใบเบิก (MRF) →</a>
+      </div>
+      <div id="proxyNote" class="fk-gate info hide" style="margin-bottom:12px"><span></span></div>
+
+      <!-- ── เพิ่ม / แก้ใบเสร็จ ── -->
+      <section id="pform" class="card hide">
+        <h3 id="fTitle">เพิ่มใบเสร็จ</h3>
+        <div class="g">
+          <div class="full">
+            <label>รูปใบเสร็จ หรือ PDF <span class="rq">*</span></label>
+            <div class="acts2" style="margin-top:6px">
+              <button type="button" id="camBtn">📷 ถ่ายรูป</button>
+              <button type="button" id="fileBtn">เลือกไฟล์</button>
+              <span class="msg" id="fileMsg"></span>
+            </div>
+            <input type="file" id="cam" accept="image/*" capture="environment" class="hide">
+            <input type="file" id="file" accept="image/*,application/pdf" class="hide">
+            <div class="pv" id="pv"></div>
+          </div>
+          <label>วันที่ในใบเสร็จ <span class="rq">*</span><input id="date" type="date"></label>
+          <label>ร้าน / ผู้ขาย <span class="rq">*</span><input id="vendor" maxlength="200" autocomplete="off"></label>
+          <label>เลขผู้เสียภาษีของผู้ขาย<input id="taxId" inputmode="numeric" maxlength="13" placeholder="13 หลัก (ถ้ามีใบกำกับภาษี)"></label>
+          <label>เลขที่ใบเสร็จ / ใบกำกับภาษี<input id="docNo" maxlength="60" autocomplete="off"></label>
+          <label class="full">รายการ <span class="rq">*</span><input id="desc" maxlength="300" autocomplete="off" placeholder="เช่น ค่าที่พัก 2 คืน · ค่าน้ำมันรถไปสนามบิน"></label>
+          <label>หมวดค่าใช้จ่าย <span class="rq">*</span><select id="cat"></select></label>
+          <label>ยอดรวมตามใบเสร็จ (บาท) <span class="rq">*</span><input id="amount" type="number" min="0.01" step="0.01" inputmode="decimal"></label>
+          <label style="align-self:end;font-weight:500"><input type="checkbox" id="vat"> เป็นใบกำกับภาษี — ยอดรวม VAT 7% แล้ว</label>
+          <label class="full">หมายเหตุ<input id="note" maxlength="300" autocomplete="off"></label>
+        </div>
+        <div class="acts" style="margin-top:14px">
+          <button type="button" class="big pri" id="save">บันทึก</button>
+          <button type="button" class="big sec" id="cancel">ยกเลิก</button>
+          <span class="msg" id="saveMsg"></span>
+        </div>
+      </section>
+
+      <div class="sum" id="sum"></div>
+      <div id="list"></div>
+    </div>
+  </main>
+</div>
+@@BOTNAV@@
+<dialog id="dlg"><div class="hd"><b id="dlgT"></b><button type="button" class="big sec" id="dlgX">ปิด</button></div><div class="bd" id="dlgB"></div></dialog>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="@@BASE@@assets/app.js"></script>
+<script>D0507.GAS_URL='@@GASURL@@';</script>
+<script>
+"use strict";
+const A = D0507, REG = @@REG@@, $ = id => document.getElementById(id), esc = s => A.esc(s);
+A.reg = REG;
+/* หมวดค่าใช้จ่ายของ FlowAccount (บริษัท ดี-0507 · ดึงจาก FlowAccount 25 NOV 2026)
+   ใช้ id เดียวกับ FlowAccount ตอนลงค่าใช้จ่ายจะได้ไม่ต้องจับคู่หมวดใหม่ · ไม่รวมเงินเดือน/สวัสดิการ
+   ดอกเบี้ย เงินมัดจำ และ "ส่วนตัว" (รายจ่ายต้องห้าม) เพราะไม่ใช่ค่าใช้จ่ายที่พนักงานสำรองจ่ายแล้วมาเบิก */
+const CATS = [
+  ['การเดินทาง', [[199496,'ค่าเดินทางและที่พัก'],[199497,'ค่าน้ำมัน/แก๊ส/รถยนต์'],[199498,'ค่าขนส่งสินค้า/ลอจิสติกส์']]],
+  ['ออฟฟิศ', [[199508,'วัสดุสำนักงาน/เครื่องเขียน'],[199506,'ค่าส่งเอกสาร/เมสเซนเจอร์/ไปรษณีย์'],[199510,'โทรศัพท์'],
+              [199531,'อินเตอร์เน็ต'],[199507,'โปรแกรม/ซอฟท์แวร์/แอพลิเคชั่น'],[199503,'ค่าใช้จ่ายสำนักงานอื่น ๆ']]],
+  ['ซ่อมบำรุงและวัสดุ', [[199527,'ซ่อมแซมบำรุงรักษา'],[199501,'ซื้อของ/วัสดุไว้ให้บริการ'],[556059,'อุปกรณ์ ช่าง/บำรุงรักษา'],
+              [199505,'เฟอร์นิเจอร์/อุปกรณ์สำนักงาน'],[199504,'คอมพิวเตอร์/อุปกรณ์ไอที']]],
+  ['บริการและค่าธรรมเนียม', [[199512,'บริการทั่วไป/ฟรีแลนซ์'],[199523,'ภาษีและทะเบียน'],[199522,'ค่าธรรมเนียมธนาคาร'],[199521,'เบี้ยประกัน']]],
+  ['อื่น ๆ', [[199495,'รับรอง/เลี้ยงลูกค้า'],[199493,'การตลาดและโฆษณา'],[199529,'ค่าใช้จ่ายทั่วไป']]]
+];
+const CATN = {}; CATS.forEach(g => g[1].forEach(c => CATN[c[0]] = c[1]));
+const Q = new URLSearchParams(location.search);
+const ST = { draft:['draft','ยังไม่เบิก'], claimed:['claimed','อยู่ในใบเบิก'], posted:['posted','ลง FlowAccount แล้ว'] };
+let ROWS = [], EDIT = null, FILE = null, TARGET = '', USERS = [];
+
+A.initAuth(@@FBCFG@@, boot);
+boot();
+
+const money = n => Number(n || 0).toLocaleString('th-TH', { minimumFractionDigits:2, maximumFractionDigits:2 });
+const dmy = v => v ? new Date(v + 'T00:00:00').toLocaleDateString('th-TH', { day:'2-digit', month:'short', year:'2-digit' }) : '—';
+const thisMonth = () => new Date(Date.now() + 7 * 3600e3).toISOString().slice(0, 7);
+// ผู้ดูแลหรือ FA ทำแทนคนอื่นได้ · ฝ่ายปฏิบัติการ/บริหารเปิดดูได้อย่างเดียว (ผู้ตรวจ/ผู้อนุมัติใบเบิก) — กติกาจริงอยู่ที่ firestore.rules
+const isProxy = () => A.isAdmin() || A.myPositions().indexOf('FA') >= 0;
+const isReader = () => isProxy() || (A.isStaff() && A.myRoles().some(r => r === 'ops' || r === 'mgt'));
+const mine = () => TARGET === (A.user && A.user.uid);
+const canEdit = () => mine() || isProxy();
+
+async function boot(){
+  const gate = $('gate');
+  if (!A.signedIn()){
+    $('app').classList.add('hide');
+    gate.innerHTML = `<div class="card"><p>ต้องเข้าสู่ระบบก่อน — <a href="@@BASE@@staff-login/?next=${encodeURIComponent(location.pathname + location.search)}">เข้าสู่ระบบ</a></p></div>`;
+    return;
+  }
+  gate.innerHTML = '';
+  $('app').classList.remove('hide');
+  if (!$('month').value) $('month').value = /^\d{4}-\d{2}$/.test(Q.get('m') || '') ? Q.get('m') : thisMonth();
+  TARGET = TARGET || Q.get('u') || A.user.uid;
+  const cs = $('cat');
+  cs.innerHTML = '<option value="">— เลือก —</option>' + CATS.map(g => `<optgroup label="${esc(g[0])}">${
+    g[1].map(c => `<option value="${c[0]}">${esc(c[1])}</option>`).join('')}</optgroup>`).join('');
+  if (isReader() && !USERS.length){
+    try {
+      const q = await A.db.collection('users').get();
+      USERS = q.docs.map(d => Object.assign({ id:d.id }, d.data()))
+        .filter(u => u.active !== false && u.name && (u.roles || []).some(r => ['ins','mnt','ops','mgt','sms'].indexOf(r) >= 0))
+        .sort((a, b) => a.name.localeCompare(b.name));
+    } catch (e) { USERS = []; }
+  }
+  if (isReader()){
+    $('whoWrap').classList.remove('hide');
+    const me = A.user.uid;
+    $('who').innerHTML = `<option value="${esc(me)}">ตัวเอง — ${esc(A.myName())}</option>` +
+      USERS.filter(u => u.id !== me).map(u => `<option value="${esc(u.id)}"${u.id === TARGET ? ' selected' : ''}>${esc(u.name)}</option>`).join('');
+    $('who').value = TARGET;
+  }
+  $('month').onchange = load;
+  $('who').onchange = () => { TARGET = $('who').value; closeForm(); load(); };
+  $('addBtn').onclick = () => openForm(null);
+  $('cancel').onclick = closeForm;
+  $('save').onclick = save;
+  $('camBtn').onclick = () => $('cam').click();
+  $('fileBtn').onclick = () => $('file').click();
+  $('cam').onchange = e => pick(e.target.files[0]);
+  $('file').onchange = e => pick(e.target.files[0]);
+  $('dlgX').onclick = () => $('dlg').close();
+  load();
+}
+
+function targetName(){
+  if (mine()) return A.myName();
+  const u = USERS.find(x => x.id === TARGET); return u ? u.name : TARGET;
+}
+
+async function load(){
+  const m = $('month').value;
+  $('addBtn').classList.toggle('hide', !canEdit());
+  $('mrfLink').classList.toggle('hide', !canEdit());
+  const pn = $('proxyNote');
+  pn.classList.toggle('hide', mine());
+  pn.querySelector('span').textContent = mine() ? '' : (canEdit()
+    ? 'กำลังจัดการใบเสร็จของ ' + targetName() + ' — ใบเสร็จที่เพิ่มบันทึกว่าคุณเป็นผู้บันทึกแทน'
+    : 'ดูใบเสร็จของ ' + targetName() + ' (อ่านอย่างเดียว)');
+  $('list').innerHTML = '<div class="empty">กำลังโหลด…</div>';
+  try {
+    const q = await A.db.collection('receipts').where('uid', '==', TARGET).where('month', '==', m).get();
+    ROWS = q.docs.map(d => Object.assign({ id:d.id }, d.data())).sort((a, b) => (a.date + a.vendor).localeCompare(b.date + b.vendor));
+  } catch (e) {
+    $('list').innerHTML = `<div class="empty">อ่านใบเสร็จไม่ได้ — ${esc(e.message || e)}</div>`; return;
+  }
+  render();
+}
+
+function render(){
+  const sum = k => ROWS.filter(r => !k || r.status === k).reduce((a, r) => a + Number(r.amount || 0), 0);
+  const n = k => ROWS.filter(r => r.status === k).length;
+  $('sum').innerHTML = `<div><span>ใบเสร็จทั้งหมด</span><b>${ROWS.length}</b></div>
+    <div><span>ยอดรวม (บาท)</span><b>${money(sum())}</b></div>
+    <div><span>ยังไม่เบิก</span><b>${n('draft')} · ${money(sum('draft'))}</b></div>
+    <div><span>อยู่ในใบเบิก / ลงบัญชีแล้ว</span><b>${n('claimed') + n('posted')}</b></div>`;
+  if (!ROWS.length){ $('list').innerHTML = '<div class="empty">ยังไม่มีใบเสร็จในเดือนนี้</div>'; return; }
+  $('list').innerHTML = `<div class="twrap"><table class="ml"><thead><tr>
+      <th>วันที่</th><th>ร้าน / ผู้ขาย</th><th>รายการ</th><th>หมวด</th><th style="text-align:right">บาท</th><th>สถานะ</th><th></th></tr></thead><tbody>${
+    ROWS.map(r => { const s = ST[r.status] || [r.status, r.status];
+      return `<tr><td>${esc(dmy(r.date))}</td>
+        <td>${esc(r.vendor)}${r.vendorTaxId ? `<br><span class="hint" style="margin:0">${esc(r.vendorTaxId)}</span>` : ''}${r.docNo ? `<br><span class="hint" style="margin:0">เลขที่ ${esc(r.docNo)}</span>` : ''}</td>
+        <td>${esc(r.desc)}${r.byName ? `<br><span class="hint" style="margin:0">บันทึกแทนโดย ${esc(r.byName)}</span>` : ''}${r.note ? `<br><span class="hint" style="margin:0">${esc(r.note)}</span>` : ''}</td>
+        <td>${esc(r.catName || CATN[r.catId] || '')}</td>
+        <td class="n">${money(r.amount)}${r.vat === 'in7' ? '<br><span class="hint" style="margin:0">รวม VAT 7%</span>' : ''}</td>
+        <td><span class="st ${esc(s[0])}">${esc(s[1])}</span>${r.claimTrk ? `<br><span class="hint mono" style="margin:0">${esc(r.claimTrk)}</span>` : ''}${r.faSerial ? `<br><span class="hint mono" style="margin:0">${esc(r.faSerial)}</span>` : ''}</td>
+        <td><div class="acts2"><button type="button" data-view="${esc(r.id)}">ดูใบเสร็จ</button>${
+          canEdit() && r.status === 'draft' ? `<button type="button" data-edit="${esc(r.id)}">แก้</button><button type="button" data-del="${esc(r.id)}">ลบ</button>` : ''}${
+          canEdit() && r.status === 'claimed' ? `<button type="button" data-free="${esc(r.id)}" title="ใช้เมื่อใบเบิกไม่อนุมัติหรือส่งไม่สำเร็จ">ปลดจากใบเบิก</button>` : ''}</div></td></tr>`; }).join('')}
+    </tbody></table></div>`;
+  document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => view(b.dataset.view));
+  document.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => openForm(ROWS.find(r => r.id === b.dataset.edit)));
+  document.querySelectorAll('[data-del]').forEach(b => b.onclick = () => del(ROWS.find(r => r.id === b.dataset.del)));
+  document.querySelectorAll('[data-free]').forEach(b => b.onclick = () => free(ROWS.find(r => r.id === b.dataset.free)));
+}
+
+function openForm(r){
+  EDIT = r; FILE = null;
+  $('fTitle').textContent = r ? 'แก้ใบเสร็จ' : 'เพิ่มใบเสร็จ' + (mine() ? '' : ' ของ ' + targetName());
+  $('date').value = r ? r.date : (new Date(Date.now() + 7 * 3600e3).toISOString().slice(0, 7) === $('month').value
+    ? new Date(Date.now() + 7 * 3600e3).toISOString().slice(0, 10) : $('month').value + '-01');
+  $('vendor').value = r ? r.vendor : ''; $('taxId').value = r ? (r.vendorTaxId || '') : '';
+  $('docNo').value = r ? (r.docNo || '') : ''; $('desc').value = r ? r.desc : '';
+  $('cat').value = r ? String(r.catId) : ''; $('amount').value = r ? r.amount : '';
+  $('vat').checked = !!(r && r.vat === 'in7'); $('note').value = r ? (r.note || '') : '';
+  $('pv').innerHTML = r ? '<span class="msg">ไฟล์เดิม: ' + esc(r.file && r.file.name || '') + ' — เลือกไฟล์ใหม่ถ้าต้องการเปลี่ยน</span>' : '';
+  $('fileMsg').textContent = ''; $('saveMsg').textContent = '';
+  $('pform').classList.remove('hide');
+  $('pform').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+function closeForm(){ EDIT = null; FILE = null; $('pform').classList.add('hide'); $('cam').value = ''; $('file').value = ''; }
+
+/* รูปจากกล้องมือถือมักใหญ่ 3–8 MB — ย่อด้านยาวเหลือ 1,800 px JPEG ก่อนส่ง ตัวหนังสือในใบเสร็จยังอ่านได้
+   ถ้าเบราว์เซอร์ถอดรูปไม่ได้ (HEIC บนเครื่องที่ไม่ใช่ Safari) ส่งไฟล์เดิม · PDF ส่งตามเดิม */
+async function pick(f){
+  if (!f) return;
+  $('fileMsg').textContent = 'กำลังเตรียมไฟล์…';
+  try {
+    if (f.type === 'application/pdf'){
+      FILE = { name:f.name, mime:f.type, b64: await b64(f) };
+      $('pv').innerHTML = '<span class="msg ok">PDF: ' + esc(f.name) + '</span>';
+    } else {
+      FILE = await shrink(f);
+      $('pv').innerHTML = `<img src="data:${FILE.mime};base64,${FILE.b64}" alt="">`;
+    }
+    $('fileMsg').textContent = Math.round(FILE.b64.length * 0.75 / 1024) + ' KB';
+  } catch (e) { FILE = null; $('fileMsg').textContent = 'อ่านไฟล์ไม่ได้ — ' + (e.message || e); }
+}
+function b64(f){ return new Promise((ok, no) => { const r = new FileReader();
+  r.onload = () => ok(String(r.result).split(',')[1]); r.onerror = no; r.readAsDataURL(f); }); }
+function shrink(f){
+  return new Promise(async (ok) => {
+    const raw = { name:f.name, mime:f.type || 'image/jpeg', b64: await b64(f) };
+    const img = new Image();
+    img.onload = () => {
+      const s = Math.min(1, 1800 / Math.max(img.width, img.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      const out = c.toDataURL('image/jpeg', 0.82).split(',')[1];
+      ok(out.length < raw.b64.length || raw.mime !== 'image/jpeg'
+        ? { name:f.name.replace(/\.\w+$/, '') + '.jpg', mime:'image/jpeg', b64:out } : raw);
+    };
+    img.onerror = () => ok(raw);
+    img.src = 'data:' + raw.mime + ';base64,' + raw.b64;
+  });
+}
+
+async function save(){
+  const msg = $('saveMsg'), btn = $('save');
+  const d = {
+    date:$('date').value, vendor:$('vendor').value.trim(), vendorTaxId:$('taxId').value.replace(/\D/g, ''),
+    docNo:$('docNo').value.trim(), desc:$('desc').value.trim(), catId:Number($('cat').value) || 0,
+    amount:Math.round(Number($('amount').value) * 100) / 100, vat:$('vat').checked ? 'in7' : 'none', note:$('note').value.trim()
+  };
+  const miss = [];
+  if (!EDIT && !FILE) miss.push('รูปใบเสร็จ');
+  if (!d.date) miss.push('วันที่'); if (!d.vendor) miss.push('ร้าน/ผู้ขาย'); if (!d.desc) miss.push('รายการ');
+  if (!d.catId) miss.push('หมวด'); if (!(d.amount > 0)) miss.push('ยอดเงิน');
+  if (miss.length){ msg.className = 'msg bad'; msg.textContent = 'ยังขาด: ' + miss.join(' · '); return; }
+  if (d.vendorTaxId && !/^(\d{10}|\d{13})$/.test(d.vendorTaxId)){ msg.className = 'msg bad'; msg.textContent = 'เลขผู้เสียภาษีต้องเป็น 13 หลัก (หรือ 10 หลัก)'; return; }
+  if (d.vat === 'in7' && !d.vendorTaxId){ msg.className = 'msg bad'; msg.textContent = 'ใบกำกับภาษีต้องมีเลขผู้เสียภาษีของผู้ขาย'; return; }
+  const month = d.date.slice(0, 7);
+  btn.disabled = true; msg.className = 'msg'; msg.textContent = FILE ? 'กำลังอัปโหลดไฟล์…' : 'กำลังบันทึก…';
+  let up = null;
+  try {
+    if (FILE){
+      const r = await A.gas('rcptUpload', { b64:FILE.b64, mime:FILE.mime, name:FILE.name, month }, { timeout:90000 });
+      if (!r.ok) throw new Error(r.error);
+      up = r.result;
+    }
+    msg.textContent = 'กำลังบันทึก…';
+    const ts = firebase.firestore.FieldValue.serverTimestamp();
+    const doc = Object.assign({}, d, { uid:TARGET, month, catName:CATN[d.catId] || '', status:'draft',
+      file: up ? { id:up.fileId, name:up.name, mime:up.mime, size:up.size } : EDIT.file });
+    if (!mine()){ doc.byUid = A.user.uid; doc.byName = A.myName(); }
+    if (!doc.vendorTaxId) delete doc.vendorTaxId; if (!doc.docNo) delete doc.docNo; if (!doc.note) delete doc.note;
+    if (EDIT){
+      // ผู้บันทึกแทนคนแรกคงไว้ — แก้ทีหลังไม่ทำให้ใบเสร็จเปลี่ยนว่าใครบันทึก
+      if (EDIT.byUid){ doc.byUid = EDIT.byUid; doc.byName = EDIT.byName; }
+      doc.createdAt = EDIT.createdAt; doc.updatedAt = ts;
+      await A.db.collection('receipts').doc(EDIT.id).set(doc);
+      // ไฟล์เดิมถูกแทนแล้ว — ทิ้งไฟล์เก่า (ทิ้งไม่ได้ก็ไม่เป็นไร ใบเสร็จชี้ไฟล์ใหม่แล้ว)
+      if (up && EDIT.file && EDIT.file.id) A.gas('rcptDel', { fileId:EDIT.file.id }).catch(() => {});
+    } else {
+      doc.createdAt = ts;
+      await A.db.collection('receipts').add(doc);
+    }
+    if (month !== $('month').value) $('month').value = month;
+    closeForm(); load();
+  } catch (e) {
+    // บันทึกไม่สำเร็จหลังอัปโหลดแล้ว — ทิ้งไฟล์ที่เพิ่งขึ้นไป ไม่ให้ค้างเป็นไฟล์กำพร้า
+    if (up) A.gas('rcptDel', { fileId:up.fileId }).catch(() => {});
+    msg.className = 'msg bad'; msg.textContent = 'บันทึกไม่สำเร็จ — ' + (e.message || e);
+  } finally { btn.disabled = false; }
+}
+
+async function del(r){
+  if (!r || !confirm('ลบใบเสร็จ ' + r.vendor + ' ' + money(r.amount) + ' บาท ?')) return;
+  try {
+    await A.db.collection('receipts').doc(r.id).delete();
+    if (r.file && r.file.id) A.gas('rcptDel', { fileId:r.file.id }).catch(() => {});
+    load();
+  } catch (e) { alert('ลบไม่ได้ — ' + (e.message || e)); }
+}
+
+/* ปลดจากใบเบิก — ใช้เมื่อใบเบิกนั้นไม่อนุมัติ หรือบันทึกใบไม่สำเร็จ (rules ตรวจสถานะของใบเอง) */
+async function free(r){
+  if (!r || !confirm('ปลดใบเสร็จนี้ออกจากใบเบิก ' + (r.claimTrk || '') + ' ? ใช้ได้เมื่อใบเบิกนั้นไม่อนุมัติหรือส่งไม่สำเร็จเท่านั้น')) return;
+  try {
+    const d = Object.assign({}, r); delete d.id; delete d.claimId; delete d.claimTrk; delete d.claimedAt;
+    d.status = 'draft'; d.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+    await A.db.collection('receipts').doc(r.id).set(d);
+    load();
+  } catch (e) { alert('ปลดไม่ได้ — ใบเบิก ' + (r.claimTrk || '') + ' ยังอยู่ระหว่างอนุมัติหรืออนุมัติแล้ว'); }
+}
+
+async function view(id){
+  const r = ROWS.find(x => x.id === id);
+  $('dlgT').textContent = r ? r.vendor + ' · ' + money(r.amount) + ' บาท' : '';
+  $('dlgB').innerHTML = '<p class="msg">กำลังโหลด…</p>';
+  $('dlg').showModal();
+  try {
+    const x = await A.gas('rcptGet', { id }, { timeout:60000 });
+    if (!x.ok) throw new Error(x.error);
+    const bin = atob(x.result.b64), u8 = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+    const url = URL.createObjectURL(new Blob([u8], { type:x.result.mime }));
+    $('dlgB').innerHTML = /pdf/.test(x.result.mime) ? `<iframe src="${url}"></iframe>` : `<img src="${url}" alt="">`;
+  } catch (e) { $('dlgB').innerHTML = '<p class="msg bad">เปิดไฟล์ไม่ได้ — ' + esc(e.message || e) + '</p>'; }
+}
+</script>
+</body></html>
