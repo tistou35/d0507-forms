@@ -2726,7 +2726,11 @@ var TOKEN_MAP = {
             "head": "Remarks"
           }
         ],
-        "font": 8,
+        "font": {
+          "size": 8,
+          "family": "Arial",
+          "pad": 2
+        },
         "widen": {
           "col": "type",
           "pt": 72,
@@ -2771,6 +2775,12 @@ var TOKEN_MAP = {
       }
     ],
     "manual": [
+      {
+        "tok": "{{flogNote}}",
+        "label": "Flight Log reconciliation",
+        "labelTh": "บันทึกการดึงข้อมูล Flight Log",
+        "sign": false
+      },
       {
         "tok": "{{accomActual}}",
         "label": "Accommodation — actual cost (Baht)",

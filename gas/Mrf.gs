@@ -44,6 +44,28 @@ function mrfMin_(t) {   // "H:MM" → นาที · ว่าง/ผิดร�
 function mrfHm_(min) { return Math.floor(min / 60) + ':' + ('0' + (min % 60)).slice(-2); }
 function mrfDayNo_(ymd) { return Math.round(Date.UTC(+ymd.slice(0, 4), +ymd.slice(5, 7) - 1, +ymd.slice(8, 10)) / 864e5); }
 
+/* ระยะแก้คำ (Levenshtein) — ชื่อที่สะกดต่าง 1 ตัวถือว่าคนเดียวกัน 2–3 ตัวต้องให้ผู้เบิกยืนยัน */
+function mrfDist_(a, b) {
+  if (a === b) return 0;
+  var p = [], c, i, j;
+  for (j = 0; j <= b.length; j++) p[j] = j;
+  for (i = 1; i <= a.length; i++) {
+    c = [i];
+    for (j = 1; j <= b.length; j++)
+      c[j] = Math.min(p[j] + 1, c[j - 1] + 1, p[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    p = c;
+  }
+  return p[b.length];
+}
+
+/**
+ * opts (ส่งกลับมาจากหน้าเว็บเมื่อผู้เบิกตัดสินแล้ว)
+ *   decided: true  — ใช้ excl ตามที่ติ๊ก ไม่ใช้ค่าตั้งต้น (ค่าตั้งต้น: แถวทดสอบไม่นับ)
+ *   excl:   [key]  — แถวในชีตที่ไม่นับ (key = "r<เลขแถว>")
+ *   accept: [ชื่อ] — ชื่อที่ต่าง 2–3 ตัวซึ่งผู้เบิกยืนยันว่าเป็นตัวเอง
+ *   reject: [ชื่อ] — ชื่อที่ผู้เบิกบอกว่าไม่ใช่
+ * ชื่อที่ยังไม่ได้ตัดสินไม่นับ — นับชั่วโมงบินของคนอื่นมาเบิกผิดหนักกว่าลืมนับของตัวเอง
+ */
 function mrfPull_(body, who) {
   var month = String(body.month || '');
   if (!/^\d{4}-\d{2}$/.test(month)) throw new Error('เดือนไม่ถูกต้อง (ต้องเป็น YYYY-MM)');
@@ -54,10 +76,30 @@ function mrfPull_(body, who) {
   try { cfg = fsGet_('config/mrf', tok); } catch (e) {}
   var C = {};
   Object.keys(MRF_DEFAULT).forEach(function (k) { C[k] = cfg[k] != null && cfg[k] !== '' ? cfg[k] : MRF_DEFAULT[k]; });
+  var arr = function (v) { return Array.isArray(v) ? v.map(String) : []; };
+  var decided = body.decided === true, exclSet = {}, acc = {}, rej = {};
+  arr(body.excl).forEach(function (k) { exclSet[k] = true; });
+  arr(body.accept).forEach(function (n) { acc[mrfNorm_(n)] = true; });
+  arr(body.reject).forEach(function (n) { rej[mrfNorm_(n)] = true; });
 
   var names = [prof.name].concat(rate.aliases || []).filter(function (x) { return x; });
-  var want = {}; names.forEach(function (n) { want[mrfNorm_(n)] = n; });
-  if (!Object.keys(want).length) throw new Error('ยังไม่มีชื่อในโปรไฟล์ — ให้ผู้ดูแลตั้งชื่อก่อน');
+  var want = names.map(mrfNorm_).filter(function (n) { return n; });
+  if (!want.length) throw new Error('ยังไม่มีชื่อในโปรไฟล์ — ให้ผู้ดูแลตั้งชื่อก่อน');
+  /* 0 = ตรง · 1 = ต่างหนึ่งตัว (นับเลย) · 2–3 = ต้องถาม · อื่น ๆ = ไม่ใช่
+     ชื่อสั้นกว่า 8 ตัวอักษรต้องตรงเป๊ะ — ระยะ 2 ในชื่อสั้นเป็นคนละคนได้ง่าย */
+  var nameCache = {};
+  var nameDist = function (raw) {
+    var n = mrfNorm_(raw);
+    if (!n || n === 'na') return 99;
+    if (nameCache[n] != null) return nameCache[n];
+    var best = 99;
+    want.forEach(function (w) {
+      var d = mrfDist_(n, w);
+      if (d > 0 && (n.length < 8 || w.length < 8)) d = 99;
+      if (d < best) best = d;
+    });
+    return (nameCache[n] = best);
+  };
 
   var sh = SpreadsheetApp.openById(C.logSheet).getSheetByName(C.logTab);
   if (!sh) throw new Error('ไม่พบแท็บ "' + C.logTab + '" ในไฟล์ Flight Logs');
@@ -70,40 +112,73 @@ function mrfPull_(body, who) {
   var missing = Object.keys(ix).filter(function (k) { return ix[k] < 0; });
   if (missing.length) throw new Error('ไฟล์ Flight Logs ไม่มีคอลัมน์ที่ต้องใช้: ' + missing.join(', '));
 
-  var warns = [], near = {}, seenId = {}, mine = [];
+  var warns = [], ask = {}, auto = {}, cand = [], idAll = {};
+  for (var r0 = 1; r0 < all.length; r0++) {
+    var id0 = String(all[r0][ix.id] || '').trim();
+    if (id0) idAll[id0] = (idAll[id0] || 0) + 1;
+  }
   for (var r = 1; r < all.length; r++) {
     var row = all[r], ymd = mrfYmd_(row[ix.date]);
     if (!ymd || ymd.slice(0, 7) !== month) continue;
-    var p1 = row[ix.p1], p2 = row[ix.p2], hit = want[mrfNorm_(p1)] ? 'P1' : want[mrfNorm_(p2)] ? 'P2' : '';
-    if (!hit) {
-      // ชื่อคล้าย (คำแรกตรงกัน) แต่สะกดต่าง — บอกให้ผู้ดูแลเพิ่มเป็นชื่ออื่น ไม่จับคู่เอง
-      [p1, p2].forEach(function (p) {
-        var f = mrfNorm_(String(p).split(/\s+/)[0]);
-        names.forEach(function (n) { if (f && f.length > 2 && mrfNorm_(String(n).split(/\s+/)[0]) === f) near[p] = true; });
-      });
-      continue;
-    }
+    var hit = '', who1 = '';
+    [['P1', row[ix.p1]], ['P2', row[ix.p2]]].forEach(function (pp) {
+      if (hit) return;
+      var raw = String(pp[1] || '').trim(), d = nameDist(raw), n = mrfNorm_(raw);
+      if (d === 0) { hit = pp[0]; who1 = raw; }
+      else if (d === 1) { hit = pp[0]; who1 = raw; auto[raw] = (auto[raw] || 0) + 1; }
+      else if (d <= 3) {
+        if (acc[n]) { hit = pp[0]; who1 = raw; }
+        if (!acc[n] && !rej[n]) {
+          ask[raw] = ask[raw] || { name: raw, dist: d, n: 0, ids: [] };
+          ask[raw].n++; ask[raw].ids.push(String(row[ix.id] || '').trim());
+        }
+      }
+    });
+    if (!hit) continue;
     var id = String(row[ix.id] || '').trim(), rem = String(row[ix.remark] || '').trim();
-    if (/\btest\b|safe to delete/i.test(rem)) { warns.push(id + ' (' + ymd + ') เป็นรายการทดสอบ — ไม่นับ'); continue; }
-    if (seenId[id]) warns.push('Flight Log ID ซ้ำ: ' + id + ' — ตรวจในไฟล์ Flight Logs');
-    seenId[id] = true;
     var on = mrfMin_(row[ix.on]), off = mrfMin_(row[ix.off]);
-    var blk = mrfMin_(row[ix.block]);
-    if (blk == null && on != null && off != null && off > on) blk = off - on;
-    if (blk == null) {
-      var ft = mrfMin_(row[ix.flt]);
-      warns.push(id + ' (' + ymd + ') ไม่มี Block Time' + (ft != null ? ' — ใช้ Flight Time ' + row[ix.flt] + ' แทน' : ' — นับ 0 ชม.'));
-      blk = ft || 0;
-    }
-    mine.push({ id: id, ymd: ymd, type: String(row[ix.type] || '').trim(), reg: String(row[ix.reg] || '').trim(),
-                on: on, off: off, blk: blk, rem: rem.replace(/^\[Crew corrected[^\]]*\]?/i, '').trim(), seat: hit });
+    var blk = mrfMin_(row[ix.block]), src = 'block';
+    if (blk == null && on != null && off != null && off > on) { blk = off - on; src = 'engine'; }
+    if (blk == null) { var ft = mrfMin_(row[ix.flt]); blk = ft || 0; src = ft != null ? 'flight' : 'none'; }
+    var test = /\btest\b|safe to delete/i.test(rem);
+    cand.push({ key: 'r' + (r + 1), id: id, ymd: ymd, type: String(row[ix.type] || '').trim(), reg: String(row[ix.reg] || '').trim(),
+                on: on, off: off, blk: blk, src: src, rem: rem.replace(/^\[Crew corrected[^\]]*\]?/i, '').trim(),
+                seat: hit, as: who1, test: test,
+                out: decided ? !!exclSet['r' + (r + 1)] : test });
   }
-  Object.keys(near).forEach(function (n) {
-    warns.push('พบชื่อ "' + n + '" ในเดือนนี้ที่ไม่ได้นับ — ถ้าเป็นคนเดียวกับผู้เบิก ให้ผู้ดูแลเพิ่มเป็นชื่ออื่นในหน้าตั้งค่าระบบ › อัตราค่าตอบแทน');
+
+  /* ข้อมูลที่ขัดกัน — ให้ผู้เบิกเห็นทั้งสองแถวแล้วติ๊กว่าไม่นับแถวไหน ระบบไม่เลือกให้
+     (ยกเว้นแถวทดสอบที่ค่าตั้งต้นไม่นับ แต่ติ๊กกลับมานับได้) */
+  var conflicts = [], byId = {};
+  cand.forEach(function (f) { (byId[f.id] = byId[f.id] || []).push(f); });
+  /* ID ซ้ำนับทั้งชีต — แถวอีกแถวอาจเป็นของคนอื่นหรือเดือนอื่น ผู้เบิกเห็นเฉพาะแถวของตัวเองให้เลือก
+     แต่ต้องรู้ว่ามีแถวอื่นใช้ ID เดียวกัน เพราะเป็นเที่ยวบินเดียวกันที่ถูกบันทึกซ้ำได้ */
+  var dupIds = {};
+  Object.keys(byId).forEach(function (id) {
+    if (byId[id].length > 1 || (id && idAll[id] > 1)) {
+      dupIds[id] = true;
+      var other = (idAll[id] || 0) - byId[id].length;
+      conflicts.push({ kind: 'dup', label: 'Flight Log ID ซ้ำ ' + id + (other > 0 ? ' — อีก ' + other + ' แถวในชีตที่ไม่ใช่ของคุณใช้ ID นี้' : ''),
+                       other: other, rows: byId[id] });
+    }
+  });
+  var tests = cand.filter(function (f) { return f.test && !dupIds[f.id]; });
+  if (tests.length) conflicts.push({ kind: 'test', label: 'Remark ระบุว่าเป็นรายการทดสอบ', rows: tests });
+  var sorted = cand.slice().sort(function (a, b) { return a.ymd < b.ymd ? -1 : a.ymd > b.ymd ? 1 : (a.on || 0) - (b.on || 0); });
+  for (var q = 0; q < sorted.length; q++) for (var q2 = q + 1; q2 < sorted.length; q2++) {
+    var A1 = sorted[q], B1 = sorted[q2];
+    if (B1.ymd !== A1.ymd) break;
+    if (A1.id === B1.id) continue;      // อยู่ในกลุ่ม ID ซ้ำแล้ว
+    if (A1.on != null && A1.off != null && B1.on != null && B1.off != null && B1.on < A1.off && A1.on < B1.off)
+      conflicts.push({ kind: 'overlap', label: 'เวลาบินทับกัน ' + A1.id + ' กับ ' + B1.id, rows: [A1, B1] });
+  }
+
+  var mine = sorted.filter(function (f) { return !f.out; });
+  mine.forEach(function (f) {
+    if (f.src === 'flight') warns.push(f.id + ' (' + f.ymd + ') ไม่มี Block Time และ Engine ON/OFF — ใช้ Flight Time ' + mrfHm_(f.blk) + ' แทน');
+    if (f.src === 'none') warns.push(f.id + ' (' + f.ymd + ') ไม่มีทั้ง Block Time, Engine ON/OFF และ Flight Time — นับ 0 ชม.');
   });
 
-  // แถวละหนึ่งวัน เรียงตามวันที่ แล้วตามเวลา Engine ON
-  mine.sort(function (a, b) { return a.ymd < b.ymd ? -1 : a.ymd > b.ymd ? 1 : (a.on || 0) - (b.on || 0); });
   var days = [], byDay = {};
   mine.forEach(function (f) {
     var d = byDay[f.ymd];
@@ -114,19 +189,16 @@ function mrfPull_(body, who) {
   var perDiem = 0, sheet = [];
   days.forEach(function (d) {
     var fl = d.f, blk = fl.reduce(function (a, f) { return a + (f.blk || 0); }, 0);
-    // เที่ยวบินทับเวลากันของคนเดียวกัน = ข้อมูลผิด ชั่วโมงจะนับซ้ำ
-    for (var i = 1; i < fl.length; i++) {
-      if (fl[i].on != null && fl[i - 1].off != null && fl[i].on < fl[i - 1].off)
-        warns.push(fl[i - 1].id + ' กับ ' + fl[i].id + ' (' + d.ymd + ') เวลาทับกัน — ชั่วโมงอาจนับซ้ำ');
-    }
-    var ons = fl.map(function (f) { return f.on; }).filter(function (x) { return x != null; });
-    var offs = fl.map(function (f) { return f.off; }).filter(function (x) { return x != null; });
-    var pd = 0.5;
-    if (ons.length && offs.length) {
-      var span = (Math.max.apply(null, offs) + C.postMin) - (Math.min.apply(null, ons) - C.preMin);
-      pd = span >= C.fullDayHrs * 60 ? 1 : 0.5;
-      d.duty = mrfHm_(Math.min.apply(null, ons) - C.preMin) + '–' + mrfHm_(Math.max.apply(null, offs) + C.postMin);
-    } else warns.push(d.ymd + ' ไม่มีเวลา Engine ON/OFF — นับ per diem 0.5 วัน');
+    /* per diem นับจากเที่ยวที่มีเวลา Engine ON/OFF เท่านั้น — ไม่มีเวลาเลยทั้งวัน = ไม่นับ
+       (เดิมให้ 0.5 ผู้ควบคุมเอกสารสั่งให้ไม่นับ เพราะพิสูจน์ช่วงทำงานไม่ได้) */
+    var timed = fl.filter(function (f) { return f.on != null && f.off != null; });
+    var pd = 0;
+    if (timed.length) {
+      var s0 = Math.min.apply(null, timed.map(function (f) { return f.on; })) - C.preMin;
+      var s1 = Math.max.apply(null, timed.map(function (f) { return f.off; })) + C.postMin;
+      pd = s1 - s0 >= C.fullDayHrs * 60 ? 1 : 0.5;
+      d.duty = mrfHm_(s0) + '–' + mrfHm_(s1);
+    } else warns.push(d.ymd + ' ไม่มีเวลา Engine ON/OFF — ไม่นับ per diem วันนี้');
     perDiem += pd;
     sheet.push({ date: d.ymd, detail: fl.map(function (f) { return f.id; }).join(', '),
                  place: uniq(fl.map(function (f) { return f.reg; })).join(' / '),
@@ -146,10 +218,19 @@ function mrfPull_(body, who) {
     a = b + 1;
   }
 
+  var pub = function (f) {
+    return { key: f.key, id: f.id, date: f.ymd, reg: f.reg, type: f.type, as: f.as, seat: f.seat,
+             on: f.on == null ? '' : mrfHm_(f.on), off: f.off == null ? '' : mrfHm_(f.off),
+             blk: mrfHm_(f.blk), src: f.src, rem: f.rem.slice(0, 80), test: f.test, out: f.out };
+  };
   var num = function (v) { return v === '' || v == null || isNaN(Number(v)) ? null : Number(v); };
   return {
     month: month, flights: mine.length, days: days.length, names: names,
     sheet: sheet, nights: nights, stays: stays, perDiemDays: perDiem,
+    conflicts: conflicts.map(function (c) { return { kind: c.kind, label: c.label, other: c.other || 0, rows: c.rows.map(pub) }; }),
+    ask: Object.keys(ask).map(function (k) { return ask[k]; }),
+    auto: Object.keys(auto).map(function (k) { return { name: k, n: auto[k] }; }),
+    accepted: arr(body.accept), excluded: sorted.filter(function (f) { return f.out; }).map(pub),
     rates: { flt: num(rate.fltRate), gnd: num(rate.gndRate), accom: num(rate.accomRate),
              perDiem: rate.perDiem === true, perDiemRate: num(rate.perDiemRate) },
     rule: { preMin: C.preMin, postMin: C.postMin, fullDayHrs: C.fullDayHrs, gapDays: C.gapDays },

@@ -44,7 +44,8 @@
   "rFlt",
   "rGnd",
   "rAcc",
-  "rPd"
+  "rPd",
+  "rLog"
  ],
  "parties": [
   {
@@ -160,8 +161,22 @@
       "en": "Fetch this month"
      },
      "hint": {
-      "th": "เลือกเดือนแล้วกด — ระบบหาเที่ยวบินที่ชื่อของคุณอยู่ใน Pilot 1 หรือ Pilot 2 รวมเป็นแถวละหนึ่งวัน (Flight Log ID ทุกเที่ยว · Block Time รวมของวัน) และเติมอัตรา จำนวนคืนที่พัก และ per diem ที่ผู้ดูแลตั้งไว้ · แถวภาคพื้น/SIM ที่กรอกเองไม่ถูกลบ",
-      "en": "Pick the month — flights where you are Pilot 1 or Pilot 2 become one row per day (every Flight Log ID · total block time), and the rates, accommodation nights and per diem set by the administrator are filled in. Ground / sim rows you typed are kept."
+      "th": "เลือกเดือนแล้วกด — ระบบหาเที่ยวบินที่ชื่อของคุณอยู่ใน Pilot 1 หรือ Pilot 2 รวมเป็นแถวละหนึ่งวัน (Flight Log ID ทุกเที่ยว · Block Time รวมของวัน) และเติมอัตรา จำนวนคืนที่พัก และ per diem ที่ผู้ดูแลตั้งไว้ · Flight Log ID ซ้ำหรือเวลาบินทับกันขึ้นให้เลือกว่าไม่นับแถวไหน · ชื่อที่สะกดต่าง 1 ตัวนับให้ ต่าง 2–3 ตัวถามก่อน · แถวภาคพื้น/SIM ที่กรอกเองไม่ถูกลบ",
+      "en": "Pick the month — flights where you are Pilot 1 or Pilot 2 become one row per day (every Flight Log ID · total block time), and the rates, accommodation nights and per diem set by the administrator are filled in. Duplicate IDs or overlapping times are listed for you to leave out; a name 1 letter different is counted, 2–3 letters asks you first. Ground / sim rows you typed are kept."
+     }
+    },
+    {
+     "k": "flogNote",
+     "type": "textarea",
+     "lockIf": "rLog == true",
+     "showIf": "rLog == true",
+     "label": {
+      "th": "บันทึกการดึงข้อมูล Flight Log",
+      "en": "Flight Log reconciliation"
+     },
+     "hint": {
+      "th": "ระบบเขียนให้ — แถวที่ไม่นับ และชื่อสะกดต่างที่นับเป็นผู้เบิก พิมพ์ใน PDF ให้ผู้ตรวจสอบเห็น",
+      "en": "Written by the system — entries left out and name spellings counted as you; printed for the verifier"
      }
     },
     {

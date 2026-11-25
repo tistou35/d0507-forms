@@ -1133,22 +1133,33 @@
         } finally { b.disabled = false; }
       }));
 
+    /* ปุ่มดึงข้อมูล และปุ่ม "คำนวณใหม่" ในผลลัพธ์ (data-pullre) — อย่างหลังส่งสิ่งที่ผู้กรอกเลือกในผลลัพธ์กลับไปด้วย
+       input ที่มี data-pullopt="ชื่อ" และถูกเลือก รวมเป็น opts[ชื่อ] = [value…] หน้าที่เรียกเป็นคนตีความ */
+    const runPull = async (k, b, opts) => {
+      if (!self.pull) return;
+      const f = self.fields[k] || {};
+      const m = el.querySelector(`[data-pullm="${k}"]`);
+      self._pullMonth = (m && m.value) || self._pullMonth;
+      if (!self._pullMonth) return;
+      b.disabled = true; b.textContent = self.lang === 'en' ? 'Fetching…' : 'กำลังดึงข้อมูล…';
+      try {
+        const r = await self.pull(f, self._pullMonth, self, opts || null) || {};
+        Object.keys(r.set || {}).forEach(x => self.set(x, r.set[x]));
+        self._pullMsg[k] = r.html || '';
+      } catch (e) {
+        self._pullMsg[k] = `<div class="fk-gate stop"><span>${esc(e.message || e)}</span></div>`;
+      }
+      rerender();
+    };
     el.querySelectorAll('[data-pullb]').forEach(b =>
-      b.addEventListener('click', async () => {
-        if (!self.pull) return;
-        const k = b.dataset.pullb, f = self.fields[k] || {};
-        const m = el.querySelector(`[data-pullm="${k}"]`);
-        self._pullMonth = m && m.value;
-        if (!self._pullMonth) return;
-        b.disabled = true; b.textContent = self.lang === 'en' ? 'Fetching…' : 'กำลังดึงข้อมูล…';
-        try {
-          const r = await self.pull(f, self._pullMonth, self) || {};
-          Object.keys(r.set || {}).forEach(x => self.set(x, r.set[x]));
-          self._pullMsg[k] = r.html || '';
-        } catch (e) {
-          self._pullMsg[k] = `<div class="fk-gate stop"><span>${esc(e.message || e)}</span></div>`;
-        }
-        rerender();
+      b.addEventListener('click', () => runPull(b.dataset.pullb, b, null)));
+    el.querySelectorAll('[data-pullre]').forEach(b =>
+      b.addEventListener('click', () => {
+        const k = b.dataset.pullre, box = b.closest('.fk-pull-msg') || el, opts = {};
+        box.querySelectorAll('input[data-pullopt]').forEach(i => {
+          if (i.checked) (opts[i.dataset.pullopt] = opts[i.dataset.pullopt] || []).push(i.value);
+        });
+        runPull(k, b, opts);
       }));
 
     el.querySelectorAll('[data-fx]').forEach(b =>

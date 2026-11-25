@@ -878,3 +878,10 @@ a.gf:hover{border-color:var(--navy-900);color:var(--navy-900)}
 .stalebar{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;
   background:var(--amber-500,#f59e0b);color:var(--navy-900,#0f172a);padding:8px 16px;font-size:14px;font-weight:600}
 .stalebar button{min-height:36px;padding:0 16px;border-radius:99px;border:0;background:var(--navy-900,#0f172a);color:#fff;font:inherit;cursor:pointer}
+/* MRF — ผลการดึง Flight Log: ชื่อที่ต้องยืนยัน และแถวที่ขัดกัน */
+.fk-pull-msg .mrf-q{margin:6px 0;padding:6px 8px;background:rgba(255,255,255,.6);border-radius:6px}
+.fk-pull-msg .mrf-q label{margin-right:14px;white-space:nowrap}
+.fk-pull-msg .mrf-c{margin:8px 0 0}
+.fk-pull-msg .mrf-r{display:flex;gap:6px;align-items:baseline;margin:3px 0;padding:4px 6px;border-radius:6px;background:rgba(255,255,255,.6)}
+.fk-pull-msg .mrf-r.out{text-decoration:line-through;opacity:.65}
+.fk-pull-msg .mrf-r input{flex:none}

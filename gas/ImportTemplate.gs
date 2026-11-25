@@ -263,8 +263,8 @@ function fillTokens_(doc, map) {
         var cell = row.getCell(ci), cur = cell.getText().trim();
         if (cur && !/^[_\.\s\/\-:]*$/.test(cur)) return;   // ช่องเลขลำดับ ฯลฯ อย่าไปทับ
         cell.setText('{{' + t.k + '_' + (di + 1) + '_' + c.k + '}}');
-        // setText ทิ้งฟอนต์ของกระดาษ — ตารางที่ระบุ font ใช้ Arial ขนาดนั้น (คอลัมน์แคบของ MRF)
-        if (t.font) cell.editAsText().setFontFamily('Arial').setFontSize(t.font);
+        // setText ทิ้งฟอนต์ของกระดาษ — ตารางที่ระบุ font ใช้แบบอักษรและขนาดนั้น (คอลัมน์แคบของ MRF)
+        if (t.font) cell.editAsText().setFontFamily(t.font.family || 'Arial').setFontSize(t.font.size || t.font);
         placed++;
       });
       di++;
@@ -291,6 +291,16 @@ function fillTokens_(doc, map) {
        แต่ค่าที่ดึงจาก Flight Log คือ "Training Flight") ขยายคอลัมน์ col เป็น pt แล้วหักส่วนต่าง
        จากคอลัมน์ from ความกว้างรวมของตารางจึงเท่าเดิม ไม่ล้นขอบกระดาษ
        ดัชนีคอลัมน์ใช้ได้ตรง ๆ เพราะเซลล์ที่ถูกผสานยังอยู่ในแถว (colSpan 0) */
+    /* font.pad — ระยะขอบในเซลล์ (pt) ของหัวตารางและแถวข้อมูล ค่าตั้งต้นของ Docs ~5 pt ต่อด้าน
+       ลดแล้วตัวหนังสือในคอลัมน์แคบไม่ขาดบรรทัด และแถวเตี้ยลง (รวมแถวที่เพิ่งเพิ่ม เพราะ lastRowIdx เลื่อนตามแล้ว) */
+    if (t.font && t.font.pad != null && lastRowIdx >= 0) {
+      for (var pr = hit.headRow; pr <= lastRowIdx; pr++) {
+        var prow = hit.tbl.getRow(pr);
+        for (var pc = 0; pc < prow.getNumCells(); pc++)
+          prow.getCell(pc).setPaddingLeft(t.font.pad).setPaddingRight(t.font.pad)
+              .setPaddingTop(t.font.pad / 2).setPaddingBottom(t.font.pad / 2);
+      }
+    }
     if (t.widen) {
       var wi = function (k) { for (var q = 0; q < t.cols.length; q++) if (t.cols[q].k === k) return hit.colIdx[q]; return null; };
       var ca = wi(t.widen.col), cb = wi(t.widen.from);

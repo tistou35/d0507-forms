@@ -369,7 +369,7 @@ function boot(){
     onChange:()=>{ A.draftSave(code, FK.data); renderFoot(); },
     upload:async f=>{const r=await A.gas('attach',Object.assign({code:DEF.code},f));
       return r.ok?r.result:{error:r.error};},
-    pull:(f,month,fk)=>PULL[f.action] ? PULL[f.action](f,month,fk) : null});
+    pull:(f,month,fk,opts)=>PULL[f.action] ? PULL[f.action](f,month,fk,opts) : null});
   FK.render(document.getElementById('form'));
   if(F.abbr==='ARF' && !SES_ID) document.getElementById('form').insertAdjacentHTML('afterbegin',
     `<div class="fk-gate warn" style="margin:18px 0 0"><span><b>${A.esc(A.L({th:'ไม่ได้สแกน QR ของคาบเรียน',en:'No session QR'}))}</b> — ${
@@ -547,9 +547,22 @@ function partyOf(){
    แถวละหนึ่งวัน · แถวที่ผู้เบิกกรอกเอง (ไม่มี Flight Log ID) เก็บไว้แล้วเรียงรวมตามวันที่
    อัตราที่ผู้ดูแลตั้งไว้เติมแล้วล็อก (r* = ธงล็อก ไม่ใช่ช่องของใบ) ยังไม่ตั้ง = ผู้เบิกกรอกเอง */
 const PULL = {
-  mrfPull: async (f, month, fk) => {
+  mrfPull: async (f, month, fk, opts) => {
     if (!A.signedIn()) throw new Error(A.L({th:'ต้องเข้าสู่ระบบก่อน ระบบจึงรู้ว่าต้องหาเที่ยวบินของใคร',en:'Sign in first so the system knows whose flights to look for'}));
-    const r = await A.gas('mrfPull', {month}, {timeout:90000});
+    /* ชื่อที่ผู้เบิกเคยยืนยัน/ปฏิเสธ จำไว้ในเครื่อง เดือนหน้าจะได้ไม่ถามซ้ำ (ติ๊กออกในผลลัพธ์เพื่อให้ถามใหม่)
+       แถวที่เลือกไม่นับจำแยกตามเดือน — เปิดใบใหม่แล้วกดดึงซ้ำ ได้ผลเท่าเดิม */
+    const KN = 'mrf.names.' + A.user.uid, KX = 'mrf.excl.' + A.user.uid + '.' + month;
+    const rd = k => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } };
+    const wr = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+    let nm = rd(KN) || {accept: [], reject: []}, ex = rd(KX);
+    if (opts) {
+      nm = {accept: opts.accept || [], reject: opts.reject || []};
+      ex = opts.excl || [];
+      wr(KN, nm); wr(KX, ex);
+    }
+    const req = {month, accept: nm.accept, reject: nm.reject};
+    if (ex) { req.decided = true; req.excl = ex; }
+    const r = await A.gas('mrfPull', req, {timeout:90000});
     if (!r.ok) throw new Error(r.error);
     const x = r.result, R = x.rates || {}, M = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
     const mine = (fk.data.sheet || []).filter(o => o && !/(^|,\s*)LOG-/.test(o.detail || '')
@@ -557,10 +570,20 @@ const PULL = {
     const fromLog = (x.sheet || []).map(o => ({date:o.date, detail:o.detail, place:o.place, type:o.type, flt:o.flt, gnd:'', remark:o.remark}));
     const rows = fromLog.concat(mine).sort((a, b) => String(a.date || '9').localeCompare(String(b.date || '9')));
     const has = v => v !== null && v !== undefined && v !== '';
+    const dd = ymd => ymd ? ymd.slice(8) + ' ' + M[+ymd.slice(5, 7) - 1] + ' ' + ymd.slice(0, 4) : '';
+    const period = M[+month.slice(5) - 1] + ' ' + month.slice(0, 4);
+
+    /* บันทึกการดึงข้อมูล — พิมพ์ใน PDF ให้ผู้ตรวจสอบ (ธุรการ) เห็นว่าตัดแถวไหน และนับชื่อสะกดต่างใดเป็นผู้เบิก */
+    const note = ['Flight Log ' + period + ': ' + x.flights + ' flights / ' + x.days + ' days'];
+    (x.excluded || []).forEach(o => note.push('Not counted: ' + o.id + ' (' + dd(o.date) + (o.on ? ' ' + o.on + '–' + o.off : '') + (o.test ? ', test entry' : '') + ')'));
+    (x.auto || []).forEach(o => note.push('Name spelled "' + o.name + '" counted (1 letter different) — ' + o.n + ' flight(s)'));
+    (x.accepted || []).forEach(n => note.push('Name spelled "' + n + '" confirmed by claimant'));
+    if ((x.ask || []).length) note.push('Unconfirmed name spellings not counted: ' + x.ask.map(a => a.name).join(', '));
+
     const set = {
-      period: M[+month.slice(5) - 1] + ' ' + month.slice(0, 4), sheet: rows,
-      rFlt: has(R.flt), rGnd: has(R.gnd), rAcc: has(R.accom), rPd: !!R.perDiem && has(R.perDiemRate),
-      accomNights: x.nights, perDiemOn: !!R.perDiem
+      period, sheet: rows,
+      rFlt: has(R.flt), rGnd: has(R.gnd), rAcc: has(R.accom), rPd: !!R.perDiem && has(R.perDiemRate), rLog: true,
+      accomNights: x.nights, perDiemOn: !!R.perDiem, flogNote: note.join('\n')
     };
     if (has(R.flt)) set.fltRate = R.flt;
     if (has(R.gnd)) set.gndRate = R.gnd;
@@ -572,15 +595,43 @@ const PULL = {
     if (rows.length > 22) warns.push(A.L({th:'มี '+rows.length+' แถว เกิน 22 แถวที่กระดาษพิมพ์ไว้',en:rows.length+' rows — the printed form holds 22'}));
     if (!has(R.flt) || !has(R.gnd)) warns.push(A.L({th:'ผู้ดูแลยังไม่ได้ตั้งอัตรา'+(!has(R.flt)?'ค่าบิน':'')+(!has(R.flt)&&!has(R.gnd)?'และ':'')+(!has(R.gnd)?'ภาคพื้น/SIM':'')+'ของคุณ — กรอกเอง หรือแจ้งผู้ดูแล',
                                                    en:'No administrator rate for '+[!has(R.flt)&&'flight',!has(R.gnd)&&'ground / sim'].filter(Boolean).join(' and ')+' — type it, or ask the administrator'}));
-    const e = A.esc;
-    const html = `<div class="fk-gate ${x.flights ? 'info' : 'warn'}"><span>${e(set.period)} · ${
+    const e = A.esc, k = f.k;
+    const fl = o => `<b>${e(o.id)}</b> · ${e(dd(o.date))} · ${e(o.on ? o.on + '–' + o.off : A.L({th:'ไม่มีเวลา Engine',en:'no engine times'}))} · ${e(o.reg)} · ${e(o.blk)}${
+      o.as ? ' · ' + e(o.seat + ' ' + o.as) : ''}${o.rem ? ' · <i>' + e(o.rem) + '</i>' : ''}`;
+
+    /* ① ชื่อที่สะกดต่าง 2–3 ตัว — ต้องตอบก่อนจึงนับ */
+    const askHtml = (x.ask || []).map((a, n) => `<div class="mrf-q">
+        <div>${e(A.L({th:'"'+a.name+'" ('+a.n+' เที่ยว: '+a.ids.join(', ')+') — ใช่ชื่อคุณที่สะกดต่างไหม',
+                     en:'"'+a.name+'" ('+a.n+' flight(s): '+a.ids.join(', ')+') — is this you, spelled differently?'}))}</div>
+        <label><input type="radio" name="mrfask${n}" data-pullopt="accept" value="${e(a.name)}"> ${e(A.L({th:'ใช่ — นับ',en:'Yes — count'}))}</label>
+        <label><input type="radio" name="mrfask${n}" data-pullopt="reject" value="${e(a.name)}"> ${e(A.L({th:'ไม่ใช่ — ไม่นับ',en:'No — leave out'}))}</label></div>`).join('');
+    const keepHtml = (nm.accept || []).concat(nm.reject || []).length ? `<div class="hint" style="margin-top:6px">${
+        (nm.accept || []).map(n => `<label style="margin-right:12px"><input type="checkbox" checked data-pullopt="accept" value="${e(n)}"> ${e(A.L({th:'นับ "'+n+'" เป็นคุณ',en:'Count "'+n+'" as you'}))}</label>`).join('')}${
+        (nm.reject || []).map(n => `<label style="margin-right:12px"><input type="checkbox" checked data-pullopt="reject" value="${e(n)}"> ${e(A.L({th:'"'+n+'" ไม่ใช่คุณ',en:'"'+n+'" is not you'}))}</label>`).join('')}
+        <br>${e(A.L({th:'ติ๊กออกแล้วกดคำนวณใหม่ ระบบจะถามชื่อนั้นอีกครั้ง',en:'Untick and recalculate to be asked again'}))}</div>` : '';
+
+    /* ② ข้อมูลที่ขัดกัน — ติ๊ก "ไม่นับ" แถวที่ผิด ระบบไม่เลือกแทน (แถวทดสอบติ๊กไว้ให้ก่อน) */
+    const KIND = {dup:{th:'Flight Log ID ซ้ำ',en:'Duplicate Flight Log ID'}, overlap:{th:'เวลาบินทับกัน',en:'Flight times overlap'},
+                  test:{th:'Remark บอกว่าเป็นรายการทดสอบ',en:'Remark marks these as test entries'}};
+    const conHtml = (x.conflicts || []).map(c => `<div class="mrf-c"><b>${e(A.L(KIND[c.kind] || {th:c.label,en:c.label}))}</b>${
+        c.other ? ' · ' + e(A.L({th:'อีก '+c.other+' แถวในไฟล์ Flight Logs ที่ไม่ใช่ของคุณใช้ ID เดียวกัน — แจ้งผู้บันทึกให้แก้',en:c.other+' other row(s) in the Flight Logs file use the same ID — ask for it to be corrected'})) : ''}${
+        c.rows.map(o => `<label class="mrf-r${o.out ? ' out' : ''}"><input type="checkbox" data-pullopt="excl" value="${e(o.key)}"${o.out ? ' checked' : ''}>
+          <span>${e(A.L({th:'ไม่นับ',en:'Leave out'}))}</span> ${fl(o)}</label>`).join('')}</div>`).join('');
+    const reBtn = `<button type="button" class="fb" data-pullre="${e(k)}" style="margin-top:8px">${e(A.L({th:'คำนวณใหม่ตามที่เลือก',en:'Recalculate with these choices'}))}</button>`;
+
+    const html = `<div class="fk-gate ${x.flights ? 'info' : 'warn'}"><span>${e(period)} · ${
         x.flights ? e(A.L({th:x.flights+' เที่ยวบิน '+x.days+' วัน · Block รวม '+Math.floor(blk/60)+':'+String(blk%60).padStart(2,'0')+' ชม.',
                           en:x.flights+' flights on '+x.days+' days · block '+Math.floor(blk/60)+':'+String(blk%60).padStart(2,'0')}))
                   : e(A.L({th:'ไม่พบเที่ยวบินของคุณในเดือนนี้',en:'No flights of yours this month'}))}
       ${x.flights ? '<br>'+e(A.L({th:'ที่พัก '+x.nights+' คืน (ช่วงวันที่ '+(x.stays||[]).join(', ')+')',en:'Accommodation '+x.nights+' nights (days '+(x.stays||[]).join(', ')+')'}))
         + (R.perDiem ? ' · '+e(A.L({th:'per diem '+x.perDiemDays+' วัน',en:'per diem '+x.perDiemDays+' days'})) : '') : ''}
       <br><span class="hint" style="margin:0">${e(A.L({th:'จับคู่ชื่อ: ',en:'Matched names: '}))}${e((x.names||[]).join(' · '))}${
+        (x.auto||[]).length ? ' · '+e(A.L({th:'สะกดต่าง 1 ตัว นับให้แล้ว: ',en:'1 letter different, counted: '}))+e(x.auto.map(a=>a.name).join(', ')) : ''}${
         mine.length ? ' · '+e(A.L({th:'คงแถวที่กรอกเอง '+mine.length+' แถว',en:'kept '+mine.length+' rows you typed'})) : ''}</span></span></div>`
+      + (askHtml || conHtml || keepHtml ? `<div class="fk-gate warn" style="margin-top:8px"><span>${
+          askHtml ? `<b>${e(A.L({th:'ชื่อที่สะกดคล้ายของคุณ — ยังไม่นับจนกว่าจะตอบ',en:'Names close to yours — not counted until you answer'}))}</b>${askHtml}` : ''}${
+          conHtml ? `<b style="display:block;margin-top:${askHtml?10:0}px">${e(A.L({th:'ข้อมูลใน Flight Log ที่ขัดกัน — ติ๊กแถวที่ไม่ควรนับ',en:'Conflicting Flight Log entries — tick the ones that should not count'}))}</b>${conHtml}` : ''}${
+          keepHtml}${reBtn}</span></div>` : '')
       + (warns.length ? `<div class="fk-gate warn" style="margin-top:8px"><span><b>${e(A.L({th:'ตรวจก่อนส่ง',en:'Check before submitting'}))}</b><ul>${warns.map(w=>'<li>'+e(w)+'</li>').join('')}</ul></span></div>` : '');
     return { set, html };
   }

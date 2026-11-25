@@ -407,6 +407,7 @@
    "{{k_perDiemOn}}"
   ],
   "manual": [
+   "{{flogNote}}",
    "{{accomActual}}",
    "{{perDiemDays}}",
    "{{perDiemRate}}",
@@ -418,7 +419,11 @@
   ],
   "_why_perdiem": "per diem และค่าที่พักตามจริงไม่มีช่องบนกระดาษ (เพิ่ม 23 NOV 2026) — พิมพ์ในบล็อก ADDITIONAL ท้ายเอกสาร ยอดรวมอยู่ใน Reimbursement / Total แล้ว · ช่อง \"มีสิทธิ์เบิก per diem\" ไม่ใช่ ☐ บนกระดาษ จึงข้าม ไม่งั้นจำนวนช่องติ๊กไม่เท่ากระดาษแล้วตัววางไม่ติ๊กสักช่อง",
   "tableFont": {
-   "sheet": 8
+   "sheet": {
+    "size": 8,
+    "family": "Arial",
+    "pad": 2
+   }
   },
   "_why_tableFont": "ช่อง Type ของกระดาษกว้างพอแค่รหัส 3–4 ตัว (FLT/SIM/GND/GS) แต่ค่าที่ดึงจาก Flight Log คือ Flight Type (\"Training Flight\") ขาดกลางคำแม้ลดตัวอักษร จึงใช้ Arial 8 pt และขยาย Type เป็น 72 pt โดยหักจาก Remarks ความกว้างรวมเท่าเดิม · เปลี่ยนเฉพาะแม่แบบที่ระบบออก กระดาษ .docx ไม่เปลี่ยน",
   "tableWiden": {
