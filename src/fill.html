@@ -699,24 +699,33 @@ const PULL = {
     const tu = proxyUid();
     const q = await A.db.collection('receipts').where('uid','==',tu).where('month','==',month).get();
     const all = q.docs.map(d => Object.assign({id:d.id}, d.data())).sort((a,b) => (a.date+a.vendor).localeCompare(b.date+b.vendor));
-    const free = all.filter(r => r.status === 'draft'), taken = all.filter(r => r.status !== 'draft');
+    /* เบิกได้เฉพาะใบที่ FA ตรวจผ่านแล้ว (ok) — ใบที่ยังไม่ผ่านบอกไว้ ไม่นับ
+       pay = income คือผู้เบิกเลือกรับเป็นรายได้หลังถูกส่งกลับ — หมายเหตุลงท้าย WHT 3% ให้ compute นับเข้าฐานภาษี */
+    const free = all.filter(r => r.status === 'ok'), taken = all.filter(r => r.status === 'claimed' || r.status === 'posted');
+    const waiting = all.filter(r => r.status === 'draft' || r.status === 'review' || r.status === 'returned');
+    const INC = ' · INCOME (WHT 3%)';
     const M = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
     const dd = ymd => ymd ? ymd.slice(8) + ' ' + M[+ymd.slice(5, 7) - 1] + ' ' + ymd.slice(0, 4) : '';
     const money = n => Number(n||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
     const typed = (fk.data.exp || []).filter(o => o && !/^R\d+ ·/.test(o.remark || '')
       && Object.keys(o).some(k => String(o[k] == null ? '' : o[k]).trim()));
-    const rows = free.map((r, i) => ({desc: (r.vendor + ' — ' + r.desc).slice(0, 120), qty: 1, unit: r.amount, amount: r.amount,
-      remark: 'R' + (i + 1) + ' · ' + dd(r.date) + (r.docNo ? ' · ' + r.docNo : '')})).concat(typed);
+    const fx = r => r.cur && r.cur !== 'THB' ? ' (' + r.cur + ' ' + Number(r.amountFx||0).toFixed(2) + ')' : '';
+    const rows = free.map((r, i) => ({desc: (r.vendor + ' — ' + r.desc + fx(r)).slice(0, 120), qty: 1, unit: r.amount, amount: r.amount,
+      remark: 'R' + (i + 1) + ' · ' + dd(r.date) + (r.docNo ? ' · ' + r.docNo : '') + (r.pay === 'income' ? INC : '')})).concat(typed);
     const base = location.href.replace(/\/fill\/.*$/, '/');
     const note = free.map((r, i) => 'R' + (i + 1) + '  ' + dd(r.date) + ' · ' + r.vendor + (r.vendorTaxId ? ' (Tax ID ' + r.vendorTaxId + ')' : '')
-        + (r.docNo ? ' · No. ' + r.docNo : '') + ' · ' + r.catName + ' · ' + money(r.amount) + ' Baht' + (r.vat === 'in7' ? ' (incl. VAT 7%)' : ''))
+        + (r.docNo ? ' · No. ' + r.docNo : '') + ' · ' + r.catName + ' · ' + money(r.amount) + ' Baht' + fx(r) + (r.vat === 'in7' ? ' (incl. VAT 7%)' : '')
+        + (r.pay === 'income' ? ' · paid as income, WHT 3%' : (r.reviewedByName ? ' · verified by ' + r.reviewedByName : '')))
       .concat(free.length ? ['Receipt images: ' + base + 'receipts/?u=' + encodeURIComponent(tu) + '&m=' + month] : []).join('\n');
     const total = free.reduce((a, r) => a + Number(r.amount || 0), 0);
     const set = {exp: rows, rcptIds: free.map(r => r.id), rcptNote: note, rRc: free.length > 0};
     const e = A.esc;
     const html = `<div class="fk-gate ${free.length ? 'info' : 'warn'}"><span>${
         free.length ? e(A.L({th:'ใบเสร็จ '+free.length+' ใบ รวม '+money(total)+' บาท — เติมในตารางแล้ว',en:free.length+' receipts, '+money(total)+' Baht — added to the table'}))
-                    : e(A.L({th:'ไม่มีใบเสร็จที่ยังไม่ได้เบิกในเดือนนี้',en:'No unclaimed receipts this month'}))}${
+                    : e(A.L({th:'ไม่มีใบเสร็จที่ผ่านการตรวจและยังไม่ได้เบิกในเดือนนี้',en:'No verified, unclaimed receipts this month'}))}${
+        waiting.length ? '<br><span class="hint" style="margin:0;color:var(--red-600)">'+e(A.L({th:'ยังไม่นับ '+waiting.length+' ใบที่ FA ยังไม่ตรวจผ่าน (ร่าง '+waiting.filter(r=>r.status==='draft').length+' · รอตรวจ '+waiting.filter(r=>r.status==='review').length+' · ส่งกลับ '+waiting.filter(r=>r.status==='returned').length+')',
+          en:'Not counted: '+waiting.length+' receipts not yet verified by FA (draft '+waiting.filter(r=>r.status==='draft').length+' · in review '+waiting.filter(r=>r.status==='review').length+' · returned '+waiting.filter(r=>r.status==='returned').length+')'}))+'</span>' : ''}${
+        free.some(r => r.pay === 'income') ? '<br><span class="hint" style="margin:0">'+e(A.L({th:'รับเป็นรายได้ '+free.filter(r=>r.pay==='income').length+' ใบ — หัก ณ ที่จ่าย 3%',en:free.filter(r=>r.pay==='income').length+' paid as income — 3% withheld'}))+'</span>' : ''}${
         taken.length ? '<br><span class="hint" style="margin:0">'+e(A.L({th:'ไม่นับ '+taken.length+' ใบที่อยู่ในใบเบิกอื่นแล้ว: ',en:'Left out '+taken.length+' already on another claim: '}))
           + e(taken.map(r => r.vendor + ' ' + money(r.amount) + (r.claimTrk ? ' (' + r.claimTrk + ')' : '')).join(', ')) + '</span>' : ''}${
         typed.length ? '<br><span class="hint" style="margin:0">'+e(A.L({th:'คงแถวที่พิมพ์เอง '+typed.length+' แถว',en:'Kept '+typed.length+' typed rows'}))+'</span>' : ''}

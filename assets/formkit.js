@@ -342,7 +342,9 @@
         };
         out[c.k] = !Array.isArray(rows) ? 0 : rows.reduce((a, r) => {
           if (!r) return a;
-          if (c.where && !(c.where.in || []).includes(String(r[c.where.col] || ''))) return a;
+          if (c.where && c.where.in && !c.where.in.includes(String(r[c.where.col] || ''))) return a;
+          // where.re — แถวที่ค่าในคอลัมน์ตรงรูปแบบ (MRF: หมายเหตุ "INCOME (WHT 3%)" ของใบเสร็จที่รับเป็นรายได้)
+          if (c.where && c.where.re && !new RegExp(c.where.re).test(String(r[c.where.col] || ''))) return a;
           return a + num(r[c.col]);
         }, 0);
         if (c.round != null) out[c.k] = Math.round(out[c.k] * Math.pow(10, c.round)) / Math.pow(10, c.round);

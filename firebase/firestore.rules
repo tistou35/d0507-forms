@@ -663,18 +663,25 @@ service cloud.firestore {
         allow update, delete: if false;
       }
     }
-    /* ใบเสร็จค่าใช้จ่ายรายใบ (D-0507-MRF-001 ส่วนที่ 4) — ผู้เบิกเก็บระหว่างเดือน แล้วดึงเข้าใบเบิกตอนสิ้นเดือน
-       draft   แก้/ลบได้โดยเจ้าของ
-       claimed ผูกกับใบเบิกแล้ว (claimId = id ของใบ) แก้ไม่ได้ ลบไม่ได้ — เป็นหลักฐานของใบเบิก
-               กลับเป็น draft ได้เมื่อใบเบิกนั้นไม่มีอยู่จริง (ส่งไม่สำเร็จ) หรือไม่อนุมัติ
-       posted  ผู้ดูแลลงใน FlowAccount แล้ว (ใบเสร็จละหนึ่งเอกสาร ค้างจ่าย) — เก็บเลขเอกสาร FlowAccount
-       อ่านได้: เจ้าของ · ผู้ดูแล · ฝ่ายปฏิบัติการ/บริหาร (ผู้ตรวจและผู้อนุมัติใบเบิก) */
+    /* ใบเสร็จค่าใช้จ่ายรายใบ (D-0507-MRF-001 ส่วนที่ 4) — ผู้เบิกเก็บระหว่างเดือน ส่งให้ FA ตรวจ แล้วดึงเข้าใบเบิกตอนสิ้นเดือน
+       draft    แก้/ลบได้โดยเจ้าของ
+       review   ส่งให้ FA ตรวจแล้ว — FA (หรือผู้ที่ FA มอบให้ตรวจ reviewerUid) ตัดสินได้ · เจ้าของถอนกลับเป็นร่างได้
+       ok       ผ่านการตรวจ เบิกได้ · pay = reimb (เบิกตามใบเสร็จ ไม่หัก ณ ที่จ่าย)
+                                    pay = income (ผู้เบิกเลือกรับเป็นรายได้หลังถูกส่งกลับ — หัก ณ ที่จ่าย 3%)
+       returned ส่งกลับพร้อมเหตุผล (reviewNote) — เจ้าของแก้แล้วส่งใหม่ หรือเลือกรับเป็นรายได้
+       claimed  ผูกกับใบเบิกแล้ว (claimId = id ของใบ) แก้ไม่ได้ ลบไม่ได้ — เป็นหลักฐานของใบเบิก
+                กลับเป็น ok ได้เมื่อใบเบิกนั้นไม่มีอยู่จริง (ส่งไม่สำเร็จ) หรือไม่อนุมัติ
+       posted   ผู้ดูแลลงใน FlowAccount แล้ว (ใบเสร็จละหนึ่งเอกสาร ค้างจ่าย) — เก็บเลขเอกสาร FlowAccount
+       ผู้ตรวจตรวจใบเสร็จของตัวเอง หรือใบที่ตัวเองบันทึกแทน ไม่ได้
+       อ่านได้: เจ้าของ · ผู้ดูแล · FA · ฝ่ายปฏิบัติการ/บริหาร (ผู้ตรวจและผู้อนุมัติใบเบิก) · ผู้ที่ได้รับมอบให้ตรวจใบนั้น */
     function rcptKeys() {
       return ['uid','ownerName','month','date','vendor','vendorTaxId','docNo','desc','catId','catName',
               'amount','vat','note','file','status','createdAt','updatedAt',
-              'claimId','claimTrk','claimedAt','faDocId','faSerial','postedAt','postedBy','byUid','byName'];
+              'claimId','claimTrk','claimedAt','faDocId','faSerial','postedAt','postedBy','byUid','byName',
+              'submittedAt','reviewerUid','reviewerName','delegatedBy','delegatedByName','delegatedAt',
+              'reviewedAt','reviewedBy','reviewedByName','reviewNote','pay','incomeAt','cur','amountFx'];
     }
-    // ผู้ดูแลหรือผู้ถือตำแหน่ง FA — ทำใบเบิกและบันทึกใบเสร็จแทนผู้เบิกได้
+    // ผู้ดูแลหรือผู้ถือตำแหน่ง FA — ทำใบเบิกและบันทึกใบเสร็จแทนผู้เบิกได้ · ตรวจใบเสร็จและมอบให้คนอื่นตรวจได้
     function faProxy() {
       return admin() || (hasStaffRole() && get(meDoc()).data.get('positions', []).hasAny(['FA']));
     }
@@ -694,6 +701,9 @@ service cloud.firestore {
           && d.get('vendorTaxId', '') is string && d.get('vendorTaxId', '').matches('^([0-9]{10}|[0-9]{13})?$')
           && d.get('docNo', '') is string && d.get('docNo', '').size() <= 60
           && d.get('note', '') is string && d.get('note', '').size() <= 300
+          // ใบเสร็จสกุลเงินต่างประเทศ — amount เป็นเงินบาทที่จ่ายจริง (ตามใบแจ้งยอดบัตร) · amountFx ยอดตามใบเสร็จ
+          && d.get('cur', 'THB') is string && d.get('cur', 'THB').matches('^[A-Z]{3}$')
+          && (d.get('cur', 'THB') == 'THB' || (d.get('amountFx', 0) is number && d.get('amountFx', 0) > 0))
           && d.file is map && d.file.id is string;
     }
     function rcptOnly(keys) {
@@ -703,41 +713,71 @@ service cloud.firestore {
       return !exists(/databases/$(database)/documents/submissions/$(claimId))
           || get(/databases/$(database)/documents/submissions/$(claimId)).data.status == 'rejected';
     }
+    /* การเปลี่ยนสถานะของใบเสร็จ — ตรวจคู่สถานะ (เดิม → ใหม่) ก่อนเสมอ แล้วค่อยเรียกสิทธิ์ ซึ่งต้องอ่านโปรไฟล์
+       ไม่งั้นทุกกิ่งเรียก faProxy() ซ้ำจนเกินเพดานจำนวนนิพจน์ที่ rules ประเมินได้ต่อคำขอ (ผู้ดูแลผ่านเพราะ admin() ตัดจบก่อน
+       ส่วน FA และผู้รับมอบถูกปฏิเสธ — พบตอนทดสอบ 26 NOV 2026) */
+    function rcptUpdOk(o, n) {
+      let s0 = o.status;
+      let s1 = n.status;
+      let me = request.auth.uid;
+      let ownerSide = o.uid == me;
+      let judgeBase = o.uid != me && o.get('byUid', '') != me;
+      return n.uid == o.uid && (
+           // เจ้าของ (หรือ FA ที่ทำแทน) แก้ร่าง หรือแก้ใบที่ถูกส่งกลับ — กลับเป็นร่าง
+           (s0 in ['draft', 'returned'] && s1 == 'draft'
+             && n.updatedAt == request.time && n.createdAt == o.createdAt
+             && !('claimId' in n) && !('pay' in n)
+             && n.get('reviewerUid', '') == o.get('reviewerUid', '')
+             && (ownerSide || faProxy()) && rcptValid(n))
+           // ส่งให้ FA ตรวจ — ผู้ที่ได้รับมอบในรอบก่อน (ถ้ามี) ตรวจต่อ เปลี่ยนเองไม่ได้
+        || (s0 == 'draft' && s1 == 'review' && rcptOnly(['status', 'submittedAt'])
+             && n.submittedAt == request.time && (ownerSide || faProxy()))
+           // ถอนกลับเป็นร่าง ก่อน FA ตัดสิน
+        || (s0 == 'review' && s1 == 'draft' && rcptOnly(['status', 'updatedAt'])
+             && n.updatedAt == request.time && (ownerSide || faProxy()))
+           // FA มอบให้คนอื่นตรวจ หรือดึงกลับเข้ากองกลาง (ลบ reviewerUid) — ผู้รับมอบต้องไม่ใช่เจ้าของใบหรือผู้บันทึกแทน
+        || (s0 == 'review' && s1 == 'review'
+             && rcptOnly(['reviewerUid', 'reviewerName', 'delegatedBy', 'delegatedByName', 'delegatedAt'])
+             && n.get('reviewerUid', '') != o.uid && n.get('reviewerUid', '') != o.get('byUid', '')
+             && n.delegatedBy == me && n.delegatedAt == request.time && faProxy())
+           // ตัดสิน: ผ่าน (เบิกตามใบเสร็จ) หรือส่งกลับพร้อมเหตุผล · ใบที่ผ่านแล้วแต่ยังไม่เข้าใบเบิก ส่งกลับได้
+        || (s0 in ['review', 'ok'] && s1 in ['ok', 'returned'] && judgeBase
+             && rcptOnly(['status', 'reviewedAt', 'reviewedBy', 'reviewedByName', 'reviewNote', 'pay', 'incomeAt'])
+             && n.reviewedBy == me && n.reviewedAt == request.time
+             && ((s0 == 'review' && s1 == 'ok' && n.get('pay', '') == 'reimb' && !('incomeAt' in n))
+              || (s1 == 'returned' && !('pay' in n) && n.get('reviewNote', '') is string
+                   && n.get('reviewNote', '').size() > 0 && n.get('reviewNote', '').size() <= 500))
+             && (o.get('reviewerUid', '') == me || faProxy()))
+           // ผู้เบิกเลือกรับเป็นรายได้ (หัก ณ ที่จ่าย 3%) แทนการแก้ใบเสร็จ
+        || (s0 == 'returned' && s1 == 'ok' && rcptOnly(['status', 'pay', 'incomeAt'])
+             && n.get('pay', '') == 'income' && n.incomeAt == request.time && (ownerSide || faProxy()))
+           // ผูกกับใบเบิก — เฉพาะใบที่ผ่านการตรวจ · แตะได้เฉพาะสี่ช่องนี้
+        || (s0 == 'ok' && s1 == 'claimed' && rcptOnly(['status', 'claimId', 'claimTrk', 'claimedAt'])
+             && n.claimId is string && n.claimId.size() > 5 && n.claimTrk is string
+             && n.claimedAt == request.time && (ownerSide || faProxy()))
+           // ปลดจากใบเบิกที่ไม่มีอยู่จริงหรือไม่อนุมัติ — กลับเป็นผ่านการตรวจ (ผลตรวจเดิมคงไว้)
+        || (s0 == 'claimed' && s1 == 'ok' && rcptOnly(['status', 'claimId', 'claimTrk', 'claimedAt', 'updatedAt'])
+             && !('claimId' in n) && n.updatedAt == request.time
+             && (ownerSide || faProxy()) && rcptClaimFree(o.claimId))
+           // ผู้ดูแลบันทึกเลขเอกสาร FlowAccount หลังลงค่าใช้จ่ายแล้ว
+        || (s0 == 'claimed' && s1 == 'posted' && rcptOnly(['status', 'faDocId', 'faSerial', 'postedAt', 'postedBy'])
+             && n.faSerial is string && n.faSerial.size() > 0
+             && n.postedBy == me && n.postedAt == request.time && admin()));
+    }
     match /receipts/{id} {
-      allow read: if signedIn() && (resource.data.uid == request.auth.uid || rcptReader());
+      allow read: if signedIn() && (resource.data.uid == request.auth.uid || rcptReader()
+                                    || resource.data.get('reviewerUid', '') == request.auth.uid);
       allow create: if signedIn() && !anon()
                     && (request.resource.data.uid == request.auth.uid
                         || (faProxy() && request.resource.data.byUid == request.auth.uid))
-                    && request.resource.data.status == 'draft'
                     && request.resource.data.createdAt == request.time
+                    && (request.resource.data.status == 'draft'
+                        || (request.resource.data.status == 'review' && request.resource.data.submittedAt == request.time))
+                    && !('reviewerUid' in request.resource.data) && !('pay' in request.resource.data)
+                    && !('reviewedBy' in request.resource.data) && !('claimId' in request.resource.data)
                     && rcptValid(request.resource.data);
-      allow update: if signedIn() && rcptMine()
-                    && request.resource.data.uid == resource.data.uid && (
-                       // แก้ร่าง
-                       (resource.data.status == 'draft' && request.resource.data.status == 'draft'
-                         && request.resource.data.updatedAt == request.time
-                         && request.resource.data.createdAt == resource.data.createdAt
-                         && !('claimId' in request.resource.data)
-                         && rcptValid(request.resource.data))
-                       // ผูกกับใบเบิก — แตะได้เฉพาะสี่ช่องนี้
-                    || (resource.data.status == 'draft' && request.resource.data.status == 'claimed'
-                         && rcptOnly(['status','claimId','claimTrk','claimedAt'])
-                         && request.resource.data.claimId is string && request.resource.data.claimId.size() > 5
-                         && request.resource.data.claimTrk is string
-                         && request.resource.data.claimedAt == request.time)
-                       // ปลดจากใบเบิกที่ไม่มีอยู่จริงหรือไม่อนุมัติ
-                    || (resource.data.status == 'claimed' && request.resource.data.status == 'draft'
-                         && rcptClaimFree(resource.data.claimId)
-                         && rcptOnly(['status','claimId','claimTrk','claimedAt','updatedAt'])
-                         && !('claimId' in request.resource.data)
-                         && request.resource.data.updatedAt == request.time))
-                 // ผู้ดูแลบันทึกเลขเอกสาร FlowAccount หลังลงค่าใช้จ่ายแล้ว
-                 || (admin() && resource.data.status == 'claimed' && request.resource.data.status == 'posted'
-                     && rcptOnly(['status','faDocId','faSerial','postedAt','postedBy'])
-                     && request.resource.data.faSerial is string
-                     && request.resource.data.postedBy == request.auth.uid
-                     && request.resource.data.postedAt == request.time);
-      allow delete: if signedIn() && rcptMine() && resource.data.status == 'draft';
+      allow update: if signedIn() && rcptUpdOk(resource.data, request.resource.data);
+      allow delete: if signedIn() && rcptMine() && resource.data.status in ['draft', 'returned'];
     }
     // อัตราค่าตอบแทนรายคน (D-0507-MRF-001) — ผู้ดูแลตั้งและแก้ · เจ้าตัวอ่านของตัวเองได้ (หน้ากรอกเติมให้)
     // คนอื่นอ่านไม่ได้ เพราะเป็นอัตราค่าจ้างรายบุคคล

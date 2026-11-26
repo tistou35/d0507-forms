@@ -464,8 +464,8 @@
       "en": "Fetch this month's receipts"
      },
      "hint": {
-      "th": "ใบเสร็จที่บันทึกไว้ในหน้า \"ใบเสร็จของฉัน\" ระหว่างเดือน และยังไม่เคยอยู่ในใบเบิกใด · ส่งใบเบิกแล้วใบเสร็จเหล่านั้นถูกผูกกับใบนี้ ดึงเข้าใบอื่นซ้ำไม่ได้",
-      "en": "Receipts saved on the \"My receipts\" page during the month that are not on any claim yet · once this claim is submitted they are tied to it and cannot be claimed again"
+      "th": "เฉพาะใบเสร็จที่ FA ตรวจผ่านแล้วในหน้า \"ใบเสร็จของฉัน\" และยังไม่เคยอยู่ในใบเบิกใด · ส่งใบเบิกแล้วใบเสร็จเหล่านั้นถูกผูกกับใบนี้ ดึงเข้าใบอื่นซ้ำไม่ได้",
+      "en": "Only receipts verified by FA on the \"My receipts\" page that are not on any claim yet · once this claim is submitted they are tied to it and cannot be claimed again"
      },
      "monthFrom": "period"
     },
@@ -575,8 +575,8 @@
      "k": "note8",
      "type": "static",
      "text": {
-      "th": "รวมทั้งสิ้น {totalIncome} บาท · หักภาษี ณ ที่จ่าย 3% {whtAmt} บาท (คิดจากค่าตอบแทน ค่าที่พักเหมาจ่าย และ per diem {whtBase} บาท — ค่าใช้จ่ายที่มีใบเสร็จไม่หัก) · รับสุทธิประมาณ {afterTax} บาท",
-      "en": "Total {totalIncome} Baht · 3% withholding {whtAmt} Baht (on pay, flat accommodation and per diem {whtBase} Baht — receipted expenses are not withheld) · approx. net {afterTax} Baht"
+      "th": "รวมทั้งสิ้น {totalIncome} บาท · หักภาษี ณ ที่จ่าย 3% {whtAmt} บาท (คิดจากค่าตอบแทน ค่าที่พักเหมาจ่าย per diem และใบเสร็จที่รับเป็นรายได้ {whtBase} บาท — ค่าใช้จ่ายที่มีใบเสร็จไม่หัก) · รับสุทธิประมาณ {afterTax} บาท",
+      "en": "Total {totalIncome} Baht · 3% withholding {whtAmt} Baht (on pay, flat accommodation, per diem and receipts taken as income {whtBase} Baht — receipted expenses are not withheld) · approx. net {afterTax} Baht"
      }
     },
     {
@@ -775,15 +775,28 @@
    ]
   },
   {
+   "k": "rcptIncome",
+   "op": "sumCol",
+   "of": "exp",
+   "col": "amount",
+   "where": {
+    "col": "remark",
+    "re": "INCOME \\(WHT 3%\\)"
+   },
+   "round": 2,
+   "_why": "ใบเสร็จที่ FA ส่งกลับแล้วผู้เบิกเลือกรับเป็นรายได้ (receipts.pay = income) — นับเข้าฐานหัก ณ ที่จ่าย 3% · 26 NOV 2026"
+  },
+  {
    "k": "whtBase",
    "op": "sum",
    "of": [
     "fltPay",
     "gndPay",
     "accomFlat",
-    "perDiemTotal"
+    "perDiemTotal",
+    "rcptIncome"
    ],
-   "_why": "ฐานภาษีหัก ณ ที่จ่าย 3% — ค่าตอบแทน ค่าที่พักแบบเหมาจ่าย และ per diem · ค่าใช้จ่ายที่มีใบเสร็จ (ส่วนที่ 4 รายการค่าใช้จ่าย และค่าที่พักตามจริง) ไม่หัก ตามที่ผู้ควบคุมเอกสารสั่ง 25 NOV 2026"
+   "_why": "ฐานภาษีหัก ณ ที่จ่าย 3% — ค่าตอบแทน ค่าที่พักแบบเหมาจ่าย และ per diem · ค่าใช้จ่ายที่มีใบเสร็จ (ส่วนที่ 4 รายการค่าใช้จ่าย และค่าที่พักตามจริง) ไม่หัก ตามที่ผู้ควบคุมเอกสารสั่ง 25 NOV 2026 · ใบเสร็จที่ผู้เบิกเลือกรับเป็นรายได้ (rcptIncome) หักด้วย 26 NOV 2026"
   },
   {
    "k": "whtAmt",
