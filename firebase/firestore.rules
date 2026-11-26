@@ -20,7 +20,7 @@ service cloud.firestore {
        อ่านคิวงาน และอนุมัติใบไม่ได้เลย ใบที่ส่งถึงเขาค้างอยู่อย่างนั้น
        (ทดลองด้วยบัญชีที่มีบทบาท ins แล้วได้ 403 ทั้งทะเบียน คิวงาน และรายชื่อเจ้าหน้าที่)
 
-       ปลอมบทบาทให้ตัวเองไม่ได้ — users/{uid} คนอื่นเขียนได้เฉพาะเจ้าหน้าที่
+       ปลอมบทบาทให้ตัวเองไม่ได้ — users/{uid} คนอื่นเขียนได้เฉพาะผู้ดูแลระบบ
        ส่วนเจ้าตัวเขียนได้แค่ตอนสมัครครั้งแรกและถูกบังคับให้เป็น ['stu'] เท่านั้น
        (ดู selfProfileOk / selfProfileEditOk ข้างล่าง)
 
@@ -79,16 +79,28 @@ service cloud.firestore {
     function selfProfileEditOk(uid) {
       let d = request.resource.data;
       return isSelf(uid)
-          && d.roles == resource.data.roles
+          && d.get('roles', []) == resource.data.get('roles', [])
           && d.get('active', true) == resource.data.get('active', true)
           // ตำแหน่งให้สิทธิ์จริง (กองรองาน · FA ทำใบเบิกแทนคนอื่น) — ตั้งให้ตัวเองไม่ได้
           && d.get('positions', []) == resource.data.get('positions', []);
     }
+    /* โปรไฟล์ของคนอื่น — ผู้ดูแลระบบเท่านั้น (26 NOV 2026)
+       เดิมเจ้าหน้าที่ทุกคน (ins · mnt · ops · mgt · sms) เขียน users/{uid} ของใครก็ได้
+       จึงตั้ง roles / positions / active ให้ตัวเองหรือคนอื่นได้ผ่านโปรไฟล์ของคนอื่น
+       หรือแม้แต่เขียนทับโปรไฟล์ตัวเองด้วยสิทธิ์ staff() ซึ่งข้าม selfProfileEditOk ไปทั้งหมด
+       เช่นเติมตำแหน่ง FA (ทำใบเบิกแทนคนอื่น · เปิดใบเสร็จของทุกคน) หรือตำแหน่งกองรอ
+       ที่ใช้กดรับงานอนุมัติ — ตำแหน่งให้สิทธิ์จริง ต้องมาจากผู้ดูแลเท่านั้น
+
+       ทุกที่ในหน้าเว็บที่เขียนโปรไฟล์ของคนอื่นอยู่ในหน้าตั้งค่าระบบ ซึ่งเปิดได้เฉพาะผู้ดูแล
+       (เพิ่มผู้ใช้ · แก้ไขผู้ใช้ · ตั้งรหัสชั่วคราว · ซิงก์ตำแหน่งจากรายชื่อผู้รับฟอร์ม
+       · เพิ่มบัญชีที่ยังไม่มีโปรไฟล์) และตัวส่งออกลบโปรไฟล์ตอนรวมบัญชีด้วย token ผู้ดูแล
+       ส่วนที่ผู้ใช้ทั่วไปเขียนเองมีแค่ของตัวเอง — สมัคร/เข้าด้วย Google ครั้งแรก (selfProfileOk)
+       และธง mustChangePw หลังเปลี่ยนรหัส (selfProfileEditOk) */
     match /users/{uid} {
       allow read:   if isSelf(uid) || staff();
-      allow create: if staff() || selfProfileOk(uid);
-      allow update: if staff() || selfProfileEditOk(uid);
-      allow delete: if staff();
+      allow create: if admin() || selfProfileOk(uid);
+      allow update: if admin() || selfProfileEditOk(uid);
+      allow delete: if admin();
     }
 
     // ── รายชื่อผู้รับฟอร์ม สำหรับตัวเลือกฝั่งนักเรียน ────────
