@@ -114,17 +114,16 @@
     },
     {
      "k": "period",
-     "type": "text",
+     "type": "month",
      "req": true,
      "half": true,
-     "ph": "{YYYYMM}",
      "label": {
       "th": "เดือน / ปี",
       "en": "Month / year"
      },
      "hint": {
-      "th": "เช่น 09/2026",
-      "en": "e.g. 09/2026"
+      "th": "เดือนที่เบิก — ปุ่มดึง Flight Log และใบเสร็จใช้เดือนนี้",
+      "en": "The month being claimed — the Flight Log and receipt buttons use this month"
      }
     },
     {
@@ -169,9 +168,10 @@
       "en": "Fetch this month"
      },
      "hint": {
-      "th": "เลือกเดือนแล้วกด — ระบบหาเที่ยวบินที่ชื่อของคุณอยู่ใน Pilot 1 หรือ Pilot 2 รวมเป็นแถวละหนึ่งวัน (Flight Log ID ทุกเที่ยว · Block Time รวมของวัน) และเติมอัตรา จำนวนคืนที่พัก และ per diem ที่ผู้ดูแลตั้งไว้ · Flight Log ID ซ้ำหรือเวลาบินทับกันขึ้นให้เลือกว่าไม่นับแถวไหน · ชื่อที่สะกดต่าง 1 ตัวนับให้ ต่าง 2–3 ตัวถามก่อน · แถวภาคพื้น/SIM ที่กรอกเองไม่ถูกลบ",
-      "en": "Pick the month — flights where you are Pilot 1 or Pilot 2 become one row per day (every Flight Log ID · total block time), and the rates, accommodation nights and per diem set by the administrator are filled in. Duplicate IDs or overlapping times are listed for you to leave out; a name 1 letter different is counted, 2–3 letters asks you first. Ground / sim rows you typed are kept."
-     }
+      "th": "ใช้เดือนจากช่องเดือน / ปี ด้านบน — ระบบหาเที่ยวบินที่ชื่อของคุณอยู่ใน Pilot 1 หรือ Pilot 2 รวมเป็นแถวละหนึ่งวัน (Flight Log ID ทุกเที่ยว · Block Time รวมของวัน) และเติมอัตรา จำนวนคืนที่พัก และ per diem ที่ผู้ดูแลตั้งไว้ · Flight Log ID ซ้ำหรือเวลาบินทับกันขึ้นให้เลือกว่าไม่นับแถวไหน · ชื่อที่สะกดต่าง 1 ตัวนับให้ ต่าง 2–3 ตัวถามก่อน · แถวภาคพื้น/SIM ที่กรอกเองไม่ถูกลบ",
+      "en": "Uses the Month / year chosen above — flights where you are Pilot 1 or Pilot 2 become one row per day (every Flight Log ID · total block time), and the rates, accommodation nights and per diem set by the administrator are filled in. Duplicate IDs or overlapping times are listed for you to leave out; a name 1 letter different is counted, 2–3 letters asks you first. Ground / sim rows you typed are kept."
+     },
+     "monthFrom": "period"
     },
     {
      "k": "flogNote",
@@ -466,7 +466,8 @@
      "hint": {
       "th": "ใบเสร็จที่บันทึกไว้ในหน้า \"ใบเสร็จของฉัน\" ระหว่างเดือน และยังไม่เคยอยู่ในใบเบิกใด · ส่งใบเบิกแล้วใบเสร็จเหล่านั้นถูกผูกกับใบนี้ ดึงเข้าใบอื่นซ้ำไม่ได้",
       "en": "Receipts saved on the \"My receipts\" page during the month that are not on any claim yet · once this claim is submitted they are tied to it and cannot be claimed again"
-     }
+     },
+     "monthFrom": "period"
     },
     {
      "k": "rcptNote",

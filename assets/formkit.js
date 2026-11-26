@@ -198,6 +198,26 @@
     return String(s || '').replace(/\{YYYYMM\}/g, d.getFullYear() + p2(d.getMonth() + 1));
   }
 
+  /* ช่องเดือน / ปี (type: month) — เก็บเป็น "NOV 2026" ตามรูปแบบวันที่ของเอกสารควบคุม
+     ค่าที่เก็บพิมพ์ลงแม่แบบ PDF ได้ตรง ๆ ไม่ต้องแปลงฝั่งตัวส่งออก
+     อ่านค่าเก่าที่พิมพ์เองไว้ได้ด้วย ("09/2026" · "2026-09" · "Sep 2026") */
+  const MON = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const MON_TH = ['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน',
+                  'กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+  const MON_EN = ['January','February','March','April','May','June','July','August',
+                  'September','October','November','December'];
+  function monthParse(v) {
+    const s = String(v || '').trim();
+    let m = /^([A-Za-z]{3})[a-z]*\.?\s+(\d{4})$/.exec(s);
+    if (m) { const i = MON.indexOf(m[1].toUpperCase()); return i < 0 ? null : { y: +m[2], m: i + 1 }; }
+    m = /^(\d{1,2})\s*[\/\-.]\s*(\d{4})$/.exec(s);
+    if (m && +m[1] >= 1 && +m[1] <= 12) return { y: +m[2], m: +m[1] };
+    m = /^(\d{4})-(\d{2})$/.exec(s);
+    if (m && +m[2] >= 1 && +m[2] <= 12) return { y: +m[1], m: +m[2] };
+    return null;
+  }
+  const monthIso = p => p ? p.y + '-' + p2(p.m) : '';
+
   /* ── mask: ใส่ตัวคั่นให้อัตโนมัติระหว่างพิมพ์ ──────────────
      "AAAA-999999-999"   A = ตัวอักษร (แปลงเป็นตัวใหญ่) · 9 = ตัวเลข · อื่น ๆ = ตัวคั่น
 
@@ -649,6 +669,19 @@
          ผลและคำเตือนแสดงใต้ปุ่ม เพื่อให้ผู้กรอกเห็นว่าอะไรถูกเติม อะไรไม่ได้นับ */
       case 'pull': {
         if (ro) return '';
+        /* monthFrom = ใช้เดือนจากช่องเดือน / ปี ของใบ ไม่มีตัวเลือกเดือนแยกที่ปุ่ม
+           ใบเดียวจึงไม่มีสองเดือนที่ขัดกัน */
+        if (f.monthFrom) {
+          const iso = monthIso(monthParse(this.data[f.monthFrom]));
+          const mf = this.fields[f.monthFrom], ml = mf ? this.labelOf(mf) : f.monthFrom;
+          return `<div class="fk-f fk-pull" data-fk="${esc(f.k)}">
+          <label>${esc(lab)}</label>${f.hint ? `<p class="hint">${esc(L(f.hint, this.lang))}</p>` : ''}
+          <div class="fk-pull-row"><input type="hidden" data-pullm="${esc(f.k)}" value="${esc(iso)}">
+            <button type="button" class="fb" data-pullb="${esc(f.k)}"${iso ? '' : ' disabled'}>${esc(L(f.button, this.lang) || (this.lang === 'en' ? 'Fetch' : 'ดึงข้อมูล'))}${
+              iso ? ' — ' + esc(this.data[f.monthFrom]) : ''}</button>${
+              iso ? '' : `<span class="hint" style="margin:0 0 0 8px">${esc((this.lang === 'en' ? 'Choose ' : 'เลือก ') + ml + (this.lang === 'en' ? ' first' : ' ก่อน'))}</span>`}</div>
+          <div class="fk-pull-msg">${this._pullMsg[f.k] || ''}</div></div>`;
+        }
         const mo = this._pullMonth || (() => { const d = new Date(); d.setMonth(d.getMonth() - 1);
           return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); })();
         return `<div class="fk-f fk-pull" data-fk="${esc(f.k)}">
@@ -710,6 +743,26 @@
                </label>`}
           <div class="fk-file-msg" data-fm="${esc(f.k)}"></div>
         </div>`;
+        break;
+      }
+
+      /* เดือน / ปี — เลือกจากเมนูสองอัน ไม่ให้พิมพ์เอง ได้รูปแบบเดียวทุกใบ
+         ไม่ใช้ <input type="month"> เพราะ Safari บน Mac แสดงเป็นช่องพิมพ์ธรรมดา */
+      case 'month': {
+        const pv = monthParse(v), tmp = (this._monthTmp || {})[f.k] || {};
+        const selM = pv ? pv.m : (tmp.m || ''), selY = pv ? pv.y : (tmp.y || '');
+        const now = new Date().getFullYear();
+        const ys = []; for (let y = now + 1; y >= now - 3; y--) ys.push(y);
+        if (selY && ys.indexOf(+selY) < 0) ys.push(+selY);
+        const names = this.lang === 'en' ? MON_EN : MON_TH;
+        body = `<div class="fk-month">
+          <select id="${id}" data-mk="${esc(f.k)}" data-mp="m"${dis}>
+            <option value="">${esc(this.lang === 'en' ? 'Month' : 'เดือน')}</option>${
+            names.map((n, i) => `<option value="${i + 1}"${+selM === i + 1 ? ' selected' : ''}>${esc(n)}</option>`).join('')}</select>
+          <select data-mk="${esc(f.k)}" data-mp="y"${dis}>
+            <option value="">${esc(this.lang === 'en' ? 'Year' : 'ปี')}</option>${
+            ys.map(y => `<option value="${y}"${+selY === y ? ' selected' : ''}>${y}</option>`).join('')}</select></div>`;
+        if (v && !pv) body += `<p class="fk-soft">${esc((this.lang === 'en' ? 'Previously typed: ' : 'ค่าเดิมที่พิมพ์ไว้: ') + v)}</p>`;
         break;
       }
 
@@ -1070,6 +1123,20 @@
       });
     });
 
+    /* เดือน / ปี — เก็บค่าเมื่อเลือกครบทั้งสองเมนู ระหว่างนั้นจำไว้ใน _monthTmp
+       ปุ่มดึงข้อมูลที่ผูกช่องนี้ (monthFrom) ใช้เดือนเดียวกันทันที */
+    el.querySelectorAll('select[data-mk]').forEach(sel =>
+      sel.addEventListener('change', () => {
+        const k = sel.dataset.mk, box = sel.closest('.fk-month');
+        const mv = +(box.querySelector('[data-mp="m"]').value || 0), yv = +(box.querySelector('[data-mp="y"]').value || 0);
+        self._monthTmp = self._monthTmp || {};
+        self._monthTmp[k] = { m: mv, y: yv };
+        self.set(k, mv && yv ? MON[mv - 1] + ' ' + yv : '');
+        // ผลดึงข้อมูลของเดือนเดิมไม่ใช่ของเดือนนี้แล้ว — ล้างทิ้ง ให้กดดึงใหม่
+        Object.keys(self.fields).forEach(x => { if (self.fields[x].monthFrom === k) delete self._pullMsg[x]; });
+        rerender();
+      }));
+
     // select ที่ตั้ง menu:true — เก็บค่าจากเมนูดึงลง ('' = ยังไม่เลือก)
     el.querySelectorAll('select[data-k]').forEach(sel =>
       sel.addEventListener('change', () => {
@@ -1144,11 +1211,12 @@
       if (!self.pull) return;
       const f = self.fields[k] || {};
       const m = el.querySelector(`[data-pullm="${k}"]`);
-      self._pullMonth = (m && m.value) || self._pullMonth;
-      if (!self._pullMonth) return;
+      const month = f.monthFrom ? monthIso(monthParse(self.data[f.monthFrom]))
+                                : ((self._pullMonth = (m && m.value) || self._pullMonth));
+      if (!month) return;
       b.disabled = true; b.textContent = self.lang === 'en' ? 'Fetching…' : 'กำลังดึงข้อมูล…';
       try {
-        const r = await self.pull(f, self._pullMonth, self, opts || null) || {};
+        const r = await self.pull(f, month, self, opts || null) || {};
         Object.keys(r.set || {}).forEach(x => self.set(x, r.set[x]));
         self._pullMsg[k] = r.html || '';
       } catch (e) {

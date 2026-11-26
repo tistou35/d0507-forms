@@ -680,6 +680,7 @@ a.gf:hover{border-color:var(--navy-900);color:var(--navy-900)}
 /* ดึงข้อมูลจากระบบอื่น (MRF ← Flight Logs) */
 .fk-pull-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .fk-pull-row input{min-height:44px;max-width:200px}
+.fk-month{display:flex;gap:8px;flex-wrap:wrap}.fk-month select{flex:1 1 90px;min-height:44px;min-width:0}
 .fk-pull-msg{margin-top:8px;font-size:13px;line-height:1.6}
 .fk-pull-msg ul{margin:6px 0 0 18px;padding:0}
 @media print{ .fk-pull{display:none} }
