@@ -349,6 +349,14 @@
         }, 0);
         if (c.round != null) out[c.k] = Math.round(out[c.k] * Math.pow(10, c.round)) / Math.pow(10, c.round);
       }
+      /* ฟังก์ชันคำนวณเฉพาะใบ (FormKit.fns) — ใช้เมื่อสูตรมีเงื่อนไขเกินกว่า sum/mul จะบอกได้
+         คืนค่าเป็นอ็อบเจกต์ ทุกคีย์ลงใน out ให้สูตรทอดถัดไปอ้างได้ (MRF: ค่าตอบแทนแยกภารกิจ) */
+      else if (c.op === 'fn') {
+        const fn = FormKit.fns[c.fn];
+        const r = fn ? fn(Object.assign({}, this.data, out), c) : null;
+        if (r) Object.keys(r).forEach(k => { out[k] = r[k]; });
+        out[c.k] = !!fn;
+      }
       else if (c.op === 'mul') {
         out[c.k] = (c.of || []).reduce((a, k) => a * val(k, out), 1);
         if (c.round != null) out[c.k] = Math.round(out[c.k] * Math.pow(10, c.round)) / Math.pow(10, c.round);
@@ -1461,6 +1469,88 @@
     window.addEventListener('pointerup', up);
   }
 
+  /* ── D-0507-MRF-001: ค่าตอบแทนแยกตามภารกิจ (เจ้าของเครื่อง) ─────────────────
+     ภารกิจของแถวในตารางเวลา = ทะเบียนในช่อง Aircraft (ตาม config/mrf.missions) หรือรหัสภารกิจที่พิมพ์เอง
+     ไม่ตรงอะไรเลย = ภารกิจหลัก (D0507)
+       ค่าบิน       ชั่วโมงบินของแต่ละภารกิจ × อัตราของภารกิจนั้น
+       ค่าเดินทาง    วันแรกของแต่ละช่วงที่มาประจำ (หยุดคั่น ≤ gapDays วัน นับเป็นช่วงเดียว) · ขากลับ = วันสุดท้าย ถ้าเปิดไว้
+       เบี้ยเลี้ยง    วันละครั้ง · ค่าแรงรายวัน (payType = daily) วันละครั้ง
+       วันที่มีหลายภารกิจ — รายการรายวัน (เดินทาง เบี้ยเลี้ยง ค่าแรง) จ่ายครั้งเดียวตามอัตราที่สูงกว่า
+       และคิดกับภารกิจที่อัตราสูงกว่า อีกภารกิจไม่จ่าย (ผู้ควบคุมเอกสารกำหนด 27 NOV 2026) · อัตราเท่ากัน คิดกับภารกิจหลัก
+     ข้อมูลอัตราและภารกิจ (misCfg) มาจากปุ่มดึง Flight Log — ไม่มี = ไม่ใช้วิธีนี้ ใบคิดแบบเดิม */
+  FormKit.fns = {};
+  FormKit.fns.mrfMission = function (d) {
+    const z = { misOn: false, mFlt: 0, mTrv: 0, mAlw: 0, mDay: 0, misPay: 0, misNote: '' };
+    const C = d.misCfg;
+    if (!C || !C.on) return z;
+    const base = C.base || 'D0507', mis = C.missions || [], R = C.rates || {};
+    const regOf = {}; mis.forEach(m => (m.regs || []).forEach(r => { regOf[String(r).toUpperCase().replace(/\s/g, '')] = m.code; }));
+    const codes = mis.map(m => m.code);
+    const misOf = place => {
+      const t = String(place || '').toUpperCase();
+      for (const part of t.split(/[\/,;]+/)) {
+        const p = part.replace(/\s/g, '');
+        if (regOf[p]) return regOf[p];
+        if (codes.indexOf(p) >= 0) return p;
+      }
+      return base;
+    };
+    const hrs = v => { const t = String(v == null ? '' : v).trim(); if (!t) return 0;
+      const m = /^(\d+):([0-5]?\d)$/.exec(t); return m ? +m[1] + +m[2] / 60 : (Number(t.replace(/,/g, '')) || 0); };
+    const rate = (m, k) => Number((R[m] || {})[k]) || 0;
+    const fl = {}, days = {}, warn = [];
+    (d.sheet || []).forEach(r => {
+      if (!r || !/^\d{4}-\d{2}-\d{2}$/.test(String(r.date || ''))) return;
+      const f = hrs(r.flt), g = hrs(r.gnd);
+      if (!(f > 0 || g > 0)) return;
+      const m = misOf(r.place);
+      fl[m] = (fl[m] || 0) + f;
+      (days[r.date] = days[r.date] || []).indexOf(m) < 0 && days[r.date].push(m);
+    });
+    const dates = Object.keys(days).sort();
+    // รายการรายวัน: อัตราสูงสุดของภารกิจในวันนั้น คิดกับภารกิจนั้น · เท่ากัน → ภารกิจหลัก ไม่งั้นภารกิจแรกที่พบ
+    const pick = (ms, k) => {
+      let best = null;
+      ms.forEach(m => { const v = rate(m, k);
+        if (!best || v > best.v || (v === best.v && m === base)) best = { m, v }; });
+      return best;
+    };
+    const by = {}; const add = (m, k, v) => { by[m] = by[m] || { flt: 0, trv: 0, alw: 0, day: 0 }; by[m][k] += v; };
+    Object.keys(fl).forEach(m => add(m, 'flt', Math.round(fl[m] * rate(m, 'flt') * 100) / 100));
+    const dn = y => Math.round(Date.UTC(+y.slice(0, 4), +y.slice(5, 7) - 1, +y.slice(8, 10)) / 864e5);
+    const gap = C.gapDays == null ? 2 : Number(C.gapDays), trips = [];
+    for (let a = 0; a < dates.length;) {
+      let b = a;
+      while (b + 1 < dates.length && dn(dates[b + 1]) - dn(dates[b]) - 1 <= gap) b++;
+      trips.push({ d: dates[a], leg: 'arrival' });
+      if (d.trvRet === true || (d.trvRet !== false && C.trvReturn)) trips.push({ d: dates[b], leg: 'return' });
+      a = b + 1;
+    }
+    const tLines = [], mixed = [];
+    trips.forEach(t => { const p = pick(days[t.d], 'trv'); if (p.v > 0) { add(p.m, 'trv', p.v); tLines.push(t.d.slice(8) + ' ' + t.leg + ' ' + p.m); } });
+    dates.forEach(dt => {
+      const a = pick(days[dt], 'alw'); if (a.v > 0) add(a.m, 'alw', a.v);
+      if (C.payType === 'daily') { const w = pick(days[dt], 'day'); if (w.v > 0) add(w.m, 'day', w.v); }
+      if (days[dt].length > 1) mixed.push(dt.slice(8) + ' ' + days[dt].join('+') + ' → ' + a.m);
+    });
+    Object.keys(fl).forEach(m => { if (fl[m] > 0 && !rate(m, 'flt') && C.payType !== 'daily') warn.push('no flight rate for ' + m); });
+    const sum = k => Object.keys(by).reduce((s, m) => s + by[m][k], 0);
+    const r2 = v => Math.round(v * 100) / 100, n2 = v => r2(v).toLocaleString('en-US', { minimumFractionDigits: 2 });
+    z.misOn = true; z.mFlt = r2(sum('flt')); z.mTrv = r2(sum('trv')); z.mAlw = r2(sum('alw')); z.mDay = r2(sum('day'));
+    z.misPay = r2(z.mTrv + z.mAlw + z.mDay);
+    const hm = h => Math.floor(h + 1e-9) + ':' + String(Math.round((h - Math.floor(h + 1e-9)) * 60)).padStart(2, '0');
+    z.misNote = ['Pay by mission (aircraft owner) — ' + (C.payType === 'daily' ? 'daily-rate staff' : 'hourly flight pay')]
+      .concat(Object.keys(by).sort((a, b) => a === base ? -1 : b === base ? 1 : a.localeCompare(b)).map(m => {
+        const x = by[m], dd = dates.filter(t => days[t].indexOf(m) >= 0).length;
+        return m + ': ' + (fl[m] ? 'flight ' + hm(fl[m]) + ' h × ' + n2(rate(m, 'flt')) + ' = ' + n2(x.flt) + ' · ' : '')
+          + 'travel ' + n2(x.trv) + ' · allowance ' + n2(x.alw) + (C.payType === 'daily' ? ' · daily wage ' + n2(x.day) : '')
+          + ' · days worked ' + dd + ' · subtotal ' + n2(x.flt + x.trv + x.alw + x.day) + ' Baht';
+      }))
+      .concat(tLines.length ? ['Travel paid: ' + tLines.join(', ')] : [])
+      .concat(mixed.length ? ['Days with more than one mission (daily items paid once at the higher rate, charged to): ' + mixed.join(', ')] : [])
+      .concat(warn.length ? ['Check: ' + warn.join('; ')] : []).join('\n');
+    return z;
+  };
   FormKit.evalCond = evalCond;
   FormKit.L = L;
   global.FormKit = FormKit;

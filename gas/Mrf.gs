@@ -19,8 +19,18 @@ var MRF_DEFAULT = {
   preMin: 60,        // เริ่มงานก่อน Engine ON ของเที่ยวแรก
   postMin: 30,       // เลิกงานหลัง Engine OFF ของเที่ยวสุดท้าย
   fullDayHrs: 6,     // ช่วงทำงาน ≥ นี้ = per diem 1 วัน · น้อยกว่า = 0.5
-  gapDays: 2         // วันหยุดคั่นไม่เกินนี้ ถือว่าไม่ได้กลับบ้าน — นับคืนต่อเนื่อง
+  gapDays: 2,        // วันหยุดคั่นไม่เกินนี้ ถือว่าไม่ได้กลับบ้าน — นับคืนต่อเนื่อง
+  /* ภารกิจ = เจ้าของเครื่อง · ทะเบียนที่ไม่อยู่ในรายการใดเป็นภารกิจหลัก (ตัวแรก)
+     HS-BSC เป็นเครื่องของลูกค้าที่ฝากโรงเรียนดูแล (แท็บ Aircraft Fleet: Owner SPI/D0507) อัตราจ่ายต่างจากเครื่องของโรงเรียน */
+  missions: [{ code: 'D0507', name: 'D-0507 (เครื่องของโรงเรียน)', regs: ['HS-VVD'] },
+             { code: 'BSC', name: 'BSC (เครื่องลูกค้าที่ฝากดูแล)', regs: ['HS-BSC'] }]
 };
+function mrfMisOf_(missions, reg) {
+  var r = String(reg || '').toUpperCase().replace(/\s/g, '');
+  for (var i = 0; i < missions.length; i++)
+    if ((missions[i].regs || []).some(function (x) { return String(x).toUpperCase().replace(/\s/g, '') === r; })) return missions[i].code;
+  return missions[0].code;
+}
 var MRF_MON = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 
 function mrfNorm_(s) { return String(s || '').toLowerCase().replace(/[^a-z฀-๿]/g, ''); }
@@ -193,9 +203,10 @@ function mrfPull_(body, who) {
     d.f.push(f);
   });
   var uniq = function (a) { return a.filter(function (x, i) { return x && a.indexOf(x) === i; }); };
+  var MIS = Array.isArray(C.missions) && C.missions.length ? C.missions : MRF_DEFAULT.missions;
   var perDiem = 0, sheet = [];
   days.forEach(function (d) {
-    var fl = d.f, blk = fl.reduce(function (a, f) { return a + (f.blk || 0); }, 0);
+    var fl = d.f;
     /* per diem นับจากเที่ยวที่มีเวลา Engine ON/OFF เท่านั้น — ไม่มีเวลาเลยทั้งวัน = ไม่นับ
        (เดิมให้ 0.5 ผู้ควบคุมเอกสารสั่งให้ไม่นับ เพราะพิสูจน์ช่วงทำงานไม่ได้) */
     var timed = fl.filter(function (f) { return f.on != null && f.off != null; });
@@ -207,11 +218,18 @@ function mrfPull_(body, who) {
       d.duty = mrfHm_(s0) + '–' + mrfHm_(s1);
     } else warns.push(d.ymd + ' ไม่มีเวลา Engine ON/OFF — ไม่นับ per diem วันนี้');
     perDiem += pd;
-    sheet.push({ date: d.ymd, detail: fl.map(function (f) { return f.id; }).join(', '),
-                 place: uniq(fl.map(function (f) { return f.reg; })).join(' / '),
-                 type: uniq(fl.map(function (f) { return f.type; })).join(' / ') || 'FLT',
-                 flt: mrfHm_(blk), gnd: '', remark: uniq(fl.map(function (f) { return f.rem; })).join('; ').slice(0, 120),
-                 src: 'flightlog', pd: pd, duty: d.duty || '' });
+    /* แถวละหนึ่งวันต่อภารกิจ — วันที่บินทั้งเครื่องโรงเรียนและเครื่องลูกค้า ได้สองแถว
+       ค่าบินคิดตามอัตราของแต่ละภารกิจ จึงรวมชั่วโมงข้ามภารกิจในแถวเดียวไม่ได้ */
+    var groups = {}, order = [];
+    fl.forEach(function (f) { var m = mrfMisOf_(MIS, f.reg); if (!groups[m]) { groups[m] = []; order.push(m); } groups[m].push(f); });
+    order.forEach(function (m, gi) {
+      var g = groups[m], blk = g.reduce(function (a, f) { return a + (f.blk || 0); }, 0);
+      sheet.push({ date: d.ymd, detail: g.map(function (f) { return f.id; }).join(', '),
+                   place: uniq(g.map(function (f) { return f.reg; })).join(' / '),
+                   type: uniq(g.map(function (f) { return f.type; })).join(' / ') || 'FLT',
+                   flt: mrfHm_(blk), gnd: '', remark: uniq(g.map(function (f) { return f.rem; })).join('; ').slice(0, 120),
+                   src: 'flightlog', pd: gi === 0 ? pd : 0, duty: gi === 0 ? (d.duty || '') : '', mis: m });
+    });
   });
 
   // คืนที่พัก — วันทำงานที่หยุดคั่นไม่เกิน gapDays วันถือเป็นช่วงเดียวกัน · คืนของช่วง = วันสุดท้าย − วันแรก
@@ -240,6 +258,13 @@ function mrfPull_(body, who) {
     accepted: arr(body.accept), excluded: sorted.filter(function (f) { return f.out; }).map(pub),
     rates: { flt: num(rate.fltRate), gnd: num(rate.gndRate), accom: num(rate.accomRate),
              perDiem: rate.perDiem === true, perDiemRate: num(rate.perDiemRate) },
+    /* อัตราแยกภารกิจ (payRates.mis) — มีเมื่อผู้ดูแลตั้งไว้ หน้าเว็บใช้คิดค่าบิน ค่าเดินทาง เบี้ยเลี้ยง ค่าแรงรายวัน */
+    misCfg: rate.mis && typeof rate.mis === 'object' ? {
+      on: true, base: MIS[0].code, gapDays: C.gapDays, payType: rate.payType === 'daily' ? 'daily' : 'hourly',
+      trvReturn: rate.trvReturn === true,
+      missions: MIS.map(function (m) { return { code: m.code, name: m.name || m.code, regs: m.regs || [] }; }),
+      rates: rate.mis
+    } : null,
     rule: { preMin: C.preMin, postMin: C.postMin, fullDayHrs: C.fullDayHrs, gapDays: C.gapDays },
     warns: warns
   };

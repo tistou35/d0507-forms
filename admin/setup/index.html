@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="th"><head>
-<meta name="d0507-build" content="a1baf691fecb"><meta charset="UTF-8">
+<meta name="d0507-build" content="1b67cfec917d"><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>ตั้งค่าระบบ — D-0507 Flight Training</title>
 <meta name="robots" content="noindex">
@@ -1194,7 +1194,10 @@ async function adminLog(action, target, detail){
 }
 /* ── อัตราค่าตอบแทน (MRF) ──────────────────────────────────
    payRates/<uid> — ผู้ดูแลเขียน เจ้าตัวอ่านของตัวเอง · config/mrf กติกาการนับ (ค่าตั้งต้นใน gas/Mrf.gs) */
-const PAY_DEF = { logSheet:'1N-gJ3koYT2OiN1V0NWH4-jOifcIwT5IKlFB3D8DkJRs', logTab:'Flight Log', preMin:60, postMin:30, fullDayHrs:6, gapDays:2 };
+const PAY_DEF = { logSheet:'1N-gJ3koYT2OiN1V0NWH4-jOifcIwT5IKlFB3D8DkJRs', logTab:'Flight Log', preMin:60, postMin:30, fullDayHrs:6, gapDays:2,
+  // ภารกิจ = เจ้าของเครื่อง (ตรงกับ MRF_DEFAULT ใน gas/Mrf.gs) · ตัวแรกเป็นภารกิจหลัก รับทะเบียนที่ไม่อยู่ในรายการใด
+  missions:[{ code:'D0507', name:'D-0507 (เครื่องของโรงเรียน)', regs:['HS-VVD'] }, { code:'BSC', name:'BSC (เครื่องลูกค้าที่ฝากดูแล)', regs:['HS-BSC'] }] };
+const MIS_K = [['flt','ค่าบิน / ชม.'],['trv','ค่าเดินทาง / ครั้ง'],['alw','เบี้ยเลี้ยง / วัน'],['day','ค่าแรง / วัน']];
 async function pay(){
   const L = document.getElementById('payList'), esc = A.esc;
   L.innerHTML = '<p class="hint">กำลังโหลด…</p>';
@@ -1211,9 +1214,14 @@ async function pay(){
       <label>ช่วงทำงานขั้นต่ำของ 1 วัน (ชม.)<input type="number" step="0.5" id="pc_full" value="${esc(C.fullDayHrs)}"></label>
       <label>วันหยุดคั่นที่ยังนับคืนต่อเนื่อง<input type="number" id="pc_gap" value="${esc(C.gapDays)}"></label>
       <label style="grid-column:1/-1">ไฟล์ Flight Logs (id ของ Google Sheet)<input id="pc_sheet" value="${esc(C.logSheet)}"></label>
+      <label style="grid-column:1/-1">ภารกิจ (เจ้าของเครื่อง) — บรรทัดละภารกิจ: <code>รหัส | ชื่อ | ทะเบียน, ทะเบียน</code> · บรรทัดแรกเป็นภารกิจหลัก รับทะเบียนที่ไม่อยู่ในรายการใด
+        <textarea id="pc_mis" rows="3" style="width:100%;font-family:var(--font-mono,monospace);font-size:13px">${esc(C.missions.map(m => m.code + ' | ' + (m.name || '') + ' | ' + (m.regs || []).join(', ')).join('\n'))}</textarea></label>
     </div><div class="acts" style="margin-top:10px"><button class="obtn" id="pc_save" type="button">บันทึกกติกา</button><span id="pc_msg" class="hint"></span></div></details>`;
   document.getElementById('pc_save').onclick = async () => {
-    const v = { preMin:+pc_pre.value, postMin:+pc_post.value, fullDayHrs:+pc_full.value, gapDays:+pc_gap.value, logSheet:pc_sheet.value.trim(), logTab:C.logTab };
+    const missions = pc_mis.value.split('\n').map(l => l.split('|').map(x => x.trim())).filter(a => a[0])
+      .map(a => ({ code:a[0].toUpperCase().replace(/[^A-Z0-9_-]/g, ''), name:a[1] || a[0], regs:(a[2] || '').split(',').map(x => x.trim().toUpperCase()).filter(Boolean) }));
+    if (!missions.length || missions.some(m => !m.code)) { pc_msg.textContent = 'ภารกิจต้องมีรหัสอย่างน้อยหนึ่งบรรทัด'; return; }
+    const v = { preMin:+pc_pre.value, postMin:+pc_post.value, fullDayHrs:+pc_full.value, gapDays:+pc_gap.value, logSheet:pc_sheet.value.trim(), logTab:C.logTab, missions };
     try { await A.db.collection('config').doc('mrf').set(v, { merge:true });
           adminLog('payCfg', null, JSON.stringify(v)); pc_msg.textContent = 'บันทึกแล้ว'; } catch(e){ pc_msg.textContent = 'บันทึกไม่ได้: ' + (e.code||e.message); }
   };
@@ -1221,7 +1229,7 @@ async function pay(){
     .sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
   const num = v => v === null || v === undefined ? '' : v;
   L.innerHTML = `<div class="twrap"><table class="reg"><thead><tr><th>ชื่อ</th><th>ชื่อใน Flight Log</th><th>ค่าบิน<br>บาท/ชม.</th><th>ภาคพื้น/SIM<br>บาท/ชม.</th>
-      <th>ที่พักเหมา<br>บาท/คืน</th><th>Per diem</th><th>Per diem<br>บาท/วัน</th><th></th></tr></thead><tbody>${staff.map(u => { const r = rates[u.uid] || {};
+      <th>ที่พักเหมา<br>บาท/คืน</th><th>Per diem</th><th>Per diem<br>บาท/วัน</th><th></th></tr></thead><tbody>${staff.map(u => { const r = rates[u.uid] || {}, M = r.mis || {};
       return `<tr data-pu="${esc(u.uid)}"><td><b>${esc(u.name || u.email || u.uid)}</b>${r.updatedByName ? `<div class="hint" style="margin:0">แก้ล่าสุด ${esc(r.updatedByName)}</div>` : ''}</td>
         <td><input data-f="aliases" value="${esc((r.aliases || []).join(', '))}" placeholder="เช่น Atcha Chartdhummarugsa" style="min-width:180px"></td>
         <td><input data-f="fltRate" type="number" value="${esc(num(r.fltRate))}" style="width:90px"></td>
@@ -1229,20 +1237,45 @@ async function pay(){
         <td><input data-f="accomRate" type="number" value="${esc(num(r.accomRate))}" placeholder="ตามจริง" style="width:90px"></td>
         <td style="text-align:center"><input data-f="perDiem" type="checkbox"${r.perDiem ? ' checked' : ''}></td>
         <td><input data-f="perDiemRate" type="number" value="${esc(num(r.perDiemRate))}" style="width:90px"></td>
-        <td><button type="button" class="fb" data-psave="${esc(u.uid)}">บันทึก</button><span class="hint" data-pmsg="${esc(u.uid)}" style="margin:0"></span></td></tr>`; }).join('')}</tbody></table></div>`;
+        <td><button type="button" class="fb" data-psave="${esc(u.uid)}">บันทึก</button><span class="hint" data-pmsg="${esc(u.uid)}" style="margin:0"></span></td></tr>
+      <tr data-pm="${esc(u.uid)}"><td colspan="8" style="background:var(--g-50);padding:8px 12px">
+        <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:6px;font-size:13px">
+          <b>อัตราแยกตามภารกิจ</b>
+          <label><input type="checkbox" data-f="misOn"${r.mis ? ' checked' : ''}> ใช้</label>
+          <label>จ่ายแบบ <select data-f="payType"><option value="hourly"${r.payType !== 'daily' ? ' selected' : ''}>รายชั่วโมงบิน (นักบิน/ครู)</option><option value="daily"${r.payType === 'daily' ? ' selected' : ''}>ค่าแรงรายวัน (Flt Ops / ช่าง)</option></select></label>
+          <label><input type="checkbox" data-f="trvReturn"${r.trvReturn ? ' checked' : ''}> จ่ายค่าเดินทางขากลับด้วย</label>
+        </div>
+        <table class="reg" data-mg style="width:auto${r.mis ? '' : ';display:none'}"><thead><tr><th>ภารกิจ</th>${MIS_K.map(k => `<th>${k[1]}</th>`).join('')}</tr></thead><tbody>${
+          C.missions.map(m => `<tr><td><b>${esc(m.code)}</b><div class="hint" style="margin:0">${esc((m.regs || []).join(', ') || 'ทะเบียนอื่นทั้งหมด')}</div></td>${
+            MIS_K.map(k => `<td><input type="number" min="0" data-mis="${esc(m.code)}" data-mk="${k[0]}" value="${esc(num((M[m.code] || {})[k[0]] ?? (m.code === C.missions[0].code && k[0] === 'flt' ? r.fltRate : '')))}" style="width:90px"></td>`).join('')}</tr>`).join('')}
+        </tbody></table></td></tr>`; }).join('')}</tbody></table></div>
+    <p class="hint">อัตราแยกตามภารกิจ: วันที่มีหลายภารกิจ ค่าเดินทาง เบี้ยเลี้ยง และค่าแรงรายวันจ่ายครั้งเดียวตามอัตราที่สูงกว่า และคิดกับภารกิจนั้น (อัตราเท่ากันคิดกับภารกิจหลัก) · ค่าเดินทางจ่ายวันแรกของแต่ละช่วงที่มาประจำ ขากลับจ่ายวันสุดท้ายถ้าติ๊กไว้ · ทุกรายการแบบเหมาจ่ายถูกหัก ณ ที่จ่าย 3%</p>`;
+  L.querySelectorAll('[data-pm] [data-f="misOn"]').forEach(c => c.onchange = () => {
+    c.closest('[data-pm]').querySelector('[data-mg]').style.display = c.checked ? '' : 'none'; });
   L.querySelectorAll('[data-psave]').forEach(b => b.onclick = async () => {
     const uid = b.dataset.psave, tr = L.querySelector(`[data-pu="${uid}"]`), u = staff.find(x => x.uid === uid) || {};
     const g = f => tr.querySelector(`[data-f="${f}"]`), n = f => { const v = g(f).value.trim(); return v === '' ? null : Number(v); };
     const before = rates[uid] || {};
+    const pm = L.querySelector(`[data-pm="${uid}"]`), pf = f => pm.querySelector(`[data-f="${f}"]`);
+    let mis = null;
+    if (pf('misOn').checked) {
+      mis = {}; let bad = false;
+      pm.querySelectorAll('[data-mis]').forEach(i => { const t = i.value.trim(), x = t === '' ? null : Number(t);
+        if (x !== null && (isNaN(x) || x < 0)) bad = true;
+        (mis[i.dataset.mis] = mis[i.dataset.mis] || {})[i.dataset.mk] = x; });
+      if (bad) { L.querySelector(`[data-pmsg="${uid}"]`).textContent = ' อัตราภารกิจไม่ถูกต้อง'; return; }
+    }
     const v = { aliases: g('aliases').value.split(',').map(x => x.trim()).filter(Boolean), fltRate: n('fltRate'), gndRate: n('gndRate'),
+      mis, payType: pf('payType').value, trvReturn: pf('trvReturn').checked,
       accomRate: n('accomRate'), perDiem: g('perDiem').checked, perDiemRate: n('perDiemRate'), name: u.name || '',
       updatedByUid: A.user.uid, updatedByName: A.myName() || A.user.email || '', updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
     if ([v.fltRate, v.gndRate, v.accomRate, v.perDiemRate].some(x => x !== null && (isNaN(x) || x < 0))) { L.querySelector(`[data-pmsg="${uid}"]`).textContent = ' ตัวเลขไม่ถูกต้อง'; return; }
     try {
       await A.db.collection('payRates').doc(uid).set(v);
       rates[uid] = v;
-      const keys = ['fltRate','gndRate','accomRate','perDiem','perDiemRate'], ch = keys.filter(k => String(before[k] ?? '') !== String(v[k] ?? ''))
+      const keys = ['fltRate','gndRate','accomRate','perDiem','perDiemRate','payType','trvReturn'], ch = keys.filter(k => String(before[k] ?? '') !== String(v[k] ?? ''))
         .map(k => k + ' ' + (before[k] ?? '—') + ' → ' + (v[k] ?? '—'));
+      if (JSON.stringify(before.mis || null) !== JSON.stringify(v.mis)) ch.push('อัตราภารกิจ → ' + (v.mis ? JSON.stringify(v.mis) : 'ไม่ใช้'));
       if (String((before.aliases||[]).join(',')) !== v.aliases.join(',')) ch.push('ชื่อใน Flight Log → ' + (v.aliases.join(', ') || '—'));
       adminLog('pay', { uid, name: u.name, email: u.email }, ch.join(' · ') || 'ไม่เปลี่ยน');
       L.querySelector(`[data-pmsg="${uid}"]`).textContent = ' บันทึกแล้ว';

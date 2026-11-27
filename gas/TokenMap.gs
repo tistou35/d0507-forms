@@ -2812,14 +2812,24 @@ var TOKEN_MAP = {
         "labelTh": "ทำใบเบิกแทน"
       },
       {
+        "tok": "{{misNote}}",
+        "label": "Pay by mission (aircraft owner)",
+        "labelTh": "ค่าตอบแทนแยกตามภารกิจ (เจ้าของเครื่อง)"
+      },
+      {
+        "tok": "{{misPay}}",
+        "label": "Travel, allowance and daily wage (Baht) — included in Total Income",
+        "labelTh": "ค่าเดินทาง เบี้ยเลี้ยง และค่าแรงรายวัน (บาท) — รวมอยู่ใน Total Income แล้ว"
+      },
+      {
         "tok": "{{perDiemTotal}}",
         "label": "Per diem total (Baht) — included in the reimbursement total",
         "labelTh": "Per diem รวม (บาท) — รวมอยู่ในยอดค่าใช้จ่ายที่ขอเบิก"
       },
       {
         "tok": "{{whtAmt}}",
-        "label": "Withholding tax 3% — on pay, flat accommodation and per diem only; receipted expenses are not withheld",
-        "labelTh": "ภาษีหัก ณ ที่จ่าย 3% — คิดจากค่าตอบแทน ค่าที่พักเหมาจ่าย และ per diem เท่านั้น ค่าใช้จ่ายที่มีใบเสร็จไม่หัก"
+        "label": "Withholding tax 3% — on pay, travel, allowance, daily wage, flat accommodation, per diem and receipts taken as income; receipted expenses are not withheld",
+        "labelTh": "ภาษีหัก ณ ที่จ่าย 3% — คิดจากค่าตอบแทน ค่าเดินทาง เบี้ยเลี้ยง ค่าแรงรายวัน ค่าที่พักเหมาจ่าย per diem และใบเสร็จที่รับเป็นรายได้ ค่าใช้จ่ายที่มีใบเสร็จไม่หัก"
       }
     ]
   },

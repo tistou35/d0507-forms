@@ -404,7 +404,8 @@
    "{{sig_apvSign}}",
    "{{apvName}}",
    "{{apvDate}}",
-   "{{k_perDiemOn}}"
+   "{{k_perDiemOn}}",
+   "{{k_trvRet}}"
   ],
   "manual": [
    {
@@ -413,6 +414,16 @@
     "labelTh": "ทำใบเบิกแทน"
    },
    "{{flogNote}}",
+   {
+    "tok": "{{misNote}}",
+    "label": "Pay by mission (aircraft owner)",
+    "labelTh": "ค่าตอบแทนแยกตามภารกิจ (เจ้าของเครื่อง)"
+   },
+   {
+    "tok": "{{misPay}}",
+    "label": "Travel, allowance and daily wage (Baht) — included in Total Income",
+    "labelTh": "ค่าเดินทาง เบี้ยเลี้ยง และค่าแรงรายวัน (บาท) — รวมอยู่ใน Total Income แล้ว"
+   },
    "{{rcptNote}}",
    "{{accomActual}}",
    "{{perDiemDays}}",
@@ -424,8 +435,8 @@
    },
    {
     "tok": "{{whtAmt}}",
-    "label": "Withholding tax 3% — on pay, flat accommodation and per diem only; receipted expenses are not withheld",
-    "labelTh": "ภาษีหัก ณ ที่จ่าย 3% — คิดจากค่าตอบแทน ค่าที่พักเหมาจ่าย และ per diem เท่านั้น ค่าใช้จ่ายที่มีใบเสร็จไม่หัก"
+    "label": "Withholding tax 3% — on pay, travel, allowance, daily wage, flat accommodation, per diem and receipts taken as income; receipted expenses are not withheld",
+    "labelTh": "ภาษีหัก ณ ที่จ่าย 3% — คิดจากค่าตอบแทน ค่าเดินทาง เบี้ยเลี้ยง ค่าแรงรายวัน ค่าที่พักเหมาจ่าย per diem และใบเสร็จที่รับเป็นรายได้ ค่าใช้จ่ายที่มีใบเสร็จไม่หัก"
    }
   ],
   "_why_perdiem": "per diem และค่าที่พักตามจริงไม่มีช่องบนกระดาษ (เพิ่ม 23 NOV 2026) — พิมพ์ในบล็อก ADDITIONAL ท้ายเอกสาร ยอดรวมอยู่ใน Reimbursement / Total แล้ว · ช่อง \"มีสิทธิ์เบิก per diem\" ไม่ใช่ ☐ บนกระดาษ จึงข้าม ไม่งั้นจำนวนช่องติ๊กไม่เท่ากระดาษแล้วตัววางไม่ติ๊กสักช่อง",
@@ -447,7 +458,8 @@
   "tableRows": {
    "exp": 30
   },
-  "_why_wht": "กระดาษพิมพ์ป้าย \"Approx. Pay After Withholding Tax 3% (Total × 0.97)\" แต่ระบบคิด 3% เฉพาะส่วนที่ไม่มีใบเสร็จ (ผู้ควบคุมเอกสารสั่ง 25 NOV 2026) จึงพิมพ์ยอดภาษีและฐานที่ใช้ในบล็อก ADDITIONAL ให้ผู้ตรวจเห็นว่าตัวเลขไม่ใช่ Total × 0.97 · ป้ายบนกระดาษต้องแก้ผ่าน DRF"
+  "_why_wht": "กระดาษพิมพ์ป้าย \"Approx. Pay After Withholding Tax 3% (Total × 0.97)\" แต่ระบบคิด 3% เฉพาะส่วนที่ไม่มีใบเสร็จ (ผู้ควบคุมเอกสารสั่ง 25 NOV 2026) จึงพิมพ์ยอดภาษีและฐานที่ใช้ในบล็อก ADDITIONAL ให้ผู้ตรวจเห็นว่าตัวเลขไม่ใช่ Total × 0.97 · ป้ายบนกระดาษต้องแก้ผ่าน DRF",
+  "_why_mission": "ค่าเดินทาง เบี้ยเลี้ยง ค่าแรงรายวัน และรายละเอียดแยกภารกิจ ไม่มีบรรทัดบนกระดาษ (เพิ่ม 27 NOV 2026) — พิมพ์ในบล็อก ADDITIONAL · ค่าบินตามภารกิจรวมอยู่ใน Flight Pay แล้ว ช่องอัตราต่อชั่วโมงว่างเมื่อใช้อัตราแยกภารกิจ · ต้องออก DRF ถ้าจะให้เป็นบรรทัดของเอกสารควบคุม"
  },
  "DAF": {
   "cells": {

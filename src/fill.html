@@ -581,7 +581,7 @@ async function proxyBar(){
       else { ['forUid','forName','forEmail','proxyNote'].forEach(k=>FK.set(k,'')); FK.set('empName',A.myName()); FK.set('empEmail',(A.user&&A.user.email)||''); }
       // ค่าที่ดึงมาก่อนหน้าเป็นของอีกคน — ล้างทิ้ง กันส่งชั่วโมงบินของคนหนึ่งในชื่ออีกคน
       ['sheet','exp','rcptIds','rcptNote','flogNote'].forEach(k=>FK.set(k, k==='sheet'||k==='exp'||k==='rcptIds' ? [] : ''));
-      ['rLog','rRc'].forEach(k=>FK.set(k,false));
+      ['rLog','rRc','rMis','rDay'].forEach(k=>FK.set(k,false)); FK.set('misCfg',null); FK.set('trvRet',null);
       FK._pullMsg={};
       FK.render(host); draw(); renderFoot();
     };
@@ -642,6 +642,14 @@ const PULL = {
     };
     if (has(R.flt)) set.fltRate = R.flt;
     if (has(R.gnd)) set.gndRate = R.gnd;
+    /* อัตราแยกภารกิจ (เจ้าของเครื่อง) — ค่าบินคิดตามภารกิจใน FormKit.fns.mrfMission ช่องอัตราต่อชั่วโมงเดียวจึงว่างและล็อก
+       ค่าแรงรายวัน (Flt Ops · ช่าง): ชั่วโมงในตารางเป็นบันทึกเวลาทำงาน ไม่ใช่ค่าจ้างรายชั่วโมง — ช่องอัตราภาคพื้นว่างและล็อก
+       ขากลับ: ผู้ดูแลหรือ FA ที่ทำใบแทนติ๊กได้ ผู้เบิกเองติ๊กไม่ได้ */
+    const MC = x.misCfg || null;
+    set.misCfg = MC; set.rMis = !!MC; set.rDay = !!(MC && MC.payType === 'daily');
+    set.rTrvLock = !(canProxy() && fk.data.forUid);
+    if (MC) { set.fltRate = ''; set.rFlt = true; if (fk.data.trvRet == null || set.rTrvLock) set.trvRet = !!MC.trvReturn; }
+    if (MC && MC.payType === 'daily') { set.gndRate = ''; set.rGnd = true; }
     if (has(R.accom)) { set.accomRate = R.accom; set.accomActual = ''; } else set.accomRate = '';
     if (R.perDiem) { set.perDiemDays = x.perDiemDays; if (has(R.perDiemRate)) set.perDiemRate = R.perDiemRate; }
     else { set.perDiemDays = ''; set.perDiemRate = ''; }
@@ -679,7 +687,9 @@ const PULL = {
                           en:x.flights+' flights on '+x.days+' days · block '+Math.floor(blk/60)+':'+String(blk%60).padStart(2,'0')}))
                   : e(A.L({th:'ไม่พบเที่ยวบินของคุณในเดือนนี้',en:'No flights of yours this month'}))}
       ${x.flights ? '<br>'+e(A.L({th:'ที่พัก '+x.nights+' คืน (ช่วงวันที่ '+(x.stays||[]).join(', ')+')',en:'Accommodation '+x.nights+' nights (days '+(x.stays||[]).join(', ')+')'}))
-        + (R.perDiem ? ' · '+e(A.L({th:'per diem '+x.perDiemDays+' วัน',en:'per diem '+x.perDiemDays+' days'})) : '') : ''}
+        + (R.perDiem ? ' · '+e(A.L({th:'per diem '+x.perDiemDays+' วัน',en:'per diem '+x.perDiemDays+' days'})) : '') : ''}${
+        MC ? '<br>'+e(A.L({th:'คิดค่าตอบแทนแยกตามภารกิจ ('+MC.missions.map(m=>m.code+': '+(m.regs||[]).join(', ')).join(' · ')+')'+(MC.payType==='daily'?' · ค่าแรงรายวัน — กรอกชั่วโมงทำงานในตารางเอง':''),
+                           en:'Pay by mission ('+MC.missions.map(m=>m.code+': '+(m.regs||[]).join(', ')).join(' · ')+')'+(MC.payType==='daily'?' · daily rate — type your working hours in the table':'')})) : ''}
       <br><span class="hint" style="margin:0">${e(A.L({th:'จับคู่ชื่อ: ',en:'Matched names: '}))}${e((x.names||[]).join(' · '))}${
         (x.auto||[]).length ? ' · '+e(A.L({th:'สะกดต่าง 1 ตัว นับให้แล้ว: ',en:'1 letter different, counted: '}))+e(x.auto.map(a=>a.name).join(', ')) : ''}${
         mine.length ? ' · '+e(A.L({th:'คงแถวที่กรอกเอง '+mine.length+' แถว',en:'kept '+mine.length+' rows you typed'})) : ''}</span></span></div>`
