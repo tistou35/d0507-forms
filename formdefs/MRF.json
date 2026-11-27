@@ -1,22 +1,21 @@
 {
  "code": "MRF",
  "doc": "D-0507-MRF-001",
- "control": "",
+ "control": "AD-MRF-301-B",
  "issue": "01",
- "rev": "00",
- "eff": "",
+ "rev": "01",
+ "eff": "27 NOV 2026",
  "title": {
   "th": "แบบเบิกค่าใช้จ่ายรายเดือน",
   "en": "Monthly Reimbursement Form"
  },
  "retain": "HR / Finance",
  "ui": {
-  "compact": true,
   "tabs": [
    {
     "k": "T1",
-    "th": "ผู้เบิก",
-    "en": "Employee"
+    "th": "เริ่มต้น",
+    "en": "Start"
    },
    {
     "k": "T2",
@@ -25,16 +24,11 @@
    },
    {
     "k": "T3",
-    "th": "ค่าตอบแทน",
-    "en": "Pay"
+    "th": "เงินที่เบิก",
+    "en": "Pay & expenses"
    },
    {
     "k": "T4",
-    "th": "ค่าใช้จ่าย",
-    "en": "Expenses"
-   },
-   {
-    "k": "T5",
     "th": "สรุปและลงนาม",
     "en": "Summary & sign"
    }
@@ -45,7 +39,13 @@
    ],
    "admin": true,
    "_why": "ผู้ดูแลระบบหรือผู้ถือตำแหน่ง FA ทำใบเบิกแทนผู้เบิกได้ — เลือกชื่อแล้วระบบดึง Flight Log อัตรา และใบเสร็จของคนนั้น"
-  }
+  },
+  "dense": true,
+  "sumbar": {
+   "th": "ยอดเบิก {totalIncome:$} · หัก ณ ที่จ่าย 3% {whtAmt:$} · รับสุทธิ {afterTax:$} บาท",
+   "en": "Claim {totalIncome:$} · 3% withholding {whtAmt:$} · net {afterTax:$} Baht"
+  },
+  "_why_sumbar": "ยอดที่ได้รับค้างอยู่ใต้แถบแท็บทุกแท็บ คนกรอกครั้งแรกเห็นทันทีว่าแก้ช่องไหนแล้วเงินเปลี่ยนเท่าไร ไม่ต้องเลื่อนไปแท็บสรุป · 27 NOV 2026"
  },
  "flags": [
   "rFlt",
@@ -90,10 +90,18 @@
    "tab": "T1",
    "party": "emp",
    "title": {
-    "th": "ส่วนที่ 1 — ข้อมูลผู้เบิก",
-    "en": "Section 1 — Employee information"
+    "th": "ส่วนที่ 1 — ผู้เบิก",
+    "en": "Section 1 — Claimant"
    },
    "fields": [
+    {
+     "k": "guide",
+     "type": "static",
+     "text": {
+      "th": "① เลือกเดือนที่เบิก  ② กด \"ดึงข้อมูลเดือนนี้\" — ระบบเติมตารางเวลา อัตรา และใบเสร็จที่ FA ตรวจผ่านให้  ③ ตรวจทีละแท็บ เพิ่มแถวงานที่ไม่ได้อยู่ใน Flight Log  ④ ลงนามในแท็บสุดท้ายแล้วส่ง",
+      "en": "① Choose the month  ② Press \"Fetch this month\" — the timesheet, your rates and FA-verified receipts are filled in  ③ Check each tab and add work not in the Flight Log  ④ Sign on the last tab and submit"
+     }
+    },
     {
      "k": "empName",
      "type": "text",
@@ -102,7 +110,27 @@
      "self": true,
      "label": {
       "th": "ชื่อ–นามสกุล",
-      "en": "Employee's name"
+      "en": "Claimant Name"
+     }
+    },
+    {
+     "k": "empPos",
+     "type": "text",
+     "half": true,
+     "label": {
+      "th": "ตำแหน่ง",
+      "en": "Position"
+     },
+     "ph": "FI · Flt Ops · Engineer"
+    },
+    {
+     "k": "period",
+     "type": "month",
+     "req": true,
+     "half": true,
+     "label": {
+      "th": "เดือน / ปีที่เบิก",
+      "en": "Month / Year"
      }
     },
     {
@@ -112,31 +140,35 @@
      "half": true,
      "label": {
       "th": "อีเมล",
-      "en": "Employee's email"
-     }
-    },
-    {
-     "k": "period",
-     "type": "month",
-     "req": true,
-     "half": true,
-     "label": {
-      "th": "เดือน / ปี",
-      "en": "Month / year"
-     },
-     "hint": {
-      "th": "เดือนที่เบิก — ปุ่มดึง Flight Log และใบเสร็จใช้เดือนนี้",
-      "en": "The month being claimed — the Flight Log and receipt buttons use this month"
+      "en": "Email"
      }
     },
     {
      "k": "bank",
      "type": "text",
      "req": true,
-     "half": true,
+     "half": false,
      "label": {
       "th": "ธนาคารและเลขที่บัญชี",
-      "en": "Bank name & account no."
+      "en": "Bank Name & Account No."
+     }
+    },
+    {
+     "k": "flog",
+     "type": "pull",
+     "action": "mrfAll",
+     "monthFrom": "period",
+     "label": {
+      "th": "ดึงข้อมูลอัตโนมัติ",
+      "en": "Fill in automatically"
+     },
+     "button": {
+      "th": "ดึงข้อมูลเดือนนี้ (Flight Log + ใบเสร็จ)",
+      "en": "Fetch this month (Flight Log + receipts)"
+     },
+     "hint": {
+      "th": "กดซ้ำได้ แถวที่พิมพ์เองไม่หาย",
+      "en": "Safe to press again — rows you typed are kept"
      }
     }
    ]
@@ -151,49 +183,9 @@
    },
    "fields": [
     {
-     "k": "note1",
-     "type": "static",
-     "text": {
-      "th": "ประเภท: ใช้ Flight Type ตาม Flight Log (Training Flight · General Flight) · แถวที่กรอกเอง: SIM = เครื่องฝึกบินจำลอง · GND = ภาคพื้น/บรรยาย · GS = ภาคทฤษฎี (TKI)",
-      "en": "Type: the Flight Type from the Flight Log (Training Flight · General Flight) · rows you add: SIM = simulator · GND = ground / briefing · GS = ground school (TKI)"
-     }
-    },
-    {
-     "k": "flog",
-     "type": "pull",
-     "action": "mrfPull",
-     "label": {
-      "th": "ดึงตารางเวลาจาก Flight Log",
-      "en": "Fill the timesheet from the Flight Log"
-     },
-     "button": {
-      "th": "ดึงข้อมูลเดือนนี้",
-      "en": "Fetch this month"
-     },
-     "hint": {
-      "th": "ใช้เดือนจากช่องเดือน / ปี ด้านบน — ระบบหาเที่ยวบินที่ชื่อของคุณอยู่ใน Pilot 1 หรือ Pilot 2 รวมเป็นแถวละหนึ่งวัน (Flight Log ID ทุกเที่ยว · Block Time รวมของวัน) และเติมอัตรา จำนวนคืนที่พัก และ per diem ที่ผู้ดูแลตั้งไว้ · Flight Log ID ซ้ำหรือเวลาบินทับกันขึ้นให้เลือกว่าไม่นับแถวไหน · ชื่อที่สะกดต่าง 1 ตัวนับให้ ต่าง 2–3 ตัวถามก่อน · แถวภาคพื้น/SIM ที่กรอกเองไม่ถูกลบ",
-      "en": "Uses the Month / year chosen above — flights where you are Pilot 1 or Pilot 2 become one row per day (every Flight Log ID · total block time), and the rates, accommodation nights and per diem set by the administrator are filled in. Duplicate IDs or overlapping times are listed for you to leave out; a name 1 letter different is counted, 2–3 letters asks you first. Ground / sim rows you typed are kept."
-     },
-     "monthFrom": "period"
-    },
-    {
-     "k": "flogNote",
-     "type": "textarea",
-     "lockIf": "rLog == true",
-     "showIf": "rLog == true",
-     "label": {
-      "th": "บันทึกการดึงข้อมูล Flight Log",
-      "en": "Flight Log reconciliation"
-     },
-     "hint": {
-      "th": "ระบบเขียนให้ — แถวที่ไม่นับ และชื่อสะกดต่างที่นับเป็นผู้เบิก พิมพ์ใน PDF ให้ผู้ตรวจสอบเห็น",
-      "en": "Written by the system — entries left out and name spellings counted as you; printed for the verifier"
-     }
-    },
-    {
      "k": "sheet",
      "type": "table",
-     "rows": 8,
+     "rows": 3,
      "max": 22,
      "req": true,
      "label": {
@@ -201,35 +193,49 @@
       "en": "Work performed"
      },
      "hint": {
-      "th": "วันที่ไม่ได้บินจะไม่มี Flight Log ID · ชั่วโมงกรอกได้ทั้ง 1:30 และ 1.5 · ชั่วโมงบินใส่เฉพาะแถวที่บินจริง ภาคพื้น/SIM ใส่ช่อง ชม.ภาคพื้น/SIM · กระดาษพิมพ์ไว้ 22 แถว",
-      "en": "Days without a Flight Log ID were not flown · hours accept 1:30 or 1.5 · flight hours only on flown rows, ground / sim in its own column · the printed form holds 22 rows"
+      "th": "วันละแถวต่อภารกิจ · ชั่วโมงพิมพ์ 1:30 หรือ 1.5 ก็ได้ · ภารกิจว่างไว้ = ดูจากทะเบียนเครื่อง",
+      "en": "One row per day and mission · hours as 1:30 or 1.5 · mission left blank = taken from the aircraft"
      },
      "cols": [
       {
        "k": "date",
        "type": "date",
-       "w": "14%",
+       "w": "13%",
        "label": {
         "th": "วันที่",
         "en": "Date"
        }
       },
       {
+       "k": "mis",
+       "type": "select",
+       "w": "9%",
+       "opt": [
+        "",
+        "D0507",
+        "BSC"
+       ],
+       "label": {
+        "th": "ภารกิจ",
+        "en": "Mission"
+       }
+      },
+      {
        "k": "detail",
        "type": "text",
-       "w": "26%",
+       "w": "22%",
        "label": {
-        "th": "รายละเอียด",
-        "en": "Detail"
+        "th": "รายละเอียด / Flight Log ID",
+        "en": "Detail / Flight Log ID"
        }
       },
       {
        "k": "place",
        "type": "text",
-       "w": "13%",
+       "w": "11%",
        "label": {
-        "th": "อากาศยาน / ห้อง",
-        "en": "Aircraft / room"
+        "th": "เครื่อง / ห้อง",
+        "en": "Aircraft / Room"
        }
       },
       {
@@ -244,25 +250,25 @@
       {
        "k": "flt",
        "type": "text",
-       "w": "10%",
+       "w": "8%",
        "label": {
         "th": "ชม.บิน",
-        "en": "Flt hrs"
+        "en": "Flt Hrs"
        }
       },
       {
        "k": "gnd",
        "type": "text",
-       "w": "10%",
+       "w": "9%",
        "label": {
-        "th": "ชม.ภาคพื้น/SIM",
-        "en": "Gnd / sim hrs"
+        "th": "ชม.ภาคพื้น/ทำงาน",
+        "en": "Gnd / Sim / Work Hrs"
        }
       },
       {
        "k": "remark",
        "type": "text",
-       "w": "15%",
+       "w": "16%",
        "label": {
         "th": "หมายเหตุ",
         "en": "Remarks"
@@ -274,8 +280,34 @@
      "k": "note2",
      "type": "static",
      "text": {
-      "th": "รวมชั่วโมงบิน {fltHours} ชม. · รวมชั่วโมงภาคพื้น/SIM {gndHours} ชม. · Flt Ops / ช่าง (ค่าแรงรายวัน): กรอกวันละแถว ใส่ชั่วโมงทำงานในช่องภาคพื้น และใส่ทะเบียนเครื่องหรือรหัสภารกิจ (D0507 / BSC) ในช่อง Aircraft",
-      "en": "Total flight {fltHours} h · total ground / sim {gndHours} h · Flt Ops / engineers (daily rate): one row per day, working hours in the ground column, aircraft or mission code (D0507 / BSC) in the Aircraft column"
+      "th": "รวม: บิน {fltHours} ชม. · ภาคพื้น/SIM/ทำงาน {gndHours} ชม.",
+      "en": "Total: flight {fltHours} h · ground / sim / work {gndHours} h"
+     }
+    },
+    {
+     "k": "note1",
+     "type": "static",
+     "fold": {
+      "th": "รหัสประเภทและภารกิจ",
+      "en": "Type and mission codes"
+     },
+     "text": {
+      "th": "ประเภท: FLT บิน · SIM เครื่องฝึกบินจำลอง · GND ภาคพื้น/บรรยาย · GS ภาคทฤษฎี (TKI) · DUTY วันทำงาน (Flt Ops / ช่าง) — แถวจาก Flight Log ใช้ Flight Type ตามที่บันทึก\nภารกิจ = เจ้าของเครื่อง: D0507 เครื่องของโรงเรียน (HS-VVD) · BSC เครื่องลูกค้า (HS-BSC)\nFlt Ops / ช่าง: วันละแถว ใส่ชั่วโมงทำงานในช่อง ชม.ภาคพื้น/ทำงาน และเลือกภารกิจ",
+      "en": "Type: FLT flight · SIM simulator · GND ground / briefing · GS ground school (TKI) · DUTY working day (Flt Ops / engineer) — Flight Log rows keep their Flight Type\nMission = aircraft owner: D0507 school aircraft (HS-VVD) · BSC customer aircraft (HS-BSC)\nFlt Ops / engineers: one row per day, working hours in the Gnd / Sim / Work column, and pick the mission"
+     }
+    },
+    {
+     "k": "flogNote",
+     "type": "textarea",
+     "lockIf": "rLog == true",
+     "showIf": "rLog == true",
+     "label": {
+      "th": "บันทึกการดึงข้อมูล Flight Log",
+      "en": "Flight Log reconciliation"
+     },
+     "hint": {
+      "th": "ระบบเขียนให้ — พิมพ์ใน PDF ให้ผู้ตรวจสอบเห็นแถวที่ไม่นับ",
+      "en": "Written by the system — printed for the verifier"
      }
     }
    ]
@@ -285,52 +317,185 @@
    "tab": "T3",
    "party": "emp",
    "title": {
-    "th": "ส่วนที่ 3 — ค่าตอบแทนการบิน",
-    "en": "Section 3 — Flight pay"
+    "th": "ส่วนที่ 3 — ค่าตอบแทนตามภารกิจ",
+    "en": "Section 3 — Pay by mission"
    },
    "fields": [
+    {
+     "k": "payGrid",
+     "type": "grid",
+     "head": [
+      {
+       "th": "รายการ",
+       "en": "Item"
+      },
+      {
+       "th": "D0507 เครื่องโรงเรียน",
+       "en": "D0507 school aircraft"
+      },
+      {
+       "th": "BSC เครื่องลูกค้า",
+       "en": "BSC customer aircraft"
+      },
+      {
+       "th": "รวม (บาท)",
+       "en": "Total (Baht)"
+      }
+     ],
+     "rows": [
+      {
+       "label": {
+        "th": "ค่าบิน",
+        "en": "Flight instruction"
+       },
+       "cells": [
+        "{m1Flt:$}\n{m1FltN} ชม. × {m1FltR:n}",
+        "{m2Flt:$}\n{m2FltN} ชม. × {m2FltR:n}",
+        "{fltPay:$}"
+       ],
+       "cellsEn": [
+        "{m1Flt:$}\n{m1FltN} h × {m1FltR:n}",
+        "{m2Flt:$}\n{m2FltN} h × {m2FltR:n}",
+        "{fltPay:$}"
+       ]
+      },
+      {
+       "label": {
+        "th": "ค่าเดินทาง",
+        "en": "Travel"
+       },
+       "showIf": "rMis == true",
+       "cells": [
+        "{m1Trv:$}\n{m1TrvN} ครั้ง × {m1TrvR:n}",
+        "{m2Trv:$}\n{m2TrvN} ครั้ง × {m2TrvR:n}",
+        "{mTrv:$}"
+       ],
+       "cellsEn": [
+        "{m1Trv:$}\n{m1TrvN} trips × {m1TrvR:n}",
+        "{m2Trv:$}\n{m2TrvN} trips × {m2TrvR:n}",
+        "{mTrv:$}"
+       ]
+      },
+      {
+       "label": {
+        "th": "เบี้ยเลี้ยง",
+        "en": "Allowance"
+       },
+       "showIf": "rMis == true",
+       "cells": [
+        "{m1Alw:$}\n{m1AlwN} วัน × {m1AlwR:n}",
+        "{m2Alw:$}\n{m2AlwN} วัน × {m2AlwR:n}",
+        "{mAlw:$}"
+       ],
+       "cellsEn": [
+        "{m1Alw:$}\n{m1AlwN} days × {m1AlwR:n}",
+        "{m2Alw:$}\n{m2AlwN} days × {m2AlwR:n}",
+        "{mAlw:$}"
+       ]
+      },
+      {
+       "label": {
+        "th": "ค่าแรงรายวัน",
+        "en": "Daily wage"
+       },
+       "showIf": "rDay == true",
+       "cells": [
+        "{m1Day:$}\n{m1DayN} วัน × {m1DayR:n}",
+        "{m2Day:$}\n{m2DayN} วัน × {m2DayR:n}",
+        "{mDay:$}"
+       ],
+       "cellsEn": [
+        "{m1Day:$}\n{m1DayN} days × {m1DayR:n}",
+        "{m2Day:$}\n{m2DayN} days × {m2DayR:n}",
+        "{mDay:$}"
+       ]
+      },
+      {
+       "label": {
+        "th": "รวมตามภารกิจ",
+        "en": "Subtotal by mission"
+       },
+       "cls": "sub",
+       "cells": [
+        "{m1Sub:$}",
+        "{m2Sub:$}",
+        "{misTot:$}"
+       ],
+       "cellsEn": [
+        "{m1Sub:$}",
+        "{m2Sub:$}",
+        "{misTot:$}"
+       ]
+      },
+      {
+       "label": {
+        "th": "ภาคพื้น / SIM (อัตราเดียวทุกภารกิจ)",
+        "en": "Ground / sim (one rate)"
+       },
+       "showIf": "rDay != true",
+       "cells": [
+        "{gndPay:$}\n{gndHours} ชม. × {gndRate:n}",
+        "",
+        "{gndPay:$}"
+       ],
+       "cellsEn": [
+        "{gndPay:$}\n{gndHours} h × {gndRate:n}",
+        "",
+        "{gndPay:$}"
+       ]
+      },
+      {
+       "label": {
+        "th": "รวมค่าตอบแทน",
+        "en": "Total pay"
+       },
+       "cls": "tot",
+       "cells": [
+        "",
+        "",
+        "{payTotal:$}"
+       ],
+       "cellsEn": [
+        "",
+        "",
+        "{payTotal:$}"
+       ]
+      }
+     ]
+    },
     {
      "k": "fltRate",
      "type": "number",
      "half": true,
      "min": 0,
      "label": {
-      "th": "อัตราต่อชั่วโมง (บาท)",
-      "en": "Flight hourly rate (Baht/hr)"
+      "th": "อัตราค่าบิน (บาท/ชม.)",
+      "en": "Flight rate (Baht / hr)"
      },
      "lockIf": "rFlt == true",
      "hint": {
-      "th": "ผู้ดูแลตั้งอัตรารายคนไว้ ระบบเติมให้และแก้ไม่ได้ · ยังไม่ได้ตั้ง กรอกเอง · ถ้าผู้ดูแลตั้งอัตราแยกตามภารกิจ ช่องนี้ว่าง และค่าบินคิดตามภารกิจด้านล่าง",
-      "en": "Set per person by the administrator — filled in and locked; type it only if none is set · with per-mission rates this stays blank and flight pay is worked out by mission below"
+      "th": "ผู้ดูแลตั้งไว้ = เติมให้และล็อก · ยังไม่ตั้ง = กรอกเอง",
+      "en": "Set by the administrator = filled and locked · not set = type it"
      },
-     "reqIf": "rMis != true"
-    },
-    {
-     "k": "note3",
-     "type": "static",
-     "text": {
-      "th": "ชั่วโมงบินจากส่วนที่ 2: {fltHours} ชม. → ค่าตอบแทนการบิน {fltPay} บาท",
-      "en": "Flight hours from Section 2: {fltHours} h → flight pay {fltPay} Baht"
-     },
+     "reqIf": "rMis != true",
      "showIf": "rMis != true"
     },
     {
-     "k": "note3m",
-     "type": "static",
-     "showIf": "rMis == true",
-     "text": {
-      "th": "ค่าตอบแทนตามภารกิจ — ค่าบิน {mFlt} บาท · ค่าเดินทาง {mTrv} บาท · เบี้ยเลี้ยง {mAlw} บาท · ค่าแรงรายวัน {mDay} บาท (รวมค่าเดินทาง เบี้ยเลี้ยง ค่าแรง {misPay} บาท)",
-      "en": "Pay by mission — flight {mFlt} Baht · travel {mTrv} Baht · allowance {mAlw} Baht · daily wage {mDay} Baht (travel, allowance and wage {misPay} Baht)"
-     }
-    },
-    {
-     "k": "note3d",
-     "type": "static",
-     "showIf": "rMis == true",
-     "text": {
-      "th": "{misNote}",
-      "en": "{misNote}"
-     }
+     "k": "gndRate",
+     "type": "number",
+     "half": true,
+     "min": 0,
+     "label": {
+      "th": "อัตราภาคพื้น / SIM (บาท/ชม.)",
+      "en": "Ground / sim rate (Baht / hr)"
+     },
+     "lockIf": "rGnd == true",
+     "hint": {
+      "th": "ผู้ดูแลตั้งไว้ = เติมให้และล็อก · ยังไม่ตั้ง = กรอกเอง",
+      "en": "Set by the administrator = filled and locked · not set = type it"
+     },
+     "reqIf": "rDay != true",
+     "showIf": "rDay != true"
     },
     {
      "k": "trvRet",
@@ -338,12 +503,26 @@
      "showIf": "rMis == true",
      "lockIf": "rTrvLock == true",
      "label": {
-      "th": "จ่ายค่าเดินทางขากลับด้วย (วันสุดท้ายของแต่ละช่วง)",
-      "en": "Also pay the return trip (last day of each stay)"
+      "th": "จ่ายค่าเดินทางขากลับด้วย",
+      "en": "Pay the return trip too"
      },
      "hint": {
-      "th": "ค่าตั้งต้นจ่ายเฉพาะขามา · ผู้ดูแลตั้งเป็นรายคนได้ที่หน้าตั้งค่าระบบ · ผู้ดูแลหรือ FA ที่ทำใบแทนติ๊กเปลี่ยนในใบนี้ได้",
-      "en": "By default only the arrival trip is paid · set per person by the administrator; an administrator or FA preparing the claim can change it here"
+      "th": "ผู้ดูแลหรือ FA ที่ทำใบแทนเปลี่ยนได้ ผู้เบิกเปลี่ยนเองไม่ได้",
+      "en": "Only an administrator or FA preparing the claim can change this"
+     },
+     "half": true
+    },
+    {
+     "k": "note3d",
+     "type": "static",
+     "showIf": "rMis == true",
+     "fold": {
+      "th": "ดูวิธีคิด",
+      "en": "How it was worked out"
+     },
+     "text": {
+      "th": "{misNote}",
+      "en": "{misNote}"
      }
     }
    ]
@@ -353,43 +532,8 @@
    "tab": "T3",
    "party": "emp",
    "title": {
-    "th": "ส่วนที่ 4 — ค่าตอบแทนภาคพื้น / SIM",
-    "en": "Section 4 — Ground / simulator pay"
-   },
-   "fields": [
-    {
-     "k": "gndRate",
-     "type": "number",
-     "half": true,
-     "min": 0,
-     "label": {
-      "th": "อัตราต่อชั่วโมง (บาท)",
-      "en": "Ground / sim rate (Baht/hr)"
-     },
-     "lockIf": "rGnd == true",
-     "hint": {
-      "th": "ผู้ดูแลตั้งอัตรารายคนไว้ ระบบเติมให้และแก้ไม่ได้ · ยังไม่ได้ตั้ง กรอกเอง",
-      "en": "Set per person by the administrator — filled in and locked; type it only if none is set"
-     },
-     "reqIf": "rDay != true"
-    },
-    {
-     "k": "note4",
-     "type": "static",
-     "text": {
-      "th": "ชั่วโมงภาคพื้น/SIM จากส่วนที่ 2: {gndHours} ชม. → ค่าตอบแทน {gndPay} บาท",
-      "en": "Ground / sim hours from Section 2: {gndHours} h → pay {gndPay} Baht"
-     }
-    }
-   ]
-  },
-  {
-   "k": "S5",
-   "tab": "T4",
-   "party": "emp",
-   "title": {
-    "th": "ส่วนที่ 5 — ค่าใช้จ่ายที่ขอเบิก",
-    "en": "Section 5 — Reimbursement / expenses"
+    "th": "ส่วนที่ 4 — ที่พัก per diem และค่าใช้จ่าย",
+    "en": "Section 4 — Accommodation, per diem & expenses"
    },
    "fields": [
     {
@@ -398,12 +542,12 @@
      "half": true,
      "min": 0,
      "label": {
-      "th": "ที่พัก (จำนวนคืน)",
+      "th": "ที่พัก (คืน)",
       "en": "Accommodation (nights)"
      },
      "hint": {
-      "th": "นับจากวันที่มาทำงาน — วันหยุดคั่นไม่เกิน 2 วันถือว่าไม่ได้กลับ (ทำงาน 1 2 4 5 = 4 คืน)",
-      "en": "From working days — a break of up to 2 days counts as staying (work 1 2 4 5 = 4 nights)"
+      "th": "หยุดคั่นไม่เกิน 2 วันนับว่าไม่ได้กลับ",
+      "en": "A break of up to 2 days counts as staying"
      }
     },
     {
@@ -412,36 +556,25 @@
      "half": true,
      "min": 0,
      "label": {
-      "th": "อัตราเหมาค่าที่พัก (บาท/คืน)",
-      "en": "Accommodation flat rate (Baht/night)"
+      "th": "อัตราเหมา (บาท/คืน)",
+      "en": "Flat rate (Baht / night)"
      },
      "lockIf": "rAcc == true",
-     "showIf": "rAcc == true",
-     "hint": {
-      "th": "ผู้ดูแลตั้งอัตราเหมาไว้ เบิกตามจำนวนคืน",
-      "en": "Flat rate set by the administrator — paid per night"
-     }
+     "showIf": "rAcc == true"
     },
     {
      "k": "accomActual",
      "type": "number",
      "showIf": "rAcc != true",
      "label": {
-      "th": "ค่าที่พักตามจริง (บาท)",
-      "en": "Accommodation — actual cost (Baht)"
+      "th": "ค่าที่พักตามใบเสร็จ (บาท)",
+      "en": "Accommodation — actual (Baht)"
      },
      "hint": {
-      "th": "ไม่ได้กำหนดอัตราเหมา — เบิกตามใบเสร็จ แนบหลักฐานในรายการค่าใช้จ่ายหรือส่งธุรการ",
-      "en": "No flat rate set — claim the receipted amount"
-     }
-    },
-    {
-     "k": "note5",
-     "type": "static",
-     "text": {
-      "th": "ค่าที่พักรวม {accomTotal} บาท",
-      "en": "Accommodation total {accomTotal} Baht"
-     }
+      "th": "ไม่มีอัตราเหมา — เบิกตามใบเสร็จ",
+      "en": "No flat rate — claim the receipted amount"
+     },
+     "half": true
     },
     {
      "k": "perDiemOn",
@@ -464,9 +597,10 @@
       "en": "Per diem (days)"
      },
      "hint": {
-      "th": "นับจากวันที่บิน — เริ่มงาน 1 ชม. ก่อน Engine ON ของเที่ยวแรก เลิกงาน 30 นาทีหลัง Engine OFF ของเที่ยวสุดท้าย · ช่วงทำงานตั้งแต่ 6 ชม. = 1 วัน น้อยกว่า = 0.5",
-      "en": "From flying days — duty starts 1 h before the first Engine ON and ends 30 min after the last Engine OFF · 6 h or more = 1 day, less = 0.5"
-     }
+      "th": "ทำงานตั้งแต่ 6 ชม. = 1 วัน น้อยกว่า = ½",
+      "en": "6 h or more on duty = 1 day, less = ½"
+     },
+     "half": true
     },
     {
      "k": "perDiemRate",
@@ -475,54 +609,14 @@
      "lockIf": "rPd == true",
      "label": {
       "th": "อัตรา per diem (บาท/วัน)",
-      "en": "Per diem rate (Baht/day)"
-     }
-    },
-    {
-     "k": "note5b",
-     "type": "static",
-     "showIf": "perDiemOn == true",
-     "text": {
-      "th": "Per diem รวม {perDiemTotal} บาท",
-      "en": "Per diem total {perDiemTotal} Baht"
-     }
-    },
-    {
-     "k": "rcptPull",
-     "type": "pull",
-     "action": "rcptPull",
-     "label": {
-      "th": "ดึงใบเสร็จที่บันทึกไว้",
-      "en": "Fetch saved receipts"
+      "en": "Per diem rate (Baht / day)"
      },
-     "button": {
-      "th": "ดึงใบเสร็จของเดือนนี้",
-      "en": "Fetch this month's receipts"
-     },
-     "hint": {
-      "th": "เฉพาะใบเสร็จที่ FA ตรวจผ่านแล้วในหน้า \"ใบเสร็จของฉัน\" และยังไม่เคยอยู่ในใบเบิกใด · ส่งใบเบิกแล้วใบเสร็จเหล่านั้นถูกผูกกับใบนี้ ดึงเข้าใบอื่นซ้ำไม่ได้",
-      "en": "Only receipts verified by FA on the \"My receipts\" page that are not on any claim yet · once this claim is submitted they are tied to it and cannot be claimed again"
-     },
-     "monthFrom": "period"
-    },
-    {
-     "k": "rcptNote",
-     "type": "textarea",
-     "lockIf": "rRc == true",
-     "showIf": "rRc == true",
-     "label": {
-      "th": "รายการใบเสร็จที่แนบ",
-      "en": "Receipts attached"
-     },
-     "hint": {
-      "th": "ระบบเขียนให้ — พิมพ์ใน PDF พร้อมลิงก์ให้ผู้ตรวจเปิดดูรูปใบเสร็จ",
-      "en": "Written by the system — printed with a link for the verifier to open the receipt images"
-     }
+     "half": true
     },
     {
      "k": "exp",
      "type": "table",
-     "rows": 5,
+     "rows": 2,
      "max": 30,
      "label": {
       "th": "รายการค่าใช้จ่าย",
@@ -552,7 +646,7 @@
        "type": "number",
        "w": "16%",
        "label": {
-        "th": "ราคาต่อหน่วย (บาท)",
+        "th": "ราคา/หน่วย",
         "en": "Unit (Baht)"
        }
       },
@@ -561,7 +655,7 @@
        "type": "number",
        "w": "16%",
        "label": {
-        "th": "จำนวนเงิน (บาท)",
+        "th": "จำนวนเงิน",
         "en": "Amount (Baht)"
        }
       },
@@ -576,43 +670,175 @@
       }
      ],
      "hint": {
-      "th": "กด \"ดึงใบเสร็จที่บันทึกไว้\" ด้านบน รายการจากใบเสร็จเติมให้ใบละหนึ่งแถว (หมายเหตุขึ้นต้น R1, R2 …) แถวที่พิมพ์เองไม่ถูกลบ · กระดาษพิมพ์ไว้ 5 แถว PDF ที่ระบบออกเพิ่มแถวให้",
-      "en": "Press \"Fetch saved receipts\" above — one row per receipt (remarks start R1, R2 …); rows you typed are kept · the paper has 5 rows, the PDF adds more"
+      "th": "ใบเสร็จที่ FA ตรวจผ่านถูกเติมให้ใบละแถว (R1, R2 …) · กระดาษมี 5 แถว PDF เพิ่มให้",
+      "en": "FA-verified receipts are added one per row (R1, R2 …) · the paper has 5 rows, the PDF adds more"
      }
     },
     {
-     "k": "note6",
-     "type": "static",
-     "text": {
-      "th": "ค่าใช้จ่ายตามรายการ {expTotal} บาท · รวมกับค่าที่พักและ per diem เป็น {reimburse} บาท",
-      "en": "Listed expenses {expTotal} Baht · with accommodation and per diem {reimburse} Baht"
+     "k": "rcptNote",
+     "type": "textarea",
+     "lockIf": "rRc == true",
+     "showIf": "rRc == true",
+     "label": {
+      "th": "รายการใบเสร็จที่แนบ",
+      "en": "Receipts attached"
+     },
+     "hint": {
+      "th": "ระบบเขียนให้ — พิมพ์ใน PDF พร้อมลิงก์ดูรูปใบเสร็จ",
+      "en": "Written by the system — printed with a link to the receipt images"
      }
+    },
+    {
+     "k": "s4Grid",
+     "type": "grid",
+     "head": [
+      {
+       "th": "รายการ",
+       "en": "Item"
+      },
+      {
+       "th": "จำนวน × อัตรา",
+       "en": "Qty × rate"
+      },
+      {
+       "th": "บาท",
+       "en": "Baht"
+      }
+     ],
+     "rows": [
+      {
+       "label": {
+        "th": "ที่พัก — อัตราเหมา",
+        "en": "Accommodation — flat"
+       },
+       "showIf": "rAcc == true",
+       "cells": [
+        "{accomNights} × {accomRate:n}",
+        "{accomFlat:$}"
+       ]
+      },
+      {
+       "label": {
+        "th": "ที่พัก — ตามใบเสร็จ",
+        "en": "Accommodation — actual"
+       },
+       "showIf": "rAcc != true",
+       "cells": [
+        "",
+        "{accomActual:$}"
+       ]
+      },
+      {
+       "label": "Per diem",
+       "showIf": "perDiemOn == true",
+       "cells": [
+        "{perDiemDays} × {perDiemRate:n}",
+        "{perDiemTotal:$}"
+       ]
+      },
+      {
+       "label": {
+        "th": "ค่าใช้จ่ายตามรายการ",
+        "en": "Listed expenses"
+       },
+       "cells": [
+        "",
+        "{expTotal:$}"
+       ]
+      },
+      {
+       "label": {
+        "th": "รวมส่วนที่ 4",
+        "en": "Total — Section 4"
+       },
+       "cls": "tot",
+       "cells": [
+        "",
+        "{reimburse:$}"
+       ]
+      }
+     ]
     }
    ]
   },
   {
-   "k": "S6",
-   "tab": "T5",
+   "k": "S5",
+   "tab": "T4",
    "party": "emp",
    "title": {
-    "th": "ส่วนที่ 6 — สรุป",
-    "en": "Section 6 — Summary"
+    "th": "ส่วนที่ 5 — สรุปและลงนามผู้เบิก",
+    "en": "Section 5 — Summary & claimant signature"
    },
    "fields": [
     {
-     "k": "note7",
-     "type": "static",
-     "text": {
-      "th": "ค่าตอบแทนการบิน {fltPay} บาท · ค่าตอบแทนภาคพื้น/SIM {gndPay} บาท · ค่าใช้จ่ายที่ขอเบิก {reimburse} บาท",
-      "en": "Flight pay {fltPay} · ground / sim pay {gndPay} · reimbursement {reimburse} Baht"
-     }
+     "k": "sumGrid",
+     "type": "grid",
+     "head": [
+      {
+       "th": "",
+       "en": ""
+      },
+      {
+       "th": "บาท",
+       "en": "Baht"
+      }
+     ],
+     "rows": [
+      {
+       "label": {
+        "th": "A. ถูกหัก ณ ที่จ่าย 3% — ค่าตอบแทน ที่พักเหมาจ่าย per diem ใบเสร็จที่รับเป็นรายได้",
+        "en": "A. Subject to 3% withholding — pay, flat accommodation, per diem, receipts paid as income"
+       },
+       "cells": [
+        "{whtBase:$}"
+       ]
+      },
+      {
+       "label": {
+        "th": "B. ค่าใช้จ่ายตามใบเสร็จ — ไม่หัก",
+        "en": "B. Receipted expenses — not withheld"
+       },
+       "cells": [
+        "{noWht:$}"
+       ]
+      },
+      {
+       "label": {
+        "th": "C. ยอดเบิกรวม (A + B)",
+        "en": "C. Total claim (A + B)"
+       },
+       "cls": "sub",
+       "cells": [
+        "{totalIncome:$}"
+       ]
+      },
+      {
+       "label": {
+        "th": "D. ภาษีหัก ณ ที่จ่าย 3% (A × 3%)",
+        "en": "D. Withholding tax 3% (A × 3%)"
+       },
+       "cells": [
+        "{whtAmt:$}"
+       ]
+      },
+      {
+       "label": {
+        "th": "E. รับสุทธิ (C − D)",
+        "en": "E. Net payment (C − D)"
+       },
+       "cls": "tot",
+       "cells": [
+        "{afterTax:$}"
+       ]
+      }
+     ]
     },
     {
-     "k": "note8",
+     "k": "cert",
      "type": "static",
      "text": {
-      "th": "รวมทั้งสิ้น {totalIncome} บาท · หักภาษี ณ ที่จ่าย 3% {whtAmt} บาท (คิดจากค่าตอบแทน ค่าเดินทาง เบี้ยเลี้ยง ค่าแรงรายวัน ค่าที่พักเหมาจ่าย per diem และใบเสร็จที่รับเป็นรายได้ {whtBase} บาท — ค่าใช้จ่ายที่มีใบเสร็จไม่หัก) · รับสุทธิประมาณ {afterTax} บาท",
-      "en": "Total {totalIncome} Baht · 3% withholding {whtAmt} Baht (on pay, travel, allowance, daily wage, flat accommodation, per diem and receipts taken as income {whtBase} Baht — receipted expenses are not withheld) · approx. net {afterTax} Baht"
+      "th": "ข้าพเจ้าขอรับรองว่างานและค่าใช้จ่ายข้างต้นเป็นความจริงและเกิดขึ้นในงานของบริษัท",
+      "en": "I certify that the work and expenses above are true and were incurred on company business."
      }
     },
     {
@@ -621,8 +847,9 @@
      "req": true,
      "label": {
       "th": "ลายเซ็นผู้เบิก",
-      "en": "Employee signature"
-     }
+      "en": "Claimant signature"
+     },
+     "half": false
     },
     {
      "k": "empDate",
@@ -632,19 +859,19 @@
      "prefill": "today",
      "label": {
       "th": "วันที่ยื่น",
-      "en": "Date submitted"
+      "en": "Date"
      }
     }
    ]
   },
   {
-   "k": "S7",
-   "tab": "T5",
+   "k": "S6",
+   "tab": "T4",
    "party": "adm",
    "hideOthers": true,
    "title": {
-    "th": "ส่วนที่ 7 — การตรวจสอบโดยธุรการ",
-    "en": "Section 7 — Verified by admin"
+    "th": "ส่วนที่ 6 — การตรวจสอบโดยธุรการ",
+    "en": "Section 6 — Verified by (Admin)"
    },
    "fields": [
     {
@@ -688,13 +915,13 @@
    ]
   },
   {
-   "k": "S8",
-   "tab": "T5",
+   "k": "S7",
+   "tab": "T4",
    "party": "apv",
    "hideOthers": true,
    "title": {
-    "th": "ส่วนที่ 7 — การอนุมัติ",
-    "en": "Section 7 — Approval"
+    "th": "ส่วนที่ 6 — การอนุมัติ",
+    "en": "Section 6 — Approved by"
    },
    "fields": [
     {
@@ -749,22 +976,47 @@
    "k": "mis",
    "op": "fn",
    "fn": "mrfMission",
-   "_why": "ค่าตอบแทนแยกตามภารกิจ (เจ้าของเครื่อง) — คืน misOn mFlt mTrv mAlw mDay misPay misNote · ไม่มี misCfg = คืนศูนย์ ใบคิดแบบเดิม · 27 NOV 2026"
-  },
-  {
-   "k": "fltPayH",
-   "op": "mul",
-   "of": [
-    "fltRate",
-    "fltHours"
-   ]
-  },
-  {
-   "k": "fltPay",
-   "op": "sum",
-   "of": [
-    "fltPayH",
-    "mFlt"
+   "_why": "คืนตัวเลขของตารางส่วนที่ 3 ทุกช่อง (m1* = D0507 · m2* = BSC · Qty/Rate/Amount) และ fltPay mTrv mAlw mDay misTot — ไม่มี misCfg = ค่าบินทั้งหมดลงคอลัมน์ D0507 ด้วยอัตรา fltRate · 27 NOV 2026",
+   "out": [
+    "misOn",
+    "m1Code",
+    "m2Code",
+    "mFlt",
+    "mTrv",
+    "mAlw",
+    "mDay",
+    "misPay",
+    "misTot",
+    "fltPay",
+    "misNote",
+    "payBasis",
+    "trvRetTxt",
+    "m1Sub",
+    "m2Sub",
+    "m1FltN",
+    "m1FltR",
+    "m1Flt",
+    "m1TrvN",
+    "m1TrvR",
+    "m1Trv",
+    "m1AlwN",
+    "m1AlwR",
+    "m1Alw",
+    "m1DayN",
+    "m1DayR",
+    "m1Day",
+    "m2FltN",
+    "m2FltR",
+    "m2Flt",
+    "m2TrvN",
+    "m2TrvR",
+    "m2Trv",
+    "m2AlwN",
+    "m2AlwR",
+    "m2Alw",
+    "m2DayN",
+    "m2DayR",
+    "m2Day"
    ]
   },
   {
@@ -773,7 +1025,23 @@
    "of": [
     "gndRate",
     "gndHours"
-   ]
+   ],
+   "round": 2
+  },
+  {
+   "k": "gndHours2",
+   "op": "copy",
+   "of": "gndHours",
+   "_why": "ชั่วโมงภาคพื้นพิมพ์สองที่บนกระดาษ (แถว TOTAL HOURS และตารางภาคพื้น) — token ตัวเดียววางได้ที่เดียว"
+  },
+  {
+   "k": "payTotal",
+   "op": "sum",
+   "of": [
+    "misTot",
+    "gndPay"
+   ],
+   "round": 2
   },
   {
    "k": "accomFlat",
@@ -781,7 +1049,8 @@
    "of": [
     "accomNights",
     "accomRate"
-   ]
+   ],
+   "round": 2
   },
   {
    "k": "accomTotal",
@@ -797,7 +1066,8 @@
    "of": [
     "perDiemDays",
     "perDiemRate"
-   ]
+   ],
+   "round": 2
   },
   {
    "k": "expTotal",
@@ -813,17 +1083,17 @@
     "accomTotal",
     "expTotal",
     "perDiemTotal"
-   ]
+   ],
+   "round": 2
   },
   {
    "k": "totalIncome",
    "op": "sum",
    "of": [
-    "fltPay",
-    "gndPay",
-    "reimburse",
-    "misPay"
-   ]
+    "payTotal",
+    "reimburse"
+   ],
+   "round": 2
   },
   {
    "k": "rcptIncome",
@@ -835,20 +1105,36 @@
     "re": "INCOME \\(WHT 3%\\)"
    },
    "round": 2,
-   "_why": "ใบเสร็จที่ FA ส่งกลับแล้วผู้เบิกเลือกรับเป็นรายได้ (receipts.pay = income) — นับเข้าฐานหัก ณ ที่จ่าย 3% · 26 NOV 2026"
+   "_why": "ใบเสร็จที่ผู้เบิกเลือกรับเป็นรายได้ — นับเข้าฐานหัก ณ ที่จ่าย 3% · 26 NOV 2026"
   },
   {
    "k": "whtBase",
    "op": "sum",
    "of": [
-    "fltPay",
-    "gndPay",
+    "payTotal",
     "accomFlat",
     "perDiemTotal",
-    "rcptIncome",
-    "misPay"
+    "rcptIncome"
    ],
-   "_why": "ฐานภาษีหัก ณ ที่จ่าย 3% — ค่าตอบแทน ค่าที่พักแบบเหมาจ่าย และ per diem · ค่าใช้จ่ายที่มีใบเสร็จ (ส่วนที่ 4 รายการค่าใช้จ่าย และค่าที่พักตามจริง) ไม่หัก ตามที่ผู้ควบคุมเอกสารสั่ง 25 NOV 2026 · ใบเสร็จที่ผู้เบิกเลือกรับเป็นรายได้ (rcptIncome) หักด้วย 26 NOV 2026 · ค่าเดินทาง เบี้ยเลี้ยง ค่าแรงรายวันแบบเหมาจ่าย (misPay) หักด้วย 27 NOV 2026"
+   "round": 2,
+   "_why": "ส่วนที่ไม่มีใบเสร็จ (ค่าตอบแทน ค่าเดินทาง เบี้ยเลี้ยง ค่าแรงรายวัน ที่พักเหมาจ่าย per diem) + ใบเสร็จที่รับเป็นรายได้ — ค่าใช้จ่ายตามใบเสร็จไม่หัก (ผู้ควบคุมเอกสาร 25 NOV 2026)"
+  },
+  {
+   "k": "whtNegBase",
+   "op": "mul",
+   "of": [
+    "whtBase",
+    "-1"
+   ]
+  },
+  {
+   "k": "noWht",
+   "op": "sum",
+   "of": [
+    "totalIncome",
+    "whtNegBase"
+   ],
+   "round": 2
   },
   {
    "k": "whtAmt",
@@ -877,19 +1163,10 @@
    "round": 2
   },
   {
-   "k": "sumFltPay",
+   "k": "empName2",
    "op": "copy",
-   "of": "fltPay"
-  },
-  {
-   "k": "sumGndPay",
-   "op": "copy",
-   "of": "gndPay"
-  },
-  {
-   "k": "sumReimburse",
-   "op": "copy",
-   "of": "reimburse"
+   "of": "empName",
+   "_why": "ชื่อผู้เบิกพิมพ์สองที่ (ส่วนที่ 1 และแถวลงนาม)"
   }
  ],
  "route": [

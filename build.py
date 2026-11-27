@@ -51,7 +51,7 @@ PUBLIC_KEEP = ('doc', 'abbr', 't', 'th', 'sys', 'jot', 'assignTo', 'r', 'chain',
 # scan = ปุ่มถ่ายรูปเอกสารแล้วกรอกให้ ไม่ใช่ช่องเก็บข้อมูล (assets/idscan.js)
 FIELD_TYPES = {'text', 'textarea', 'date', 'time', 'number', 'email', 'tel', 'select',
                'multi', 'check', 'checklist', 'grade', 'scale', 'sign', 'static', 'table', 'file',
-               'riskmatrix', 'scan', 'pull', 'month'}
+               'riskmatrix', 'scan', 'pull', 'month', 'grid'}
 # pull = ปุ่มดึงข้อมูลจากระบบอื่นมาเติม (MRF ← Flight Logs) ไม่ใช่ช่องเก็บข้อมูลเหมือน scan
 
 

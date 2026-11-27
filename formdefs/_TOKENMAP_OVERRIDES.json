@@ -353,113 +353,166 @@
   ]
  },
  "MRF": {
-  "_why": "กระดาษมีช่องลงนามสามช่อง แต่ละช่องรวม Signature / Name / Date ไว้ในเซลล์เดียว · ยอดที่คำนวณเองไม่ใช่ช่องกรอก ตัวจับคู่จึงไม่รู้จัก ต้องชี้ป้ายในกระดาษให้เอง · ยอดสามตัวพิมพ์สองที่ (ส่วนที่ 3–5 และส่วนสรุป) ใช้คีย์คู่ขนาน sumFltPay / sumGndPay / sumReimburse · ตัวจับคู่ในแม่แบบเทียบข้อความแบบตรงตัวหลัง trim ป้ายที่ลอกมาจาก .docx จึงต้องตัดช่องว่างท้ายออก ไม่งั้นหาไม่เจอและขึ้นว่า 'ไม่มีช่องว่างข้างเคียง' · สามแถวของส่วนที่ 5 อยู่ในตารางเดียวกับส่วนที่ 3–4 ซึ่ง Word รวมช่องไว้ ตอนแปลงเป็น Google Doc กลายเป็นห้าคอลัมน์ ช่องที่ byLabel วางให้ (คอลัมน์ 1) ไม่แสดงใน PDF ที่ออกมา จึงเขียนค่าไว้ต่อท้ายป้ายในช่องเดียวกันแทน — ตรวจด้วยการเปิด PDF แล้วเห็นค่าจริง · ในช่องลงนาม ชื่อกับวันที่ต้องมาก่อนรูปลายเซ็น ไม่งั้นรูปดันข้อความข้ามหน้า (เปิด PDF แล้วเห็นชื่อทั้งสามคนไปอยู่หน้าถัดไป)",
+  "_why": "กระดาษ Rev 01 (27 NOV 2026 · tools/build_mrf.py) — ตารางส่วนที่ 3 ไม่มีป้ายในช่องตัวเลข จึงใช้ rowFill (ป้ายช่องแรก ค่าเรียงไปทางขวา '' = ข้ามช่อง) · ส่วนที่ 1 และ 5 ป้ายอยู่ช่องซ้าย ค่าอยู่ช่องขวา (labels) · ลงนามเป็นแถว บทบาท | ชื่อ | ลายเซ็น | วันที่ · ไม่มี ☐ บนกระดาษ — Pay Basis และ Return Trip Paid พิมพ์เป็นข้อความจาก mrfMission",
   "labels": {
-   "Flight Pay (Baht) = Rate × Hours": "{{fltPay}}",
-   "Ground / Sim Pay (Baht) = Rate × Hours": "{{gndPay}}",
-   "Total Flight Pay (Baht)": "{{sumFltPay}}",
-   "Total Ground / Sim Pay (Baht)": "{{sumGndPay}}",
-   "Total Reimbursement / Expenses (Baht)": "{{sumReimburse}}",
-   "Total Income (Baht)": "{{totalIncome}}",
-   "Approx. Pay After Withholding Tax 3%  (Total × 0.97)": "{{afterTax}}",
-   "Total Flight Hours \nfrom Section 2": "{{fltHours}}",
-   "Total Ground / Sim Hours\nfrom Section 2": "{{gndHours}}"
+   "Claimant Name": "{{empName}}",
+   "Position": "{{empPos}}",
+   "Month / Year": "{{period}}",
+   "Email": "{{empEmail}}",
+   "Bank Name & Account No.": "{{bank}}",
+   "Prepared on behalf by": "{{proxyNote}}",
+   "Pay Basis": "{{payBasis}}",
+   "Return Trip Paid": "{{trvRetTxt}}",
+   "TOTAL PAY — Section 3  (subtotal by mission + ground / simulator)": "{{payTotal}}",
+   "TOTAL — Section 4  (accommodation + per diem + expenses)": "{{reimburse}}",
+   "A.  Pay subject to 3% withholding tax  —  Section 3 + flat accommodation + per diem + receipts paid as income": "{{whtBase}}",
+   "B.  Receipted expenses  —  not subject to withholding tax": "{{noWht}}",
+   "C.  TOTAL CLAIM  (A + B)": "{{totalIncome}}",
+   "D.  Withholding tax 3%  (A × 3%)": "{{whtAmt}}",
+   "E.  NET PAYMENT  (C − D)": "{{afterTax}}"
   },
-  "cells": {
-   "Employee\nSignature: ____________________\nName:      ____________________\nDate:       ____________________": {
-    "head": "Employee\n",
-    "tok": "{{empName}}  ·  {{empDate}}\n{{sig_empSign}}"
-   },
-   "Verified by (ADMIN)\nSignature: ____________________\nName:      ____________________\nDate:       ____________________": {
-    "head": "Verified by (ADMIN)\n",
-    "tok": "{{admName}}  ·  {{admDate}}\n{{sig_admSign}}"
-   },
-   "Approved by (\t\t             )\nSignature: ____________________\nName:      ____________________\nDate:       ____________________": {
-    "head": "Approved by\n",
-    "tok": "{{apvName}}  ·  {{apvDate}}\n{{sig_apvSign}}"
-   },
-   "Accommodation (nights)": {
-    "head": "Accommodation (nights)   ",
-    "tok": "{{accomNights}}"
-   },
-   "Accommodation Rate (Baht / night)": {
-    "head": "Accommodation Rate (Baht / night)   ",
-    "tok": "{{accomRate}}"
-   },
-   "Accommodation Total (Baht) = Nights × Rate": {
-    "head": "Accommodation Total (Baht) = Nights × Rate   ",
-    "tok": "{{accomTotal}}"
-   },
-   "Total Expenses": {
-    "head": "Total Expenses   ",
-    "tok": "{{expTotal}}"
-   }
+  "rowFill": {
+   "TOTAL HOURS": [
+    "{{fltHours}}",
+    "{{gndHours}}"
+   ],
+   "Flight instruction": [
+    "",
+    "{{m1FltN}}",
+    "{{m1FltR}}",
+    "{{m1Flt}}",
+    "{{m2FltN}}",
+    "{{m2FltR}}",
+    "{{m2Flt}}",
+    "{{fltPay}}"
+   ],
+   "Travel": [
+    "",
+    "{{m1TrvN}}",
+    "{{m1TrvR}}",
+    "{{m1Trv}}",
+    "{{m2TrvN}}",
+    "{{m2TrvR}}",
+    "{{m2Trv}}",
+    "{{mTrv}}"
+   ],
+   "Allowance": [
+    "",
+    "{{m1AlwN}}",
+    "{{m1AlwR}}",
+    "{{m1Alw}}",
+    "{{m2AlwN}}",
+    "{{m2AlwR}}",
+    "{{m2Alw}}",
+    "{{mAlw}}"
+   ],
+   "Daily wage (Flt Ops / engineer)": [
+    "",
+    "{{m1DayN}}",
+    "{{m1DayR}}",
+    "{{m1Day}}",
+    "{{m2DayN}}",
+    "{{m2DayR}}",
+    "{{m2Day}}",
+    "{{mDay}}"
+   ],
+   "Subtotal by mission": [
+    "",
+    "",
+    "",
+    "{{m1Sub}}",
+    "",
+    "",
+    "{{m2Sub}}",
+    "{{misTot}}"
+   ],
+   "Ground / Simulator instruction (one rate for all missions)": [
+    "{{gndHours2}}",
+    "{{gndRate}}",
+    "{{gndPay}}"
+   ],
+   "Accommodation — flat rate": [
+    "{{accomNights}}",
+    "{{accomRate}}",
+    "{{accomFlat}}"
+   ],
+   "Accommodation — actual (receipted)": [
+    "",
+    "",
+    "{{accomActual}}"
+   ],
+   "Per diem": [
+    "{{perDiemDays}}",
+    "{{perDiemRate}}",
+    "{{perDiemTotal}}"
+   ],
+   "Total Expenses": [
+    "{{expTotal}}"
+   ],
+   "Claimant": [
+    "{{empName2}}",
+    "{{sig_empSign}}",
+    "{{empDate}}"
+   ],
+   "Verified by (Admin)": [
+    "{{admName}}",
+    "{{sig_admSign}}",
+    "{{admDate}}"
+   ],
+   "Approved by": [
+    "{{apvName}}",
+    "{{sig_apvSign}}",
+    "{{apvDate}}"
+   ]
   },
+  "_why_rowFill_dup": "token ตัวเดียววางได้ที่เดียว — ชั่วโมงภาคพื้นพิมพ์ทั้งแถว TOTAL HOURS และตารางภาคพื้น ชื่อผู้เบิกพิมพ์ทั้งส่วนที่ 1 และแถวลงนาม จึงมีคีย์คู่ขนาน gndHours2 / empName2 (compute copy)",
   "skip": [
+   "{{k_perDiemOn}}",
+   "{{k_trvRet}}",
    "{{sig_empSign}}",
    "{{empDate}}",
-   "{{sig_admSign}}",
    "{{admName}}",
    "{{admDate}}",
-   "{{sig_apvSign}}",
+   "{{sig_admSign}}",
    "{{apvName}}",
    "{{apvDate}}",
-   "{{k_perDiemOn}}",
-   "{{k_trvRet}}"
+   "{{sig_apvSign}}",
+   "{{fltRate}}"
   ],
   "manual": [
-   {
-    "tok": "{{proxyNote}}",
-    "label": "Prepared on behalf",
-    "labelTh": "ทำใบเบิกแทน"
-   },
    "{{flogNote}}",
+   "{{rcptNote}}",
    {
     "tok": "{{misNote}}",
-    "label": "Pay by mission (aircraft owner)",
-    "labelTh": "ค่าตอบแทนแยกตามภารกิจ (เจ้าของเครื่อง)"
-   },
-   {
-    "tok": "{{misPay}}",
-    "label": "Travel, allowance and daily wage (Baht) — included in Total Income",
-    "labelTh": "ค่าเดินทาง เบี้ยเลี้ยง และค่าแรงรายวัน (บาท) — รวมอยู่ใน Total Income แล้ว"
-   },
-   "{{rcptNote}}",
-   "{{accomActual}}",
-   "{{perDiemDays}}",
-   "{{perDiemRate}}",
-   {
-    "tok": "{{perDiemTotal}}",
-    "label": "Per diem total (Baht) — included in the reimbursement total",
-    "labelTh": "Per diem รวม (บาท) — รวมอยู่ในยอดค่าใช้จ่ายที่ขอเบิก"
-   },
-   {
-    "tok": "{{whtAmt}}",
-    "label": "Withholding tax 3% — on pay, travel, allowance, daily wage, flat accommodation, per diem and receipts taken as income; receipted expenses are not withheld",
-    "labelTh": "ภาษีหัก ณ ที่จ่าย 3% — คิดจากค่าตอบแทน ค่าเดินทาง เบี้ยเลี้ยง ค่าแรงรายวัน ค่าที่พักเหมาจ่าย per diem และใบเสร็จที่รับเป็นรายได้ ค่าใช้จ่ายที่มีใบเสร็จไม่หัก"
+    "label": "Pay by mission — travel dates and days with more than one mission",
+    "labelTh": "ค่าตอบแทนตามภารกิจ — วันที่จ่ายค่าเดินทาง และวันที่มีมากกว่าหนึ่งภารกิจ"
    }
   ],
-  "_why_perdiem": "per diem และค่าที่พักตามจริงไม่มีช่องบนกระดาษ (เพิ่ม 23 NOV 2026) — พิมพ์ในบล็อก ADDITIONAL ท้ายเอกสาร ยอดรวมอยู่ใน Reimbursement / Total แล้ว · ช่อง \"มีสิทธิ์เบิก per diem\" ไม่ใช่ ☐ บนกระดาษ จึงข้าม ไม่งั้นจำนวนช่องติ๊กไม่เท่ากระดาษแล้วตัววางไม่ติ๊กสักช่อง",
   "tableFont": {
    "sheet": {
-    "size": 8,
+    "size": 7.5,
     "family": "Arial",
     "pad": 2
-   }
-  },
-  "_why_tableFont": "ช่อง Type ของกระดาษกว้างพอแค่รหัส 3–4 ตัว (FLT/SIM/GND/GS) แต่ค่าที่ดึงจาก Flight Log คือ Flight Type (\"Training Flight\") ขาดกลางคำแม้ลดตัวอักษร จึงใช้ Arial 8 pt และขยาย Type เป็น 72 pt โดยหักจาก Remarks ความกว้างรวมเท่าเดิม · เปลี่ยนเฉพาะแม่แบบที่ระบบออก กระดาษ .docx ไม่เปลี่ยน",
-  "tableWiden": {
-   "sheet": {
-    "col": "type",
-    "pt": 72,
-    "from": "remark"
+   },
+   "exp": {
+    "size": 7.5,
+    "family": "Arial",
+    "pad": 2
    }
   },
   "tableRows": {
    "exp": 30
   },
-  "_why_wht": "กระดาษพิมพ์ป้าย \"Approx. Pay After Withholding Tax 3% (Total × 0.97)\" แต่ระบบคิด 3% เฉพาะส่วนที่ไม่มีใบเสร็จ (ผู้ควบคุมเอกสารสั่ง 25 NOV 2026) จึงพิมพ์ยอดภาษีและฐานที่ใช้ในบล็อก ADDITIONAL ให้ผู้ตรวจเห็นว่าตัวเลขไม่ใช่ Total × 0.97 · ป้ายบนกระดาษต้องแก้ผ่าน DRF",
-  "_why_mission": "ค่าเดินทาง เบี้ยเลี้ยง ค่าแรงรายวัน และรายละเอียดแยกภารกิจ ไม่มีบรรทัดบนกระดาษ (เพิ่ม 27 NOV 2026) — พิมพ์ในบล็อก ADDITIONAL · ค่าบินตามภารกิจรวมอยู่ใน Flight Pay แล้ว ช่องอัตราต่อชั่วโมงว่างเมื่อใช้อัตราแยกภารกิจ · ต้องออก DRF ถ้าจะให้เป็นบรรทัดของเอกสารควบคุม"
+  "_why_wht": "ภาษีหัก ณ ที่จ่ายคิด 3% เฉพาะส่วนที่ไม่มีใบเสร็จ (ผู้ควบคุมเอกสาร 25 NOV 2026) — กระดาษ Rev 01 แยกเป็นบรรทัด A–E แล้ว ไม่ต้องอธิบายในบล็อก ADDITIONAL อีก",
+  "dropAuto": [
+   "{{fltRate}}",
+   "{{accomActual}}",
+   "{{perDiemDays}}",
+   "{{sig_empSign}}",
+   "{{empDate}}",
+   "{{admName}}",
+   "{{apvName}}"
+  ]
  },
  "DAF": {
   "cells": {

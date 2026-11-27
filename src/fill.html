@@ -622,7 +622,7 @@ const PULL = {
     const x = r.result, R = x.rates || {}, M = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
     const mine = (fk.data.sheet || []).filter(o => o && !/(^|,\s*)LOG-/.test(o.detail || '')
       && Object.keys(o).some(k => String(o[k] == null ? '' : o[k]).trim()));
-    const fromLog = (x.sheet || []).map(o => ({date:o.date, detail:o.detail, place:o.place, type:o.type, flt:o.flt, gnd:'', remark:o.remark}));
+    const fromLog = (x.sheet || []).map(o => ({date:o.date, mis:o.mis || '', detail:o.detail, place:o.place, type:o.type, flt:o.flt, gnd:'', remark:o.remark}));
     const rows = fromLog.concat(mine).sort((a, b) => String(a.date || '9').localeCompare(String(b.date || '9')));
     const has = v => v !== null && v !== undefined && v !== '';
     const dd = ymd => ymd ? ymd.slice(8) + ' ' + M[+ymd.slice(5, 7) - 1] + ' ' + ymd.slice(0, 4) : '';
@@ -699,6 +699,18 @@ const PULL = {
           keepHtml}${reBtn}</span></div>` : '')
       + (warns.length ? `<div class="fk-gate warn" style="margin-top:8px"><span><b>${e(A.L({th:'ตรวจก่อนส่ง',en:'Check before submitting'}))}</b><ul>${warns.map(w=>'<li>'+e(w)+'</li>').join('')}</ul></span></div>` : '');
     return { set, html };
+  },
+
+  /* ปุ่มเดียวของ MRF Rev 01 — Flight Log แล้วต่อด้วยใบเสร็จ คนกรอกครั้งแรกไม่ต้องรู้ว่ามีสองแหล่ง
+     ใบเสร็จดึงไม่ได้ (เช่นสิทธิ์) ไม่ทำให้ผล Flight Log หาย — ขึ้นเตือนต่อท้ายแทน
+     ปุ่ม "คำนวณใหม่" ในผลลัพธ์ส่ง opts มา → ส่งต่อให้ส่วน Flight Log ส่วนใบเสร็จดึงใหม่เหมือนเดิม */
+  mrfAll: async (f, month, fk, opts) => {
+    const a = await PULL.mrfPull(f, month, fk, opts);
+    Object.keys(a.set || {}).forEach(x => fk.set(x, a.set[x]));
+    let b;
+    try { b = await PULL.rcptPull(f, month, fk); }
+    catch (e) { b = {set:{}, html:`<div class="fk-gate warn" style="margin-top:8px"><span>${A.esc(A.L({th:'ดึงใบเสร็จไม่ได้: ',en:'Receipts not fetched: '}) + (e.message || e))}</span></div>`}; }
+    return {set: Object.assign({}, a.set, b.set), html: a.html + '<div style="margin-top:8px"></div>' + b.html};
   },
 
   /* ใบเสร็จที่บันทึกไว้ในเดือนนั้น (receipts · หน้า "ใบเสร็จของฉัน") ที่ยังไม่อยู่ในใบเบิกใด
@@ -828,7 +840,7 @@ function review(){
     // ส่วนที่ซ่อนจากฝ่ายอื่นก็ต้องไม่โผล่ในหน้าตรวจทานด้วย
     .filter(s=>!(s.hideOthers && me && s.party!==me))
     .map(sec=>{
-    const fs=(sec.fields||[]).filter(f=>f.type!=='static'&&FormKit.evalCond(f.showIf,ctx));
+    const fs=(sec.fields||[]).filter(f=>f.type!=='static'&&f.type!=='grid'&&f.type!=='pull'&&FormKit.evalCond(f.showIf,ctx));
     if(!fs.length) return '';
     // ช่องติ๊กแสดงเฉพาะข้อที่ติ๊ก แล้วสรุปจำนวนไว้ท้าย — ถ้าโชว์ '—' ครบทุกข้อ
     // ข้อที่ติ๊กจริงจะจมหายไปในแถวว่าง 36 แถว

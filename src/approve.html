@@ -168,7 +168,7 @@ function paint(){
 function confirmApprove(){
   const ctx=FK.ctx();
   const rows=(DEF.sections||[]).filter(s=>FormKit.evalCond(s.showIf,ctx)).map(sec=>{
-    const fs=(sec.fields||[]).filter(f=>f.type!=='static'&&FormKit.evalCond(f.showIf,ctx));
+    const fs=(sec.fields||[]).filter(f=>f.type!=='static'&&f.type!=='grid'&&f.type!=='pull'&&FormKit.evalCond(f.showIf,ctx));
     if(!fs.length) return '';
     const on=fs.filter(f=>f.type!=='check'||FK.data[f.k]);
     return `<h4 class="rvh" style="font-family:var(--font-display);font-size:14px;color:var(--sky-600);margin:16px 0 6px">${A.esc(LL(sec.title))}</h4>`+

@@ -84,7 +84,7 @@ def check(abbr):
         return ['อ่านไฟล์ไม่ได้: %s' % e], []
 
     fields = {f['k']: f for s in d.get('sections', []) for f in s.get('fields', [])}
-    comp = {c['k'] for c in d.get('compute', [])}
+    comp = {c['k'] for c in d.get('compute', [])} | {o for c in d.get('compute', []) for o in (c.get('out') or [])}  # op fn คืนหลายคีย์ — ระบุไว้ที่ out
     parties = {p['k'] for p in d.get('parties', [])}
     tabs = {t['k'] for t in (d.get('ui', {}).get('tabs') or [])}
 

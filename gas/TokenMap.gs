@@ -2587,108 +2587,72 @@ var TOKEN_MAP = {
   "MRF": {
     "abbr": "MRF",
     "docx": "D-0507-MRF-001.docx",
-    "control": "",
+    "control": "AD-MRF-301-B",
     "orderWarn": [],
     "byLabel": [
       {
-        "label": "Employee's Name",
+        "label": "Claimant Name",
         "tok": "{{empName}}"
       },
       {
-        "label": "Employee's Email",
-        "tok": "{{empEmail}}"
+        "label": "Position",
+        "tok": "{{empPos}}"
       },
       {
         "label": "Month / Year",
         "tok": "{{period}}"
       },
       {
+        "label": "Email",
+        "tok": "{{empEmail}}"
+      },
+      {
         "label": "Bank Name & Account No.",
         "tok": "{{bank}}"
       },
       {
-        "label": "Flight Hourly Rate \n(Baht / hr)",
-        "tok": "{{fltRate}}"
+        "label": "Prepared on behalf by",
+        "tok": "{{proxyNote}}"
       },
       {
-        "label": "Ground / Sim Rate \n(Baht / hr)",
-        "tok": "{{gndRate}}"
+        "label": "Pay Basis",
+        "tok": "{{payBasis}}"
       },
       {
-        "label": "Flight Pay (Baht) = Rate × Hours",
-        "tok": "{{fltPay}}"
+        "label": "Return Trip Paid",
+        "tok": "{{trvRetTxt}}"
       },
       {
-        "label": "Ground / Sim Pay (Baht) = Rate × Hours",
-        "tok": "{{gndPay}}"
+        "label": "TOTAL PAY — Section 3  (subtotal by mission + ground / simulator)",
+        "tok": "{{payTotal}}"
       },
       {
-        "label": "Total Flight Pay (Baht)",
-        "tok": "{{sumFltPay}}"
+        "label": "TOTAL — Section 4  (accommodation + per diem + expenses)",
+        "tok": "{{reimburse}}"
       },
       {
-        "label": "Total Ground / Sim Pay (Baht)",
-        "tok": "{{sumGndPay}}"
+        "label": "A.  Pay subject to 3% withholding tax  —  Section 3 + flat accommodation + per diem + receipts paid as income",
+        "tok": "{{whtBase}}"
       },
       {
-        "label": "Total Reimbursement / Expenses (Baht)",
-        "tok": "{{sumReimburse}}"
+        "label": "B.  Receipted expenses  —  not subject to withholding tax",
+        "tok": "{{noWht}}"
       },
       {
-        "label": "Total Income (Baht)",
+        "label": "C.  TOTAL CLAIM  (A + B)",
         "tok": "{{totalIncome}}"
       },
       {
-        "label": "Approx. Pay After Withholding Tax 3%  (Total × 0.97)",
+        "label": "D.  Withholding tax 3%  (A × 3%)",
+        "tok": "{{whtAmt}}"
+      },
+      {
+        "label": "E.  NET PAYMENT  (C − D)",
         "tok": "{{afterTax}}"
-      },
-      {
-        "label": "Total Flight Hours \nfrom Section 2",
-        "tok": "{{fltHours}}"
-      },
-      {
-        "label": "Total Ground / Sim Hours\nfrom Section 2",
-        "tok": "{{gndHours}}"
       }
     ],
     "byLine": [],
-    "byCell": [
-      {
-        "cell": "Employee\nSignature: ____________________\nName:      ____________________\nDate:       ____________________",
-        "head": "Employee\n",
-        "tok": "{{empName}}  ·  {{empDate}}\n{{sig_empSign}}"
-      },
-      {
-        "cell": "Verified by (ADMIN)\nSignature: ____________________\nName:      ____________________\nDate:       ____________________",
-        "head": "Verified by (ADMIN)\n",
-        "tok": "{{admName}}  ·  {{admDate}}\n{{sig_admSign}}"
-      },
-      {
-        "cell": "Approved by (\t\t             )\nSignature: ____________________\nName:      ____________________\nDate:       ____________________",
-        "head": "Approved by\n",
-        "tok": "{{apvName}}  ·  {{apvDate}}\n{{sig_apvSign}}"
-      },
-      {
-        "cell": "Accommodation (nights)",
-        "head": "Accommodation (nights)   ",
-        "tok": "{{accomNights}}"
-      },
-      {
-        "cell": "Accommodation Rate (Baht / night)",
-        "head": "Accommodation Rate (Baht / night)   ",
-        "tok": "{{accomRate}}"
-      },
-      {
-        "cell": "Accommodation Total (Baht) = Nights × Rate",
-        "head": "Accommodation Total (Baht) = Nights × Rate   ",
-        "tok": "{{accomTotal}}"
-      },
-      {
-        "cell": "Total Expenses",
-        "head": "Total Expenses   ",
-        "tok": "{{expTotal}}"
-      }
-    ],
+    "byCell": [],
     "boxes": [],
     "boxesPartial": false,
     "tables": [
@@ -2702,12 +2666,16 @@ var TOKEN_MAP = {
             "head": "Date"
           },
           {
+            "k": "mis",
+            "head": "Mission"
+          },
+          {
             "k": "detail",
-            "head": "Detail"
+            "head": "Detail / Flight Log ID"
           },
           {
             "k": "place",
-            "head": "Aircraft / room"
+            "head": "Aircraft / Room"
           },
           {
             "k": "type",
@@ -2715,11 +2683,11 @@ var TOKEN_MAP = {
           },
           {
             "k": "flt",
-            "head": "Flt hrs"
+            "head": "Flt Hrs"
           },
           {
             "k": "gnd",
-            "head": "Gnd / sim hrs"
+            "head": "Gnd / Sim / Work Hrs"
           },
           {
             "k": "remark",
@@ -2727,14 +2695,9 @@ var TOKEN_MAP = {
           }
         ],
         "font": {
-          "size": 8,
+          "size": 7.5,
           "family": "Arial",
           "pad": 2
-        },
-        "widen": {
-          "col": "type",
-          "pt": 72,
-          "from": "remark"
         }
       },
       {
@@ -2763,7 +2726,12 @@ var TOKEN_MAP = {
             "head": "Remarks"
           }
         ],
-        "grow": true
+        "grow": true,
+        "font": {
+          "size": 7.5,
+          "family": "Arial",
+          "pad": 2
+        }
       }
     ],
     "boxesInDocx": 0,
@@ -2783,53 +2751,151 @@ var TOKEN_MAP = {
         "sign": false
       },
       {
-        "tok": "{{accomActual}}",
-        "label": "Accommodation — actual cost (Baht)",
-        "labelTh": "ค่าที่พักตามจริง (บาท)",
-        "sign": false
-      },
-      {
-        "tok": "{{perDiemDays}}",
-        "label": "Per diem (days)",
-        "labelTh": "Per diem (วัน)",
-        "sign": false
-      },
-      {
-        "tok": "{{perDiemRate}}",
-        "label": "Per diem rate (Baht/day)",
-        "labelTh": "อัตรา per diem (บาท/วัน)",
-        "sign": false
-      },
-      {
         "tok": "{{rcptNote}}",
         "label": "Receipts attached",
         "labelTh": "รายการใบเสร็จที่แนบ",
         "sign": false
       },
       {
-        "tok": "{{proxyNote}}",
-        "label": "Prepared on behalf",
-        "labelTh": "ทำใบเบิกแทน"
-      },
-      {
         "tok": "{{misNote}}",
-        "label": "Pay by mission (aircraft owner)",
-        "labelTh": "ค่าตอบแทนแยกตามภารกิจ (เจ้าของเครื่อง)"
+        "label": "Pay by mission — travel dates and days with more than one mission",
+        "labelTh": "ค่าตอบแทนตามภารกิจ — วันที่จ่ายค่าเดินทาง และวันที่มีมากกว่าหนึ่งภารกิจ"
+      }
+    ],
+    "rowFill": [
+      {
+        "label": "TOTAL HOURS",
+        "toks": [
+          "{{fltHours}}",
+          "{{gndHours}}"
+        ]
       },
       {
-        "tok": "{{misPay}}",
-        "label": "Travel, allowance and daily wage (Baht) — included in Total Income",
-        "labelTh": "ค่าเดินทาง เบี้ยเลี้ยง และค่าแรงรายวัน (บาท) — รวมอยู่ใน Total Income แล้ว"
+        "label": "Flight instruction",
+        "toks": [
+          "",
+          "{{m1FltN}}",
+          "{{m1FltR}}",
+          "{{m1Flt}}",
+          "{{m2FltN}}",
+          "{{m2FltR}}",
+          "{{m2Flt}}",
+          "{{fltPay}}"
+        ]
       },
       {
-        "tok": "{{perDiemTotal}}",
-        "label": "Per diem total (Baht) — included in the reimbursement total",
-        "labelTh": "Per diem รวม (บาท) — รวมอยู่ในยอดค่าใช้จ่ายที่ขอเบิก"
+        "label": "Travel",
+        "toks": [
+          "",
+          "{{m1TrvN}}",
+          "{{m1TrvR}}",
+          "{{m1Trv}}",
+          "{{m2TrvN}}",
+          "{{m2TrvR}}",
+          "{{m2Trv}}",
+          "{{mTrv}}"
+        ]
       },
       {
-        "tok": "{{whtAmt}}",
-        "label": "Withholding tax 3% — on pay, travel, allowance, daily wage, flat accommodation, per diem and receipts taken as income; receipted expenses are not withheld",
-        "labelTh": "ภาษีหัก ณ ที่จ่าย 3% — คิดจากค่าตอบแทน ค่าเดินทาง เบี้ยเลี้ยง ค่าแรงรายวัน ค่าที่พักเหมาจ่าย per diem และใบเสร็จที่รับเป็นรายได้ ค่าใช้จ่ายที่มีใบเสร็จไม่หัก"
+        "label": "Allowance",
+        "toks": [
+          "",
+          "{{m1AlwN}}",
+          "{{m1AlwR}}",
+          "{{m1Alw}}",
+          "{{m2AlwN}}",
+          "{{m2AlwR}}",
+          "{{m2Alw}}",
+          "{{mAlw}}"
+        ]
+      },
+      {
+        "label": "Daily wage (Flt Ops / engineer)",
+        "toks": [
+          "",
+          "{{m1DayN}}",
+          "{{m1DayR}}",
+          "{{m1Day}}",
+          "{{m2DayN}}",
+          "{{m2DayR}}",
+          "{{m2Day}}",
+          "{{mDay}}"
+        ]
+      },
+      {
+        "label": "Subtotal by mission",
+        "toks": [
+          "",
+          "",
+          "",
+          "{{m1Sub}}",
+          "",
+          "",
+          "{{m2Sub}}",
+          "{{misTot}}"
+        ]
+      },
+      {
+        "label": "Ground / Simulator instruction (one rate for all missions)",
+        "toks": [
+          "{{gndHours2}}",
+          "{{gndRate}}",
+          "{{gndPay}}"
+        ]
+      },
+      {
+        "label": "Accommodation — flat rate",
+        "toks": [
+          "{{accomNights}}",
+          "{{accomRate}}",
+          "{{accomFlat}}"
+        ]
+      },
+      {
+        "label": "Accommodation — actual (receipted)",
+        "toks": [
+          "",
+          "",
+          "{{accomActual}}"
+        ]
+      },
+      {
+        "label": "Per diem",
+        "toks": [
+          "{{perDiemDays}}",
+          "{{perDiemRate}}",
+          "{{perDiemTotal}}"
+        ]
+      },
+      {
+        "label": "Total Expenses",
+        "toks": [
+          "{{expTotal}}"
+        ]
+      },
+      {
+        "label": "Claimant",
+        "toks": [
+          "{{empName2}}",
+          "{{sig_empSign}}",
+          "{{empDate}}"
+        ]
+      },
+      {
+        "label": "Verified by (Admin)",
+        "toks": [
+          "{{admName}}",
+          "{{sig_admSign}}",
+          "{{admDate}}"
+        ]
+      },
+      {
+        "label": "Approved by",
+        "toks": [
+          "{{apvName}}",
+          "{{sig_apvSign}}",
+          "{{apvDate}}"
+        ]
       }
     ]
   },

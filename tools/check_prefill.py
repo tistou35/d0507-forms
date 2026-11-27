@@ -47,7 +47,7 @@ def sendable(d):
         if any(f.get('type') == 'sign' for f in sec.get('fields', [])):
             continue
         for f in sec.get('fields', []):
-            if f.get('type') == 'static':      # ข้อความอธิบาย ไม่ใช่ช่องกรอก
+            if f.get('type') in ('static', 'grid', 'pull'):      # ข้อความอธิบาย ไม่ใช่ช่องกรอก
                 continue
             out[f['k']] = f
     return out

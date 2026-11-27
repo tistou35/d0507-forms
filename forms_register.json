@@ -1534,13 +1534,13 @@
   },
   {
    "doc": "D-0507-MRF-001",
-   "code": "",
+   "code": "AD-MRF-301-B",
    "abbr": "MRF",
    "t": "Monthly Reimbursement Form",
    "th": "แบบเบิกค่าใช้จ่ายรายเดือน",
    "iss": "01",
-   "rev": "00",
-   "eff": "",
+   "rev": "01",
+   "eff": "27 NOV 2026",
    "own": "AD",
    "lef": [],
    "jot": "210050755822448",
@@ -1568,7 +1568,7 @@
    ],
    "blank": "blank/MRF.pdf",
    "edit": "1rYTVuOpIiLt-1p5uB0T2Rp7E7_BsW0mAqviUxIkEyRI",
-   "tpl": "1-6QkfNrVMt_suxLC1vr9EIalUjGOoWjAvB_7FnAx1-s"
+   "tpl": "1SZcZ09Ddw4CjhpI7l9i16vyktw4n0GATjSc1J3PdUcY"
   },
   {
    "doc": "D-0507-MTC-001",

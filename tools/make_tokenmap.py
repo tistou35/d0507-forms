@@ -287,7 +287,7 @@ def build(abbr, verbose=False):
         # ไม่เข้าใบที่ส่งและไม่ขึ้นใน PDF ถ้าปล่อยให้จับคู่ ปุ่มสแกนของผู้โดยสารจะไปแย่งป้าย
         # "ID / Passport No." ของช่องเลขบัตรจริง แล้วเลขบัตรตกไปท้ายเอกสาร
         # pull = ปุ่มดึงข้อมูลจากระบบอื่น (MRF ← Flight Logs) ก็ไม่ใช่ช่องเก็บข้อมูลเช่นกัน
-        if f.get('type') in ('static', 'scan', 'pull'):
+        if f.get('type') in ('static', 'grid', 'scan', 'pull'):
             continue
         tok = '{{sig_%s}}' % f['k'] if f.get('type') == 'sign' else '{{%s}}' % f['k']
 
@@ -495,6 +495,14 @@ def build(abbr, verbose=False):
     st = set(ov.get('skipTables') or [])
     if st:
         tables = [t for t in tables if t.get('k') not in st]
+
+    # dropAuto: token ที่ตัวจับคู่อัตโนมัติวางผิดช่อง และมีที่วางจริงใน rowFill แล้ว
+    # MRF Rev 01 — หัวตาราง "Rate (Baht / hr)" ถูกจับเป็น fltRate · ป้ายแถวลงนาม "Claimant" ถูกจับเป็นลายเซ็น
+    # ถ้าไม่ตัด token เดียวกันจะถูกวางสองที่ ที่หนึ่งจะว่างเงียบ ๆ ตอนออกเอกสาร
+    drop = set(ov.get('dropAuto') or [])
+    if drop:
+        by_label = [b for b in by_label if b['tok'] not in drop]
+        by_line = [b for b in by_line if b['tok'] not in drop]
 
     skip = set(ov.get('skip') or [])
     if skip:

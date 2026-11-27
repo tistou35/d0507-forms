@@ -11,6 +11,18 @@
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g,
     c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+  /* {คีย์} ในข้อความ → ค่าที่กรอก/คำนวณ · {คีย์:$} = เงิน 2 ตำแหน่ง · {คีย์:n} = ตัวเลขมีจุลภาค
+     ยังไม่มีค่า = — ไม่ปล่อยให้ {คีย์} โผล่ให้ผู้ใช้เห็น */
+  const fmtVal = (v, how) => {
+    if (v == null || v === '') return '—';
+    const n = typeof v === 'number' ? v : (/^-?\d+(\.\d+)?$/.test(String(v)) ? Number(v) : NaN);
+    if (how === '$' && !isNaN(n)) return n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    if ((how === 'n' || typeof v === 'number') && !isNaN(n)) return n.toLocaleString('en-US', { maximumFractionDigits: 2 });
+    return String(v);
+  };
+  const fillText = (raw, ctx) => String(raw == null ? '' : raw)
+    .replace(/\{([a-zA-Z0-9_]+)(?::([$n]))?\}/g, (m, k, how) => fmtVal(ctx[k], how));
+
   /* รับได้ทั้ง {th,en} และสตริงเปล่า ๆ · ขาดคำแปลก็ยังได้ข้อความ ไม่ใช่ช่องว่าง */
   const L = (o, lang) => typeof o === 'string' ? o
     : (o && (o[lang || 'th'] || o.th || o.en)) || '';
@@ -419,7 +431,7 @@
       if (!evalCond(sec.showIf, ctx)) return;
       const rows = [];
       (sec.fields || []).forEach(f => {
-        if (f.type === 'static' || f.type === 'scan' || f.type === 'pull') return;
+        if (f.type === 'static' || f.type === 'grid' || f.type === 'scan' || f.type === 'pull') return;
         if (!evalCond(f.showIf, ctx)) return;
         const v = this.data[f.k];
 
@@ -564,7 +576,7 @@
         .filter(s => !(s.hideOthers && this.party && s.party !== this.party));
       let sc = 0, ans = 0, tot = 0;
       secs.forEach(s => (s.fields || []).forEach(f => {
-        if (f.type === 'static' || f.type === 'scan' || f.type === 'pull' || !evalCond(f.showIf, ctx)) return;
+        if (f.type === 'static' || f.type === 'grid' || f.type === 'scan' || f.type === 'pull' || !evalCond(f.showIf, ctx)) return;
         sc += fieldScore(f, this.data[f.k]);
         tot++;
         if (this.filled(f)) ans++;
@@ -650,9 +662,33 @@
       case 'static': {
         const raw = L(f.text || f.label, this.lang);
         const ctx = Object.assign({}, this.data, this.computed());
-        return `<div class="fk-f"><div class="fk-static">${
-          String(raw).replace(/\{([a-zA-Z0-9_]+)\}/g, (m, k) =>
-            esc(ctx[k] == null || ctx[k] === '' ? '—' : String(ctx[k])))}</div></div>`;
+        const txt = esc(fillText(raw, ctx));
+        /* fold = คำอธิบายยาวที่อ่านเฉพาะตอนสงสัย — พับไว้ ไม่กินที่ทุกครั้งที่เปิดแท็บ */
+        if (f.fold) return `<div class="fk-f"><details class="fk-fold"><summary>${esc(L(f.fold, this.lang))}</summary>
+          <div class="fk-static">${txt}</div></details></div>`;
+        return `<div class="fk-f"><div class="fk-static">${txt}</div></div>`;
+      }
+
+      /* ตารางตัวเลขที่ระบบคิดให้ (อ่านอย่างเดียว) — แถวคือรายการ คอลัมน์คือกลุ่ม
+         MRF ส่วนที่ 3: ค่าบิน/เดินทาง/เบี้ยเลี้ยง × ภารกิจ D0507/BSC เห็นทั้งก้อนในตารางเดียว
+         แทนประโยคยาวที่ต้องอ่านทีละคำ
+           head  [ป้ายคอลัมน์…]  rows [{label, cells:[ข้อความ…], cellsEn?, cls: sub|tot, showIf}]
+           ในช่อง: บรรทัดแรก = ตัวเลขหลัก บรรทัดถัดไป (\n) = ที่มา ตัวเล็ก
+           บรรทัดแรกเป็นศูนย์/ว่าง → แสดง – ช่องเดียว (ไม่มีรายการนี้) ยกเว้นแถวรวม */
+      case 'grid': {
+        const ctx = Object.assign({}, this.data, this.computed());
+        const zero = t => { const x = String(t).trim(); return !x || x === '—' || /^0(\.0+)?$/.test(x.replace(/,/g, '')); };
+        const head = (f.head || []).map((h, j) => `<th${j ? ' class="n"' : ''}>${esc(L(h, this.lang))}</th>`).join('');
+        const rows = (f.rows || []).filter(r => evalCond(r.showIf, ctx)).map(r => {
+          const cells = (this.lang === 'en' && r.cellsEn) ? r.cellsEn : (r.cells || []);
+          return `<tr class="${esc(r.cls || '')}"><th>${esc(L(r.label, this.lang))}</th>${cells.map(c => {
+            const lines = String(c || '').split('\n').map(x => fillText(x, ctx));
+            if (!c || (zero(lines[0]) && !r.cls)) return '<td class="n z">–</td>';
+            return `<td class="n"><b>${esc(lines[0])}</b>${lines.slice(1).map(x => `<small>${esc(x)}</small>`).join('')}</td>`;
+          }).join('')}</tr>`;
+        }).join('');
+        return `<div class="fk-f fk-gridf">${lab ? `<label>${esc(lab)}</label>` : ''}<div class="fk-tw">
+          <table class="fk-grid"><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table></div></div>`;
       }
 
       /* ถ่ายรูปเอกสารแล้วกรอกให้ — ปุ่มลัด ไม่ใช่ช่องเก็บข้อมูล ใบที่ส่งไม่มีค่าของฟิลด์นี้
@@ -921,6 +957,10 @@
           if (rk && c.k === rkFirst) return rkCell(row, ri);
           if (rkCols.indexOf(c.k) >= 0) return '';
           const cv = row[c.k] == null ? '' : row[c.k];
+          /* select — ค่าที่ต้องเลือกจากรายการ (MRF: ภารกิจ D0507 / BSC) พิมพ์เองแล้วสะกดต่างจะคิดเงินผิดภารกิจ */
+          if (c.type === 'select') return `<td><select data-tk="${esc(f.k)}" data-tr="${ri}" data-tc="${esc(c.k)}"${ro ? ' disabled' : ''}>${
+            (c.opt || []).map(o => { const ov = typeof o === 'object' ? o.v : o, on = typeof o === 'object' ? L(o.n, this.lang) : o;
+              return `<option value="${esc(ov)}"${String(cv) === String(ov) ? ' selected' : ''}>${esc(on || '')}</option>`; }).join('')}</select></td>`;
           const t = ['number', 'date', 'time'].includes(c.type) ? c.type : 'text';
           return `<td><input type="${t}" data-tk="${esc(f.k)}" data-tr="${ri}" data-tc="${esc(c.k)}"
             value="${esc(cv)}"${ro ? ' disabled' : ''}></td>`;
@@ -1065,7 +1105,8 @@
              aria-selected="${on}" tabindex="${on ? 0 : -1}"
              aria-label="${n + 1}. ${esc(t.n)} — ${say}">
              <span class="i">${n + 1}</span><span class="nm">${esc(t.n)}</span>${tag}</button>`;
-        }).join('') + `</nav></div>`;
+        }).join('') + `</nav>${this.def.ui && this.def.ui.sumbar
+          ? `<div class="fk-sumbar">${esc(fillText(L(this.def.ui.sumbar, this.lang), Object.assign({}, this.data, c)))}</div>` : ''}</div>`;
 
       // gate ระดับ stop ต้องเห็นทุกแท็บ ที่เหลือรวมไว้หน้าสรุป
       for (const g of this.gates()) {
@@ -1283,7 +1324,7 @@
       }));
 
     // ตารางแถวซ้ำ — เขียนค่าลงช่องโดยไม่ rerender ระหว่างพิมพ์ กัน focus หลุดเหมือน mask
-    el.querySelectorAll('input[data-tk]').forEach(i =>
+    el.querySelectorAll('input[data-tk],select[data-tk]').forEach(i =>
       i.addEventListener('change', () => {
         const k = i.dataset.tk, ri = Number(i.dataset.tr);
         const f = self.fields[k] || {};
@@ -1480,75 +1521,97 @@
      ข้อมูลอัตราและภารกิจ (misCfg) มาจากปุ่มดึง Flight Log — ไม่มี = ไม่ใช้วิธีนี้ ใบคิดแบบเดิม */
   FormKit.fns = {};
   FormKit.fns.mrfMission = function (d) {
-    const z = { misOn: false, mFlt: 0, mTrv: 0, mAlw: 0, mDay: 0, misPay: 0, misNote: '' };
-    const C = d.misCfg;
-    if (!C || !C.on) return z;
-    const base = C.base || 'D0507', mis = C.missions || [], R = C.rates || {};
+    /* คืนทุกช่องของตารางส่วนที่ 3 (กระดาษ Rev 01) — m1 = ภารกิจหลัก (D0507) · m2 = ภารกิจที่สอง (BSC)
+       ต่อรายการ: N = จำนวน (ชม./ครั้ง/วัน) · R = อัตรา · ไม่มีต่อท้าย = ยอดเงิน · Sub = รวมของภารกิจ
+       fltPay mTrv mAlw mDay = คอลัมน์ Total · misTot = รวมทุกภารกิจ (ไม่รวมภาคพื้น/SIM ซึ่งเป็นอัตราเดียว)
+       ภารกิจที่สามขึ้นไป (ถ้าผู้ดูแลเพิ่ม) ไม่มีคอลัมน์บนกระดาษ — นับเข้ายอดรวม และบอกไว้ใน misNote */
+    const r2 = v => Math.round((Number(v) || 0) * 100) / 100;
+    const hrs = v => { const t = String(v == null ? '' : v).trim(); if (!t) return 0;
+      const m = /^(\d+):([0-5]?\d)$/.exec(t); return m ? +m[1] + +m[2] / 60 : (Number(t.replace(/,/g, '')) || 0); };
+    const C = d.misCfg && d.misCfg.on ? d.misCfg : null;
+    const base = (C && C.base) || 'D0507';
+    const mis = (C && C.missions) || [{ code: 'D0507' }, { code: 'BSC' }];
+    const second = (mis.find(m => m.code !== base) || { code: 'BSC' }).code;
+    const z = { misOn: !!C, m1Code: base, m2Code: second, mFlt: 0, mTrv: 0, mAlw: 0, mDay: 0, misPay: 0, misTot: 0, fltPay: 0, misNote: '',
+      payBasis: C && C.payType === 'daily' ? 'Daily wage' : 'Hourly', trvRetTxt: '' };
+    ['m1', 'm2'].forEach(p => ['Flt', 'Trv', 'Alw', 'Day'].forEach(k => { z[p + k + 'N'] = 0; z[p + k + 'R'] = 0; z[p + k] = 0; }));
+    z.m1Sub = 0; z.m2Sub = 0;
+    const rows = (d.sheet || []).filter(r => r && (hrs(r.flt) > 0 || hrs(r.gnd) > 0));
+
+    if (!C) {
+      /* อัตราเดียว (ผู้ดูแลยังไม่ได้ตั้งอัตราแยกภารกิจ) — ชั่วโมงบินทั้งหมดอยู่คอลัมน์ D0507 ด้วย fltRate */
+      const h = r2(rows.reduce((a, r) => a + hrs(r.flt), 0)), rt = Number(d.fltRate) || 0;
+      z.m1FltN = h; z.m1FltR = rt; z.m1Flt = r2(h * rt);
+      z.fltPay = z.m1Flt; z.m1Sub = z.m1Flt; z.misTot = z.m1Flt;
+      return z;
+    }
+
+    const R = C.rates || {};
     const regOf = {}; mis.forEach(m => (m.regs || []).forEach(r => { regOf[String(r).toUpperCase().replace(/\s/g, '')] = m.code; }));
     const codes = mis.map(m => m.code);
-    const misOf = place => {
-      const t = String(place || '').toUpperCase();
-      for (const part of t.split(/[\/,;]+/)) {
+    const misOf = row => {
+      if (row.mis && codes.indexOf(row.mis) >= 0) return row.mis;       // เลือกในคอลัมน์ภารกิจ
+      for (const part of String(row.place || '').toUpperCase().split(/[\/,;]+/)) {
         const p = part.replace(/\s/g, '');
         if (regOf[p]) return regOf[p];
         if (codes.indexOf(p) >= 0) return p;
       }
       return base;
     };
-    const hrs = v => { const t = String(v == null ? '' : v).trim(); if (!t) return 0;
-      const m = /^(\d+):([0-5]?\d)$/.exec(t); return m ? +m[1] + +m[2] / 60 : (Number(t.replace(/,/g, '')) || 0); };
     const rate = (m, k) => Number((R[m] || {})[k]) || 0;
     const fl = {}, days = {}, warn = [];
-    (d.sheet || []).forEach(r => {
-      if (!r || !/^\d{4}-\d{2}-\d{2}$/.test(String(r.date || ''))) return;
-      const f = hrs(r.flt), g = hrs(r.gnd);
-      if (!(f > 0 || g > 0)) return;
-      const m = misOf(r.place);
-      fl[m] = (fl[m] || 0) + f;
+    rows.forEach(r => {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(String(r.date || ''))) { warn.push('row without a date not counted for travel / allowance'); return; }
+      const m = misOf(r);
+      fl[m] = (fl[m] || 0) + hrs(r.flt);
       (days[r.date] = days[r.date] || []).indexOf(m) < 0 && days[r.date].push(m);
     });
     const dates = Object.keys(days).sort();
-    // รายการรายวัน: อัตราสูงสุดของภารกิจในวันนั้น คิดกับภารกิจนั้น · เท่ากัน → ภารกิจหลัก ไม่งั้นภารกิจแรกที่พบ
-    const pick = (ms, k) => {
-      let best = null;
-      ms.forEach(m => { const v = rate(m, k);
-        if (!best || v > best.v || (v === best.v && m === base)) best = { m, v }; });
-      return best;
-    };
-    const by = {}; const add = (m, k, v) => { by[m] = by[m] || { flt: 0, trv: 0, alw: 0, day: 0 }; by[m][k] += v; };
-    Object.keys(fl).forEach(m => add(m, 'flt', Math.round(fl[m] * rate(m, 'flt') * 100) / 100));
+    // รายการรายวัน: อัตราสูงสุดของภารกิจในวันนั้น คิดกับภารกิจนั้น · เท่ากัน → ภารกิจหลัก
+    const pick = (ms, k) => { let best = null;
+      ms.forEach(m => { const v = rate(m, k); if (!best || v > best.v || (v === best.v && m === base)) best = { m, v }; });
+      return best; };
+    const by = {}; const B = m => (by[m] = by[m] || { flt: 0, fltN: 0, trv: 0, trvN: 0, alw: 0, alwN: 0, day: 0, dayN: 0 });
+    Object.keys(fl).forEach(m => { B(m).fltN = fl[m]; B(m).flt = r2(fl[m] * rate(m, 'flt')); });
     const dn = y => Math.round(Date.UTC(+y.slice(0, 4), +y.slice(5, 7) - 1, +y.slice(8, 10)) / 864e5);
     const gap = C.gapDays == null ? 2 : Number(C.gapDays), trips = [];
+    const ret = d.trvRet === true || (d.trvRet !== false && !!C.trvReturn);
     for (let a = 0; a < dates.length;) {
       let b = a;
       while (b + 1 < dates.length && dn(dates[b + 1]) - dn(dates[b]) - 1 <= gap) b++;
       trips.push({ d: dates[a], leg: 'arrival' });
-      if (d.trvRet === true || (d.trvRet !== false && C.trvReturn)) trips.push({ d: dates[b], leg: 'return' });
+      if (ret) trips.push({ d: dates[b], leg: 'return' });
       a = b + 1;
     }
     const tLines = [], mixed = [];
-    trips.forEach(t => { const p = pick(days[t.d], 'trv'); if (p.v > 0) { add(p.m, 'trv', p.v); tLines.push(t.d.slice(8) + ' ' + t.leg + ' ' + p.m); } });
+    trips.forEach(t => { const p = pick(days[t.d], 'trv'); if (p.v > 0) { B(p.m).trv += p.v; B(p.m).trvN++; tLines.push(t.d.slice(8) + ' ' + t.leg + ' ' + p.m); } });
     dates.forEach(dt => {
-      const a = pick(days[dt], 'alw'); if (a.v > 0) add(a.m, 'alw', a.v);
-      if (C.payType === 'daily') { const w = pick(days[dt], 'day'); if (w.v > 0) add(w.m, 'day', w.v); }
+      const a = pick(days[dt], 'alw'); if (a.v > 0) { B(a.m).alw += a.v; B(a.m).alwN++; }
+      if (C.payType === 'daily') { const w = pick(days[dt], 'day'); if (w.v > 0) { B(w.m).day += w.v; B(w.m).dayN++; } }
       if (days[dt].length > 1) mixed.push(dt.slice(8) + ' ' + days[dt].join('+') + ' → ' + a.m);
     });
     Object.keys(fl).forEach(m => { if (fl[m] > 0 && !rate(m, 'flt') && C.payType !== 'daily') warn.push('no flight rate for ' + m); });
-    const sum = k => Object.keys(by).reduce((s, m) => s + by[m][k], 0);
-    const r2 = v => Math.round(v * 100) / 100, n2 = v => r2(v).toLocaleString('en-US', { minimumFractionDigits: 2 });
-    z.misOn = true; z.mFlt = r2(sum('flt')); z.mTrv = r2(sum('trv')); z.mAlw = r2(sum('alw')); z.mDay = r2(sum('day'));
-    z.misPay = r2(z.mTrv + z.mAlw + z.mDay);
-    const hm = h => Math.floor(h + 1e-9) + ':' + String(Math.round((h - Math.floor(h + 1e-9)) * 60)).padStart(2, '0');
-    z.misNote = ['Pay by mission (aircraft owner) — ' + (C.payType === 'daily' ? 'daily-rate staff' : 'hourly flight pay')]
-      .concat(Object.keys(by).sort((a, b) => a === base ? -1 : b === base ? 1 : a.localeCompare(b)).map(m => {
-        const x = by[m], dd = dates.filter(t => days[t].indexOf(m) >= 0).length;
-        return m + ': ' + (fl[m] ? 'flight ' + hm(fl[m]) + ' h × ' + n2(rate(m, 'flt')) + ' = ' + n2(x.flt) + ' · ' : '')
-          + 'travel ' + n2(x.trv) + ' · allowance ' + n2(x.alw) + (C.payType === 'daily' ? ' · daily wage ' + n2(x.day) : '')
-          + ' · days worked ' + dd + ' · subtotal ' + n2(x.flt + x.trv + x.alw + x.day) + ' Baht';
-      }))
+
+    [['m1', base], ['m2', second]].forEach(([p, m]) => {
+      const x = by[m] || B(m);
+      z[p + 'FltN'] = r2(x.fltN); z[p + 'FltR'] = rate(m, 'flt'); z[p + 'Flt'] = r2(x.flt);
+      z[p + 'TrvN'] = x.trvN; z[p + 'TrvR'] = rate(m, 'trv'); z[p + 'Trv'] = r2(x.trv);
+      z[p + 'AlwN'] = x.alwN; z[p + 'AlwR'] = rate(m, 'alw'); z[p + 'Alw'] = r2(x.alw);
+      z[p + 'DayN'] = x.dayN; z[p + 'DayR'] = rate(m, 'day'); z[p + 'Day'] = r2(x.day);
+      z[p + 'Sub'] = r2(x.flt + x.trv + x.alw + x.day);
+    });
+    const sum = k => r2(Object.keys(by).reduce((s, m) => s + by[m][k], 0));
+    z.fltPay = sum('flt'); z.mFlt = z.fltPay; z.mTrv = sum('trv'); z.mAlw = sum('alw'); z.mDay = sum('day');
+    z.misPay = r2(z.mTrv + z.mAlw + z.mDay); z.misTot = r2(z.fltPay + z.misPay);
+    z.trvRetTxt = ret ? 'Yes' : 'No';
+    const extra = Object.keys(by).filter(m => m !== base && m !== second && (by[m].flt + by[m].trv + by[m].alw + by[m].day) > 0);
+    const n2 = v => r2(v).toLocaleString('en-US', { minimumFractionDigits: 2 });
+    z.misNote = []
       .concat(tLines.length ? ['Travel paid: ' + tLines.join(', ')] : [])
-      .concat(mixed.length ? ['Days with more than one mission (daily items paid once at the higher rate, charged to): ' + mixed.join(', ')] : [])
-      .concat(warn.length ? ['Check: ' + warn.join('; ')] : []).join('\n');
+      .concat(mixed.length ? ['Days with more than one mission (paid once at the higher rate, charged to): ' + mixed.join(', ')] : [])
+      .concat(extra.map(m => 'Other mission ' + m + ' (no column on the form, included in Total): '
+        + n2(by[m].flt + by[m].trv + by[m].alw + by[m].day) + ' Baht'))
+      .concat(warn.length ? ['Check: ' + warn.filter((w, i) => warn.indexOf(w) === i).join('; ')] : []).join('\n');
     return z;
   };
   FormKit.evalCond = evalCond;
