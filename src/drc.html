@@ -3,45 +3,45 @@
 <title>ใบรับเอกสารควบคุม — D-0507 Flight Training</title>
 <link rel="stylesheet" href="@@BASE@@assets/app.css">
 <style>
-.dtabs{display:flex;gap:8px;margin:14px 0 4px;flex-wrap:wrap}
-.dtabs button{padding:8px 15px;border-radius:9px;border:1px solid var(--border-light);
+.dtabs{display:flex;gap:8px;margin:12px 0 4px;flex-wrap:wrap}
+.dtabs button{padding:8px 16px;border-radius:8px;border:1px solid var(--border-light);
   background:var(--surface);font-size:13.5px;cursor:pointer;color:var(--fg-2)}
 .dtabs button[aria-selected="true"]{background:var(--navy-900);color:#fff;border-color:var(--navy-900)}
 
 /* ── สร้างลิงก์ ── */
-.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px 14px}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px 12px}
 .g label,.wide label{display:block;font-size:13px;font-weight:600}
-.wide{margin-top:10px}
-.g input,.g select,.wide input{width:100%;margin-top:4px;min-height:40px;padding:0 11px;
+.wide{margin-top:8px}
+.g input,.g select,.wide input{width:100%;margin-top:4px;min-height:40px;padding:0 12px;
   border-radius:8px;border:1px solid var(--border-med);background:var(--surface);
   font-size:14px;font-family:inherit}
 .g input:focus,.wide input:focus,.g select:focus{outline:2px solid var(--sky-500);outline-offset:1px}
 .rq{color:var(--red-600)}
 
-.drow{display:grid;grid-template-columns:1fr 150px 96px 138px 40px;gap:8px;margin-bottom:7px}
-.drow input{min-height:38px;padding:0 10px;border-radius:8px;border:1px solid var(--border-med);
+.drow{display:grid;grid-template-columns:1fr 150px 96px 138px 40px;gap:8px;margin-bottom:8px}
+.drow input{min-height:38px;padding:0 8px;border-radius:8px;border:1px solid var(--border-med);
   background:var(--surface);font-size:13.5px;font-family:inherit}
 .drow .x{border:1px solid var(--border-light);background:var(--surface);border-radius:8px;
   cursor:pointer;color:var(--g-500)}
 .drow .x:hover{border-color:var(--red-600);color:var(--red-600)}
 .dhead{display:grid;grid-template-columns:1fr 150px 96px 138px 40px;gap:8px;
-  font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--g-500);margin-bottom:5px}
+  font-size:11.5px;color:var(--g-500);margin-bottom:4px}
 @media(max-width:760px){ .drow,.dhead{grid-template-columns:1fr} .dhead{display:none} }
 
-.out{margin-top:14px;padding:13px 15px;border-radius:10px;background:var(--g-50);
+.out{margin-top:12px;padding:12px 16px;border-radius:8px;background:var(--g-50);
   border:1px solid var(--border-light)}
 .out code{display:block;font-family:var(--font-mono);font-size:12px;line-height:1.6;
-  word-break:break-all;color:var(--fg-1);margin-top:6px;max-height:120px;overflow:auto}
+  word-break:break-all;color:var(--fg-1);margin-top:4px;max-height:120px;overflow:auto}
 .msg{font-size:12.5px;color:var(--g-500)}
 .msg.bad{color:var(--red-600)}
 .msg.ok{color:var(--green-600)}
 
 /* ── ทะเบียนลายเซ็น ── */
 .sigreg{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
-.sigreg th{text-align:left;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;
+.sigreg th{text-align:left;font-size:10.5px;
   white-space:nowrap;
-  color:var(--g-500);font-weight:600;padding:7px 9px;border-bottom:1.5px solid var(--border-med)}
-.sigreg td{padding:8px 9px;border-bottom:1px solid var(--border-light);vertical-align:middle}
+  color:var(--g-500);font-weight:600;padding:8px 8px;border-bottom:1.5px solid var(--border-med)}
+.sigreg td{padding:8px 8px;border-bottom:1px solid var(--border-light);vertical-align:middle}
 .sigreg tr:last-child td{border-bottom:0}
 .sigreg .mono{font-family:var(--font-mono);font-size:11.5px;white-space:nowrap}
 /* ตำแหน่งงานยาวกว่าช่องที่เหลือเสมอ ปล่อยให้ตัดบรรทัดได้แต่ไม่กลางคำ */
@@ -52,9 +52,9 @@
 /* หัวกลุ่มอยู่ใน <thead> ไม่ใช่ <h3> เหนือตาราง — เบราว์เซอร์ซ้ำ thead ให้ทุกหน้า
    ตารางที่ยาวข้ามหน้าจึงพาชื่อคู่มือไปด้วย ถ้าปล่อยไว้ข้างนอก หน้าที่สองจะเป็น
    รายชื่อคนเซ็นลอย ๆ ที่ไม่บอกว่าเซ็นรับคู่มือเล่มไหน ซึ่งใช้เป็นหลักฐานไม่ได้ */
-.sigreg .gh th{border-bottom:2px solid var(--navy-900);padding:0 0 5px;
+.sigreg .gh th{border-bottom:2px solid var(--navy-900);padding:0 0 4px;
   text-transform:none;letter-spacing:0;color:var(--fg-1)}
-.sigreg .gh .t{display:block;font-size:14.5px;font-weight:700;font-family:var(--font-display)}
+.sigreg .gh .t{display:block;font-size:14.5px;font-weight:600;font-family:var(--font-display)}
 .sigreg .gh .s{display:block;font-size:11.5px;color:var(--g-500);
   font-family:var(--font-mono);font-weight:400;margin-top:2px}
 
@@ -71,8 +71,8 @@
   .prhead{display:block !important}
 }
 .prhead{display:none;border-bottom:1.2pt solid #000;padding-bottom:5pt;margin-bottom:9pt}
-.prhead .o{font-family:var(--font-mono);font-size:7.5pt;letter-spacing:.12em}
-.prhead h2{font-size:13pt;font-weight:700;font-family:var(--font-display)}
+.prhead .o{font-family:var(--font-mono);font-size:7.5pt;}
+.prhead h2{font-size:13pt;font-weight:600;font-family:var(--font-display)}
 .prhead .m{font-size:8pt;color:#333}
 </style>
 </head><body>
@@ -138,7 +138,7 @@
     <!-- ── ทะเบียนลายเซ็น ───────────────────────────────── -->
     <section id="preg" class="card hide">
       <div class="prhead">
-        <p class="o">D-0507 FLIGHT TRAINING CO., LTD.</p>
+        <p class="o">D-0507 Flight Training Co., Ltd.</p>
         <h2>ทะเบียนการรับเอกสารควบคุม · CONTROLLED DOCUMENT RECEIPT REGISTER</h2>
         <p class="m" id="prm"></p>
       </div>

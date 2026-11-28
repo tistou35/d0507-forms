@@ -3,22 +3,22 @@
 <title>ผังงานของฟอร์ม — D-0507 Flight Training</title>
 <link rel="stylesheet" href="@@BASE@@assets/app.css">
 <style>
-.wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px;align-items:start}
+.wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
 @media(max-width:900px){ .wrap{grid-template-columns:1fr} }
-.chart{background:var(--surface);border:1px solid var(--border-light);border-radius:10px;
-  padding:18px;overflow-x:auto}
+.chart{background:var(--surface);border:1px solid var(--border-light);border-radius:8px;
+  padding:16px;overflow-x:auto}
 .stab{width:100%;border-collapse:collapse;font-size:13px}
-.stab th{text-align:left;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
-  color:var(--g-500);font-weight:600;padding:7px 9px;border-bottom:1.5px solid var(--border-med)}
-.stab td{padding:9px;border-bottom:1px solid var(--border-light);vertical-align:top}
+.stab th{text-align:left;font-size:10.5px;
+  color:var(--g-500);font-weight:600;padding:8px 8px;border-bottom:1.5px solid var(--border-med)}
+.stab td{padding:8px;border-bottom:1px solid var(--border-light);vertical-align:top}
 .stab tr:last-child td{border-bottom:0}
-.stab .n{font-family:var(--font-mono);font-weight:700;color:var(--navy-900);width:26px}
+.stab .n{font-family:var(--font-mono);font-weight:600;color:var(--navy-900);width:26px}
 .stab .by{font-weight:600}
 .stab .d{font-family:var(--font-mono);white-space:nowrap;font-size:12px}
 .stab .rj{font-size:12px;color:var(--red-600)}
 .draft{background:#fff7e6;border:1px solid rgba(214,158,46,.4);color:#7a5312;
-  border-radius:8px;padding:11px 14px;font-size:13px;line-height:1.6;margin-bottom:14px}
-.meta{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 14px}
+  border-radius:8px;padding:12px 12px;font-size:13px;line-height:1.6;margin-bottom:12px}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 12px}
 .desc{font-size:14px;line-height:1.75;color:var(--fg-2)}
 @media print{
   .topbar,.rail,.botnav,.obtn,.greet .obtn,#gate{display:none !important}
@@ -33,7 +33,7 @@
 @@RAIL@@
   <main class="main">
     <div class="greet"><div>
-      <p class="eyebrow" id="eyebrow">ผังงานของฟอร์ม · FORM WORKFLOW</p>
+      <p class="eyebrow" id="eyebrow">ผังงานของฟอร์ม · Form workflow</p>
       <h1 id="title">—</h1>
       <p class="sub" id="sub"></p></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -169,15 +169,15 @@ function standalone(flow){
 <title>${A.esc(F.doc || F.abbr)} — ผังงาน</title>
 <style>
  body{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#0d1b2a;margin:28px;line-height:1.6}
- h1{font-size:21px;margin:0 0 2px} .s{color:#567;font-size:13px;margin:0 0 18px}
- table{width:100%;border-collapse:collapse;font-size:13px;margin-top:18px}
- th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#678;
-    border-bottom:1.5px solid #ccd;padding:7px 9px}
- td{padding:9px;border-bottom:1px solid #e6e9ee;vertical-align:top}
+ h1{font-size:21px;margin:0 0 2px} .s{color:#567;font-size:13px;margin:0 0 16px}
+ table{width:100%;border-collapse:collapse;font-size:13px;margin-top:16px}
+ th{text-align:left;font-size:11px;color:#678;
+    border-bottom:1.5px solid #ccd;padding:8px 8px}
+ td{padding:8px;border-bottom:1px solid #e6e9ee;vertical-align:top}
  .rj{color:#b23} .d{font-family:ui-monospace,monospace;white-space:nowrap}
- .w{background:#fff7e6;border:1px solid #e4c26a;color:#7a5312;padding:10px 13px;
+ .w{background:#fff7e6;border:1px solid #e4c26a;color:#7a5312;padding:8px 12px;
     border-radius:8px;font-size:13px;margin-bottom:16px}
- footer{margin-top:26px;padding-top:10px;border-top:1px solid #dde;color:#789;font-size:11px}
+ footer{margin-top:24px;padding-top:8px;border-top:1px solid #dde;color:#789;font-size:11px}
  @page{size:A4 portrait;margin:14mm}
 </style></head><body>
 <h1>${A.esc(A.nm(F))}</h1>

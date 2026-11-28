@@ -6,35 +6,35 @@
 <style>
 /* หนึ่งแถวต่อหนึ่งใบ — ชื่อใบและสถานะซ้าย ปุ่มขวา
    เดิมเป็นการ์ดที่กดได้ทั้งใบ มีทางไปทางเดียว ตอนนี้ต้องมีสามทาง (ทำงาน · ดู · พิมพ์) */
-.qsec{margin-top:26px}
-.qsec:first-of-type{margin-top:6px}
-.qrow{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;
-  background:var(--surface);border:1px solid var(--border-light);border-radius:10px;
+.qsec{margin-top:24px}
+.qsec:first-of-type{margin-top:4px}
+.qrow{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;
+  background:var(--surface);border:1px solid var(--border-light);border-radius:8px;
   padding:12px 16px;margin-bottom:8px}
 .qrow.hot{border-left:4px solid var(--amber-500)}
 .qrow .t{font-size:14.5px;font-weight:600;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.qrow .m{font-size:12.5px;color:var(--g-500);margin-top:3px;line-height:1.55}
+.qrow .m{font-size:12.5px;color:var(--g-500);margin-top:4px;line-height:1.55}
 .qrow .m .mono{font-size:11.5px}
-.qrow .b{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.qrow .b{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 .qrow .b a{text-decoration:none}
 .qrow .go{background:var(--navy-900);color:#fff;border-color:var(--navy-900)}
 @media(max-width:640px){ .qrow{grid-template-columns:1fr} .qrow .b{justify-content:flex-start} }
-.st{display:inline-flex;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px}
+.st{display:inline-flex;font-size:11px;font-weight:600;padding:2px 8px;border-radius:8px}
 .st.wait{background:var(--amber-100);color:var(--amber-600)}
 .st.ok{background:var(--green-100);color:var(--green-600)}
 .st.no{background:var(--red-100);color:var(--red-600)}
 .st.dl{background:var(--sky-100);color:var(--sky-600)}
-.empty{padding:14px 16px;border:1px dashed var(--border-med);border-radius:10px;color:var(--g-500);font-size:13.5px}
+.empty{padding:12px 16px;border:1px dashed var(--border-med);border-radius:8px;color:var(--g-500);font-size:13.5px}
 .qsec .sh .cnt{font-family:var(--font-mono);font-size:12px;color:var(--g-500);margin-left:8px}
-.ffind{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.ffind{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
 .ffind input{flex:1 1 240px;min-height:44px}
 .ffind select{flex:0 1 200px;min-height:44px}
-.fchips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-.fchips button{min-height:36px;padding:0 14px;border-radius:99px;border:1px solid var(--border-med);background:var(--surface,#fff);
+.fchips{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px}
+.fchips button{min-height:36px;padding:0 12px;border-radius:8px;border:1px solid var(--border-med);background:var(--surface,#fff);
   cursor:pointer;font:inherit;font-size:13px;color:var(--fg-2)}
 .fchips button[aria-pressed="true"]{background:var(--navy-900);color:#fff;border-color:var(--navy-900)}
-.fchips .n{font-family:var(--font-mono);font-size:11.5px;margin-left:6px;opacity:.75}
-.kind{font-family:var(--font-mono);font-size:11px;padding:1px 7px;border-radius:4px;background:var(--g-100,#f1f5f9);color:var(--g-600,#475569)}
+.fchips .n{font-family:var(--font-mono);font-size:11.5px;margin-left:4px;opacity:.75}
+.kind{font-family:var(--font-mono);font-size:11px;padding:1px 8px;border-radius:4px;background:var(--g-100,#f1f5f9);color:var(--g-600,#475569)}
 .where{color:var(--amber-600);font-weight:600}
 </style>
 </head><body>
@@ -43,7 +43,7 @@
 @@RAIL@@
   <main class="main">
     <div class="greet"><div>
-      <p class="eyebrow">งานของฉัน · MY QUEUE</p>
+      <p class="eyebrow">งานของฉัน · My queue</p>
       <h1>งานของฉัน</h1>
       <p class="sub">ใบที่รอคุณอนุมัติหรือลงนาม และใบที่คุณส่งไปแล้ว — งาน CAR อยู่ที่ระบบตรวจสอบ ต้องเข้าสู่ระบบแยก</p></div></div>
     <div id="gate"></div>

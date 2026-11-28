@@ -1,39 +1,39 @@
 <!DOCTYPE html><html lang="th"><head>
-<meta name="d0507-build" content="0ac8e94716a8"><meta charset="UTF-8">
+<meta name="d0507-build" content="f9f389b22079"><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>กรอกฟอร์ม — D-0507 Flight Training</title>
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="../assets/app.css?v=b273bda9">
+<link rel="stylesheet" href="../assets/app.css?v=e09aed9b">
 <style>
 dialog{border:0;border-radius:12px;padding:0;max-width:680px;width:calc(100% - 32px);
   box-shadow:var(--sh-lg);background:var(--surface);color:var(--fg-1)}
 dialog::backdrop{background:rgba(13,27,42,.5)}
-dialog .dh{background:var(--navy-900);color:#fff;padding:18px 22px}
-dialog .dh h3{font-size:18px;font-weight:700;color:#fff}
-dialog .dh p{font-size:12.5px;color:rgba(255,255,255,.7);margin-top:3px}
-dialog .db{padding:18px 22px;max-height:60vh;overflow:auto}
-dialog .df{padding:14px 22px;border-top:1px solid var(--g-100);display:flex;gap:10px;
+dialog .dh{background:var(--navy-900);color:#fff;padding:16px 20px}
+dialog .dh h3{font-size:18px;font-weight:600;color:#fff}
+dialog .dh p{font-size:12.5px;color:rgba(255,255,255,.7);margin-top:4px}
+dialog .db{padding:16px 20px;max-height:60vh;overflow:auto}
+dialog .df{padding:12px 20px;border-top:1px solid var(--g-100);display:flex;gap:8px;
   justify-content:flex-end;flex-wrap:wrap}
 .rvh{font-family:var(--font-display);font-size:14px;color:var(--sky-600);
-  margin:18px 0 6px;letter-spacing:.02em}
+  margin:16px 0 4px;letter-spacing:.02em}
 .rvh:first-child{margin-top:0}
-.rvr{display:flex;gap:14px;justify-content:space-between;align-items:baseline;
-  padding:6px 0;border-bottom:1px solid var(--g-100);font-size:13.5px}
+.rvr{display:flex;gap:12px;justify-content:space-between;align-items:baseline;
+  padding:4px 0;border-bottom:1px solid var(--g-100);font-size:13.5px}
 .rvr span{color:var(--g-600);flex:1}
 .rvr b{font-weight:600;text-align:right;max-width:55%}
 /* กล่อง "ทำต่อที่ระบบอื่น" ท้ายหน้าหลังส่งใบ */
 .afterbox{margin-top:16px;border:1px solid var(--border-light);border-radius:12px;
-  background:var(--surface);padding:16px 18px}
-.afterbox h3{font-family:var(--font-display);font-size:16px;margin:0 0 10px}
-.afterbox h4{font-size:13px;color:var(--sky-600);margin:18px 0 4px;letter-spacing:.02em}
-.afchk{display:flex;gap:9px;align-items:flex-start;font-size:14px;line-height:1.5;cursor:pointer}
-.afchk input{margin-top:3px;width:17px;height:17px}
+  background:var(--surface);padding:16px 16px}
+.afterbox h3{font-family:var(--font-display);font-size:16px;margin:0 0 8px}
+.afterbox h4{font-size:13px;color:var(--sky-600);margin:16px 0 4px;letter-spacing:.02em}
+.afchk{display:flex;gap:8px;align-items:flex-start;font-size:14px;line-height:1.5;cursor:pointer}
+.afchk input{margin-top:4px;width:17px;height:17px}
 .afstat{font-size:12.5px;color:var(--g-500);align-self:center}
 .afstat.ok{color:var(--green-600)}
 table.aftbl{width:100%;border-collapse:collapse;font-size:13.5px}
-table.aftbl th{text-align:left;font-weight:500;color:var(--g-600);padding:7px 10px 7px 0;
+table.aftbl th{text-align:left;font-weight:500;color:var(--g-600);padding:8px 8px 8px 0;
   border-bottom:1px solid var(--g-100);width:40%}
-table.aftbl td{padding:7px 0;border-bottom:1px solid var(--g-100);font-weight:600}
+table.aftbl td{padding:8px 0;border-bottom:1px solid var(--g-100);font-weight:600}
 table.aftbl td.c{width:1%;text-align:right;font-weight:400;white-space:nowrap}
 table.aftbl tr:last-child th,table.aftbl tr:last-child td{border-bottom:0}
 @media print{ .afterbox{display:none} }
@@ -92,7 +92,7 @@ table.aftbl tr:last-child th,table.aftbl tr:last-child td{border-bottom:0}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="../assets/app.js?v=28d94290"></script>
+<script src="../assets/app.js?v=fc6cd7bb"></script>
 <script>D0507.GAS_URL='https://script.google.com/macros/s/AKfycby7rFFVxd92wPImX4m8pv8nHqTrK3Iq0O32A34844DAg1rP8N3RfgKEyGvAUkQu-NXd/exec';</script>
 <script src="../assets/formkit.js?v=308e07b0"></script>
 <!-- อ่านเอกสารจากรูปเพื่อกรอกให้ — ตัวอ่าน OCR โหลดต่อเมื่อกดปุ่ม -->

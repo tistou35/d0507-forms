@@ -5,15 +5,15 @@
 
    หน้า HTML ใช้เครือข่ายก่อนแล้วค่อยตกมาที่แคช — จะได้ไม่ค้างรุ่นเก่าเมื่อออนไลน์
    asset ใช้แคชก่อนเพราะติด ?v= อยู่แล้ว เปลี่ยนเนื้อไฟล์เมื่อไร URL เปลี่ยนตาม */
-const CACHE = 'd0507-2ed3b9529c';
+const CACHE = 'd0507-4bb4f55efa';
 const FILES = [
   "fill/",
   "cl/",
   "pubs/",
   "all/",
   "",
-  "assets/app.css?v=b273bda9",
-  "assets/app.js?v=28d94290",
+  "assets/app.css?v=e09aed9b",
+  "assets/app.js?v=fc6cd7bb",
   "assets/formkit.js?v=308e07b0"
 ];
 

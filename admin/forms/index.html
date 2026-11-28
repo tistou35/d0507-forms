@@ -1,46 +1,46 @@
 <!DOCTYPE html><html lang="th"><head>
-<meta name="d0507-build" content="065d687d09c3"><meta charset="UTF-8">
+<meta name="d0507-build" content="9f85ee2d5d1f"><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>จัดการฟอร์ม — D-0507 Flight Training</title>
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="../../assets/app.css?v=b273bda9">
+<link rel="stylesheet" href="../../assets/app.css?v=e09aed9b">
 <style>
-.fmrow{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center;
+.fmrow{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;
   background:var(--surface);border:1px solid var(--border-light);border-radius:8px;
-  padding:14px 18px;margin-bottom:10px}
-.fmrow .hd{display:flex;gap:9px;align-items:baseline;flex-wrap:wrap}
-.fmrow .ab{font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--navy-900);
-  background:var(--g-100);border-radius:5px;padding:1px 7px;letter-spacing:.02em}
-.fmrow .cd{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--sky-600)}
+  padding:12px 16px;margin-bottom:8px}
+.fmrow .hd{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.fmrow .ab{font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--navy-900);
+  background:var(--g-100);border-radius:4px;padding:1px 8px;letter-spacing:.02em}
+.fmrow .cd{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--sky-600)}
 .fmrow .rc{font-family:var(--font-mono);font-size:11px;color:var(--g-500)}
-.fmrow .mt{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.fmrow .mt{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
 .fmrow .vr{font-size:12px;color:var(--g-500)}
 .tag.dep{background:var(--sky-50,#eaf2fb);color:var(--sky-600);border:1px solid rgba(42,111,190,.25)}
 .tag.man{background:var(--g-50);color:var(--fg-2);border:1px solid var(--border-light);
   font-family:var(--font-mono);font-size:10.5px}
 .fmrow .nm{font-size:15px;font-weight:600;font-family:var(--font-sans);line-height:1.3}
-.fmrow .mt{font-size:12.5px;color:var(--g-500);margin-top:3px}
+.fmrow .mt{font-size:12.5px;color:var(--g-500);margin-top:4px}
 .fmrow .act{display:flex;gap:8px;flex-wrap:wrap}
 .fb.sm{min-height:36px;font-size:12.5px;padding:0 12px}
-.filters select{min-height:40px;padding:0 11px;border-radius:8px;border:1px solid var(--border-med);
+.filters select{min-height:40px;padding:0 12px;border-radius:8px;border:1px solid var(--border-med);
   background:var(--surface);font-size:13.5px;font-family:inherit;color:var(--fg-1)}
 .filters .cnt{font-size:12.5px;color:var(--g-500);margin-left:auto}
 dialog{border:0;border-radius:12px;padding:0;max-width:640px;width:calc(100% - 32px);
   box-shadow:var(--sh-lg);background:var(--surface);color:var(--fg-1)}
 dialog::backdrop{background:rgba(13,27,42,.5)}
-dialog .dh{background:var(--navy-900);color:#fff;padding:18px 22px}
-dialog .dh h3{font-size:18px;font-weight:700;color:#fff}
-dialog .dh p{font-size:12.5px;color:rgba(255,255,255,.7);margin-top:3px}
-dialog .db{padding:20px 22px;max-height:60vh;overflow:auto}
-dialog .df{padding:14px 22px;border-top:1px solid var(--g-100);display:flex;gap:10px;
+dialog .dh{background:var(--navy-900);color:#fff;padding:16px 20px}
+dialog .dh h3{font-size:18px;font-weight:600;color:#fff}
+dialog .dh p{font-size:12.5px;color:rgba(255,255,255,.7);margin-top:4px}
+dialog .db{padding:20px 20px;max-height:60vh;overflow:auto}
+dialog .df{padding:12px 20px;border-top:1px solid var(--g-100);display:flex;gap:8px;
   justify-content:flex-end;flex-wrap:wrap}
-.ver{border-left:2px solid var(--g-150);padding:0 0 14px 16px;margin-left:6px;position:relative}
+.ver{border-left:2px solid var(--g-150);padding:0 0 12px 16px;margin-left:4px;position:relative}
 .ver::before{content:"";position:absolute;left:-5px;top:5px;width:8px;height:8px;border-radius:50%;
   background:var(--sky-500)}
 .ver .h{font-size:13.5px;font-weight:600;font-family:var(--font-sans)}
 .ver .m{font-size:12.5px;color:var(--g-500);line-height:1.6}
-.ver pre{font-family:var(--font-mono);font-size:11.5px;background:var(--g-50);border-radius:6px;
-  padding:10px 12px;margin-top:8px;white-space:pre-wrap;line-height:1.6}
+.ver pre{font-family:var(--font-mono);font-size:11.5px;background:var(--g-50);border-radius:4px;
+  padding:8px 12px;margin-top:8px;white-space:pre-wrap;line-height:1.6}
 </style>
 </head><body>
 <div class="topbar">
@@ -114,13 +114,13 @@ dialog .df{padding:14px 22px;border-top:1px solid var(--g-100);display:flex;gap:
 
   <div class="railfoot">
     <svg class="q" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9.2"/><path d="M9.4 9.2a2.7 2.7 0 1 1 3.4 2.6c-.6.2-.8.7-.8 1.3v.6"/><circle cx="12" cy="17" r=".9" fill="currentColor" stroke="none"/></svg>
-    <b data-t="helpTitle">ไม่รู้ว่าต้องใช้ฟอร์มไหน?</b>
+    <b data-t="helpTitle">หาฟอร์มที่ต้องใช้</b>
     <p data-t="helpBody">พิมพ์สิ่งที่อยากทำในช่องค้นหา ระบบจะหาให้ข้ามทุกระบบ</p>
   </div>
 </nav>
   <main class="main">
     <div class="greet"><div>
-      <p class="eyebrow">ผู้ดูแลระบบ · FORM MANAGEMENT</p>
+      <p class="eyebrow">ผู้ดูแลระบบ · Form management</p>
       <h1>จัดการฟอร์ม</h1>
       <p class="sub">เพิ่มฟอร์ม · ออกเวอร์ชันใหม่ · เปิด-ปิดใช้งาน · ดูประวัติการแก้ไข</p></div>
       <button class="obtn" id="add">
@@ -186,7 +186,7 @@ dialog .df{padding:14px 22px;border-top:1px solid var(--g-100);display:flex;gap:
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="../../assets/app.js?v=28d94290"></script>
+<script src="../../assets/app.js?v=fc6cd7bb"></script>
 <script>D0507.GAS_URL='https://script.google.com/macros/s/AKfycby7rFFVxd92wPImX4m8pv8nHqTrK3Iq0O32A34844DAg1rP8N3RfgKEyGvAUkQu-NXd/exec';</script>
 <script src="../../assets/formmgr.js?v=d1ace91e"></script>
 <script>

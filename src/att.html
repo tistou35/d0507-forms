@@ -4,50 +4,50 @@
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="@@BASE@@assets/app.css">
 <style>
-.dtabs{display:flex;gap:8px;margin:14px 0 4px;flex-wrap:wrap}
-.dtabs button{padding:8px 15px;border-radius:9px;border:1px solid var(--border-light);
+.dtabs{display:flex;gap:8px;margin:12px 0 4px;flex-wrap:wrap}
+.dtabs button{padding:8px 16px;border-radius:8px;border:1px solid var(--border-light);
   background:var(--surface);font-size:13.5px;cursor:pointer;color:var(--fg-2)}
 .dtabs button[aria-selected="true"]{background:var(--navy-900);color:#fff;border-color:var(--navy-900)}
-.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px 14px}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px 12px}
 .g label{display:block;font-size:13px;font-weight:600}
 .g .full{grid-column:1/-1}
-.g input,.g select{width:100%;margin-top:4px;min-height:40px;padding:0 11px;border-radius:8px;
+.g input,.g select{width:100%;margin-top:4px;min-height:40px;padding:0 12px;border-radius:8px;
   border:1px solid var(--border-med);background:var(--surface);font-size:14px;font-family:inherit}
 .g input[readonly]{background:var(--g-50);color:var(--g-600)}
 .rq{color:var(--red-600)}
 .msg{font-size:12.5px;color:var(--g-500)} .msg.bad{color:var(--red-600)} .msg.ok{color:var(--green-600)}
 .hide{display:none!important}
-.twrap{overflow-x:auto;border:1px solid var(--border-light);border-radius:10px;background:var(--surface)}
+.twrap{overflow-x:auto;border:1px solid var(--border-light);border-radius:8px;background:var(--surface)}
 table.ml{width:100%;border-collapse:collapse;font-size:13.5px}
-table.ml th{text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--g-500);
-  padding:9px 12px;border-bottom:1px solid var(--border-light);white-space:nowrap;background:var(--g-50)}
+table.ml th{text-align:left;font-size:11px;color:var(--g-500);
+  padding:8px 12px;border-bottom:1px solid var(--border-light);white-space:nowrap;background:var(--g-50)}
 table.ml td{padding:8px 12px;border-bottom:1px solid var(--g-100);vertical-align:middle}
 table.ml tr:last-child td{border-bottom:0}
 table.ml tbody tr.go{cursor:pointer} table.ml tbody tr.go:hover{background:var(--sky-100)}
 table.ml tr.x td{color:var(--g-500);text-decoration:line-through}
 .mono{font-family:var(--font-mono);font-size:11.5px;white-space:nowrap}
-.st{display:inline-flex;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;white-space:nowrap}
+.st{display:inline-flex;font-size:11px;font-weight:600;padding:2px 8px;border-radius:8px;white-space:nowrap}
 .st.open{background:var(--green-100);color:var(--green-600)} .st.closed{background:var(--g-100);color:var(--g-600)}
 .sig img{max-height:30px;max-width:120px}
-.empty{padding:16px;border:1px dashed var(--border-med);border-radius:10px;color:var(--g-500);font-size:13.5px}
+.empty{padding:16px;border:1px dashed var(--border-med);border-radius:8px;color:var(--g-500);font-size:13.5px}
 /* ── คาบเรียน ── */
-.ses{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start}
+.ses{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start}
 @media(max-width:860px){ .ses{grid-template-columns:1fr} }
 .qrbox{text-align:center}
-.qrbox #qr{display:inline-block;padding:12px;background:#fff;border-radius:10px;border:1px solid var(--border-light)}
+.qrbox #qr{display:inline-block;padding:12px;background:#fff;border-radius:8px;border:1px solid var(--border-light)}
 .qrbox #qr img,.qrbox #qr canvas{display:block;width:240px;height:240px}
-.qrbox .cnt{font-size:34px;font-weight:700;font-family:var(--font-display);margin-top:10px}
-.det{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px 16px;margin-bottom:14px}
-.det div span{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--g-500)}
+.qrbox .cnt{font-size:34px;font-weight:600;font-family:var(--font-display);margin-top:8px}
+.det{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px 16px;margin-bottom:12px}
+.det div span{display:block;font-size:11px;color:var(--g-500)}
 .det div b{font-size:14px}
 .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .pad{border:1px dashed var(--border-med);border-radius:8px;background:#fff;touch-action:none;width:100%;max-width:420px;height:150px}
 /* เต็มจอ — ให้ทั้งห้องสแกนได้จากโปรเจกเตอร์ */
-#full{position:fixed;inset:0;background:#fff;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:20px;text-align:center}
+#full{position:fixed;inset:0;background:#fff;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px;text-align:center}
 #full .qr2 img,#full .qr2 canvas{width:min(70vh,80vw);height:min(70vh,80vw)}
 #full h2{font-size:24px;font-family:var(--font-display)} #full p{color:var(--g-600)}
-#full .n{font-size:42px;font-weight:700}
-.gtag{display:inline-block;font-size:10.5px;font-weight:600;color:#9a6700;background:#fff4d6;border:1px solid #f0d28a;border-radius:99px;padding:0 7px;margin-left:5px;vertical-align:1px}
+#full .n{font-size:42px;font-weight:600}
+.gtag{display:inline-block;font-size:10.5px;font-weight:600;color:#9a6700;background:#fff4d6;border:1px solid #f0d28a;border-radius:8px;padding:0 8px;margin-left:4px;vertical-align:1px}
 </style>
 </head><body>
 @@TOPBAR@@

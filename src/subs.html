@@ -10,28 +10,28 @@
    หน้างานของฉันตอบได้เฉพาะใบที่ส่งถึงเราหรือเราส่งเอง ส่วนใบที่จบตั้งแต่ขั้นแรก
    (ผู้โดยสารเซ็น PWR) ไม่สร้างงานให้ใครเลย จึงไม่เคยโผล่ที่ใดในระบบก่อนมีหน้านี้
    ผู้ดูแลระบบเท่านั้นที่เปิดได้ เพราะเห็นใบของทุกฝ่ายรวมถึงรายงานนิรภัย */
-.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:4px 0 18px}
-.tile{background:var(--surface);border:1px solid var(--border-light);border-radius:10px;padding:12px 14px;
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:4px 0 16px}
+.tile{background:var(--surface);border:1px solid var(--border-light);border-radius:8px;padding:12px 12px;
   cursor:pointer;text-align:left;font-family:inherit}
 .tile:hover{border-color:var(--navy-900)}
 .tile[aria-pressed="true"]{border-color:var(--navy-900);box-shadow:inset 0 0 0 1px var(--navy-900)}
 .tile b{display:block;font-family:var(--font-display);font-size:24px;line-height:1.1}
-.tile span{display:block;font-size:12px;color:var(--g-500);margin-top:3px}
+.tile span{display:block;font-size:12px;color:var(--g-500);margin-top:4px}
 .bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
-.bar input,.bar select{min-height:38px;padding:0 11px;border-radius:8px;border:1px solid var(--border-med);
+.bar input,.bar select{min-height:38px;padding:0 12px;border-radius:8px;border:1px solid var(--border-med);
   background:var(--surface);color:var(--fg-1);font-family:inherit;font-size:13.5px}
 .bar input{flex:1;min-width:190px}
-.twrap{overflow-x:auto;border:1px solid var(--border-light);border-radius:10px;background:var(--surface)}
+.twrap{overflow-x:auto;border:1px solid var(--border-light);border-radius:8px;background:var(--surface)}
 table.subs{width:100%;border-collapse:collapse;font-size:13.5px}
-table.subs th{text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--g-500);
-  padding:10px 12px;border-bottom:1px solid var(--border-light);white-space:nowrap}
-table.subs td{padding:10px 12px;border-bottom:1px solid var(--g-100);vertical-align:top}
+table.subs th{text-align:left;font-size:11px;color:var(--g-500);
+  padding:8px 12px;border-bottom:1px solid var(--border-light);white-space:nowrap}
+table.subs td{padding:8px 12px;border-bottom:1px solid var(--g-100);vertical-align:top}
 table.subs tr:last-child td{border-bottom:0}
 table.subs .mono{font-family:var(--font-mono);font-size:11.5px}
 table.subs .nm{font-weight:600}
-table.subs .b{display:flex;gap:6px;justify-content:flex-end;white-space:nowrap}
+table.subs .b{display:flex;gap:4px;justify-content:flex-end;white-space:nowrap}
 table.subs .b a{text-decoration:none}
-.st{display:inline-flex;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;white-space:nowrap}
+.st{display:inline-flex;font-size:11px;font-weight:600;padding:2px 8px;border-radius:8px;white-space:nowrap}
 .st.wait{background:var(--amber-100);color:var(--amber-600)}
 .st.ok{background:var(--green-100);color:var(--green-600)}
 .st.no{background:var(--red-100);color:var(--red-600)}
@@ -39,29 +39,29 @@ table.subs .b a{text-decoration:none}
 .nx{font-size:12.5px;line-height:1.5}
 .nx b{font-weight:600}
 .nx span{color:var(--g-500)}
-.empty{padding:16px;border:1px dashed var(--border-med);border-radius:10px;color:var(--g-500);font-size:13.5px}
+.empty{padding:16px;border:1px dashed var(--border-med);border-radius:8px;color:var(--g-500);font-size:13.5px}
 @media(max-width:820px){ table.subs .hide-s{display:none} }
 
 dialog#act{border:0;border-radius:12px;padding:0;max-width:560px;width:calc(100% - 28px);margin:auto;
   background:var(--surface);color:var(--fg-1);box-shadow:var(--sh-lg)}
 dialog#act::backdrop{background:rgba(13,27,42,.5)}
-dialog#act .dh{background:var(--navy-900);color:#fff;padding:15px 20px}
+dialog#act .dh{background:var(--navy-900);color:#fff;padding:16px 20px}
 dialog#act .dh h3{margin:0;font-size:17px;color:#fff}
-dialog#act .dh p{margin:3px 0 0;font-size:12.5px;color:rgba(255,255,255,.72);font-family:var(--font-mono)}
+dialog#act .dh p{margin:4px 0 0;font-size:12.5px;color:rgba(255,255,255,.72);font-family:var(--font-mono)}
 dialog#act .db{padding:16px 20px;max-height:66vh;overflow:auto}
 dialog#act .df{padding:12px 20px;border-top:1px solid var(--g-100);display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
-dialog#act label{display:block;font-size:12.5px;color:var(--g-600);margin:12px 0 5px}
+dialog#act label{display:block;font-size:12.5px;color:var(--g-600);margin:12px 0 4px}
 dialog#act textarea{width:100%;min-height:74px;border:1px solid var(--border-med);border-radius:8px;
-  padding:9px 11px;font-family:inherit;font-size:13.5px;background:var(--surface);color:var(--fg-1)}
+  padding:8px 12px;font-family:inherit;font-size:13.5px;background:var(--surface);color:var(--fg-1)}
 .kinds{display:grid;gap:8px}
-.kind{text-align:left;border:1px solid var(--border-med);border-radius:9px;padding:10px 12px;
+.kind{text-align:left;border:1px solid var(--border-med);border-radius:8px;padding:8px 12px;
   background:var(--surface);cursor:pointer;font-family:inherit}
 .kind b{display:block;font-size:13.5px}
 .kind span{display:block;font-size:12px;color:var(--g-500);margin-top:2px;line-height:1.5}
 .kind[aria-pressed="true"]{border-color:var(--navy-900);box-shadow:inset 0 0 0 1px var(--navy-900)}
-.pick{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px}
+.pick{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
 .pick button{border:1px solid var(--border-med);border-radius:8px;background:var(--surface);cursor:pointer;
-  padding:8px 11px;font-family:inherit;font-size:13px}
+  padding:8px 12px;font-family:inherit;font-size:13px}
 .pick button[aria-pressed="true"]{border-color:var(--navy-900);box-shadow:inset 0 0 0 1px var(--navy-900)}
 </style>
 </head><body>
@@ -70,7 +70,7 @@ dialog#act textarea{width:100%;min-height:74px;border:1px solid var(--border-med
 @@RAIL@@
   <main class="main">
     <div class="greet"><div>
-      <p class="eyebrow">ใบที่ส่งเข้ามา · SUBMITTED RECORDS</p>
+      <p class="eyebrow">ใบที่ส่งเข้ามา · Submitted records</p>
       <h1>ใบที่ส่งเข้ามา</h1>
       <p class="sub">ใบทุกฟอร์มที่ส่งเข้าระบบ บอกว่าตอนนี้อยู่กับใครและไปต่อทางไหน
         รวมใบที่จบตั้งแต่ขั้นแรกและใบที่คนนอกกรอก (ผู้โดยสาร · ผู้รายงานนิรภัย) ซึ่งไม่ได้สร้างงานให้ใคร</p></div></div>

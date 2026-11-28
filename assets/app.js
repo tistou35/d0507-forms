@@ -501,7 +501,7 @@
     signOut:    { th: 'ออก', en: 'Sign out' },
     signOutSub: { th: 'Sign out', en: 'ออกจากระบบ' },
     noRole:     { th: 'ยังไม่ได้กำหนดบทบาท', en: 'No role assigned yet' },
-    helpTitle:  { th: 'ไม่รู้ว่าต้องใช้ฟอร์มไหน?', en: 'Not sure which form you need?' },
+    helpTitle:  { th: 'หาฟอร์มที่ต้องใช้', en: 'Finding the right form' },
     helpBody:   { th: 'พิมพ์สิ่งที่อยากทำในช่องค้นหา ระบบจะหาให้ข้ามทุกระบบ',
                   en: 'Type what you want to do in the search box — it looks across every system.' },
     notFound:   { th: 'ไม่พบฟอร์มนี้', en: 'Form not found' },
@@ -573,13 +573,12 @@
 
     /* หน้าหลัก — เดิมเขียนเป็นข้อความไทยตรง ๆ ใน home.html ปุ่มสลับภาษา
        จึงเปลี่ยนได้แต่เมนู เนื้อหากลางหน้ายังเป็นไทยหมด */
-    hiName:     { th: n => 'สวัสดี ' + n + ' — วันนี้ต้องทำอะไร?',
-                  en: n => 'Hello ' + n + ' — what do you need today?' },
-    hiAnon:     { th: 'จะทำอะไรวันนี้?', en: 'What do you need today?' },
+    hiName:     { th: n => 'ฟอร์มและงานของคุณ', en: n => 'Your forms and tasks' },
+    hiAnon:     { th: 'ฟอร์มที่กรอกได้ทันที', en: 'Forms you can fill in now' },
     subStaff:   { th: 'ค้นหาฟอร์ม เปิดงานที่รออยู่ หรือดูทะเบียนเอกสาร',
-                  en: 'Search forms, open what is waiting on you, or read the register.' },
+                  en: 'Search forms, open what is waiting on you, or read the register' },
     subAnon:    { th: 'เลือกฟอร์มที่ต้องการได้เลย — ไม่ต้องเข้าสู่ระบบ',
-                  en: 'Pick the form you need — no sign-in required.' },
+                  en: 'Pick the form you need — no sign-in required' },
     allBtnN:    { th: n => 'ดูฟอร์มทั้งหมด ' + n + ' ฟอร์ม', en: n => 'See all ' + n + ' forms' },
     qPhStaff:   { th: 'เช่น ‘ต้องยื่นแผนการบิน’ · ชื่อฟอร์ม หรือรหัสเอกสาร',
                   en: 'e.g. “file a flight plan” · form name or doc code' },

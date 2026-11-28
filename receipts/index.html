@@ -1,64 +1,64 @@
 <!DOCTYPE html><html lang="th"><head>
-<meta name="d0507-build" content="55b631debc04"><meta charset="UTF-8">
+<meta name="d0507-build" content="6e88b8895736"><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>ใบเสร็จของฉัน — D-0507 Flight Training</title>
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="../assets/app.css?v=b273bda9">
+<link rel="stylesheet" href="../assets/app.css?v=e09aed9b">
 <style>
-.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px 14px}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px 12px}
 .g label{display:block;font-size:13px;font-weight:600}
 .g .full{grid-column:1/-1}
-.g input,.g select{width:100%;margin-top:4px;min-height:40px;padding:0 11px;border-radius:8px;
+.g input,.g select{width:100%;margin-top:4px;min-height:40px;padding:0 12px;border-radius:8px;
   border:1px solid var(--border-med);background:var(--surface);font-size:14px;font-family:inherit}
-.g input[type=checkbox]{width:auto;min-height:0;margin:0 6px 0 0}
+.g input[type=checkbox]{width:auto;min-height:0;margin:0 4px 0 0}
 .rq{color:var(--red-600)}
 .msg{font-size:12.5px;color:var(--g-500)} .msg.bad{color:var(--red-600)} .msg.ok{color:var(--green-600)}
 .hide{display:none!important}
-.bar{display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin:14px 0}
+.bar{display:flex;gap:8px;align-items:end;flex-wrap:wrap;margin:12px 0}
 .bar label{font-size:12.5px;font-weight:600;display:block}
-.bar select,.bar input{margin-top:4px;min-height:38px;padding:0 10px;border-radius:8px;border:1px solid var(--border-med);
+.bar select,.bar input{margin-top:4px;min-height:38px;padding:0 8px;border-radius:8px;border:1px solid var(--border-med);
   background:var(--surface);font-family:inherit;font-size:14px}
-.sum{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 12px}
-.sum div{background:var(--surface);border:1px solid var(--border-light);border-radius:10px;padding:8px 14px}
+.sum{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 12px}
+.sum div{background:var(--surface);border:1px solid var(--border-light);border-radius:8px;padding:8px 12px}
 .sum b{display:block;font-size:20px;font-family:var(--font-display)} .sum span{font-size:12px;color:var(--g-500)}
-.twrap{overflow-x:auto;border:1px solid var(--border-light);border-radius:10px;background:var(--surface)}
+.twrap{overflow-x:auto;border:1px solid var(--border-light);border-radius:8px;background:var(--surface)}
 table.ml{width:100%;border-collapse:collapse;font-size:13.5px}
-table.ml th{text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--g-500);
-  padding:9px 12px;border-bottom:1px solid var(--border-light);white-space:nowrap;background:var(--g-50)}
-table.ml td{padding:8px 10px;border-bottom:1px solid var(--g-100);vertical-align:middle}
+table.ml th{text-align:left;font-size:11px;color:var(--g-500);
+  padding:8px 12px;border-bottom:1px solid var(--border-light);white-space:nowrap;background:var(--g-50)}
+table.ml td{padding:8px 8px;border-bottom:1px solid var(--g-100);vertical-align:middle}
 table.ml td.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 table.ml tr:last-child td{border-bottom:0}
-.st{display:inline-flex;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;white-space:nowrap}
+.st{display:inline-flex;font-size:11px;font-weight:600;padding:2px 8px;border-radius:8px;white-space:nowrap}
 .st.draft{background:var(--g-100);color:var(--g-600)} .st.claimed{background:var(--sky-100);color:var(--navy-900)}
 .st.posted{background:var(--green-100);color:var(--green-600)}
 .st.review{background:var(--amber-100,#fef3c7);color:#92400e} .st.ok{background:var(--green-100);color:var(--green-600)}
 .st.returned{background:var(--red-100,#fee2e2);color:var(--red-600)} .st.income{background:#ede9fe;color:#5b21b6}
-.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border-light);margin:4px 0 6px;overflow-x:auto}
-.tabs button{border:0;background:none;padding:10px 14px;font:inherit;font-size:14px;font-weight:600;color:var(--g-500);
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border-light);margin:4px 0 4px;overflow-x:auto}
+.tabs button{border:0;background:none;padding:8px 12px;font:inherit;font-size:14px;font-weight:600;color:var(--g-500);
   border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap}
 .tabs button.on{color:var(--navy-900);border-bottom-color:var(--navy-900)}
-.tabs .cnt{display:inline-block;min-width:18px;padding:0 5px;margin-left:4px;border-radius:99px;background:var(--red-600);color:#fff;font-size:11px}
-.bulk{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0;padding:8px 10px;border:1px solid var(--border-light);
-  border-radius:10px;background:var(--g-50);font-size:13px}
-.bulk button{font-size:13px;padding:6px 12px;border-radius:8px;border:1px solid var(--border-med);background:var(--surface);cursor:pointer}
+.tabs .cnt{display:inline-block;min-width:18px;padding:0 4px;margin-left:4px;border-radius:8px;background:var(--red-600);color:#fff;font-size:11px}
+.bulk{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0;padding:8px 8px;border:1px solid var(--border-light);
+  border-radius:8px;background:var(--g-50);font-size:13px}
+.bulk button{font-size:13px;padding:4px 12px;border-radius:8px;border:1px solid var(--border-med);background:var(--surface);cursor:pointer}
 .bulk button.pri{background:var(--navy-900);color:#fff;border-color:var(--navy-900)}
 .bulk button:disabled{opacity:.45;cursor:default}
-.why{margin-top:4px;padding:6px 9px;border-radius:7px;background:var(--red-100,#fee2e2);color:var(--red-600);font-size:12.5px}
+.why{margin-top:4px;padding:4px 8px;border-radius:8px;background:var(--red-100,#fee2e2);color:var(--red-600);font-size:12.5px}
 .why.inc{background:#ede9fe;color:#5b21b6}
 table.ml td.ck{width:28px} table.ml input[type=checkbox]{width:16px;height:16px}
 pre.pl{font-size:11.5px;background:var(--g-50);border:1px solid var(--border-light);border-radius:8px;padding:8px;
-  white-space:pre-wrap;word-break:break-word;text-align:left;margin:6px 0 0;max-height:260px;overflow:auto}
-.grp{margin:14px 0 6px;font-size:13.5px} .grp b{font-size:14.5px}
+  white-space:pre-wrap;word-break:break-word;text-align:left;margin:4px 0 0;max-height:260px;overflow:auto}
+.grp{margin:12px 0 4px;font-size:13.5px} .grp b{font-size:14.5px}
 #ask{max-width:min(520px,94vw);border:0;border-radius:12px;padding:16px}
-#ask textarea,#ask select{width:100%;margin-top:6px;border:1px solid var(--border-med);border-radius:8px;padding:8px;font:inherit;font-size:14px}
+#ask textarea,#ask select{width:100%;margin-top:4px;border:1px solid var(--border-med);border-radius:8px;padding:8px;font:inherit;font-size:14px}
 #ask textarea{min-height:90px}
-.acts2{display:flex;gap:6px;flex-wrap:wrap}
-.acts2 button{font-size:12.5px;padding:4px 10px;border-radius:7px;border:1px solid var(--border-med);background:var(--surface);cursor:pointer}
-.empty{padding:16px;border:1px dashed var(--border-med);border-radius:10px;color:var(--g-500);font-size:13.5px}
+.acts2{display:flex;gap:4px;flex-wrap:wrap}
+.acts2 button{font-size:12.5px;padding:4px 8px;border-radius:8px;border:1px solid var(--border-med);background:var(--surface);cursor:pointer}
+.empty{padding:16px;border:1px dashed var(--border-med);border-radius:8px;color:var(--g-500);font-size:13.5px}
 .pv{margin-top:8px;max-width:260px} .pv img{max-width:100%;border-radius:8px;border:1px solid var(--border-light)}
 #dlg{max-width:min(920px,96vw);width:96vw;border:0;border-radius:12px;padding:0}
-#dlg .hd{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border-light)}
-#dlg .bd{padding:10px;max-height:80vh;overflow:auto;text-align:center}
+#dlg .hd{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;border-bottom:1px solid var(--border-light)}
+#dlg .bd{padding:8px;max-height:80vh;overflow:auto;text-align:center}
 #dlg .bd img{max-width:100%} #dlg .bd iframe{width:100%;height:75vh;border:0}
 </style>
 </head><body>
@@ -133,7 +133,7 @@ pre.pl{font-size:11.5px;background:var(--g-50);border:1px solid var(--border-lig
 
   <div class="railfoot">
     <svg class="q" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9.2"/><path d="M9.4 9.2a2.7 2.7 0 1 1 3.4 2.6c-.6.2-.8.7-.8 1.3v.6"/><circle cx="12" cy="17" r=".9" fill="currentColor" stroke="none"/></svg>
-    <b data-t="helpTitle">ไม่รู้ว่าต้องใช้ฟอร์มไหน?</b>
+    <b data-t="helpTitle">หาฟอร์มที่ต้องใช้</b>
     <p data-t="helpBody">พิมพ์สิ่งที่อยากทำในช่องค้นหา ระบบจะหาให้ข้ามทุกระบบ</p>
   </div>
 </nav>
@@ -170,7 +170,7 @@ pre.pl{font-size:11.5px;background:var(--g-50);border:1px solid var(--border-lig
           <div class="full">
             <label>รูปใบเสร็จ หรือ PDF <span class="rq">*</span></label>
             <div class="acts2" style="margin-top:6px">
-              <button type="button" id="camBtn">📷 ถ่ายรูป</button>
+              <button type="button" id="camBtn"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3"/></svg>ถ่ายรูป</button>
               <button type="button" id="fileBtn">เลือกไฟล์</button>
               <span class="msg" id="fileMsg"></span>
             </div>
@@ -259,7 +259,7 @@ pre.pl{font-size:11.5px;background:var(--g-50);border:1px solid var(--border-lig
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="../assets/app.js?v=28d94290"></script>
+<script src="../assets/app.js?v=fc6cd7bb"></script>
 <script>D0507.GAS_URL='https://script.google.com/macros/s/AKfycby7rFFVxd92wPImX4m8pv8nHqTrK3Iq0O32A34844DAg1rP8N3RfgKEyGvAUkQu-NXd/exec';</script>
 <script>
 "use strict";

@@ -1,102 +1,102 @@
 <!DOCTYPE html><html lang="th"><head>
-<meta name="d0507-build" content="cd4074aaa301"><meta charset="UTF-8">
+<meta name="d0507-build" content="c150ec37b180"><meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>บันทึกข้อความ — D-0507 Flight Training</title>
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="../assets/app.css?v=b273bda9">
+<link rel="stylesheet" href="../assets/app.css?v=e09aed9b">
 <style>
 /* ── หน้ารายการ ── */
-.twrap{overflow-x:auto;border:1px solid var(--border-light);border-radius:10px;background:var(--surface)}
+.twrap{overflow-x:auto;border:1px solid var(--border-light);border-radius:8px;background:var(--surface)}
 table.ml{width:100%;border-collapse:collapse;font-size:13.5px}
-table.ml th{text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--g-500);
-  padding:9px 12px;border-bottom:1px solid var(--border-light);white-space:nowrap;background:var(--g-50)}
-table.ml td{padding:9px 12px;border-bottom:1px solid var(--g-100);vertical-align:top}
+table.ml th{text-align:left;font-size:11px;color:var(--g-500);
+  padding:8px 12px;border-bottom:1px solid var(--border-light);white-space:nowrap;background:var(--g-50)}
+table.ml td{padding:8px 12px;border-bottom:1px solid var(--g-100);vertical-align:top}
 table.ml tbody tr[data-id]{cursor:pointer} table.ml tbody tr[data-id]:hover{background:var(--sky-100)}
 table.ml tr:last-child td{border-bottom:0}
 .mono{font-family:var(--font-mono);font-size:11.5px;white-space:nowrap}
-.st{display:inline-flex;font-size:11px;font-weight:700;padding:2px 9px;border-radius:99px;white-space:nowrap}
+.st{display:inline-flex;font-size:11px;font-weight:600;padding:2px 8px;border-radius:8px;white-space:nowrap}
 .st.draft{background:var(--g-100);color:var(--g-600)} .st.submitted,.st.proposed{background:var(--amber-100);color:var(--amber-600)}
 .st.issued{background:var(--green-100);color:var(--green-600)} .st.returned,.st.declined{background:var(--red-100);color:var(--red-600)}
 .st.recorded{background:var(--sky-100);color:var(--navy-900)}
 .st.cancelled,.st.superseded,.st.expired{background:var(--g-100);color:var(--g-500);text-decoration:line-through}
-.empty{padding:16px;border:1px dashed var(--border-med);border-radius:10px;color:var(--g-500);font-size:13.5px}
+.empty{padding:16px;border:1px dashed var(--border-med);border-radius:8px;color:var(--g-500);font-size:13.5px}
 /* ── ฟอร์ม ── */
-.mf{display:grid;grid-template-columns:1fr 1fr;gap:14px 18px}
+.mf{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px}
 .mf .full{grid-column:1/-1}
-.mf label{display:block;font-size:12.5px;color:var(--g-600);margin-bottom:5px}
+.mf label{display:block;font-size:12.5px;color:var(--g-600);margin-bottom:4px}
 .mf input[type=text],.mf input[type=date],.mf input[type=url],.mf input[type=file],.mf select,.mf textarea{width:100%;min-height:40px;
-  padding:8px 11px;border-radius:8px;border:1px solid var(--border-med);background:var(--surface);
+  padding:8px 12px;border-radius:8px;border:1px solid var(--border-med);background:var(--surface);
   color:var(--fg-1);font-family:inherit;font-size:14px}
 .mf textarea{min-height:160px;line-height:1.5}
 .mf .hint,.hint{font-size:12px;color:var(--g-500);margin-top:4px}
-.ck{display:flex;gap:9px;align-items:flex-start;font-size:14px}
+.ck{display:flex;gap:8px;align-items:flex-start;font-size:14px}
 .ck input{width:17px;height:17px;margin-top:2px}
-.calc{background:var(--g-50);border-radius:8px;padding:9px 11px;font-family:var(--font-mono);font-size:13px;min-height:40px}
-.sect{grid-column:1/-1;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--g-500);
+.calc{background:var(--g-50);border-radius:8px;padding:8px 12px;font-family:var(--font-mono);font-size:13px;min-height:40px}
+.sect{grid-column:1/-1;font-size:11px;color:var(--g-500);
   border-top:1px solid var(--border-light);padding-top:12px;margin-top:4px}
 @media(max-width:700px){ .mf{grid-template-columns:1fr} }
 /* ── ตัวหนังสือบนจอ (ใกล้เคียง PDF — ฉบับจริงคือ PDF) ── */
-.letter{background:#fff;color:#111;border:1px solid var(--border-light);border-radius:6px;padding:40px 48px;
+.letter{background:#fff;color:#111;border:1px solid var(--border-light);border-radius:4px;padding:40px 48px;
   max-width:820px;font-size:14px;line-height:1.55}
 .letter.f-Helvetica,.letter.f-Arial{font-family:Helvetica,Arial,sans-serif}
 .letter.f-Courier{font-family:"Courier New",Courier,monospace;font-size:13px}
-.letter .org{text-align:center;font-weight:700;letter-spacing:.04em;font-size:15px}
+.letter .org{text-align:center;font-weight:600;letter-spacing:.04em;font-size:15px}
 .letter .org2{text-align:center;font-size:12px;color:#444}
-.letter h2{text-align:center;font-size:18px;letter-spacing:.12em;margin:18px 0 14px;font-family:inherit}
+.letter h2{text-align:center;font-size:18px;margin:16px 0 12px;font-family:inherit}
 .letter table.hd{width:100%;border-collapse:collapse;margin-bottom:16px;font-size:13px}
 .letter table.hd td{padding:4px 8px;border:1px solid #bbb;vertical-align:top}
-.letter table.hd td.k{width:22%;font-weight:700;background:#f4f4f4}
-.letter .retro{border:2px solid #b45309;background:#fff7ed;padding:10px 12px;margin:10px 0 14px;font-size:12.5px}
-.letter ol{padding-left:22px} .letter li{margin-bottom:8px}
+.letter table.hd td.k{width:22%;font-weight:600;background:#f4f4f4}
+.letter .retro{border:2px solid #b45309;background:#fff7ed;padding:8px 12px;margin:8px 0 12px;font-size:12.5px}
+.letter ol{padding-left:20px} .letter li{margin-bottom:8px}
 .letter .val{margin:12px 0;font-size:13px}
-.letter .note{font-style:italic;font-size:12.5px;margin-top:10px}
-.letter .sig{margin-top:26px}
+.letter .note{font-style:italic;font-size:12.5px;margin-top:8px}
+.letter .sig{margin-top:24px}
 .letter .sig img{max-height:64px;display:block}
 .letter .sig .ln{border-top:1px solid #333;width:260px;margin-top:4px;padding-top:4px;font-size:13px}
-.letter .stamp{font-size:11px;color:#555;margin-top:6px}
-.letter .draftmark{color:#b91c1c;font-weight:700;text-align:center;letter-spacing:.2em;margin-bottom:8px}
-.letter .endo{margin-top:22px}
-.letter .dirs{margin-top:22px} .letter .dirs h4{font-size:12.5px;letter-spacing:.04em;margin-bottom:6px}
-.letter .dirs .dg{display:grid;grid-template-columns:1fr 1fr;gap:14px 24px}
+.letter .stamp{font-size:11px;color:#555;margin-top:4px}
+.letter .draftmark{color:#b91c1c;font-weight:600;text-align:center;margin-bottom:8px}
+.letter .endo{margin-top:20px}
+.letter .dirs{margin-top:20px} .letter .dirs h4{font-size:12.5px;letter-spacing:.04em;margin-bottom:4px}
+.letter .dirs .dg{display:grid;grid-template-columns:1fr 1fr;gap:12px 24px}
 .letter .dirs img{height:40px;max-width:150px;display:block} .letter .dirs .sp{height:40px}
 .letter .dirs .ln{border-top:1px solid #333;padding-top:4px;font-size:12.5px;width:230px}
-.dirrow{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1.2fr) minmax(0,1fr) 150px 38px;gap:6px;margin-bottom:6px}
+.dirrow{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1.2fr) minmax(0,1fr) 150px 38px;gap:4px;margin-bottom:4px}
 .dirrow input,.dirrow select{min-height:38px}
 @media(max-width:760px){ .dirrow{grid-template-columns:1fr} }
 .letter .endo img{max-width:100%;display:block}
-.acts2{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0;align-items:center}
+.acts2{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0;align-items:center}
 .pad{border:1px dashed var(--border-med);border-radius:8px;background:#fff;touch-action:none;width:100%;max-width:420px;height:150px}
 .savedsig{border:1px solid var(--border-light);border-radius:8px;background:#fff;padding:8px;max-width:420px}
 .savedsig img{max-height:90px;display:block}
-.sigpick{display:flex;gap:18px;flex-wrap:wrap;margin:6px 0 10px}
+.sigpick{display:flex;gap:16px;flex-wrap:wrap;margin:4px 0 8px}
 /* ── วางบล็อกสั่งการบนหน้ากระดาษ ── */
 .stage{position:relative;display:inline-block;border:1px solid var(--border-med);background:#fff;max-width:100%;
   box-shadow:0 2px 10px rgba(0,0,0,.08);touch-action:none}
 .stage canvas.pg{display:block;max-width:100%;height:auto}
 .stage .blk{position:absolute;cursor:move;outline:2px dashed #2563eb;outline-offset:2px;background:rgba(255,255,255,.55)}
 .stage .blk img{display:block;width:100%;height:auto;pointer-events:none}
-.urow{display:grid;grid-template-columns:28px minmax(0,1.4fr) minmax(0,1fr) minmax(0,1.2fr) auto;gap:6px;align-items:center;margin-bottom:6px}
-.urow .uno{font-family:var(--font-mono);font-weight:700;text-align:center}
+.urow{display:grid;grid-template-columns:28px minmax(0,1.4fr) minmax(0,1fr) minmax(0,1.2fr) auto;gap:4px;align-items:center;margin-bottom:4px}
+.urow .uno{font-family:var(--font-mono);font-weight:600;text-align:center}
 .urow .uact{display:flex;gap:4px}
 @media (max-width:720px){ .urow{grid-template-columns:28px 1fr} .urow>select,.urow>input,.urow .uact{grid-column:2} }
 .ustate{display:grid;gap:8px}
-.pgnav{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0 0 8px}
-.pgnav button{padding:4px 12px;border:1px solid var(--border-med);border-radius:6px;background:#fff;cursor:pointer;font:inherit;font-size:13px}
+.pgnav{display:flex;gap:4px;flex-wrap:wrap;align-items:center;margin:0 0 8px}
+.pgnav button{padding:4px 12px;border:1px solid var(--border-med);border-radius:4px;background:#fff;cursor:pointer;font:inherit;font-size:13px}
 .pgnav button[aria-pressed="true"]{background:#1e3a8a;border-color:#1e3a8a;color:#fff}
 .endogrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:20px;align-items:start}
 @media(max-width:900px){ .endogrid{grid-template-columns:1fr} }
 /* ── การ์ดประเภท · ผู้รับ ── */
-.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-bottom:6px}
-.tcard{display:flex;flex-direction:column;gap:4px;padding:12px 14px;border:1px solid var(--border-light);border-radius:10px;
+.tgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;margin-bottom:4px}
+.tcard{display:flex;flex-direction:column;gap:4px;padding:12px 12px;border:1px solid var(--border-light);border-radius:8px;
   background:var(--surface);color:var(--fg-1);text-decoration:none}
 .tcard:hover{border-color:var(--navy-900)}
 .tcard .tc{font-family:var(--font-mono);font-size:11px;color:var(--g-500)}
-.tcard .tc i{font-style:normal;background:var(--sky-100);color:var(--navy-900);border-radius:99px;padding:1px 7px;margin-left:4px}
+.tcard .tc i{font-style:normal;background:var(--sky-100);color:var(--navy-900);border-radius:8px;padding:1px 8px;margin-left:4px}
 .tcard .tc i.o{background:var(--g-100);color:var(--g-600)}
 .tcard b{font-size:14px} .tcard .td{font-size:12px;color:var(--g-500);line-height:1.45}
-.rgrp{display:flex;flex-wrap:wrap;gap:8px 18px}
-.rchips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
-.chip{display:inline-flex;align-items:center;gap:4px;background:var(--g-100);border-radius:99px;padding:2px 4px 2px 10px;font-size:12.5px}
+.rgrp{display:flex;flex-wrap:wrap;gap:8px 16px}
+.rchips{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.chip{display:inline-flex;align-items:center;gap:4px;background:var(--g-100);border-radius:8px;padding:2px 4px 2px 8px;font-size:12.5px}
 .chip button{border:0;background:none;cursor:pointer;font-size:14px;color:var(--g-500);padding:0 4px}
 @media print{ .noprint,header,nav,footer,.rail,.botnav{display:none!important} .letter{border:0;padding:0} }
 </style>
@@ -172,13 +172,13 @@ table.ml tr:last-child td{border-bottom:0}
 
   <div class="railfoot">
     <svg class="q" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9.2"/><path d="M9.4 9.2a2.7 2.7 0 1 1 3.4 2.6c-.6.2-.8.7-.8 1.3v.6"/><circle cx="12" cy="17" r=".9" fill="currentColor" stroke="none"/></svg>
-    <b data-t="helpTitle">ไม่รู้ว่าต้องใช้ฟอร์มไหน?</b>
+    <b data-t="helpTitle">หาฟอร์มที่ต้องใช้</b>
     <p data-t="helpBody">พิมพ์สิ่งที่อยากทำในช่องค้นหา ระบบจะหาให้ข้ามทุกระบบ</p>
   </div>
 </nav>
   <main class="main">
     <div class="greet noprint"><div>
-      <p class="eyebrow">บันทึกข้อความภายใน · INTERNAL MEMORANDUM</p>
+      <p class="eyebrow">บันทึกข้อความภายใน · Internal memorandum</p>
       <h1 id="h1">บันทึกข้อความ</h1>
       <p class="sub" id="sub">ผู้เสนอลงนาม → ออกเลขและวันที่ออก · ผู้รับทราบ/สั่งการลงนามและวางบล็อกสั่งการบนหน้ากระดาษ · วันที่ออกคือเวลาที่ลงนามจริง แก้ไม่ได้ · ห้ามลบ</p></div></div>
     <div id="gate"></div>
@@ -203,7 +203,7 @@ table.ml tr:last-child td{border-bottom:0}
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="../assets/app.js?v=28d94290"></script>
+<script src="../assets/app.js?v=fc6cd7bb"></script>
 <script>D0507.GAS_URL='https://script.google.com/macros/s/AKfycby7rFFVxd92wPImX4m8pv8nHqTrK3Iq0O32A34844DAg1rP8N3RfgKEyGvAUkQu-NXd/exec';</script>
 <script>
 "use strict";
@@ -788,7 +788,7 @@ function letterHtml(m){
   return `<div class="letter f-${esc(m.font||'Helvetica')}">
     ${numbered?'':later&&psig?'<div class="draftmark">NOT YET NUMBERED OR DATED</div>':'<div class="draftmark">DRAFT — NOT ISSUED</div>'}
     ${m.test?'<div class="draftmark">TEST — NOT A VALID MEMORANDUM</div>':''}
-    <div class="org">D-0507 FLIGHT TRAINING CO., LTD.</div>
+    <div class="org">D-0507 Flight Training Co., Ltd.</div>
     <div class="org2">Approved Training Organisation</div>
     <h2>INTERNAL MEMORANDUM</h2>
     <table class="hd">
